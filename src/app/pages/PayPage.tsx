@@ -6,6 +6,9 @@ import imgFrame37 from "../../imports/LandingPage/da31c95f5bc0f013c26804882654e4
 const SUPABASE_FUNCTIONS_URL = "https://vuywydhwkqmihfztpkgl.supabase.co/functions/v1";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1eXd5ZGh3a3FtaWhmenRwa2dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NTkxMjAsImV4cCI6MjA1OTQzNTEyMH0.bG0GfCEMbMBqPOMtkFDAiFjKQMqFVLHGe3bTG-hsaMA";
 const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
+const EXTENSION_ID = "iphkppgbobpilmphloffcalicmejacfl";
+
+type ExtStatus = "detecting" | "not_installed" | "not_logged_in" | "ready";
 
 /* ─── Reusable Icons (same as landing) ─── */
 
@@ -105,22 +108,58 @@ export default function PayPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [extStatus, setExtStatus] = useState<ExtStatus>("detecting");
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    // Read auth token from URL hash: /pay#token=JWT_HERE
+    // 1. Check URL hash first (direct link from extension)
     const hash = window.location.hash.slice(1);
     const params = new URLSearchParams(hash);
-    const t = params.get("token");
-    if (t) {
-      setToken(t);
+    const hashToken = params.get("token");
+    if (hashToken) {
+      setToken(hashToken);
+      setExtStatus("ready");
       window.history.replaceState(null, "", window.location.pathname);
+    } else {
+      // 2. Try to get token from extension via externally_connectable
+      detectExtension();
     }
 
     const handler = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  const detectExtension = () => {
+    try {
+      // chrome.runtime.sendMessage to extension — works only if extension is installed
+      // and has externally_connectable matching this origin
+      const chrome = (window as any).chrome;
+      if (!chrome?.runtime?.sendMessage) {
+        setExtStatus("not_installed");
+        return;
+      }
+      chrome.runtime.sendMessage(
+        EXTENSION_ID,
+        { type: "GET_AUTH_TOKEN" },
+        (response: any) => {
+          if (chrome.runtime.lastError || !response) {
+            // Extension not installed or doesn't respond
+            setExtStatus("not_installed");
+            return;
+          }
+          if (response.token) {
+            setToken(response.token);
+            setExtStatus("ready");
+          } else {
+            setExtStatus("not_logged_in");
+          }
+        }
+      );
+    } catch {
+      setExtStatus("not_installed");
+    }
+  };
 
   const handlePay = async () => {
     if (!token) {
@@ -259,45 +298,88 @@ export default function PayPage() {
                         <PricingFeature text="Поддержка в Telegram" />
                       </div>
                     </div>
-                    <button
-                      onClick={handlePay}
-                      disabled={loading || !token}
-                      className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
-                    >
-                      <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                      {loading ? "Переход к оплате..." : "Оплатить 199₽/мес"}
-                    </button>
+                    {extStatus === "ready" ? (
+                      <button
+                        onClick={handlePay}
+                        disabled={loading}
+                        className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+                      >
+                        <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
+                        {loading ? "Переход к оплате..." : "Оплатить 199₽/мес"}
+                      </button>
+                    ) : (
+                      <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none no-underline">
+                        <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
+                        <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">Попробовать Pro</span>
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
 
             {/* ── Status messages ── */}
-            <div className="flex flex-col gap-[12px] items-center max-w-[500px]">
+            <div className="flex flex-col gap-[16px] items-center max-w-[560px]">
               {error && (
                 <p className="font-['PT_Root_UI',sans-serif] text-[#d4183d] text-[14px] text-center leading-[1.5]">{error}</p>
               )}
 
-              {!token && (
+              {extStatus === "detecting" && (
                 <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] px-[24px] py-[16px] text-center">
                   <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.5)] text-[14px] leading-[1.6]">
-                    Для оплаты Pro перейдите на эту страницу из расширения Opten.
-                    <br />
-                    Ещё не установили?{" "}
-                    <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-[#2777C3] underline">
-                      Скачать бесплатно
-                    </a>
+                    Проверяем расширение Opten...
                   </p>
                 </div>
               )}
 
-              <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.3)] text-[12px] text-center leading-[1.5]">
-                Нажимая «Оплатить», вы принимаете{" "}
-                <Link to="/terms" className="text-[rgba(255,255,255,0.5)] underline">условия оферты</Link>
-                {" "}и{" "}
-                <Link to="/privacy" className="text-[rgba(255,255,255,0.5)] underline">политику конфиденциальности</Link>.
-                {" "}Подписка продлевается автоматически. Отменить можно в любой момент.
-              </p>
+              {extStatus === "not_installed" && (
+                <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] px-[24px] py-[20px] text-center w-full">
+                  <p className="font-['PT_Root_UI',sans-serif] text-white text-[15px] font-medium leading-[1.5] mb-[12px]">
+                    Для оплаты Pro нужно расширение Opten
+                  </p>
+                  <div className="flex flex-col gap-[8px] text-left max-w-[360px] mx-auto">
+                    <div className="flex gap-[10px] items-center">
+                      <span className="text-[#2777C3] text-[14px] font-bold shrink-0 w-[20px] text-center font-['PT_Root_UI',sans-serif]">1</span>
+                      <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.5]">
+                        <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-[#2777C3] underline">Установите расширение</a> из Chrome Web Store
+                      </p>
+                    </div>
+                    <div className="flex gap-[10px] items-center">
+                      <span className="text-[#2777C3] text-[14px] font-bold shrink-0 w-[20px] text-center font-['PT_Root_UI',sans-serif]">2</span>
+                      <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.5]">
+                        Откройте popup и войдите через Google
+                      </p>
+                    </div>
+                    <div className="flex gap-[10px] items-center">
+                      <span className="text-[#2777C3] text-[14px] font-bold shrink-0 w-[20px] text-center font-['PT_Root_UI',sans-serif]">3</span>
+                      <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.5]">
+                        Вернитесь на эту страницу — оплата станет доступна
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {extStatus === "not_logged_in" && (
+                <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] px-[24px] py-[20px] text-center w-full">
+                  <p className="font-['PT_Root_UI',sans-serif] text-white text-[15px] font-medium leading-[1.5] mb-[8px]">
+                    Расширение найдено! Осталось войти в аккаунт.
+                  </p>
+                  <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.6]">
+                    Откройте popup расширения Opten, войдите через Google и обновите эту страницу.
+                  </p>
+                </div>
+              )}
+
+              {extStatus === "ready" && (
+                <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.3)] text-[12px] text-center leading-[1.5]">
+                  Нажимая «Оплатить», вы принимаете{" "}
+                  <Link to="/terms" className="text-[rgba(255,255,255,0.5)] underline">условия оферты</Link>
+                  {" "}и{" "}
+                  <Link to="/privacy" className="text-[rgba(255,255,255,0.5)] underline">политику конфиденциальности</Link>.
+                  {" "}Подписка продлевается автоматически. Отменить можно в любой момент.
+                </p>
+              )}
 
               <div className="flex items-center justify-center gap-[8px]">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
