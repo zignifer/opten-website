@@ -8,6 +8,10 @@ import imgFrame233 from "../imports/LandingPage/643b83f6ac31944ea5c6501794954e84
 import imgFrame234 from "../imports/LandingPage/5d0e2aab408679eb569960b14c42e066e5a20b92.png";
 import imgFrame232 from "../imports/LandingPage/dc7c40ef44dccb75d38f341e5a8e7f03b9d865a4.png";
 import imgFrame37 from "../imports/LandingPage/da31c95f5bc0f013c26804882654e49618ec43c7.png";
+import imgChromeLg from "../imports/LandingPage/chrome-icon-lg.png";
+import imgYandexLg from "../imports/LandingPage/yandex-icon-lg.png";
+import imgChromeSm from "../imports/LandingPage/chrome-icon-sm.png";
+import imgYandexSm from "../imports/LandingPage/yandex-icon-sm.png";
 
 /* ─── Scroll animation hook ─── */
 function useScrollReveal() {
@@ -148,14 +152,54 @@ function StarBullet() {
   );
 }
 
-function InstallButtonWhite({ text = "Установить бесплатно", showIcon = true }: { text?: string; showIcon?: boolean }) {
+const STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
+
+/* Кнопка Hero / Footer — большая, с подписью Chrome / Yandex Browser */
+function InstallButtonLarge() {
   return (
-    <a href="https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl" target="_blank" rel="noopener noreferrer" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none no-underline">
+    <a href={STORE_URL} target="_blank" rel="noopener noreferrer"
+      className="btn-hover bg-white inline-flex gap-[12px] items-center pl-[10px] pr-[24px] py-[10px] rounded-[100px] relative cursor-pointer border-none no-underline">
       <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-      {showIcon && <ChromeIconMed />}
-      <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">{text}</span>
+      {/* Иконки Chrome + Yandex внахлёст */}
+      <div className="flex items-center pr-[8px] shrink-0">
+        <div className="relative shrink-0 size-[40px] z-10">
+          <img alt="Chrome" className="absolute block size-full" src={imgChromeLg} />
+        </div>
+        <div className="relative shrink-0 size-[40px] -ml-[8px]">
+          <img alt="Yandex Browser" className="absolute block size-full" src={imgYandexLg} />
+        </div>
+      </div>
+      <div className="flex flex-col items-start leading-[1.3] text-black whitespace-nowrap">
+        <span className="font-['PT_Root_UI',sans-serif] text-[14px]">Chrome / Yandex Browser</span>
+        <span className="font-['PT_Root_UI',sans-serif] font-bold text-[18px]">Установить бесплатно</span>
+      </div>
     </a>
   );
+}
+
+/* Кнопка для остальных мест — меньше, без подписи */
+function InstallButtonSmall() {
+  return (
+    <a href={STORE_URL} target="_blank" rel="noopener noreferrer"
+      className="btn-hover bg-white inline-flex gap-[12px] items-center px-[24px] py-[16px] rounded-[100px] relative cursor-pointer border-none no-underline">
+      <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
+      {/* Иконки Chrome + Yandex внахлёст */}
+      <div className="flex items-center pr-[8px] shrink-0">
+        <div className="relative shrink-0 size-[32px] z-10">
+          <img alt="Chrome" className="absolute block size-full" src={imgChromeSm} />
+        </div>
+        <div className="relative shrink-0 size-[32px] -ml-[8px]">
+          <img alt="Yandex Browser" className="absolute block size-full" src={imgYandexSm} />
+        </div>
+      </div>
+      <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">Установить бесплатно</span>
+    </a>
+  );
+}
+
+/* Оставляем для совместимости с тарифами */
+function InstallButtonWhite({ text = "Установить бесплатно" }: { text?: string }) {
+  return <InstallButtonSmall />;
 }
 
 function Divider({ width = "100%" }: { width?: string }) {
@@ -268,14 +312,7 @@ function HeroSection() {
           </p>
         </div>
         <div className="mt-[48px]">
-          <a href="https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl" target="_blank" rel="noopener noreferrer" className="btn-hover bg-white flex gap-[22px] items-center pl-[10px] pr-[24px] py-[10px] rounded-[6px] cursor-pointer border-none relative no-underline">
-            <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] inset-0 pointer-events-none rounded-[6px]" />
-            <ChromeIconLg />
-            <div className="flex flex-col items-start leading-[1.3] text-black whitespace-nowrap">
-              <span className="font-['PT_Root_UI',sans-serif] text-[14px]">Chrome Extension</span>
-              <span className="font-['PT_Root_UI',sans-serif] font-bold text-[18px]">Установить бесплатно</span>
-            </div>
-          </a>
+          <InstallButtonLarge />
         </div>
       </div>
     </section>
@@ -602,14 +639,7 @@ function FooterSection() {
 
         <RevealSection>
           <div className="flex flex-col gap-[24px] items-center">
-            <a href="https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl" target="_blank" rel="noopener noreferrer" className="btn-hover bg-white flex gap-[22px] items-center pl-[10px] pr-[24px] py-[10px] rounded-[6px] cursor-pointer border-none relative no-underline">
-              <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] inset-0 pointer-events-none rounded-[6px]" />
-              <ChromeIconLg />
-              <div className="flex flex-col items-start leading-[1.3] text-black whitespace-nowrap">
-                <span className="font-['PT_Root_UI',sans-serif] text-[14px]">Chrome Extension</span>
-                <span className="font-['PT_Root_UI',sans-serif] font-bold text-[18px]">Установить бесплатно</span>
-              </div>
-            </a>
+            <InstallButtonLarge />
             <div className="flex gap-[12px] items-center">
               <CheckIcon />
               <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[18px] text-center text-white">10 бесплатных генераций  месяц</span>
