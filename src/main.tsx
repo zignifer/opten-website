@@ -7,6 +7,7 @@
   import PrivacyPage from "./app/pages/PrivacyPage.tsx";
   import TermsPage from "./app/pages/TermsPage.tsx";
   import RefundPage from "./app/pages/RefundPage.tsx";
+  import AccountPage from "./app/pages/AccountPage.tsx";
   import "./styles/index.css";
 
   createRoot(document.getElementById("root")!).render(
@@ -18,6 +19,7 @@
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/refund" element={<RefundPage />} />
+        <Route path="/account" element={<AccountPage />} />
       </Routes>
     </BrowserRouter>
   );
