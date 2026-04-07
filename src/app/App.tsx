@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router";
 import svgPaths from "../imports/LandingPage/svg-bvy0jfb1g6";
 import imgImage1 from "../imports/LandingPage/fa3631bfe3de9114866b4560b13297991ede111d.png";
 import imgFrame161 from "../imports/LandingPage/a4aab81523531c9d1cdd22f1a16ebda5bcca69aa.png";
@@ -612,18 +613,23 @@ function FooterSection() {
           </div>
         </RevealSection>
 
-        <div className="flex flex-col sm:flex-row gap-[20px] sm:gap-[40px] items-center">
-          <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] text-[rgba(255,255,255,0.4)]">© 2026 Opten</span>
-          <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="flex gap-[12px] items-center hover:opacity-80 transition-opacity">
-            <div className="overflow-clip relative shrink-0 size-[18px]">
-              <div className="absolute inset-[17.97%_8.92%_0.78%_7.33%]">
-                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15.0741 14.6261">
-                  <path clipRule="evenodd" d={svgPaths.p3150f900} fill="white" fillOpacity="0.4" fillRule="evenodd" />
-                </svg>
+        <div className="flex flex-col items-center gap-[16px]">
+          <div className="flex flex-wrap justify-center gap-[20px] sm:gap-[32px] font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.4)]">
+            <Link to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">Конфиденциальность</Link>
+            <Link to="/terms" className="hover:text-white transition-colors no-underline text-inherit">Оферта</Link>
+            <Link to="/refund" className="hover:text-white transition-colors no-underline text-inherit">Возврат</Link>
+            <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="flex gap-[8px] items-center hover:text-white transition-colors no-underline text-inherit">
+              <div className="overflow-clip relative shrink-0 size-[14px]">
+                <div className="absolute inset-[17.97%_8.92%_0.78%_7.33%]">
+                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15.0741 14.6261">
+                    <path clipRule="evenodd" d={svgPaths.p3150f900} fill="currentColor" fillRule="evenodd" />
+                  </svg>
+                </div>
               </div>
-            </div>
-            <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] text-[rgba(255,255,255,0.4)]">Сообщить о проблеме</span>
-          </a>
+              Связаться
+            </a>
+          </div>
+          <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[14px] text-[rgba(255,255,255,0.3)]">© 2026 Opten · ИП Воронежцев В.П. · ИНН 723016676391</span>
         </div>
       </div>
     </section>
