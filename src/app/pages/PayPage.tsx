@@ -6,7 +6,10 @@ import imgFrame37 from "../../imports/LandingPage/da31c95f5bc0f013c26804882654e4
 const SUPABASE_FUNCTIONS_URL = "https://vuywydhwkqmihfztpkgl.supabase.co/functions/v1";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1eXd5ZGh3a3FtaWhmenRwa2dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NTkxMjAsImV4cCI6MjA1OTQzNTEyMH0.bG0GfCEMbMBqPOMtkFDAiFjKQMqFVLHGe3bTG-hsaMA";
 const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
-const EXTENSION_ID = "iphkppgbobpilmphloffcalicmejacfl";
+const EXTENSION_IDS = [
+  "iphkppgbobpilmphloffcalicmejacfl",  // Chrome Web Store
+  "kcmcaeenfmfnpiaihicecnfnagejpcog",  // Local dev
+];
 
 type ExtStatus = "detecting" | "not_installed" | "not_logged_in" | "ready";
 
@@ -131,21 +134,19 @@ export default function PayPage() {
   }, []);
 
   const detectExtension = () => {
-    try {
-      // chrome.runtime.sendMessage to extension — works only if extension is installed
-      // and has externally_connectable matching this origin
-      const chrome = (window as any).chrome;
-      if (!chrome?.runtime?.sendMessage) {
-        setExtStatus("not_installed");
-        return;
-      }
-      chrome.runtime.sendMessage(
-        EXTENSION_ID,
-        { type: "GET_AUTH_TOKEN" },
-        (response: any) => {
+    const chrome = (window as any).chrome;
+    if (!chrome?.runtime?.sendMessage) {
+      setExtStatus("not_installed");
+      return;
+    }
+    // Try each known extension ID until one responds
+    let tried = 0;
+    for (const id of EXTENSION_IDS) {
+      try {
+        chrome.runtime.sendMessage(id, { type: "GET_AUTH_TOKEN" }, (response: any) => {
+          tried++;
           if (chrome.runtime.lastError || !response) {
-            // Extension not installed or doesn't respond
-            setExtStatus("not_installed");
+            if (tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
             return;
           }
           if (response.token) {
@@ -154,10 +155,11 @@ export default function PayPage() {
           } else {
             setExtStatus("not_logged_in");
           }
-        }
-      );
-    } catch {
-      setExtStatus("not_installed");
+        });
+      } catch {
+        tried++;
+        if (tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
+      }
     }
   };
 

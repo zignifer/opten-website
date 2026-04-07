@@ -5,7 +5,10 @@ import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
 const SUPABASE_FUNCTIONS_URL = "https://vuywydhwkqmihfztpkgl.supabase.co/functions/v1";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1eXd5ZGh3a3FtaWhmenRwa2dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NTkxMjAsImV4cCI6MjA1OTQzNTEyMH0.bG0GfCEMbMBqPOMtkFDAiFjKQMqFVLHGe3bTG-hsaMA";
 const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
-const EXTENSION_ID = "iphkppgbobpilmphloffcalicmejacfl";
+const EXTENSION_IDS = [
+  "iphkppgbobpilmphloffcalicmejacfl",  // Chrome Web Store
+  "kcmcaeenfmfnpiaihicecnfnagejpcog",  // Local dev
+];
 
 type ExtStatus = "detecting" | "not_installed" | "not_logged_in" | "ready";
 
@@ -100,18 +103,18 @@ export default function AccountPage() {
   }, []);
 
   const detectExtension = () => {
-    try {
-      const chrome = (window as any).chrome;
-      if (!chrome?.runtime?.sendMessage) {
-        setExtStatus("not_installed");
-        return;
-      }
-      chrome.runtime.sendMessage(
-        EXTENSION_ID,
-        { type: "GET_AUTH_TOKEN" },
-        (response: any) => {
+    const chrome = (window as any).chrome;
+    if (!chrome?.runtime?.sendMessage) {
+      setExtStatus("not_installed");
+      return;
+    }
+    let tried = 0;
+    for (const id of EXTENSION_IDS) {
+      try {
+        chrome.runtime.sendMessage(id, { type: "GET_AUTH_TOKEN" }, (response: any) => {
+          tried++;
           if (chrome.runtime.lastError || !response) {
-            setExtStatus("not_installed");
+            if (tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
             return;
           }
           if (response.token) {
@@ -121,10 +124,11 @@ export default function AccountPage() {
           } else {
             setExtStatus("not_logged_in");
           }
-        }
-      );
-    } catch {
-      setExtStatus("not_installed");
+        });
+      } catch {
+        tried++;
+        if (tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
+      }
     }
   };
 
