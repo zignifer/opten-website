@@ -1,0 +1,676 @@
+import { useState, useEffect, useRef } from "react";
+import svgPaths from "../imports/LandingPage/svg-bvy0jfb1g6";
+import imgImage1 from "../imports/LandingPage/fa3631bfe3de9114866b4560b13297991ede111d.png";
+import imgFrame161 from "../imports/LandingPage/a4aab81523531c9d1cdd22f1a16ebda5bcca69aa.png";
+import imgFrame231 from "../imports/LandingPage/6fe2b2e482114aaece3557d61a780f48e409ae7a.png";
+import imgFrame233 from "../imports/LandingPage/643b83f6ac31944ea5c6501794954e84df3835ec.png";
+import imgFrame234 from "../imports/LandingPage/5d0e2aab408679eb569960b14c42e066e5a20b92.png";
+import imgFrame232 from "../imports/LandingPage/dc7c40ef44dccb75d38f341e5a8e7f03b9d865a4.png";
+import imgFrame37 from "../imports/LandingPage/da31c95f5bc0f013c26804882654e49618ec43c7.png";
+
+/* ─── Scroll animation hook ─── */
+function useScrollReveal() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("revealed");
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return ref;
+}
+
+function RevealSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useScrollReveal();
+  return (
+    <div ref={ref} className={`scroll-reveal ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+/* ─── Reusable SVG Icons ─── */
+function ChromeIconSmall() {
+  return (
+    <div className="relative shrink-0 size-[15px]">
+      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15 15">
+        <g clipPath="url(#clip_chrome_sm)">
+          <path d={svgPaths.p8cb8900} fill="#F1F3F4" />
+          <path d={svgPaths.p191fd780} fill="url(#p_chrome_sm_0)" />
+          <path d={svgPaths.p2affbc00} fill="#1A73E8" />
+          <path d={svgPaths.p27a43300} fill="url(#p_chrome_sm_1)" />
+          <path d={svgPaths.p9dcf560} fill="url(#p_chrome_sm_2)" />
+        </g>
+        <defs>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_sm_0" x1="1.00531" x2="13.9941" y1="4.6875" y2="4.6875"><stop stopColor="#D93025" /><stop offset="1" stopColor="#EA4335" /></linearGradient>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_sm_1" x1="6.47562" x2="12.97" y1="14.8997" y2="3.65125"><stop stopColor="#FCC934" /><stop offset="1" stopColor="#FBBC04" /></linearGradient>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_sm_2" x1="8.31188" x2="1.8175" y1="14.5319" y2="3.28313"><stop stopColor="#1E8E3E" /><stop offset="1" stopColor="#34A853" /></linearGradient>
+          <clipPath id="clip_chrome_sm"><rect fill="white" height="15" width="15" /></clipPath>
+        </defs>
+      </svg>
+    </div>
+  );
+}
+
+function ChromeIconMed() {
+  return (
+    <div className="relative shrink-0 size-[23px]">
+      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 23 23">
+        <g clipPath="url(#clip_chrome_md)">
+          <path d={svgPaths.p19a6fb00} fill="white" />
+          <path d={svgPaths.p8b6f480} fill="url(#p_chrome_md_0)" />
+          <path d={svgPaths.p9ca2e00} fill="#1A73E8" />
+          <path d={svgPaths.p27e1a780} fill="url(#p_chrome_md_1)" />
+          <path d={svgPaths.p5178480} fill="url(#p_chrome_md_2)" />
+        </g>
+        <defs>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_md_0" x1="1.54148" x2="21.4576" y1="7.1875" y2="7.1875"><stop stopColor="#D93025" /><stop offset="1" stopColor="#EA4335" /></linearGradient>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_md_1" x1="9.92929" x2="19.8873" y1="22.8462" y2="5.59858"><stop stopColor="#FCC934" /><stop offset="1" stopColor="#FBBC04" /></linearGradient>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_md_2" x1="12.7449" x2="2.78683" y1="22.2822" y2="5.03413"><stop stopColor="#1E8E3E" /><stop offset="1" stopColor="#34A853" /></linearGradient>
+          <clipPath id="clip_chrome_md"><rect fill="white" height="23" width="23" /></clipPath>
+        </defs>
+      </svg>
+    </div>
+  );
+}
+
+function ChromeIconLg() {
+  return (
+    <div className="relative shrink-0 w-[46px] h-[40px]">
+      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 46 40">
+        <g clipPath="url(#clip_chrome_lg)">
+          <path d={svgPaths.pdb78400} fill="#F1F3F4" />
+          <path d={svgPaths.pdb78400} fill="#F1F3F4" />
+          <path d={svgPaths.p2c37f680} fill="#E8EAED" />
+          <path d={svgPaths.pdaf5400} fill="url(#p_chrome_lg_0)" />
+          <path d={svgPaths.pe345a00} fill="url(#p_chrome_lg_1)" />
+          <path d={svgPaths.p347aee80} fill="url(#p_chrome_lg_2)" />
+          <path d={svgPaths.p1247b800} fill="#F1F3F4" />
+          <path d={svgPaths.p4730800} fill="#1A73E8" />
+          <path d={svgPaths.p36cb4800} fill="#BDC1C6" opacity="0.1" />
+        </g>
+        <defs>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_lg_0" x1="5.79804" x2="40.1989" y1="29.3985" y2="29.3985"><stop stopColor="#D93025" /><stop offset="1" stopColor="#EA4335" /></linearGradient>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_lg_1" x1="25.1519" x2="7.9121" y1="55.5109" y2="25.692"><stop stopColor="#1E8E3E" /><stop offset="1" stopColor="#34A853" /></linearGradient>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_lg_2" x1="37.3579" x2="20.1187" y1="26.8733" y2="56.6912"><stop stopColor="#FBBC04" /><stop offset="1" stopColor="#FCC934" /></linearGradient>
+          <clipPath id="clip_chrome_lg"><rect fill="white" height="40" width="46" /></clipPath>
+        </defs>
+      </svg>
+    </div>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <div className="relative shrink-0 size-[18px]">
+      <svg className="absolute block size-full" fill="none" viewBox="0 0 18 18">
+        <path d={svgPaths.p11eab980} fill="white" fillOpacity="0.6" />
+      </svg>
+    </div>
+  );
+}
+
+function StarBullet() {
+  return (
+    <div className="h-[28px] shrink-0 w-[14px] relative">
+      <div className="absolute inset-[-17.86%_-85.71%]">
+        <svg className="block size-full" fill="none" viewBox="0 0 38 38">
+          <g>
+            <g filter="url(#star_glow)">
+              <path d={svgPaths.p1ba15070} fill="#2777C3" />
+            </g>
+          </g>
+          <defs>
+            <filter colorInterpolationFilters="sRGB" filterUnits="userSpaceOnUse" height="38" id="star_glow" width="38" x="0" y="0">
+              <feFlood floodOpacity="0" result="BackgroundImageFix" />
+              <feColorMatrix in="SourceAlpha" result="hardAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
+              <feOffset />
+              <feGaussianBlur stdDeviation="6" />
+              <feComposite in2="hardAlpha" operator="out" />
+              <feColorMatrix type="matrix" values="0 0 0 0 0.152941 0 0 0 0 0.466667 0 0 0 0 0.764706 0 0 0 1 0" />
+              <feBlend in2="BackgroundImageFix" mode="normal" result="effect1_dropShadow" />
+              <feBlend in="SourceGraphic" in2="effect1_dropShadow" mode="normal" result="shape" />
+            </filter>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+function InstallButtonWhite({ text = "Установить бесплатно", showIcon = true }: { text?: string; showIcon?: boolean }) {
+  return (
+    <a href="https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl" target="_blank" rel="noopener noreferrer" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none no-underline">
+      <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
+      {showIcon && <ChromeIconMed />}
+      <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">{text}</span>
+    </a>
+  );
+}
+
+function Divider({ width = "100%" }: { width?: string }) {
+  return (
+    <div className="w-full h-[1px] shrink-0 bg-[rgba(255,255,255,0.1)]" />
+  );
+}
+
+/* ─── Logo ─── */
+function Logo() {
+  return (
+    <div className="inline-grid grid-cols-[max-content] grid-rows-[max-content] leading-[0] place-items-start relative shrink-0">
+      <div className="col-start-1 row-start-1 h-[20px] w-[17.45px] relative">
+        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4501 20">
+          <path d={svgPaths.p1af53b80} fill="white" />
+          <path d={svgPaths.p11bbe580} fill="white" />
+          <path d={svgPaths.p3028f5f0} fill="white" />
+        </svg>
+      </div>
+      <div className="col-start-1 row-start-1 h-[19.014px] ml-[24.73px] mt-[1.99px] w-[57.84px] relative">
+        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 57.8402 19.0139">
+          <path d={svgPaths.p2caec700} fill="white" />
+          <path d={svgPaths.p395c8980} fill="white" />
+          <path d={svgPaths.p11961000} fill="white" />
+          <path d={svgPaths.p1de84f00} fill="white" />
+          <path d={svgPaths.p355f7e80} fill="white" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Navbar ─── */
+function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handler);
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  return (
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-[8px]" : "py-[21px]"}`}>
+      <div className={`max-w-[1100px] mx-[8px] lg:mx-auto flex items-center justify-between rounded-[1000px] py-[8px] pl-[24px] pr-[8px] transition-all duration-300 ${scrolled ? "bg-[rgba(0,0,0,0.6)] backdrop-blur-[12px]" : "bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px]"}`}>
+        {/* Mobile hamburger */}
+        <button className="md:hidden mr-auto text-white cursor-pointer bg-transparent border-none p-2" onClick={() => setMenuOpen(!menuOpen)}>
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+            {menuOpen ? (
+              <path d="M6 6l12 12M6 18L18 6" stroke="white" strokeWidth="2" strokeLinecap="round" />
+            ) : (
+              <path d="M3 6h18M3 12h18M3 18h18" stroke="white" strokeWidth="2" strokeLinecap="round" />
+            )}
+          </svg>
+        </button>
+
+        {/* Desktop nav links */}
+        <div className="hidden md:flex flex-1 gap-[24px] items-center font-['PT_Root_UI',sans-serif] text-[14px] text-white">
+          <a href="#features" className="hover:opacity-80 transition-opacity">Возможноси</a>
+          <a href="#pricing" className="hover:opacity-80 transition-opacity">Тарифы</a>
+          <a href="#faq" className="hover:opacity-80 transition-opacity">FAQ</a>
+        </div>
+
+        <Logo />
+
+        <div className="flex-1 flex justify-end ml-auto md:ml-0">
+          <a href="https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl" target="_blank" rel="noopener noreferrer" className="btn-hover bg-white flex gap-[8px] items-center justify-center p-[12px] rounded-[100px] cursor-pointer border-none no-underline">
+            <ChromeIconSmall />
+            <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-[#181818] text-center whitespace-nowrap">Установить бесплатно</span>
+          </a>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="md:hidden bg-[rgba(0,0,0,0.9)] backdrop-blur-[12px] mx-[16px] mt-[8px] rounded-[16px] p-[24px] flex flex-col gap-[20px] font-['PT_Root_UI',sans-serif] text-[16px] text-white">
+          <a href="#features" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>Возможноси</a>
+          <a href="#pricing" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>Тарифы</a>
+          <a href="#faq" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>FAQ</a>
+        </div>
+      )}
+    </nav>
+  );
+}
+
+/* ─── Hero Section ─── */
+function HeroSection() {
+  return (
+    <section className="bg-[#181818] relative overflow-clip w-full min-h-[600px] md:h-[850px]">
+      <div className="absolute inset-0 flex items-center justify-center">
+        <img alt="" className="min-w-full min-h-full object-cover pointer-events-none" src={imgImage1} />
+      </div>
+      <div className="absolute bg-gradient-to-b from-[rgba(0,0,0,0)] via-[rgba(0,0,0,0.2)] to-black inset-0" />
+      <div className="relative z-10 flex flex-col items-center justify-center h-full pt-[120px] pb-[60px] md:pt-0 md:pb-0 px-[20px]">
+        <div className="flex flex-col gap-[24px] items-center max-w-[590px]">
+          <div className="flex gap-[6px] items-start flex-wrap justify-center">
+            <div className="backdrop-blur-[2px] bg-[rgba(255,255,255,0.1)] flex items-center justify-center px-[12px] py-[6px] rounded-[100px] relative">
+              <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[100px]" />
+              <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-center text-white whitespace-nowrap">Работает с 43+ моделями генерации</p>
+            </div>
+          </div>
+          <h1 className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[36px] sm:text-[48px] md:text-[62px] text-center text-white tracking-[-1.24px]">
+            Не сливай кредиты на плохие промпты
+          </h1>
+          <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px] text-center text-white">
+            <span>Opten оценит промпт под конкретную нейросеть, покажет ошибки и исправит их в один клк. </span>
+            <span className="font-bold">Прямо в интерфейсе генератора.</span>
+          </p>
+        </div>
+        <div className="mt-[48px]">
+          <a href="https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl" target="_blank" rel="noopener noreferrer" className="btn-hover bg-white flex gap-[22px] items-center pl-[10px] pr-[24px] py-[10px] rounded-[6px] cursor-pointer border-none relative no-underline">
+            <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] inset-0 pointer-events-none rounded-[6px]" />
+            <ChromeIconLg />
+            <div className="flex flex-col items-start leading-[1.3] text-black whitespace-nowrap">
+              <span className="font-['PT_Root_UI',sans-serif] text-[14px]">Chrome Extension</span>
+              <span className="font-['PT_Root_UI',sans-serif] font-bold text-[18px]">Установить бесплатно</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Partners Section ─── */
+function PartnersSection() {
+  return (
+    <section className="bg-black w-full">
+      <RevealSection>
+        <div className="flex flex-col items-center justify-center pb-[56px] px-[20px] md:px-[120px]">
+          <div className="flex flex-col gap-[16px] items-center font-['PT_Root_UI',sans-serif] text-[16px] md:text-[18px] text-[rgba(255,255,255,0.6)] text-center">
+            <p>
+              <span className="leading-[1.6]">Работает с </span>
+              <span className="font-medium leading-[1.6] text-white">43+ моделями</span>
+              <span className="leading-[1.6]"> генерации</span>
+            </p>
+            <p className="leading-[1.6]">Midjourney · DALL·E · Stable Diffusion ·Flux · Kling · Seedance · GPT Image · Runway · Sora · Leonardo AI · Ideogram — и другие.</p>
+          </div>
+        </div>
+      </RevealSection>
+    </section>
+  );
+}
+
+/* ─── Three Steps Section ─── */
+function ThreeStepsSection() {
+  return (
+    <section id="features" className="bg-black w-full">
+      <div className="flex flex-col items-center overflow-clip">
+        <div className="flex flex-col gap-[48px] md:gap-[72px] items-center px-[20px] md:px-[100px] py-[60px] md:py-[80px] w-full max-w-[1440px]">
+          <RevealSection>
+            <div className="font-['PT_Root_UI',sans-serif] font-medium text-center text-white tracking-[-1.04px]">
+              <p className="leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px] text-[rgba(255,255,255,0.6)]">Три шага до</p>
+              <p className="leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px]">идеального промпта</p>
+            </div>
+          </RevealSection>
+
+          <div className="flex flex-col lg:flex-row gap-[40px] lg:gap-[120px] items-start justify-center w-full">
+            <div className="flex flex-col gap-[40px] md:gap-[56px] flex-1">
+              <RevealSection>
+                <StepItem num="01" title="Напиши промпт как обычно" desc="Opten встраивается прямо в интерфейс генератора. Никакого копирования в другие окна." />
+              </RevealSection>
+              <RevealSection>
+                <StepItem num="02" title={<>Нажми на иконку <OptenInlineIcon /> ‐ Opten оценит промпт</>} desc="Цветное кольцо, конкретные рекомендации и диагноз: что не так и почему. Под конкретную модель, а не «вообще»." />
+              </RevealSection>
+              <RevealSection>
+                <StepItem num="03" title={<>Один клик <SparkleInlineIcon /> ‐ промпт улучшен</>} desc="Auto-enhance перепишет промпт с учётом всех правил выбранной нейросети. Вставляй и генерируй." />
+              </RevealSection>
+            </div>
+            <div className="w-full lg:w-[500px] shrink-0">
+              <img alt="" className="w-full h-auto object-cover rounded-[8px]" src={imgFrame161} />
+            </div>
+          </div>
+
+          <RevealSection>
+            <InstallButtonWhite />
+          </RevealSection>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function OptenInlineIcon() {
+  return (
+    <span className="inline-block relative w-[22px] h-[25px] align-middle mx-[2px]">
+      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21.8126 25.0001">
+        <path d={svgPaths.p7c6c400} fill="white" />
+        <path d={svgPaths.p1f56500} fill="white" />
+        <path d={svgPaths.pf7df100} fill="white" />
+      </svg>
+    </span>
+  );
+}
+
+function SparkleInlineIcon() {
+  return (
+    <span className="inline-block relative size-[25px] align-middle mx-[2px]">
+      <svg className="absolute block size-full" fill="none" viewBox="0 0 25 25">
+        <path clipRule="evenodd" d={svgPaths.p2d8d1100} fill="white" fillRule="evenodd" />
+      </svg>
+    </span>
+  );
+}
+
+function StepItem({ num, title, desc }: { num: string; title: React.ReactNode; desc: string }) {
+  return (
+    <div className="flex gap-[24px] items-start w-full">
+      <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[18px] text-[rgba(255,255,255,0.6)]">{num}</span>
+      <div className="flex flex-col gap-[12px]">
+        <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[28px] md:text-[40px] text-white tracking-[-0.8px]">{title}</p>
+        <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px] text-[rgba(255,255,255,0.6)]">{desc}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Feature Cards Section ─── */
+function FeatureCardsSection() {
+  return (
+    <section className="bg-black w-full">
+      <div className="flex flex-col items-center overflow-clip">
+        <div className="flex flex-col gap-[48px] md:gap-[72px] items-center px-[20px] md:px-[100px] py-[60px] md:py-[80px] w-full max-w-[1440px]">
+          <RevealSection>
+            <div className="font-['PT_Root_UI',sans-serif] font-medium text-center text-white tracking-[-1.04px]">
+              <p className="leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px]">Не очередные</p>
+              <p className="leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px]">«советы по промптингу»</p>
+            </div>
+          </RevealSection>
+
+          <div className="flex flex-col gap-[12px] w-full">
+            <div className="flex flex-col md:flex-row gap-[12px] w-full">
+              <RevealSection className="flex-1">
+                <FeatureCard
+                  title="43 модели. У каждой свои правила."
+                  desc="Midjourney любит короткие метафоры. Flux требует технических параметров. DALL·E хочет детальные описания. Opten знает правила каждой модели — и проверяет ваш промпт по ним, а не «в целом»."
+                  img={imgFrame231}
+                  imgPosition="bottom"
+                />
+              </RevealSection>
+              <RevealSection className="flex-1">
+                <FeatureCard
+                  title="Работает там, где ты генерируешь"
+                  desc={`Не нужно переключаться между вкладками и копировать текст.\nOpten появляется прямо в интерфейсе вашего генератора — как Grammarly появляется в Gmail.`}
+                  img={imgFrame233}
+                  imgPosition="top"
+                />
+              </RevealSection>
+            </div>
+            <div className="flex flex-col md:flex-row gap-[12px] w-full">
+              <RevealSection className="flex-1">
+                <FeatureCard
+                  title="Каждый плохой промпт — это сожжённые кредиты"
+                  desc="Пользователи Opten экономят от 30% до 50% кредитов на генерацию. При среднем расходе $20–50/мес на генераторы, Opten окупается за первый час использования."
+                  img={imgFrame234}
+                  imgPosition="bottom"
+                />
+              </RevealSection>
+              <RevealSection className="flex-1">
+                <FeatureCard
+                  title="Улучшение промптов в один клик"
+                  desc={`Auto-enhance переписывает промпт за 2 секунды.\nУчитывает стиль, технические параметры, ограничения модели и ваше исходное намерение.`}
+                  img={imgFrame232}
+                  imgPosition="bottom"
+                />
+              </RevealSection>
+            </div>
+          </div>
+
+          <RevealSection>
+            <InstallButtonWhite />
+          </RevealSection>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FeatureCard({ title, desc, img, imgPosition }: { title: string; desc: string; img: string; imgPosition: "top" | "bottom" }) {
+  return (
+    <div className="card-hover bg-[#0d0d0d] md:min-h-[400px] relative rounded-[12px] overflow-clip h-full">
+      <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[12px]" />
+      <div className={`flex flex-col gap-[40px] p-[32px] h-full`}>
+        {imgPosition === "top" && <img alt="" className="w-full h-auto object-contain rounded-[4px]" src={img} />}
+        <div className="flex flex-col gap-[12px]">
+          <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[20px] md:text-[24px] text-white tracking-[-0.48px]">{title}</p>
+          <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[14px] md:text-[16px] text-[rgba(255,255,255,0.6)] whitespace-pre-wrap">{desc}</p>
+        </div>
+        {imgPosition === "bottom" && <img alt="" className="w-full h-auto object-contain rounded-[4px] mt-auto" src={img} />}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Privacy Section ─── */
+function PrivacySection() {
+  return (
+    <section id="faq" className="bg-black w-full">
+      <div className="flex flex-row justify-center overflow-clip">
+        <div className="flex flex-col lg:flex-row gap-[48px] lg:gap-[100px] items-start px-[20px] md:px-[100px] py-[60px] md:py-[80px] w-full max-w-[1440px]">
+          <RevealSection>
+            <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[36px] md:text-[52px] text-white tracking-[-1.04px] max-w-[394px]">Твои промпты принадлежат тебе</p>
+          </RevealSection>
+          <div className="flex flex-col gap-[48px] md:gap-[64px] flex-1">
+            <RevealSection>
+              <PrivacyItem title="Мы не храним промпты" desc="Расширение анализирует текст локально и через защищённый API-канал. Твои промпты и изображения не сохраняются на наших серверах." />
+            </RevealSection>
+            <Divider />
+            <RevealSection>
+              <PrivacyItem title="Не продаём и не передаём данные" desc="Мы не продаём пользовательский контент, не используем его для рекламы и не предоставляем третьим сторонам для обучения моделей." />
+            </RevealSection>
+            <Divider />
+            <RevealSection>
+              <PrivacyItem title="Минимальные разрешения" desc="Opten запрашивает только те разрешения браузера, которые необходимы для работы. Никакого доступа к твоей истории, закладкам или другим вкладкам." />
+            </RevealSection>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PrivacyItem({ title, desc }: { title: string; desc: string }) {
+  return (
+    <div className="flex flex-col gap-[24px] w-full">
+      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] md:text-[32px] text-white tracking-[-0.64px]">{title}</p>
+      <div className="flex gap-[24px] items-start w-full">
+        <StarBullet />
+        <p className="flex-1 font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px] text-[rgba(255,255,255,0.6)]">{desc}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Pricing Section ─── */
+function PricingSection() {
+  return (
+    <section id="pricing" className="bg-black w-full border-none">
+      <div className="flex flex-col items-center overflow-clip">
+        <div className="flex flex-col gap-[40px] md:gap-[56px] items-center px-[20px] md:px-[100px] py-[60px] md:py-[80px] w-full max-w-[1440px]">
+          <RevealSection>
+            <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px] text-center text-white tracking-[-1.04px] max-w-[650px]">Начни бесплатно. Перейди на Pro, когда будешь готов.</p>
+          </RevealSection>
+
+          <div className="flex flex-col md:flex-row gap-[24px] w-full max-w-[800px]">
+            <RevealSection className="flex-1">
+              <div className="card-hover bg-[#0d0d0d] rounded-[12px] h-[600px] relative overflow-clip">
+                <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[12px]" />
+                <div className="flex flex-col justify-between p-[32px] h-full">
+                  <div className="flex flex-col gap-[40px]">
+                    <div className="flex flex-col gap-[12px]">
+                      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">Бесплатно</p>
+                      <div className="flex gap-[6px] items-end">
+                        <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">0₽</span>
+                        <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">в месяц</span>
+                      </div>
+                    </div>
+                    <Divider />
+                    <div className="flex flex-col gap-[12px]">
+                      <PricingFeature text="10 генераций в месяц" />
+                      <PricingFeature text="Оценка по всем 43+ моделям" />
+                      <PricingFeature text="Цветная шкала + рекомендации" />
+                      <PricingFeature text="Работа в syntx.ai" />
+                    </div>
+                  </div>
+                  <InstallButtonWhite />
+                </div>
+              </div>
+            </RevealSection>
+
+            <RevealSection className="flex-1">
+              <div className="card-hover rounded-[12px] h-[600px] relative overflow-clip">
+                <div aria-hidden="true" className="absolute inset-0 pointer-events-none rounded-[12px]">
+                  <div className="absolute bg-[#0d0d0d] inset-0 rounded-[12px]" />
+                  <img alt="" className="absolute max-w-none object-cover rounded-[12px] size-full" src={imgFrame37} />
+                  <div className="absolute bg-[rgba(0,0,0,0.48)] inset-0 rounded-[12px]" />
+                </div>
+                <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[12px] z-10" />
+                <div className="relative z-10 flex flex-col justify-between p-[32px] h-full">
+                  <div className="flex flex-col gap-[40px]">
+                    <div className="flex flex-col gap-[12px]">
+                      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">Pro</p>
+                      <div className="flex gap-[6px] items-end">
+                        <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">199₽</span>
+                        <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">в месяц</span>
+                      </div>
+                    </div>
+                    <Divider />
+                    <div className="flex flex-col gap-[12px]">
+                      <PricingFeature text="300 генераций в месяц" />
+                      <PricingFeature text="Улучшение в один клик" />
+                      <PricingFeature text="Приоритетная скорость анализа" />
+                      <PricingFeature text="Ранний доступ к новым моделям" />
+                      <PricingFeature text="Поддержка в Telegram" />
+                    </div>
+                  </div>
+                  <InstallButtonWhite text="Попробовать Pro" showIcon={false} />
+                </div>
+              </div>
+            </RevealSection>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PricingFeature({ text }: { text: string }) {
+  return (
+    <div className="flex gap-[8px] items-center">
+      <CheckIcon />
+      <span className="font-['PT_Root_UI',sans-serif] leading-[1.5] text-[16px] md:text-[18px] text-white">{text}</span>
+    </div>
+  );
+}
+
+/* ─── Footer CTA Section ─── */
+function FooterSection() {
+  return (
+    <section className="bg-black relative w-full overflow-clip border-none">
+      {/* BG image centered */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <img alt="" className="w-full h-full object-cover" src={imgFrame37} />
+        </div>
+      </div>
+      {/* Top gradient: black fading into the image */}
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, black 0%, rgba(0,0,0,0.6) 30%, transparent 50%)' }} />
+      {/* Bottom gradient: image fading back to black */}
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.6) 80%, black 100%)' }} />
+
+      <div className="relative z-10 flex flex-col gap-[60px] md:gap-[80px] items-center pb-[32px] pt-[100px] md:pt-[120px] px-[20px] md:px-[100px]">
+        <RevealSection>
+          <div className="flex flex-col gap-[24px] items-center text-center text-white max-w-[730px]">
+            <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[36px] sm:text-[48px] md:text-[62px] tracking-[-1.24px]">Хватит гадать. Генерируй с первой попытки.</p>
+            <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px]">Установи Opten за 30 секунд и оцени свой следующий промпт бесплатно.</p>
+          </div>
+        </RevealSection>
+
+        <RevealSection>
+          <div className="flex flex-col gap-[24px] items-center">
+            <a href="https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl" target="_blank" rel="noopener noreferrer" className="btn-hover bg-white flex gap-[22px] items-center pl-[10px] pr-[24px] py-[10px] rounded-[6px] cursor-pointer border-none relative no-underline">
+              <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] inset-0 pointer-events-none rounded-[6px]" />
+              <ChromeIconLg />
+              <div className="flex flex-col items-start leading-[1.3] text-black whitespace-nowrap">
+                <span className="font-['PT_Root_UI',sans-serif] text-[14px]">Chrome Extension</span>
+                <span className="font-['PT_Root_UI',sans-serif] font-bold text-[18px]">Установить бесплатно</span>
+              </div>
+            </a>
+            <div className="flex gap-[12px] items-center">
+              <CheckIcon />
+              <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[18px] text-center text-white">10 бесплатных генераций  месяц</span>
+            </div>
+          </div>
+        </RevealSection>
+
+        <div className="flex flex-col sm:flex-row gap-[20px] sm:gap-[40px] items-center">
+          <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] text-[rgba(255,255,255,0.4)]">© 2026 Opten</span>
+          <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="flex gap-[12px] items-center hover:opacity-80 transition-opacity">
+            <div className="overflow-clip relative shrink-0 size-[18px]">
+              <div className="absolute inset-[17.97%_8.92%_0.78%_7.33%]">
+                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15.0741 14.6261">
+                  <path clipRule="evenodd" d={svgPaths.p3150f900} fill="white" fillOpacity="0.4" fillRule="evenodd" />
+                </svg>
+              </div>
+            </div>
+            <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] text-[rgba(255,255,255,0.4)]">Сообщить о проблеме</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Main App ─── */
+export default function App() {
+  return (
+    <div className="w-full min-h-full bg-black">
+      <style>{`
+        .scroll-reveal {
+          opacity: 0;
+          transform: translateY(30px);
+          transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+        }
+        .scroll-reveal.revealed {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .btn-hover {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-hover:hover {
+          transform: scale(1.03);
+          box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+        }
+        .card-hover {
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        a {
+          text-decoration: none;
+          color: inherit;
+        }
+      `}</style>
+      <Navbar />
+      <HeroSection />
+      <PartnersSection />
+      <ThreeStepsSection />
+      <FeatureCardsSection />
+      <PrivacySection />
+      <PricingSection />
+      <FooterSection />
+    </div>
+  );
+}
