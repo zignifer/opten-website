@@ -216,6 +216,11 @@ export default function AccountPage() {
   const isCancelled = sub?.status === "cancelled";
   const isFree = !sub || sub.plan === "free" || sub.status === "expired";
 
+  // Debug: remove after fixing
+  useEffect(() => {
+    if (sub) console.log("SUB STATE:", JSON.stringify(sub), "isActive:", isActive, "isFree:", isFree);
+  }, [sub]);
+
   return (
     <div className="w-full min-h-screen bg-black flex flex-col font-['PT_Root_UI',sans-serif]">
       <style>{`
