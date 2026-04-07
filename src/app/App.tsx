@@ -223,10 +223,10 @@ function Navbar() {
         <Logo />
 
         <div className="flex-1 flex justify-end ml-auto md:ml-0">
-          <a href="https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl" target="_blank" rel="noopener noreferrer" className="btn-hover bg-white flex gap-[8px] items-center justify-center p-[12px] rounded-[100px] cursor-pointer border-none no-underline">
-            <ChromeIconSmall />
-            <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-[#181818] text-center whitespace-nowrap">Установить бесплатно</span>
-          </a>
+          <Link to="/account" className="btn-hover bg-white flex gap-[8px] items-center justify-center p-[12px] px-[20px] rounded-[100px] cursor-pointer border-none no-underline">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 7.5a3 3 0 100-6 3 3 0 000 6zM7.5 9C4.46 9 2 10.34 2 12v1.5h11V12c0-1.66-2.46-3-5.5-3z" fill="#181818"/></svg>
+            <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-[#181818] text-center whitespace-nowrap">Личный кабинет</span>
+          </Link>
         </div>
       </div>
 
@@ -236,6 +236,7 @@ function Navbar() {
           <a href="#features" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>Возможноси</a>
           <a href="#pricing" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>Тарифы</a>
           <a href="#faq" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>FAQ</a>
+          <Link to="/account" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>Личный кабинет</Link>
         </div>
       )}
     </nav>
