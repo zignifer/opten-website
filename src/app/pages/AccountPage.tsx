@@ -250,7 +250,7 @@ export default function AccountPage() {
             </div>
           )}
 
-          {extStatus === "ready" && !loadingSub && sub && (
+          {extStatus === "ready" && !loadingSub && (
             <>
               {/* ── Plan card ── */}
               <div className="bg-[#0d0d0d] rounded-[16px] p-[32px] relative">
