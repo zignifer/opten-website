@@ -164,7 +164,6 @@ export default function AccountPage() {
         },
       });
       const data = await res.json();
-      console.log('get-subscription response:', res.status, data);
       if (res.ok) {
         setSub(data);
       } else {
@@ -177,37 +176,35 @@ export default function AccountPage() {
     }
   };
 
-  const handleCancel = async () => {
-    if (!token) return;
+  const handleCancel = () => {
     setCancelling(true);
     setError(null);
     try {
-      const res = await fetch(SUPABASE_FUNCTIONS_URL + "/cancel-subscription", {
-        method: "POST",
-        headers: {
-          "Authorization": "Bearer " + token,
-          "apikey": SUPABASE_ANON_KEY,
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setCancelDone(true);
-        // Update local state
-        setSub(prev => prev ? {
-          ...prev,
-          status: "cancelled",
-          auto_renew: false,
-          card_last4: null,
-          card_type: null,
-          has_card: false,
-        } : null);
-      } else {
-        setError(data.error || "Не удалось отменить подписку.");
+      const chrome = (window as any).chrome;
+      // Find working extension ID
+      for (const id of EXTENSION_IDS) {
+        try {
+          chrome.runtime.sendMessage(id, { type: "CANCEL_SUBSCRIPTION" }, (response: any) => {
+            if (chrome.runtime.lastError || !response) return;
+            if (response.success) {
+              setCancelDone(true);
+              setSub(prev => prev ? {
+                ...prev,
+                status: "cancelled",
+                auto_renew: false,
+                card_last4: null,
+                card_type: null,
+                has_card: false,
+              } : null);
+            } else if (response.error) {
+              setError("Не удалось отменить подписку.");
+            }
+            setCancelling(false);
+          });
+        } catch { /* try next ID */ }
       }
     } catch {
       setError("Ошибка сети. Попробуйте ещё раз.");
-    } finally {
       setCancelling(false);
     }
   };
@@ -216,10 +213,6 @@ export default function AccountPage() {
   const isCancelled = sub?.status === "cancelled";
   const isFree = !sub || sub.plan === "free" || sub.status === "expired";
 
-  // Debug: remove after fixing
-  useEffect(() => {
-    if (sub) console.log("SUB STATE:", JSON.stringify(sub), "isActive:", isActive, "isFree:", isFree);
-  }, [sub]);
 
   return (
     <div className="w-full min-h-screen bg-black flex flex-col font-['PT_Root_UI',sans-serif]">
