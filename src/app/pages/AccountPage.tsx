@@ -81,6 +81,7 @@ export default function AccountPage() {
   const [cancelling, setCancelling] = useState(false);
   const [cancelDone, setCancelDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -119,6 +120,7 @@ export default function AccountPage() {
           }
           if (response.token) {
             setToken(response.token);
+            if (response.email) setEmail(response.email);
             setExtStatus("ready");
             fetchSubscription(response.token);
           } else {
@@ -205,7 +207,14 @@ export default function AccountPage() {
             <Link to="/pay" className="hover:opacity-80 transition-opacity">Тарифы</Link>
           </div>
           <Logo />
-          <div className="flex-1" />
+          <div className="flex-1 flex justify-end ml-auto md:ml-0">
+            {email && (
+              <div className="bg-[rgba(255,255,255,0.1)] flex gap-[8px] items-center justify-center p-[10px] px-[16px] rounded-[100px]">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 7a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM7 8.17c-2.53 0-4.17 1.11-4.17 2.5V12h8.34v-1.33c0-1.39-1.64-2.5-4.17-2.5z" fill="rgba(255,255,255,0.7)"/></svg>
+                <span className="hidden sm:inline text-[14px] text-[rgba(255,255,255,0.7)]">{email}</span>
+              </div>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -213,7 +222,7 @@ export default function AccountPage() {
       <section className="flex-1 pt-[140px] pb-[80px] px-[20px]">
         <div className="max-w-[560px] mx-auto flex flex-col gap-[32px]">
 
-          <h1 className="text-white text-[32px] md:text-[40px] font-medium leading-[1.1] tracking-[-0.8px]">
+          <h1 className="text-white text-[32px] md:text-[40px] font-medium leading-[1.1] tracking-[-0.8px] text-center">
             Управление подпиской
           </h1>
 
