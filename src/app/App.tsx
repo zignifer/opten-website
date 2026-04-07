@@ -8,10 +8,10 @@ import imgFrame233 from "../imports/LandingPage/643b83f6ac31944ea5c6501794954e84
 import imgFrame234 from "../imports/LandingPage/5d0e2aab408679eb569960b14c42e066e5a20b92.png";
 import imgFrame232 from "../imports/LandingPage/dc7c40ef44dccb75d38f341e5a8e7f03b9d865a4.png";
 import imgFrame37 from "../imports/LandingPage/da31c95f5bc0f013c26804882654e49618ec43c7.png";
-import imgChromeLg from "../imports/LandingPage/chrome-icon-lg.png";
-import imgYandexLg from "../imports/LandingPage/yandex-icon-lg.png";
-import imgChromeSm from "../imports/LandingPage/chrome-icon-sm.png";
-import imgYandexSm from "../imports/LandingPage/yandex-icon-sm.png";
+import imgChromeLg from "../imports/LandingPage/chrome-icon-lg.svg";
+import imgYandexLg from "../imports/LandingPage/yandex-icon-lg.svg";
+import imgChromeSm from "../imports/LandingPage/chrome-icon-sm.svg";
+import imgYandexSm from "../imports/LandingPage/yandex-icon-sm.svg";
 
 /* ─── Scroll animation hook ─── */
 function useScrollReveal() {
