@@ -122,7 +122,8 @@ export default function AccountPage() {
             setToken(response.token);
             if (response.email) setEmail(response.email);
             setExtStatus("ready");
-            fetchSubscription(response.token);
+            // Fetch subscription via extension (avoids token expiry issues)
+            fetchSubscriptionViaExtension(id);
           } else {
             setExtStatus("not_logged_in");
           }
@@ -131,6 +132,25 @@ export default function AccountPage() {
         tried++;
         if (tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
       }
+    }
+  };
+
+  const fetchSubscriptionViaExtension = (extensionId: string) => {
+    setLoadingSub(true);
+    try {
+      const chrome = (window as any).chrome;
+      chrome.runtime.sendMessage(extensionId, { type: "GET_SUBSCRIPTION" }, (response: any) => {
+        if (chrome.runtime.lastError || !response || response.error) {
+          setError("Не удалось загрузить подписку.");
+          setLoadingSub(false);
+          return;
+        }
+        setSub(response);
+        setLoadingSub(false);
+      });
+    } catch {
+      setError("Не удалось загрузить подписку.");
+      setLoadingSub(false);
     }
   };
 
