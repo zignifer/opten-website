@@ -1,21 +1,111 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
+import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
+import imgFrame37 from "../../imports/LandingPage/da31c95f5bc0f013c26804882654e49618ec43c7.png";
 
 const SUPABASE_FUNCTIONS_URL = "https://vuywydhwkqmihfztpkgl.supabase.co/functions/v1";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1eXd5ZGh3a3FtaWhmenRwa2dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NTkxMjAsImV4cCI6MjA1OTQzNTEyMH0.bG0GfCEMbMBqPOMtkFDAiFjKQMqFVLHGe3bTG-hsaMA";
+const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
+
+/* ─── Reusable Icons (same as landing) ─── */
+
+function ChromeIconSmall() {
+  return (
+    <div className="relative shrink-0 size-[15px]">
+      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15 15">
+        <g clipPath="url(#clip_chrome_sm_pay)">
+          <path d={svgPaths.p8cb8900} fill="#F1F3F4" />
+          <path d={svgPaths.p191fd780} fill="url(#p_chrome_sm_pay_0)" />
+          <path d={svgPaths.p2affbc00} fill="#1A73E8" />
+          <path d={svgPaths.p27a43300} fill="url(#p_chrome_sm_pay_1)" />
+          <path d={svgPaths.p9dcf560} fill="url(#p_chrome_sm_pay_2)" />
+        </g>
+        <defs>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_sm_pay_0" x1="1.00531" x2="13.9941" y1="4.6875" y2="4.6875"><stop stopColor="#D93025" /><stop offset="1" stopColor="#EA4335" /></linearGradient>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_sm_pay_1" x1="6.47562" x2="12.97" y1="14.8997" y2="3.65125"><stop stopColor="#FCC934" /><stop offset="1" stopColor="#FBBC04" /></linearGradient>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_sm_pay_2" x1="8.31188" x2="1.8175" y1="14.5319" y2="3.28313"><stop stopColor="#1E8E3E" /><stop offset="1" stopColor="#34A853" /></linearGradient>
+          <clipPath id="clip_chrome_sm_pay"><rect fill="white" height="15" width="15" /></clipPath>
+        </defs>
+      </svg>
+    </div>
+  );
+}
+
+function ChromeIconMed() {
+  return (
+    <div className="relative shrink-0 size-[23px]">
+      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 23 23">
+        <g clipPath="url(#clip_chrome_md_pay)">
+          <path d={svgPaths.p19a6fb00} fill="white" />
+          <path d={svgPaths.p8b6f480} fill="url(#p_chrome_md_pay_0)" />
+          <path d={svgPaths.p9ca2e00} fill="#1A73E8" />
+          <path d={svgPaths.p27e1a780} fill="url(#p_chrome_md_pay_1)" />
+          <path d={svgPaths.p5178480} fill="url(#p_chrome_md_pay_2)" />
+        </g>
+        <defs>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_md_pay_0" x1="1.54148" x2="21.4576" y1="7.1875" y2="7.1875"><stop stopColor="#D93025" /><stop offset="1" stopColor="#EA4335" /></linearGradient>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_md_pay_1" x1="9.92929" x2="19.8873" y1="22.8462" y2="5.59858"><stop stopColor="#FCC934" /><stop offset="1" stopColor="#FBBC04" /></linearGradient>
+          <linearGradient gradientUnits="userSpaceOnUse" id="p_chrome_md_pay_2" x1="12.7449" x2="2.78683" y1="22.2822" y2="5.03413"><stop stopColor="#1E8E3E" /><stop offset="1" stopColor="#34A853" /></linearGradient>
+          <clipPath id="clip_chrome_md_pay"><rect fill="white" height="23" width="23" /></clipPath>
+        </defs>
+      </svg>
+    </div>
+  );
+}
 
 function CheckIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="shrink-0">
-      <path d="M15 4.5L6.75 12.75L3 9" stroke="#2777C3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <div className="relative shrink-0 size-[18px]">
+      <svg className="absolute block size-full" fill="none" viewBox="0 0 18 18">
+        <path d={svgPaths.p11eab980} fill="white" fillOpacity="0.6" />
+      </svg>
+    </div>
   );
 }
+
+function Logo() {
+  return (
+    <Link to="/" className="inline-grid grid-cols-[max-content] grid-rows-[max-content] leading-[0] place-items-start relative shrink-0 no-underline">
+      <div className="col-start-1 row-start-1 h-[20px] w-[17.45px] relative">
+        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4501 20">
+          <path d={svgPaths.p1af53b80} fill="white" />
+          <path d={svgPaths.p11bbe580} fill="white" />
+          <path d={svgPaths.p3028f5f0} fill="white" />
+        </svg>
+      </div>
+      <div className="col-start-1 row-start-1 h-[19.014px] ml-[24.73px] mt-[1.99px] w-[57.84px] relative">
+        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 57.8402 19.0139">
+          <path d={svgPaths.p2caec700} fill="white" />
+          <path d={svgPaths.p395c8980} fill="white" />
+          <path d={svgPaths.p11961000} fill="white" />
+          <path d={svgPaths.p1de84f00} fill="white" />
+          <path d={svgPaths.p355f7e80} fill="white" />
+        </svg>
+      </div>
+    </Link>
+  );
+}
+
+function PricingFeature({ text }: { text: string }) {
+  return (
+    <div className="flex gap-[8px] items-center">
+      <CheckIcon />
+      <span className="font-['PT_Root_UI',sans-serif] leading-[1.5] text-[16px] md:text-[18px] text-white">{text}</span>
+    </div>
+  );
+}
+
+function Divider() {
+  return <div className="w-full h-[1px] shrink-0 bg-[rgba(255,255,255,0.1)]" />;
+}
+
+/* ─── Page ─── */
 
 export default function PayPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     // Read auth token from URL hash: /pay#token=JWT_HERE
@@ -24,9 +114,12 @@ export default function PayPage() {
     const t = params.get("token");
     if (t) {
       setToken(t);
-      // Clean up URL
       window.history.replaceState(null, "", window.location.pathname);
     }
+
+    const handler = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handler);
+    return () => window.removeEventListener("scroll", handler);
   }, []);
 
   const handlePay = async () => {
@@ -34,10 +127,8 @@ export default function PayPage() {
       setError("Сессия не найдена. Перейдите к оплате из расширения Opten.");
       return;
     }
-
     setLoading(true);
     setError(null);
-
     try {
       const res = await fetch(SUPABASE_FUNCTIONS_URL + "/create-payment", {
         method: "POST",
@@ -47,15 +138,12 @@ export default function PayPage() {
           "Content-Type": "application/json",
         },
       });
-
       const data = await res.json();
-
       if (!res.ok || data.error) {
         setError(data.error || "Ошибка создания платежа. Попробуйте ещё раз.");
         setLoading(false);
         return;
       }
-
       if (data.confirmation_url) {
         window.location.href = data.confirmation_url;
       } else {
@@ -69,111 +157,185 @@ export default function PayPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center px-[20px] py-[60px] font-['PT_Root_UI',sans-serif]">
-      <div className="w-full max-w-[440px]">
-        {/* Logo */}
-        <div className="flex justify-center mb-[48px]">
-          <Link to="/" className="text-white text-[24px] font-bold no-underline hover:opacity-80 transition-opacity">
-            Opten
-          </Link>
-        </div>
+    <div className="w-full min-h-screen bg-black flex flex-col">
+      <style>{`
+        .btn-hover {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-hover:hover {
+          transform: scale(1.03);
+          box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+        }
+        .card-hover {
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        a { text-decoration: none; color: inherit; }
+      `}</style>
 
-        {/* Card */}
-        <div className="bg-[#0d0d0d] rounded-[16px] p-[32px] relative">
-          <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[16px]" />
-
-          <div className="relative z-10 flex flex-col gap-[32px]">
-            {/* Header */}
-            <div className="flex flex-col gap-[8px]">
-              <h1 className="text-white text-[28px] font-medium leading-[1.1] tracking-[-0.56px]">
-                Opten Pro
-              </h1>
-              <p className="text-[rgba(255,255,255,0.6)] text-[16px] leading-[1.6]">
-                Подписка на расширенные возможности
-              </p>
-            </div>
-
-            {/* Price */}
-            <div className="flex items-end gap-[6px]">
-              <span className="text-white text-[48px] leading-[1.1] tracking-[-0.96px]">199₽</span>
-              <span className="text-[rgba(255,255,255,0.6)] text-[16px] leading-[2]">/ мес</span>
-            </div>
-
-            {/* Divider */}
-            <div className="w-full h-[1px] bg-[rgba(255,255,255,0.1)]" />
-
-            {/* Features */}
-            <div className="flex flex-col gap-[12px]">
-              <div className="flex gap-[8px] items-center">
-                <CheckIcon />
-                <span className="text-white text-[16px] leading-[1.5]">300 проверок в месяц</span>
-              </div>
-              <div className="flex gap-[8px] items-center">
-                <CheckIcon />
-                <span className="text-white text-[16px] leading-[1.5]">Улучшение промптов в один клик</span>
-              </div>
-              <div className="flex gap-[8px] items-center">
-                <CheckIcon />
-                <span className="text-white text-[16px] leading-[1.5]">Приоритетная скорость анализа</span>
-              </div>
-              <div className="flex gap-[8px] items-center">
-                <CheckIcon />
-                <span className="text-white text-[16px] leading-[1.5]">Ранний доступ к новым моделям</span>
-              </div>
-              <div className="flex gap-[8px] items-center">
-                <CheckIcon />
-                <span className="text-white text-[16px] leading-[1.5]">Автоматическое продление</span>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="w-full h-[1px] bg-[rgba(255,255,255,0.1)]" />
-
-            {/* Pay button */}
-            <button
-              onClick={handlePay}
-              disabled={loading}
-              className="w-full bg-white text-black text-[18px] font-bold py-[16px] rounded-[100px] cursor-pointer border-none transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
-            >
-              {loading ? "Переход к оплате..." : "Оплатить 199₽/мес"}
-            </button>
-
-            {/* Error */}
-            {error && (
-              <p className="text-[#d4183d] text-[14px] text-center leading-[1.5]">{error}</p>
-            )}
-
-            {/* No token warning */}
-            {!token && (
-              <p className="text-[rgba(255,255,255,0.4)] text-[14px] text-center leading-[1.5]">
-                Для оплаты перейдите на эту страницу из расширения Opten.
-                <br />
-                <Link to="/" className="text-[#2777C3] underline">Установить расширение</Link>
-              </p>
-            )}
-
-            {/* Legal */}
-            <p className="text-[rgba(255,255,255,0.3)] text-[12px] text-center leading-[1.5]">
-              Нажимая кнопку, вы принимаете{" "}
-              <Link to="/terms" className="text-[rgba(255,255,255,0.5)] underline">условия оферты</Link>
-              {" "}и{" "}
-              <Link to="/privacy" className="text-[rgba(255,255,255,0.5)] underline">политику конфиденциальности</Link>.
-              <br />
-              Подписка продлевается автоматически. Отменить можно в любой момент.
-            </p>
+      {/* ─── Navbar ─── */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-[8px]" : "py-[21px]"}`}>
+        <div className={`max-w-[1100px] mx-[8px] lg:mx-auto flex items-center justify-between rounded-[1000px] py-[8px] pl-[24px] pr-[8px] transition-all duration-300 ${scrolled ? "bg-[rgba(0,0,0,0.6)] backdrop-blur-[12px]" : "bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px]"}`}>
+          <div className="hidden md:flex flex-1 gap-[24px] items-center font-['PT_Root_UI',sans-serif] text-[14px] text-white">
+            <Link to="/" className="hover:opacity-80 transition-opacity">Главная</Link>
+            <Link to="/privacy" className="hover:opacity-80 transition-opacity">Конфиденциальность</Link>
+          </div>
+          <Logo />
+          <div className="flex-1 flex justify-end ml-auto md:ml-0">
+            <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover bg-white flex gap-[8px] items-center justify-center p-[12px] rounded-[100px] cursor-pointer border-none no-underline">
+              <ChromeIconSmall />
+              <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-[#181818] text-center whitespace-nowrap">Установить бесплатно</span>
+            </a>
           </div>
         </div>
+      </nav>
 
-        {/* Security note */}
-        <div className="flex items-center justify-center gap-[8px] mt-[24px]">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M12 5.33H4C3.26 5.33 2.67 5.93 2.67 6.67V12.67C2.67 13.4 3.26 14 4 14H12C12.74 14 13.33 13.4 13.33 12.67V6.67C13.33 5.93 12.74 5.33 12 5.33ZM8 10.67C7.26 10.67 6.67 10.07 6.67 9.33C6.67 8.6 7.26 8 8 8C8.74 8 9.33 8.6 9.33 9.33C9.33 10.07 8.74 10.67 8 10.67ZM10.67 5.33V4C10.67 2.53 9.47 1.33 8 1.33C6.53 1.33 5.33 2.53 5.33 4V5.33H10.67Z" fill="rgba(255,255,255,0.3)" />
-          </svg>
-          <span className="text-[rgba(255,255,255,0.3)] text-[13px] font-['PT_Root_UI',sans-serif]">
-            Безопасная оплата через ЮKassa
+      {/* ─── Pricing Section ─── */}
+      <section className="flex-1 bg-black w-full border-none pt-[120px]">
+        <div className="flex flex-col items-center overflow-clip">
+          <div className="flex flex-col gap-[40px] md:gap-[56px] items-center px-[20px] md:px-[100px] py-[60px] md:py-[80px] w-full max-w-[1440px]">
+            <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px] text-center text-white tracking-[-1.04px] max-w-[650px]">
+              Выбери тариф
+            </p>
+
+            <div className="flex flex-col md:flex-row gap-[24px] w-full max-w-[800px]">
+              {/* ── Free Card ── */}
+              <div className="flex-1">
+                <div className="card-hover bg-[#0d0d0d] rounded-[12px] h-[600px] relative overflow-clip">
+                  <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[12px]" />
+                  <div className="flex flex-col justify-between p-[32px] h-full">
+                    <div className="flex flex-col gap-[40px]">
+                      <div className="flex flex-col gap-[12px]">
+                        <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">Бесплатно</p>
+                        <div className="flex gap-[6px] items-end">
+                          <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">0₽</span>
+                          <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">в месяц</span>
+                        </div>
+                      </div>
+                      <Divider />
+                      <div className="flex flex-col gap-[12px]">
+                        <PricingFeature text="10 генераций в месяц" />
+                        <PricingFeature text="Оценка по всем 43+ моделям" />
+                        <PricingFeature text="Цветная шкала + рекомендации" />
+                        <PricingFeature text="Работа в syntx.ai" />
+                      </div>
+                    </div>
+                    <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none no-underline">
+                      <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
+                      <ChromeIconMed />
+                      <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">Установить бесплатно</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Pro Card ── */}
+              <div className="flex-1">
+                <div className="card-hover rounded-[12px] h-[600px] relative overflow-clip">
+                  <div aria-hidden="true" className="absolute inset-0 pointer-events-none rounded-[12px]">
+                    <div className="absolute bg-[#0d0d0d] inset-0 rounded-[12px]" />
+                    <img alt="" className="absolute max-w-none object-cover rounded-[12px] size-full" src={imgFrame37} />
+                    <div className="absolute bg-[rgba(0,0,0,0.48)] inset-0 rounded-[12px]" />
+                  </div>
+                  <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[12px] z-10" />
+                  <div className="relative z-10 flex flex-col justify-between p-[32px] h-full">
+                    <div className="flex flex-col gap-[40px]">
+                      <div className="flex flex-col gap-[12px]">
+                        <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">Pro</p>
+                        <div className="flex gap-[6px] items-end">
+                          <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">199₽</span>
+                          <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">в месяц</span>
+                        </div>
+                      </div>
+                      <Divider />
+                      <div className="flex flex-col gap-[12px]">
+                        <PricingFeature text="300 генераций в месяц" />
+                        <PricingFeature text="Улучшение в один клик" />
+                        <PricingFeature text="Приоритетная скорость анализа" />
+                        <PricingFeature text="Ранний доступ к новым моделям" />
+                        <PricingFeature text="Поддержка в Telegram" />
+                      </div>
+                    </div>
+                    <button
+                      onClick={handlePay}
+                      disabled={loading || !token}
+                      className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+                    >
+                      <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
+                      {loading ? "Переход к оплате..." : "Оплатить 199₽/мес"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Status messages ── */}
+            <div className="flex flex-col gap-[12px] items-center max-w-[500px]">
+              {error && (
+                <p className="font-['PT_Root_UI',sans-serif] text-[#d4183d] text-[14px] text-center leading-[1.5]">{error}</p>
+              )}
+
+              {!token && (
+                <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] px-[24px] py-[16px] text-center">
+                  <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.5)] text-[14px] leading-[1.6]">
+                    Для оплаты Pro перейдите на эту страницу из расширения Opten.
+                    <br />
+                    Ещё не установили?{" "}
+                    <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-[#2777C3] underline">
+                      Скачать бесплатно
+                    </a>
+                  </p>
+                </div>
+              )}
+
+              <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.3)] text-[12px] text-center leading-[1.5]">
+                Нажимая «Оплатить», вы принимаете{" "}
+                <Link to="/terms" className="text-[rgba(255,255,255,0.5)] underline">условия оферты</Link>
+                {" "}и{" "}
+                <Link to="/privacy" className="text-[rgba(255,255,255,0.5)] underline">политику конфиденциальности</Link>.
+                {" "}Подписка продлевается автоматически. Отменить можно в любой момент.
+              </p>
+
+              <div className="flex items-center justify-center gap-[8px]">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M12 5.33H4C3.26 5.33 2.67 5.93 2.67 6.67V12.67C2.67 13.4 3.26 14 4 14H12C12.74 14 13.33 13.4 13.33 12.67V6.67C13.33 5.93 12.74 5.33 12 5.33ZM8 10.67C7.26 10.67 6.67 10.07 6.67 9.33C6.67 8.6 7.26 8 8 8C8.74 8 9.33 8.6 9.33 9.33C9.33 10.07 8.74 10.67 8 10.67ZM10.67 5.33V4C10.67 2.53 9.47 1.33 8 1.33C6.53 1.33 5.33 2.53 5.33 4V5.33H10.67Z" fill="rgba(255,255,255,0.3)" />
+                </svg>
+                <span className="text-[rgba(255,255,255,0.3)] text-[13px] font-['PT_Root_UI',sans-serif]">
+                  Безопасная оплата через ЮKassa
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Footer ─── */}
+      <footer className="bg-black w-full border-t border-[rgba(255,255,255,0.05)]">
+        <div className="flex flex-col items-center gap-[16px] py-[32px] px-[20px]">
+          <div className="flex flex-wrap justify-center gap-[20px] sm:gap-[32px] font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.4)]">
+            <Link to="/" className="hover:text-white transition-colors no-underline text-inherit">Главная</Link>
+            <Link to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">Конфиденциальность</Link>
+            <Link to="/terms" className="hover:text-white transition-colors no-underline text-inherit">Оферта</Link>
+            <Link to="/refund" className="hover:text-white transition-colors no-underline text-inherit">Возврат</Link>
+            <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="flex gap-[8px] items-center hover:text-white transition-colors no-underline text-inherit">
+              <div className="overflow-clip relative shrink-0 size-[14px]">
+                <div className="absolute inset-[17.97%_8.92%_0.78%_7.33%]">
+                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15.0741 14.6261">
+                    <path clipRule="evenodd" d={svgPaths.p3150f900} fill="currentColor" fillRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              Связаться
+            </a>
+          </div>
+          <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[14px] text-[rgba(255,255,255,0.3)]">
+            © 2026 Opten · ИП Воронежцев В.П. · ИНН 723016676391
           </span>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }
