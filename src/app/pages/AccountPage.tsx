@@ -144,8 +144,11 @@ export default function AccountPage() {
         },
       });
       const data = await res.json();
+      console.log('get-subscription response:', res.status, data);
       if (res.ok) {
         setSub(data);
+      } else {
+        setError("Ошибка подписки: " + (data._debug_auth_error || data.error || res.status));
       }
     } catch {
       setError("Не удалось загрузить данные подписки.");
