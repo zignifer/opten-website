@@ -574,7 +574,7 @@ function PrivacySection() {
       <div className="flex flex-row justify-center overflow-clip">
         <div className="flex flex-col lg:flex-row gap-[48px] lg:gap-[100px] items-start px-[20px] md:px-[100px] py-[60px] md:py-[80px] w-full max-w-[1440px]">
           <RevealSection>
-            <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[36px] md:text-[52px] text-white tracking-[-1.04px] max-w-[394px]">Твои промпты принадлежат тебе</p>
+            <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[36px] md:text-[52px] text-white tracking-[-1.04px] max-w-[394px] text-center md:text-left">Твои промпты принадлежат тебе</p>
           </RevealSection>
           <div className="flex flex-col gap-[48px] md:gap-[64px] flex-1">
             <RevealSection>
