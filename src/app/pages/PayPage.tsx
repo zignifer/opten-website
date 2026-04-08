@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
 import imgFrame37 from "../../imports/LandingPage/da31c95f5bc0f013c26804882654e49618ec43c7.png";
+import imgChromeSm from "../../imports/LandingPage/chrome-icon-sm.svg";
+import imgYandexSm from "../../imports/LandingPage/yandex-icon-sm.svg";
 
 const SUPABASE_FUNCTIONS_URL = "https://vuywydhwkqmihfztpkgl.supabase.co/functions/v1";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1eXd5ZGh3a3FtaWhmenRwa2dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NTkxMjAsImV4cCI6MjA1OTQzNTEyMH0.bG0GfCEMbMBqPOMtkFDAiFjKQMqFVLHGe3bTG-hsaMA";
@@ -274,9 +276,16 @@ export default function PayPage() {
                         <PricingFeature text="Работа в syntx.ai" />
                       </div>
                     </div>
-                    <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none no-underline">
+                    <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[24px] py-[16px] rounded-[100px] relative cursor-pointer border-none no-underline">
                       <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                      <ChromeIconMed />
+                      <div className="hidden md:flex items-center pr-[8px] shrink-0">
+                        <div className="relative shrink-0 size-[32px] z-10">
+                          <img alt="Chrome" className="absolute block size-full" src={imgChromeSm} />
+                        </div>
+                        <div className="relative shrink-0 size-[32px] -ml-[8px]">
+                          <img alt="Yandex Browser" className="absolute block size-full" src={imgYandexSm} />
+                        </div>
+                      </div>
                       <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">Установить бесплатно</span>
                     </a>
                   </div>

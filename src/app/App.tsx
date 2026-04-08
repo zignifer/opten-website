@@ -178,14 +178,14 @@ function InstallButtonLarge() {
   );
 }
 
-/* Кнопка для остальных мест — меньше, без подписи */
+/* Кнопка для остальных мест — меньше, без подписи. На мобильных без иконок */
 function InstallButtonSmall() {
   return (
     <a href={STORE_URL} target="_blank" rel="noopener noreferrer"
-      className="btn-hover bg-white inline-flex gap-[12px] items-center px-[24px] py-[16px] rounded-[100px] relative cursor-pointer border-none no-underline">
+      className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[24px] py-[16px] rounded-[100px] relative cursor-pointer border-none no-underline">
       <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-      {/* Иконки Chrome + Yandex внахлёст */}
-      <div className="flex items-center pr-[8px] shrink-0">
+      {/* Иконки Chrome + Yandex — скрыты на мобильных */}
+      <div className="hidden md:flex items-center pr-[8px] shrink-0">
         <div className="relative shrink-0 size-[32px] z-10">
           <img alt="Chrome" className="absolute block size-full" src={imgChromeSm} />
         </div>
