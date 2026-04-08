@@ -741,7 +741,7 @@ function FooterSection() {
               Связаться
             </a>
           </div>
-          <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[14px] text-[rgba(255,255,255,0.3)]">© 2026 Opten · ИП Воронежцев В.П. · ИНН 723016676391</span>
+          <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[14px] text-[rgba(255,255,255,0.3)] text-center">© 2026 Opten · ИП Воронежцев В.П.<br className="md:hidden" /> ИНН 723016676391</span>
         </div>
       </div>
     </section>
