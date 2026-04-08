@@ -247,7 +247,7 @@ export default function PayPage() {
       </nav>
 
       {/* ─── Pricing Section ─── */}
-      <section className="flex-1 bg-black w-full border-none pt-[120px]">
+      <section className="flex-1 bg-black w-full border-none pt-[80px] md:pt-[120px]">
         <div className="flex flex-col items-center overflow-clip">
           <div className="flex flex-col gap-[40px] md:gap-[56px] items-center px-[20px] md:px-[100px] py-[60px] md:py-[80px] w-full max-w-[1440px]">
             <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px] text-center text-white tracking-[-1.04px] max-w-[650px]">
