@@ -259,7 +259,7 @@ function Navbar() {
 
         {/* Desktop nav links */}
         <div className="hidden md:flex flex-1 gap-[24px] items-center font-['PT_Root_UI',sans-serif] text-[14px] text-white">
-          <a href="#features" className="hover:opacity-80 transition-opacity">Возможноси</a>
+          <a href="#features" className="hover:opacity-80 transition-opacity">Возможности</a>
           <a href="#pricing" className="hover:opacity-80 transition-opacity">Тарифы</a>
           <a href="#faq" className="hover:opacity-80 transition-opacity">FAQ</a>
         </div>
@@ -277,7 +277,7 @@ function Navbar() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden bg-[rgba(0,0,0,0.9)] backdrop-blur-[12px] mx-[16px] mt-[8px] rounded-[16px] p-[24px] flex flex-col gap-[20px] font-['PT_Root_UI',sans-serif] text-[16px] text-white">
-          <a href="#features" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>Возможноси</a>
+          <a href="#features" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>Возможности</a>
           <a href="#pricing" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>Тарифы</a>
           <a href="#faq" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>FAQ</a>
           <Link to="/account" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>Личный кабинет</Link>
@@ -307,7 +307,7 @@ function HeroSection() {
             Не сливай кредиты на плохие промпты
           </h1>
           <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px] text-center text-white">
-            <span>Opten оценит промпт под конкретную нейросеть, покажет ошибки и исправит их в один клк. </span>
+            <span>Opten оценит промпт под конкретную нейросеть, покажет ошибки и исправит их в один клик. </span>
             <span className="font-bold">Прямо в интерфейсе генератора.</span>
           </p>
         </div>
@@ -361,7 +361,7 @@ function ThreeStepsSection() {
                 <StepItem num="02" title={<>Нажми на иконку <OptenInlineIcon /> ‐ Opten оценит промпт</>} desc="Цветное кольцо, конкретные рекомендации и диагноз: что не так и почему. Под конкретную модель, а не «вообще»." />
               </RevealSection>
               <RevealSection>
-                <StepItem num="03" title={<>Один клик <SparkleInlineIcon /> ‐ промпт улучшен</>} desc="Auto-enhance перепишет промпт с учётом всех правил выбранной нейросети. Вставляй и генерируй." />
+                <StepItem num="03" title={<>Один клик <SparkleInlineIcon /> ‐ промпт улучшен</>} desc="«Улучшить» перепишет промпт с учётом всех правил выбранной нейросети. Вставляй и генерируй." />
               </RevealSection>
             </div>
             <div className="w-full lg:w-[500px] shrink-0">
@@ -456,7 +456,7 @@ function FeatureCardsSection() {
               <RevealSection className="flex-1">
                 <FeatureCard
                   title="Улучшение промптов в один клик"
-                  desc={`Auto-enhance переписывает промпт за 2 секунды.\nУчитывает стиль, технические параметры, ограничения модели и ваше исходное намерение.`}
+                  desc={`«Улучшить» переписывает промпт за 2 секунды.\nУчитывает стиль, технические параметры, ограничения модели и ваше исходное намерение.`}
                   img={imgFrame232}
                   imgPosition="bottom"
                 />

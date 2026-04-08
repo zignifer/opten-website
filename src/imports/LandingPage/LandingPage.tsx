@@ -115,7 +115,7 @@ function Frame11() {
 function Frame18() {
   return (
     <div className="content-stretch flex flex-[1_0_0] font-['PT_Root_UI:Regular',sans-serif] gap-[24px] items-center leading-[1.1] min-h-px min-w-px not-italic relative text-[14px] text-center text-white whitespace-nowrap">
-      <p className="relative shrink-0">Возможноси</p>
+      <p className="relative shrink-0">Возможности</p>
       <p className="relative shrink-0">Тарифы</p>
       <p className="relative shrink-0">FAQ</p>
     </div>
@@ -373,7 +373,7 @@ function Frame27() {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col gap-[12px] items-start min-h-px min-w-px relative">
       <p className="font-['PT_Root_UI:Medium',sans-serif] leading-[1.1] not-italic relative shrink-0 text-[40px] text-white tracking-[-0.8px] w-[578px] whitespace-pre-wrap">{`Нажми на иконку     ‐ Opten оценит промпт`}</p>
-      <p className="font-['PT_Root_UI:Regular',sans-serif] leading-[1.6] not-italic relative shrink-0 text-[18px] text-[rgba(255,255,255,0.6)] w-[578px]">Цветное кольцо, конкретные рекомендации идиагноз: что не так и почему. Под конкретную модель, а не «вообще».</p>
+      <p className="font-['PT_Root_UI:Regular',sans-serif] leading-[1.6] not-italic relative shrink-0 text-[18px] text-[rgba(255,255,255,0.6)] w-[578px]">Цветное кольцо, конкретные рекомендации и диагноз: что не так и почему. Под конкретную модель, а не «вообще».</p>
       <Group3 />
     </div>
   );
@@ -404,7 +404,7 @@ function Frame29() {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col gap-[12px] items-start min-h-px min-w-px relative">
       <p className="font-['PT_Root_UI:Medium',sans-serif] leading-[1.1] not-italic relative shrink-0 text-[40px] text-white tracking-[-0.8px] w-[578px] whitespace-pre-wrap">{`Один клик     ‐ промпт улучшен`}</p>
-      <p className="font-['PT_Root_UI:Regular',sans-serif] leading-[1.6] not-italic relative shrink-0 text-[18px] text-[rgba(255,255,255,0.6)] w-[578px]">Auto-enhance перепишет промпт с учётом всех правил выбранной нейросети. Вставляй и генерируй.</p>
+      <p className="font-['PT_Root_UI:Regular',sans-serif] leading-[1.6] not-italic relative shrink-0 text-[18px] text-[rgba(255,255,255,0.6)] w-[578px]">«Улучшить» перепишет промпт с учётом всех правил выбранной нейросети. Вставляй и генерируй.</p>
       <Group4 />
     </div>
   );
@@ -568,7 +568,7 @@ function Frame41() {
   return (
     <div className="content-stretch flex flex-col gap-[12px] items-start not-italic relative shrink-0 w-full">
       <p className="font-['PT_Root_UI:Medium',sans-serif] leading-[1.1] relative shrink-0 text-[24px] text-white tracking-[-0.48px] w-full">Каждый плохой промпт — это сожжённые кредиты</p>
-      <p className="font-['PT_Root_UI:Regular',sans-serif] leading-[1.6] relative shrink-0 text-[16px] text-[rgba(255,255,255,0.6)] w-full">Пользователи Opten экономятот 30% до 50% кредитов на генерацию. При среднем расходе $20–50/мес на генераторы, Opten окупается за первый час использования.</p>
+      <p className="font-['PT_Root_UI:Regular',sans-serif] leading-[1.6] relative shrink-0 text-[16px] text-[rgba(255,255,255,0.6)] w-full">Пользователи Opten экономят от 30% до 50% кредитов на генерацию. При среднем расходе $20–50/мес на генераторы, Opten окупается за первый час использования.</p>
     </div>
   );
 }
@@ -594,9 +594,9 @@ function Frame43() {
     <div className="content-stretch flex flex-col gap-[12px] items-start not-italic relative shrink-0 w-full">
       <p className="font-['PT_Root_UI:Medium',sans-serif] leading-[1.1] relative shrink-0 text-[24px] text-white tracking-[-0.48px] w-full">Улучшение промптов в один клик</p>
       <p className="font-['PT_Root_UI:Regular',sans-serif] leading-[1.6] relative shrink-0 text-[16px] text-[rgba(255,255,255,0.6)] w-full whitespace-pre-wrap">
-        {`Auto-enhance переписывает промпт за 2 секунды. `}
+        {`«Улучшить» переписывает промпт за 2 секунды.`}
         <br aria-hidden="true" />
-        Учитывает стиль, технические параметры, ограничения модели и вашеисходное намерение.
+        Учитывает стиль, технические параметры, ограничения модели и ваше исходное намерение.
       </p>
     </div>
   );
@@ -729,7 +729,7 @@ function Frame49() {
   return (
     <div className="content-stretch flex gap-[24px] items-start relative shrink-0 w-full">
       <Frame51 />
-      <p className="flex-[1_0_0] font-['PT_Root_UI:Regular',sans-serif] leading-[1.6] min-h-px min-w-px not-italic relative text-[18px] text-[rgba(255,255,255,0.6)]">Расширение анализирует текст локально и череззащищённый API-канал. Твои промпты и изображения не сохраняются на наших серверах.</p>
+      <p className="flex-[1_0_0] font-['PT_Root_UI:Regular',sans-serif] leading-[1.6] min-h-px min-w-px not-italic relative text-[18px] text-[rgba(255,255,255,0.6)]">Расширение анализирует текст локально и через защищённый API-канал. Твои промпты и изображения не сохраняются на наших серверах.</p>
     </div>
   );
 }
@@ -775,7 +775,7 @@ function Frame53() {
   return (
     <div className="content-stretch flex gap-[24px] items-start relative shrink-0 w-full">
       <Frame54 />
-      <p className="flex-[1_0_0] font-['PT_Root_UI:Regular',sans-serif] leading-[1.6] min-h-px min-w-px not-italic relative text-[18px] text-[rgba(255,255,255,0.6)]">Мы не продаём пользовательский контент, неиспользуем его для рекламы и не предоставляем третьим сторонам для обучения моделей.</p>
+      <p className="flex-[1_0_0] font-['PT_Root_UI:Regular',sans-serif] leading-[1.6] min-h-px min-w-px not-italic relative text-[18px] text-[rgba(255,255,255,0.6)]">Мы не продаём пользовательский контент, не используем его для рекламы и не предоставляем третьим сторонам для обучения моделей.</p>
     </div>
   );
 }
@@ -821,7 +821,7 @@ function Frame56() {
   return (
     <div className="content-stretch flex gap-[24px] items-start relative shrink-0 w-full">
       <Frame57 />
-      <p className="flex-[1_0_0] font-['PT_Root_UI:Regular',sans-serif] leading-[1.6] min-h-px min-w-px not-italic relative text-[18px] text-[rgba(255,255,255,0.6)]">Opten запрашивает только те разрешения браузера,которые необходимы для работы. Никакого доступа к твоей истории, закладкам или другим вкладкам.</p>
+      <p className="flex-[1_0_0] font-['PT_Root_UI:Regular',sans-serif] leading-[1.6] min-h-px min-w-px not-italic relative text-[18px] text-[rgba(255,255,255,0.6)]">Opten запрашивает только те разрешения браузера, которые необходимы для работы. Никакого доступа к твоей истории, закладкам или другим вкладкам.</p>
     </div>
   );
 }
@@ -862,7 +862,7 @@ function Frame47() {
 function Frame50() {
   return (
     <div className="h-[607px] relative shrink-0 w-[1240px]">
-      <p className="absolute font-['PT_Root_UI:Medium',sans-serif] leading-[1.1] left-0 not-italic text-[52px] text-white top-0 tracking-[-1.04px] w-[394px]">Твои промпты прнадлежат тебе</p>
+      <p className="absolute font-['PT_Root_UI:Medium',sans-serif] leading-[1.1] left-0 not-italic text-[52px] text-white top-0 tracking-[-1.04px] w-[394px]">Твои промпты принадлежат тебе</p>
       <Frame47 />
     </div>
   );
