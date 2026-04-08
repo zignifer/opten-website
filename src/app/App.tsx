@@ -368,7 +368,7 @@ function PartnersSection() {
         <div className="flex flex-col items-center justify-center pb-[56px] px-[20px] md:px-[120px]">
           <div className="flex flex-col gap-[24px] items-center">
             <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px] text-[rgba(255,255,255,0.6)] text-center">
-              После установки используйте на сайтах:
+              После установки используй на сайтах:
             </p>
             <div className="flex flex-wrap gap-[32px] md:gap-[64px] items-center justify-center">
               {/* Syntx */}
@@ -425,7 +425,7 @@ function ThreeStepsSection() {
               </RevealSection>
             </div>
             <div className="w-full lg:w-[500px] shrink-0">
-              <img alt="" className="w-full h-auto object-cover rounded-[8px]" src={imgFrame161} />
+              <img alt="" className="w-full h-auto object-cover rounded-[8px]" src="/assets/frame-53.png" />
             </div>
           </div>
 
