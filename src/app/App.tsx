@@ -353,18 +353,45 @@ function HeroSection() {
 }
 
 /* ─── Partners Section ─── */
+function SoonBadge() {
+  return (
+    <div className="backdrop-blur-[2px] bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.1)] flex items-center justify-center px-[8px] py-[3px] rounded-[100px]">
+      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[11px] text-center text-white whitespace-nowrap">Скоро</p>
+    </div>
+  );
+}
+
 function PartnersSection() {
   return (
     <section className="bg-black w-full">
       <RevealSection>
         <div className="flex flex-col items-center justify-center pb-[56px] px-[20px] md:px-[120px]">
-          <div className="flex flex-col gap-[16px] items-center font-['PT_Root_UI',sans-serif] text-[16px] md:text-[18px] text-[rgba(255,255,255,0.6)] text-center">
-            <p>
-              <span className="leading-[1.6]">Работает с </span>
-              <span className="font-medium leading-[1.6] text-white">43+ моделями</span>
-              <span className="leading-[1.6]"> генерации</span>
+          <div className="flex flex-col gap-[24px] items-center">
+            <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px] text-[rgba(255,255,255,0.6)] text-center">
+              После установки используйте на сайтах:
             </p>
-            <p className="leading-[1.6]">Midjourney · DALL·E · Stable Diffusion ·Flux · Kling · Seedance · GPT Image · Runway · Sora · Leonardo AI · Ideogram — и другие.</p>
+            <div className="flex flex-wrap gap-[32px] md:gap-[64px] items-center justify-center">
+              {/* Syntx */}
+              <div className="flex gap-[12px] items-center">
+                <img alt="" className="w-[30px] h-[30px]" src="/assets/partners/syntx-icon.svg" />
+                <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] md:text-[32px] text-center text-white tracking-[-0.64px]">Syntx</p>
+              </div>
+              {/* Freepik */}
+              <div className="flex flex-col items-center gap-[6px]">
+                <img alt="Freepik" className="w-[128px] h-[19px]" src="/assets/partners/freepik.svg" />
+                <SoonBadge />
+              </div>
+              {/* Higgsfield */}
+              <div className="flex flex-col items-center gap-[6px]">
+                <img alt="Higgsfield" className="w-[130px] h-[26px]" src="/assets/partners/higgsfield.svg" />
+                <SoonBadge />
+              </div>
+              {/* Canva */}
+              <div className="flex flex-col items-center gap-[6px]">
+                <img alt="Canva" className="w-[80px] h-[26px]" src="/assets/partners/canva.svg" />
+                <SoonBadge />
+              </div>
+            </div>
           </div>
         </div>
       </RevealSection>
