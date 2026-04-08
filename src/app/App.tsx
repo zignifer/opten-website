@@ -377,15 +377,15 @@ function PartnersSection() {
               </a>
               <div className="relative w-[134px] h-[40px]">
                 <img alt="Freepik" className="w-full h-full object-contain" src="/assets/partners/freepik.png" />
-                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[10px]"><SoonBadge /></div>
+                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px]"><SoonBadge /></div>
               </div>
               <div className="relative w-[134px] h-[40px]">
                 <img alt="Higgsfield" className="w-full h-full object-contain" src="/assets/partners/higgsfield.png" />
-                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[10px]"><SoonBadge /></div>
+                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px]"><SoonBadge /></div>
               </div>
               <div className="relative w-[134px] h-[40px]">
                 <img alt="Canva" className="w-full h-full object-contain" src="/assets/partners/canva.png" />
-                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[10px]"><SoonBadge /></div>
+                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px]"><SoonBadge /></div>
               </div>
             </div>
             {/* Мобильный: 2×2 сетка */}
@@ -396,17 +396,17 @@ function PartnersSection() {
                 </a>
                 <div className="relative w-[134px] h-[40px]">
                   <img alt="Freepik" className="w-full h-full object-contain" src="/assets/partners/freepik.png" />
-                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-[10px]"><SoonBadge /></div>
+                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px]"><SoonBadge /></div>
                 </div>
               </div>
               <div className="flex items-center justify-between w-full">
                 <div className="relative w-[134px] h-[40px]">
                   <img alt="Higgsfield" className="w-full h-full object-contain" src="/assets/partners/higgsfield.png" />
-                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-[10px]"><SoonBadge /></div>
+                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px]"><SoonBadge /></div>
                 </div>
                 <div className="relative w-[134px] h-[40px]">
                   <img alt="Canva" className="w-full h-full object-contain" src="/assets/partners/canva.png" />
-                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-[10px]"><SoonBadge /></div>
+                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px]"><SoonBadge /></div>
                 </div>
               </div>
             </div>
