@@ -370,26 +370,46 @@ function PartnersSection() {
             <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px] text-[rgba(255,255,255,0.6)] text-center">
               После установки используй на сайтах:
             </p>
-            <div className="flex flex-wrap gap-[32px] md:gap-[64px] items-center justify-center">
-              {/* Syntx */}
+            {/* Десктоп: одна строка */}
+            <div className="hidden md:flex gap-[64px] items-center justify-center">
               <a href="https://syntx.ai/welcome/GlUETIt6" target="_blank" rel="noopener noreferrer" className="relative flex gap-[12px] items-center hover:opacity-80 transition-opacity">
                 <img alt="" className="w-[30px] h-[30px]" src="/assets/partners/syntx-icon.svg" />
-                <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] md:text-[32px] text-center text-white tracking-[-0.64px]">Syntx</p>
+                <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[32px] text-center text-white tracking-[-0.64px]">Syntx</p>
               </a>
-              {/* Freepik */}
               <div className="relative">
                 <img alt="Freepik" className="w-[128px] h-[19px]" src="/assets/partners/freepik.svg" />
                 <div className="absolute left-1/2 -translate-x-1/2 -bottom-[14px]"><SoonBadge /></div>
               </div>
-              {/* Higgsfield */}
               <div className="relative">
                 <img alt="Higgsfield" className="w-[130px] h-[26px]" src="/assets/partners/higgsfield.svg" />
                 <div className="absolute left-1/2 -translate-x-1/2 -bottom-[10px]"><SoonBadge /></div>
               </div>
-              {/* Canva */}
               <div className="relative">
                 <img alt="Canva" className="w-[80px] h-[26px]" src="/assets/partners/canva.svg" />
                 <div className="absolute left-1/2 -translate-x-1/2 -bottom-[10px]"><SoonBadge /></div>
+              </div>
+            </div>
+            {/* Мобильный: 2×2 сетка */}
+            <div className="flex md:hidden flex-col gap-[40px] items-center w-full max-w-[340px]">
+              <div className="flex items-center justify-between w-full">
+                <a href="https://syntx.ai/welcome/GlUETIt6" target="_blank" rel="noopener noreferrer" className="relative flex gap-[10px] items-center hover:opacity-80 transition-opacity">
+                  <img alt="" className="w-[24px] h-[24px]" src="/assets/partners/syntx-icon.svg" />
+                  <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-center text-white tracking-[-0.48px]">Syntx</p>
+                </a>
+                <div className="relative">
+                  <img alt="Freepik" className="w-[110px] h-[16px]" src="/assets/partners/freepik.svg" />
+                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-[14px]"><SoonBadge /></div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between w-full px-[10px]">
+                <div className="relative">
+                  <img alt="Higgsfield" className="w-[110px] h-[22px]" src="/assets/partners/higgsfield.svg" />
+                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-[10px]"><SoonBadge /></div>
+                </div>
+                <div className="relative">
+                  <img alt="Canva" className="w-[70px] h-[22px]" src="/assets/partners/canva.svg" />
+                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-[10px]"><SoonBadge /></div>
+                </div>
               </div>
             </div>
           </div>
