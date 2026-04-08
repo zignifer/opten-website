@@ -372,24 +372,24 @@ function PartnersSection() {
             </p>
             <div className="flex flex-wrap gap-[32px] md:gap-[64px] items-center justify-center">
               {/* Syntx */}
-              <div className="flex gap-[12px] items-center">
+              <div className="relative flex gap-[12px] items-center">
                 <img alt="" className="w-[30px] h-[30px]" src="/assets/partners/syntx-icon.svg" />
                 <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] md:text-[32px] text-center text-white tracking-[-0.64px]">Syntx</p>
               </div>
               {/* Freepik */}
-              <div className="flex flex-col items-center gap-[6px]">
+              <div className="relative">
                 <img alt="Freepik" className="w-[128px] h-[19px]" src="/assets/partners/freepik.svg" />
-                <SoonBadge />
+                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[14px]"><SoonBadge /></div>
               </div>
               {/* Higgsfield */}
-              <div className="flex flex-col items-center gap-[6px]">
+              <div className="relative">
                 <img alt="Higgsfield" className="w-[130px] h-[26px]" src="/assets/partners/higgsfield.svg" />
-                <SoonBadge />
+                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[10px]"><SoonBadge /></div>
               </div>
               {/* Canva */}
-              <div className="flex flex-col items-center gap-[6px]">
+              <div className="relative">
                 <img alt="Canva" className="w-[80px] h-[26px]" src="/assets/partners/canva.svg" />
-                <SoonBadge />
+                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[10px]"><SoonBadge /></div>
               </div>
             </div>
           </div>
