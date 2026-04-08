@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { Link } from "react-router";
+const OptenHeroAnimation = lazy(() => import("./components/OptenHeroAnimation"));
 import svgPaths from "../imports/LandingPage/svg-bvy0jfb1g6";
 import imgImage1 from "../imports/LandingPage/fa3631bfe3de9114866b4560b13297991ede111d.png";
 import imgFrame161 from "../imports/LandingPage/a4aab81523531c9d1cdd22f1a16ebda5bcca69aa.png";
@@ -291,28 +292,60 @@ function Navbar() {
 function HeroSection() {
   return (
     <section className="bg-[#181818] relative overflow-clip w-full min-h-[600px] md:h-[850px]">
+      <style>{`
+        .hero-anim-wrap { display: none !important; }
+        .hero-fallback { display: flex !important; }
+        @media (min-width: 1066px) {
+          .hero-anim-wrap { display: flex !important; }
+          .hero-fallback { display: none !important; }
+        }
+      `}</style>
       <div className="absolute inset-0 flex items-center justify-center">
         <img alt="" className="min-w-full min-h-full object-cover pointer-events-none" src={imgImage1} />
       </div>
       <div className="absolute bg-gradient-to-b from-[rgba(0,0,0,0)] via-[rgba(0,0,0,0.2)] to-black inset-0" />
-      <div className="relative z-10 flex flex-col items-center justify-center h-full pt-[120px] pb-[60px] md:pt-0 md:pb-0 px-[20px]">
-        <div className="flex flex-col gap-[24px] items-center max-w-[590px]">
-          <div className="flex gap-[6px] items-start flex-wrap justify-center">
-            <div className="backdrop-blur-[2px] bg-[rgba(255,255,255,0.1)] flex items-center justify-center px-[12px] py-[6px] rounded-[100px] relative">
-              <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[100px]" />
-              <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-center text-white whitespace-nowrap">Работает с 43+ моделями генерации</p>
-            </div>
+      <div className="relative z-10 flex flex-col items-center justify-center h-full pt-[120px] pb-[60px] px-[20px]">
+        {/* Desktop layout (>=1066px): no badge, tighter gap, animation */}
+        <div className="hero-anim-wrap w-full flex-col items-center">
+          <div className="flex flex-col gap-[19px] items-center max-w-[590px]" style={{ paddingTop: 30 }}>
+            <h1 className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[62px] text-center text-white tracking-[-1.24px]">
+              Не сливай кредиты на плохие промпты
+            </h1>
+            <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[18px] text-center text-white">
+              <span>Opten оценит промпт под конкретную нейросеть, покажет ошибки и исправит их в один клик. </span>
+              <span className="font-bold">Прямо в интерфейсе генератора.</span>
+            </p>
           </div>
-          <h1 className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[36px] sm:text-[48px] md:text-[62px] text-center text-white tracking-[-1.24px]">
-            Не сливай кредиты на плохие промпты
-          </h1>
-          <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px] text-center text-white">
-            <span>Opten оценит промпт под конкретную нейросеть, покажет ошибки и исправит их в один клик. </span>
-            <span className="font-bold">Прямо в интерфейсе генератора.</span>
-          </p>
+          <div className="mt-[45px] overflow-visible" style={{ width: 680, position: "relative" }}>
+            <Suspense fallback={<div style={{ height: 170 }} />}>
+              <OptenHeroAnimation />
+            </Suspense>
+          </div>
+          <div className="mt-[45px]">
+            <InstallButtonLarge />
+          </div>
         </div>
-        <div className="mt-[48px]">
-          <InstallButtonLarge />
+
+        {/* Mobile/tablet layout (<1066px): original design, no animation */}
+        <div className="hero-fallback flex-col items-center gap-[24px]">
+          <div className="flex flex-col gap-[24px] items-center max-w-[590px]">
+            <div className="flex gap-[6px] items-start flex-wrap justify-center">
+              <div className="backdrop-blur-[2px] bg-[rgba(255,255,255,0.1)] flex items-center justify-center px-[12px] py-[6px] rounded-[100px] relative">
+                <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[100px]" />
+                <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-center text-white whitespace-nowrap">Работает с 43+ моделями генерации</p>
+              </div>
+            </div>
+            <h1 className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[36px] sm:text-[48px] text-center text-white tracking-[-1.24px]">
+              Не сливай кредиты на плохие промпты
+            </h1>
+            <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] text-center text-white">
+              <span>Opten оценит промпт под конкретную нейросеть, покажет ошибки и исправит их в один клик. </span>
+              <span className="font-bold">Прямо в интерфейсе генератора.</span>
+            </p>
+          </div>
+          <div className="mt-[48px]">
+            <InstallButtonLarge />
+          </div>
         </div>
       </div>
     </section>
