@@ -372,10 +372,10 @@ function PartnersSection() {
             </p>
             <div className="flex flex-wrap gap-[32px] md:gap-[64px] items-center justify-center">
               {/* Syntx */}
-              <div className="relative flex gap-[12px] items-center">
+              <a href="https://syntx.ai/welcome/GlUETIt6" target="_blank" rel="noopener noreferrer" className="relative flex gap-[12px] items-center hover:opacity-80 transition-opacity">
                 <img alt="" className="w-[30px] h-[30px]" src="/assets/partners/syntx-icon.svg" />
                 <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] md:text-[32px] text-center text-white tracking-[-0.64px]">Syntx</p>
-              </div>
+              </a>
               {/* Freepik */}
               <div className="relative">
                 <img alt="Freepik" className="w-[128px] h-[19px]" src="/assets/partners/freepik.svg" />
