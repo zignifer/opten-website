@@ -371,7 +371,7 @@ function PartnersSection() {
               После установки используй на сайтах:
             </p>
             {/* Десктоп: одна строка */}
-            <div className="hidden md:flex gap-[64px] items-center justify-center">
+            <div className="hidden md:flex gap-[80px] items-center justify-center">
               <a href="https://syntx.ai/welcome/GlUETIt6" target="_blank" rel="noopener noreferrer" className="relative hover:opacity-80 transition-opacity w-[134px] h-[40px]">
                 <img alt="Syntx" className="w-full h-full object-contain" src="/assets/partners/syntx.png" />
               </a>
