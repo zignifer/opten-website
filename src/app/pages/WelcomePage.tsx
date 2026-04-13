@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useT, useLang } from "../../i18n/LangContext";
 
 const steps = [
@@ -7,9 +8,27 @@ const steps = [
   { num: "4", titleKey: "welcome.step4.title", descKey: "welcome.step4.desc" },
 ];
 
+const slides: Record<string, string[]> = {
+  ru: ["/assets/welcome-ru.png", "/assets/welcome-ru-2.png"],
+  en: ["/assets/welcome-en.png", "/assets/welcome-en-2.png"],
+};
+
 export default function WelcomePage() {
   const t = useT();
   const { lang } = useLang();
+  const [idx, setIdx] = useState(0);
+  const images = slides[lang];
+
+  useEffect(() => {
+    setIdx(0);
+  }, [lang]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIdx((prev) => (prev + 1) % images.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [images.length]);
 
   return (
     <div className="relative min-h-screen bg-white flex flex-col items-center justify-center px-[20px] py-[48px] font-['PT_Root_UI',sans-serif]">
@@ -29,13 +48,24 @@ export default function WelcomePage() {
       `}</style>
 
       <div className="w-full max-w-[520px] flex flex-col items-center gap-[32px]">
-        {/* Hero image */}
-        <img
-          src={lang === "ru" ? "/assets/welcome-ru.png" : "/assets/welcome-en.png"}
-          alt="Opten extension"
-          className="w-full rounded-[12px]"
-          draggable={false}
-        />
+        {/* Auto-slider */}
+        <div className="relative w-full overflow-hidden rounded-[12px]">
+          {images.map((src, i) => (
+            <img
+              key={src}
+              src={src}
+              alt="Opten extension"
+              className="w-full block transition-opacity duration-700"
+              style={{
+                opacity: i === idx ? 1 : 0,
+                position: i === 0 ? "relative" : "absolute",
+                top: 0,
+                left: 0,
+              }}
+              draggable={false}
+            />
+          ))}
+        </div>
 
         {/* Steps */}
         <div className="w-full flex flex-col gap-[20px]">
