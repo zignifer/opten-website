@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
+import { useT, useLang } from "../../i18n/LangContext";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
 
 const SUPABASE_FUNCTIONS_URL = "https://vuywydhwkqmihfztpkgl.supabase.co/functions/v1";
@@ -57,13 +58,13 @@ function CardIcon() {
   );
 }
 
-function formatDate(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
+function formatDate(iso: string, lang: string) {
+  const locale = lang === "ru" ? "ru-RU" : "en-US";
+  return new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" });
 }
 
-function cardBrandName(type: string | null): string {
-  if (!type) return "Карта";
+function cardBrandName(type: string | null, t: (key: string) => string): string {
+  if (!type) return t("account.payment.cardDefault");
   const map: Record<string, string> = {
     Visa: "Visa", MasterCard: "MasterCard", Mir: "МИР",
     MaestroCard: "Maestro", UnionPay: "UnionPay",
@@ -74,6 +75,8 @@ function cardBrandName(type: string | null): string {
 /* ─── Page ─── */
 
 export default function AccountPage() {
+  const t = useT();
+  const { lang, setLang } = useLang();
   const [token, setToken] = useState<string | null>(null);
   const [extStatus, setExtStatus] = useState<ExtStatus>("detecting");
   const [sub, setSub] = useState<Subscription | null>(null);
@@ -141,7 +144,7 @@ export default function AccountPage() {
       const chrome = (window as any).chrome;
       chrome.runtime.sendMessage(extensionId, { type: "GET_SUBSCRIPTION" }, (response: any) => {
         if (chrome.runtime.lastError || !response || response.error) {
-          setError("Не удалось загрузить подписку.");
+          setError(t("account.error.loadSub"));
           setLoadingSub(false);
           return;
         }
@@ -149,7 +152,7 @@ export default function AccountPage() {
         setLoadingSub(false);
       });
     } catch {
-      setError("Не удалось загрузить подписку.");
+      setError(t("account.error.loadSub"));
       setLoadingSub(false);
     }
   };
@@ -170,7 +173,7 @@ export default function AccountPage() {
         setError("Ошибка подписки: " + (data._debug_auth_error || data.error || res.status));
       }
     } catch {
-      setError("Не удалось загрузить данные подписки.");
+      setError(t("account.error.loadSubFailed"));
     } finally {
       setLoadingSub(false);
     }
@@ -197,14 +200,14 @@ export default function AccountPage() {
                 has_card: false,
               } : null);
             } else if (response.error) {
-              setError("Не удалось отменить подписку.");
+              setError(t("account.error.cancelFailed"));
             }
             setCancelling(false);
           });
         } catch { /* try next ID */ }
       }
     } catch {
-      setError("Ошибка сети. Попробуйте ещё раз.");
+      setError(t("account.error.network"));
       setCancelling(false);
     }
   };
@@ -231,9 +234,15 @@ export default function AccountPage() {
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-[8px]" : "py-[21px]"}`}>
         <div className={`max-w-[1100px] mx-[8px] lg:mx-auto flex items-center justify-between rounded-[1000px] py-[8px] pl-[24px] pr-[8px] transition-all duration-300 ${scrolled ? "bg-[rgba(0,0,0,0.6)] backdrop-blur-[12px]" : "bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px]"}`}>
           <div className="hidden md:flex flex-1 gap-[24px] items-center font-['PT_Root_UI',sans-serif] text-[14px] text-white">
-            <Link to="/" className="hover:opacity-80 transition-opacity">Главная</Link>
-            <Link to="/pay" className="hover:opacity-80 transition-opacity">Тарифы</Link>
-            <a href="/#faq" className="hover:opacity-80 transition-opacity">FAQ</a>
+            <Link to="/" className="hover:opacity-80 transition-opacity">{t("nav.home")}</Link>
+            <Link to="/pay" className="hover:opacity-80 transition-opacity">{t("nav.pricing")}</Link>
+            <a href="/#faq" className="hover:opacity-80 transition-opacity">{t("nav.faq")}</a>
+            <button
+              onClick={() => setLang(lang === "ru" ? "en" : "ru")}
+              className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]"
+            >
+              {lang === "ru" ? "EN" : "RU"}
+            </button>
           </div>
           <Logo />
           <div className="flex-1 flex justify-end ml-auto md:ml-0">
@@ -245,7 +254,7 @@ export default function AccountPage() {
             ) : (
               <Link to="/account" className="btn-hover bg-white flex gap-[8px] items-center justify-center p-[12px] px-[20px] rounded-[100px] cursor-pointer border-none no-underline">
                 <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 7.5a3 3 0 100-6 3 3 0 000 6zM7.5 9C4.46 9 2 10.34 2 12v1.5h11V12c0-1.66-2.46-3-5.5-3z" fill="#181818"/></svg>
-                <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-[#181818] text-center whitespace-nowrap">Личный кабинет</span>
+                <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-[#181818] text-center whitespace-nowrap">{t("nav.account")}</span>
               </Link>
             )}
           </div>
@@ -257,31 +266,31 @@ export default function AccountPage() {
         <div className="max-w-[560px] mx-auto flex flex-col gap-[32px]">
 
           <h1 className="text-white text-[32px] md:text-[40px] font-medium leading-[1.1] tracking-[-0.8px] text-center">
-            Управление подпиской
+            {t("account.title")}
           </h1>
 
           {/* Extension status */}
           {extStatus === "detecting" && (
             <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] p-[24px] text-center">
-              <p className="text-[rgba(255,255,255,0.5)] text-[15px]">Подключение к расширению...</p>
+              <p className="text-[rgba(255,255,255,0.5)] text-[15px]">{t("account.ext.detecting")}</p>
             </div>
           )}
 
           {extStatus === "not_installed" && (
             <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] p-[24px] text-center">
-              <p className="text-white text-[15px] font-medium mb-[8px]">Расширение Opten не найдено</p>
+              <p className="text-white text-[15px] font-medium mb-[8px]">{t("account.ext.notInstalled.title")}</p>
               <p className="text-[rgba(255,255,255,0.5)] text-[14px] leading-[1.6]">
-                <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-[#2777C3] underline">Установите расширение</a>,
-                войдите в аккаунт и обновите эту страницу.
+                <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-[#2777C3] underline">{t("account.ext.notInstalled.desc1")}</a>,{" "}
+                {t("account.ext.notInstalled.desc2")}
               </p>
             </div>
           )}
 
           {extStatus === "not_logged_in" && (
             <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] p-[24px] text-center">
-              <p className="text-white text-[15px] font-medium mb-[8px]">Войдите в аккаунт</p>
+              <p className="text-white text-[15px] font-medium mb-[8px]">{t("account.ext.notLoggedIn.title")}</p>
               <p className="text-[rgba(255,255,255,0.5)] text-[14px] leading-[1.6]">
-                Откройте popup расширения Opten, войдите через Google и обновите страницу.
+                {t("account.ext.notLoggedIn.desc")}
               </p>
             </div>
           )}
@@ -289,7 +298,7 @@ export default function AccountPage() {
           {/* Subscription info */}
           {extStatus === "ready" && loadingSub && (
             <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] p-[24px] text-center">
-              <p className="text-[rgba(255,255,255,0.5)] text-[15px]">Загрузка данных подписки...</p>
+              <p className="text-[rgba(255,255,255,0.5)] text-[15px]">{t("account.sub.loading")}</p>
             </div>
           )}
 
@@ -301,19 +310,19 @@ export default function AccountPage() {
                 <div className="relative z-10 flex flex-col gap-[24px]">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-[rgba(255,255,255,0.5)] text-[13px] uppercase tracking-[1px] mb-[4px]">Текущий тариф</p>
+                      <p className="text-[rgba(255,255,255,0.5)] text-[13px] uppercase tracking-[1px] mb-[4px]">{t("account.plan.label")}</p>
                       <p className="text-white text-[28px] font-medium leading-[1.1]">
-                        {isFree ? "Бесплатный" : "Pro"}
+                        {isFree ? t("account.plan.free") : t("account.plan.pro")}
                       </p>
                     </div>
                     {isActive && (
                       <div className="bg-[rgba(30,142,62,0.15)] px-[12px] py-[6px] rounded-[100px]">
-                        <span className="text-[#34A853] text-[13px] font-medium">Активна</span>
+                        <span className="text-[#34A853] text-[13px] font-medium">{t("account.plan.statusActive")}</span>
                       </div>
                     )}
                     {isCancelled && (
                       <div className="bg-[rgba(255,180,0,0.15)] px-[12px] py-[6px] rounded-[100px]">
-                        <span className="text-[#FBBC04] text-[13px] font-medium">Отменена</span>
+                        <span className="text-[#FBBC04] text-[13px] font-medium">{t("account.plan.statusCancelled")}</span>
                       </div>
                     )}
                   </div>
@@ -321,29 +330,29 @@ export default function AccountPage() {
                   {(isActive || isCancelled) && sub.expires_at && (
                     <div className="flex flex-col gap-[4px]">
                       <p className="text-[rgba(255,255,255,0.5)] text-[13px]">
-                        {isActive ? "Следующее списание" : "Доступ до"}
+                        {isActive ? t("account.plan.nextCharge") : t("account.plan.accessUntil")}
                       </p>
-                      <p className="text-white text-[16px]">{formatDate(sub.expires_at)}</p>
+                      <p className="text-white text-[16px]">{formatDate(sub.expires_at, lang)}</p>
                     </div>
                   )}
 
                   {isActive && (
                     <div className="flex flex-col gap-[4px]">
-                      <p className="text-[rgba(255,255,255,0.5)] text-[13px]">Стоимость</p>
-                      <p className="text-white text-[16px]">199 ₽ / мес (автоматическое продление)</p>
+                      <p className="text-[rgba(255,255,255,0.5)] text-[13px]">{t("account.plan.priceLabel")}</p>
+                      <p className="text-white text-[16px]">{t("account.plan.priceValue")}</p>
                     </div>
                   )}
 
                   {isFree && (
                     <div className="flex flex-col gap-[4px]">
                       <p className="text-[rgba(255,255,255,0.5)] text-[14px] leading-[1.6]">
-                        10 проверок в месяц. Для расширенных возможностей перейдите на Pro.
+                        {t("account.plan.freeDesc")}
                       </p>
                       <Link
                         to="/pay"
                         className="mt-[8px] bg-white text-black text-[16px] font-bold py-[14px] px-[32px] rounded-[100px] text-center no-underline inline-block hover:opacity-90 transition-opacity"
                       >
-                        Перейти на Pro — 199₽/мес
+                        {t("account.plan.upgradeBtn")}
                       </Link>
                     </div>
                   )}
@@ -355,20 +364,20 @@ export default function AccountPage() {
                 <div className="bg-[#0d0d0d] rounded-[16px] p-[32px] relative">
                   <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[16px]" />
                   <div className="relative z-10 flex flex-col gap-[24px]">
-                    <p className="text-[rgba(255,255,255,0.5)] text-[13px] uppercase tracking-[1px]">Способ оплаты</p>
+                    <p className="text-[rgba(255,255,255,0.5)] text-[13px] uppercase tracking-[1px]">{t("account.payment.label")}</p>
 
                     {sub.has_card && sub.card_last4 ? (
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-[12px]">
                           <CardIcon />
                           <div>
-                            <p className="text-white text-[16px]">{cardBrandName(sub.card_type)} •••• {sub.card_last4}</p>
-                            <p className="text-[rgba(255,255,255,0.4)] text-[13px]">Используется для автоплатежей</p>
+                            <p className="text-white text-[16px]">{cardBrandName(sub.card_type, t)} •••• {sub.card_last4}</p>
+                            <p className="text-[rgba(255,255,255,0.4)] text-[13px]">{t("account.payment.autoLabel")}</p>
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-[rgba(255,255,255,0.4)] text-[14px]">Карта не привязана</p>
+                      <p className="text-[rgba(255,255,255,0.4)] text-[14px]">{t("account.payment.noCard")}</p>
                     )}
 
                     {/* Cancel / unlink button */}
@@ -376,8 +385,7 @@ export default function AccountPage() {
                       <div className="flex flex-col gap-[12px] pt-[8px] border-t border-[rgba(255,255,255,0.1)]">
                         {cancelDone ? (
                           <p className="text-[#FBBC04] text-[14px]">
-                            Подписка отменена. Pro-доступ сохранится до {sub.expires_at ? formatDate(sub.expires_at) : "конца периода"}.
-                            Карта отвязана.
+                            {t("account.cancel.done").replace("{date}", sub.expires_at ? formatDate(sub.expires_at, lang) : "")}
                           </p>
                         ) : (
                           <button
@@ -385,12 +393,11 @@ export default function AccountPage() {
                             disabled={cancelling}
                             className="text-[#d4183d] text-[14px] font-medium bg-transparent border-none cursor-pointer text-left p-0 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            {cancelling ? "Отменяем..." : "Отвязать карту и отменить подписку"}
+                            {cancelling ? t("account.cancel.inProgress") : t("account.cancel.btn")}
                           </button>
                         )}
                         <p className="text-[rgba(255,255,255,0.3)] text-[12px] leading-[1.5]">
-                          При отмене подписки карта будет отвязана. Автоматические списания прекратятся.
-                          Доступ к Pro сохранится до конца оплаченного периода.
+                          {t("account.cancel.disclaimer")}
                         </p>
                       </div>
                     )}
@@ -398,7 +405,7 @@ export default function AccountPage() {
                     {isCancelled && (
                       <div className="pt-[8px] border-t border-[rgba(255,255,255,0.1)]">
                         <p className="text-[rgba(255,255,255,0.4)] text-[14px]">
-                          Подписка отменена. Карта отвязана. Автоматические списания не производятся.
+                          {t("account.cancelled.info")}
                         </p>
                       </div>
                     )}
@@ -418,10 +425,10 @@ export default function AccountPage() {
       <footer className="bg-black w-full border-t border-[rgba(255,255,255,0.05)]">
         <div className="flex flex-col items-center gap-[16px] py-[32px] px-[20px]">
           <div className="flex flex-wrap justify-center gap-[20px] sm:gap-[32px] text-[14px] text-[rgba(255,255,255,0.4)]">
-            <Link to="/" className="hover:text-white transition-colors no-underline text-inherit">Главная</Link>
-            <Link to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">Конфиденциальность</Link>
-            <Link to="/terms" className="hover:text-white transition-colors no-underline text-inherit">Оферта</Link>
-            <Link to="/refund" className="hover:text-white transition-colors no-underline text-inherit">Возврат</Link>
+            <Link to="/" className="hover:text-white transition-colors no-underline text-inherit">{t("nav.home")}</Link>
+            <Link to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.privacy")}</Link>
+            <Link to="/terms" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.terms")}</Link>
+            <Link to="/refund" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.refund")}</Link>
             <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="flex gap-[8px] items-center hover:text-white transition-colors no-underline text-inherit">
               <div className="overflow-clip relative shrink-0 size-[14px]">
                 <div className="absolute inset-[17.97%_8.92%_0.78%_7.33%]">
@@ -430,11 +437,11 @@ export default function AccountPage() {
                   </svg>
                 </div>
               </div>
-              Связаться
+              {t("footer.contact")}
             </a>
           </div>
           <span className="leading-[1.6] text-[14px] text-[rgba(255,255,255,0.3)]">
-            © 2026 Opten · ИП Воронежцев В.П. · ИНН 723016676391
+            {t("footer.copyright")}
           </span>
         </div>
       </footer>

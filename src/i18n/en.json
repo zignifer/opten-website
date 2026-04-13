@@ -119,6 +119,7 @@
   "account.plan.freeDesc": "10 checks per month. Upgrade to Pro for extended features.",
   "account.plan.upgradeBtn": "Upgrade to Pro — 199₽/mo",
   "account.payment.label": "Payment method",
+  "account.payment.cardDefault": "Card",
   "account.payment.autoLabel": "Used for automatic payments",
   "account.payment.noCard": "No card linked",
   "account.cancel.btn": "Unlink card and cancel subscription",

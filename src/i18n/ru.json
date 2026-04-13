@@ -119,6 +119,7 @@
   "account.plan.freeDesc": "10 проверок в месяц. Для расширенных возможностей перейдите на Pro.",
   "account.plan.upgradeBtn": "Перейти на Pro — 199₽/мес",
   "account.payment.label": "Способ оплаты",
+  "account.payment.cardDefault": "Карта",
   "account.payment.autoLabel": "Используется для автоплатежей",
   "account.payment.noCard": "Карта не привязана",
   "account.cancel.btn": "Отвязать карту и отменить подписку",
