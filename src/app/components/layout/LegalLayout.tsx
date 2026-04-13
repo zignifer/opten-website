@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { useT } from "../../../i18n/LangContext";
 
 interface LegalLayoutProps {
   title: string;
@@ -7,6 +8,8 @@ interface LegalLayoutProps {
 }
 
 export default function LegalLayout({ title, updatedAt, children }: LegalLayoutProps) {
+  const t = useT();
+
   return (
     <div className="min-h-screen bg-black font-['PT_Root_UI',sans-serif]">
       {/* Header */}
@@ -15,7 +18,7 @@ export default function LegalLayout({ title, updatedAt, children }: LegalLayoutP
           Opten
         </Link>
         <Link to="/" className="text-[rgba(255,255,255,0.5)] text-[14px] no-underline hover:text-white transition-colors">
-          На главную
+          {t("legal.backLink")}
         </Link>
       </header>
 
@@ -25,7 +28,7 @@ export default function LegalLayout({ title, updatedAt, children }: LegalLayoutP
           {title}
         </h1>
         <p className="text-[rgba(255,255,255,0.3)] text-[14px] mb-[40px]">
-          Последнее обновление: {updatedAt}
+          {t("legal.updatedAt")} {updatedAt}
         </p>
 
         <div className="legal-content text-[rgba(255,255,255,0.7)] text-[16px] leading-[1.7]">
@@ -36,10 +39,10 @@ export default function LegalLayout({ title, updatedAt, children }: LegalLayoutP
       {/* Footer */}
       <footer className="max-w-[800px] mx-auto px-[20px] py-[32px] border-t border-[rgba(255,255,255,0.1)]">
         <div className="flex flex-wrap gap-[24px] text-[14px] text-[rgba(255,255,255,0.4)]">
-          <Link to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">Конфиденциальность</Link>
-          <Link to="/terms" className="hover:text-white transition-colors no-underline text-inherit">Оферта</Link>
-          <Link to="/refund" className="hover:text-white transition-colors no-underline text-inherit">Возврат</Link>
-          <span>&copy; 2026 Opten</span>
+          <Link to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">{t("legal.footer.privacy")}</Link>
+          <Link to="/terms" className="hover:text-white transition-colors no-underline text-inherit">{t("legal.footer.terms")}</Link>
+          <Link to="/refund" className="hover:text-white transition-colors no-underline text-inherit">{t("legal.footer.refund")}</Link>
+          <span>{t("legal.footer.copyright")}</span>
         </div>
       </footer>
 
