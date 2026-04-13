@@ -9,17 +9,20 @@
   import RefundPage from "./app/pages/RefundPage.tsx";
   import AccountPage from "./app/pages/AccountPage.tsx";
   import "./styles/index.css";
+  import { LangProvider } from "./i18n/LangContext";
 
   createRoot(document.getElementById("root")!).render(
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/pay" element={<PayPage />} />
-        <Route path="/success" element={<SuccessPage />} />
-        <Route path="/privacy" element={<PrivacyPage />} />
-        <Route path="/terms" element={<TermsPage />} />
-        <Route path="/refund" element={<RefundPage />} />
-        <Route path="/account" element={<AccountPage />} />
-      </Routes>
-    </BrowserRouter>
+    <LangProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/pay" element={<PayPage />} />
+          <Route path="/success" element={<SuccessPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/refund" element={<RefundPage />} />
+          <Route path="/account" element={<AccountPage />} />
+        </Routes>
+      </BrowserRouter>
+    </LangProvider>
   );
