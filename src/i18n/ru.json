@@ -171,7 +171,7 @@
   "welcome.step1.desc": "Нажми иконку пазла в браузере и закрепи Opten для быстрого доступа",
   "welcome.step2.title": "Войди в аккаунт",
   "welcome.step2.desc": "Кликни на иконку расширения и залогинься через Google. Это бесплатно",
-  "welcome.step3.title": "Открой AI-генератор",
+  "welcome.step3.title": "Открой AI-генератор и выбери модель",
   "welcome.step3.desc": "Перейди на syntx.ai, higgsfield.ai или freepik.com",
   "welcome.step4.title": "Оцени или улучши промпт",
   "welcome.step4.desc": "Нажми кнопку-планету — получишь score и советы",
