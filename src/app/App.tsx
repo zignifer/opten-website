@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
+import { useT, useLang } from "../i18n/LangContext";
 import { Link } from "react-router";
 const OptenHeroAnimation = lazy(() => import("./components/OptenHeroAnimation"));
 import svgPaths from "../imports/LandingPage/svg-bvy0jfb1g6";
@@ -157,6 +158,7 @@ const STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-
 
 /* Кнопка Hero / Footer — большая, с подписью Chrome / Yandex Browser */
 function InstallButtonLarge() {
+  const t = useT();
   return (
     <a href={STORE_URL} target="_blank" rel="noopener noreferrer"
       className="btn-hover bg-white inline-flex gap-[12px] items-center pl-[10px] pr-[24px] py-[10px] rounded-[100px] relative cursor-pointer border-none no-underline">
@@ -171,8 +173,8 @@ function InstallButtonLarge() {
         </div>
       </div>
       <div className="flex flex-col items-start leading-[1.3] text-black whitespace-nowrap">
-        <span className="font-['PT_Root_UI',sans-serif] text-[14px]">Chrome / Yandex Browser</span>
-        <span className="font-['PT_Root_UI',sans-serif] font-bold text-[18px]">Установить бесплатно</span>
+        <span className="font-['PT_Root_UI',sans-serif] text-[14px]">{t("hero.installBtnSub")}</span>
+        <span className="font-['PT_Root_UI',sans-serif] font-bold text-[18px]">{t("hero.installBtn")}</span>
       </div>
     </a>
   );
@@ -180,6 +182,7 @@ function InstallButtonLarge() {
 
 /* Кнопка для остальных мест — меньше, без подписи. На мобильных без иконок */
 function InstallButtonSmall() {
+  const t = useT();
   return (
     <a href={STORE_URL} target="_blank" rel="noopener noreferrer"
       className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[24px] py-[16px] rounded-[100px] relative cursor-pointer border-none no-underline">
@@ -193,7 +196,7 @@ function InstallButtonSmall() {
           <img alt="Yandex Browser" className="absolute block size-full" src={imgYandexSm} />
         </div>
       </div>
-      <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">Установить бесплатно</span>
+      <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">{t("hero.installBtn")}</span>
     </a>
   );
 }
@@ -237,12 +240,18 @@ function Logo() {
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const t = useT();
+  const { lang, setLang } = useLang();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  useEffect(() => {
+    document.title = t("meta.title");
+  }, [t]);
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-[8px]" : "py-[21px]"}`}>
@@ -260,9 +269,15 @@ function Navbar() {
 
         {/* Desktop nav links */}
         <div className="hidden md:flex flex-1 gap-[24px] items-center font-['PT_Root_UI',sans-serif] text-[14px] text-white">
-          <a href="#features" className="hover:opacity-80 transition-opacity">Возможности</a>
-          <a href="#pricing" className="hover:opacity-80 transition-opacity">Тарифы</a>
-          <a href="#faq" className="hover:opacity-80 transition-opacity">FAQ</a>
+          <a href="#features" className="hover:opacity-80 transition-opacity">{t("nav.features")}</a>
+          <a href="#pricing" className="hover:opacity-80 transition-opacity">{t("nav.pricing")}</a>
+          <a href="#faq" className="hover:opacity-80 transition-opacity">{t("nav.faq")}</a>
+          <button
+            onClick={() => setLang(lang === "ru" ? "en" : "ru")}
+            className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]"
+          >
+            {lang === "ru" ? "EN" : "RU"}
+          </button>
         </div>
 
         <Logo />
@@ -270,7 +285,7 @@ function Navbar() {
         <div className="flex-1 flex justify-end ml-auto md:ml-0">
           <Link to="/account" className="btn-hover bg-white flex gap-[8px] items-center justify-center p-[12px] px-[20px] rounded-[100px] cursor-pointer border-none no-underline">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 7.5a3 3 0 100-6 3 3 0 000 6zM7.5 9C4.46 9 2 10.34 2 12v1.5h11V12c0-1.66-2.46-3-5.5-3z" fill="#181818"/></svg>
-            <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-[#181818] text-center whitespace-nowrap">Личный кабинет</span>
+            <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-[#181818] text-center whitespace-nowrap">{t("nav.account")}</span>
           </Link>
         </div>
       </div>
@@ -278,10 +293,16 @@ function Navbar() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden bg-[rgba(0,0,0,0.9)] backdrop-blur-[12px] mx-[16px] mt-[8px] rounded-[16px] p-[24px] flex flex-col gap-[20px] font-['PT_Root_UI',sans-serif] text-[16px] text-white">
-          <a href="#features" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>Возможности</a>
-          <a href="#pricing" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>Тарифы</a>
-          <a href="#faq" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>FAQ</a>
-          <Link to="/account" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>Личный кабинет</Link>
+          <a href="#features" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>{t("nav.features")}</a>
+          <a href="#pricing" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>{t("nav.pricing")}</a>
+          <a href="#faq" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>{t("nav.faq")}</a>
+          <Link to="/account" className="hover:opacity-80" onClick={() => setMenuOpen(false)}>{t("nav.account")}</Link>
+          <button
+            onClick={() => { setLang(lang === "ru" ? "en" : "ru"); setMenuOpen(false); }}
+            className="text-left text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif] text-[16px] p-0"
+          >
+            {lang === "ru" ? "EN" : "RU"}
+          </button>
         </div>
       )}
     </nav>
@@ -290,6 +311,7 @@ function Navbar() {
 
 /* ─── Hero Section ─── */
 function HeroSection() {
+  const t = useT();
   return (
     <section className="bg-[#181818] relative overflow-clip w-full min-h-[600px] md:h-[850px]">
       <style>{`
@@ -309,11 +331,11 @@ function HeroSection() {
         <div className="hero-anim-wrap w-full flex-col items-center">
           <div className="flex flex-col gap-[19px] items-center max-w-[590px]" style={{ paddingTop: 30 }}>
             <h1 className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[62px] text-center text-white tracking-[-1.24px]">
-              Не сливай кредиты на плохие промпты
+              {t("hero.title")}
             </h1>
             <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[18px] text-center text-white">
-              <span>Opten оценит промпт под конкретную нейросеть, покажет ошибки и исправит их в один клик. </span>
-              <span className="font-bold">Прямо в интерфейсе генератора.</span>
+              <span>{t("hero.subtitle1")}</span>
+              <span className="font-bold">{t("hero.subtitle2")}</span>
             </p>
           </div>
           <div className="mt-[45px] overflow-visible" style={{ width: 680, position: "relative" }}>
@@ -332,15 +354,15 @@ function HeroSection() {
             <div className="flex gap-[6px] items-start flex-wrap justify-center">
               <div className="backdrop-blur-[2px] bg-[rgba(255,255,255,0.1)] flex items-center justify-center px-[12px] py-[6px] rounded-[100px] relative">
                 <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[100px]" />
-                <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-center text-white whitespace-nowrap">Работает с 43+ моделями генерации</p>
+                <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-center text-white whitespace-nowrap">{t("hero.badge")}</p>
               </div>
             </div>
             <h1 className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[36px] sm:text-[48px] text-center text-white tracking-[-1.24px]">
-              Не сливай кредиты на плохие промпты
+              {t("hero.title")}
             </h1>
             <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] text-center text-white">
-              <span>Opten оценит промпт под конкретную нейросеть, покажет ошибки и исправит их в один клик. </span>
-              <span className="font-bold">Прямо в интерфейсе генератора.</span>
+              <span>{t("hero.subtitle1")}</span>
+              <span className="font-bold">{t("hero.subtitle2")}</span>
             </p>
           </div>
           <div className="mt-[48px]">
@@ -354,21 +376,23 @@ function HeroSection() {
 
 /* ─── Partners Section ─── */
 function SoonBadge() {
+  const t = useT();
   return (
     <div className="backdrop-blur-[2px] bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.1)] flex items-center justify-center px-[8px] py-[3px] rounded-[100px]">
-      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[11px] text-center text-white whitespace-nowrap">Скоро</p>
+      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[11px] text-center text-white whitespace-nowrap">{t("partners.soon")}</p>
     </div>
   );
 }
 
 function PartnersSection() {
+  const t = useT();
   return (
     <section className="bg-black w-full">
       <RevealSection>
         <div className="flex flex-col items-center justify-center pb-[56px] px-[20px] md:px-[120px]">
           <div className="flex flex-col gap-[24px] items-center">
             <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px] text-[rgba(255,255,255,0.6)] text-center">
-              После установки используй на сайтах:
+              {t("partners.label")}
             </p>
             {/* Десктоп: одна строка */}
             <div className="hidden md:flex gap-[80px] items-center justify-center">
@@ -419,27 +443,28 @@ function PartnersSection() {
 
 /* ─── Three Steps Section ─── */
 function ThreeStepsSection() {
+  const t = useT();
   return (
     <section id="features" className="bg-black w-full">
       <div className="flex flex-col items-center overflow-clip">
         <div className="flex flex-col gap-[48px] md:gap-[72px] items-center px-[20px] md:px-[100px] py-[60px] md:py-[80px] w-full max-w-[1440px]">
           <RevealSection>
             <div className="font-['PT_Root_UI',sans-serif] font-medium text-center text-white tracking-[-1.04px]">
-              <p className="leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px] text-[rgba(255,255,255,0.6)]">Три шага до</p>
-              <p className="leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px]">идеального промпта</p>
+              <p className="leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px] text-[rgba(255,255,255,0.6)]">{t("steps.heading1")}</p>
+              <p className="leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px]">{t("steps.heading2")}</p>
             </div>
           </RevealSection>
 
           <div className="flex flex-col lg:flex-row gap-[40px] lg:gap-[120px] items-start justify-center w-full">
             <div className="flex flex-col gap-[40px] md:gap-[56px] flex-1">
               <RevealSection>
-                <StepItem num="01" title="Напиши промпт как обычно" desc="Opten встраивается прямо в интерфейс генератора. Никакого копирования в другие окна." />
+                <StepItem num="01" title={t("steps.01.title")} desc={t("steps.01.desc")} />
               </RevealSection>
               <RevealSection>
-                <StepItem num="02" title={<>Нажми на иконку <OptenInlineIcon /> ‐ Opten оценит промпт</>} desc="Цветное кольцо, конкретные рекомендации и диагноз: что не так и почему. Под конкретную модель, а не «вообще»." />
+                <StepItem num="02" title={<>{t("steps.02.titlePre")} <OptenInlineIcon /> {t("steps.02.titlePost")}</>} desc={t("steps.02.desc")} />
               </RevealSection>
               <RevealSection>
-                <StepItem num="03" title={<>Один клик <SparkleInlineIcon /> ‐ промпт улучшен</>} desc="«Улучшить» перепишет промпт с учётом всех правил выбранной нейросети. Вставляй и генерируй." />
+                <StepItem num="03" title={<>{t("steps.03.titlePre")} <SparkleInlineIcon /> {t("steps.03.titlePost")}</>} desc={t("steps.03.desc")} />
               </RevealSection>
             </div>
             <div className="w-full lg:w-[500px] shrink-0">
@@ -492,14 +517,15 @@ function StepItem({ num, title, desc }: { num: string; title: React.ReactNode; d
 
 /* ─── Feature Cards Section ─── */
 function FeatureCardsSection() {
+  const t = useT();
   return (
     <section className="bg-black w-full">
       <div className="flex flex-col items-center overflow-clip">
         <div className="flex flex-col gap-[48px] md:gap-[72px] items-center px-[20px] md:px-[100px] py-[60px] md:py-[80px] w-full max-w-[1440px]">
           <RevealSection>
             <div className="font-['PT_Root_UI',sans-serif] font-medium text-center text-white tracking-[-1.04px]">
-              <p className="leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px]">Не очередные</p>
-              <p className="leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px]">«советы по промптингу»</p>
+              <p className="leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px]">{t("features.heading1")}</p>
+              <p className="leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px]">{t("features.heading2")}</p>
             </div>
           </RevealSection>
 
@@ -507,16 +533,16 @@ function FeatureCardsSection() {
             <div className="flex flex-col md:flex-row gap-[12px] w-full">
               <RevealSection className="flex-1">
                 <FeatureCard
-                  title="43 модели. У каждой свои правила."
-                  desc="Midjourney любит короткие метафоры. Flux требует технических параметров. DALL·E хочет детальные описания. Opten знает правила каждой модели — и проверяет ваш промпт по ним, а не «в целом»."
+                  title={t("features.card1.title")}
+                  desc={t("features.card1.desc")}
                   img={imgFrame231}
                   imgPosition="bottom"
                 />
               </RevealSection>
               <RevealSection className="flex-1">
                 <FeatureCard
-                  title="Работает там, где ты генерируешь"
-                  desc={`Не нужно переключаться между вкладками и копировать текст.\nOpten появляется прямо в интерфейсе вашего генератора — как Grammarly появляется в Gmail.`}
+                  title={t("features.card2.title")}
+                  desc={t("features.card2.desc")}
                   img={imgFrame233}
                   imgPosition="top"
                 />
@@ -525,16 +551,16 @@ function FeatureCardsSection() {
             <div className="flex flex-col md:flex-row gap-[12px] w-full">
               <RevealSection className="flex-1">
                 <FeatureCard
-                  title="Каждый плохой промпт — это сожжённые кредиты"
-                  desc="Пользователи Opten экономят от 30% до 50% кредитов на генерацию. При среднем расходе $20–50/мес на генераторы, Opten окупается за первый час использования."
+                  title={t("features.card3.title")}
+                  desc={t("features.card3.desc")}
                   img={imgFrame234}
                   imgPosition="bottom"
                 />
               </RevealSection>
               <RevealSection className="flex-1">
                 <FeatureCard
-                  title="Улучшение промптов в один клик"
-                  desc={`«Улучшить» переписывает промпт за 2 секунды.\nУчитывает стиль, технические параметры, ограничения модели и ваше исходное намерение.`}
+                  title={t("features.card4.title")}
+                  desc={t("features.card4.desc")}
                   img={imgFrame232}
                   imgPosition="bottom"
                 />
@@ -569,24 +595,25 @@ function FeatureCard({ title, desc, img, imgPosition }: { title: string; desc: s
 
 /* ─── Privacy Section ─── */
 function PrivacySection() {
+  const t = useT();
   return (
     <section id="faq" className="bg-black w-full">
       <div className="flex flex-row justify-center overflow-clip">
         <div className="flex flex-col lg:flex-row gap-[48px] lg:gap-[100px] items-start px-[20px] md:px-[100px] py-[60px] md:py-[80px] w-full max-w-[1440px]">
           <RevealSection>
-            <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[36px] md:text-[52px] text-white tracking-[-1.04px] max-w-[394px] text-center md:text-left">Твои промпты принадлежат тебе</p>
+            <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[36px] md:text-[52px] text-white tracking-[-1.04px] max-w-[394px] text-center md:text-left">{t("privacy.sectionTitle")}</p>
           </RevealSection>
           <div className="flex flex-col gap-[48px] md:gap-[64px] flex-1">
             <RevealSection>
-              <PrivacyItem title="Мы не храним промпты" desc="Расширение анализирует текст локально и через защищённый API-канал. Твои промпты и изображения не сохраняются на наших серверах." />
+              <PrivacyItem title={t("privacy.item1.title")} desc={t("privacy.item1.desc")} />
             </RevealSection>
             <Divider />
             <RevealSection>
-              <PrivacyItem title="Не продаём и не передаём данные" desc="Мы не продаём пользовательский контент, не используем его для рекламы и не предоставляем третьим сторонам для обучения моделей." />
+              <PrivacyItem title={t("privacy.item2.title")} desc={t("privacy.item2.desc")} />
             </RevealSection>
             <Divider />
             <RevealSection>
-              <PrivacyItem title="Минимальные разрешения" desc="Opten запрашивает только те разрешения браузера, которые необходимы для работы. Никакого доступа к твоей истории, закладкам или другим вкладкам." />
+              <PrivacyItem title={t("privacy.item3.title")} desc={t("privacy.item3.desc")} />
             </RevealSection>
           </div>
         </div>
@@ -609,12 +636,13 @@ function PrivacyItem({ title, desc }: { title: string; desc: string }) {
 
 /* ─── Pricing Section ─── */
 function PricingSection() {
+  const t = useT();
   return (
     <section id="pricing" className="bg-black w-full border-none">
       <div className="flex flex-col items-center overflow-clip">
         <div className="flex flex-col gap-[40px] md:gap-[56px] items-center px-[20px] md:px-[100px] py-[60px] md:py-[80px] w-full max-w-[1440px]">
           <RevealSection>
-            <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px] text-center text-white tracking-[-1.04px] max-w-[650px]">Начни бесплатно. Перейди на Pro, когда будешь готов.</p>
+            <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px] text-center text-white tracking-[-1.04px] max-w-[650px]">{t("pricing.heading")}</p>
           </RevealSection>
 
           <div className="flex flex-col md:flex-row gap-[24px] w-full max-w-[800px]">
@@ -624,18 +652,18 @@ function PricingSection() {
                 <div className="flex flex-col justify-between p-[32px] h-full">
                   <div className="flex flex-col gap-[40px]">
                     <div className="flex flex-col gap-[12px]">
-                      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">Бесплатно</p>
+                      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.free.name")}</p>
                       <div className="flex gap-[6px] items-end">
-                        <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">0₽</span>
-                        <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">в месяц</span>
+                        <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{t("pricing.free.price")}</span>
+                        <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">{t("pricing.free.period")}</span>
                       </div>
                     </div>
                     <Divider />
                     <div className="flex flex-col gap-[12px]">
-                      <PricingFeature text="10 генераций в месяц" />
-                      <PricingFeature text="Оценка по всем 43+ моделям" />
-                      <PricingFeature text="Цветная шкала + рекомендации" />
-                      <PricingFeature text="Работа в syntx.ai" />
+                      <PricingFeature text={t("pricing.free.feature1")} />
+                      <PricingFeature text={t("pricing.free.feature2")} />
+                      <PricingFeature text={t("pricing.free.feature3")} />
+                      <PricingFeature text={t("pricing.free.feature4")} />
                     </div>
                   </div>
                   <InstallButtonWhite />
@@ -654,24 +682,24 @@ function PricingSection() {
                 <div className="relative z-10 flex flex-col justify-between p-[32px] h-full">
                   <div className="flex flex-col gap-[40px]">
                     <div className="flex flex-col gap-[12px]">
-                      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">Pro</p>
+                      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.pro.name")}</p>
                       <div className="flex gap-[6px] items-end">
-                        <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">199₽</span>
-                        <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">в месяц</span>
+                        <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{t("pricing.pro.price")}</span>
+                        <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">{t("pricing.pro.period")}</span>
                       </div>
                     </div>
                     <Divider />
                     <div className="flex flex-col gap-[12px]">
-                      <PricingFeature text="300 генераций в месяц" />
-                      <PricingFeature text="Улучшение в один клик" />
-                      <PricingFeature text="Приоритетная скорость анализа" />
-                      <PricingFeature text="Ранний доступ к новым моделям" />
-                      <PricingFeature text="Поддержка в Telegram" />
+                      <PricingFeature text={t("pricing.pro.feature1")} />
+                      <PricingFeature text={t("pricing.pro.feature2")} />
+                      <PricingFeature text={t("pricing.pro.feature3")} />
+                      <PricingFeature text={t("pricing.pro.feature4")} />
+                      <PricingFeature text={t("pricing.pro.feature5")} />
                     </div>
                   </div>
                   <Link to="/pay" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none no-underline">
                     <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                    <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">Попробовать Pro</span>
+                    <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">{t("pricing.pro.btn")}</span>
                   </Link>
                 </div>
               </div>
@@ -694,6 +722,7 @@ function PricingFeature({ text }: { text: string }) {
 
 /* ─── Footer CTA Section ─── */
 function FooterSection() {
+  const t = useT();
   return (
     <section className="bg-black relative w-full overflow-clip border-none">
       {/* BG image centered */}
@@ -710,8 +739,8 @@ function FooterSection() {
       <div className="relative z-10 flex flex-col gap-[60px] md:gap-[80px] items-center pb-[32px] pt-[100px] md:pt-[120px] px-[20px] md:px-[100px]">
         <RevealSection>
           <div className="flex flex-col gap-[24px] items-center text-center text-white max-w-[730px]">
-            <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[36px] sm:text-[48px] md:text-[62px] tracking-[-1.24px]">Хватит гадать. Генерируй с первой попытки.</p>
-            <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px]">Установи Opten за 30 секунд и оцени свой следующий промпт бесплатно.</p>
+            <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[36px] sm:text-[48px] md:text-[62px] tracking-[-1.24px]">{t("cta.title")}</p>
+            <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px]">{t("cta.subtitle")}</p>
           </div>
         </RevealSection>
 
@@ -720,16 +749,16 @@ function FooterSection() {
             <InstallButtonLarge />
             <div className="flex gap-[12px] items-center">
               <CheckIcon />
-              <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[18px] text-center text-white">10 бесплатных генераций  месяц</span>
+              <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[18px] text-center text-white">{t("cta.freeLabel")}</span>
             </div>
           </div>
         </RevealSection>
 
         <div className="flex flex-col items-center gap-[16px]">
           <div className="flex flex-wrap justify-center gap-[20px] sm:gap-[32px] font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.4)]">
-            <Link to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">Конфиденциальность</Link>
-            <Link to="/terms" className="hover:text-white transition-colors no-underline text-inherit">Оферта</Link>
-            <Link to="/refund" className="hover:text-white transition-colors no-underline text-inherit">Возврат</Link>
+            <Link to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.privacy")}</Link>
+            <Link to="/terms" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.terms")}</Link>
+            <Link to="/refund" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.refund")}</Link>
             <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="flex gap-[8px] items-center hover:text-white transition-colors no-underline text-inherit">
               <div className="overflow-clip relative shrink-0 size-[14px]">
                 <div className="absolute inset-[17.97%_8.92%_0.78%_7.33%]">
@@ -738,10 +767,10 @@ function FooterSection() {
                   </svg>
                 </div>
               </div>
-              Связаться
+              {t("footer.contact")}
             </a>
           </div>
-          <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[14px] text-[rgba(255,255,255,0.3)] text-center">© 2026 Opten · ИП Воронежцев В.П.<br className="md:hidden" /> ИНН 723016676391</span>
+          <span className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[14px] text-[rgba(255,255,255,0.3)] text-center">{t("footer.copyright")}</span>
         </div>
       </div>
     </section>
