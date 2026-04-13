@@ -401,14 +401,12 @@ function PartnersSection() {
               <a href="https://syntx.ai/welcome/GlUETIt6" target="_blank" rel="noopener noreferrer" className="relative hover:opacity-80 transition-opacity w-[134px] h-[40px]">
                 <img alt="Syntx" className="w-full h-full object-contain" src="/assets/partners/syntx.png" />
               </a>
-              <div className="relative w-[134px] h-[40px]">
+              <a href="https://www.freepik.com/" target="_blank" rel="noopener noreferrer" className="relative hover:opacity-80 transition-opacity w-[134px] h-[40px]">
                 <img alt="Freepik" className="w-full h-full object-contain" src="/assets/partners/freepik.png" />
-                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px]"><SoonBadge /></div>
-              </div>
-              <div className="relative w-[134px] h-[40px]">
+              </a>
+              <a href="https://higgsfield.ai/" target="_blank" rel="noopener noreferrer" className="relative hover:opacity-80 transition-opacity w-[134px] h-[40px]">
                 <img alt="Higgsfield" className="w-full h-full object-contain" src="/assets/partners/higgsfield.png" />
-                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px]"><SoonBadge /></div>
-              </div>
+              </a>
               <div className="relative w-[134px] h-[40px]">
                 <img alt="Canva" className="w-full h-full object-contain" src="/assets/partners/canva.png" />
                 <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px]"><SoonBadge /></div>
@@ -420,16 +418,14 @@ function PartnersSection() {
                 <a href="https://syntx.ai/welcome/GlUETIt6" target="_blank" rel="noopener noreferrer" className="relative hover:opacity-80 transition-opacity w-[134px] h-[40px]">
                   <img alt="Syntx" className="w-full h-full object-contain" src="/assets/partners/syntx.png" />
                 </a>
-                <div className="relative w-[134px] h-[40px]">
+                <a href="https://www.freepik.com/" target="_blank" rel="noopener noreferrer" className="relative hover:opacity-80 transition-opacity w-[134px] h-[40px]">
                   <img alt="Freepik" className="w-full h-full object-contain" src="/assets/partners/freepik.png" />
-                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px]"><SoonBadge /></div>
-                </div>
+                </a>
               </div>
               <div className="flex items-center justify-between w-full">
-                <div className="relative w-[134px] h-[40px]">
+                <a href="https://higgsfield.ai/" target="_blank" rel="noopener noreferrer" className="relative hover:opacity-80 transition-opacity w-[134px] h-[40px]">
                   <img alt="Higgsfield" className="w-full h-full object-contain" src="/assets/partners/higgsfield.png" />
-                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px]"><SoonBadge /></div>
-                </div>
+                </a>
                 <div className="relative w-[134px] h-[40px]">
                   <img alt="Canva" className="w-full h-full object-contain" src="/assets/partners/canva.png" />
                   <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px]"><SoonBadge /></div>
