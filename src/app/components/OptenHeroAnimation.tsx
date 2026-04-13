@@ -1,8 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-
-const OLD_TEXT = "красивый пейзаж, горы";
-const NEW_TEXT =
-  "Величественный горный пейзаж на закате, тёплые золотистые лучи пробиваются сквозь облака, стиль landscape photography, Fujifilm, wide angle, cinematic lighting, 8K, --ar 16:9";
+import { useT } from "../../i18n/LangContext";
 
 const ASSET = "/assets/opten-anim";
 
@@ -22,6 +19,9 @@ type Phase =
   | "fade-out";
 
 export default function OptenHeroAnimation() {
+  const t = useT();
+  const oldText = t("anim.oldText");
+  const newText = t("anim.newText");
   const [phase, setPhase] = useState<Phase>("typing");
   const [oldChars, setOldChars] = useState(0);
   const [cursorVisible, setCursorVisible] = useState(true);
@@ -55,7 +55,7 @@ export default function OptenHeroAnimation() {
         setPhase("typing");
         setOldChars(0);
         setEnhancePressed(false);
-        for (let i = 0; i <= OLD_TEXT.length; i++) {
+        for (let i = 0; i <= oldText.length; i++) {
           if (cancelled) return;
           setOldChars(i);
           await delay(charDelay(i));
@@ -79,7 +79,7 @@ export default function OptenHeroAnimation() {
     }
     run();
     return () => { cancelled = true; clear(); };
-  }, [delay, clear]);
+  }, [delay, clear, oldText, newText]);
 
   const isRedPhase = ["red-in", "enhance-press", "red-out"].includes(phase);
   const isGreenPhase = ["swap", "green-in", "hold"].includes(phase);
@@ -157,13 +157,13 @@ export default function OptenHeroAnimation() {
           >
             {showOldText && (
               <span>
-                {OLD_TEXT.slice(0, phase === "typing" ? oldChars : OLD_TEXT.length)}
+                {oldText.slice(0, phase === "typing" ? oldChars : oldText.length)}
                 {phase === "typing" && (
                   <span style={{ opacity: cursorVisible ? 0.7 : 0 }}>|</span>
                 )}
               </span>
             )}
-            {showNewText && <span>{NEW_TEXT}</span>}
+            {showNewText && <span>{newText}</span>}
           </div>
 
           <div
@@ -180,7 +180,7 @@ export default function OptenHeroAnimation() {
             <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
               <div style={{ display: "flex", gap: 6, height: 28, alignItems: "center", padding: "0 8px", borderRadius: 10 }}>
                 <span style={{ fontFamily: '"PT Root UI", sans-serif', fontWeight: 500, fontSize: 11.8, color: "rgba(255,255,255,0.5)" }}>
-                  MidJourney
+                  {t("anim.model")}
                 </span>
                 <img src={`${ASSET}/chevron-down.svg`} style={{ width: 12, height: 12 }} alt="" />
               </div>
@@ -222,22 +222,22 @@ export default function OptenHeroAnimation() {
               }}
             >
               <div style={{ display: "flex", gap: 2.9, alignItems: "center" }}>
-                <span style={{ fontSize: 8.7, fontWeight: 600, color: "#fff" }}>34%</span>
-                <span style={{ fontSize: 8.7, fontWeight: 300, color: "rgba(255,255,255,0.6)" }}>Слабый промпт</span>
+                <span style={{ fontSize: 8.7, fontWeight: 600, color: "#fff" }}>{t("anim.scorePercent")}</span>
+                <span style={{ fontSize: 8.7, fontWeight: 300, color: "rgba(255,255,255,0.6)" }}>{t("anim.scoreBad")}</span>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 2.9 }}>
                 <div style={{ display: "flex", gap: 5.8, alignItems: "center", fontSize: 8.7, color: "#fff" }}>
                   <span style={{ color: "#ef4444", fontSize: 8 }}>✦</span>
-                  <span style={{ flex: 1 }}>Слишком общий запрос</span>
+                  <span style={{ flex: 1 }}>{t("anim.issue1")}</span>
                   <img src={`${ASSET}/arrow-down.svg`} style={{ width: 5.95, height: 3.54, transform: "rotate(180deg)" }} alt="" />
                 </div>
                 <div style={{ paddingLeft: 11.6, fontSize: 8, fontWeight: 300, color: "rgba(255,255,255,0.6)" }}>
-                  Добавьте: время суток, погоду, освещение
+                  {t("anim.issue1hint")}
                 </div>
               </div>
               <div style={{ display: "flex", gap: 5.8, alignItems: "center", fontSize: 8.7, color: "#fff" }}>
                 <span style={{ color: "#eab308", fontSize: 8 }}>✦</span>
-                <span style={{ flex: 1 }}>Отсутствуют параметры</span>
+                <span style={{ flex: 1 }}>{t("anim.issue2")}</span>
                 <img src={`${ASSET}/arrow-down.svg`} style={{ width: 5.95, height: 3.54 }} alt="" />
               </div>
             </div>
@@ -257,9 +257,9 @@ export default function OptenHeroAnimation() {
             >
               <div style={{ display: "flex", gap: 5.8, alignItems: "center" }}>
                 <img src={`${ASSET}/enhance-icon.svg`} style={{ width: 5.8, height: 8.7 }} alt="" />
-                <span style={{ fontSize: 8.7, color: "#fff" }}>Улучшить</span>
+                <span style={{ fontSize: 8.7, color: "#fff" }}>{t("anim.enhance")}</span>
               </div>
-              <span style={{ fontSize: 8.7, fontWeight: 300, color: "rgba(255,255,255,0.6)" }}>Seedance 2.0</span>
+              <span style={{ fontSize: 8.7, fontWeight: 300, color: "rgba(255,255,255,0.6)" }}>{t("anim.enhanceModel")}</span>
             </div>
           </div>
 
@@ -288,7 +288,7 @@ export default function OptenHeroAnimation() {
             >
               <div style={{ display: "flex", gap: 5.8, alignItems: "center" }}>
                 <img src={`${ASSET}/checkmark-green.svg`} style={{ width: 5.8, height: 8.7 }} alt="" />
-                <span style={{ fontSize: 8.7, color: "#fff" }}>Отличный промпт</span>
+                <span style={{ fontSize: 8.7, color: "#fff" }}>{t("anim.good")}</span>
               </div>
             </div>
           </div>

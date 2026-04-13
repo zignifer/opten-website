@@ -7,8 +7,10 @@ import imgImage1 from "../imports/LandingPage/fa3631bfe3de9114866b4560b13297991e
 import imgFrame161 from "../imports/LandingPage/a4aab81523531c9d1cdd22f1a16ebda5bcca69aa.png";
 import imgFrame231 from "../imports/LandingPage/6fe2b2e482114aaece3557d61a780f48e409ae7a.png";
 import imgFrame233 from "../imports/LandingPage/643b83f6ac31944ea5c6501794954e84df3835ec.png";
+import imgFrame233En from "../imports/LandingPage/imgFrame233-en.png";
 import imgFrame234 from "../imports/LandingPage/5d0e2aab408679eb569960b14c42e066e5a20b92.png";
 import imgFrame232 from "../imports/LandingPage/dc7c40ef44dccb75d38f341e5a8e7f03b9d865a4.png";
+import imgFrame232En from "../imports/LandingPage/imgFrame232-en.png";
 import imgFrame37 from "../imports/LandingPage/da31c95f5bc0f013c26804882654e49618ec43c7.png";
 import imgChromeLg from "../imports/LandingPage/chrome-icon-lg.svg";
 import imgYandexLg from "../imports/LandingPage/yandex-icon-lg.svg";
@@ -444,6 +446,7 @@ function PartnersSection() {
 /* ─── Three Steps Section ─── */
 function ThreeStepsSection() {
   const t = useT();
+  const { lang } = useLang();
   return (
     <section id="features" className="bg-black w-full">
       <div className="flex flex-col items-center overflow-clip">
@@ -468,7 +471,7 @@ function ThreeStepsSection() {
               </RevealSection>
             </div>
             <div className="w-full lg:w-[500px] shrink-0">
-              <img alt="" className="w-full h-auto object-cover rounded-[8px]" src="/assets/frame-53.png" />
+              <img alt="" className="w-full h-auto object-cover rounded-[8px]" src={lang === "ru" ? "/assets/frame-53.png" : "/assets/frame-53-en.png"} />
             </div>
           </div>
 
@@ -518,6 +521,7 @@ function StepItem({ num, title, desc }: { num: string; title: React.ReactNode; d
 /* ─── Feature Cards Section ─── */
 function FeatureCardsSection() {
   const t = useT();
+  const { lang } = useLang();
   return (
     <section className="bg-black w-full">
       <div className="flex flex-col items-center overflow-clip">
@@ -543,7 +547,7 @@ function FeatureCardsSection() {
                 <FeatureCard
                   title={t("features.card2.title")}
                   desc={t("features.card2.desc")}
-                  img={imgFrame233}
+                  img={lang === "ru" ? imgFrame233 : imgFrame233En}
                   imgPosition="top"
                 />
               </RevealSection>
@@ -561,7 +565,7 @@ function FeatureCardsSection() {
                 <FeatureCard
                   title={t("features.card4.title")}
                   desc={t("features.card4.desc")}
-                  img={imgFrame232}
+                  img={lang === "ru" ? imgFrame232 : imgFrame232En}
                   imgPosition="bottom"
                 />
               </RevealSection>

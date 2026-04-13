@@ -69,6 +69,18 @@
   "cta.subtitle": "Установи Opten за 30 секунд и оцени свой следующий промпт бесплатно.",
   "cta.freeLabel": "10 бесплатных генераций в месяц",
 
+  "anim.oldText": "красивый пейзаж, горы",
+  "anim.newText": "Величественный горный пейзаж на закате, тёплые золотистые лучи пробиваются сквозь облака, стиль landscape photography, Fujifilm, wide angle, cinematic lighting, 8K, --ar 16:9",
+  "anim.model": "MidJourney",
+  "anim.scorePercent": "34%",
+  "anim.scoreBad": "Слабый промпт",
+  "anim.issue1": "Слишком общий запрос",
+  "anim.issue1hint": "Добавьте: время суток, погоду, освещение",
+  "anim.issue2": "Отсутствуют параметры",
+  "anim.enhance": "Улучшить",
+  "anim.enhanceModel": "Seedance 2.0",
+  "anim.good": "Отличный промпт",
+
   "footer.privacy": "Конфиденциальность",
   "footer.terms": "Оферта",
   "footer.refund": "Возврат",
