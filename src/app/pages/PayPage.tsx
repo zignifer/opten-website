@@ -170,7 +170,7 @@ export default function PayPage() {
     }
   };
 
-  const handlePay = async () => {
+  const handlePay = async (recurring: boolean) => {
     if (!token) {
       setError(t("pay.error.sessionNotFound"));
       return;
@@ -185,6 +185,7 @@ export default function PayPage() {
           "apikey": SUPABASE_ANON_KEY,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ recurring }),
       });
       const data = await res.json();
       if (!res.ok || data.error) {
@@ -264,39 +265,46 @@ export default function PayPage() {
             </p>
 
             <div className="flex flex-col md:flex-row gap-[24px] w-full max-w-[800px]">
-              {/* ── Free Card ── */}
+              {/* ── One-time Card (D-01: plain dark bg, D-02: subtitle, FE-01: 5 features) ── */}
               <div className="flex-1">
                 <div className="card-hover bg-[#0d0d0d] rounded-[12px] h-[600px] relative overflow-clip">
                   <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[12px]" />
                   <div className="flex flex-col justify-between p-[32px] h-full">
                     <div className="flex flex-col gap-[40px]">
-                      <div className="flex flex-col gap-[12px]">
-                        <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.free.name")}</p>
+                      <div className="flex flex-col gap-[8px]">
+                        <div className="flex flex-col gap-[4px]">
+                          <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.onetime.name")}</p>
+                          <p className="font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.5)] leading-[1.4]">{t("pricing.onetime.subtitle")}</p>
+                        </div>
                         <div className="flex gap-[6px] items-end">
-                          <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{t("pricing.free.price")}</span>
-                          <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">{t("pricing.free.period")}</span>
+                          <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{t("pricing.onetime.price")}</span>
+                          <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">{t("pricing.onetime.period")}</span>
                         </div>
                       </div>
                       <Divider />
                       <div className="flex flex-col gap-[12px]">
-                        <PricingFeature text={t("pricing.free.feature1")} />
-                        <PricingFeature text={t("pricing.free.feature2")} />
-                        <PricingFeature text={t("pricing.free.feature3")} />
-                        <PricingFeature text={t("pricing.free.feature4")} />
+                        <PricingFeature text={t("pricing.onetime.feature1")} />
+                        <PricingFeature text={t("pricing.onetime.feature2")} />
+                        <PricingFeature text={t("pricing.onetime.feature3")} />
+                        <PricingFeature text={t("pricing.onetime.feature4")} />
+                        <PricingFeature text={t("pricing.onetime.feature5")} />
                       </div>
                     </div>
-                    <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[24px] py-[16px] rounded-[100px] relative cursor-pointer border-none no-underline">
-                      <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                      <div className="hidden md:flex items-center pr-[8px] shrink-0">
-                        <div className="relative shrink-0 size-[32px] z-10">
-                          <img alt="Chrome" className="absolute block size-full" src={imgChromeSm} />
-                        </div>
-                        <div className="relative shrink-0 size-[32px] -ml-[8px]">
-                          <img alt="Yandex Browser" className="absolute block size-full" src={imgYandexSm} />
-                        </div>
-                      </div>
-                      <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">{t("pay.free.installBtn")}</span>
-                    </a>
+                    {extStatus === "ready" ? (
+                      <button
+                        onClick={() => handlePay(false)}
+                        disabled={loading}
+                        className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+                      >
+                        <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
+                        {loading ? t("pay.onetime.payingBtn") : t("pay.onetime.payBtn")}
+                      </button>
+                    ) : (
+                      <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none no-underline">
+                        <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
+                        <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">{t("pay.onetime.tryBtn")}</span>
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
@@ -312,8 +320,11 @@ export default function PayPage() {
                   <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[12px] z-10" />
                   <div className="relative z-10 flex flex-col justify-between p-[32px] h-full">
                     <div className="flex flex-col gap-[40px]">
-                      <div className="flex flex-col gap-[12px]">
-                        <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.pro.name")}</p>
+                      <div className="flex flex-col gap-[8px]">
+                        <div className="flex flex-col gap-[4px]">
+                          <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.pro.name")}</p>
+                          <p className="font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.5)] leading-[1.4]">{t("pricing.pro.subtitle")}</p>
+                        </div>
                         <div className="flex gap-[6px] items-end">
                           <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{t("pricing.pro.price")}</span>
                           <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">{t("pricing.pro.period")}</span>
@@ -330,7 +341,7 @@ export default function PayPage() {
                     </div>
                     {extStatus === "ready" ? (
                       <button
-                        onClick={handlePay}
+                        onClick={() => handlePay(true)}
                         disabled={loading}
                         className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
                       >
