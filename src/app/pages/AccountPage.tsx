@@ -125,8 +125,8 @@ export default function AccountPage() {
             setToken(response.token);
             if (response.email) setEmail(response.email);
             setExtStatus("ready");
-            // Fetch subscription via extension (avoids token expiry issues)
-            fetchSubscriptionViaExtension(id);
+            // Always fetch fresh data from Edge Function (not stale chrome.storage cache)
+            fetchSubscription(response.token);
           } else {
             setExtStatus("not_logged_in");
           }
@@ -135,25 +135,6 @@ export default function AccountPage() {
         tried++;
         if (tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
       }
-    }
-  };
-
-  const fetchSubscriptionViaExtension = (extensionId: string) => {
-    setLoadingSub(true);
-    try {
-      const chrome = (window as any).chrome;
-      chrome.runtime.sendMessage(extensionId, { type: "GET_SUBSCRIPTION" }, (response: any) => {
-        if (chrome.runtime.lastError || !response || response.error) {
-          setError(t("account.error.loadSub"));
-          setLoadingSub(false);
-          return;
-        }
-        setSub(response);
-        setLoadingSub(false);
-      });
-    } catch {
-      setError(t("account.error.loadSub"));
-      setLoadingSub(false);
     }
   };
 
