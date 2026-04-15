@@ -196,6 +196,8 @@ export default function AccountPage() {
   const isActive = sub?.status === "active";
   const isCancelled = sub?.status === "cancelled";
   const isFree = !sub || sub.plan === "free" || sub.status === "expired";
+  const isOneTime = (isActive || isCancelled) && !sub?.auto_renew;
+  const isSubscription = (isActive || isCancelled) && !!sub?.auto_renew;
 
 
   return (
@@ -311,13 +313,13 @@ export default function AccountPage() {
                   {(isActive || isCancelled) && sub.expires_at && (
                     <div className="flex flex-col gap-[4px]">
                       <p className="text-[rgba(255,255,255,0.5)] text-[13px]">
-                        {isActive ? t("account.plan.nextCharge") : t("account.plan.accessUntil")}
+                        {isSubscription && isActive ? t("account.plan.nextCharge") : t("account.plan.accessUntil")}
                       </p>
                       <p className="text-white text-[16px]">{formatDate(sub.expires_at, lang)}</p>
                     </div>
                   )}
 
-                  {isActive && (
+                  {isSubscription && isActive && (
                     <div className="flex flex-col gap-[4px]">
                       <p className="text-[rgba(255,255,255,0.5)] text-[13px]">{t("account.plan.priceLabel")}</p>
                       <p className="text-white text-[16px]">{t("account.plan.priceValue")}</p>
@@ -341,7 +343,7 @@ export default function AccountPage() {
               </div>
 
               {/* ── Card info ── */}
-              {(isActive || isCancelled) && (
+              {isSubscription && (
                 <div className="bg-[#0d0d0d] rounded-[16px] p-[32px] relative">
                   <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[16px]" />
                   <div className="relative z-10 flex flex-col gap-[24px]">
