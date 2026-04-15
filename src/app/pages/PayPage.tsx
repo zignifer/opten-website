@@ -271,15 +271,9 @@ export default function PayPage() {
                   <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[12px]" />
                   <div className="flex flex-col justify-between p-[32px] h-full">
                     <div className="flex flex-col gap-[40px]">
-                      <div className="flex flex-col gap-[8px]">
-                        <div className="flex flex-col gap-[4px]">
-                          <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.onetime.name")}</p>
-                          <p className="font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.5)] leading-[1.4]">{t("pricing.onetime.subtitle")}</p>
-                        </div>
-                        <div className="flex gap-[6px] items-end">
-                          <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{t("pricing.onetime.price")}</span>
-                          <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">{t("pricing.onetime.period")}</span>
-                        </div>
+                      <div className="flex flex-col gap-[12px]">
+                        <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.onetime.subtitle")}</p>
+                        <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{t("pricing.onetime.price")}</span>
                       </div>
                       <Divider />
                       <div className="flex flex-col gap-[12px]">
@@ -321,10 +315,7 @@ export default function PayPage() {
                   <div className="relative z-10 flex flex-col justify-between p-[32px] h-full">
                     <div className="flex flex-col gap-[40px]">
                       <div className="flex flex-col gap-[8px]">
-                        <div className="flex flex-col gap-[4px]">
-                          <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.pro.name")}</p>
-                          <p className="font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.5)] leading-[1.4]">{t("pricing.pro.subtitle")}</p>
-                        </div>
+                        <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.pro.subtitle")}</p>
                         <div className="flex gap-[6px] items-end">
                           <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{t("pricing.pro.price")}</span>
                           <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">{t("pricing.pro.period")}</span>
