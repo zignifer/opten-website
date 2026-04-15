@@ -16,6 +16,16 @@ const EXTENSION_IDS = [
 
 type ExtStatus = "detecting" | "not_installed" | "not_logged_in" | "ready";
 
+interface Subscription {
+  plan: string;
+  status: string | null;
+  expires_at: string | null;
+  auto_renew: boolean;
+  card_last4: string | null;
+  card_type: string | null;
+  has_card: boolean;
+}
+
 /* ─── Reusable Icons (same as landing) ─── */
 
 function ChromeIconSmall() {
@@ -119,6 +129,8 @@ export default function PayPage() {
   const [email, setEmail] = useState<string | null>(null);
   const [extStatus, setExtStatus] = useState<ExtStatus>("detecting");
   const [scrolled, setScrolled] = useState(false);
+  const [sub, setSub] = useState<Subscription | null>(null);
+  const [loadingSub, setLoadingSub] = useState(false);
 
   useEffect(() => {
     // 1. Check URL hash first (direct link from extension)
@@ -129,6 +141,7 @@ export default function PayPage() {
       setToken(hashToken);
       setExtStatus("ready");
       window.history.replaceState(null, "", window.location.pathname);
+      fetchSubscription(hashToken);
     } else {
       // 2. Try to get token from extension via externally_connectable
       detectExtension();
@@ -159,6 +172,7 @@ export default function PayPage() {
             setToken(response.token);
             if (response.email) setEmail(response.email);
             setExtStatus("ready");
+            fetchSubscription(response.token);
           } else {
             setExtStatus("not_logged_in");
           }
@@ -167,6 +181,26 @@ export default function PayPage() {
         tried++;
         if (tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
       }
+    }
+  };
+
+  const fetchSubscription = async (authToken: string) => {
+    setLoadingSub(true);
+    try {
+      const res = await fetch(SUPABASE_FUNCTIONS_URL + "/get-subscription", {
+        headers: {
+          "Authorization": "Bearer " + authToken,
+          "apikey": SUPABASE_ANON_KEY,
+        },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSub(data);
+      }
+    } catch {
+      // silent — PayPage degrades gracefully (buttons remain enabled if fetch fails)
+    } finally {
+      setLoadingSub(false);
     }
   };
 
@@ -204,6 +238,9 @@ export default function PayPage() {
       setLoading(false);
     }
   };
+
+  // D-10: active or cancelled (not yet expired) Pro blocks payment
+  const hasActivePro = sub !== null && (sub.status === "active" || sub.status === "cancelled") && sub.plan !== "free";
 
   return (
     <div className="w-full min-h-screen bg-black flex flex-col">
@@ -285,14 +322,23 @@ export default function PayPage() {
                       </div>
                     </div>
                     {extStatus === "ready" ? (
-                      <button
-                        onClick={() => handlePay(false)}
-                        disabled={loading}
-                        className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
-                      >
-                        <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                        {loading ? t("pay.onetime.payingBtn") : t("pay.onetime.payBtn")}
-                      </button>
+                      hasActivePro ? (
+                        <button
+                          disabled
+                          className="inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-white whitespace-nowrap bg-[#555] opacity-40 cursor-not-allowed border-none w-full"
+                        >
+                          {t("pay.alreadyActive")}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handlePay(false)}
+                          disabled={loading}
+                          className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+                        >
+                          <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
+                          {loading ? t("pay.onetime.payingBtn") : t("pay.onetime.payBtn")}
+                        </button>
+                      )
                     ) : (
                       <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none no-underline">
                         <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
@@ -331,14 +377,23 @@ export default function PayPage() {
                       </div>
                     </div>
                     {extStatus === "ready" ? (
-                      <button
-                        onClick={() => handlePay(true)}
-                        disabled={loading}
-                        className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
-                      >
-                        <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                        {loading ? t("pay.pro.payingBtn") : t("pay.pro.payBtn")}
-                      </button>
+                      hasActivePro ? (
+                        <button
+                          disabled
+                          className="inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-white whitespace-nowrap bg-[#555] opacity-40 cursor-not-allowed border-none w-full"
+                        >
+                          {t("pay.alreadyActive")}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handlePay(true)}
+                          disabled={loading}
+                          className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+                        >
+                          <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
+                          {loading ? t("pay.pro.payingBtn") : t("pay.pro.payBtn")}
+                        </button>
+                      )
                     ) : (
                       <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none no-underline">
                         <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
@@ -349,6 +404,14 @@ export default function PayPage() {
                 </div>
               </div>
             </div>
+
+            {extStatus === "ready" && hasActivePro && (
+              <div className="flex justify-center">
+                <Link to="/account" className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.5)] text-[14px] underline hover:text-white transition-colors">
+                  {t("account.title")}
+                </Link>
+              </div>
+            )}
 
             {/* ── Status messages ── */}
             <div className="flex flex-col gap-[16px] items-center max-w-[560px]">
