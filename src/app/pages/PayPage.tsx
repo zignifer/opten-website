@@ -405,14 +405,6 @@ export default function PayPage() {
               </div>
             </div>
 
-            {extStatus === "ready" && hasActivePro && (
-              <div className="flex justify-center">
-                <Link to="/account" className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.5)] text-[14px] underline hover:text-white transition-colors">
-                  {t("account.title")}
-                </Link>
-              </div>
-            )}
-
             {/* ── Status messages ── */}
             <div className="flex flex-col gap-[16px] items-center max-w-[560px]">
               {error && (
