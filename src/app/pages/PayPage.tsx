@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { useT, useLang } from "../../i18n/LangContext";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
-import imgFrame37 from "../../imports/LandingPage/da31c95f5bc0f013c26804882654e49618ec43c7.png";
+import imgFrame37 from "../../imports/LandingPage/da31c95f5bc0f013c26804882654e49618ec43c7.webp";
 import imgChromeSm from "../../imports/LandingPage/chrome-icon-sm.svg";
 import imgYandexSm from "../../imports/LandingPage/yandex-icon-sm.svg";
 

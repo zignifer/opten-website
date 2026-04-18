@@ -1,5 +1,5 @@
 import svgPaths from "./svg-phej6zj9ki";
-import imgFrame37 from "./da31c95f5bc0f013c26804882654e49618ec43c7.png";
+import imgFrame37 from "./da31c95f5bc0f013c26804882654e49618ec43c7.webp";
 
 function Frame12() {
   return (

@@ -1,11 +1,11 @@
 import svgPaths from "./svg-bvy0jfb1g6";
-import imgImage1 from "./fa3631bfe3de9114866b4560b13297991ede111d.png";
+import imgImage1 from "./fa3631bfe3de9114866b4560b13297991ede111d.webp";
 import imgFrame161 from "./a4aab81523531c9d1cdd22f1a16ebda5bcca69aa.png";
 import imgFrame231 from "./6fe2b2e482114aaece3557d61a780f48e409ae7a.png";
 import imgFrame233 from "./643b83f6ac31944ea5c6501794954e84df3835ec.png";
 import imgFrame234 from "./5d0e2aab408679eb569960b14c42e066e5a20b92.png";
 import imgFrame232 from "./dc7c40ef44dccb75d38f341e5a8e7f03b9d865a4.png";
-import imgFrame37 from "./da31c95f5bc0f013c26804882654e49618ec43c7.png";
+import imgFrame37 from "./da31c95f5bc0f013c26804882654e49618ec43c7.webp";
 
 function Frame5() {
   return (
