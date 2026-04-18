@@ -9,8 +9,8 @@ const steps = [
 ];
 
 const slides: Record<string, string[]> = {
-  ru: ["/assets/welcome-ru.png", "/assets/welcome-ru-2.png", "/assets/welcome-ru-3.png"],
-  en: ["/assets/welcome-en.png", "/assets/welcome-en-2.png", "/assets/welcome-en-3.png"],
+  ru: ["/assets/welcome-ru.png", "/assets/welcome-ru-2.png", "/assets/welcome-ru-3.png", "/assets/welcome-ru-4.png"],
+  en: ["/assets/welcome-en.png", "/assets/welcome-en-2.png", "/assets/welcome-en-3.png", "/assets/welcome-en-4.png"],
 };
 
 export default function WelcomePage() {
