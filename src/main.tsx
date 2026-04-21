@@ -12,12 +12,20 @@
   import "./styles/index.css";
   import { LangProvider } from "./i18n/LangContext";
 
-  // === Paddle.js v2 SDK bootstrap — Phase 66 D-14 (FE-05) ===
+  // === Paddle.js v2 SDK bootstrap — Phase 66 D-14 (FE-05), Phase 67 fix ===
   // Environment.set MUST come before Initialize (Pitfall #4 — ordering contract).
   // Guarded by `if (window.Paddle)`: sync script tag in index.html normally guarantees it,
   // but adblock / CSP / network failure can leave it undefined (Pitfall #2).
+  //
+  // Phase 67 / BG-67-01: Paddle v2 SDK Environment.set() only accepts 'sandbox' —
+  // passing 'production' throws `Cannot read properties of undefined (reading
+  // 'profitwellSnippetBase')` because production is the default and lacks a lookup
+  // entry. Call Environment.set() ONLY for sandbox; production skips it entirely.
   if (window.Paddle) {
-    window.Paddle.Environment.set(import.meta.env.VITE_PADDLE_ENV as "sandbox" | "production");
+    const paddleEnv = import.meta.env.VITE_PADDLE_ENV as "sandbox" | "production";
+    if (paddleEnv === "sandbox") {
+      window.Paddle.Environment.set("sandbox");
+    }
     window.Paddle.Initialize({ token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN as string });
   } else {
     console.warn("[Opten] Paddle.js failed to load — USD payment path unavailable");
