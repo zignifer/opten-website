@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { useT, useLang } from "../../i18n/LangContext";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
@@ -13,6 +13,11 @@ const EXTENSION_IDS = [
   "iphkppgbobpilmphloffcalicmejacfl",  // Chrome Web Store
   "kcmcaeenfmfnpiaihicecnfnagejpcog",  // Local dev
 ];
+
+// --- Phase 66: currency state (D-04, FE-02) ---
+const CURRENCY_STORAGE_KEY = "opten_pay_currency";
+type Currency = "RUB" | "USD";
+const langToCurrency = (lang: string): Currency => (lang === "ru" ? "RUB" : "USD");
 
 type ExtStatus = "detecting" | "not_installed" | "not_logged_in" | "ready";
 
@@ -123,6 +128,30 @@ function Divider() {
 export default function PayPage() {
   const t = useT();
   const { lang, setLang } = useLang();
+
+  // Phase 66 D-04 + FE-02: currency state with lang-driven default and manual override
+  // Pitfall #1 fix (RESEARCH §Pitfall 1): guard the useEffect with useRef(true) so that on MOUNT
+  // we do NOT wipe the localStorage override. Only actual lang *changes* should reset it.
+  const [currency, setCurrencyState] = useState<Currency>(() => {
+    const stored = localStorage.getItem(CURRENCY_STORAGE_KEY);
+    if (stored === "RUB" || stored === "USD") return stored as Currency;
+    return langToCurrency(lang);
+  });
+  const isFirstCurrencyRun = useRef(true);
+  useEffect(() => {
+    if (isFirstCurrencyRun.current) {
+      isFirstCurrencyRun.current = false;
+      return; // skip mount — preserve just-restored localStorage value
+    }
+    // Real lang change: drop the manual override and re-derive from new lang
+    localStorage.removeItem(CURRENCY_STORAGE_KEY);
+    setCurrencyState(langToCurrency(lang));
+  }, [lang]);
+  const setCurrency = (c: Currency) => {
+    localStorage.setItem(CURRENCY_STORAGE_KEY, c);
+    setCurrencyState(c);
+  };
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
