@@ -12,6 +12,17 @@
   import "./styles/index.css";
   import { LangProvider } from "./i18n/LangContext";
 
+  // === Paddle.js v2 SDK bootstrap — Phase 66 D-14 (FE-05) ===
+  // Environment.set MUST come before Initialize (Pitfall #4 — ordering contract).
+  // Guarded by `if (window.Paddle)`: sync script tag in index.html normally guarantees it,
+  // but adblock / CSP / network failure can leave it undefined (Pitfall #2).
+  if (window.Paddle) {
+    window.Paddle.Environment.set(import.meta.env.VITE_PADDLE_ENV as "sandbox" | "production");
+    window.Paddle.Initialize({ token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN as string });
+  } else {
+    console.warn("[Opten] Paddle.js failed to load — USD payment path unavailable");
+  }
+
   createRoot(document.getElementById("root")!).render(
     <LangProvider>
       <BrowserRouter>
