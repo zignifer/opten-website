@@ -330,6 +330,40 @@ export default function PayPage() {
               {t("pay.title")}
             </p>
 
+            {/* Phase 66 (FE-01): RUB/USD pill toggle (D-01 style, D-02 position, D-03 compact width, D-07 i18n keys) */}
+            <div
+              role="tablist"
+              aria-label="Select payment currency"
+              className="flex gap-0 p-[4px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] rounded-[100px] mx-auto font-['PT_Root_UI',sans-serif]"
+            >
+              <button
+                role="tab"
+                aria-selected={currency === "RUB"}
+                onClick={() => setCurrency("RUB")}
+                className={
+                  "px-[20px] py-[10px] rounded-[100px] text-[14px] font-medium transition-colors cursor-pointer border-none " +
+                  (currency === "RUB"
+                    ? "bg-white text-black"
+                    : "bg-transparent text-[rgba(255,255,255,0.7)] hover:bg-[rgba(255,255,255,0.08)] hover:text-white")
+                }
+              >
+                {t("pricing.currency.rub")}
+              </button>
+              <button
+                role="tab"
+                aria-selected={currency === "USD"}
+                onClick={() => setCurrency("USD")}
+                className={
+                  "px-[20px] py-[10px] rounded-[100px] text-[14px] font-medium transition-colors cursor-pointer border-none " +
+                  (currency === "USD"
+                    ? "bg-white text-black"
+                    : "bg-transparent text-[rgba(255,255,255,0.7)] hover:bg-[rgba(255,255,255,0.08)] hover:text-white")
+                }
+              >
+                {t("pricing.currency.usd")}
+              </button>
+            </div>
+
             <div className="flex flex-col md:flex-row gap-[24px] w-full max-w-[800px]">
               {/* ── One-time Card (D-01: plain dark bg, D-02: subtitle, FE-01: 5 features) ── */}
               <div className="flex-1">
