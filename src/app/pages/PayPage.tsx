@@ -466,7 +466,7 @@ export default function PayPage() {
                           className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
                         >
                           <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                          {loading ? t("pay.onetime.payingBtn") : t("pay.onetime.payBtn")}
+                          {loading ? t("pay.onetime.payingBtn") : t(currency === "USD" ? "pay.onetime.payBtnUsd" : "pay.onetime.payBtn")}
                         </button>
                       )
                     ) : (
@@ -521,7 +521,7 @@ export default function PayPage() {
                           className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
                         >
                           <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                          {loading ? t("pay.pro.payingBtn") : t("pay.pro.payBtn")}
+                          {loading ? t("pay.pro.payingBtn") : t(currency === "USD" ? "pay.pro.payBtnUsd" : "pay.pro.payBtn")}
                         </button>
                       )
                     ) : (
