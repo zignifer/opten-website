@@ -116,6 +116,7 @@
   "pay.error.paymentFailed": "Failed to create payment. Please try again.",
   "pay.error.noUrl": "Could not get payment link.",
   "pay.error.network": "Network error. Check your connection and try again.",
+  "pay.error.sdkBlocked": "Payment service unavailable. Disable ad blocker and refresh the page.",
   "pay.alreadyActive": "Subscription already active",
   "account.title": "Subscription Management",
   "account.ext.detecting": "Connecting to extension...",
