@@ -233,7 +233,7 @@ export default function PayPage() {
     }
   };
 
-  const handlePay = async (recurring: boolean) => {
+  const handlePayRub = async (recurring: boolean) => {
     if (!token) {
       setError(t("pay.error.sessionNotFound"));
       return;
@@ -267,6 +267,73 @@ export default function PayPage() {
       setLoading(false);
     }
   };
+
+  // Phase 66 D-19 + FE-04: USD payment — calls create-payment-paddle then opens Paddle overlay.
+  // Includes Pitfall #2 guard (SDK blocked by adblock/CSP) and Pitfall #3 (absolute successUrl).
+  const handlePayUsd = async (recurring: boolean) => {
+    if (!token) {
+      setError(t("pay.error.sessionNotFound"));
+      return;
+    }
+    if (!window.Paddle) {
+      // Pitfall #2: Paddle.js didn't load (adblock / CSP / network failure).
+      // The <script> tag in index.html is synchronous, so this should be rare —
+      // but when it happens, surface a clear message rather than crash on .Checkout.open.
+      setError(t("pay.error.sdkBlocked"));
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(SUPABASE_FUNCTIONS_URL + "/create-payment-paddle", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + token,
+          "apikey": SUPABASE_ANON_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ recurring }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setError(data.error || t("pay.error.paymentFailed"));
+        setLoading(false);
+        return;
+      }
+      const { priceId, customerEmail, userId } = data;
+      if (!priceId || !userId) {
+        setError(t("pay.error.paymentFailed"));
+        setLoading(false);
+        return;
+      }
+      window.Paddle.Checkout.open({
+        items: [{ priceId, quantity: 1 }],
+        customer: customerEmail ? { email: customerEmail } : undefined,
+        customData: { user_id: userId },
+        settings: {
+          theme: "dark",
+          locale: "en",
+          successUrl: window.location.origin + "/success",
+          displayMode: "overlay",
+        },
+        eventCallback: (event) => {
+          // D-12: on checkout.closed (user cancel OR post-completion close) — clear loading.
+          // Pitfall #5: checkout.closed also fires after checkout.completed; setLoading(false) is idempotent, so safe.
+          if (event.name === "checkout.closed") {
+            setLoading(false);
+          }
+        },
+      });
+    } catch {
+      setError(t("pay.error.network"));
+      setLoading(false);
+    }
+  };
+
+  // Phase 66 D-20: dispatcher — route pay click by currency.
+  // Button onClick handlers below still call `handlePay(...)` — unchanged.
+  const handlePay = (recurring: boolean) =>
+    currency === "USD" ? handlePayUsd(recurring) : handlePayRub(recurring);
 
   // D-10: active or cancelled (not yet expired) Pro blocks payment
   const hasActivePro = sub !== null && (sub.status === "active" || sub.status === "cancelled") && sub.plan !== "free";
