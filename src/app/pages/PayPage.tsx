@@ -89,23 +89,8 @@ function CheckIcon() {
 
 function Logo() {
   return (
-    <Link to="/" className="inline-grid grid-cols-[max-content] grid-rows-[max-content] leading-[0] place-items-start relative shrink-0 no-underline">
-      <div className="col-start-1 row-start-1 h-[20px] w-[17.45px] relative">
-        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4501 20">
-          <path d={svgPaths.p1af53b80} fill="white" />
-          <path d={svgPaths.p11bbe580} fill="white" />
-          <path d={svgPaths.p3028f5f0} fill="white" />
-        </svg>
-      </div>
-      <div className="col-start-1 row-start-1 h-[19.014px] ml-[24.73px] mt-[1.99px] w-[57.84px] relative">
-        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 57.8402 19.0139">
-          <path d={svgPaths.p2caec700} fill="white" />
-          <path d={svgPaths.p395c8980} fill="white" />
-          <path d={svgPaths.p11961000} fill="white" />
-          <path d={svgPaths.p1de84f00} fill="white" />
-          <path d={svgPaths.p355f7e80} fill="white" />
-        </svg>
-      </div>
+    <Link to="/" className="inline-block leading-[0] no-underline shrink-0">
+      <img alt="Opten" src="/logo.svg" className="block h-[20px] w-auto" />
     </Link>
   );
 }

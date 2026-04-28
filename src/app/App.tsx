@@ -166,7 +166,7 @@ function InstallButtonLarge() {
       className="btn-hover bg-white inline-flex gap-[12px] items-center pl-[10px] pr-[24px] py-[10px] rounded-[100px] relative cursor-pointer border-none no-underline">
       <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
       {/* Иконки Chrome + Yandex внахлёст */}
-      <div className="flex items-center pr-[8px] shrink-0">
+      <div className="flex items-center pr-[6px] shrink-0">
         <div className="relative shrink-0 size-[40px] z-10">
           <img alt="Chrome" className="absolute block size-full" src={imgChromeLg} />
         </div>
@@ -217,24 +217,7 @@ function Divider({ width = "100%" }: { width?: string }) {
 /* ─── Logo ─── */
 function Logo() {
   return (
-    <div className="inline-grid grid-cols-[max-content] grid-rows-[max-content] leading-[0] place-items-start relative shrink-0">
-      <div className="col-start-1 row-start-1 h-[20px] w-[17.45px] relative">
-        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4501 20">
-          <path d={svgPaths.p1af53b80} fill="white" />
-          <path d={svgPaths.p11bbe580} fill="white" />
-          <path d={svgPaths.p3028f5f0} fill="white" />
-        </svg>
-      </div>
-      <div className="col-start-1 row-start-1 h-[19.014px] ml-[24.73px] mt-[1.99px] w-[57.84px] relative">
-        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 57.8402 19.0139">
-          <path d={svgPaths.p2caec700} fill="white" />
-          <path d={svgPaths.p395c8980} fill="white" />
-          <path d={svgPaths.p11961000} fill="white" />
-          <path d={svgPaths.p1de84f00} fill="white" />
-          <path d={svgPaths.p355f7e80} fill="white" />
-        </svg>
-      </div>
-    </div>
+    <img alt="Opten" src="/logo.svg" className="block h-[20px] w-auto shrink-0" />
   );
 }
 
@@ -637,6 +620,10 @@ function PrivacyItem({ title, desc }: { title: string; desc: string }) {
 /* ─── Pricing Section ─── */
 function PricingSection() {
   const t = useT();
+  const { lang } = useLang();
+  const isRub = lang === "ru";
+  const onetimePrice = isRub ? t("pricing.onetime.price") : t("pricing.onetime.priceUsd");
+  const proPrice = isRub ? t("pricing.pro.price") : t("pricing.pro.priceUsd");
   return (
     <section id="pricing" className="bg-black w-full border-none">
       <div className="flex flex-col items-center overflow-clip">
@@ -646,31 +633,34 @@ function PricingSection() {
           </RevealSection>
 
           <div className="flex flex-col md:flex-row gap-[24px] w-full max-w-[800px]">
+            {/* One-time Pro */}
             <RevealSection className="flex-1">
               <div className="card-hover bg-[#0d0d0d] rounded-[12px] h-[600px] relative overflow-clip">
                 <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[12px]" />
                 <div className="flex flex-col justify-between p-[32px] h-full">
                   <div className="flex flex-col gap-[40px]">
                     <div className="flex flex-col gap-[12px]">
-                      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.free.name")}</p>
-                      <div className="flex gap-[6px] items-end">
-                        <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{t("pricing.free.price")}</span>
-                        <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">{t("pricing.free.period")}</span>
-                      </div>
+                      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.onetime.subtitle")}</p>
+                      <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{onetimePrice}</span>
                     </div>
                     <Divider />
                     <div className="flex flex-col gap-[12px]">
-                      <PricingFeature text={t("pricing.free.feature1")} />
-                      <PricingFeature text={t("pricing.free.feature2")} />
-                      <PricingFeature text={t("pricing.free.feature3")} />
-                      <PricingFeature text={t("pricing.free.feature4")} />
+                      <PricingFeature text={t("pricing.onetime.feature1")} />
+                      <PricingFeature text={t("pricing.onetime.feature2")} />
+                      <PricingFeature text={t("pricing.onetime.feature3")} />
+                      <PricingFeature text={t("pricing.onetime.feature4")} />
+                      <PricingFeature text={t("pricing.onetime.feature5")} />
                     </div>
                   </div>
-                  <InstallButtonWhite />
+                  <Link to="/pay" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none no-underline">
+                    <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
+                    <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">{t("pay.onetime.tryBtn")}</span>
+                  </Link>
                 </div>
               </div>
             </RevealSection>
 
+            {/* Pro Subscription */}
             <RevealSection className="flex-1">
               <div className="card-hover rounded-[12px] h-[600px] relative overflow-clip">
                 <div aria-hidden="true" className="absolute inset-0 pointer-events-none rounded-[12px]">
@@ -681,10 +671,10 @@ function PricingSection() {
                 <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[12px] z-10" />
                 <div className="relative z-10 flex flex-col justify-between p-[32px] h-full">
                   <div className="flex flex-col gap-[40px]">
-                    <div className="flex flex-col gap-[12px]">
-                      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.pro.name")}</p>
+                    <div className="flex flex-col gap-[8px]">
+                      <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.pro.subtitle")}</p>
                       <div className="flex gap-[6px] items-end">
-                        <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{t("pricing.pro.price")}</span>
+                        <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{proPrice}</span>
                         <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">{t("pricing.pro.period")}</span>
                       </div>
                     </div>
@@ -699,7 +689,7 @@ function PricingSection() {
                   </div>
                   <Link to="/pay" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none no-underline">
                     <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                    <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">{t("pricing.pro.btn")}</span>
+                    <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">{t("pay.pro.tryBtn")}</span>
                   </Link>
                 </div>
               </div>
