@@ -9,6 +9,7 @@
   import RefundPage from "./app/pages/RefundPage.tsx";
   import AccountPage from "./app/pages/AccountPage.tsx";
   import WelcomePage from "./app/pages/WelcomePage.tsx";
+  import { Toaster } from "sonner";
   import "./styles/index.css";
   import { LangProvider } from "./i18n/LangContext";
 
@@ -45,5 +46,6 @@
           <Route path="/welcome" element={<WelcomePage />} />
         </Routes>
       </BrowserRouter>
+      <Toaster theme="dark" position="bottom-center" />
     </LangProvider>
   );
