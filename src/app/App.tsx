@@ -749,6 +749,7 @@ function FooterSection() {
             <Link to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.privacy")}</Link>
             <Link to="/terms" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.terms")}</Link>
             <Link to="/refund" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.refund")}</Link>
+            <Link to="/connect-claude" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.connectClaude")}</Link>
             <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="flex gap-[8px] items-center hover:text-white transition-colors no-underline text-inherit">
               <div className="overflow-clip relative shrink-0 size-[14px]">
                 <div className="absolute inset-[17.97%_8.92%_0.78%_7.33%]">
