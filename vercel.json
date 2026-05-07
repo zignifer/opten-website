@@ -1,5 +1,19 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/mcp",                  "destination": "https://promptscore-proxy.vercel.app/api/mcp" },
+    { "source": "/mcp/(.*)",             "destination": "https://promptscore-proxy.vercel.app/api/mcp/$1" },
+    { "source": "/api/oauth/authorize",  "destination": "https://promptscore-proxy.vercel.app/api/oauth/authorize" },
+    { "source": "/api/oauth/token",      "destination": "https://promptscore-proxy.vercel.app/api/oauth/token" },
+    { "source": "/api/oauth/register",   "destination": "https://promptscore-proxy.vercel.app/api/oauth/register" },
+    { "source": "/(.*)",                 "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/mcp(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Cache-Control",          "value": "no-store" }
+      ]
+    }
   ]
 }
