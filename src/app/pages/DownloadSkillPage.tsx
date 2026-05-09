@@ -128,7 +128,18 @@ export default function DownloadSkillPage() {
         {status === "success" && (
           <>
             <p style={msgStyle}>{t("download.successLine1")}</p>
-            <p style={msgStyle}>{t("download.successLine2")}</p>
+            <p style={{ ...msgStyle, marginTop: 18, fontWeight: 600, color: "#ffffff" }}>
+              {t("download.successHeading")}
+            </p>
+            <ol style={stepsListStyle}>
+              <li style={stepItemStyle}>{t("download.successStep1")}</li>
+              <li style={stepItemStyle}>{t("download.successStep2")}</li>
+              <li style={stepItemStyle}>{t("download.successStep3")}</li>
+              <li style={stepItemStyle}>{t("download.successStep4")}</li>
+            </ol>
+            <p style={{ ...msgStyle, marginTop: 16, color: "rgba(255,255,255,0.5)", fontSize: 13 }}>
+              {t("download.successFooter")}
+            </p>
           </>
         )}
         {status === "not_pro" && (
@@ -163,13 +174,26 @@ const containerStyle: React.CSSProperties = {
 };
 
 const cardStyle: React.CSSProperties = {
-  maxWidth: 480,
+  maxWidth: 540,
   width: "100%",
   background: "#171717",
   border: "1px solid #262626",
   borderRadius: 12,
   padding: "32px 28px",
   textAlign: "center",
+};
+
+const stepsListStyle: React.CSSProperties = {
+  textAlign: "left",
+  margin: "8px 0 0 0",
+  paddingLeft: 22,
+  color: "rgba(255,255,255,0.85)",
+  fontSize: 14,
+  lineHeight: 1.55,
+};
+
+const stepItemStyle: React.CSSProperties = {
+  marginBottom: 10,
 };
 
 const titleStyle: React.CSSProperties = {
