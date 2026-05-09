@@ -9,6 +9,7 @@
   import RefundPage from "./app/pages/RefundPage.tsx";
   import AccountPage from "./app/pages/AccountPage.tsx";
   import WelcomePage from "./app/pages/WelcomePage.tsx";
+  import DownloadSkillPage from "./app/pages/DownloadSkillPage.tsx";
   import "./styles/index.css";
   import { LangProvider } from "./i18n/LangContext";
 
@@ -43,6 +44,7 @@
           <Route path="/refund" element={<RefundPage />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/welcome" element={<WelcomePage />} />
+          <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
         </Routes>
       </BrowserRouter>
     </LangProvider>
