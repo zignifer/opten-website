@@ -75,11 +75,14 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   }
 
   // 3. Query subscriptions table — RLS allows user to read their own row.
-  // Filter: plan='pro' AND status='active'. Covers both YooKassa and Paddle providers.
+  // Filter: plan='pro' AND status IN ('active', 'cancelled'). 'cancelled' means the user
+  // clicked Cancel but their paid period hasn't ended yet — they retain Pro access until
+  // expiry, mirroring the canonical get-subscription Edge Function logic and DEC-14 in
+  // 73-CONTEXT.md (popup also treats this state as Pro).
   let isPro = false;
   try {
     const subRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${userId}&plan=eq.pro&status=eq.active&select=plan,status&limit=1`,
+      `${SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${userId}&plan=eq.pro&status=in.(active,cancelled)&select=plan,status&limit=1`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
