@@ -18,9 +18,7 @@ type Status =
   | "error";
 
 export default function DownloadSkillPage() {
-  // useT is wired for future i18n; current copy is inline en/ru-neutral while DEC-18 keys
-  // live in extension i18n.js, not website ru.json/en.json yet.
-  useT();
+  const t = useT();
   const [status, setStatus] = useState<Status>("detecting");
   const [errorMsg, setErrorMsg] = useState<string>("");
 
@@ -109,51 +107,44 @@ export default function DownloadSkillPage() {
   return (
     <div style={containerStyle}>
       <div style={cardStyle}>
-        <h1 style={titleStyle}>Opten Skill</h1>
-        {status === "detecting" && <p style={msgStyle}>Detecting extension…</p>}
+        <h1 style={titleStyle}>{t("download.title")}</h1>
+        {status === "detecting" && <p style={msgStyle}>{t("download.detecting")}</p>}
         {status === "no_extension" && (
           <>
-            <p style={msgStyle}>
-              Open this page from the Opten Chrome extension. The extension supplies the
-              authorization token used to download your skill bundle.
-            </p>
+            <p style={msgStyle}>{t("download.noExtensionLine1")}</p>
             <p style={msgStyle}>
               <a
                 href="https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl"
                 style={linkStyle}
               >
-                Install Opten extension
+                {t("download.installExt")}
               </a>
             </p>
           </>
         )}
-        {status === "no_auth" && (
-          <p style={msgStyle}>You are not signed in. Open the Opten extension and sign in with Google.</p>
-        )}
-        {status === "checking" && <p style={msgStyle}>Verifying your subscription…</p>}
-        {status === "downloading" && <p style={msgStyle}>Preparing download…</p>}
+        {status === "no_auth" && <p style={msgStyle}>{t("download.noAuth")}</p>}
+        {status === "checking" && <p style={msgStyle}>{t("download.checking")}</p>}
+        {status === "downloading" && <p style={msgStyle}>{t("download.preparing")}</p>}
         {status === "success" && (
           <>
-            <p style={msgStyle}>
-              ✓ Your skill bundle (<code>opten.zip</code>) has been downloaded.
-            </p>
-            <p style={msgStyle}>
-              Unzip and install in ChatGPT or Claude. You can close this tab.
-            </p>
+            <p style={msgStyle}>{t("download.successLine1")}</p>
+            <p style={msgStyle}>{t("download.successLine2")}</p>
           </>
         )}
         {status === "not_pro" && (
           <>
-            <p style={msgStyle}>The skill bundle is available for Pro subscribers.</p>
+            <p style={msgStyle}>{t("download.notProLine1")}</p>
             <p style={msgStyle}>
               <Link to="/account?upgrade=skill" style={linkStyle}>
-                Upgrade to Pro
+                {t("download.upgrade")}
               </Link>
             </p>
           </>
         )}
         {status === "error" && (
-          <p style={msgStyle}>Download failed: {errorMsg}. Please try again or contact support.</p>
+          <p style={msgStyle}>
+            {t("download.errorPrefix")}: {errorMsg}. {t("download.errorSuffix")}
+          </p>
         )}
       </div>
     </div>
