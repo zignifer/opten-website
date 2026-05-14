@@ -75,7 +75,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [x] 02-04: Create `scripts/prerender.mjs` — postbuild Node script emitting per-route HTML (GEO-B-1 + GEO-B-2)
-- [ ] 02-05: Create `scripts/sitemap.mjs` — postbuild script emitting `dist/sitemap.xml` with build-time lastmod (GEO-B-3)
+- [x] 02-05: Create `scripts/sitemap.mjs` — postbuild script emitting `dist/sitemap.xml` with build-time lastmod (GEO-B-3)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 - [ ] 02-06: Modify `package.json` `build` script to chain SPA + SSR builds + postbuild scripts (GEO-B-1, GEO-B-2, GEO-B-3)
@@ -131,7 +131,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phases 1 and 2 are p
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Static GEO foundations | 0/8 | Ready to execute | - |
-| 2. Per-route prerender + metadata | 4/8 | In Progress|  |
+| 2. Per-route prerender + metadata | 5/8 | In Progress|  |
 | 3. Bilingual routing | 0/TBD | Backlog | - |
 | 4. Content surface | 0/TBD | Backlog | - |
 | 5. Brand authority | 0/TBD | Backlog | - |
