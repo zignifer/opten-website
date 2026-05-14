@@ -130,12 +130,12 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phases 1 and 2 are p
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Static GEO foundations | 0/8 | Ready to execute | - |
-| 2. Per-route prerender + metadata | 8/8 | Impl complete; awaiting post-deploy verify | 2026-05-15 |
-| 3. Bilingual routing | 0/TBD | Backlog | - |
+| 1. Static GEO foundations | 8/8 | Shipped 2026-05-14 | 2026-05-14 |
+| 2. Per-route prerender + metadata | 8/8 + hotfix `80b16be` | Shipped 2026-05-15 (after rollback + hotfix cycle) | 2026-05-15 |
+| 3. Bilingual routing | 0/TBD | Backlog (blocked on URL strategy decision) | - |
 | 4. Content surface | 0/TBD | Backlog | - |
 | 5. Brand authority | 0/TBD | Backlog | - |
 
 ---
 *Roadmap defined: 2026-05-14*
-*Last updated: 2026-05-15 after Phase 2 implementation complete (02-08)*
+*Last updated: 2026-05-15 after Phase 2 hotfix `80b16be` shipped to production. Phase 2 lesson-learned: SPA-fallback routes (`/account`, `/success`, `/dashboard/*`) need a path-marker check in `main.tsx` to avoid React #418/#423 hydration mismatch — the initial Phase 2 deploy (`b241989`) was rolled back via `vercel rollback` after playwright surfaced this regression in production. Future prerender phases must include a playwright sweep across ALL routes (not just prerendered ones) as an acceptance gate.*

@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-14)
 
 **Core value:** Sell, service, and onboard extension users without breaking the shipped integration contract with the Opten Chrome extension.
-**Current focus:** Phase 2 — Per-route prerender + per-route metadata
+**Current focus:** Phase 2 — Per-route prerender + per-route metadata (COMPLETE + hotfix shipped)
 **Active milestone:** GEO Optimization (12/100 → ~30/100 in Phase 1, higher across Phases 2-5)
 
 ## Current Position
 
-Phase: 2 (Per-route prerender + per-route metadata) — VERIFYING
-Plan: 8 of 8 (implementation complete)
-Status: All 8 plans done; awaiting post-deploy Vercel verification (Sections A-G in 02-08-SUMMARY.md)
+Phase: 2 (Per-route prerender + per-route metadata) — COMPLETE
+Plan: 8 of 8 deployed + 1 hotfix commit (`80b16be`)
+Status: SHIPPED to https://opten.space — deploy `dpl_HAzfr2h8sADbiHHBt4yi4Wkf6ncg` (commit `80b16be`). All 6 prerendered routes serve distinct titles/descriptions/canonicals/OG; 3 SPA-fallback routes (`/account`, `/success`, `/dashboard/download-skill`) keep working without hydration mismatch. Playwright sweep: 0 console errors on all 9 routes. Phase 1 invariants preserved (2 JSON-LD blocks + Paddle sync script on every emitted HTML, security headers intact). `dist/sitemap.xml` has 6 per-route `<lastmod>` entries. Outstanding: visual OG card unfurl test in Telegram/Slack + Paddle modal click test on `/pay` + ~7-14 day AI-crawler refresh window for `/geo audit` rescore.
 Last activity: 2026-05-15
 
-Progress: [█████████░] 89%
+Progress: [██████████] 100% shipped
 
 ## Performance Metrics
 
@@ -78,12 +78,15 @@ Full log in PROJECT.md Key Decisions table — 8 ADR-locked decisions from `docs
 
 [From .planning/todos/pending/ — ideas captured during sessions]
 
-None yet.
+- **Phase 2 post-deploy visual checks** — visual OG card unfurl test in Telegram + Slack against https://opten.space/{,welcome,privacy,terms,refund,pay}; Paddle modal click test on `/pay` in real browser (confirm modal opens, no console errors).
+- **Phase 2 GEO rescore** — after ~7-14 days on production (2026-05-22 – 2026-05-29 window), run `~/.claude/skills/geo/scripts/fetch_page.py` against the 5 fully-prerendered routes (confirm `has_ssr_content: true`, `word_count > 100`); then run `/geo audit https://opten.space` for Phase 2 score uplift measurement.
+- **Phase 2 lessons-learned** — for future GSD planning loops: (a) playwright sweep across ALL routes (including SPA-fallback ones) should be an acceptance gate in plan-checker, not just in human-verify; (b) `dist/index.html` overwrite has wide blast radius via Vercel's SPA rewrite — prerender of `/` must coexist with empty SPA-fallback semantics for other routes. Both should feed the "Anti-Patterns" reference for future prerender phases.
 
 ### Blockers/Concerns
 
 - **Phase 2 prerequisite (RESOLVED 2026-05-15)**: cross-route head-management strategy — decided build-time prerender via `scripts/prerender.mjs`. `react-helmet-async` rejected.
-- **Phase 2 post-deploy verification (OPEN)**: push `git push origin main` to trigger Vercel deploy, then run Sections A-G from `02-08-SUMMARY.md`. Phase 2 not formally closed until all sections PASS.
+- **Phase 2 post-deploy verification (CLOSED 2026-05-15)**: deploy `dpl_HAzfr2h8sADbiHHBt4yi4Wkf6ncg` (commit `80b16be`, hotfix included) shipped to opten.space; Sections A-D verified via curl, Section E playwright sweep on all 9 routes returned 0 console errors. Outstanding visual checks (OG card unfurl, Paddle modal click) listed under "Pending Todos" below.
+- **Phase 2 hotfix landed 2026-05-15**: see commit `80b16be` — `fix(seo): match prerender path to client route + eager-import hero animation`. Two regressions fixed: (a) hydration mismatch on SPA-fallback routes via `window.__PRERENDER_PATH` marker + path-check in `main.tsx`, (b) Suspense SSR failure on `/` via eager-import of `OptenHeroAnimation`. Initial Phase 2 deploy (`b241989`) was rolled back via `vercel rollback` before hotfix was promoted — extension users were never exposed to the broken state for longer than ~30 minutes.
 - **Phase 3 prerequisite (open question)**: per-language URL strategy — `/ru/*` `/en/*` vs `?lang=` vs subdomain. Must be resolved before Phase 3 detailed planning.
 - **Locked-route constraint (permanent)**: `/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill` must keep responding at root paths — applies to every phase, especially Phase 3 bilingual work (`/ru/*` `/en/*` are **additions**, not replacements).
 
@@ -99,6 +102,6 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-05-15T00:00:00.000Z
-Stopped at: Phase 2 implementation complete; awaiting post-deploy verification (checkpoint)
-Next action: (1) git push origin main to trigger Vercel deploy; (2) run Sections A-G from .planning/phases/02-per-route-prerender-per-route-metadata/02-08-SUMMARY.md against the preview URL; (3) after all sections PASS — mark Phase 2 formally closed; (4) resolve Phase 3 prerequisite (per-language URL strategy) before /gsd-plan-phase 3; (5) after ~7-14 days on production run /geo audit https://opten.space for Phase 2 score uplift measurement.
+Stopped at: Phase 2 SHIPPED to production after rollback + hotfix cycle. Deploy `dpl_HAzfr2h8sADbiHHBt4yi4Wkf6ncg` (commit `80b16be`) is live on opten.space; playwright sweep clean.
+Next action: (1) visual OG unfurl test on Telegram/Slack + Paddle modal browser test on /pay; (2) ~7-14 days from 2026-05-15 → `/geo audit https://opten.space` for Phase 2 score uplift measurement; (3) resolve Phase 3 prerequisite (per-language URL strategy — `/ru/*` `/en/*` vs `?lang=` vs subdomain) before `/gsd-plan-phase 3`; (4) extract Phase 2 hotfix as anti-pattern for future prerender phases (SPA-fallback hydration mismatch + Suspense SSR boundary failure).
 Resume file: None
