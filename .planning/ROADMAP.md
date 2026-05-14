@@ -55,17 +55,27 @@ Plans:
 - [ ] 01-08: Add security headers to `vercel.json` (GEO-A-8) — last; rollback = `git revert`
 
 ### Phase 2: Per-route prerender + per-route metadata
-**Status**: Backlog. Scope set; detailed planning deferred.
+**Status**: Ready to execute (plans written 2026-05-15).
 **Goal**: Make each route return its own `<title>`, `<meta>`, canonical, and OG tags pre-hydration so AI crawlers and search engines see distinct documents.
 **Depends on**: Phase 1.
 **Requirements**: GEO-B-1, GEO-B-2, GEO-B-3
 **Audit findings closed**: C-1 (no SSR), C-4 (one shared title/meta across 7 routes)
-**Open question (must resolve first)**: cross-route head-management strategy — `react-helmet-async` (runtime — doesn't help non-JS crawlers) vs build-time prerender (Vite SSG / vite-plugin-ssr / Vike — preferred).
-**Success Criteria** (sketch, refined during planning):
-  1. Each route returns distinct `<title>` and `<meta description>` in the pre-hydration HTML.
+**Resolved open question**: build-time prerender (D-01 in 02-CONTEXT.md) — hand-rolled postbuild `scripts/prerender.mjs` invoked from `npm run build` after `vite build` and `vite build --ssr`. `react-helmet-async` rejected (runtime-only, doesn't reach non-JS crawlers).
+**Success Criteria** (refined during planning):
+  1. Each route returns distinct `<title>` and `<meta description>` in the pre-hydration HTML (full-tier routes get body content; `/pay` is head-only).
   2. `<link rel="canonical">` correctly identifies each route.
-  3. Sitemap.xml now carries per-route `lastmod` derived from build metadata.
-**Plans**: TBD
+  3. Sitemap.xml now carries per-route `lastmod` derived from build-time ISO date (D-04 uniform date).
+**Plans**: 8 plans (one per atomic commit — interface-first ordering, highest-risk `src/main.tsx` hydration switch shipped last)
+
+Plans:
+- [ ] 02-01: Create `scripts/seo-routes.ts` — per-route metadata manifest (GEO-B-1)
+- [ ] 02-02: Create `scripts/entry-server.tsx` — SSR React tree entry, 5 full-tier routes (GEO-B-2)
+- [ ] 02-03: Patch `src/i18n/LangContext.tsx` for SSR safety — move `detectLang()` into `useEffect` (GEO-B-2 pre-req)
+- [ ] 02-04: Create `scripts/prerender.mjs` — postbuild Node script emitting per-route HTML (GEO-B-1 + GEO-B-2)
+- [ ] 02-05: Create `scripts/sitemap.mjs` — postbuild script emitting `dist/sitemap.xml` with build-time lastmod (GEO-B-3)
+- [ ] 02-06: Modify `package.json` `build` script to chain SPA + SSR builds + postbuild scripts (GEO-B-1, GEO-B-2, GEO-B-3)
+- [ ] 02-07: Modify `src/main.tsx` — branch render call on `hasChildNodes()` for `hydrateRoot` vs `createRoot` (GEO-B-2) — HIGHEST RISK; rollback = `git revert`
+- [ ] 02-08: Add `.ssr-cache` to `.gitignore` + post-deploy acceptance verification (GEO-B-1, GEO-B-2, GEO-B-3)
 
 ### Phase 3: Bilingual routing
 **Status**: Backlog. Scope set; detailed planning deferred.
@@ -109,12 +119,12 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phase 1 is the only phase currently planned in detail; Phases 2–5 require their open questions resolved before planning begins.
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phases 1 and 2 are planned in detail; Phases 3–5 require their open questions resolved before planning begins.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Static GEO foundations | 0/8 | Ready to execute | - |
-| 2. Per-route prerender + metadata | 0/TBD | Backlog | - |
+| 2. Per-route prerender + metadata | 0/8 | Ready to execute | - |
 | 3. Bilingual routing | 0/TBD | Backlog | - |
 | 4. Content surface | 0/TBD | Backlog | - |
 | 5. Brand authority | 0/TBD | Backlog | - |
