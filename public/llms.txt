@@ -1,0 +1,20 @@
+# Opten
+
+> Opten is a Chrome extension that scores and improves AI image-generation
+> prompts for 43+ models (Midjourney, DALL-E, Stable Diffusion, Flux, etc.)
+> directly inside the generator's interface — so users don't waste credits
+> on bad prompts.
+
+## How it works
+
+Opten detects which AI image model the user is targeting, scores the
+current prompt against that model's optimal patterns, and offers one-click
+rewrites. Works inline in 43+ web-based image generators.
+
+## Product
+
+- [Install on Chrome Web Store](https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl)
+- [Pricing](https://opten.space/pay) — Free tier + Pro at $2.99/month (199₽)
+- [Privacy](https://opten.space/privacy)
+- [Terms](https://opten.space/terms)
+- [Refund policy](https://opten.space/refund)
