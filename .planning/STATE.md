@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 2 context gathered
-last_updated: "2026-05-14T19:56:36.761Z"
+last_updated: "2026-05-14T20:07:29.661Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 9
-  completed_plans: 3
-  percent: 33
+  completed_plans: 4
+  percent: 44
 ---
 
 # Project State
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 ## Current Position
 
 Phase: 2 (Per-route prerender + per-route metadata) — EXECUTING
-Plan: 4 of 8
+Plan: 5 of 8
 Status: Ready to execute
 Last activity: 2026-05-14
 
-Progress: [███░░░░░░░] 33%
+Progress: [████░░░░░░] 44%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [███░░░░░░░] 33%
 
 *Updated after each plan completion*
 | Phase 02-per-route-prerender-per-route-metadata P01 | 15 | 1 tasks | 1 files |
+| Phase 02-per-route-prerender-per-route-metadata P04 | 45 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,8 @@ Full log in PROJECT.md Key Decisions table — 8 ADR-locked decisions from `docs
 - Phase 1: OG `og:image` points to RU card (hardcoded `<html lang="ru">`); EN card ready for Phase 2.
 - Phase 1: `/pay` stays crawlable in robots.txt (diverges from SEO-AUDIT.md broader recommendation; SPEC wins).
 - [Phase ?]: Phase 2 Plan 01
+- [Phase ?]: Two-outDir SSR builds (.ssr-cache + .ssr-meta) — Vite 6 empties outDir on every SSR build even without --emptyOutDir; splitting dirs prevents inter-build erasure
+- [Phase ?]: pathToFileURL() for dynamic import on Windows — bare C:\ absolute paths rejected by Node ESM loader
 
 ### Pending Todos
 
@@ -91,7 +94,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-14T19:56:36.752Z
+Last session: 2026-05-14T20:07:25.106Z
 Stopped at: Phase 2 context gathered
 Next action: (a) visual OG-card unfurl test in Telegram/Slack against https://opten.space; (b) wait ~7-14 days for AI-crawler refresh then run `~/.claude/skills/geo/scripts/fetch_page.py https://opten.space/` + `/geo audit https://opten.space` for new GEO score; (c) resolve Phase 2 prerequisite (cross-route head-management strategy: react-helmet-async vs build-time prerender) before `/gsd-plan-phase 2`.
 Resume file: None
