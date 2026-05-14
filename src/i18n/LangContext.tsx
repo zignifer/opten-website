@@ -27,7 +27,12 @@ export const LangContext = createContext<LangContextValue>({
 });
 
 export function LangProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(detectLang);
+  const [lang, setLangState] = useState<Lang>("ru"); // Phase 2 D-05: SSR-safe RU default; detection runs in useEffect below.
+
+  useEffect(() => {
+    // detectLang() reads localStorage + navigator — defer to client mount (RESEARCH.md Pitfall 1).
+    setLangState(detectLang());
+  }, []);
 
   const setLang = (l: Lang) => {
     localStorage.setItem(STORAGE_KEY, l);
