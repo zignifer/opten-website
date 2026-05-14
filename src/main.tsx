@@ -1,5 +1,5 @@
 
-  import { createRoot } from "react-dom/client";
+  import { createRoot, hydrateRoot } from "react-dom/client";
   import { BrowserRouter, Routes, Route } from "react-router";
   import App from "./app/App.tsx";
   import PayPage from "./app/pages/PayPage.tsx";
@@ -37,7 +37,13 @@
     console.warn("[Opten] Paddle.js failed to load — USD payment path unavailable");
   }
 
-  createRoot(document.getElementById("root")!).render(
+  // === Hydration detector — Phase 2 D-06 (GEO-B-2) ===
+  // Prerendered routes (Plan 02-04 emitted full-body HTML) have content in <div id="root">…</div>;
+  // SPA routes have the empty <div id="root"></div>. Vite minifies index.html with no inner
+  // whitespace so hasChildNodes() is a reliable discriminator (RESEARCH.md Pitfall 3).
+  // Paddle bootstrap above runs BEFORE this call — order locked by DEC-integration-contract-paddle-init / BG-67-01.
+
+  const tree = (
     <LangProvider>
       <BrowserRouter>
         <Routes>
@@ -54,3 +60,10 @@
       </BrowserRouter>
     </LangProvider>
   );
+
+  const root = document.getElementById("root")!;
+  if (root.hasChildNodes()) {
+    hydrateRoot(root, tree);
+  } else {
+    createRoot(root).render(tree);
+  }
