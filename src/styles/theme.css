@@ -119,6 +119,42 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+.opten-figma-gradient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.opten-figma-gradient::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -640px;
+  width: 1650px;
+  height: 942px;
+  transform: translateX(-50%);
+  background: url("/assets/landing-design/gradient-blob-shape.svg") center / 100% 100% no-repeat;
+  filter: blur(351px);
+  opacity: 0.2;
+  will-change: transform;
+}
+
+.opten-figma-gradient::after {
+  content: none;
+}
+
+@media (max-width: 767px) {
+  .opten-figma-gradient::before {
+    top: -300px;
+    width: 900px;
+    height: 514px;
+    filter: blur(170px);
+    opacity: 0.22;
+  }
+
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -135,6 +171,21 @@
 
   html {
     font-size: var(--font-size);
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  #root {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 
   h1 {

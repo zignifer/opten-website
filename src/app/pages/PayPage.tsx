@@ -77,11 +77,11 @@ function ChromeIconMed() {
   );
 }
 
-function CheckIcon() {
+function CheckIcon({ className = "text-white/60" }: { className?: string }) {
   return (
-    <div className="relative shrink-0 size-[18px]">
+    <div className={`relative shrink-0 size-[18px] ${className}`}>
       <svg className="absolute block size-full" fill="none" viewBox="0 0 18 18">
-        <path d={svgPaths.p11eab980} fill="white" fillOpacity="0.6" />
+        <path d={svgPaths.p11eab980} fill="currentColor" />
       </svg>
     </div>
   );
@@ -95,11 +95,11 @@ function Logo() {
   );
 }
 
-function PricingFeature({ text }: { text: string }) {
+function PricingFeature({ text, tone = "dark" }: { text: string; tone?: "dark" | "green" }) {
   return (
-    <div className="flex gap-[8px] items-center">
-      <CheckIcon />
-      <span className="font-['PT_Root_UI',sans-serif] leading-[1.5] text-[16px] md:text-[18px] text-white">{text}</span>
+    <div className="flex items-start gap-[10px]">
+      <CheckIcon className={tone === "green" ? "mt-[2px] text-[#011417]/70" : "mt-[2px] text-white/60"} />
+      <span className={`font-['PT_Root_UI',sans-serif] text-[16px] leading-[1.55] md:text-[17px] ${tone === "green" ? "text-[#011417]" : "text-white"}`}>{text}</span>
     </div>
   );
 }
@@ -324,7 +324,7 @@ export default function PayPage() {
   const hasActivePro = sub !== null && (sub.status === "active" || sub.status === "cancelled") && sub.plan !== "free";
 
   return (
-    <div className="w-full min-h-screen bg-black flex flex-col">
+    <div className="flex min-h-screen w-full flex-col overflow-x-hidden bg-[#011417] text-white">
       <style>{`
         .btn-hover {
           transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -345,7 +345,7 @@ export default function PayPage() {
 
       {/* ─── Navbar ─── */}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-[8px]" : "py-[21px]"}`}>
-        <div className={`max-w-[1100px] mx-[8px] lg:mx-auto flex items-center justify-between rounded-[1000px] py-[8px] pl-[24px] pr-[8px] transition-all duration-300 ${scrolled ? "bg-[rgba(0,0,0,0.6)] backdrop-blur-[12px]" : "bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px]"}`}>
+        <div className={`relative max-w-[1100px] mx-[8px] lg:mx-auto flex items-center justify-between rounded-[1000px] py-[8px] pl-[24px] pr-[8px] transition-all duration-300 ${scrolled ? "bg-[rgba(0,0,0,0.6)] backdrop-blur-[12px]" : "bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px]"}`}>
           <div className="hidden md:flex flex-1 gap-[24px] items-center font-['PT_Root_UI',sans-serif] text-[14px] text-white">
             <Link to="/" className="hover:opacity-80 transition-opacity">{t("nav.home")}</Link>
             <Link to="/pay" className="hover:opacity-80 transition-opacity">{t("nav.pricing")}</Link>
@@ -357,7 +357,9 @@ export default function PayPage() {
               {lang === "ru" ? "EN" : "RU"}
             </button>
           </div>
-          <Logo />
+          <div className="absolute left-1/2 -translate-x-1/2">
+            <Logo />
+          </div>
           <div className="flex-1 flex justify-end ml-auto md:ml-0">
             {email ? (
               <Link to="/account" className="bg-[rgba(255,255,255,0.1)] flex gap-[8px] items-center justify-center p-[10px] px-[16px] rounded-[100px] no-underline">
@@ -375,25 +377,30 @@ export default function PayPage() {
       </nav>
 
       {/* ─── Pricing Section ─── */}
-      <section className="flex-1 bg-black w-full border-none pt-[80px] md:pt-[120px]">
-        <div className="flex flex-col items-center overflow-clip">
-          <div className="flex flex-col gap-[40px] md:gap-[56px] items-center px-[20px] md:px-[100px] py-[60px] md:py-[80px] w-full max-w-[1440px]">
-            <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[32px] sm:text-[42px] md:text-[52px] text-center text-white tracking-[-1.04px] max-w-[650px]">
-              {t("pay.title")}
+      <section className="relative w-full flex-1 overflow-hidden border-none bg-[#011417] pt-[96px] md:pt-[130px]">
+        <div aria-hidden="true" className="opten-figma-gradient" />
+        <div className="relative z-10 flex flex-col items-center overflow-clip">
+          <div className="flex w-full max-w-[1440px] flex-col items-center gap-[40px] px-[20px] py-[56px] md:gap-[56px] md:px-[100px] md:py-[72px]">
+            <p className="max-w-[820px] text-center font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.12] text-white sm:text-[46px] md:text-[58px]">
+              {lang === "ru" ? (
+                <>Скачай бесплатно.<br /><span className="text-[#9cfb51]">Перейди на Pro,</span><br />когда будешь готов.</>
+              ) : (
+                <>Start Free.<br /><span className="text-[#9cfb51]">Upgrade To Pro</span><br />When You're Ready.</>
+              )}
             </p>
 
             {/* Phase 66 (FE-01): RUB/USD pill toggle (D-01 style, D-02 position, D-03 compact width, D-07 i18n keys) */}
             <div
               role="tablist"
               aria-label="Select payment currency"
-              className="flex gap-0 p-[4px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] rounded-[100px] mx-auto font-['PT_Root_UI',sans-serif]"
+              className="mx-auto flex gap-0 rounded-[100px] border border-white/10 bg-white/5 p-[4px] font-['PT_Root_UI',sans-serif]"
             >
               <button
                 role="tab"
                 aria-selected={currency === "RUB"}
                 onClick={() => setCurrency("RUB")}
                 className={
-                  "px-[20px] py-[10px] rounded-[100px] text-[14px] font-medium transition-colors cursor-pointer border-none " +
+                  "rounded-[100px] border-none px-[22px] py-[10px] text-[14px] font-bold transition-colors cursor-pointer " +
                   (currency === "RUB"
                     ? "bg-white text-black"
                     : "bg-transparent text-[rgba(255,255,255,0.7)] hover:bg-[rgba(255,255,255,0.08)] hover:text-white")
@@ -406,7 +413,7 @@ export default function PayPage() {
                 aria-selected={currency === "USD"}
                 onClick={() => setCurrency("USD")}
                 className={
-                  "px-[20px] py-[10px] rounded-[100px] text-[14px] font-medium transition-colors cursor-pointer border-none " +
+                  "rounded-[100px] border-none px-[22px] py-[10px] text-[14px] font-bold transition-colors cursor-pointer " +
                   (currency === "USD"
                     ? "bg-white text-black"
                     : "bg-transparent text-[rgba(255,255,255,0.7)] hover:bg-[rgba(255,255,255,0.08)] hover:text-white")
@@ -416,16 +423,15 @@ export default function PayPage() {
               </button>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-[24px] w-full max-w-[800px]">
+            <div className="grid w-full max-w-[800px] gap-[24px] md:grid-cols-2">
               {/* ── One-time Card (D-01: plain dark bg, D-02: subtitle, FE-01: 5 features) ── */}
               <div className="flex-1">
-                <div className="card-hover bg-[#0d0d0d] rounded-[12px] h-[600px] relative overflow-clip">
-                  <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[12px]" />
-                  <div className="flex flex-col justify-between p-[32px] h-full">
+                <div className="card-hover relative min-h-[600px] overflow-hidden rounded-[12px] border border-white/10 bg-[#0e2023]">
+                  <div className="flex h-full min-h-[600px] flex-col justify-between p-[32px]">
                     <div className="flex flex-col gap-[40px]">
                       <div className="flex flex-col gap-[12px]">
                         <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.onetime.subtitle")}</p>
-                        <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{currency === "USD" ? t("pricing.onetime.priceUsd") : t("pricing.onetime.price")}</span>
+                        <span className="font-['Unbounded',sans-serif] text-[48px] font-bold leading-[1.1] text-[#9cfb51]">{currency === "USD" ? t("pricing.onetime.priceUsd") : t("pricing.onetime.price")}</span>
                       </div>
                       <Divider />
                       <div className="flex flex-col gap-[12px]">
@@ -440,7 +446,7 @@ export default function PayPage() {
                       hasActivePro ? (
                         <button
                           disabled
-                          className="inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-white whitespace-nowrap bg-[#555] opacity-40 cursor-not-allowed border-none w-full"
+                          className="inline-flex w-full cursor-not-allowed items-center justify-center gap-[12px] rounded-[100px] border-none bg-[#555] px-[32px] py-[18px] font-['PT_Root_UI',sans-serif] text-[18px] font-bold leading-[1.3] text-white opacity-40"
                         >
                           {t("pay.alreadyActive")}
                         </button>
@@ -448,16 +454,16 @@ export default function PayPage() {
                         <button
                           onClick={() => handlePay(false)}
                           disabled={loading}
-                          className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+                          className="btn-hover relative inline-flex cursor-pointer items-center justify-center gap-[12px] rounded-[100px] border-none bg-white px-[32px] py-[18px] font-['PT_Root_UI',sans-serif] text-[18px] font-bold leading-[1.3] text-[#011417] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
                         >
                           <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
                           {loading ? t("pay.onetime.payingBtn") : t(currency === "USD" ? "pay.onetime.payBtnUsd" : "pay.onetime.payBtn")}
                         </button>
                       )
                     ) : (
-                      <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none no-underline">
+                      <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover relative inline-flex cursor-pointer items-center justify-center gap-[12px] rounded-[100px] border-none bg-white px-[32px] py-[18px] no-underline">
                         <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                        <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">{t("pay.onetime.tryBtn")}</span>
+                        <span className="font-['PT_Root_UI',sans-serif] text-[18px] font-bold leading-[1.3] text-[#011417]">{t("pay.onetime.tryBtn")}</span>
                       </a>
                     )}
                   </div>
@@ -466,36 +472,30 @@ export default function PayPage() {
 
               {/* ── Pro Card ── */}
               <div className="flex-1">
-                <div className="card-hover rounded-[12px] h-[600px] relative overflow-clip">
-                  <div aria-hidden="true" className="absolute inset-0 pointer-events-none rounded-[12px]">
-                    <div className="absolute bg-[#0d0d0d] inset-0 rounded-[12px]" />
-                    <img alt="" className="absolute max-w-none object-cover rounded-[12px] size-full" src={imgFrame37} />
-                    <div className="absolute bg-[rgba(0,0,0,0.48)] inset-0 rounded-[12px]" />
-                  </div>
-                  <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[12px] z-10" />
-                  <div className="relative z-10 flex flex-col justify-between p-[32px] h-full">
+                <div className="card-hover relative min-h-[600px] overflow-hidden rounded-[12px] border border-white/10 bg-[#9cfb51] text-[#011417]">
+                  <div className="relative z-10 flex h-full min-h-[600px] flex-col justify-between p-[32px]">
                     <div className="flex flex-col gap-[40px]">
                       <div className="flex flex-col gap-[8px]">
-                        <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.pro.subtitle")}</p>
+                        <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-[#011417] tracking-[-0.48px]">{t("pricing.pro.subtitle")}</p>
                         <div className="flex gap-[6px] items-end">
-                          <span className="font-['PT_Root_UI',sans-serif] leading-[1.1] text-[48px] text-white tracking-[-0.96px]">{currency === "USD" ? t("pricing.pro.priceUsd") : t("pricing.pro.price")}</span>
-                          <span className="font-['PT_Root_UI',sans-serif] leading-[2] text-[16px] text-[rgba(255,255,255,0.6)]">{t("pricing.pro.period")}</span>
+                          <span className="font-['Unbounded',sans-serif] text-[48px] font-bold leading-[1.1] text-[#011417]">{currency === "USD" ? t("pricing.pro.priceUsd") : t("pricing.pro.price")}</span>
+                          <span className="pb-1 font-['PT_Root_UI',sans-serif] text-[16px] leading-[2] text-[#011417]/60">{t("pricing.pro.period")}</span>
                         </div>
                       </div>
-                      <Divider />
+                      <div className="h-px w-full shrink-0 bg-[#011417]/12" />
                       <div className="flex flex-col gap-[12px]">
-                        <PricingFeature text={t("pricing.pro.feature1")} />
-                        <PricingFeature text={t("pricing.pro.feature2")} />
-                        <PricingFeature text={t("pricing.pro.feature3")} />
-                        <PricingFeature text={t("pricing.pro.feature4")} />
-                        <PricingFeature text={t("pricing.pro.feature5")} />
+                        <PricingFeature tone="green" text={t("pricing.pro.feature1")} />
+                        <PricingFeature tone="green" text={t("pricing.pro.feature2")} />
+                        <PricingFeature tone="green" text={t("pricing.pro.feature3")} />
+                        <PricingFeature tone="green" text={t("pricing.pro.feature4")} />
+                        <PricingFeature tone="green" text={t("pricing.pro.feature5")} />
                       </div>
                     </div>
                     {extStatus === "ready" ? (
                       hasActivePro ? (
                         <button
                           disabled
-                          className="inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-white whitespace-nowrap bg-[#555] opacity-40 cursor-not-allowed border-none w-full"
+                          className="inline-flex w-full cursor-not-allowed items-center justify-center gap-[12px] rounded-[100px] border-none bg-[#011417] px-[32px] py-[18px] font-['PT_Root_UI',sans-serif] text-[18px] font-bold leading-[1.3] text-[#9cfb51] opacity-40"
                         >
                           {t("pay.alreadyActive")}
                         </button>
@@ -503,16 +503,15 @@ export default function PayPage() {
                         <button
                           onClick={() => handlePay(true)}
                           disabled={loading}
-                          className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+                          className="btn-hover relative inline-flex cursor-pointer items-center justify-center gap-[12px] rounded-[100px] border-none bg-[#011417] px-[32px] py-[18px] font-['PT_Root_UI',sans-serif] text-[18px] font-bold leading-[1.3] text-[#9cfb51] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
                         >
                           <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
                           {loading ? t("pay.pro.payingBtn") : t(currency === "USD" ? "pay.pro.payBtnUsd" : "pay.pro.payBtn")}
                         </button>
                       )
                     ) : (
-                      <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover bg-white inline-flex gap-[12px] items-center justify-center px-[32px] py-[18px] rounded-[100px] relative cursor-pointer border-none no-underline">
-                        <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                        <span className="font-['PT_Root_UI',sans-serif] font-bold leading-[1.3] text-[18px] text-black whitespace-nowrap">{t("pay.pro.tryBtn")}</span>
+                      <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover relative inline-flex cursor-pointer items-center justify-center gap-[12px] rounded-[100px] border-none bg-[#011417] px-[32px] py-[18px] no-underline">
+                        <span className="font-['PT_Root_UI',sans-serif] text-[18px] font-bold leading-[1.3] text-[#9cfb51]">{t("pay.pro.tryBtn")}</span>
                       </a>
                     )}
                   </div>
@@ -535,25 +534,25 @@ export default function PayPage() {
               )}
 
               {extStatus === "not_installed" && (
-                <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] px-[24px] py-[20px] text-center w-full">
+                <div className="w-full rounded-[12px] border border-white/10 bg-[#0e2023] px-[24px] py-[20px] text-center">
                   <p className="font-['PT_Root_UI',sans-serif] text-white text-[15px] font-medium leading-[1.5] mb-[12px]">
                     {t("pay.status.notInstalled.title")}
                   </p>
                   <div className="flex flex-col gap-[8px] text-left max-w-[360px] mx-auto">
                     <div className="flex gap-[10px] items-center">
-                      <span className="text-[#2777C3] text-[14px] font-bold shrink-0 w-[20px] text-center font-['PT_Root_UI',sans-serif]">1</span>
+                      <span className="text-[#9cfb51] text-[14px] font-bold shrink-0 w-[20px] text-center font-['PT_Root_UI',sans-serif]">1</span>
                       <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.5]">
                         <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-[#2777C3] underline">{t("pay.status.notInstalled.step1pre")}</a> {t("pay.status.notInstalled.step1post")}
                       </p>
                     </div>
                     <div className="flex gap-[10px] items-center">
-                      <span className="text-[#2777C3] text-[14px] font-bold shrink-0 w-[20px] text-center font-['PT_Root_UI',sans-serif]">2</span>
+                      <span className="text-[#9cfb51] text-[14px] font-bold shrink-0 w-[20px] text-center font-['PT_Root_UI',sans-serif]">2</span>
                       <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.5]">
                         {t("pay.status.notInstalled.step2")}
                       </p>
                     </div>
                     <div className="flex gap-[10px] items-center">
-                      <span className="text-[#2777C3] text-[14px] font-bold shrink-0 w-[20px] text-center font-['PT_Root_UI',sans-serif]">3</span>
+                      <span className="text-[#9cfb51] text-[14px] font-bold shrink-0 w-[20px] text-center font-['PT_Root_UI',sans-serif]">3</span>
                       <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.5]">
                         {t("pay.status.notInstalled.step3")}
                       </p>
@@ -563,7 +562,7 @@ export default function PayPage() {
               )}
 
               {extStatus === "not_logged_in" && (
-                <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] px-[24px] py-[20px] text-center w-full">
+                <div className="w-full rounded-[12px] border border-white/10 bg-[#0e2023] px-[24px] py-[20px] text-center">
                   <p className="font-['PT_Root_UI',sans-serif] text-white text-[15px] font-medium leading-[1.5] mb-[8px]">
                     {t("pay.status.notLoggedIn.title")}
                   </p>
@@ -597,7 +596,7 @@ export default function PayPage() {
       </section>
 
       {/* ─── Footer ─── */}
-      <footer className="bg-black w-full border-t border-[rgba(255,255,255,0.05)]">
+      <footer className="w-full border-t border-white/5 bg-[#011417]">
         <div className="flex flex-col items-center gap-[16px] py-[32px] px-[20px]">
           <div className="flex flex-wrap justify-center gap-[20px] sm:gap-[32px] font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.4)]">
             <Link to="/" className="hover:text-white transition-colors no-underline text-inherit">{t("nav.home")}</Link>

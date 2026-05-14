@@ -1,1 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=PT+Root+UI:wght@400;500;700&display=swap');
+
+@font-face {
+  font-family: 'Unbounded';
+  src: url('/assets/landing-design/Unbounded-VariableFont_wght.ttf') format('truetype');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}

@@ -110,11 +110,13 @@ export default function OptenHeroAnimation() {
   return (
     <>
       <style>{`
-        .opten-anim { transition: opacity 0.7s ease; }
+        .opten-anim { transition: opacity 0.7s ease; text-align: left; }
+        .opten-anim * { box-sizing: border-box; text-align: left; }
         .opten-tt-hide { opacity: 0; transform: translateY(6px); pointer-events: none; transition: opacity 0.25s ease, transform 0.3s ease; }
         .opten-tt-in { opacity: 1; transform: translateY(0); transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
         .opten-tt-vis { opacity: 1; transform: translateY(0); }
         .opten-tt-out { opacity: 0; transform: translateY(6px); transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.7, 0, 0.84, 0); }
+        .opten-tooltip-panel { box-sizing: border-box; width: 203px; }
         .enhance-btn { transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease; }
         .enhance-btn.pressed { transform: scale(0.96); background: rgba(255,255,255,0.15) !important; border-color: rgba(255,255,255,0.25) !important; }
       `}</style>
@@ -153,6 +155,7 @@ export default function OptenHeroAnimation() {
               fontSize: 14.6,
               lineHeight: "26px",
               color: "#fff",
+              textAlign: "left",
             }}
           >
             {showOldText && (
@@ -199,16 +202,17 @@ export default function OptenHeroAnimation() {
             className={redTooltipClass}
             style={{
               position: "absolute",
-              left: 623,
-              top: 5,
+              left: 615,
+              top: 9,
               width: 203,
               display: "flex",
               flexDirection: "column",
-              gap: 2.9,
+              gap: 4,
               zIndex: 10,
             }}
           >
             <div
+              className="opten-tooltip-panel"
               style={{
                 background: "rgba(38,38,38,0.9)",
                 backdropFilter: "blur(1.45px)",
@@ -242,7 +246,7 @@ export default function OptenHeroAnimation() {
               </div>
             </div>
             <div
-              className={`enhance-btn ${enhancePressed ? "pressed" : ""}`}
+              className={`opten-tooltip-panel enhance-btn ${enhancePressed ? "pressed" : ""}`}
               style={{
                 background: "rgba(38,38,38,0.9)",
                 backdropFilter: "blur(1.45px)",

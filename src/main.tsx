@@ -24,10 +24,15 @@
   // entry. Call Environment.set() ONLY for sandbox; production skips it entirely.
   if (window.Paddle) {
     const paddleEnv = import.meta.env.VITE_PADDLE_ENV as "sandbox" | "production";
-    if (paddleEnv === "sandbox") {
-      window.Paddle.Environment.set("sandbox");
+    const paddleToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN as string | undefined;
+    if (paddleToken) {
+      if (paddleEnv === "sandbox") {
+        window.Paddle.Environment.set("sandbox");
+      }
+      window.Paddle.Initialize({ token: paddleToken });
+    } else {
+      console.warn("[Opten] VITE_PADDLE_CLIENT_TOKEN is not set — USD payment path unavailable");
     }
-    window.Paddle.Initialize({ token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN as string });
   } else {
     console.warn("[Opten] Paddle.js failed to load — USD payment path unavailable");
   }
