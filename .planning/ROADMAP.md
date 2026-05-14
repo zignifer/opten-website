@@ -71,7 +71,7 @@ Plans:
 **Wave 1**
 - [x] 02-01: Create `scripts/seo-routes.ts` — per-route metadata manifest (GEO-B-1)
 - [x] 02-02: Create `scripts/entry-server.tsx` — SSR React tree entry, 5 full-tier routes (GEO-B-2)
-- [ ] 02-03: Patch `src/i18n/LangContext.tsx` for SSR safety — move `detectLang()` into `useEffect` (GEO-B-2 pre-req)
+- [x] 02-03: Patch `src/i18n/LangContext.tsx` for SSR safety — move `detectLang()` into `useEffect` (GEO-B-2 pre-req)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 02-04: Create `scripts/prerender.mjs` — postbuild Node script emitting per-route HTML (GEO-B-1 + GEO-B-2)
@@ -131,7 +131,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phases 1 and 2 are p
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Static GEO foundations | 0/8 | Ready to execute | - |
-| 2. Per-route prerender + metadata | 2/8 | In Progress|  |
+| 2. Per-route prerender + metadata | 3/8 | In Progress|  |
 | 3. Bilingual routing | 0/TBD | Backlog | - |
 | 4. Content surface | 0/TBD | Backlog | - |
 | 5. Brand authority | 0/TBD | Backlog | - |
