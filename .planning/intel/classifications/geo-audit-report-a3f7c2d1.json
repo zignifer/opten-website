@@ -1,0 +1,29 @@
+{
+  "source_path": "C:\\Projects\\opten-website\\.geo-audit\\GEO-AUDIT-REPORT.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "GEO Audit Report: opten.space",
+  "summary": "GEO (generative engine optimization) audit of opten.space scoring AI citability across 7 routes, identifying SPA/SSR, robots/sitemap/llms.txt, and JSON-LD schema gaps.",
+  "scope": [
+    "opten.space",
+    "GEO / AI citability",
+    "SSR / prerendering",
+    "robots.txt",
+    "sitemap.xml",
+    "llms.txt",
+    "JSON-LD structured data",
+    "meta tags per route",
+    "Vercel SPA rewrite",
+    "Vite SPA"
+  ],
+  "cross_refs": [
+    "docs/SEO-AUDIT.md",
+    "docs/superpowers/specs/2026-05-14-geo-phase-a-design.md",
+    "docs/superpowers/plans/2026-05-14-geo-phase-a.md",
+    "vercel.json"
+  ],
+  "locked": false,
+  "precedence": 3,
+  "notes": ""
+}

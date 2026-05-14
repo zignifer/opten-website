@@ -1,0 +1,124 @@
+---
+tags:
+  - gsd
+  - roadmap
+  - milestone
+kind: roadmap
+milestone: "geo-optimization"
+aliases:
+  - Roadmap
+---
+# Roadmap: opten-website — GEO Optimization milestone
+
+## Overview
+
+One milestone: **GEO Optimization**. The opten.space site currently scores 12/100 on AI-citability (`geo-seo-claude` audit). The root cause is structural — Vite SPA with no SSR, byte-identical empty `index.html` on every route, zero structured data, no static crawler signals. This roadmap addresses the problem in five sequenced phases. Phase 1 is in-flight (static foundations, no React or build-pipeline changes); Phases 2–5 are backlog placeholders scoped to specific findings in `.planning/research/GEO-AUDIT.md`, to be planned in detail later.
+
+Every phase respects the locked routes and the 8 ADR-locked decisions from `docs/INTEGRATION-CONTRACT.md` (binding interface with the Opten Chrome extension at `C:\Projects\promptscore`).
+
+## Phases
+
+**Phase Numbering:**
+- Integer phases (1, 2, 3, 4, 5): Planned milestone work
+- Decimal phases would be inserted urgent work (none yet)
+
+- [ ] **Phase 1: Static GEO foundations** — robots/sitemap/llms.txt + inline JSON-LD + OG hero cards + Paddle preconnect + Vercel security headers (8 atomic commits, no React changes)
+- [ ] **Phase 2: Per-route prerender + metadata** — resolve head-management strategy; per-route titles/descriptions/canonical/OG (closes audit C-1, C-4)
+- [ ] **Phase 3: Bilingual routing** — resolve per-language URL strategy; `/ru/*` `/en/*` siblings + hreflang + dynamic `<html lang>` (closes audit C-5)
+- [ ] **Phase 4: Content surface** — `/about` E-E-A-T page + `/guides/*` HowTo content + FAQ schema (closes audit M-3, M-4, H-3)
+- [ ] **Phase 5: Brand authority** — Product Hunt + Wikipedia + Reddit + YouTube + expanded `sameAs` schema (closes audit H-4, M-5)
+
+## Phase Details
+
+### Phase 1: Static GEO foundations
+**Goal**: Raise opten.space GEO score from 12/100 → ~30/100 by adding the static foundations AI crawlers and link-preview clients expect, without touching React or the build pipeline.
+**Status**: Ready to execute (design approved, plan ready, in-flight).
+**Depends on**: Nothing.
+**Requirements**: GEO-A-1, GEO-A-2, GEO-A-3, GEO-A-4, GEO-A-5, GEO-A-6, GEO-A-7, GEO-A-8
+**Audit findings closed**: C-2, C-3, H-1, H-2, H-5
+**Success Criteria** (what must be TRUE):
+  1. `curl` against the preview deploy returns real files (not SPA HTML fallback) at `/robots.txt` (text/plain), `/sitemap.xml` (application/xml), `/llms.txt` (text/plain), and `/og-card-{ru,en}.png` (1200×630 PNGs).
+  2. The live root HTML contains exactly two `<script type="application/ld+json">` blocks — one `SoftwareApplication`, one `Organization` — and both parse as valid JSON; `~/.claude/skills/geo/scripts/fetch_page.py` reports `structured_data` count = 2.
+  3. Telegram/Slack link unfurl on the preview URL renders a 1200×630 hero card (not the favicon); `<meta property="og:image">` points to `https://opten.space/og-card-ru.png`; no remaining `favicon-310x310` references in `index.html`.
+  4. `curl -sI /` on the Vercel preview returns `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(self "https://*.paddle.com")`.
+  5. After 7–14 days on production, `/geo audit https://opten.space` reports score uplift from 12 → ~30.
+**Plans**: 8 plans (one per atomic commit — Tasks 1-8 from the GEO Phase A plan; Task 8 / vercel.json executed last as highest-risk)
+
+Plans:
+- [ ] 01-01: Add `public/robots.txt` (GEO-A-1)
+- [ ] 01-02: Add `public/sitemap.xml` (GEO-A-2)
+- [ ] 01-03: Add `public/llms.txt` (GEO-A-3)
+- [ ] 01-04: Copy OG hero card PNGs into `public/` (GEO-A-4)
+- [ ] 01-05: Inline SoftwareApplication + Organization JSON-LD in `index.html` (GEO-A-5)
+- [ ] 01-06: Replace OG image meta block in `index.html` (GEO-A-6)
+- [ ] 01-07: Add Paddle `preconnect` link in `index.html` (GEO-A-7)
+- [ ] 01-08: Add security headers to `vercel.json` (GEO-A-8) — last; rollback = `git revert`
+
+### Phase 2: Per-route prerender + per-route metadata
+**Status**: Backlog. Scope set; detailed planning deferred.
+**Goal**: Make each route return its own `<title>`, `<meta>`, canonical, and OG tags pre-hydration so AI crawlers and search engines see distinct documents.
+**Depends on**: Phase 1.
+**Requirements**: GEO-B-1, GEO-B-2, GEO-B-3
+**Audit findings closed**: C-1 (no SSR), C-4 (one shared title/meta across 7 routes)
+**Open question (must resolve first)**: cross-route head-management strategy — `react-helmet-async` (runtime — doesn't help non-JS crawlers) vs build-time prerender (Vite SSG / vite-plugin-ssr / Vike — preferred).
+**Success Criteria** (sketch, refined during planning):
+  1. Each route returns distinct `<title>` and `<meta description>` in the pre-hydration HTML.
+  2. `<link rel="canonical">` correctly identifies each route.
+  3. Sitemap.xml now carries per-route `lastmod` derived from build metadata.
+**Plans**: TBD
+
+### Phase 3: Bilingual routing
+**Status**: Backlog. Scope set; detailed planning deferred.
+**Goal**: Make EN audience discoverable via real URLs that search engines and AI crawlers understand — without breaking shipped extension binaries that deep-link to locked routes.
+**Depends on**: Phase 2 (per-route metadata is a prerequisite for hreflang to mean anything).
+**Requirements**: GEO-C-1, GEO-C-2, GEO-C-3, GEO-C-4
+**Audit findings closed**: C-5 (no language signaling for EN audience)
+**Open question (must resolve first)**: per-language URL strategy — `/ru/*` `/en/*` path prefixes (recommended) vs `?lang=` query vs `ru.opten.space` subdomain.
+**Hard constraint**: locked routes (`/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill`) must continue to respond at their existing paths; any new `/ru/*` `/en/*` URLs are **additions, not replacements** (per CON-locked-routes-keep-existing-paths and DEC-integration-contract-locked-routes).
+**Success Criteria** (sketch, refined during planning):
+  1. EN user can land on an `/en/*` URL and see English content with `<html lang="en">`.
+  2. `hreflang` annotations cross-link each RU page with its EN counterpart and vice versa.
+  3. Shipped extension binaries continue to navigate to `/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill` without breakage.
+**Plans**: TBD
+
+### Phase 4: Content surface
+**Status**: Backlog. Scope set; detailed planning deferred.
+**Goal**: Establish E-E-A-T signals and indexable answer content so AI assistants have material to cite when answering prompt-engineering questions.
+**Depends on**: Phase 3 (content surface should ship bilingual or with the chosen language strategy applied).
+**Requirements**: GEO-D-1, GEO-D-2, GEO-D-3
+**Audit findings closed**: M-3 (no FAQ schema), M-4 (no HowTo content), H-3 (no `/about` E-E-A-T surface)
+**Success Criteria** (sketch, refined during planning):
+  1. `/about` page exists with founder bio, Telegram contact, and credentials sufficient to satisfy E-E-A-T audit.
+  2. At least one `/guides/*` HowTo article exists, structured per schema.org HowTo, with at least three steps.
+  3. Landing page carries `FAQPage` JSON-LD; question/answer pairs sourced from real user questions.
+**Plans**: TBD
+
+### Phase 5: Brand authority
+**Status**: Backlog. Scope set; detailed planning deferred.
+**Goal**: Disambiguate "Opten" from the Hungarian legal DB and Australian company that currently dominate search results for the brand name, and accumulate citable third-party signals.
+**Depends on**: Phase 4 (need real content to point at from authority sites).
+**Requirements**: GEO-E-1, GEO-E-2, GEO-E-3, GEO-E-4
+**Audit findings closed**: H-4 (brand collision), M-5 (no Wikipedia/Reddit/YouTube presence)
+**Success Criteria** (sketch, refined during planning):
+  1. Product Hunt launch live with referral traffic measurable.
+  2. Wikipedia entry or disambiguation page exists referencing opten.space.
+  3. At least one Reddit thread + at least one YouTube video link back to opten.space and are referenced in `sameAs`.
+  4. `Organization` JSON-LD `sameAs` array expanded to include all newly-acquired authority URLs.
+**Plans**: TBD
+
+## Progress
+
+**Execution Order:**
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phase 1 is the only phase currently planned in detail; Phases 2–5 require their open questions resolved before planning begins.
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Static GEO foundations | 0/8 | Ready to execute | - |
+| 2. Per-route prerender + metadata | 0/TBD | Backlog | - |
+| 3. Bilingual routing | 0/TBD | Backlog | - |
+| 4. Content surface | 0/TBD | Backlog | - |
+| 5. Brand authority | 0/TBD | Backlog | - |
+
+---
+*Roadmap defined: 2026-05-14*
+*Last updated: 2026-05-14 after `new-project-from-ingest` bootstrap from `.planning/intel/`*

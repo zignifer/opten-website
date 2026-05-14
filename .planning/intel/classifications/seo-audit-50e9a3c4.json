@@ -1,0 +1,29 @@
+{
+  "source_path": "C:\\Projects\\opten-website\\docs\\SEO-AUDIT.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "SEO Audit — opten.space",
+  "summary": "Baseline snapshot of opten.space SEO state at planning init, enumerating existing meta tags and gaps across sitemap, hreflang, JSON-LD, performance, and analytics.",
+  "scope": [
+    "index.html meta tags",
+    "vercel.json configuration",
+    "sitemap.xml",
+    "robots.txt",
+    "hreflang and per-language URLs",
+    "JSON-LD structured data",
+    "OG/Twitter cards",
+    "Core Web Vitals / Paddle script",
+    "analytics and Search Console",
+    "per-route head management"
+  ],
+  "cross_refs": [
+    "../../index.html",
+    "../../vercel.json",
+    "../INTEGRATION-CONTRACT.md",
+    "../../src/main.tsx"
+  ],
+  "locked": false,
+  "precedence": 3,
+  "notes": ""
+}

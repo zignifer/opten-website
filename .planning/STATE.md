@@ -1,0 +1,86 @@
+---
+tags:
+  - gsd
+  - state
+  - live
+kind: state
+aliases:
+  - Project State
+---
+# Project State
+
+## Project Reference
+
+See: .planning/PROJECT.md (updated 2026-05-14)
+
+**Core value:** Sell, service, and onboard extension users without breaking the shipped integration contract with the Opten Chrome extension.
+**Current focus:** Phase 1 — Static GEO foundations (SHIPPED to production)
+**Active milestone:** GEO Optimization (12/100 → ~30/100 in Phase 1, higher across Phases 2-5)
+
+## Current Position
+
+Phase: 1 of 5 (Static GEO foundations) — COMPLETE
+Plan: 8 of 8 tasks deployed to https://opten.space
+Status: All Final Verification checks pass on production: security headers (X-Content-Type-Options, Referrer-Policy, Permissions-Policy) present; static MIME types correct (`text/plain` for robots.txt/llms.txt, `application/xml` for sitemap.xml, `image/png` for OG cards — SPA fallback bypassed); 2 JSON-LD blocks (SoftwareApplication + Organization); og:image points to `og-card-ru.png`; Paddle preconnect present. Outstanding: OG card unfurl visual check + 7-14 day AI-crawler refresh window for `/geo audit` rescore.
+Last activity: 2026-05-14 — Executed Phase 1 inline, pushed 8 commits (5dbee1b…86df64b) to `origin/main`, verified production headers and HTML.
+
+Progress: [██████████] 100% shipped
+
+## Performance Metrics
+
+**Velocity:**
+- Total plans completed: 0
+- Average duration: n/a
+- Total execution time: 0 hours
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| 1. Static GEO foundations | 0/8 | - | - |
+
+**Recent Trend:**
+- Last 5 plans: n/a (none completed)
+- Trend: n/a
+
+*Updated after each plan completion*
+
+## Accumulated Context
+
+### Decisions
+
+Full log in PROJECT.md Key Decisions table — 8 ADR-locked decisions from `docs/INTEGRATION-CONTRACT.md` + 6 milestone-level decisions. Recent decisions affecting current work:
+
+- Phase 1: confined to `public/` + `index.html` + `vercel.json` — no React or build-pipeline changes.
+- Phase 1: Task 8 (vercel.json) executed last as highest-risk; rollback = `git revert <sha>`.
+- Phase 1: CSP header deferred (conflicts with Paddle inline script — separate ticket).
+- Phase 1: OG `og:image` points to RU card (hardcoded `<html lang="ru">`); EN card ready for Phase 2.
+- Phase 1: `/pay` stays crawlable in robots.txt (diverges from SEO-AUDIT.md broader recommendation; SPEC wins).
+
+### Pending Todos
+
+[From .planning/todos/pending/ — ideas captured during sessions]
+
+None yet.
+
+### Blockers/Concerns
+
+- **Phase 2 prerequisite (open question)**: cross-route head-management strategy — `react-helmet-async` vs build-time prerender. Must be resolved before Phase 2 detailed planning.
+- **Phase 3 prerequisite (open question)**: per-language URL strategy — `/ru/*` `/en/*` vs `?lang=` vs subdomain. Must be resolved before Phase 3 detailed planning.
+- **Locked-route constraint (permanent)**: `/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill` must keep responding at root paths — applies to every phase, especially Phase 3 bilingual work (`/ru/*` `/en/*` are **additions**, not replacements).
+
+## Deferred Items
+
+Items acknowledged and carried forward from previous milestone close:
+
+| Category | Item | Status | Deferred At |
+|----------|------|--------|-------------|
+| Security | CSP header in `vercel.json` | Separate ticket | 2026-05-14 (Phase 1 scope cut) |
+| Hygiene | Audit and dedupe overlapping UI libs (Radix + MUI + Lucide + react-slick + embla) inherited from Figma Make origin | Not scheduled | 2026-05-14 (not a GEO concern) |
+
+## Session Continuity
+
+Last session: 2026-05-14 — `/gsd-execute-phase 1` (complete + shipped)
+Stopped at: 8 atomic commits pushed to `origin/main`, Vercel auto-deployed, production curl-verified end-to-end (headers, MIME types, JSON-LD, OG, preconnect — all pass).
+Next action: (a) visual OG-card unfurl test in Telegram/Slack against https://opten.space; (b) wait ~7-14 days for AI-crawler refresh then run `~/.claude/skills/geo/scripts/fetch_page.py https://opten.space/` + `/geo audit https://opten.space` for new GEO score; (c) resolve Phase 2 prerequisite (cross-route head-management strategy: react-helmet-async vs build-time prerender) before `/gsd-plan-phase 2`.
+Resume file: None

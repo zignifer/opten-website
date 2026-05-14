@@ -1,0 +1,38 @@
+{
+  "source_path": "C:\\Projects\\opten-website\\docs\\superpowers\\specs\\2026-05-14-geo-phase-a-design.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "GEO Phase A — Static GEO Foundations (Design)",
+  "summary": "Technical spec for raising opten.space's GEO score from 12 to ~30 by adding static foundations (robots.txt, sitemap.xml, llms.txt, JSON-LD, OG cards, security headers, Paddle preconnect) without React/build changes.",
+  "scope": [
+    "robots.txt",
+    "sitemap.xml",
+    "llms.txt",
+    "JSON-LD structured data (SoftwareApplication, Organization)",
+    "Open Graph hero card images",
+    "vercel.json security headers",
+    "Paddle preconnect link",
+    "index.html head edits",
+    "GEO/SEO foundations for AI crawlers"
+  ],
+  "cross_refs": [
+    ".geo-audit/GEO-AUDIT-REPORT",
+    "docs/SEO-AUDIT",
+    "docs/INTEGRATION-CONTRACT",
+    "docs/superpowers/plans/2026-05-14-geo-phase-a",
+    "src/i18n/ru.json",
+    "public/robots.txt",
+    "public/sitemap.xml",
+    "public/llms.txt",
+    "public/og-card-ru.png",
+    "public/og-card-en.png",
+    "opten-design/Landing/banner-ru.png",
+    "opten-design/Landing/banner-eng.png",
+    "vercel.json",
+    "index.html"
+  ],
+  "locked": false,
+  "precedence": 1,
+  "notes": ""
+}

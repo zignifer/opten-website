@@ -1,0 +1,49 @@
+filters:
+  and:
+    - file.folder.startsWith("\.planning/phases")
+    - file.ext == "md"
+formulas:
+  phase_label: "Phase " + phase
+properties:
+  file.name:
+    displayName: File
+  phase:
+    displayName: "#"
+  kind:
+    displayName: Type
+  status:
+    displayName: Status
+  milestone:
+    displayName: Milestone
+views:
+  - type: table
+    name: All phase artifacts
+    order:
+      - phase_label
+      - kind
+      - status
+      - file.name
+      - milestone
+    sort:
+      - property: phase
+        direction: ASC
+      - property: kind
+        direction: ASC
+  - type: table
+    name: Ready to execute
+    filters:
+      and:
+        - status == "ready-to-execute"
+    order:
+      - phase_label
+      - kind
+      - file.name
+  - type: table
+    name: Approved specs
+    filters:
+      and:
+        - kind == "phase-spec"
+        - status == "approved"
+    order:
+      - phase_label
+      - file.name
