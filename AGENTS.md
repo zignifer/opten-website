@@ -127,13 +127,28 @@ src/
 
 ## Workflow
 
-This project uses [Superpowers](https://github.com/obra/superpowers) for
-agentic workflow conventions (planning, execution, review). Follow the
-Superpowers commands and skills installed in your environment when doing
-non-trivial work; refer to that repo for the current command list.
+This project uses **GSD (Get Shit Done)** for planning. Live state in
+`.planning/`:
+
+- `.planning/PROJECT.md` — project context, locked decisions (mirrors INTEGRATION-CONTRACT.md)
+- `.planning/ROADMAP.md` — milestone → phases breakdown
+- `.planning/REQUIREMENTS.md` — falsifiable requirements per milestone
+- `.planning/STATE.md` — current phase / progress / blockers
+- `.planning/phases/XX-name/` — per-phase artifacts: `N-SPEC.md`, `N-PLAN.md`, `N-CONTEXT.md`
+- `.planning/intel/` — consolidated context from ingested docs (read-only after bootstrap)
+- `.planning/research/` — audit reports and exploratory analyses (e.g. `GEO-AUDIT.md`)
+
+For non-trivial work use the GSD slash commands (`/gsd-plan-phase`,
+`/gsd-execute-phase`, `/gsd-verify-work`, etc.) — they keep state in
+`.planning/` in sync and respect locked decisions.
 
 For ad-hoc edits this section is non-binding — just keep changes scoped and
 respect the integration contract above.
+
+The Obsidian vault root is the repo root, so every `.md` here also appears
+in the vault graph. Prefer `[[wikilinks]]` over relative markdown links
+inside `.planning/` so backlinks/graph view stay populated. See `_index.md`
+for the navigation hub.
 
 ## Deploy & build
 
@@ -165,3 +180,6 @@ Reference documentation lives in `docs/`:
 - [docs/TECH.md](docs/TECH.md) — stack snapshot
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — routes, flows, state
 - [docs/SEO-AUDIT.md](docs/SEO-AUDIT.md) — SEO baseline + gap analysis
+
+Active planning state lives in `.planning/` (managed by GSD slash commands).
+See `_index.md` for the Obsidian-friendly navigation hub.
