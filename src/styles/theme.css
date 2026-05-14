@@ -131,12 +131,12 @@
   position: absolute;
   left: 50%;
   top: -640px;
-  width: 1650px;
-  height: 942px;
-  transform: translateX(-50%);
+  width: 1720px;
+  height: 982px;
+  transform: translateX(-56%);
   background: url("/assets/landing-design/gradient-blob-shape.svg") center / 100% 100% no-repeat;
-  filter: blur(351px);
-  opacity: 0.2;
+  filter: blur(285px);
+  opacity: 0.18;
   will-change: transform;
 }
 
@@ -147,10 +147,11 @@
 @media (max-width: 767px) {
   .opten-figma-gradient::before {
     top: -300px;
-    width: 900px;
-    height: 514px;
-    filter: blur(170px);
-    opacity: 0.22;
+    width: 960px;
+    height: 548px;
+    transform: translateX(-59%);
+    filter: blur(150px);
+    opacity: 0.2;
   }
 
 }
