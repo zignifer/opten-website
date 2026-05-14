@@ -68,12 +68,19 @@ Plans:
 **Plans**: 8 plans (one per atomic commit — interface-first ordering, highest-risk `src/main.tsx` hydration switch shipped last)
 
 Plans:
+**Wave 1**
 - [ ] 02-01: Create `scripts/seo-routes.ts` — per-route metadata manifest (GEO-B-1)
 - [ ] 02-02: Create `scripts/entry-server.tsx` — SSR React tree entry, 5 full-tier routes (GEO-B-2)
 - [ ] 02-03: Patch `src/i18n/LangContext.tsx` for SSR safety — move `detectLang()` into `useEffect` (GEO-B-2 pre-req)
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 02-04: Create `scripts/prerender.mjs` — postbuild Node script emitting per-route HTML (GEO-B-1 + GEO-B-2)
 - [ ] 02-05: Create `scripts/sitemap.mjs` — postbuild script emitting `dist/sitemap.xml` with build-time lastmod (GEO-B-3)
+
+**Wave 3** *(blocked on Wave 2 completion)*
 - [ ] 02-06: Modify `package.json` `build` script to chain SPA + SSR builds + postbuild scripts (GEO-B-1, GEO-B-2, GEO-B-3)
+
+**Wave 4** *(blocked on Wave 3 completion)*
 - [ ] 02-07: Modify `src/main.tsx` — branch render call on `hasChildNodes()` for `hydrateRoot` vs `createRoot` (GEO-B-2) — HIGHEST RISK; rollback = `git revert`
 - [ ] 02-08: Add `.ssr-cache` to `.gitignore` + post-deploy acceptance verification (GEO-B-1, GEO-B-2, GEO-B-3)
 
