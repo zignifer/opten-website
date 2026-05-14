@@ -43,9 +43,9 @@ Tracked but not in current detailed plan. Each refers back to specific audit fin
 
 Closes: **C-1** (no SSR — entire site is one empty SPA shell), **C-4** (all 7 routes share one `<title>`/`<meta>`, RU only).
 
-- **GEO-B-1**: Resolve open question — head-management strategy: `react-helmet-async` (runtime) vs build-time prerender (Vite SSG / vite-plugin-ssr / Vike). Build-time preferred per audit.
-- **GEO-B-2**: Implement chosen strategy across all 8 routes — per-route `<title>`, `<meta description>`, canonical, `og:title`, `og:description`, `og:image` (route-appropriate).
-- **GEO-B-3**: Sitemap.xml grows `lastmod` field per route once prerender produces per-route build metadata.
+- [x] **GEO-B-1**: Resolve open question — head-management strategy: `react-helmet-async` (runtime) vs build-time prerender (Vite SSG / vite-plugin-ssr / Vike). Build-time preferred per audit. **DONE** — hand-rolled `scripts/prerender.mjs` (02-04). Awaiting post-deploy Vercel verification to formally close.
+- [x] **GEO-B-2**: Implement chosen strategy across all 8 routes — per-route `<title>`, `<meta description>`, canonical, `og:title`, `og:description`, `og:image` (route-appropriate). **DONE** — 6 prerendered routes with distinct metadata (02-01 through 02-07). Awaiting post-deploy Vercel verification to formally close.
+- [x] **GEO-B-3**: Sitemap.xml grows `lastmod` field per route once prerender produces per-route build metadata. **DONE** — `scripts/sitemap.mjs` emits 6-entry sitemap with uniform build-time lastmod (02-05). Awaiting post-deploy Vercel verification to formally close.
 
 ### Phase 3 — Bilingual routing
 

@@ -23,7 +23,7 @@ Every phase respects the locked routes and the 8 ADR-locked decisions from `docs
 - Decimal phases would be inserted urgent work (none yet)
 
 - [ ] **Phase 1: Static GEO foundations** — robots/sitemap/llms.txt + inline JSON-LD + OG hero cards + Paddle preconnect + Vercel security headers (8 atomic commits, no React changes)
-- [ ] **Phase 2: Per-route prerender + metadata** — resolve head-management strategy; per-route titles/descriptions/canonical/OG (closes audit C-1, C-4)
+- [x] **Phase 2: Per-route prerender + metadata** — resolve head-management strategy; per-route titles/descriptions/canonical/OG (closes audit C-1, C-4) (completed 2026-05-14)
 - [ ] **Phase 3: Bilingual routing** — resolve per-language URL strategy; `/ru/*` `/en/*` siblings + hreflang + dynamic `<html lang>` (closes audit C-5)
 - [ ] **Phase 4: Content surface** — `/about` E-E-A-T page + `/guides/*` HowTo content + FAQ schema (closes audit M-3, M-4, H-3)
 - [ ] **Phase 5: Brand authority** — Product Hunt + Wikipedia + Reddit + YouTube + expanded `sameAs` schema (closes audit H-4, M-5)
@@ -55,7 +55,7 @@ Plans:
 - [ ] 01-08: Add security headers to `vercel.json` (GEO-A-8) — last; rollback = `git revert`
 
 ### Phase 2: Per-route prerender + per-route metadata
-**Status**: Ready to execute (plans written 2026-05-15).
+**Status**: Implementation complete (2026-05-15). Awaiting post-deploy Vercel verification (push to main, then run Sections A-G from 02-08-SUMMARY.md).
 **Goal**: Make each route return its own `<title>`, `<meta>`, canonical, and OG tags pre-hydration so AI crawlers and search engines see distinct documents.
 **Depends on**: Phase 1.
 **Requirements**: GEO-B-1, GEO-B-2, GEO-B-3
@@ -82,7 +82,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 - [x] 02-07: Modify `src/main.tsx` — branch render call on `hasChildNodes()` for `hydrateRoot` vs `createRoot` (GEO-B-2) — HIGHEST RISK; rollback = `git revert`
-- [ ] 02-08: Add `.ssr-cache` to `.gitignore` + post-deploy acceptance verification (GEO-B-1, GEO-B-2, GEO-B-3)
+- [x] 02-08: Add `.ssr-cache` to `.gitignore` + post-deploy acceptance verification (GEO-B-1, GEO-B-2, GEO-B-3)
 
 ### Phase 3: Bilingual routing
 **Status**: Backlog. Scope set; detailed planning deferred.
@@ -131,11 +131,11 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phases 1 and 2 are p
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Static GEO foundations | 0/8 | Ready to execute | - |
-| 2. Per-route prerender + metadata | 7/8 | In Progress|  |
+| 2. Per-route prerender + metadata | 8/8 | Impl complete; awaiting post-deploy verify | 2026-05-15 |
 | 3. Bilingual routing | 0/TBD | Backlog | - |
 | 4. Content surface | 0/TBD | Backlog | - |
 | 5. Brand authority | 0/TBD | Backlog | - |
 
 ---
 *Roadmap defined: 2026-05-14*
-*Last updated: 2026-05-14 after `new-project-from-ingest` bootstrap from `.planning/intel/`*
+*Last updated: 2026-05-15 after Phase 2 implementation complete (02-08)*
