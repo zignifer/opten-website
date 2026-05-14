@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import {
   Check,
@@ -8,8 +8,7 @@ import {
   X,
 } from "lucide-react";
 import { useLang, useT } from "../i18n/LangContext";
-
-const OptenHeroAnimation = lazy(() => import("./components/OptenHeroAnimation"));
+import OptenHeroAnimation from "./components/OptenHeroAnimation";
 
 const STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 const ASSET_ROOT = "/assets/landing-design";
@@ -163,9 +162,7 @@ function Hero() {
         </p>
         <div className="mt-12 hidden w-full justify-center overflow-visible min-[1066px]:flex">
           <div className="w-[680px] max-w-full overflow-visible">
-            <Suspense fallback={<div className="h-[170px]" />}>
-              <OptenHeroAnimation />
-            </Suspense>
+            <OptenHeroAnimation />
           </div>
         </div>
         <div className="mt-12">

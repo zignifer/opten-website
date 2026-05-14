@@ -38,9 +38,17 @@
   }
 
   // === Hydration detector — Phase 2 D-06 (GEO-B-2) ===
-  // Prerendered routes (Plan 02-04 emitted full-body HTML) have content in <div id="root">…</div>;
-  // SPA routes have the empty <div id="root"></div>. Vite minifies index.html with no inner
-  // whitespace so hasChildNodes() is a reliable discriminator (RESEARCH.md Pitfall 3).
+  // Two signals must agree for hydrateRoot to be safe:
+  //   (1) <div id="root"> has prerendered children (Vite minifies an empty root with no
+  //       whitespace, so hasChildNodes() reliably discriminates — RESEARCH.md Pitfall 3).
+  //   (2) The prerendered HTML was generated for THIS path. Vercel's SPA rewrite
+  //       (/((?!api/).*) → /index.html) serves dist/index.html (prerendered for "/") at
+  //       any uncovered route — /account, /success, /dashboard/* etc. — so the children
+  //       of #root look hydratable but describe the wrong route. The prerender script
+  //       writes window.__PRERENDER_PATH per emitted file; if it doesn't match
+  //       window.location.pathname, we are in SPA-fallback territory and must wipe the
+  //       stale tree and createRoot. Without this check, React #418/#423 fires on every
+  //       extension deep-link load (DownloadSkillPage / AccountPage / SuccessPage).
   // Paddle bootstrap above runs BEFORE this call — order locked by DEC-integration-contract-paddle-init / BG-67-01.
 
   const tree = (
@@ -62,8 +70,11 @@
   );
 
   const root = document.getElementById("root")!;
-  if (root.hasChildNodes()) {
+  const prerenderPath = (window as unknown as { __PRERENDER_PATH?: string }).__PRERENDER_PATH;
+  const pathMatches = prerenderPath !== undefined && prerenderPath === window.location.pathname;
+  if (root.hasChildNodes() && pathMatches) {
     hydrateRoot(root, tree);
   } else {
+    if (root.hasChildNodes()) root.innerHTML = "";
     createRoot(root).render(tree);
   }

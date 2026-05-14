@@ -59,11 +59,24 @@ function applyBody(html, rendered) {
   return html.replace(target, `<div id="root">${rendered}</div>`);
 }
 
+// Path marker: lets main.tsx distinguish a real route match from an SPA-fallback hit.
+// Without this, Vercel's rewrite serves dist/index.html (which is prerendered for "/")
+// at any uncovered route (/account, /success, /dashboard/*) — hydrateRoot would then
+// mismatch the client-rendered route component and trigger React #418/#423.
+function applyMarker(html, path) {
+  const marker = `<script>window.__PRERENDER_PATH=${JSON.stringify(path)};</script>`;
+  if (!html.includes("</head>")) {
+    throw new Error("prerender: </head> not found — cannot inject route marker");
+  }
+  return html.replace("</head>", `    ${marker}\n  </head>`);
+}
+
 for (const meta of routes) {
   // resolve ogImage default (Phase 2 site-wide og-card-ru.png per Open Question #2)
   const ogImage = meta.ogImage ?? DEFAULT_OG_IMAGE;
   // (ogImage is read but not currently re-injected — index.html already has og-card-ru.png hardcoded; Phase 4+ may swap this per-route)
   let html = applyMeta(template, meta);
+  html = applyMarker(html, meta.path);
   if (meta.prerender === "full") {
     const rendered = renderRoute(meta.path);
     html = applyBody(html, rendered);
