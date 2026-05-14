@@ -81,7 +81,7 @@ Plans:
 - [x] 02-06: Modify `package.json` `build` script to chain SPA + SSR builds + postbuild scripts (GEO-B-1, GEO-B-2, GEO-B-3)
 
 **Wave 4** *(blocked on Wave 3 completion)*
-- [ ] 02-07: Modify `src/main.tsx` — branch render call on `hasChildNodes()` for `hydrateRoot` vs `createRoot` (GEO-B-2) — HIGHEST RISK; rollback = `git revert`
+- [x] 02-07: Modify `src/main.tsx` — branch render call on `hasChildNodes()` for `hydrateRoot` vs `createRoot` (GEO-B-2) — HIGHEST RISK; rollback = `git revert`
 - [ ] 02-08: Add `.ssr-cache` to `.gitignore` + post-deploy acceptance verification (GEO-B-1, GEO-B-2, GEO-B-3)
 
 ### Phase 3: Bilingual routing
@@ -131,7 +131,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phases 1 and 2 are p
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Static GEO foundations | 0/8 | Ready to execute | - |
-| 2. Per-route prerender + metadata | 6/8 | In Progress|  |
+| 2. Per-route prerender + metadata | 7/8 | In Progress|  |
 | 3. Bilingual routing | 0/TBD | Backlog | - |
 | 4. Content surface | 0/TBD | Backlog | - |
 | 5. Brand authority | 0/TBD | Backlog | - |
