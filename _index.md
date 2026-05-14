@@ -55,7 +55,6 @@ GEO score 12/100 → target ~30 after Phase 1. One milestone, 5 phases.
 ## Design references
 
 - `opten-design/` — landing screenshots, logo, covers (open in Obsidian image preview)
-- `WebsiteMotion/` — motion design references
 
 ## Workflow
 
