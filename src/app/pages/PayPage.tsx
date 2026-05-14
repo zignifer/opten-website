@@ -380,15 +380,7 @@ export default function PayPage() {
       <section className="relative w-full flex-1 overflow-hidden border-none bg-[#011417] pt-[96px] md:pt-[130px]">
         <div aria-hidden="true" className="opten-figma-gradient" />
         <div className="relative z-10 flex flex-col items-center overflow-clip">
-          <div className="flex w-full max-w-[1440px] flex-col items-center gap-[40px] px-[20px] py-[56px] md:gap-[56px] md:px-[100px] md:py-[72px]">
-            <p className="max-w-[820px] text-center font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.12] text-white sm:text-[46px] md:text-[58px]">
-              {lang === "ru" ? (
-                <>Скачай бесплатно.<br /><span className="text-[#9cfb51]">Перейди на Pro,</span><br />когда будешь готов.</>
-              ) : (
-                <>Start Free.<br /><span className="text-[#9cfb51]">Upgrade To Pro</span><br />When You're Ready.</>
-              )}
-            </p>
-
+          <div className="flex w-full max-w-[1440px] flex-col items-center gap-[40px] px-[20px] py-[32px] md:gap-[48px] md:px-[100px] md:py-[48px]">
             {/* Phase 66 (FE-01): RUB/USD pill toggle (D-01 style, D-02 position, D-03 compact width, D-07 i18n keys) */}
             <div
               role="tablist"
