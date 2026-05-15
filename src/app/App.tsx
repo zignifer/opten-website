@@ -56,7 +56,7 @@ function InstallButton({ compact = false, label }: { compact?: boolean; label?: 
       rel="noopener noreferrer"
       className={cx(
         "group inline-flex items-center justify-center rounded-full bg-white text-[#011417] shadow-[0_1px_0_rgba(255,255,255,0.2)_inset] transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(156,251,81,0.18)]",
-        compact ? "gap-2 px-3 py-2 text-[13px] font-bold" : "w-[calc(100vw-40px)] max-w-[310px] gap-3 px-[10px] py-[10px] pr-5 sm:w-auto sm:max-w-none sm:pr-6"
+        compact ? "gap-2 px-3 py-2 text-[13px] font-bold" : "w-[calc(100vw-32px)] max-w-[390px] gap-2 px-[10px] py-[10px] pr-4 sm:w-auto sm:max-w-none sm:gap-3 sm:pr-6"
       )}
     >
       <BrowserIcons size={compact ? "sm" : "lg"} />
@@ -65,8 +65,8 @@ function InstallButton({ compact = false, label }: { compact?: boolean; label?: 
           label ?? t("hero.installBtn")
         ) : (
           <span className="flex flex-col text-left">
-            <span className="text-[13px] font-normal sm:text-[14px]">{t("hero.installBtnSub")}</span>
-            <span className="text-[17px] font-bold sm:text-[18px]">{label ?? t("hero.installBtn")}</span>
+            <span className="whitespace-nowrap text-[13px] font-normal sm:text-[14px]">{t("hero.installBtnSub")}</span>
+            <span className="whitespace-nowrap text-[17px] font-bold sm:text-[18px]">{label ?? t("hero.installBtn")}</span>
           </span>
         )}
       </span>
@@ -373,8 +373,18 @@ function Pricing() {
   return (
     <section id="pricing" className="bg-[#011417] px-5 py-24">
       <div className="mx-auto max-w-[800px]">
-        <SectionTitle>
-          {isRu ? <>Скачай бесплатно.<br /><Accent>Перейди на Pro,</Accent><br />когда будешь готов.</> : <>Start Free.<br /><Accent>Upgrade To Pro</Accent><br />When You're Ready.</>}
+        <SectionTitle className="w-[calc(100vw-24px)] md:w-auto">
+          {isRu ? (
+            <>
+              <span className="md:hidden">Скачай бесплатно. <Accent>Перейди на Pro,</Accent> когда будешь готов.</span>
+              <span className="hidden md:inline">Скачай бесплатно.<br /><Accent>Перейди на Pro,</Accent><br />когда будешь готов.</span>
+            </>
+          ) : (
+            <>
+              <span className="md:hidden">Start Free. <Accent>Upgrade To Pro</Accent> When You're Ready.</span>
+              <span className="hidden md:inline">Start Free.<br /><Accent>Upgrade To Pro</Accent><br />When You're Ready.</span>
+            </>
+          )}
         </SectionTitle>
         <div className="mt-16 grid gap-6 md:grid-cols-2">
           <PlanCard
@@ -457,7 +467,7 @@ function Footer() {
         <div className="mt-8 flex items-center justify-center gap-3 font-['PT_Root_UI',sans-serif] text-[18px] text-white">
           <Check className="size-[18px] stroke-[1.8]" /> {t("cta.freeLabel")}
         </div>
-        <div className="mt-20 flex flex-wrap justify-center gap-8 font-['PT_Root_UI',sans-serif] text-[16px] text-white/40">
+        <div className="mt-20 flex flex-wrap justify-center gap-x-5 gap-y-4 font-['PT_Root_UI',sans-serif] text-[16px] text-white/40 sm:gap-8">
           <Link to="/privacy" className="hover:text-white">{t("footer.privacy")}</Link>
           <Link to="/terms" className="hover:text-white">{t("footer.terms")}</Link>
           <Link to="/refund" className="hover:text-white">{t("footer.refund")}</Link>
@@ -469,9 +479,9 @@ function Footer() {
   );
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+function SectionTitle({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <h2 className="mx-auto text-center font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] text-white sm:text-[46px] md:text-[52px]">
+    <h2 className={cx("mx-auto text-center font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] text-white sm:text-[46px] md:text-[52px]", className)}>
       {children}
     </h2>
   );
