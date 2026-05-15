@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 2 context gathered
-last_updated: "2026-05-14T20:25:39.451Z"
-last_activity: 2026-05-14
+status: "SHIPPED to https://opten.space — deploy `dpl_HAzfr2h8sADbiHHBt4yi4Wkf6ncg` (commit `80b16be`). All 6 prerendered routes serve distinct titles/descriptions/canonicals/OG; 3 SPA-fallback routes (`/account`, `/success`, `/dashboard/download-skill`) keep working without hydration mismatch. Playwright sweep: 0 console errors on all 9 routes. Phase 1 invariants preserved (2 JSON-LD blocks + Paddle sync script on every emitted HTML, security headers intact). `dist/sitemap.xml` has 6 per-route `<lastmod>` entries. Outstanding: visual OG card unfurl test in Telegram/Slack + Paddle modal click test on `/pay` + ~7-14 day AI-crawler refresh window for `/geo audit` rescore."
+stopped_at: Phase 2 SHIPPED to production after rollback + hotfix cycle. Deploy `dpl_HAzfr2h8sADbiHHBt4yi4Wkf6ncg` (commit `80b16be`) is live on opten.space; playwright sweep clean.
+last_updated: "2026-05-15T18:17:55.259Z"
+last_activity: 2026-05-15
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 1
   total_plans: 9
   completed_plans: 8
@@ -60,6 +60,10 @@ Progress: [██████████] 100% shipped
 | Phase 02-per-route-prerender-per-route-metadata P08 | 15 | 2 tasks | 0 files |
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 2.1 inserted after Phase 2: Hydration speedup + perceived-load optimization (code-split, modulepreload, img dims, PNG->WebP/AVIF) (URGENT)
 
 ### Decisions
 

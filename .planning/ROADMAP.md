@@ -20,10 +20,11 @@ Every phase respects the locked routes and the 8 ADR-locked decisions from `docs
 
 **Phase Numbering:**
 - Integer phases (1, 2, 3, 4, 5): Planned milestone work
-- Decimal phases would be inserted urgent work (none yet)
+- Decimal phases: inserted urgent work (Phase 2.1 added 2026-05-15 to address Phase 2 side effects)
 
 - [ ] **Phase 1: Static GEO foundations** — robots/sitemap/llms.txt + inline JSON-LD + OG hero cards + Paddle preconnect + Vercel security headers (8 atomic commits, no React changes)
 - [x] **Phase 2: Per-route prerender + metadata** — resolve head-management strategy; per-route titles/descriptions/canonical/OG (closes audit C-1, C-4) (completed 2026-05-14)
+- [ ] **Phase 2.1: Hydration speedup & perceived-load optimization** *(INSERTED 2026-05-15)* — fix the hydration gap exposed by Phase 2: route-level code-split, JS preload, explicit `<img>` dimensions, PNG→WebP/AVIF
 - [ ] **Phase 3: Bilingual routing** — resolve per-language URL strategy; `/ru/*` `/en/*` siblings + hreflang + dynamic `<html lang>` (closes audit C-5)
 - [ ] **Phase 4: Content surface** — `/about` E-E-A-T page + `/guides/*` HowTo content + FAQ schema (closes audit M-3, M-4, H-3)
 - [ ] **Phase 5: Brand authority** — Product Hunt + Wikipedia + Reddit + YouTube + expanded `sameAs` schema (closes audit H-4, M-5)
@@ -83,6 +84,32 @@ Plans:
 **Wave 4** *(blocked on Wave 3 completion)*
 - [x] 02-07: Modify `src/main.tsx` — branch render call on `hasChildNodes()` for `hydrateRoot` vs `createRoot` (GEO-B-2) — HIGHEST RISK; rollback = `git revert`
 - [x] 02-08: Add `.ssr-cache` to `.gitignore` + post-deploy acceptance verification (GEO-B-1, GEO-B-2, GEO-B-3)
+
+### Phase 2.1: Hydration speedup & perceived-load optimization *(INSERTED)*
+**Status**: Backlog. Inserted 2026-05-15 to address side effects of Phase 2's prerender + hydrateRoot shipping. Detailed planning deferred to `/gsd-plan-phase 2.1`.
+**Goal**: Close the hydration gap that Phase 2 exposed — the page now paints fully dark + content-complete from first paint, but `<button onClick>` handlers are dead for 1-3s on mobile while the JS bundle downloads, parses, and hydrates. Also kill the secondary FOUC/CLS as 37 unoptimized PNG `<img>` tags pop in over time.
+**Depends on**: Phase 2 (uses the prerender + hydrate split as the basis for measurement; landing must stay prerendered).
+**Trigger**: User report 2026-05-15 — "верхние кнопки не нажимаются до прокрутки, либо с огромной задержкой" on iPhone Safari. Root-cause analysis in conversation: 362 KB JS bundle + zero code-split means landing pays for PayPage/AccountPage/Paddle integration code it never runs.
+**Hard constraints**:
+  - Touches NO extension-coupled constants (`EXTENSION_IDS`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`).
+  - Touches NO locked routes (`/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill`).
+  - Must not regress Phase 2 prerender invariants — `dist/index.html` and `dist/{route}/index.html` keep their per-route titles/meta/canonical/OG; SPA-fallback (`/account` etc.) keeps its `__PRERENDER_PATH` discriminator and `createRoot` path.
+**Scope (four sub-areas)**:
+  1. **Route-level code-split** — `React.lazy()` + `<Suspense>` for `PayPage`, `AccountPage`, `SuccessPage`, `DownloadSkillPage`, `PrivacyPage`, `TermsPage`, `RefundPage`, `WelcomePage`. Landing-only bundle target: 362 KB → ≤ 220 KB (~40% reduction).
+  2. **`<link rel="modulepreload">` for main bundle** in `index.html`'s `<head>` so the JS chunk for `/` starts downloading in parallel with HTML parse, not after.
+  3. **Explicit `width`/`height` (or `aspect-ratio`)** on every `<img>` in `src/app/` (37 tags total — partner logos, feature cards, step illustrations, hero highlight, OptenHeroAnimation inner SVGs). Eliminates CLS as images stream in.
+  4. **PNG → WebP/AVIF conversion** for partner logos (`/assets/partners/*.png`) and feature card images (`/assets/landing-design/feature-*.png`) via `vite-imagetools` or a build-time `sharp` postbuild step. SVG icons untouched.
+**Success Criteria** (refined during planning):
+  1. `npm run build` produces a route chunks map showing `/` does NOT pull in `Paddle.js`-using or `chrome.runtime`-using code (verify via `vite build --report` or `rollup-plugin-visualizer`).
+  2. Lighthouse Mobile Performance score for `/` on production ≥ 90 (was: unmeasured baseline, likely 50-70 given current bundle + no image opt).
+  3. Initial JS transferred for `/` reduced by ≥ 40% from current 362 KB / 105 KB gzipped baseline.
+  4. Cumulative Layout Shift = 0 on `/` per Lighthouse.
+  5. Smoke test on Chrome DevTools "Slow 4G" + 4× CPU throttling: tap on navbar `Menu` hamburger within 500 ms of first-contentful-paint registers `setOpen` state change (verified via React DevTools event log).
+  6. No regression: all 9 routes still respond, prerendered routes still have distinct titles/meta/canonical, Paddle modal still opens on `/pay` button click.
+**Plans**: TBD (run `/gsd-plan-phase 2.1` to break down — expected ~5-7 atomic commits, one per sub-area + one acceptance verification).
+
+Plans:
+- [ ] TBD (run `/gsd-plan-phase 2.1` to break down)
 
 ### Phase 3: Bilingual routing
 **Status**: Backlog. Scope set; detailed planning deferred.
