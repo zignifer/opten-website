@@ -170,17 +170,35 @@
   * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
   */
 
+  /*
+   * BG-MOBILE-SCROLL-WHITE-01 (Phase 2 regression hotfix):
+   * iOS Safari with bottom URL bar reveals the document background through
+   * the translucent address-bar / safe-area / rubber-band overscroll. Before
+   * Phase 2 (per-route prerender) the page was empty until JS hydrated, so
+   * the white body was masked by emptiness. After Phase 2 the dark 8062px
+   * page is painted from first paint, making the white body underneath
+   * suddenly visible as a large white area while scrolling.
+   *
+   * Fix: paint html + body in the brand dark color (#011417) so iOS has
+   * nothing white to reveal. The Tailwind `bg-background` token stays white
+   * (Radix UI components still depend on it). Pages with non-dark wrappers
+   * (only /welcome today) keep working because their own min-h-screen
+   * wrapper covers the viewport — overscroll bounce will briefly show dark,
+   * which is acceptable and matches /welcome's call-to-action style.
+   */
   html {
     font-size: var(--font-size);
     overflow-x: hidden;
     width: 100%;
     max-width: 100vw;
+    background-color: #011417;
   }
 
   body {
     overflow-x: hidden;
     width: 100%;
     max-width: 100vw;
+    background-color: #011417;
   }
 
   #root {
