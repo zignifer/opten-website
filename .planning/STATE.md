@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: "SHIPPED to https://opten.space — deploy `dpl_HAzfr2h8sADbiHHBt4yi4Wkf6ncg` (commit `80b16be`). All 6 prerendered routes serve distinct titles/descriptions/canonicals/OG; 3 SPA-fallback routes (`/account`, `/success`, `/dashboard/download-skill`) keep working without hydration mismatch. Playwright sweep: 0 console errors on all 9 routes. Phase 1 invariants preserved (2 JSON-LD blocks + Paddle sync script on every emitted HTML, security headers intact). `dist/sitemap.xml` has 6 per-route `<lastmod>` entries. Outstanding: visual OG card unfurl test in Telegram/Slack + Paddle modal click test on `/pay` + ~7-14 day AI-crawler refresh window for `/geo audit` rescore."
-stopped_at: Phase 2 SHIPPED to production after rollback + hotfix cycle. Deploy `dpl_HAzfr2h8sADbiHHBt4yi4Wkf6ncg` (commit `80b16be`) is live on opten.space; playwright sweep clean.
-last_updated: "2026-05-15T18:17:55.259Z"
+stopped_at: Phase 2.1 context gathered
+last_updated: "2026-05-15T19:55:32.358Z"
 last_activity: 2026-05-15
 progress:
   total_phases: 6
@@ -105,7 +105,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-15T00:00:00.000Z
-Stopped at: Phase 2 SHIPPED to production after rollback + hotfix cycle. Deploy `dpl_HAzfr2h8sADbiHHBt4yi4Wkf6ncg` (commit `80b16be`) is live on opten.space; playwright sweep clean.
+Last session: 2026-05-15T19:55:32.348Z
+Stopped at: Phase 2.1 context gathered
 Next action: (1) visual OG unfurl test on Telegram/Slack + Paddle modal browser test on /pay; (2) ~7-14 days from 2026-05-15 → `/geo audit https://opten.space` for Phase 2 score uplift measurement; (3) resolve Phase 3 prerequisite (per-language URL strategy — `/ru/*` `/en/*` vs `?lang=` vs subdomain) before `/gsd-plan-phase 3`; (4) extract Phase 2 hotfix as anti-pattern for future prerender phases (SPA-fallback hydration mismatch + Suspense SSR boundary failure).
-Resume file: None
+Resume file: .planning/phases/02.1-hydration-and-perf/02.1-CONTEXT.md
