@@ -106,10 +106,16 @@ Plans:
   4. Cumulative Layout Shift = 0 on `/` per Lighthouse.
   5. Smoke test on Chrome DevTools "Slow 4G" + 4× CPU throttling: tap on navbar `Menu` hamburger within 500 ms of first-contentful-paint registers `setOpen` state change (verified via React DevTools event log).
   6. No regression: all 9 routes still respond, prerendered routes still have distinct titles/meta/canonical, Paddle modal still opens on `/pay` button click.
-**Plans**: TBD (run `/gsd-plan-phase 2.1` to break down — expected ~5-7 atomic commits, one per sub-area + one acceptance verification).
+**Plans**: 7 plans (planned 2026-05-16 by /gsd-plan-phase 2.1).
 
 Plans:
-- [ ] TBD (run `/gsd-plan-phase 2.1` to break down)
+- [ ] 02.1-01-PLAN.md — Register vite-imagetools plugin + TS declaration (Wave 1)
+- [ ] 02.1-02-PLAN.md — Add Picture.tsx component wrapping vite-imagetools <picture> output (Wave 1)
+- [ ] 02.1-03-PLAN.md — Add RouteLoading.tsx Suspense fallback component (Wave 1)
+- [ ] 02.1-04-PLAN.md — Set explicit width/height/loading attrs on every <img> for CLS=0 (Wave 2)
+- [ ] 02.1-05-PLAN.md — Wrap PNG <img> tags with vite-imagetools <Picture> for WebP delivery (Wave 3)
+- [ ] 02.1-06-PLAN.md — Inject <link rel=modulepreload> into prerendered HTML via prerender.mjs (Wave 3)
+- [ ] 02.1-07-PLAN.md — Lazy-load SPA-fallback routes via React.lazy + Suspense (Wave 4, highest risk, last)
 
 ### Phase 3: Bilingual routing
 **Status**: Backlog. Scope set; detailed planning deferred.
