@@ -1,0 +1,77 @@
+{
+  "canva.png": {
+    "w": 268,
+    "h": 80,
+    "bytes": 2601
+  },
+  "freepik.png": {
+    "w": 268,
+    "h": 80,
+    "bytes": 1699
+  },
+  "higgsfield.png": {
+    "w": 268,
+    "h": 80,
+    "bytes": 3698
+  },
+  "syntx.png": {
+    "w": 268,
+    "h": 80,
+    "bytes": 3151
+  },
+  "feature-models.png": {
+    "w": 1100,
+    "h": 424,
+    "bytes": 111536
+  },
+  "feature-models-en.png": {
+    "w": 1100,
+    "h": 424,
+    "bytes": 73175
+  },
+  "feature-models-ru.png": {
+    "w": 1100,
+    "h": 424,
+    "bytes": 72747
+  },
+  "feature-credits.png": {
+    "w": 1100,
+    "h": 424,
+    "bytes": 56163
+  },
+  "feature-interface-en.png": {
+    "w": 1100,
+    "h": 424,
+    "bytes": 73175
+  },
+  "feature-interface-ru.png": {
+    "w": 1100,
+    "h": 424,
+    "bytes": 72747
+  },
+  "feature-enhance-en.png": {
+    "w": 1100,
+    "h": 372,
+    "bytes": 34368
+  },
+  "feature-enhance-ru.png": {
+    "w": 1100,
+    "h": 372,
+    "bytes": 33440
+  },
+  "steps-inner-en.png": {
+    "w": 813,
+    "h": 638,
+    "bytes": 80552
+  },
+  "steps-inner-ru.png": {
+    "w": 813,
+    "h": 638,
+    "bytes": 84780
+  },
+  "gradient-blob-shape.png": {
+    "w": 3300,
+    "h": 1884,
+    "bytes": 62968
+  }
+}
