@@ -140,7 +140,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 - [x] 03-02-seo-routes-add-en-entries-PLAN.md — Extend RouteMeta (htmlLang + hreflangAlternates) + 6 EN entries in scripts/seo-routes.ts (GEO-C-1, GEO-C-4)
-- [ ] 03-06-langcontext-url-prefix-detection-PLAN.md — LangProvider URL-driven via useLocation + SSR-eager en.json gate (GEO-C-4)
+- [x] 03-06-langcontext-url-prefix-detection-PLAN.md — LangProvider URL-driven via useLocation + SSR-eager en.json gate (GEO-C-4)
 
 **Wave 3** *(blocked on Wave 2)*
 - [ ] 03-03-prerender-apply-htmlLang-hreflang-oglocale-PLAN.md — 3 new apply* helpers in scripts/prerender.mjs (GEO-C-3, GEO-C-4)
@@ -187,7 +187,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phases 1 and 2 are p
 | 2. Per-route prerender + metadata | 8/8 | Complete   | 2026-05-16 |
 | 2.1. Hydration speedup & perceived-load opt | 7/7 | Complete (PageSpeed Mobile 91 / CLS 0 / TBT 0 ms) | 2026-05-16 |
 | 2.2. Mobile-perf + Safari fixes | inline (~5 commits, no per-task plans) | Complete (shipped inline; retroactive note in `02.1-VERIFICATION.md`) | 2026-05-16 |
-| 3. Bilingual routing | 2/8 | In Progress|  |
+| 3. Bilingual routing | 3/8 | In Progress|  |
 | 4. Content surface | 0/TBD | Backlog | - |
 | 5. Brand authority | 0/TBD | Backlog | - |
 
