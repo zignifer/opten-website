@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: "Completed 03-01-PLAN.md — Task 2 checkpoint:human-verify pending"
-last_updated: "2026-05-16T16:38:00.839Z"
+last_updated: "2026-05-16T17:00:14.928Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 24
-  completed_plans: 16
-  percent: 67
+  completed_plans: 17
+  percent: 71
 ---
 
 # Project State
@@ -27,14 +27,14 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 ## Current Position
 
 Phase: 03 (bilingual-routing) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (no per-task plans, ~5 atomic commits `0a73069`..`81284d4`)
 Status: Ready to execute
 Last activity: 2026-05-16
 Next: Phase 3 (bilingual routing) — discuss in progress (separate context), blocks on per-language URL strategy (`/ru/*` `/en/*` vs `?lang=` vs subdomain).
 
 Milestone phases: 4 of 7 complete (1, 2, 2.1, 2.2). Phases 3-5 backlog.
-Progress: [███████░░░] 67%
+Progress: [███████░░░] 71%
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Progress: [███████░░░] 67%
 | Phase 02.1-hydration-and-perf P02 | 3 minutes | 1 tasks | 1 files |
 | Phase 02.1-hydration-and-perf P05 | 30 | 2 tasks | 3 files |
 | Phase 03-bilingual-routing P01 | 5min | 1 tasks | 1 files |
+| Phase 03-bilingual-routing P02 | 8min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -123,7 +124,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-16T16:38:00.830Z
+Last session: 2026-05-16T17:00:14.917Z
 Stopped at: Completed 03-01-PLAN.md — Task 2 checkpoint:human-verify pending
 Next action (in order):
 
@@ -132,4 +133,4 @@ Next action (in order):
   3. **Phase 2 follow-up todos (independent of Phase 3)** — visual OG unfurl test on Telegram/Slack + Paddle modal browser test on `/pay`; GEO rescore window opens 2026-05-22 → `/geo audit https://opten.space`.
   4. **Lessons-learned capture** — Phase 2 hotfix + Phase 02.2 ad-hoc-then-retroactive pattern → future anti-patterns reference.
 
-Resume file: .planning/phases/03-bilingual-routing/03-01-SUMMARY.md
+Resume file: None
