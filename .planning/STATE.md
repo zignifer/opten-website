@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "SHIPPED to https://opten.space — deploy `dpl_HAzfr2h8sADbiHHBt4yi4Wkf6ncg` (commit `80b16be`). All 6 prerendered routes serve distinct titles/descriptions/canonicals/OG; 3 SPA-fallback routes (`/account`, `/success`, `/dashboard/download-skill`) keep working without hydration mismatch. Playwright sweep: 0 console errors on all 9 routes. Phase 1 invariants preserved (2 JSON-LD blocks + Paddle sync script on every emitted HTML, security headers intact). `dist/sitemap.xml` has 6 per-route `<lastmod>` entries. Outstanding: visual OG card unfurl test in Telegram/Slack + Paddle modal click test on `/pay` + ~7-14 day AI-crawler refresh window for `/geo audit` rescore."
+status: executing
 stopped_at: Phase 2.1 context gathered
-last_updated: "2026-05-15T19:55:32.358Z"
-last_activity: 2026-05-15
+last_updated: "2026-05-16T06:49:21.113Z"
+last_activity: 2026-05-16
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 9
-  completed_plans: 8
-  percent: 89
+  total_plans: 16
+  completed_plans: 9
+  percent: 56
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-14)
 
 **Core value:** Sell, service, and onboard extension users without breaking the shipped integration contract with the Opten Chrome extension.
-**Current focus:** Phase 2 — Per-route prerender + per-route metadata (COMPLETE + hotfix shipped)
+**Current focus:** Phase 02.1 — hydration-and-perf
 **Active milestone:** GEO Optimization (12/100 → ~30/100 in Phase 1, higher across Phases 2-5)
 
 ## Current Position
 
-Phase: 2 (Per-route prerender + per-route metadata) — COMPLETE
-Plan: 8 of 8 deployed + 1 hotfix commit (`80b16be`)
-Status: SHIPPED to https://opten.space — deploy `dpl_HAzfr2h8sADbiHHBt4yi4Wkf6ncg` (commit `80b16be`). All 6 prerendered routes serve distinct titles/descriptions/canonicals/OG; 3 SPA-fallback routes (`/account`, `/success`, `/dashboard/download-skill`) keep working without hydration mismatch. Playwright sweep: 0 console errors on all 9 routes. Phase 1 invariants preserved (2 JSON-LD blocks + Paddle sync script on every emitted HTML, security headers intact). `dist/sitemap.xml` has 6 per-route `<lastmod>` entries. Outstanding: visual OG card unfurl test in Telegram/Slack + Paddle modal click test on `/pay` + ~7-14 day AI-crawler refresh window for `/geo audit` rescore.
-Last activity: 2026-05-15
+Phase: 02.1 (hydration-and-perf) — EXECUTING
+Plan: 2 of 7
+Status: Ready to execute
+Last activity: 2026-05-16
 
-Progress: [██████████] 100% shipped
+Progress: [██████░░░░] 56%
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Progress: [██████████] 100% shipped
 | Phase 02-per-route-prerender-per-route-metadata P05 | 15m | 1 tasks | 1 files |
 | Phase 02-per-route-prerender-per-route-metadata P06 | 10m | 1 tasks | 1 files |
 | Phase 02-per-route-prerender-per-route-metadata P08 | 15 | 2 tasks | 0 files |
+| Phase 02.1-hydration-and-perf P01 | 3m | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -105,7 +106,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-15T19:55:32.348Z
+Last session: 2026-05-16T06:49:21.107Z
 Stopped at: Phase 2.1 context gathered
 Next action: (1) visual OG unfurl test on Telegram/Slack + Paddle modal browser test on /pay; (2) ~7-14 days from 2026-05-15 → `/geo audit https://opten.space` for Phase 2 score uplift measurement; (3) resolve Phase 3 prerequisite (per-language URL strategy — `/ru/*` `/en/*` vs `?lang=` vs subdomain) before `/gsd-plan-phase 3`; (4) extract Phase 2 hotfix as anti-pattern for future prerender phases (SPA-fallback hydration mismatch + Suspense SSR boundary failure).
-Resume file: .planning/phases/02.1-hydration-and-perf/02.1-CONTEXT.md
+Resume file: None
