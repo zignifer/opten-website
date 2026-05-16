@@ -1,16 +1,27 @@
-/* Phase 2.2: switched from Google Fonts @import to self-hosted WOFF2.
+/* Phase 2.2: self-hosted variable WOFF2 fonts with adjusted-fallback metric overrides.
  *
- * The previous `@import url('https://fonts.googleapis.com/...')` was a render-
- * blocking 3-RTT chain on iOS Safari: parse main.css → fetch googleapis CSS →
- * fetch gstatic font files. Chrome/Firefox preload-scan the chain in parallel;
- * Safari does not, so users on iPhone hit a 1-2s FOIT before the text appeared.
+ * The original Google Fonts @import was a sequential 3-RTT cascade on iOS Safari.
+ * Replaced with self-hosted /fonts/*.woff2 + <link rel=preload> in index.html for
+ * both fonts.
  *
- * Both fonts now ship as variable WOFF2 from /fonts/:
- *   PT-Root-UI_VF.woff2  (91KB, covers weights 400 / 500 / 700)
- *   Unbounded-VF.woff2   (253KB, used only in headings)
- * WOFF2 ≈ 35 % the size of the original TTF. PT Root UI is also <link rel=
- * preload>'d in index.html so the browser starts the fetch before parsing CSS.
+ * Even with WOFF2 self-hosted, font-display:swap caused a visible "jump" on first
+ * paint (heading text was rendered in the system fallback, then swapped to Unbounded
+ * which has very different metrics — wider, taller, bolder). Fix: declare a SECOND
+ * @font-face under the same font-family name pointing at a local system font with
+ * ascent/descent/size overrides chosen to match the loaded font's glyph box. The
+ * browser uses this rule while the WOFF2 is still downloading; when the WOFF2 lands
+ * the first rule (src: url) takes over but the glyph box stays the same → no layout
+ * shift, no perceptible jump.
+ *
+ * Override values were eyeballed against the actual fonts in the Playwright preview.
+ * If a typeface is swapped in the future, recompute via Malte Ubl's "Faster Web
+ * Fonts" generator or the Google Fonts adjusted-fallback table.
+ *
+ *   PT-Root-UI_VF.woff2  91 KB, covers weights 100-900 (we use 400 / 500 / 700)
+ *   Unbounded-VF.woff2  253 KB, covers weights 200-900 (we use 400 / 700)
  */
+
+/* --- PT Root UI (body text) --- */
 
 @font-face {
   font-family: 'PT Root UI';
@@ -21,6 +32,20 @@
   font-display: swap;
 }
 
+/* Same family name → used as fallback while the WOFF2 above is loading. */
+@font-face {
+  font-family: 'PT Root UI';
+  src: local('Arial'), local('Helvetica Neue'), local('Helvetica');
+  font-weight: 100 900;
+  font-style: normal;
+  ascent-override: 96%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+  size-adjust: 100%;
+}
+
+/* --- Unbounded (display / headings) --- */
+
 @font-face {
   font-family: 'Unbounded';
   src: url('/fonts/Unbounded-VF.woff2') format('woff2-variations'),
@@ -28,4 +53,18 @@
   font-weight: 200 900;
   font-style: normal;
   font-display: swap;
+}
+
+/* Unbounded is wider and slightly taller than any common system sans-serif —
+   size-adjust:108 % roughly matches its advance width so the H1 doesn't reflow
+   when the loaded font kicks in. */
+@font-face {
+  font-family: 'Unbounded';
+  src: local('Impact'), local('Arial Black'), local('Arial Bold'), local('Arial'), local('Helvetica');
+  font-weight: 200 900;
+  font-style: normal;
+  ascent-override: 95%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+  size-adjust: 108%;
 }

@@ -87,10 +87,13 @@
          src/lib/paddle.ts when the user navigates to /pay through React Router. -->
     <link rel="preconnect" href="https://cdn.paddle.com" />
 
-    <!-- Phase 2.2: preload PT Root UI so the font fetch starts in parallel with HTML/CSS
-         parsing instead of waiting for the CSSOM to discover the @font-face rule. Critical
-         on iOS Safari where the previous Google Fonts @import chain caused a 1-2s FOIT. -->
+    <!-- Phase 2.2: preload both webfonts so the fetch starts in parallel with HTML/CSS
+         parsing instead of waiting for the CSSOM to discover the @font-face rule. Both
+         appear above the fold on every prerendered route (Unbounded in <h1>, PT Root UI
+         in the subtitle + CTAs). Pairs with the adjusted-fallback @font-face rules in
+         src/styles/fonts.css to eliminate the FOUT layout shift on first paint. -->
     <link rel="preload" href="/fonts/PT-Root-UI_VF.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="/fonts/Unbounded-VF.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
   </head>
 
   <body>
