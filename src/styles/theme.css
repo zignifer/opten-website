@@ -119,6 +119,21 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Phase 2.2 Safari fix: kill the legacy 300 ms click delay on touch devices.
+   Modern iOS (≥ 9.3) already removes it when the viewport meta declares
+   width=device-width, but some older Safari builds and in-app browsers still
+   wait for a possible double-tap-to-zoom before firing click. touch-action:
+   manipulation tells the browser the element doesn't participate in zoom
+   gestures, so the click event fires on touchend without delay. Applied to
+   every interactive element since they're all dark/finger-friendly. */
+button,
+a,
+[role="button"],
+input[type="button"],
+input[type="submit"] {
+  touch-action: manipulation;
+}
+
 .opten-figma-gradient {
   position: absolute;
   inset: 0;

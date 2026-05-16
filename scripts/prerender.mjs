@@ -87,6 +87,33 @@ function applyModulePreload(html) {
   return html.replace("</head>", `${tag}\n  </head>`);
 }
 
+// Phase 2.2 Safari fix: Vite emits <link rel="modulepreload"> for the entry and every
+// statically-imported vendor chunk, but Safari < iOS 17 (Sep 2023) IGNORES modulepreload.
+// On those browsers vendor-react.js / vendor-router.js / vendor-lucide.js only start
+// fetching after the main chunk has parsed and the dynamic import graph has been
+// resolved — adding 100-300 ms of sequential network time to TTI.
+//
+// Fix: for every <link rel="modulepreload"> already emitted, ALSO emit a parallel
+// <link rel="preload" as="script" crossorigin>. preload as=script is supported on
+// Safari iOS 11+ and triggers a parallel fetch into the prefetch cache. Modern browsers
+// see both tags; modulepreload is preferred because it ALSO parses the module graph,
+// but the preload duplicate doesn't hurt — same byte stream, double-counted in cache.
+// The browser deduplicates the network request.
+//
+// Also emit a preload for the entry script (Vite emits a <script type="module" src=>
+// for the entry but no preload, since the script tag itself is supposed to be enough —
+// it isn't on slow Safari, which fetches scripts later than preloaded resources).
+function applySafariPreloadFallback(html) {
+  const moduleHrefs = [...html.matchAll(/<link rel="modulepreload"[^>]*href="([^"]+)"/g)].map(m => m[1]);
+  const entryMatch = html.match(/<script type="module"[^>]*src="(\/assets\/index-[^"]+\.js)"/);
+  const allHrefs = [...new Set([...(entryMatch ? [entryMatch[1]] : []), ...moduleHrefs])];
+  if (allHrefs.length === 0) return html;
+  const tags = allHrefs
+    .map(h => `    <link rel="preload" as="script" crossorigin href="${h}">`)
+    .join("\n");
+  return html.replace("</head>", `${tags}\n  </head>`);
+}
+
 // Phase 2.2: Inject Paddle SDK <script> tag synchronously into /pay only.
 // Integration Contract §6 requires window.Paddle to exist before PayPage interacts with it.
 // Loading the SDK site-wide (previous behavior) cost 500-1500ms render-blocking on mobile 3G
@@ -105,9 +132,10 @@ for (const meta of routes) {
   const ogImage = meta.ogImage ?? DEFAULT_OG_IMAGE;
   // (ogImage is read but not currently re-injected — index.html already has og-card-ru.png hardcoded; Phase 4+ may swap this per-route)
   let html = applyMeta(template, meta);
-  html = applyModulePreload(html);   // Phase 2.1 D-03: must precede applyMarker (which consumes </head>)
+  html = applyModulePreload(html);          // Phase 2.1 D-03: must precede applyMarker (which consumes </head>)
+  html = applySafariPreloadFallback(html);  // Phase 2.2 Safari fix: must run after applyModulePreload so it sees all module hrefs
   if (meta.path === "/pay") {
-    html = applyPaddleScript(html);  // Phase 2.2: sync Paddle SDK on /pay only
+    html = applyPaddleScript(html);         // Phase 2.2: sync Paddle SDK on /pay only
   }
   html = applyMarker(html, meta.path);
   if (meta.prerender === "full") {
