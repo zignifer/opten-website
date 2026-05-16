@@ -86,6 +86,11 @@
          needs window.Paddle synchronously). On other routes the SDK loads on demand via
          src/lib/paddle.ts when the user navigates to /pay through React Router. -->
     <link rel="preconnect" href="https://cdn.paddle.com" />
+
+    <!-- Phase 2.2: preload PT Root UI so the font fetch starts in parallel with HTML/CSS
+         parsing instead of waiting for the CSSOM to discover the @font-face rule. Critical
+         on iOS Safari where the previous Google Fonts @import chain caused a 1-2s FOIT. -->
+    <link rel="preload" href="/fonts/PT-Root-UI_VF.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
   </head>
 
   <body>
