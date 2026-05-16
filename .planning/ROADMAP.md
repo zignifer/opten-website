@@ -24,7 +24,7 @@ Every phase respects the locked routes and the 8 ADR-locked decisions from `docs
 
 - [ ] **Phase 1: Static GEO foundations** — robots/sitemap/llms.txt + inline JSON-LD + OG hero cards + Paddle preconnect + Vercel security headers (8 atomic commits, no React changes)
 - [x] **Phase 2: Per-route prerender + metadata** — resolve head-management strategy; per-route titles/descriptions/canonical/OG (closes audit C-1, C-4) (completed 2026-05-14)
-- [ ] **Phase 2.1: Hydration speedup & perceived-load optimization** *(INSERTED 2026-05-15)* — fix the hydration gap exposed by Phase 2: route-level code-split, JS preload, explicit `<img>` dimensions, PNG→WebP/AVIF
+- [x] **Phase 2.1: Hydration speedup & perceived-load optimization** *(INSERTED 2026-05-15)* — fix the hydration gap exposed by Phase 2: route-level code-split, JS preload, explicit `<img>` dimensions, PNG→WebP/AVIF (completed 2026-05-16)
 - [ ] **Phase 3: Bilingual routing** — resolve per-language URL strategy; `/ru/*` `/en/*` siblings + hreflang + dynamic `<html lang>` (closes audit C-5)
 - [ ] **Phase 4: Content surface** — `/about` E-E-A-T page + `/guides/*` HowTo content + FAQ schema (closes audit M-3, M-4, H-3)
 - [ ] **Phase 5: Brand authority** — Product Hunt + Wikipedia + Reddit + YouTube + expanded `sameAs` schema (closes audit H-4, M-5)
@@ -164,7 +164,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phases 1 and 2 are p
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Static GEO foundations | 8/8 | Shipped 2026-05-14 | 2026-05-14 |
-| 2. Per-route prerender + metadata | 8/8 + hotfix `80b16be` | Shipped 2026-05-15 (after rollback + hotfix cycle) | 2026-05-15 |
+| 2. Per-route prerender + metadata | 8/8 | Complete   | 2026-05-16 |
 | 3. Bilingual routing | 0/TBD | Backlog (blocked on URL strategy decision) | - |
 | 4. Content surface | 0/TBD | Backlog | - |
 | 5. Brand authority | 0/TBD | Backlog | - |
