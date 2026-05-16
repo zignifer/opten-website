@@ -115,7 +115,7 @@ Plans:
 - [x] 02.1-04-PLAN.md — Set explicit width/height/loading attrs on every <img> for CLS=0 (Wave 2)
 - [x] 02.1-05-PLAN.md — Wrap PNG <img> tags with vite-imagetools <Picture> for WebP delivery (Wave 3)
 - [x] 02.1-06-PLAN.md — Inject <link rel=modulepreload> into prerendered HTML via prerender.mjs (Wave 3)
-- [ ] 02.1-07-PLAN.md — Lazy-load SPA-fallback routes via React.lazy + Suspense (Wave 4, highest risk, last)
+- [x] 02.1-07-PLAN.md — Lazy-load SPA-fallback routes via React.lazy + Suspense (Wave 4, highest risk, last)
 
 ### Phase 3: Bilingual routing
 **Status**: Backlog. Scope set; detailed planning deferred.
