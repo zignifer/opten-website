@@ -31,7 +31,12 @@ export function renderRoute(path: string): string {
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/refund" element={<RefundPage />} />
-            {/* NOTE: /pay is head-only (D-02), /success /account /dashboard/* are SPA-only — intentionally NOT mounted here. */}
+            {/* NOTE: /pay AND /en/pay are head-only (D-02 + D-03b), /success /account /dashboard/* are SPA-only — intentionally NOT mounted here. */}
+            <Route path="/en/"        element={<App />} />
+            <Route path="/en/welcome" element={<WelcomePage />} />
+            <Route path="/en/privacy" element={<PrivacyPage />} />
+            <Route path="/en/terms"   element={<TermsPage />} />
+            <Route path="/en/refund"  element={<RefundPage />} />
           </Routes>
         </Suspense>
       </LangProvider>

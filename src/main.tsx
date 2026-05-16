@@ -57,6 +57,13 @@
             <Route path="/account" element={<AccountPage />} />
             <Route path="/welcome" element={<WelcomePage />} />
             <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
+            {/* Phase 3 D-01/D-03b: /en/* siblings. Mirror of entry-server.tsx EN routes + /en/pay (head-only, client-mount-only). __PRERENDER_PATH discriminator (lines 65-66) handles these unchanged — meta.path strings written by applyMarker include "/en/welcome" etc. */}
+            <Route path="/en/"        element={<App />} />
+            <Route path="/en/pay"     element={<PayPage />} />
+            <Route path="/en/welcome" element={<WelcomePage />} />
+            <Route path="/en/privacy" element={<PrivacyPage />} />
+            <Route path="/en/terms"   element={<TermsPage />} />
+            <Route path="/en/refund"  element={<RefundPage />} />
           </Routes>
         </Suspense>
       </LangProvider>
