@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: ready_to_plan
-stopped_at: "Completed 03-01-PLAN.md — Task 2 checkpoint:human-verify pending"
-last_updated: "2026-05-16T17:40:37.265Z"
-last_activity: 2026-05-16
+stopped_at: "Phase 3 closed + 2 post-release i18n bugfixes shipped (c789dee, bfd164b)"
+last_updated: "2026-05-17T00:00:00.000Z"
+last_activity: 2026-05-17
 progress:
-  total_phases: 6
-  completed_phases: 4
-  total_plans: 24
-  completed_plans: 23
-  percent: 67
+  total_phases: 7
+  completed_phases: 5
+  total_plans: 31
+  completed_plans: 31
+  percent: 71
 ---
 
 # Project State
@@ -21,20 +21,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-14)
 
 **Core value:** Sell, service, and onboard extension users without breaking the shipped integration contract with the Opten Chrome extension.
-**Current focus:** Phase 03 — bilingual-routing
+**Current focus:** Phase 04 — content surface (backlog)
 **Active milestone:** GEO Optimization (12/100 → ~30/100 in Phase 1, higher across Phases 2-5)
 
 ## Current Position
 
 Phase: 4
 Plan: Not started
-Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (no per-task plans, ~5 atomic commits `0a73069`..`81284d4`)
+Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (~5 atomic commits `0a73069`..`81284d4`), 3 → 8/8 + 2 post-release fixes (`c789dee`, `bfd164b`)
 Status: Ready to plan
-Last activity: 2026-05-16
-Next: Phase 3 (bilingual routing) — discuss in progress (separate context), blocks on per-language URL strategy (`/ru/*` `/en/*` vs `?lang=` vs subdomain).
+Last activity: 2026-05-17
+Next: Phase 4 (content surface) — backlog; planning not started.
 
-Milestone phases: 4 of 7 complete (1, 2, 2.1, 2.2). Phases 3-5 backlog.
-Progress: [██████████] 96%
+Milestone phases: 5 of 7 complete (1, 2, 2.1, 2.2, 3). Phases 4-5 backlog.
+Progress: [██████████] 100% of scoped phases through Phase 3
 
 ## Performance Metrics
 
@@ -106,9 +106,8 @@ Full log in PROJECT.md Key Decisions table — 8 ADR-locked decisions from `docs
 - **Phase 2 prerequisite (RESOLVED 2026-05-15)**: cross-route head-management strategy — decided build-time prerender via `scripts/prerender.mjs`. `react-helmet-async` rejected.
 - **Phase 2 post-deploy verification (CLOSED 2026-05-15)**: deploy `dpl_HAzfr2h8sADbiHHBt4yi4Wkf6ncg` (commit `80b16be`, hotfix included) shipped to opten.space; Sections A-D verified via curl, Section E playwright sweep on all 9 routes returned 0 console errors. Outstanding visual checks (OG card unfurl, Paddle modal click) listed under "Pending Todos" below.
 - **Phase 2 hotfix landed 2026-05-15**: see commit `80b16be` — `fix(seo): match prerender path to client route + eager-import hero animation`. Two regressions fixed: (a) hydration mismatch on SPA-fallback routes via `window.__PRERENDER_PATH` marker + path-check in `main.tsx`, (b) Suspense SSR failure on `/` via eager-import of `OptenHeroAnimation`. Initial Phase 2 deploy (`b241989`) was rolled back via `vercel rollback` before hotfix was promoted — extension users were never exposed to the broken state for longer than ~30 minutes.
-- **Phase 3 prerequisite (OPEN — blocks `/gsd-plan-phase 3`)**: per-language URL strategy — `/ru/*` `/en/*` vs `?lang=` vs subdomain. Discuss currently in progress (separate context); resolve before `/gsd-plan-phase 3`.
-- **Pre-Phase-3 known mismatch (carried from Phase 02.2)**: landing (`/`) retains a pre-existing hydration mismatch identified by Plan 02.2-02 Playwright sweep. Predates Phase 02.2 (verified via `git stash`); React recovers via client re-render. Should be addressed before Phase 3 bilingual work so it doesn't compound with dynamic `<html lang>` changes.
-- **Locked-route constraint (permanent)**: `/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill` must keep responding at root paths — applies to every phase, especially Phase 3 bilingual work (`/ru/*` `/en/*` are **additions**, not replacements).
+- **Phase 03 (CLOSED 2026-05-16, post-release fixes 2026-05-17)**: 8/8 plans shipped. Per-language URL strategy resolved as `/en/*` path-prefix (D-01). Pre-Phase-3 hydration mismatch resolved in Plan 01. Two post-release i18n bugfixes (`c789dee`, `bfd164b`) cover storage-key migration and non-sibling switcher UX. Full notes in [03-POST-RELEASE.md](phases/03-bilingual-routing/03-POST-RELEASE.md).
+- **Locked-route constraint (permanent)**: `/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill` must keep responding at root paths — applies to every phase; Phase 3 confirmed `/en/*` URLs are **additions**, not replacements.
 
 ## Quick Tasks Completed
 
@@ -127,13 +126,13 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-16T17:40:37.255Z
-Stopped at: Completed 03-01-PLAN.md — Task 2 checkpoint:human-verify pending
+Last session: 2026-05-17
+Stopped at: Phase 3 closed + 2 post-release i18n bugfixes shipped (`c789dee`, `bfd164b`); planning artifacts updated.
 Next action (in order):
 
-  1. **Finish Phase 3 discuss** (in progress in separate context) — resolve per-language URL strategy decision, then `/gsd-plan-phase 3`.
-  2. **Pre-Phase-3 hygiene** — investigate the residual landing-page hydration mismatch flagged by Plan 02.2-02 Playwright sweep, so it doesn't compound with dynamic `<html lang>` work in Phase 3.
-  3. **Phase 2 follow-up todos (independent of Phase 3)** — visual OG unfurl test on Telegram/Slack + Paddle modal browser test on `/pay`; GEO rescore window opens 2026-05-22 → `/geo audit https://opten.space`.
-  4. **Lessons-learned capture** — Phase 2 hotfix + Phase 02.2 ad-hoc-then-retroactive pattern → future anti-patterns reference.
+  1. **Phase 2/3 post-deploy verification** — visual OG unfurl test (Telegram/Slack) on RU + EN URLs; Paddle modal click on `/pay` and `/en/pay` in real browser. After Vercel finishes deploying `bfd164b`, re-snap PageSpeed `/en/` mobile baseline (was 92 pre-fix; expect ±1 noise).
+  2. **GEO rescore window** — opens 2026-05-22 (7 days post-Phase-2 deploy) and again post-Phase-3 (~2026-05-23). Run `~/.claude/skills/geo/scripts/fetch_page.py` on the 12 prerendered routes (RU + EN) → confirm `has_ssr_content: true`, `word_count > 100`, distinct titles. Then `/geo audit https://opten.space` for milestone uplift.
+  3. **Phase 4 planning** — content surface (`/about`, `/guides/*`, FAQ schema). Bilingual scaffolding from Phase 3 is in place; Plan from day one for both `/route` and `/en/route` siblings.
+  4. **Lessons-learned capture** — Phase 2 hotfix + 02.2 inline pattern + Phase 3 post-release fix loop (D-07b "URL is the only signal" was too strict — needed storage for cross-page persistence). Future anti-patterns reference.
 
 Resume file: None

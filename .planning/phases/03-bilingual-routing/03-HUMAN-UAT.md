@@ -1,14 +1,15 @@
 ---
 status: resolved
 phase: 03-bilingual-routing
-source: [03-VERIFICATION.md]
+source: [03-VERIFICATION.md, 03-POST-RELEASE.md]
 started: 2026-05-16T17:48:00Z
-updated: 2026-05-16T17:50:00Z
+updated: 2026-05-17T00:00:00Z
 ---
 
 ## Current Test
 
 [approved by user 2026-05-16 — phase closed and pushed to production]
+[post-release: 2 user-reported i18n bugs fixed and shipped 2026-05-17 — see 03-POST-RELEASE.md (commits c789dee, bfd164b)]
 
 ## Tests
 
