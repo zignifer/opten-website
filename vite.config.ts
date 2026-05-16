@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { imagetools } from 'vite-imagetools'
 
 export default defineConfig({
   plugins: [
@@ -9,6 +10,8 @@ export default defineConfig({
     // Tailwind is not being actively used – do not remove them
     react(),
     tailwindcss(),
+    // Phase 2.1 D-05: register vite-imagetools for ?w=...&format=webp;png&as=picture query-string imports
+    imagetools(),
   ],
   resolve: {
     alias: {
