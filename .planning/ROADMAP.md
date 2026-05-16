@@ -119,18 +119,37 @@ Plans:
 - [x] 02.1-07-PLAN.md — Lazy-load SPA-fallback routes via React.lazy + Suspense (Wave 4, highest risk, last)
 
 ### Phase 3: Bilingual routing
-**Status**: Backlog. Scope set; detailed planning deferred.
+**Status**: Planned 2026-05-16. 8 plans across 4 waves (Plan 01 hydration fix isolated in Wave 1; Plans 02 + 06 in Wave 2; Plans 03/05/07 parallel in Wave 3; Plans 04/08 in Wave 4). Ready for /gsd-execute-phase 3.
 **Goal**: Make EN audience discoverable via real URLs that search engines and AI crawlers understand — without breaking shipped extension binaries that deep-link to locked routes.
 **Depends on**: Phase 2 (per-route metadata is a prerequisite for hreflang to mean anything).
 **Requirements**: GEO-C-1, GEO-C-2, GEO-C-3, GEO-C-4
 **Audit findings closed**: C-5 (no language signaling for EN audience)
-**Open question (must resolve first)**: per-language URL strategy — `/ru/*` `/en/*` path prefixes (recommended) vs `?lang=` query vs `ru.opten.space` subdomain.
-**Hard constraint**: locked routes (`/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill`) must continue to respond at their existing paths; any new `/ru/*` `/en/*` URLs are **additions, not replacements** (per CON-locked-routes-keep-existing-paths and DEC-integration-contract-locked-routes).
-**Success Criteria** (sketch, refined during planning):
-  1. EN user can land on an `/en/*` URL and see English content with `<html lang="en">`.
-  2. `hreflang` annotations cross-link each RU page with its EN counterpart and vice versa.
-  3. Shipped extension binaries continue to navigate to `/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill` without breakage.
-**Plans**: TBD
+**Resolved open question**: per-language URL strategy — path-prefix `/en/*` chosen (CONTEXT D-01). `/ru/*` stays virtual (hreflang `ru` points at unprefixed canonical, D-02).
+**Hard constraint**: locked routes (`/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill`) must continue to respond at their existing paths; any new `/en/*` URLs are **additions, not replacements** (per CON-locked-routes-keep-existing-paths and DEC-integration-contract-locked-routes).
+**Success Criteria** (refined during planning):
+  1. EN user can land on an `/en/*` URL and see English content with `<html lang="en">` baked at build time (no runtime DOM mutation).
+  2. `hreflang` triplet (`ru`, `en`, `x-default`) on every prerendered `<head>`, reciprocal between cluster pairs (Pitfall 5 mitigation by manifest construction).
+  3. Shipped extension binaries continue to navigate to `/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill` without breakage; `/en/pay` carries the same synchronous Paddle CDN `<script>` tag as `/pay` (D-03b, INTEGRATION-CONTRACT §6 updated symmetrically).
+  4. Header LangSwitcher writes URL via `useNavigate` (URL = source of truth, D-05/D-07b); on routes without an EN sibling routes to `/en/`.
+  5. Residual hydration mismatch on `/` (carry-over from Phase 02.2) is resolved before bilingual surface ships (Plan 01 isolated, Wave 1).
+**Plans**: 8 plans
+
+Plans:
+**Wave 1**
+- [ ] 03-01-fix-hydration-mismatch-on-root-PLAN.md — Delete LangContext.tsx:84-86 document.documentElement.lang useEffect (carry-over from Phase 02.2; isolation per CONTEXT D-06)
+
+**Wave 2** *(blocked on Wave 1)*
+- [ ] 03-02-seo-routes-add-en-entries-PLAN.md — Extend RouteMeta (htmlLang + hreflangAlternates) + 6 EN entries in scripts/seo-routes.ts (GEO-C-1, GEO-C-4)
+- [ ] 03-06-langcontext-url-prefix-detection-PLAN.md — LangProvider URL-driven via useLocation + SSR-eager en.json gate (GEO-C-4)
+
+**Wave 3** *(blocked on Wave 2)*
+- [ ] 03-03-prerender-apply-htmlLang-hreflang-oglocale-PLAN.md — 3 new apply* helpers in scripts/prerender.mjs (GEO-C-3, GEO-C-4)
+- [ ] 03-05-sitemap-xhtml-link-annotations-PLAN.md — sitemap.mjs Option A xhtml:link annotations + 12+ entries (GEO-C-2, GEO-C-3)
+- [ ] 03-07-register-en-routes-in-routers-PLAN.md — /en/* Route declarations in entry-server.tsx (5) + main.tsx (6) (GEO-C-1, GEO-C-2)
+
+**Wave 4** *(blocked on Wave 3)*
+- [ ] 03-04-paddle-symmetric-en-pay-and-contract-PLAN.md — Widen Paddle injection to /en/pay + INTEGRATION-CONTRACT §6 + robots.txt defense-in-depth (GEO-C-2)
+- [ ] 03-08-langswitcher-extract-and-wire-PLAN.md — Extract src/app/components/LangSwitcher.tsx + wire 4 consumer sites (GEO-C-1, GEO-C-4)
 
 ### Phase 4: Content surface
 **Status**: Backlog. Scope set; detailed planning deferred.
