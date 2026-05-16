@@ -2,17 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: awaiting-phase-3-discuss
-stopped_at: Phases 02 + 02.1 + 02.2 closed; mobile section spacing normalized via quick task; blocked on Phase 3 URL-strategy decision
-last_updated: "2026-05-16T18:50:00Z"
+status: Phases 02, 02.1, 02.2 all in production. Quick task 260516-pmk (mobile section spacing normalization) shipped 2026-05-16 (commit `c4a96ba`).
+stopped_at: Phase 3 context gathered
+last_updated: "2026-05-16T14:23:24.443Z"
 last_activity: 2026-05-16
 progress:
-  total_phases: 7
-  completed_phases: 4
-  total_plans: 23
-  completed_plans: 23
-  percent: 57
-  percent_note: "4 of 7 phases complete (1, 2, 2.1, 2.2). Phase 2.2 shipped inline (~5 atomic commits, no per-task plan artifacts — see 02.1-VERIFICATION.md retroactive note + ROADMAP.md Phase 2.2 section). Phases 3-5 have no plans authored yet."
+  total_phases: 6
+  completed_phases: 2
+  total_plans: 16
+  completed_plans: 15
+  percent: 94
 ---
 
 # Project State
@@ -121,11 +120,13 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-16T18:50:00Z
-Stopped at: Phases 02, 02.1, 02.2 all closed in production; quick task 260516-pmk (mobile section spacing) shipped (commit `c4a96ba`); STATE.md + ROADMAP.md reconciled. Phase 3 discuss already running in a separate context.
+Last session: 2026-05-16T14:23:24.433Z
+Stopped at: Phase 3 context gathered
 Next action (in order):
+
   1. **Finish Phase 3 discuss** (in progress in separate context) — resolve per-language URL strategy decision, then `/gsd-plan-phase 3`.
   2. **Pre-Phase-3 hygiene** — investigate the residual landing-page hydration mismatch flagged by Plan 02.2-02 Playwright sweep, so it doesn't compound with dynamic `<html lang>` work in Phase 3.
   3. **Phase 2 follow-up todos (independent of Phase 3)** — visual OG unfurl test on Telegram/Slack + Paddle modal browser test on `/pay`; GEO rescore window opens 2026-05-22 → `/geo audit https://opten.space`.
   4. **Lessons-learned capture** — Phase 2 hotfix + Phase 02.2 ad-hoc-then-retroactive pattern → future anti-patterns reference.
-Resume file: None
+
+Resume file: .planning/phases/03-bilingual-routing/03-CONTEXT.md
