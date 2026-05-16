@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: "Completed 03-01-PLAN.md — Task 2 checkpoint:human-verify pending"
-last_updated: "2026-05-16T17:08:34.473Z"
+last_updated: "2026-05-16T17:17:31.543Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 24
-  completed_plans: 18
-  percent: 75
+  completed_plans: 19
+  percent: 79
 ---
 
 # Project State
@@ -27,14 +27,14 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 ## Current Position
 
 Phase: 03 (bilingual-routing) — EXECUTING
-Plan: 4 of 8
+Plan: 5 of 8
 Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (no per-task plans, ~5 atomic commits `0a73069`..`81284d4`)
 Status: Ready to execute
 Last activity: 2026-05-16
 Next: Phase 3 (bilingual routing) — discuss in progress (separate context), blocks on per-language URL strategy (`/ru/*` `/en/*` vs `?lang=` vs subdomain).
 
 Milestone phases: 4 of 7 complete (1, 2, 2.1, 2.2). Phases 3-5 backlog.
-Progress: [████████░░] 75%
+Progress: [████████░░] 79%
 
 ## Performance Metrics
 
@@ -124,7 +124,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-16T17:08:34.463Z
+Last session: 2026-05-16T17:17:31.536Z
 Stopped at: Completed 03-01-PLAN.md — Task 2 checkpoint:human-verify pending
 Next action (in order):
 
