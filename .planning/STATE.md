@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: ready_to_plan
-stopped_at: "Phase 3 closed + 2 post-release i18n bugfixes shipped (c789dee, bfd164b)"
-last_updated: "2026-05-17T00:00:00.000Z"
+stopped_at: "Phase 4 context gathered (04-CONTEXT.md) — ready for /gsd-plan-phase 4"
+last_updated: "2026-05-17T01:00:00.000Z"
 last_activity: 2026-05-17
 progress:
   total_phases: 7
@@ -127,12 +127,12 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-05-17
-Stopped at: Phase 3 closed + 2 post-release i18n bugfixes shipped (`c789dee`, `bfd164b`); planning artifacts updated.
+Stopped at: Phase 4 context gathered (`04-CONTEXT.md` committed in `1f0ff0e`); ready for planning.
 Next action (in order):
 
-  1. **Phase 2/3 post-deploy verification** — visual OG unfurl test (Telegram/Slack) on RU + EN URLs; Paddle modal click on `/pay` and `/en/pay` in real browser. After Vercel finishes deploying `bfd164b`, re-snap PageSpeed `/en/` mobile baseline (was 92 pre-fix; expect ±1 noise).
-  2. **GEO rescore window** — opens 2026-05-22 (7 days post-Phase-2 deploy) and again post-Phase-3 (~2026-05-23). Run `~/.claude/skills/geo/scripts/fetch_page.py` on the 12 prerendered routes (RU + EN) → confirm `has_ssr_content: true`, `word_count > 100`, distinct titles. Then `/geo audit https://opten.space` for milestone uplift.
-  3. **Phase 4 planning** — content surface (`/about`, `/guides/*`, FAQ schema). Bilingual scaffolding from Phase 3 is in place; Plan from day one for both `/route` and `/en/route` siblings.
-  4. **Lessons-learned capture** — Phase 2 hotfix + 02.2 inline pattern + Phase 3 post-release fix loop (D-07b "URL is the only signal" was too strict — needed storage for cross-page persistence). Future anti-patterns reference.
+  1. **`/gsd-plan-phase 4`** — produce 04-PLAN.md from the 16 captured decisions. Expected plan structure: schema bundle injection (4-5 atomic tasks via `scripts/prerender.mjs`), `/pay` + `/en/pay` full prerender refactor (high-risk billing surface — separate plan task with Playwright + Paddle verification), `/about` page (RU only), anchor `/guides/<slug>` + `/en/guides/<slug>` bilingual pair, FAQ block, llms.txt + llms-full.txt generation, hero preload + X-Frame-Options + Content-Signal.
+  2. **GEO rescore window** — pre-Phase-4 baseline = 48/100 (2026-05-17, `GEO-AUDIT-POST-PHASE-3.md`). After Phase 4 deploy, re-run `/geo audit https://opten.space` — target 65–73/100 per the audit's quick-win estimate.
+  3. **Lessons-learned capture** — Phase 2 hotfix + 02.2 inline pattern + Phase 3 post-release fix loop (D-07b "URL is the only signal" was too strict — needed storage for cross-page persistence). Future anti-patterns reference.
+  4. **Post-Phase-4: Phase 5 brand authority** — Wikipedia/Wikidata, Product Hunt, Reddit, YouTube, expanded `sameAs`. Mostly off-domain marketing work — small code component (sameAs additions only).
 
-Resume file: None
+Resume file: `.planning/phases/04-content-surface/04-CONTEXT.md`
