@@ -42,13 +42,41 @@ export default function OptenHeroAnimation() {
     []
   );
 
+  // Phase 2.2: Defer rendering until after client mount. The animation block contains 30+
+  // inline-styled <div>s using shorthand CSS (flex:1, padding:"0 12px 12px", color:"#fff")
+  // and hex colors. React 18 SSR serializes the style attribute literally ("flex:1"), but
+  // when React then re-applies the same style object on the client, the browser normalizes
+  // it to canonical form ("flex:1 1 0%", "rgb(255,255,255)"). React 18 hydration compares
+  // the raw attribute string and sees a mismatch on EVERY styled element → falls back to a
+  // full client re-render of the entire root (React #418 + #423), which on mobile is the
+  // actual cause of the 1-3 s "buttons unresponsive" symptom the user reported.
+  //
+  // The block is hidden via `hidden min-[1066px]:flex` on viewports below 1066px (App.tsx
+  // line 191), so rendering nothing on SSR is invisible to mobile users. On desktop, the
+  // animation appears one frame after hydration — small UX cost in exchange for skipping
+  // the full-root re-render. Also: animationEnabled gates the timers so the animation loop
+  // only runs on desktop, sparing mobile CPU.
+  const [mounted, setMounted] = useState(false);
+  const [animationEnabled, setAnimationEnabled] = useState(false);
   useEffect(() => {
+    setMounted(true);
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mql = window.matchMedia("(min-width: 1066px)");
+    const sync = () => setAnimationEnabled(mql.matches);
+    sync();
+    mql.addEventListener("change", sync);
+    return () => mql.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !animationEnabled) return;
     if (phase !== "typing") return;
     const id = setInterval(() => setCursorVisible((v) => !v), 500);
     return () => clearInterval(id);
-  }, [phase]);
+  }, [phase, mounted, animationEnabled]);
 
   useEffect(() => {
+    if (!mounted || !animationEnabled) return;
     let cancelled = false;
     async function run() {
       while (!cancelled) {
@@ -79,7 +107,13 @@ export default function OptenHeroAnimation() {
     }
     run();
     return () => { cancelled = true; clear(); };
-  }, [delay, clear, oldText, newText]);
+  }, [delay, clear, oldText, newText, mounted, animationEnabled]);
+
+  // Early return MUST come after all hooks (Rules of Hooks). Server + first client render
+  // both produce nothing → hydration sees nothing here on either side. The wrapping div
+  // (App.tsx) is `hidden min-[1066px]:flex`, so the empty area is invisible on mobile and
+  // briefly empty on desktop until the post-mount render fills it in.
+  if (!mounted) return null;
 
   const isRedPhase = ["red-in", "enhance-press", "red-out"].includes(phase);
   const isGreenPhase = ["swap", "green-in", "hold"].includes(phase);

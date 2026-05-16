@@ -61,7 +61,6 @@ export default function WelcomePage() {
               width="1051"
               height="800"
               loading="eager"
-              fetchPriority="high"
               className="w-full block transition-opacity duration-700"
               style={{
                 opacity: i === idx ? 1 : 0,

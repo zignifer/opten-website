@@ -63,11 +63,14 @@ function BrowserIcons({ size = "lg" }: { size?: "sm" | "lg" }) {
   const iconSize = size === "lg" ? "size-[40px]" : "size-[28px]";
   const srcSuffix = size === "lg" ? "lg" : "sm";
   const px = size === "lg" ? 40 : 28;
-  const fp: "high" | undefined = size === "lg" ? "high" : undefined;
+  // Phase 2.2: fetchPriority dropped — React 18.3 doesn't normalize the camelCase JSX prop,
+  // so SSR emits `fetchPriority="high"` verbatim and hydration sees a mismatch → React #418
+  // + #423 fall through to a full client re-render (the actual cause of "buttons unresponsive
+  // for 1-3 s on mobile"). Re-add as `fetchpriority` (lowercase) after upgrading to React 19.
   return (
     <span className="flex items-center">
-      <img alt="Chrome" src={`/assets/landing-design/chrome-${srcSuffix}.svg`} width={px} height={px} loading="eager" fetchPriority={fp} className={cx(iconSize, "relative z-10")} />
-      <img alt="Yandex Browser" src={`/assets/landing-design/yandex-${srcSuffix}.svg`} width={px} height={px} loading="eager" fetchPriority={fp} className={cx(iconSize, "-ml-[8px]")} />
+      <img alt="Chrome" src={`/assets/landing-design/chrome-${srcSuffix}.svg`} width={px} height={px} loading="eager" className={cx(iconSize, "relative z-10")} />
+      <img alt="Yandex Browser" src={`/assets/landing-design/yandex-${srcSuffix}.svg`} width={px} height={px} loading="eager" className={cx(iconSize, "-ml-[8px]")} />
     </span>
   );
 }
@@ -268,8 +271,14 @@ function Steps() {
   return (
     <section id="features" className="bg-[#011417] px-5 py-20 md:px-8">
       <div className="mx-auto w-full max-w-[1200px]">
+        {/* Phase 2.2: JSX literal whitespace ("} <br />") creates an adjacent text-then-expression
+            pair that React 18 SSR delimits with `<!-- -->` comments; React 18 hydration sometimes
+            fails to reconcile these against the client tree → React #418 + #423 fall through to a
+            full client re-render. Fix is to fold whitespace into the preceding expression so the
+            JSX child list never has two adjacent text nodes. */}
         <SectionTitle>
-          {titleCaseEn(t("steps.heading1"), lang)} <br />
+          {titleCaseEn(t("steps.heading1"), lang) + " "}
+          <br />
           <Accent>{titleCaseEn(t("steps.heading2"), lang)}</Accent>
         </SectionTitle>
         <div className="mt-20 grid items-stretch gap-12 lg:grid-cols-[minmax(0,1fr)_500px] lg:gap-[56px] xl:gap-[80px] 2xl:gap-[120px]">
@@ -277,18 +286,21 @@ function Steps() {
             <Step num="01" title={t("steps.01.title")} desc={t("steps.01.desc")} />
             <Step
               num="02"
-              title={<>{t("steps.02.titlePre")} <InlinePlanet /> {t("steps.02.titlePost")}</>}
+              title={<>{t("steps.02.titlePre") + " "}<InlinePlanet />{" " + t("steps.02.titlePost")}</>}
               desc={t("steps.02.desc")}
             />
             <Step
               num="03"
-              title={<>{t("steps.03.titlePre")} <InlineStars /> {t("steps.03.titlePost")}</>}
+              title={<>{t("steps.03.titlePre") + " "}<InlineStars />{" " + t("steps.03.titlePost")}</>}
               desc={t("steps.03.desc")}
               nowrapDesktop
             />
           </div>
           <div className="relative flex min-h-[420px] w-full shrink-0 overflow-hidden rounded-[16px] border border-white/10 bg-[#0e2023] lg:h-[512px] lg:w-[500px]">
-            <Picture data={stepsSrc} width={813} height={638} alt="" loading="lazy" className="absolute left-1/2 top-1/2 w-[86%] max-w-[430px] -translate-x-1/2 -translate-y-1/2" />
+            {/* Phase 2.2: steps-inner is the first below-fold image users scroll to; lazy
+                made it pop in 1-2s after scroll on mobile 3G. Eager + low priority lets the
+                browser start the fetch in parallel with critical resources without blocking. */}
+            <Picture data={stepsSrc} width={813} height={638} alt="" loading="eager" className="absolute left-1/2 top-1/2 w-[86%] max-w-[430px] -translate-x-1/2 -translate-y-1/2" />
           </div>
         </div>
         <div className="mt-16 flex justify-center">
@@ -329,13 +341,17 @@ function FeatureCards() {
       <div className="mx-auto max-w-[1240px]">
         <div className="relative mx-auto max-w-[1000px] text-center">
           <SectionTitle>
-            {titleCaseEn(t("features.heading1"), lang)} <br />
+            {titleCaseEn(t("features.heading1"), lang) + " "}
+            <br />
             {titleCaseEn(t("features.heading2"), lang)}
           </SectionTitle>
           <img alt="" src={`${ASSET_ROOT}/cross.svg`} width="150" height="126" loading="lazy" className="pointer-events-none absolute left-1/2 top-1/2 w-[150px] -translate-x-1/2 -translate-y-1/2 md:w-[205px]" />
         </div>
         <div className="mt-20 grid gap-3 md:grid-cols-2">
-          <FeatureCard title={t("features.card1.title")} desc={t("features.card1.desc")} imgData={featureModelsSrc} imgWidth={1100} imgHeight={424} />
+          {/* Phase 2.2: first feature card is closest to viewport on the typical mobile scroll
+              path; load it eagerly (low priority) so users don't see a 1-2s blank below the
+              steps section. Cards 2-4 stay lazy. */}
+          <FeatureCard title={t("features.card1.title")} desc={t("features.card1.desc")} imgData={featureModelsSrc} imgWidth={1100} imgHeight={424} loading="eager" />
           <FeatureCard title={t("features.card2.title")} desc={t("features.card2.desc")} imgData={suffix === "ru" ? featureInterfaceRuSrc : featureInterfaceEnSrc} imgWidth={1100} imgHeight={424} imageFirst />
           <FeatureCard title={t("features.card3.title")} desc={t("features.card3.desc")} imgData={featureCreditsSrc} imgWidth={1100} imgHeight={424} />
           <FeatureCard title={t("features.card4.title")} desc={t("features.card4.desc")} imgData={suffix === "ru" ? featureEnhanceRuSrc : featureEnhanceEnSrc} imgWidth={1100} imgHeight={372} />
@@ -348,15 +364,15 @@ function FeatureCards() {
   );
 }
 
-function FeatureCard({ title, desc, imgData, imgWidth, imgHeight, imageFirst = false }: { title: string; desc: string; imgData: PictureData; imgWidth: number; imgHeight: number; imageFirst?: boolean }) {
+function FeatureCard({ title, desc, imgData, imgWidth, imgHeight, imageFirst = false, loading = "lazy" }: { title: string; desc: string; imgData: PictureData; imgWidth: number; imgHeight: number; imageFirst?: boolean; loading?: "eager" | "lazy" }) {
   return (
     <article className="flex min-h-[405px] flex-col overflow-hidden rounded-[12px] border border-white/10 bg-[#0e2023]">
-      {imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt="" loading="lazy" className="mx-8 h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
+      {imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt="" loading={loading} className="mx-8 h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
       <div className="p-8">
         <h3 className="font-['PT_Root_UI',sans-serif] text-[24px] font-medium leading-[1.12] text-white">{title}</h3>
         <p className="mt-4 whitespace-pre-wrap font-['PT_Root_UI',sans-serif] text-[16px] leading-[1.65] text-white/55">{desc}</p>
       </div>
-      {!imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt="" loading="lazy" className="mx-8 mt-auto h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
+      {!imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt="" loading={loading} className="mx-8 mt-auto h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
     </article>
   );
 }
@@ -458,7 +474,8 @@ function PlanCard({ title, price, period, features, buttonText, dark = false }: 
         </Link>
       ) : (
         <Link to="/pay" className="inline-flex h-16 items-center justify-center gap-3 rounded-full bg-[#011417] px-6 font-['PT_Root_UI',sans-serif] text-[18px] font-bold text-[#9cfb51] transition hover:-translate-y-0.5">
-          <Rocket size={24} fill="currentColor" /> {buttonText}
+          <Rocket size={24} fill="currentColor" />
+          <span>{buttonText}</span>
         </Link>
       )}
     </article>
@@ -470,14 +487,7 @@ function Footer() {
   const { lang } = useLang();
   return (
     <footer className="relative overflow-hidden bg-[#011417] px-5 pb-8 pt-28 text-center">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            "linear-gradient(180deg, #011417 0%, #011417 24%, rgba(1, 20, 23, 0) 50%), radial-gradient(circle 560px at 50% 62%, rgba(156, 251, 81, 0.18) 0%, rgba(32, 95, 45, 0.14) 42%, rgba(1, 20, 23, 0) 74%), radial-gradient(ellipse 130% 92% at 50% 100%, rgba(156, 251, 81, 0.18) 0%, rgba(32, 95, 45, 0.16) 48%, rgba(1, 20, 23, 0) 84%)",
-        }}
-      />
+      <div aria-hidden="true" className="opten-footer-gradient" />
       <div className="relative z-10 mx-auto max-w-[900px]">
         <h2 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.12] text-white md:text-[60px]">
           {lang === "ru" ? (
@@ -491,7 +501,8 @@ function Footer() {
           <InstallButton />
         </div>
         <div className="mt-8 flex items-center justify-center gap-3 font-['PT_Root_UI',sans-serif] text-[18px] text-white">
-          <Check className="size-[18px] stroke-[1.8]" /> {t("cta.freeLabel")}
+          <Check className="size-[18px] stroke-[1.8]" />
+          <span>{t("cta.freeLabel")}</span>
         </div>
         <div className="mt-20 flex flex-wrap justify-center gap-x-5 gap-y-4 font-['PT_Root_UI',sans-serif] text-[16px] text-white/40 sm:gap-8">
           <Link to="/privacy" className="hover:text-white">{t("footer.privacy")}</Link>

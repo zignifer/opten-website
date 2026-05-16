@@ -126,6 +126,20 @@
   pointer-events: none;
 }
 
+/* Phase 2.2: footer gradient extracted from inline style. React 18 SSR emits hex colors
+   ("#011417") in the style attribute but the browser normalizes them ("rgb(1, 20, 23)")
+   when React reads/writes via element.style.cssText on the client, causing a hydration
+   mismatch on every render. Pure-CSS class avoids the round-trip. */
+.opten-footer-gradient {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(180deg, #011417 0%, #011417 24%, rgba(1, 20, 23, 0) 50%),
+    radial-gradient(circle 560px at 50% 62%, rgba(156, 251, 81, 0.18) 0%, rgba(32, 95, 45, 0.14) 42%, rgba(1, 20, 23, 0) 74%),
+    radial-gradient(ellipse 130% 92% at 50% 100%, rgba(156, 251, 81, 0.18) 0%, rgba(32, 95, 45, 0.16) 48%, rgba(1, 20, 23, 0) 84%);
+}
+
 .opten-figma-gradient::before {
   content: "";
   position: absolute;
