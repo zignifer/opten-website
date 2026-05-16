@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router";
 import { useT, useLang } from "../../i18n/LangContext";
 import LangSwitcher from "../components/LangSwitcher";
+import LocalizedLink from "../components/LocalizedLink";
 import { ensurePaddle } from "../../lib/paddle";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
 import imgFrame37 from "../../imports/LandingPage/da31c95f5bc0f013c26804882654e49618ec43c7.webp";
@@ -91,9 +91,9 @@ function CheckIcon({ className = "text-white/60" }: { className?: string }) {
 
 function Logo() {
   return (
-    <Link to="/" className="inline-block leading-[0] no-underline shrink-0">
+    <LocalizedLink to="/" className="inline-block leading-[0] no-underline shrink-0">
       <img alt="Opten" src="/logo.svg" width="62" height="20" loading="eager" className="block h-[20px] w-auto" />
-    </Link>
+    </LocalizedLink>
   );
 }
 
@@ -368,8 +368,8 @@ export default function PayPage() {
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-[8px]" : "py-[21px]"}`}>
         <div className={`relative max-w-[1100px] mx-[8px] lg:mx-auto flex items-center justify-between rounded-[1000px] py-[8px] pl-[24px] pr-[8px] transition-all duration-300 ${scrolled ? "bg-[rgba(0,0,0,0.6)] backdrop-blur-[12px]" : "bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px]"}`}>
           <div className="hidden md:flex flex-1 gap-[24px] items-center font-['PT_Root_UI',sans-serif] text-[14px] text-white">
-            <Link to="/" className="hover:opacity-80 transition-opacity">{t("nav.home")}</Link>
-            <Link to="/pay" className="hover:opacity-80 transition-opacity">{t("nav.pricing")}</Link>
+            <LocalizedLink to="/" className="hover:opacity-80 transition-opacity">{t("nav.home")}</LocalizedLink>
+            <LocalizedLink to="/pay" className="hover:opacity-80 transition-opacity">{t("nav.pricing")}</LocalizedLink>
             <a href="/#faq" className="hover:opacity-80 transition-opacity">{t("nav.faq")}</a>
             <LangSwitcher className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]" />
           </div>
@@ -378,15 +378,15 @@ export default function PayPage() {
           </div>
           <div className="flex-1 flex justify-end ml-auto md:ml-0">
             {email ? (
-              <Link to="/account" className="bg-[rgba(255,255,255,0.1)] flex gap-[8px] items-center justify-center p-[10px] px-[16px] rounded-[100px] no-underline">
+              <LocalizedLink to="/account" className="bg-[rgba(255,255,255,0.1)] flex gap-[8px] items-center justify-center p-[10px] px-[16px] rounded-[100px] no-underline">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 7a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM7 8.17c-2.53 0-4.17 1.11-4.17 2.5V12h8.34v-1.33c0-1.39-1.64-2.5-4.17-2.5z" fill="rgba(255,255,255,0.7)"/></svg>
                 <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.7)]">{email}</span>
-              </Link>
+              </LocalizedLink>
             ) : (
-              <Link to="/account" className="btn-hover bg-white flex gap-[8px] items-center justify-center p-[12px] px-[20px] rounded-[100px] cursor-pointer border-none no-underline">
+              <LocalizedLink to="/account" className="btn-hover bg-white flex gap-[8px] items-center justify-center p-[12px] px-[20px] rounded-[100px] cursor-pointer border-none no-underline">
                 <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 7.5a3 3 0 100-6 3 3 0 000 6zM7.5 9C4.46 9 2 10.34 2 12v1.5h11V12c0-1.66-2.46-3-5.5-3z" fill="#181818"/></svg>
                 <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-[#181818] text-center whitespace-nowrap">{t("nav.account")}</span>
-              </Link>
+              </LocalizedLink>
             )}
           </div>
         </div>
@@ -583,9 +583,9 @@ export default function PayPage() {
               {extStatus === "ready" && (
                 <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.3)] text-[12px] text-center leading-[1.5]">
                   {t("pay.status.ready.disclaimer")}{" "}
-                  <Link to="/terms" className="text-[rgba(255,255,255,0.5)] underline">{t("pay.status.ready.terms")}</Link>
+                  <LocalizedLink to="/terms" className="text-[rgba(255,255,255,0.5)] underline">{t("pay.status.ready.terms")}</LocalizedLink>
                   {" "}{t("pay.status.ready.and")}{" "}
-                  <Link to="/privacy" className="text-[rgba(255,255,255,0.5)] underline">{t("pay.status.ready.privacy")}</Link>.
+                  <LocalizedLink to="/privacy" className="text-[rgba(255,255,255,0.5)] underline">{t("pay.status.ready.privacy")}</LocalizedLink>.
                   {" "}{t("pay.status.ready.autoRenew")}
                 </p>
               )}
@@ -607,10 +607,10 @@ export default function PayPage() {
       <footer className="w-full border-t border-white/5 bg-[#011417]">
         <div className="flex flex-col items-center gap-[16px] py-[32px] px-[20px]">
           <div className="flex flex-wrap justify-center gap-[20px] sm:gap-[32px] font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.4)]">
-            <Link to="/" className="hover:text-white transition-colors no-underline text-inherit">{t("nav.home")}</Link>
-            <Link to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.privacy")}</Link>
-            <Link to="/terms" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.terms")}</Link>
-            <Link to="/refund" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.refund")}</Link>
+            <LocalizedLink to="/" className="hover:text-white transition-colors no-underline text-inherit">{t("nav.home")}</LocalizedLink>
+            <LocalizedLink to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.privacy")}</LocalizedLink>
+            <LocalizedLink to="/terms" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.terms")}</LocalizedLink>
+            <LocalizedLink to="/refund" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.refund")}</LocalizedLink>
             <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="flex gap-[8px] items-center hover:text-white transition-colors no-underline text-inherit">
               <div className="overflow-clip relative shrink-0 size-[14px]">
                 <div className="absolute inset-[17.97%_8.92%_0.78%_7.33%]">

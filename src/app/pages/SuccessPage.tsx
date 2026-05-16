@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { Link } from "react-router";
 import { useT } from "../../i18n/LangContext";
+import LocalizedLink from "../components/LocalizedLink";
 
 export default function SuccessPage() {
   const t = useT();
@@ -18,9 +18,9 @@ export default function SuccessPage() {
     <div className="min-h-screen bg-black flex flex-col items-center justify-center px-[20px] py-[60px] font-['PT_Root_UI',sans-serif]">
       <div className="w-full max-w-[480px] flex flex-col items-center gap-[32px]">
         {/* Logo */}
-        <Link to="/" className="text-white text-[24px] font-bold no-underline hover:opacity-80 transition-opacity">
+        <LocalizedLink to="/" className="text-white text-[24px] font-bold no-underline hover:opacity-80 transition-opacity">
           Opten
-        </Link>
+        </LocalizedLink>
 
         {/* Success icon */}
         <div className="w-[80px] h-[80px] rounded-full bg-[#1E8E3E] flex items-center justify-center">
@@ -68,12 +68,12 @@ export default function SuccessPage() {
         </div>
 
         {/* Back to site */}
-        <Link
+        <LocalizedLink
           to="/"
           className="text-[#2777C3] text-[16px] no-underline hover:underline transition-all"
         >
           {t("success.backLink")}
-        </Link>
+        </LocalizedLink>
       </div>
     </div>
   );

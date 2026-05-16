@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router";
 import { useT, useLang } from "../../i18n/LangContext";
 import LangSwitcher from "../components/LangSwitcher";
+import LocalizedLink from "../components/LocalizedLink";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
 
 const SUPABASE_FUNCTIONS_URL = "https://vuywydhwkqmihfztpkgl.supabase.co/functions/v1";
@@ -28,9 +28,9 @@ interface Subscription {
 
 function Logo() {
   return (
-    <Link to="/" className="inline-block leading-[0] no-underline shrink-0">
+    <LocalizedLink to="/" className="inline-block leading-[0] no-underline shrink-0">
       <img alt="Opten" src="/logo.svg" width="62" height="20" loading="eager" className="block h-[20px] w-auto" />
-    </Link>
+    </LocalizedLink>
   );
 }
 
@@ -203,8 +203,8 @@ export default function AccountPage() {
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-[8px]" : "py-[21px]"}`}>
         <div className={`max-w-[1100px] mx-[8px] lg:mx-auto flex items-center justify-between rounded-[1000px] py-[8px] pl-[24px] pr-[8px] transition-all duration-300 ${scrolled ? "bg-[rgba(0,0,0,0.6)] backdrop-blur-[12px]" : "bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px]"}`}>
           <div className="hidden md:flex flex-1 gap-[24px] items-center font-['PT_Root_UI',sans-serif] text-[14px] text-white">
-            <Link to="/" className="hover:opacity-80 transition-opacity">{t("nav.home")}</Link>
-            <Link to="/pay" className="hover:opacity-80 transition-opacity">{t("nav.pricing")}</Link>
+            <LocalizedLink to="/" className="hover:opacity-80 transition-opacity">{t("nav.home")}</LocalizedLink>
+            <LocalizedLink to="/pay" className="hover:opacity-80 transition-opacity">{t("nav.pricing")}</LocalizedLink>
             <a href="/#faq" className="hover:opacity-80 transition-opacity">{t("nav.faq")}</a>
             <LangSwitcher className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]" />
           </div>
@@ -216,10 +216,10 @@ export default function AccountPage() {
                 <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.7)]">{email}</span>
               </div>
             ) : (
-              <Link to="/account" className="btn-hover bg-white flex gap-[8px] items-center justify-center p-[12px] px-[20px] rounded-[100px] cursor-pointer border-none no-underline">
+              <LocalizedLink to="/account" className="btn-hover bg-white flex gap-[8px] items-center justify-center p-[12px] px-[20px] rounded-[100px] cursor-pointer border-none no-underline">
                 <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 7.5a3 3 0 100-6 3 3 0 000 6zM7.5 9C4.46 9 2 10.34 2 12v1.5h11V12c0-1.66-2.46-3-5.5-3z" fill="#181818"/></svg>
                 <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-[#181818] text-center whitespace-nowrap">{t("nav.account")}</span>
-              </Link>
+              </LocalizedLink>
             )}
           </div>
         </div>
@@ -312,12 +312,12 @@ export default function AccountPage() {
                       <p className="text-[rgba(255,255,255,0.5)] text-[14px] leading-[1.6]">
                         {t("account.plan.freeDesc")}
                       </p>
-                      <Link
+                      <LocalizedLink
                         to="/pay"
                         className="mt-[8px] bg-white text-black text-[16px] font-bold py-[14px] px-[32px] rounded-[100px] text-center no-underline inline-block hover:opacity-90 transition-opacity"
                       >
                         {t("account.plan.upgradeBtn")}
-                      </Link>
+                      </LocalizedLink>
                     </div>
                   )}
                 </div>
@@ -389,10 +389,10 @@ export default function AccountPage() {
       <footer className="bg-black w-full border-t border-[rgba(255,255,255,0.05)]">
         <div className="flex flex-col items-center gap-[16px] py-[32px] px-[20px]">
           <div className="flex flex-wrap justify-center gap-[20px] sm:gap-[32px] text-[14px] text-[rgba(255,255,255,0.4)]">
-            <Link to="/" className="hover:text-white transition-colors no-underline text-inherit">{t("nav.home")}</Link>
-            <Link to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.privacy")}</Link>
-            <Link to="/terms" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.terms")}</Link>
-            <Link to="/refund" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.refund")}</Link>
+            <LocalizedLink to="/" className="hover:text-white transition-colors no-underline text-inherit">{t("nav.home")}</LocalizedLink>
+            <LocalizedLink to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.privacy")}</LocalizedLink>
+            <LocalizedLink to="/terms" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.terms")}</LocalizedLink>
+            <LocalizedLink to="/refund" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.refund")}</LocalizedLink>
             <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="flex gap-[8px] items-center hover:text-white transition-colors no-underline text-inherit">
               <div className="overflow-clip relative shrink-0 size-[14px]">
                 <div className="absolute inset-[17.97%_8.92%_0.78%_7.33%]">

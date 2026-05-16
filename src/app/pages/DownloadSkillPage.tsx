@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
 import { useT } from "../../i18n/LangContext";
+import LocalizedLink from "../components/LocalizedLink";
 
 const EXTENSION_IDS = [
   "iphkppgbobpilmphloffcalicmejacfl",  // Chrome Web Store
@@ -146,9 +146,9 @@ export default function DownloadSkillPage() {
           <>
             <p style={msgStyle}>{t("download.notProLine1")}</p>
             <p style={msgStyle}>
-              <Link to="/account?upgrade=skill" style={linkStyle}>
+              <LocalizedLink to="/account?upgrade=skill" style={linkStyle}>
                 {t("download.upgrade")}
-              </Link>
+              </LocalizedLink>
             </p>
           </>
         )}

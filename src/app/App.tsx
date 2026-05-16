@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { useLang, useT } from "../i18n/LangContext";
 import {
   Check,
   Menu,
@@ -7,8 +7,8 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useLang, useT } from "../i18n/LangContext";
 import LangSwitcher from "./components/LangSwitcher";
+import LocalizedLink from "./components/LocalizedLink";
 import OptenHeroAnimation from "./components/OptenHeroAnimation";
 import { Picture } from "./components/Picture";
 import type { Picture as PictureData } from 'vite-imagetools';
@@ -131,18 +131,18 @@ function Navbar() {
           <LangSwitcher className="bg-transparent font-['PT_Root_UI',sans-serif] text-[14px] text-white/45 transition hover:text-white" />
         </div>
 
-        <Link to="/" className="absolute left-1/2 -translate-x-1/2">
+        <LocalizedLink to="/" className="absolute left-1/2 -translate-x-1/2">
           <Logo />
-        </Link>
+        </LocalizedLink>
 
         <div className="flex flex-1 items-center justify-end gap-2">
-          <Link
+          <LocalizedLink
             to="/account"
             className="inline-flex h-[44px] items-center gap-2 rounded-full bg-white px-4 font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5"
           >
             <User size={16} fill="currentColor" />
             <span className="hidden lg:inline">{t("nav.account")}</span>
-          </Link>
+          </LocalizedLink>
         </div>
       </nav>
 
@@ -464,14 +464,14 @@ function PlanCard({ title, price, period, features, buttonText, dark = false }: 
         </ul>
       </div>
       {dark ? (
-        <Link to="/pay" className="inline-flex h-16 w-full items-center justify-center rounded-full bg-white px-6 font-['PT_Root_UI',sans-serif] text-[18px] font-bold text-[#011417] transition hover:-translate-y-0.5">
+        <LocalizedLink to="/pay" className="inline-flex h-16 w-full items-center justify-center rounded-full bg-white px-6 font-['PT_Root_UI',sans-serif] text-[18px] font-bold text-[#011417] transition hover:-translate-y-0.5">
           {buttonText}
-        </Link>
+        </LocalizedLink>
       ) : (
-        <Link to="/pay" className="inline-flex h-16 items-center justify-center gap-3 rounded-full bg-[#011417] px-6 font-['PT_Root_UI',sans-serif] text-[18px] font-bold text-[#9cfb51] transition hover:-translate-y-0.5">
+        <LocalizedLink to="/pay" className="inline-flex h-16 items-center justify-center gap-3 rounded-full bg-[#011417] px-6 font-['PT_Root_UI',sans-serif] text-[18px] font-bold text-[#9cfb51] transition hover:-translate-y-0.5">
           <Rocket size={24} fill="currentColor" />
           <span>{buttonText}</span>
-        </Link>
+        </LocalizedLink>
       )}
     </article>
   );
@@ -500,9 +500,9 @@ function Footer() {
           <span>{t("cta.freeLabel")}</span>
         </div>
         <div className="mt-20 flex flex-wrap justify-center gap-x-5 gap-y-4 font-['PT_Root_UI',sans-serif] text-[16px] text-white/40 sm:gap-8">
-          <Link to="/privacy" className="hover:text-white">{t("footer.privacy")}</Link>
-          <Link to="/terms" className="hover:text-white">{t("footer.terms")}</Link>
-          <Link to="/refund" className="hover:text-white">{t("footer.refund")}</Link>
+          <LocalizedLink to="/privacy" className="hover:text-white">{t("footer.privacy")}</LocalizedLink>
+          <LocalizedLink to="/terms" className="hover:text-white">{t("footer.terms")}</LocalizedLink>
+          <LocalizedLink to="/refund" className="hover:text-white">{t("footer.refund")}</LocalizedLink>
           <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="hover:text-white">{t("footer.contact")}</a>
         </div>
         <p className="mt-4 font-['PT_Root_UI',sans-serif] text-[16px] text-white/30">{t("footer.copyright")}</p>

@@ -1,6 +1,6 @@
-import { Link } from "react-router";
 import { useT } from "../../../i18n/LangContext";
 import LangSwitcher from "../LangSwitcher";
+import LocalizedLink from "../LocalizedLink";
 
 interface LegalLayoutProps {
   title: string;
@@ -15,14 +15,14 @@ export default function LegalLayout({ title, updatedAt, children }: LegalLayoutP
     <div className="min-h-screen bg-black font-['PT_Root_UI',sans-serif]">
       {/* Header */}
       <header className="flex items-center justify-between max-w-[800px] mx-auto px-[20px] py-[24px]">
-        <Link to="/" className="text-white text-[20px] font-bold no-underline hover:opacity-80 transition-opacity">
+        <LocalizedLink to="/" className="text-white text-[20px] font-bold no-underline hover:opacity-80 transition-opacity">
           Opten
-        </Link>
+        </LocalizedLink>
         <div className="flex items-center gap-[16px]">
           <LangSwitcher className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]" />
-          <Link to="/" className="text-[rgba(255,255,255,0.5)] text-[14px] no-underline hover:text-white transition-colors">
+          <LocalizedLink to="/" className="text-[rgba(255,255,255,0.5)] text-[14px] no-underline hover:text-white transition-colors">
             {t("legal.backLink")}
-          </Link>
+          </LocalizedLink>
         </div>
       </header>
 
@@ -43,9 +43,9 @@ export default function LegalLayout({ title, updatedAt, children }: LegalLayoutP
       {/* Footer */}
       <footer className="max-w-[800px] mx-auto px-[20px] py-[32px] border-t border-[rgba(255,255,255,0.1)]">
         <div className="flex flex-wrap gap-[24px] text-[14px] text-[rgba(255,255,255,0.4)]">
-          <Link to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">{t("legal.footer.privacy")}</Link>
-          <Link to="/terms" className="hover:text-white transition-colors no-underline text-inherit">{t("legal.footer.terms")}</Link>
-          <Link to="/refund" className="hover:text-white transition-colors no-underline text-inherit">{t("legal.footer.refund")}</Link>
+          <LocalizedLink to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">{t("legal.footer.privacy")}</LocalizedLink>
+          <LocalizedLink to="/terms" className="hover:text-white transition-colors no-underline text-inherit">{t("legal.footer.terms")}</LocalizedLink>
+          <LocalizedLink to="/refund" className="hover:text-white transition-colors no-underline text-inherit">{t("legal.footer.refund")}</LocalizedLink>
           <span>{t("legal.footer.copyright")}</span>
         </div>
       </footer>

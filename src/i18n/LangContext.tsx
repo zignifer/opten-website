@@ -10,13 +10,25 @@ import enFallback from "./en.json";
 
 export type Lang = "ru" | "en";
 
-const STORAGE_KEY = "opten_lang";
+// Post-Phase-3 fix: bumped storage key from "opten_lang" → "opten_lang_v3".
+// The previous key was contaminated by older builds that auto-wrote "ru" on detect,
+// so EN-browser visitors with a stale value were pinned to RU forever even after
+// switching their browser language. The new key is written ONLY by an explicit
+// LangSwitcher click; the legacy key is still read as a one-shot migration for
+// users who explicitly chose "en" before (RU-pinned values are intentionally
+// ignored so navigator.language gets a fresh chance to win).
+const STORAGE_KEY = "opten_lang_v3";
+const LEGACY_STORAGE_KEY = "opten_lang";
 
 function detectLangFromStorage(): Lang {
   // Phase 3 Pitfall 6: SSR-safe guard — localStorage and navigator are undefined during renderToString.
   if (typeof window === "undefined") return "ru";
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored === "ru" || stored === "en") return stored;
+  // One-shot legacy migration: only honor an explicit "en" choice from the old key
+  // (RU is the default detect result so it's not safe to treat as an explicit choice).
+  const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+  if (legacy === "en") return "en";
   return navigator.language.startsWith("ru") ? "ru" : "en";
 }
 
@@ -143,4 +155,13 @@ export function useT(): (key: string) => string {
 export function useLang(): { lang: Lang; setLang: (l: Lang) => void } {
   const { lang, setLang } = useContext(LangContext);
   return { lang, setLang };
+}
+
+// Post-Phase-3: true iff the current URL is /en/-prefixed. Used by <LocalizedLink>
+// to decide whether to rewrite internal hrefs to their EN sibling. Lives here (not
+// in paths.ts) because it needs the react-router context that LangProvider already
+// consumes via useLocation().
+export function useOnEnPath(): boolean {
+  const { pathname } = useLocation();
+  return pathname === "/en" || pathname.startsWith("/en/");
 }
