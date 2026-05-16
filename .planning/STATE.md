@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
+status: ready_to_plan
 stopped_at: "Completed 03-01-PLAN.md — Task 2 checkpoint:human-verify pending"
 last_updated: "2026-05-16T17:40:37.265Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 24
   completed_plans: 23
-  percent: 96
+  percent: 67
 ---
 
 # Project State
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 
 ## Current Position
 
-Phase: 03 (bilingual-routing) — EXECUTING
-Plan: 8 of 8
+Phase: 4
+Plan: Not started
 Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (no per-task plans, ~5 atomic commits `0a73069`..`81284d4`)
-Status: Phase complete — ready for verification
+Status: Ready to plan
 Last activity: 2026-05-16
 Next: Phase 3 (bilingual routing) — discuss in progress (separate context), blocks on per-language URL strategy (`/ru/*` `/en/*` vs `?lang=` vs subdomain).
 
@@ -40,7 +40,7 @@ Progress: [██████████] 96%
 
 **Velocity:**
 
-- Total plans completed: 0
+- Total plans completed: 8
 - Average duration: n/a
 - Total execution time: 0 hours
 
@@ -49,6 +49,7 @@ Progress: [██████████] 96%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Static GEO foundations | 0/8 | - | - |
+| 03 | 8 | - | - |
 
 **Recent Trend:**
 

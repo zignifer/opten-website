@@ -1,14 +1,14 @@
 ---
-status: partial
+status: resolved
 phase: 03-bilingual-routing
 source: [03-VERIFICATION.md]
 started: 2026-05-16T17:48:00Z
-updated: 2026-05-16T17:48:00Z
+updated: 2026-05-16T17:50:00Z
 ---
 
 ## Current Test
 
-[awaiting human approval — orchestrator already ran Playwright sweeps; user nod requested before phase close]
+[approved by user 2026-05-16 — phase closed and pushed to production]
 
 ## Tests
 
@@ -27,12 +27,13 @@ result: dist/en/*/index.html still reference /og-card-ru.png. Intentional deferr
 ## Summary
 
 total: 3
-passed: 0
+passed: 2
 issues: 0
-pending: 3
+pending: 0
 skipped: 0
 blocked: 0
+deferred: 1
 
 ## Gaps
 
-[none — all 5 must-haves verified; 2 items pending user approval; 1 documented deferral to Phase 4+]
+[none — all 5 must-haves verified; 2 items approved by user; og:image swap deferred to Phase 4+]
