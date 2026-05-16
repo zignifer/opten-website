@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: phases-2-and-2.1-closed
-stopped_at: Phases 02 + 02.1 closed; 02.2 (mobile-perf follow-up) shipped inline
-last_updated: "2026-05-16T17:40:00Z"
+stopped_at: Phases 02 + 02.1 closed; 02.2 (mobile-perf follow-up) shipped inline; mobile section spacing normalized via quick task
+last_updated: "2026-05-16T17:50:00Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 7
@@ -97,6 +97,12 @@ Full log in PROJECT.md Key Decisions table — 8 ADR-locked decisions from `docs
 - **Phase 2 hotfix landed 2026-05-15**: see commit `80b16be` — `fix(seo): match prerender path to client route + eager-import hero animation`. Two regressions fixed: (a) hydration mismatch on SPA-fallback routes via `window.__PRERENDER_PATH` marker + path-check in `main.tsx`, (b) Suspense SSR failure on `/` via eager-import of `OptenHeroAnimation`. Initial Phase 2 deploy (`b241989`) was rolled back via `vercel rollback` before hotfix was promoted — extension users were never exposed to the broken state for longer than ~30 minutes.
 - **Phase 3 prerequisite (open question)**: per-language URL strategy — `/ru/*` `/en/*` vs `?lang=` vs subdomain. Must be resolved before Phase 3 detailed planning.
 - **Locked-route constraint (permanent)**: `/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill` must keep responding at root paths — applies to every phase, especially Phase 3 bilingual work (`/ru/*` `/en/*` are **additions**, not replacements).
+
+## Quick Tasks Completed
+
+| ID | Slug | Date | Files | Notes |
+|----|------|------|-------|-------|
+| 260516-pmk | normalize-mobile-landing-section-spacing | 2026-05-16 | 1 | Mobile-only: section gaps→140, heading→content→60, hero top −19. Build ✓, Playwright-замеры подтвердили все 9 целевых гэпов. |
 
 ## Deferred Items
 

@@ -181,7 +181,7 @@ function Hero() {
   const accentTitle = titleCaseEn(rawAccentTitle, lang);
   const restTitle = titleCaseEn(title.replace(rawAccentTitle, "").trim(), lang);
   return (
-    <section className="relative overflow-hidden bg-[#011417] px-5 pb-24 pt-[150px] md:min-h-[850px] md:pb-28 md:pt-[190px]">
+    <section className="relative overflow-hidden bg-[#011417] px-5 pb-24 pt-[131px] md:min-h-[850px] md:pb-28 md:pt-[190px]">
       <div aria-hidden="true" className="opten-figma-gradient" />
       <div className="relative z-10 mx-auto flex w-full max-w-[1000px] flex-col items-center text-center">
         <h1 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.08] text-white sm:text-[54px] md:text-[62px]">
@@ -210,7 +210,7 @@ function Partners() {
   const t = useT();
   return (
     <section className="w-full bg-[#011417]">
-      <div className="flex flex-col items-center justify-center pb-[56px] px-[20px] md:px-[120px]">
+      <div className="flex flex-col items-center justify-center pb-[70px] px-[20px] md:pb-[56px] md:px-[120px]">
         <div className="flex flex-col gap-[24px] items-center">
           <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px] text-[rgba(255,255,255,0.6)] text-center">
             {t("partners.label")}
@@ -274,7 +274,7 @@ function Steps() {
   const { lang } = useLang();
   const stepsSrc = lang === "ru" ? stepsInnerRuSrc : stepsInnerEnSrc;
   return (
-    <section id="features" className="bg-[#011417] px-5 py-20 md:px-8">
+    <section id="features" className="bg-[#011417] px-5 py-[70px] md:px-8 md:py-20">
       <div className="mx-auto w-full max-w-[1200px]">
         {/* Phase 2.2: JSX literal whitespace ("} <br />") creates an adjacent text-then-expression
             pair that React 18 SSR delimits with `<!-- -->` comments; React 18 hydration sometimes
@@ -286,7 +286,7 @@ function Steps() {
           <br />
           <Accent>{titleCaseEn(t("steps.heading2"), lang)}</Accent>
         </SectionTitle>
-        <div className="mt-20 grid items-stretch gap-12 lg:grid-cols-[minmax(0,1fr)_500px] lg:gap-[56px] xl:gap-[80px] 2xl:gap-[120px]">
+        <div className="mt-[60px] grid items-stretch gap-12 md:mt-20 lg:grid-cols-[minmax(0,1fr)_500px] lg:gap-[56px] xl:gap-[80px] 2xl:gap-[120px]">
           <div className="flex flex-col gap-12 md:gap-14">
             <Step num="01" title={t("steps.01.title")} desc={t("steps.01.desc")} />
             <Step
@@ -344,7 +344,7 @@ function FeatureCards() {
   const suffix = lang === "ru" ? "ru" : "en";
 
   return (
-    <section className="bg-[#011417] px-5 py-24">
+    <section className="bg-[#011417] px-5 py-[70px] md:py-24">
       <div className="mx-auto max-w-[1240px]">
         <div className="relative mx-auto max-w-[1000px] text-center">
           <SectionTitle>
@@ -354,7 +354,7 @@ function FeatureCards() {
           </SectionTitle>
           <img alt="" src={`${ASSET_ROOT}/cross.svg`} width="150" height="126" loading="lazy" className="pointer-events-none absolute left-1/2 top-1/2 w-[150px] -translate-x-1/2 -translate-y-1/2 md:w-[205px]" />
         </div>
-        <div className="mt-20 grid gap-3 md:grid-cols-2">
+        <div className="mt-[60px] grid gap-3 md:mt-20 md:grid-cols-2">
           {/* Phase 2.2: first feature card is closest to viewport on the typical mobile scroll
               path; load it eagerly (low priority) so users don't see a 1-2s blank below the
               steps section. Cards 2-4 stay lazy. */}
@@ -391,8 +391,8 @@ function Privacy() {
   const t = useT();
   const { lang } = useLang();
   return (
-    <section id="faq" className="bg-[#011417] px-5 py-24">
-      <div className="mx-auto grid w-full max-w-[1240px] gap-12 lg:grid-cols-[460px_1fr] lg:gap-[200px]">
+    <section id="faq" className="bg-[#011417] px-5 py-[70px] md:py-24">
+      <div className="mx-auto grid w-full max-w-[1240px] gap-y-5 lg:grid-cols-[460px_1fr] lg:gap-[200px]">
         <h2 className="w-full min-w-0 text-center font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] text-white md:text-[52px] lg:text-left">{titleCaseEn(t("privacy.sectionTitle"), lang)}</h2>
         <div className="flex w-full min-w-0 flex-col lg:-mt-10">
           <PrivacyItem title={t("privacy.item1.title")} desc={t("privacy.item1.desc")} />
@@ -406,7 +406,7 @@ function Privacy() {
 
 function PrivacyItem({ title, desc, last = false }: { title: string; desc: string; last?: boolean }) {
   return (
-    <article className={cx("w-full min-w-0 py-10", !last && "border-b border-white/10")}>
+    <article className={cx("w-full min-w-0 pt-10", last ? "pb-0 md:pb-10" : "pb-10 border-b border-white/10")}>
       <h3 className="font-['PT_Root_UI',sans-serif] text-[28px] font-medium leading-[1.15] text-white md:text-[32px]">{title}</h3>
       <div className="mt-6 flex min-w-0 gap-6">
         <img alt="" src={`${ASSET_ROOT}/stars.svg`} width="20" height="20" loading="lazy" className="mt-1 size-5 shrink-0" />
@@ -423,7 +423,7 @@ function Pricing() {
   const onetimePrice = isRu ? t("pricing.onetime.price") : t("pricing.onetime.priceUsd");
   const proPrice = isRu ? t("pricing.pro.price") : t("pricing.pro.priceUsd");
   return (
-    <section id="pricing" className="bg-[#011417] px-5 py-24">
+    <section id="pricing" className="bg-[#011417] px-5 py-[70px] md:py-24">
       <div className="mx-auto max-w-[800px]">
         <SectionTitle className="w-[calc(100vw-24px)] md:w-auto">
           {isRu ? (
@@ -438,7 +438,7 @@ function Pricing() {
             </>
           )}
         </SectionTitle>
-        <div className="mt-16 grid gap-6 md:grid-cols-2">
+        <div className="mt-[60px] grid gap-6 md:mt-16 md:grid-cols-2">
           <PlanCard
             dark
             title={t("pricing.onetime.subtitle")}
@@ -496,7 +496,7 @@ function Footer() {
   const t = useT();
   const { lang } = useLang();
   return (
-    <footer className="relative overflow-hidden bg-[#011417] px-5 pb-8 pt-28 text-center">
+    <footer className="relative overflow-hidden bg-[#011417] px-5 pb-8 pt-[70px] text-center md:pt-28">
       <div aria-hidden="true" className="opten-footer-gradient" />
       <div className="relative z-10 mx-auto max-w-[900px]">
         <h2 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.12] text-white md:text-[60px]">
