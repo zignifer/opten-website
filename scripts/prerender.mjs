@@ -42,6 +42,24 @@ function applyHtmlLang(html, meta) {
   return html;
 }
 
+// Phase 3 GEO-C-3: inject hreflang triplet (ru / en / x-default) after canonical link (RESEARCH.md Pattern 2).
+// Must run AFTER applyMeta — canonical link is injected by applyMeta; it doesn't exist in the source template.
+// Reciprocity: all three href values come from seo-routes.ts manifest (Pitfall 5 — never hand-typed).
+function applyHreflang(html, meta) {
+  const before = html;
+  const tags = [
+    `    <link rel="alternate" hreflang="ru"        href="${escapeAttr(meta.hreflangAlternates.ru)}" />`,
+    `    <link rel="alternate" hreflang="en"        href="${escapeAttr(meta.hreflangAlternates.en)}" />`,
+    `    <link rel="alternate" hreflang="x-default" href="${escapeAttr(meta.hreflangAlternates.xDefault)}" />`,
+  ].join("\n");
+  // Anchor: canonical link injected by applyMeta.
+  html = html.replace(/(<link rel="canonical"[^>]*\/>)/, `$1\n${tags}`);
+  if (html === before) {
+    throw new Error(`prerender(${meta.path}): no <link rel="canonical"> anchor for hreflang. applyMeta ordering broken?`);
+  }
+  return html;
+}
+
 // Phase 3 GEO-C-4 / Pitfall 4: update og:locale + inject og:locale:alternate to match <html lang>.
 // og:locale must always match <html lang> — mismatches confuse Open Graph scrapers (RESEARCH.md §Pitfall 4).
 function applyOgLocale(html, meta) {
@@ -165,6 +183,9 @@ for (const meta of routes) {
   const ogImage = meta.ogImage ?? DEFAULT_OG_IMAGE;
   // (ogImage is read but not currently re-injected — index.html already has og-card-ru.png hardcoded; Phase 4+ may swap this per-route)
   let html = applyMeta(template, meta);
+  html = applyHtmlLang(html, meta);         // Phase 3 GEO-C-4: bake <html lang> per file
+  html = applyHreflang(html, meta);         // Phase 3 GEO-C-3: inject hreflang triplet after canonical (must follow applyMeta)
+  html = applyOgLocale(html, meta);         // Phase 3 GEO-C-4 / Pitfall 4: update og:locale + alternate
   html = applyModulePreload(html);          // Phase 2.1 D-03: must precede applyMarker (which consumes </head>)
   html = applySafariPreloadFallback(html);  // Phase 2.2 Safari fix: must run after applyModulePreload so it sees all module hrefs
   if (meta.path === "/pay") {
