@@ -41,9 +41,11 @@
   // Paddle bootstrap is now lazy (src/lib/paddle.ts, called by PayPage on mount) —
   // ordering against this hydration block is irrelevant since Paddle is only consumed on /pay.
 
+  // Phase 3 D-05: LangProvider uses useLocation() to derive initial lang from URL prefix.
+  // useLocation() requires a Router context — LangProvider must be INSIDE BrowserRouter, not outside.
   const tree = (
-    <LangProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <LangProvider>
         <Suspense fallback={<RouteLoading />}>
           <Routes>
             <Route path="/" element={<App />} />
@@ -57,8 +59,8 @@
             <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
           </Routes>
         </Suspense>
-      </BrowserRouter>
-    </LangProvider>
+      </LangProvider>
+    </BrowserRouter>
   );
 
   const root = document.getElementById("root")!;

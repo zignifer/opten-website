@@ -19,9 +19,11 @@ import { RouteLoading } from "../src/app/components/RouteLoading";
 // boundary markers React 18 hydration walks; without it, client expects markers, finds none,
 // throws React #418/#423 and falls back to full client re-render (the residual `/` mismatch).
 export function renderRoute(path: string): string {
+  // Phase 3 D-05: LangProvider uses useLocation() to derive initial lang from URL prefix.
+  // useLocation() requires a Router context — LangProvider must be INSIDE StaticRouter, not outside.
   return renderToString(
-    <LangProvider>
-      <StaticRouter location={path}>
+    <StaticRouter location={path}>
+      <LangProvider>
         <Suspense fallback={<RouteLoading />}>
           <Routes>
             <Route path="/" element={<App />} />
@@ -32,7 +34,7 @@ export function renderRoute(path: string): string {
             {/* NOTE: /pay is head-only (D-02), /success /account /dashboard/* are SPA-only — intentionally NOT mounted here. */}
           </Routes>
         </Suspense>
-      </StaticRouter>
-    </LangProvider>
+      </LangProvider>
+    </StaticRouter>
   );
 }
