@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-05-14 against extension `manifest.json` version **1.3.5**.
+> **Last sync:** 2026-05-16 against extension `manifest.json` version **1.3.5**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -168,6 +168,11 @@ live with these exact paths and the documented behavior.
   already shipped to users. If you rename them, **users on old extension
   versions will hit 404** until they update. Don't.
 
+> **Note (Phase 3 D-03b):** the site additionally emits `/en/pay` as an EN sibling of `/pay`.
+> The extension does NOT navigate to `/en/pay` in current shipped versions; this is a site-side
+> SEO addition only (EN search results → direct link → same Paddle checkout). See §6 for the
+> Paddle SDK invariant that applies to this sibling.
+
 ---
 
 ## 4. Supabase Edge Functions — shared backend
@@ -238,13 +243,19 @@ Never rename a key in one repo without the other.
 Paddle's checkout SDK is initialized in [`src/lib/paddle.ts`](../src/lib/paddle.ts) via `ensurePaddle()`,
 called from [`PayPage.tsx`](../src/app/pages/PayPage.tsx) on mount and again before `Paddle.Checkout.open()`.
 
-**Per-route loading strategy (Phase 2.2):**
+**Per-route loading strategy (Phase 2.2, extended symmetrically in Phase 3 D-03b):**
 - The CDN `<script src="paddle.js">` tag is injected **synchronously** into `dist/pay/index.html`
-  by [`scripts/prerender.mjs`](../scripts/prerender.mjs) (`applyPaddleScript`) — direct hits on
-  `/pay` (e.g. from the extension popup's Upgrade CTA) still have `window.Paddle` defined before
-  React mounts. Integration with Pitfall #2 / `BG-67-01` is preserved on the route that needs it.
-- Other prerendered routes (`/`, `/welcome`, `/privacy`, `/terms`, `/refund`) and SPA-fallback
-  routes (`/account`, `/success`, `/dashboard/download-skill`) do NOT load Paddle in HTML.
+  **and** `dist/en/pay/index.html` by [`scripts/prerender.mjs`](../scripts/prerender.mjs)
+  (`applyPaddleScript`) — direct hits on `/pay` (e.g. from the extension popup's Upgrade CTA)
+  and direct hits on `/en/pay` (e.g. from EN search results or a shared link) both have
+  `window.Paddle` defined before React mounts. Integration with Pitfall #2 / `BG-67-01` is
+  preserved on both routes that need it.
+- Phase 3 D-03b widened the injection condition from `meta.path === "/pay"` to
+  `meta.path === "/pay" || meta.path === "/en/pay"`. This is a **symmetric extension** of the
+  §6 contract, not a violation — every `/pay` surface (root and EN sibling) ships Paddle sync.
+- Other prerendered routes (`/`, `/welcome`, `/privacy`, `/terms`, `/refund`, `/en/`, `/en/welcome`,
+  `/en/privacy`, `/en/terms`, `/en/refund`) and SPA-fallback routes (`/account`, `/success`,
+  `/dashboard/download-skill`) do NOT load Paddle in HTML.
   Loading the SDK on every page cost 500-1500 ms of render-blocking on mobile 3G and provided
   no benefit (only `PayPage` consumes `window.Paddle`).
 - SPA-navigation to `/pay` (user clicks a `<Link to="/pay">` from landing) triggers

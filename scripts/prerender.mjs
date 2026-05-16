@@ -189,8 +189,8 @@ for (const meta of routes) {
   html = applyOgLocale(html, meta);         // Phase 3 GEO-C-4 / Pitfall 4: update og:locale + alternate
   html = applyModulePreload(html);          // Phase 2.1 D-03: must precede applyMarker (which consumes </head>)
   html = applySafariPreloadFallback(html);  // Phase 2.2 Safari fix: must run after applyModulePreload so it sees all module hrefs
-  if (meta.path === "/pay") {
-    html = applyPaddleScript(html);         // Phase 2.2: sync Paddle SDK on /pay only
+  if (meta.path === "/pay" || meta.path === "/en/pay") {
+    html = applyPaddleScript(html);         // Phase 3 D-03b: sync Paddle SDK on /pay AND /en/pay (symmetric extension; INTEGRATION-CONTRACT §6).
   }
   html = applyMarker(html, meta.path);
   if (meta.prerender === "full") {

@@ -1,32 +1,47 @@
 User-agent: *
 Allow: /
 Disallow: /account
+Disallow: /en/account
 Disallow: /success
+Disallow: /en/success
 Disallow: /dashboard/
+Disallow: /en/dashboard/
 
 User-agent: GPTBot
 Allow: /
 Disallow: /account
+Disallow: /en/account
 Disallow: /success
+Disallow: /en/success
 Disallow: /dashboard/
+Disallow: /en/dashboard/
 
 User-agent: ClaudeBot
 Allow: /
 Disallow: /account
+Disallow: /en/account
 Disallow: /success
+Disallow: /en/success
 Disallow: /dashboard/
+Disallow: /en/dashboard/
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /account
+Disallow: /en/account
 Disallow: /success
+Disallow: /en/success
 Disallow: /dashboard/
+Disallow: /en/dashboard/
 
 User-agent: Google-Extended
 Allow: /
 Disallow: /account
+Disallow: /en/account
 Disallow: /success
+Disallow: /en/success
 Disallow: /dashboard/
+Disallow: /en/dashboard/
 
 User-agent: Applebot-Extended
 Allow: /
