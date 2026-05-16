@@ -90,7 +90,7 @@ function CheckIcon({ className = "text-white/60" }: { className?: string }) {
 function Logo() {
   return (
     <Link to="/" className="inline-block leading-[0] no-underline shrink-0">
-      <img alt="Opten" src="/logo.svg" className="block h-[20px] w-auto" />
+      <img alt="Opten" src="/logo.svg" width="62" height="20" loading="eager" className="block h-[20px] w-auto" />
     </Link>
   );
 }

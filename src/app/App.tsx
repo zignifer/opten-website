@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useLang, useT } from "../i18n/LangContext";
 import OptenHeroAnimation from "./components/OptenHeroAnimation";
+// Phase 2.1 D-04: Add width/height attrs to every <img> for CLS=0 (aspect-ratio-from-attributes)
 
 const STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 const ASSET_ROOT = "/assets/landing-design";
@@ -33,16 +34,18 @@ function Accent({ children }: { children: React.ReactNode }) {
 }
 
 function Logo() {
-  return <img alt="Opten" src="/logo.svg" className="h-[18px] w-auto md:h-[20px]" />;
+  return <img alt="Opten" src="/logo.svg" width="62" height="20" loading="eager" className="h-[18px] w-auto md:h-[20px]" />;
 }
 
 function BrowserIcons({ size = "lg" }: { size?: "sm" | "lg" }) {
   const iconSize = size === "lg" ? "size-[40px]" : "size-[28px]";
   const srcSuffix = size === "lg" ? "lg" : "sm";
+  const px = size === "lg" ? 40 : 28;
+  const fp: "high" | undefined = size === "lg" ? "high" : undefined;
   return (
     <span className="flex items-center">
-      <img alt="Chrome" src={`/assets/landing-design/chrome-${srcSuffix}.svg`} className={cx(iconSize, "relative z-10")} />
-      <img alt="Yandex Browser" src={`/assets/landing-design/yandex-${srcSuffix}.svg`} className={cx(iconSize, "-ml-[8px]")} />
+      <img alt="Chrome" src={`/assets/landing-design/chrome-${srcSuffix}.svg`} width={px} height={px} loading="eager" fetchPriority={fp} className={cx(iconSize, "relative z-10")} />
+      <img alt="Yandex Browser" src={`/assets/landing-design/yandex-${srcSuffix}.svg`} width={px} height={px} loading="eager" fetchPriority={fp} className={cx(iconSize, "-ml-[8px]")} />
     </span>
   );
 }
@@ -155,7 +158,7 @@ function Hero() {
           <Accent>{accentTitle}</Accent>
           {restTitle ? <><br />{restTitle}</> : null}
         </h1>
-        <img alt="" src={`${ASSET_ROOT}/highlight.svg`} className="relative mt-1 h-auto w-[260px] md:-left-[50px] md:w-[360px]" />
+        <img alt="" src={`${ASSET_ROOT}/highlight.svg`} width="260" height="28" loading="eager" className="relative mt-1 h-auto w-[260px] md:-left-[50px] md:w-[360px]" />
         <p className="mt-8 w-full max-w-[800px] font-['PT_Root_UI',sans-serif] text-[16px] leading-[1.6] text-white md:text-[18px]">
           {t("hero.subtitle1")}
           <strong>{t("hero.subtitle2")}</strong>
@@ -233,7 +236,7 @@ function SoonBadge() {
 }
 
 function PartnerLogo({ name }: { name: "syntx" | "freepik" | "higgsfield" | "canva" }) {
-  return <img alt={name} src={`/assets/partners/${name}.png`} className="h-full w-full object-contain" />;
+  return <img alt={name} src={`/assets/partners/${name}.png`} width="268" height="80" loading="eager" className="h-full w-full object-contain" />;
 }
 
 function Steps() {
@@ -262,7 +265,7 @@ function Steps() {
             />
           </div>
           <div className="relative flex min-h-[420px] w-full shrink-0 overflow-hidden rounded-[16px] border border-white/10 bg-[#0e2023] lg:h-[512px] lg:w-[500px]">
-            <img alt="" className="absolute left-1/2 top-1/2 w-[86%] max-w-[430px] -translate-x-1/2 -translate-y-1/2" src={`${ASSET_ROOT}/steps-inner-${lang}.png`} />
+            <img alt="" className="absolute left-1/2 top-1/2 w-[86%] max-w-[430px] -translate-x-1/2 -translate-y-1/2" src={`${ASSET_ROOT}/steps-inner-${lang}.png`} width="813" height="638" loading="lazy" />
           </div>
         </div>
         <div className="mt-16 flex justify-center">
@@ -274,11 +277,11 @@ function Steps() {
 }
 
 function InlinePlanet() {
-  return <img alt="" src={`${ASSET_ROOT}/optenicon.svg`} className="inline size-7 align-[-4px]" />;
+  return <img alt="" src={`${ASSET_ROOT}/optenicon.svg`} width="28" height="28" loading="lazy" className="inline size-7 align-[-4px]" />;
 }
 
 function InlineStars() {
-  return <img alt="" src={`${ASSET_ROOT}/stars.svg`} className="inline size-7 align-[-4px]" />;
+  return <img alt="" src={`${ASSET_ROOT}/stars.svg`} width="28" height="28" loading="lazy" className="inline size-7 align-[-4px]" />;
 }
 
 function Step({ num, title, desc, nowrapDesktop = false }: { num: string; title: React.ReactNode; desc: string; nowrapDesktop?: boolean }) {
@@ -306,13 +309,13 @@ function FeatureCards() {
             {titleCaseEn(t("features.heading1"), lang)} <br />
             {titleCaseEn(t("features.heading2"), lang)}
           </SectionTitle>
-          <img alt="" src={`${ASSET_ROOT}/cross.svg`} className="pointer-events-none absolute left-1/2 top-1/2 w-[150px] -translate-x-1/2 -translate-y-1/2 md:w-[205px]" />
+          <img alt="" src={`${ASSET_ROOT}/cross.svg`} width="150" height="126" loading="lazy" className="pointer-events-none absolute left-1/2 top-1/2 w-[150px] -translate-x-1/2 -translate-y-1/2 md:w-[205px]" />
         </div>
         <div className="mt-20 grid gap-3 md:grid-cols-2">
-          <FeatureCard title={t("features.card1.title")} desc={t("features.card1.desc")} img={`${ASSET_ROOT}/feature-models.png`} />
-          <FeatureCard title={t("features.card2.title")} desc={t("features.card2.desc")} img={`${ASSET_ROOT}/feature-interface-${suffix}.png`} imageFirst />
-          <FeatureCard title={t("features.card3.title")} desc={t("features.card3.desc")} img={`${ASSET_ROOT}/feature-credits.png`} />
-          <FeatureCard title={t("features.card4.title")} desc={t("features.card4.desc")} img={`${ASSET_ROOT}/feature-enhance-${suffix}.png`} />
+          <FeatureCard title={t("features.card1.title")} desc={t("features.card1.desc")} img={`${ASSET_ROOT}/feature-models.png`} imgWidth={1100} imgHeight={424} />
+          <FeatureCard title={t("features.card2.title")} desc={t("features.card2.desc")} img={`${ASSET_ROOT}/feature-interface-${suffix}.png`} imgWidth={1100} imgHeight={424} imageFirst />
+          <FeatureCard title={t("features.card3.title")} desc={t("features.card3.desc")} img={`${ASSET_ROOT}/feature-credits.png`} imgWidth={1100} imgHeight={424} />
+          <FeatureCard title={t("features.card4.title")} desc={t("features.card4.desc")} img={`${ASSET_ROOT}/feature-enhance-${suffix}.png`} imgWidth={1100} imgHeight={372} />
         </div>
         <div className="mt-16 flex justify-center">
           <InstallButton />
@@ -322,15 +325,15 @@ function FeatureCards() {
   );
 }
 
-function FeatureCard({ title, desc, img, imageFirst = false }: { title: string; desc: string; img: string; imageFirst?: boolean }) {
+function FeatureCard({ title, desc, img, imgWidth, imgHeight, imageFirst = false }: { title: string; desc: string; img: string; imgWidth: number; imgHeight: number; imageFirst?: boolean }) {
   return (
     <article className="flex min-h-[405px] flex-col overflow-hidden rounded-[12px] border border-white/10 bg-[#0e2023]">
-      {imageFirst && <img alt="" src={img} className="mx-8 h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
+      {imageFirst && <img alt="" src={img} width={imgWidth} height={imgHeight} loading="lazy" className="mx-8 h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
       <div className="p-8">
         <h3 className="font-['PT_Root_UI',sans-serif] text-[24px] font-medium leading-[1.12] text-white">{title}</h3>
         <p className="mt-4 whitespace-pre-wrap font-['PT_Root_UI',sans-serif] text-[16px] leading-[1.65] text-white/55">{desc}</p>
       </div>
-      {!imageFirst && <img alt="" src={img} className="mx-8 mt-auto h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
+      {!imageFirst && <img alt="" src={img} width={imgWidth} height={imgHeight} loading="lazy" className="mx-8 mt-auto h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
     </article>
   );
 }
@@ -357,7 +360,7 @@ function PrivacyItem({ title, desc, last = false }: { title: string; desc: strin
     <article className={cx("w-full min-w-0 py-10", !last && "border-b border-white/10")}>
       <h3 className="font-['PT_Root_UI',sans-serif] text-[28px] font-medium leading-[1.15] text-white md:text-[32px]">{title}</h3>
       <div className="mt-6 flex min-w-0 gap-6">
-        <img alt="" src={`${ASSET_ROOT}/stars.svg`} className="mt-1 size-5 shrink-0" />
+        <img alt="" src={`${ASSET_ROOT}/stars.svg`} width="20" height="20" loading="lazy" className="mt-1 size-5 shrink-0" />
         <p className="min-w-0 font-['PT_Root_UI',sans-serif] text-[18px] leading-[1.65] text-white/55">{desc}</p>
       </div>
     </article>

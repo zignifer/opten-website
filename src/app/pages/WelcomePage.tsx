@@ -36,6 +36,9 @@ export default function WelcomePage() {
       <img
         src="/assets/welcome-arrow.svg"
         alt=""
+        width="40"
+        height="22"
+        loading="eager"
         className="absolute top-[6px] right-[89px] sm:right-[109px] w-[40px] sm:w-[50px] animate-[blink_1.5s_ease-in-out_infinite]"
         draggable={false}
       />
@@ -55,6 +58,10 @@ export default function WelcomePage() {
               key={src}
               src={src}
               alt="Opten extension"
+              width="1051"
+              height="800"
+              loading="eager"
+              fetchPriority="high"
               className="w-full block transition-opacity duration-700"
               style={{
                 opacity: i === idx ? 1 : 0,
