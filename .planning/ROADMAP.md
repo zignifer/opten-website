@@ -47,14 +47,14 @@ Every phase respects the locked routes and the 8 ADR-locked decisions from `docs
 **Plans**: 8 plans (one per atomic commit — Tasks 1-8 from the GEO Phase A plan; Task 8 / vercel.json executed last as highest-risk)
 
 Plans:
-- [ ] 01-01: Add `public/robots.txt` (GEO-A-1)
-- [ ] 01-02: Add `public/sitemap.xml` (GEO-A-2)
-- [ ] 01-03: Add `public/llms.txt` (GEO-A-3)
-- [ ] 01-04: Copy OG hero card PNGs into `public/` (GEO-A-4)
-- [ ] 01-05: Inline SoftwareApplication + Organization JSON-LD in `index.html` (GEO-A-5)
-- [ ] 01-06: Replace OG image meta block in `index.html` (GEO-A-6)
-- [ ] 01-07: Add Paddle `preconnect` link in `index.html` (GEO-A-7)
-- [ ] 01-08: Add security headers to `vercel.json` (GEO-A-8) — last; rollback = `git revert`
+- [x] 01-01: Add `public/robots.txt` (GEO-A-1)
+- [x] 01-02: Add `public/sitemap.xml` (GEO-A-2)
+- [x] 01-03: Add `public/llms.txt` (GEO-A-3)
+- [x] 01-04: Copy OG hero card PNGs into `public/` (GEO-A-4)
+- [x] 01-05: Inline SoftwareApplication + Organization JSON-LD in `index.html` (GEO-A-5)
+- [x] 01-06: Replace OG image meta block in `index.html` (GEO-A-6)
+- [x] 01-07: Add Paddle `preconnect` link in `index.html` (GEO-A-7)
+- [x] 01-08: Add security headers to `vercel.json` (GEO-A-8) — last; rollback = `git revert`
 
 ### Phase 2: Per-route prerender + per-route metadata
 **Status**: Implementation complete (2026-05-15). Awaiting post-deploy Vercel verification (push to main, then run Sections A-G from 02-08-SUMMARY.md).
@@ -166,10 +166,13 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phases 1 and 2 are p
 |-------|----------------|--------|-----------|
 | 1. Static GEO foundations | 8/8 | Shipped 2026-05-14 | 2026-05-14 |
 | 2. Per-route prerender + metadata | 8/8 | Complete   | 2026-05-16 |
-| 3. Bilingual routing | 0/TBD | Backlog (blocked on URL strategy decision) | - |
+| 2.1. Hydration speedup & perceived-load opt | 7/7 | Complete (PageSpeed Mobile 91 / CLS 0 / TBT 0 ms) | 2026-05-16 |
+| 2.2. Mobile-perf + Safari fixes | inline (~5 commits, no per-task plans) | Complete (shipped inline; retroactive note in `02.1-VERIFICATION.md`) | 2026-05-16 |
+| 3. Bilingual routing | 0/TBD | Backlog (blocked on URL strategy decision — discuss in progress) | - |
 | 4. Content surface | 0/TBD | Backlog | - |
 | 5. Brand authority | 0/TBD | Backlog | - |
 
 ---
 *Roadmap defined: 2026-05-14*
-*Last updated: 2026-05-15 after Phase 2 hotfix `80b16be` shipped to production. Phase 2 lesson-learned: SPA-fallback routes (`/account`, `/success`, `/dashboard/*`) need a path-marker check in `main.tsx` to avoid React #418/#423 hydration mismatch — the initial Phase 2 deploy (`b241989`) was rolled back via `vercel rollback` after playwright surfaced this regression in production. Future prerender phases must include a playwright sweep across ALL routes (not just prerendered ones) as an acceptance gate.*
+*Last updated: 2026-05-16 — Phases 02, 02.1, 02.2 all in production. Phase 02.1 verified via PageSpeed Mobile (score 91 / CLS 0 / TBT 0 ms). Phase 02.2 shipped inline as ~5 atomic commits (`0a73069` → `81284d4`) without per-task plan artifacts; retroactive note in `02.1-VERIFICATION.md`. Next: Phase 3 discuss (in progress in a separate context) — resolves per-language URL strategy.*
+*Earlier note (2026-05-15): Phase 2 lesson-learned — SPA-fallback routes (`/account`, `/success`, `/dashboard/*`) need a path-marker check in `main.tsx` to avoid React #418/#423 hydration mismatch — the initial Phase 2 deploy (`b241989`) was rolled back via `vercel rollback` after playwright surfaced this regression in production. Future prerender phases must include a playwright sweep across ALL routes (not just prerendered ones) as an acceptance gate.*

@@ -2,16 +2,17 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: phases-2-and-2.1-closed
-stopped_at: Phases 02 + 02.1 closed; 02.2 (mobile-perf follow-up) shipped inline; mobile section spacing normalized via quick task
-last_updated: "2026-05-16T17:50:00Z"
+status: awaiting-phase-3-discuss
+stopped_at: Phases 02 + 02.1 + 02.2 closed; mobile section spacing normalized via quick task; blocked on Phase 3 URL-strategy decision
+last_updated: "2026-05-16T18:50:00Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 7
-  completed_phases: 3
-  total_plans: 24
-  completed_plans: 24
-  percent: 43
+  completed_phases: 4
+  total_plans: 23
+  completed_plans: 23
+  percent: 57
+  percent_note: "4 of 7 phases complete (1, 2, 2.1, 2.2). Phase 2.2 shipped inline (~5 atomic commits, no per-task plan artifacts — see 02.1-VERIFICATION.md retroactive note + ROADMAP.md Phase 2.2 section). Phases 3-5 have no plans authored yet."
 ---
 
 # Project State
@@ -21,18 +22,19 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-14)
 
 **Core value:** Sell, service, and onboard extension users without breaking the shipped integration contract with the Opten Chrome extension.
-**Current focus:** Phase 02.1 — hydration-and-perf
+**Current focus:** Awaiting Phase 3 — bilingual routing (blocked on per-language URL strategy decision)
 **Active milestone:** GEO Optimization (12/100 → ~30/100 in Phase 1, higher across Phases 2-5)
 
 ## Current Position
 
-Phase: 02.1 (hydration-and-perf) — CLOSED 2026-05-16
-Plan: 7 of 7 shipped + verified (`.planning/phases/02.1-hydration-and-perf/02.1-VERIFICATION.md`)
-Status: Closed. Phase 02.2 (mobile-perf + Safari + WOFF2 + lazy-EN) shipped inline as reactive follow-up.
+Phase: 02.2 (mobile-perf-followup) — CLOSED 2026-05-16 (shipped inline; retroactive note in `.planning/phases/02.1-hydration-and-perf/02.1-VERIFICATION.md`)
+Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (no per-task plans, ~5 atomic commits `0a73069`..`81284d4`)
+Status: Phases 02, 02.1, 02.2 all in production. Quick task 260516-pmk (mobile section spacing normalization) shipped 2026-05-16 (commit `c4a96ba`).
 Last activity: 2026-05-16
-Next: Phase 3 (bilingual routing) prerequisite — resolve per-language URL strategy (`/ru/*` `/en/*` vs `?lang=` vs subdomain).
+Next: Phase 3 (bilingual routing) — discuss in progress (separate context), blocks on per-language URL strategy (`/ru/*` `/en/*` vs `?lang=` vs subdomain).
 
-Progress: [████░░░░░░] 43% (3 of 7 phases done — Phase 1, 2, 2.1; Phase 2.2 inserted+done; Phases 3, 4, 5 pending)
+Milestone phases: 4 of 7 complete (1, 2, 2.1, 2.2). Phases 3-5 backlog.
+Progress: [██████░░░░] 57%
 
 ## Performance Metrics
 
@@ -67,7 +69,8 @@ Progress: [████░░░░░░] 43% (3 of 7 phases done — Phase 1, 
 
 ### Roadmap Evolution
 
-- Phase 2.1 inserted after Phase 2: Hydration speedup + perceived-load optimization (code-split, modulepreload, img dims, PNG->WebP/AVIF) (URGENT)
+- Phase 2.1 inserted after Phase 2 (2026-05-15): Hydration speedup + perceived-load optimization (code-split, modulepreload, img dims, PNG->WebP/AVIF) (URGENT)
+- Phase 2.2 inserted after Phase 2.1 (2026-05-16): Mobile-perf + Safari fixes — Paddle SDK lazy on `/pay`, vendor chunk split, self-hosted WOFF2 + adjusted-fallback metrics, Safari `<link rel=preload as=script>` fallback, `touch-action: manipulation`, lazy EN i18n dict, mobile srcset for feature cards + steps. Shipped inline as ~5 atomic commits (`0a73069`, `451af5b`, `3556fe4`, `39d2f4d`, `c353e5e`, `e9b24c6`, `15eb5c3`, `09341be`, `81284d4`). No `.planning/phases/02.2-*/` directory created — reactive work, tracked via commit history + retroactive note in `02.1-VERIFICATION.md`.
 
 ### Decisions
 
@@ -92,10 +95,13 @@ Full log in PROJECT.md Key Decisions table — 8 ADR-locked decisions from `docs
 
 ### Blockers/Concerns
 
+- **Phase 02.1 (CLOSED 2026-05-16)**: 7/7 plans shipped. Verified via PageSpeed Insights Mobile against `https://opten.space` — score 91 / CLS 0 / TBT 0 ms. See [02.1-VERIFICATION.md](phases/02.1-hydration-and-perf/02.1-VERIFICATION.md).
+- **Phase 02.2 (CLOSED 2026-05-16)**: shipped inline as ~5 atomic commits (no per-task plan artifacts). Integration Contract §6 preserved on `/pay`. Retroactive note in `02.1-VERIFICATION.md`; ROADMAP.md Phase 2.2 section enumerates the scope.
 - **Phase 2 prerequisite (RESOLVED 2026-05-15)**: cross-route head-management strategy — decided build-time prerender via `scripts/prerender.mjs`. `react-helmet-async` rejected.
 - **Phase 2 post-deploy verification (CLOSED 2026-05-15)**: deploy `dpl_HAzfr2h8sADbiHHBt4yi4Wkf6ncg` (commit `80b16be`, hotfix included) shipped to opten.space; Sections A-D verified via curl, Section E playwright sweep on all 9 routes returned 0 console errors. Outstanding visual checks (OG card unfurl, Paddle modal click) listed under "Pending Todos" below.
 - **Phase 2 hotfix landed 2026-05-15**: see commit `80b16be` — `fix(seo): match prerender path to client route + eager-import hero animation`. Two regressions fixed: (a) hydration mismatch on SPA-fallback routes via `window.__PRERENDER_PATH` marker + path-check in `main.tsx`, (b) Suspense SSR failure on `/` via eager-import of `OptenHeroAnimation`. Initial Phase 2 deploy (`b241989`) was rolled back via `vercel rollback` before hotfix was promoted — extension users were never exposed to the broken state for longer than ~30 minutes.
-- **Phase 3 prerequisite (open question)**: per-language URL strategy — `/ru/*` `/en/*` vs `?lang=` vs subdomain. Must be resolved before Phase 3 detailed planning.
+- **Phase 3 prerequisite (OPEN — blocks `/gsd-plan-phase 3`)**: per-language URL strategy — `/ru/*` `/en/*` vs `?lang=` vs subdomain. Discuss currently in progress (separate context); resolve before `/gsd-plan-phase 3`.
+- **Pre-Phase-3 known mismatch (carried from Phase 02.2)**: landing (`/`) retains a pre-existing hydration mismatch identified by Plan 02.2-02 Playwright sweep. Predates Phase 02.2 (verified via `git stash`); React recovers via client re-render. Should be addressed before Phase 3 bilingual work so it doesn't compound with dynamic `<html lang>` changes.
 - **Locked-route constraint (permanent)**: `/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill` must keep responding at root paths — applies to every phase, especially Phase 3 bilingual work (`/ru/*` `/en/*` are **additions**, not replacements).
 
 ## Quick Tasks Completed
@@ -115,7 +121,11 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-16T07:15:16.501Z
-Stopped at: Phase 2.1 context gathered
-Next action: (1) visual OG unfurl test on Telegram/Slack + Paddle modal browser test on /pay; (2) ~7-14 days from 2026-05-15 → `/geo audit https://opten.space` for Phase 2 score uplift measurement; (3) resolve Phase 3 prerequisite (per-language URL strategy — `/ru/*` `/en/*` vs `?lang=` vs subdomain) before `/gsd-plan-phase 3`; (4) extract Phase 2 hotfix as anti-pattern for future prerender phases (SPA-fallback hydration mismatch + Suspense SSR boundary failure).
+Last session: 2026-05-16T18:50:00Z
+Stopped at: Phases 02, 02.1, 02.2 all closed in production; quick task 260516-pmk (mobile section spacing) shipped (commit `c4a96ba`); STATE.md + ROADMAP.md reconciled. Phase 3 discuss already running in a separate context.
+Next action (in order):
+  1. **Finish Phase 3 discuss** (in progress in separate context) — resolve per-language URL strategy decision, then `/gsd-plan-phase 3`.
+  2. **Pre-Phase-3 hygiene** — investigate the residual landing-page hydration mismatch flagged by Plan 02.2-02 Playwright sweep, so it doesn't compound with dynamic `<html lang>` work in Phase 3.
+  3. **Phase 2 follow-up todos (independent of Phase 3)** — visual OG unfurl test on Telegram/Slack + Paddle modal browser test on `/pay`; GEO rescore window opens 2026-05-22 → `/geo audit https://opten.space`.
+  4. **Lessons-learned capture** — Phase 2 hotfix + Phase 02.2 ad-hoc-then-retroactive pattern → future anti-patterns reference.
 Resume file: None
