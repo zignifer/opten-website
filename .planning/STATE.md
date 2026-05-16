@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Phases 02, 02.1, 02.2 all in production. Quick task 260516-pmk (mobile section spacing normalization) shipped 2026-05-16 (commit `c4a96ba`).
-stopped_at: Phase 3 context gathered
-last_updated: "2026-05-16T14:23:24.443Z"
+status: executing
+stopped_at: "Completed 03-01-PLAN.md — Task 2 checkpoint:human-verify pending"
+last_updated: "2026-05-16T16:38:00.839Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 16
-  completed_plans: 15
-  percent: 94
+  total_plans: 24
+  completed_plans: 16
+  percent: 67
 ---
 
 # Project State
@@ -21,19 +21,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-14)
 
 **Core value:** Sell, service, and onboard extension users without breaking the shipped integration contract with the Opten Chrome extension.
-**Current focus:** Awaiting Phase 3 — bilingual routing (blocked on per-language URL strategy decision)
+**Current focus:** Phase 03 — bilingual-routing
 **Active milestone:** GEO Optimization (12/100 → ~30/100 in Phase 1, higher across Phases 2-5)
 
 ## Current Position
 
-Phase: 02.2 (mobile-perf-followup) — CLOSED 2026-05-16 (shipped inline; retroactive note in `.planning/phases/02.1-hydration-and-perf/02.1-VERIFICATION.md`)
+Phase: 03 (bilingual-routing) — EXECUTING
+Plan: 2 of 8
 Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (no per-task plans, ~5 atomic commits `0a73069`..`81284d4`)
-Status: Phases 02, 02.1, 02.2 all in production. Quick task 260516-pmk (mobile section spacing normalization) shipped 2026-05-16 (commit `c4a96ba`).
+Status: Ready to execute
 Last activity: 2026-05-16
 Next: Phase 3 (bilingual routing) — discuss in progress (separate context), blocks on per-language URL strategy (`/ru/*` `/en/*` vs `?lang=` vs subdomain).
 
 Milestone phases: 4 of 7 complete (1, 2, 2.1, 2.2). Phases 3-5 backlog.
-Progress: [██████░░░░] 57%
+Progress: [███████░░░] 67%
 
 ## Performance Metrics
 
@@ -63,6 +64,7 @@ Progress: [██████░░░░] 57%
 | Phase 02.1-hydration-and-perf P01 | 3m | 2 tasks | 2 files |
 | Phase 02.1-hydration-and-perf P02 | 3 minutes | 1 tasks | 1 files |
 | Phase 02.1-hydration-and-perf P05 | 30 | 2 tasks | 3 files |
+| Phase 03-bilingual-routing P01 | 5min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -83,6 +85,7 @@ Full log in PROJECT.md Key Decisions table — 8 ADR-locked decisions from `docs
 - [Phase ?]: Phase 2 Plan 01
 - [Phase ?]: Two-outDir SSR builds (.ssr-cache + .ssr-meta) — Vite 6 empties outDir on every SSR build even without --emptyOutDir; splitting dirs prevents inter-build erasure
 - [Phase ?]: pathToFileURL() for dynamic import on Windows — bare C:\ absolute paths rejected by Node ESM loader
+- [Phase ?]: Deleted useEffect document.documentElement.lang write from LangContext in isolation (D-06) — build-time html lang baking deferred to Plan 03
 
 ### Pending Todos
 
@@ -120,8 +123,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-16T14:23:24.433Z
-Stopped at: Phase 3 context gathered
+Last session: 2026-05-16T16:38:00.830Z
+Stopped at: Completed 03-01-PLAN.md — Task 2 checkpoint:human-verify pending
 Next action (in order):
 
   1. **Finish Phase 3 discuss** (in progress in separate context) — resolve per-language URL strategy decision, then `/gsd-plan-phase 3`.
@@ -129,4 +132,4 @@ Next action (in order):
   3. **Phase 2 follow-up todos (independent of Phase 3)** — visual OG unfurl test on Telegram/Slack + Paddle modal browser test on `/pay`; GEO rescore window opens 2026-05-22 → `/geo audit https://opten.space`.
   4. **Lessons-learned capture** — Phase 2 hotfix + Phase 02.2 ad-hoc-then-retroactive pattern → future anti-patterns reference.
 
-Resume file: .planning/phases/03-bilingual-routing/03-CONTEXT.md
+Resume file: .planning/phases/03-bilingual-routing/03-01-SUMMARY.md
