@@ -1,5 +1,6 @@
 import { Link } from "react-router";
-import { useT, useLang } from "../../../i18n/LangContext";
+import { useT } from "../../../i18n/LangContext";
+import LangSwitcher from "../LangSwitcher";
 
 interface LegalLayoutProps {
   title: string;
@@ -9,7 +10,6 @@ interface LegalLayoutProps {
 
 export default function LegalLayout({ title, updatedAt, children }: LegalLayoutProps) {
   const t = useT();
-  const { lang, setLang } = useLang();
 
   return (
     <div className="min-h-screen bg-black font-['PT_Root_UI',sans-serif]">
@@ -19,12 +19,7 @@ export default function LegalLayout({ title, updatedAt, children }: LegalLayoutP
           Opten
         </Link>
         <div className="flex items-center gap-[16px]">
-          <button
-            onClick={() => setLang(lang === "ru" ? "en" : "ru")}
-            className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]"
-          >
-            {lang === "ru" ? "EN" : "RU"}
-          </button>
+          <LangSwitcher className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]" />
           <Link to="/" className="text-[rgba(255,255,255,0.5)] text-[14px] no-underline hover:text-white transition-colors">
             {t("legal.backLink")}
           </Link>

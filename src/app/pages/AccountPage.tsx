@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { useT, useLang } from "../../i18n/LangContext";
+import LangSwitcher from "../components/LangSwitcher";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
 
 const SUPABASE_FUNCTIONS_URL = "https://vuywydhwkqmihfztpkgl.supabase.co/functions/v1";
@@ -61,7 +62,7 @@ function cardBrandName(type: string | null, t: (key: string) => string): string 
 
 export default function AccountPage() {
   const t = useT();
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const [token, setToken] = useState<string | null>(null);
   const [extStatus, setExtStatus] = useState<ExtStatus>("detecting");
   const [sub, setSub] = useState<Subscription | null>(null);
@@ -205,12 +206,7 @@ export default function AccountPage() {
             <Link to="/" className="hover:opacity-80 transition-opacity">{t("nav.home")}</Link>
             <Link to="/pay" className="hover:opacity-80 transition-opacity">{t("nav.pricing")}</Link>
             <a href="/#faq" className="hover:opacity-80 transition-opacity">{t("nav.faq")}</a>
-            <button
-              onClick={() => setLang(lang === "ru" ? "en" : "ru")}
-              className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]"
-            >
-              {lang === "ru" ? "EN" : "RU"}
-            </button>
+            <LangSwitcher className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]" />
           </div>
           <Logo />
           <div className="flex-1 flex justify-end ml-auto md:ml-0">

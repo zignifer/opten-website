@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { useT, useLang } from "../../i18n/LangContext";
+import LangSwitcher from "../components/LangSwitcher";
 import { ensurePaddle } from "../../lib/paddle";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
 import imgFrame37 from "../../imports/LandingPage/da31c95f5bc0f013c26804882654e49618ec43c7.webp";
@@ -113,7 +114,7 @@ function Divider() {
 
 export default function PayPage() {
   const t = useT();
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
 
   // Phase 66 D-04 + FE-02: currency state with lang-driven default and manual override
   // Pitfall #1 fix (RESEARCH §Pitfall 1): guard the useEffect with useRef(true) so that on MOUNT
@@ -370,12 +371,7 @@ export default function PayPage() {
             <Link to="/" className="hover:opacity-80 transition-opacity">{t("nav.home")}</Link>
             <Link to="/pay" className="hover:opacity-80 transition-opacity">{t("nav.pricing")}</Link>
             <a href="/#faq" className="hover:opacity-80 transition-opacity">{t("nav.faq")}</a>
-            <button
-              onClick={() => setLang(lang === "ru" ? "en" : "ru")}
-              className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]"
-            >
-              {lang === "ru" ? "EN" : "RU"}
-            </button>
+            <LangSwitcher className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]" />
           </div>
           <div className="absolute left-1/2 -translate-x-1/2">
             <Logo />
