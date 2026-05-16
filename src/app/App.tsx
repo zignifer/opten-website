@@ -9,10 +9,32 @@ import {
 } from "lucide-react";
 import { useLang, useT } from "../i18n/LangContext";
 import OptenHeroAnimation from "./components/OptenHeroAnimation";
+import { Picture } from "./components/Picture";
+import type { Picture as PictureData } from 'vite-imagetools';
 // Phase 2.1 D-04: Add width/height attrs to every <img> for CLS=0 (aspect-ratio-from-attributes)
+// Phase 2.1 D-05: vite-imagetools ?as=picture static imports (paths relative to src/app/App.tsx)
+import featureModelsSrc from '../../public/assets/landing-design/feature-models.png?w=1100&format=webp;png&as=picture'
+import featureCreditsSrc from '../../public/assets/landing-design/feature-credits.png?w=1100&format=webp;png&as=picture'
+import featureInterfaceRuSrc from '../../public/assets/landing-design/feature-interface-ru.png?w=1100&format=webp;png&as=picture'
+import featureInterfaceEnSrc from '../../public/assets/landing-design/feature-interface-en.png?w=1100&format=webp;png&as=picture'
+import featureEnhanceRuSrc from '../../public/assets/landing-design/feature-enhance-ru.png?w=1100&format=webp;png&as=picture'
+import featureEnhanceEnSrc from '../../public/assets/landing-design/feature-enhance-en.png?w=1100&format=webp;png&as=picture'
+import stepsInnerRuSrc from '../../public/assets/landing-design/steps-inner-ru.png?w=813&format=webp;png&as=picture'
+import stepsInnerEnSrc from '../../public/assets/landing-design/steps-inner-en.png?w=813&format=webp;png&as=picture'
+import canvaSrc from '../../public/assets/partners/canva.png?w=268&format=webp;png&as=picture'
+import freepikSrc from '../../public/assets/partners/freepik.png?w=268&format=webp;png&as=picture'
+import higgsfieldSrc from '../../public/assets/partners/higgsfield.png?w=268&format=webp;png&as=picture'
+import syntxSrc from '../../public/assets/partners/syntx.png?w=268&format=webp;png&as=picture'
 
 const STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 const ASSET_ROOT = "/assets/landing-design";
+
+const partnerSrcMap = {
+  canva: canvaSrc,
+  freepik: freepikSrc,
+  higgsfield: higgsfieldSrc,
+  syntx: syntxSrc,
+} as const;
 
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
@@ -236,12 +258,13 @@ function SoonBadge() {
 }
 
 function PartnerLogo({ name }: { name: "syntx" | "freepik" | "higgsfield" | "canva" }) {
-  return <img alt={name} src={`/assets/partners/${name}.png`} width="268" height="80" loading="eager" className="h-full w-full object-contain" />;
+  return <Picture data={partnerSrcMap[name]} width={268} height={80} alt={name} loading="eager" className="h-full w-full object-contain" />;
 }
 
 function Steps() {
   const t = useT();
   const { lang } = useLang();
+  const stepsSrc = lang === "ru" ? stepsInnerRuSrc : stepsInnerEnSrc;
   return (
     <section id="features" className="bg-[#011417] px-5 py-20 md:px-8">
       <div className="mx-auto w-full max-w-[1200px]">
@@ -265,7 +288,7 @@ function Steps() {
             />
           </div>
           <div className="relative flex min-h-[420px] w-full shrink-0 overflow-hidden rounded-[16px] border border-white/10 bg-[#0e2023] lg:h-[512px] lg:w-[500px]">
-            <img alt="" className="absolute left-1/2 top-1/2 w-[86%] max-w-[430px] -translate-x-1/2 -translate-y-1/2" src={`${ASSET_ROOT}/steps-inner-${lang}.png`} width="813" height="638" loading="lazy" />
+            <Picture data={stepsSrc} width={813} height={638} alt="" loading="lazy" className="absolute left-1/2 top-1/2 w-[86%] max-w-[430px] -translate-x-1/2 -translate-y-1/2" />
           </div>
         </div>
         <div className="mt-16 flex justify-center">
@@ -312,10 +335,10 @@ function FeatureCards() {
           <img alt="" src={`${ASSET_ROOT}/cross.svg`} width="150" height="126" loading="lazy" className="pointer-events-none absolute left-1/2 top-1/2 w-[150px] -translate-x-1/2 -translate-y-1/2 md:w-[205px]" />
         </div>
         <div className="mt-20 grid gap-3 md:grid-cols-2">
-          <FeatureCard title={t("features.card1.title")} desc={t("features.card1.desc")} img={`${ASSET_ROOT}/feature-models.png`} imgWidth={1100} imgHeight={424} />
-          <FeatureCard title={t("features.card2.title")} desc={t("features.card2.desc")} img={`${ASSET_ROOT}/feature-interface-${suffix}.png`} imgWidth={1100} imgHeight={424} imageFirst />
-          <FeatureCard title={t("features.card3.title")} desc={t("features.card3.desc")} img={`${ASSET_ROOT}/feature-credits.png`} imgWidth={1100} imgHeight={424} />
-          <FeatureCard title={t("features.card4.title")} desc={t("features.card4.desc")} img={`${ASSET_ROOT}/feature-enhance-${suffix}.png`} imgWidth={1100} imgHeight={372} />
+          <FeatureCard title={t("features.card1.title")} desc={t("features.card1.desc")} imgData={featureModelsSrc} imgWidth={1100} imgHeight={424} />
+          <FeatureCard title={t("features.card2.title")} desc={t("features.card2.desc")} imgData={suffix === "ru" ? featureInterfaceRuSrc : featureInterfaceEnSrc} imgWidth={1100} imgHeight={424} imageFirst />
+          <FeatureCard title={t("features.card3.title")} desc={t("features.card3.desc")} imgData={featureCreditsSrc} imgWidth={1100} imgHeight={424} />
+          <FeatureCard title={t("features.card4.title")} desc={t("features.card4.desc")} imgData={suffix === "ru" ? featureEnhanceRuSrc : featureEnhanceEnSrc} imgWidth={1100} imgHeight={372} />
         </div>
         <div className="mt-16 flex justify-center">
           <InstallButton />
@@ -325,15 +348,15 @@ function FeatureCards() {
   );
 }
 
-function FeatureCard({ title, desc, img, imgWidth, imgHeight, imageFirst = false }: { title: string; desc: string; img: string; imgWidth: number; imgHeight: number; imageFirst?: boolean }) {
+function FeatureCard({ title, desc, imgData, imgWidth, imgHeight, imageFirst = false }: { title: string; desc: string; imgData: PictureData; imgWidth: number; imgHeight: number; imageFirst?: boolean }) {
   return (
     <article className="flex min-h-[405px] flex-col overflow-hidden rounded-[12px] border border-white/10 bg-[#0e2023]">
-      {imageFirst && <img alt="" src={img} width={imgWidth} height={imgHeight} loading="lazy" className="mx-8 h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
+      {imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt="" loading="lazy" className="mx-8 h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
       <div className="p-8">
         <h3 className="font-['PT_Root_UI',sans-serif] text-[24px] font-medium leading-[1.12] text-white">{title}</h3>
         <p className="mt-4 whitespace-pre-wrap font-['PT_Root_UI',sans-serif] text-[16px] leading-[1.65] text-white/55">{desc}</p>
       </div>
-      {!imageFirst && <img alt="" src={img} width={imgWidth} height={imgHeight} loading="lazy" className="mx-8 mt-auto h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
+      {!imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt="" loading="lazy" className="mx-8 mt-auto h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
     </article>
   );
 }

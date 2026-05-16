@@ -11,7 +11,10 @@ export default defineConfig({
     react(),
     tailwindcss(),
     // Phase 2.1 D-05: register vite-imagetools for ?w=...&format=webp;png&as=picture query-string imports
-    imagetools(),
+    // exclude:'' overrides the default exclude:'public/**/*' so imagetools processes
+    // static imports that resolve into the public/ directory (Rule 3 fix — otherwise
+    // the plugin passes public/ files through as raw URL strings).
+    imagetools({ exclude: '' }),
   ],
   resolve: {
     alias: {
