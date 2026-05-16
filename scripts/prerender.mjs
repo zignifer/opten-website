@@ -71,11 +71,28 @@ function applyMarker(html, path) {
   return html.replace("</head>", `    ${marker}\n  </head>`);
 }
 
+// Phase 2.1 D-03: Synthesize <link rel="modulepreload"> from Vite's <script type="module" src="...">.
+// Vite 6 does NOT auto-emit modulepreload for the entry chunk (RESEARCH.md line 122–130).
+// The link is appended before </head>, which places it AFTER the Paddle <script> tag (which is
+// higher in <head> in the source template). modulepreload only hints fetch parallelism — it does
+// not change script execution order, so Paddle still loads synchronously before main.tsx runs
+// (Integration Contract §6 preserved).
+// MUST be called BEFORE applyMarker: applyMarker replaces </head> and a subsequent search for
+// the same anchor would silently no-op (Pitfall 5, RESEARCH.md lines 465–470).
+function applyModulePreload(html) {
+  const match = html.match(/src="(\/assets\/index-[^"]+\.js)"/);
+  if (!match) return html; // dev build / missing entry — silent no-op
+  const chunkHref = match[1];
+  const tag = `    <link rel="modulepreload" href="${chunkHref}">`;
+  return html.replace("</head>", `${tag}\n  </head>`);
+}
+
 for (const meta of routes) {
   // resolve ogImage default (Phase 2 site-wide og-card-ru.png per Open Question #2)
   const ogImage = meta.ogImage ?? DEFAULT_OG_IMAGE;
   // (ogImage is read but not currently re-injected — index.html already has og-card-ru.png hardcoded; Phase 4+ may swap this per-route)
   let html = applyMeta(template, meta);
+  html = applyModulePreload(html);   // Phase 2.1 D-03: must precede applyMarker (which consumes </head>)
   html = applyMarker(html, meta.path);
   if (meta.prerender === "full") {
     const rendered = renderRoute(meta.path);
