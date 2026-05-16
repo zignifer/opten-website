@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: "Completed 03-01-PLAN.md — Task 2 checkpoint:human-verify pending"
-last_updated: "2026-05-16T17:17:31.543Z"
+last_updated: "2026-05-16T17:20:41.703Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 24
-  completed_plans: 19
-  percent: 79
+  completed_plans: 20
+  percent: 83
 ---
 
 # Project State
@@ -27,14 +27,14 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 ## Current Position
 
 Phase: 03 (bilingual-routing) — EXECUTING
-Plan: 5 of 8
+Plan: 6 of 8
 Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (no per-task plans, ~5 atomic commits `0a73069`..`81284d4`)
 Status: Ready to execute
 Last activity: 2026-05-16
 Next: Phase 3 (bilingual routing) — discuss in progress (separate context), blocks on per-language URL strategy (`/ru/*` `/en/*` vs `?lang=` vs subdomain).
 
 Milestone phases: 4 of 7 complete (1, 2, 2.1, 2.2). Phases 3-5 backlog.
-Progress: [████████░░] 79%
+Progress: [████████░░] 83%
 
 ## Performance Metrics
 
@@ -66,6 +66,7 @@ Progress: [████████░░] 79%
 | Phase 02.1-hydration-and-perf P05 | 30 | 2 tasks | 3 files |
 | Phase 03-bilingual-routing P01 | 5min | 1 tasks | 1 files |
 | Phase 03-bilingual-routing P02 | 8min | 2 tasks | 1 files |
+| Phase 03-bilingual-routing P05 | 5min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,7 @@ Full log in PROJECT.md Key Decisions table — 8 ADR-locked decisions from `docs
 - [Phase ?]: Two-outDir SSR builds (.ssr-cache + .ssr-meta) — Vite 6 empties outDir on every SSR build even without --emptyOutDir; splitting dirs prevents inter-build erasure
 - [Phase ?]: pathToFileURL() for dynamic import on Windows — bare C:\ absolute paths rejected by Node ESM loader
 - [Phase ?]: Deleted useEffect document.documentElement.lang write from LangContext in isolation (D-06) — build-time html lang baking deferred to Plan 03
+- [Phase ?]: 03-05: Option A annotated xhtml:link per URL guarantees hreflang reciprocity by construction from manifest field
 
 ### Pending Todos
 
@@ -124,7 +126,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-16T17:17:31.536Z
+Last session: 2026-05-16T17:20:33.376Z
 Stopped at: Completed 03-01-PLAN.md — Task 2 checkpoint:human-verify pending
 Next action (in order):
 
