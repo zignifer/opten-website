@@ -1,17 +1,24 @@
 
   import { createRoot, hydrateRoot } from "react-dom/client";
+  import { lazy, Suspense } from "react";
   import { BrowserRouter, Routes, Route } from "react-router";
   import App from "./app/App.tsx";
-  import PayPage from "./app/pages/PayPage.tsx";
-  import SuccessPage from "./app/pages/SuccessPage.tsx";
   import PrivacyPage from "./app/pages/PrivacyPage.tsx";
   import TermsPage from "./app/pages/TermsPage.tsx";
   import RefundPage from "./app/pages/RefundPage.tsx";
-  import AccountPage from "./app/pages/AccountPage.tsx";
   import WelcomePage from "./app/pages/WelcomePage.tsx";
-  import DownloadSkillPage from "./app/pages/DownloadSkillPage.tsx";
   import "./styles/index.css";
   import { LangProvider } from "./i18n/LangContext";
+  import { RouteLoading } from "./app/components/RouteLoading";
+
+  // Phase 2.1 D-01: SPA-fallback routes only — NEVER add App/Welcome/Privacy/Terms/Refund here.
+  // renderToString in entry-server.tsx cannot resolve React.lazy() — only routes that never
+  // enter the hydrateRoot path are safe to lazy-load (RESEARCH.md "Suspense + hydrateRoot at
+  // Route Level" lines 329–363). Phase 2 hotfix 80b16be is the precedent.
+  const PayPage = lazy(() => import("./app/pages/PayPage.tsx"));
+  const SuccessPage = lazy(() => import("./app/pages/SuccessPage.tsx"));
+  const AccountPage = lazy(() => import("./app/pages/AccountPage.tsx"));
+  const DownloadSkillPage = lazy(() => import("./app/pages/DownloadSkillPage.tsx"));
 
   // === Paddle.js v2 SDK bootstrap — Phase 66 D-14 (FE-05), Phase 67 fix ===
   // Environment.set MUST come before Initialize (Pitfall #4 — ordering contract).
@@ -54,17 +61,19 @@
   const tree = (
     <LangProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/pay" element={<PayPage />} />
-          <Route path="/success" element={<SuccessPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/terms" element={<TermsPage />} />
-          <Route path="/refund" element={<RefundPage />} />
-          <Route path="/account" element={<AccountPage />} />
-          <Route path="/welcome" element={<WelcomePage />} />
-          <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
-        </Routes>
+        <Suspense fallback={<RouteLoading />}>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/pay" element={<PayPage />} />
+            <Route path="/success" element={<SuccessPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/refund" element={<RefundPage />} />
+            <Route path="/account" element={<AccountPage />} />
+            <Route path="/welcome" element={<WelcomePage />} />
+            <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </LangProvider>
   );
