@@ -148,7 +148,7 @@ Plans:
 - [x] 03-07-register-en-routes-in-routers-PLAN.md — /en/* Route declarations in entry-server.tsx (5) + main.tsx (6) (GEO-C-1, GEO-C-2)
 
 **Wave 4** *(blocked on Wave 3)*
-- [ ] 03-04-paddle-symmetric-en-pay-and-contract-PLAN.md — Widen Paddle injection to /en/pay + INTEGRATION-CONTRACT §6 + robots.txt defense-in-depth (GEO-C-2)
+- [x] 03-04-paddle-symmetric-en-pay-and-contract-PLAN.md — Widen Paddle injection to /en/pay + INTEGRATION-CONTRACT §6 + robots.txt defense-in-depth (GEO-C-2)
 - [ ] 03-08-langswitcher-extract-and-wire-PLAN.md — Extract src/app/components/LangSwitcher.tsx + wire 4 consumer sites (GEO-C-1, GEO-C-4)
 
 ### Phase 4: Content surface
@@ -187,7 +187,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phases 1 and 2 are p
 | 2. Per-route prerender + metadata | 8/8 | Complete   | 2026-05-16 |
 | 2.1. Hydration speedup & perceived-load opt | 7/7 | Complete (PageSpeed Mobile 91 / CLS 0 / TBT 0 ms) | 2026-05-16 |
 | 2.2. Mobile-perf + Safari fixes | inline (~5 commits, no per-task plans) | Complete (shipped inline; retroactive note in `02.1-VERIFICATION.md`) | 2026-05-16 |
-| 3. Bilingual routing | 6/8 | In Progress|  |
+| 3. Bilingual routing | 7/8 | In Progress|  |
 | 4. Content surface | 0/TBD | Backlog | - |
 | 5. Brand authority | 0/TBD | Backlog | - |
 
