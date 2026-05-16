@@ -26,14 +26,14 @@ interface PictureProps {
   alt: string;
   className?: string;
   loading?: "eager" | "lazy";
+  sizes?: string;
 }
 
 // Phase 2.2: fetchPriority dropped — React 18.3 emits the camelCase JSX prop as-is in SSR
 // markup, then mismatches it on hydration → React #418 + #423 fall through to a full client
-// re-render (the actual cause of "buttons unresponsive for 1-3 s on mobile"). Re-add as the
-// lowercase `fetchpriority` attribute after upgrading to React 19.
+// re-render. Re-add as lowercase `fetchpriority` attribute after upgrading to React 19.
 
-export function Picture({ data, width, height, alt, className, loading }: PictureProps) {
+export function Picture({ data, width, height, alt, className, loading, sizes }: PictureProps) {
   // Fallback: if data resolves to a plain URL string (unexpected), render <img> directly
   if (typeof data === 'string') {
     return (
@@ -50,18 +50,23 @@ export function Picture({ data, width, height, alt, className, loading }: Pictur
 
   // vite-imagetools@6.2.9 as=picture shape: sources is a Record<format, srcset_string>
   // e.g. { webp: "/assets/img.webp 1100w", png: "/assets/img.png 1100w" }
+  // With multiple sizes (?w=400;1100) the srcset string contains both descriptors.
   const sourcesObj = data.sources as unknown as Record<string, string>;
+  const webpSrcset = sourcesObj['webp'];
+  const pngSrcset = sourcesObj['png'];
 
   // Render WebP source first for modern browsers, then PNG fallback in <img>
-  const webpSrcset = sourcesObj['webp'];
-
+  // sizes tells the browser which srcset variant to pick — without it, all srcset
+  // entries are eligible and the browser uses heuristics that often pick the largest.
   return (
     <picture>
       {webpSrcset && (
-        <source srcSet={webpSrcset} type="image/webp" />
+        <source srcSet={webpSrcset} type="image/webp" sizes={sizes} />
       )}
       <img
         src={data.img.src}
+        srcSet={pngSrcset}
+        sizes={sizes}
         width={width}
         height={height}
         alt={alt}

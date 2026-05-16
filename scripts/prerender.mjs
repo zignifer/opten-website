@@ -94,7 +94,9 @@ function applyModulePreload(html) {
 // sync tag to /pay/index.html; other routes load Paddle on demand via src/lib/paddle.ts.
 // MUST run BEFORE applyMarker (consumes </head>).
 function applyPaddleScript(html) {
-  const tag = `    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>`;
+  // preconnect first so DNS+TLS overlap with HTML parse, then the sync script tag.
+  // Pair scoped to /pay only (PageSpeed flagged the site-wide preconnect as unused).
+  const tag = `    <link rel="preconnect" href="https://cdn.paddle.com" />\n    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>`;
   return html.replace("</head>", `${tag}\n  </head>`);
 }
 

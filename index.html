@@ -82,10 +82,10 @@
     </script>
 
     <!-- Phase 2.2: Paddle SDK is no longer loaded site-wide. scripts/prerender.mjs injects
-         the sync <script src="paddle.js"> tag into dist/pay/index.html only (the route that
-         needs window.Paddle synchronously). On other routes the SDK loads on demand via
-         src/lib/paddle.ts when the user navigates to /pay through React Router. -->
-    <link rel="preconnect" href="https://cdn.paddle.com" />
+         the sync <script src="paddle.js"> tag AND the preconnect into dist/pay/index.html
+         only (the route that needs window.Paddle synchronously). On other routes the SDK
+         loads on demand via src/lib/paddle.ts when the user navigates to /pay through
+         React Router. PageSpeed flagged a site-wide preconnect as "unused" on landing. -->
 
     <!-- Phase 2.2: preload both webfonts so the fetch starts in parallel with HTML/CSS
          parsing instead of waiting for the CSSOM to discover the @font-face rule. Both

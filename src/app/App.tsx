@@ -13,14 +13,19 @@ import { Picture } from "./components/Picture";
 import type { Picture as PictureData } from 'vite-imagetools';
 // Phase 2.1 D-04: Add width/height attrs to every <img> for CLS=0 (aspect-ratio-from-attributes)
 // Phase 2.1 D-05: vite-imagetools ?as=picture static imports (paths relative to src/app/App.tsx)
-import featureModelsSrc from '../../public/assets/landing-design/feature-models.png?w=1100&format=webp;png&as=picture'
-import featureCreditsSrc from '../../public/assets/landing-design/feature-credits.png?w=1100&format=webp;png&as=picture'
-import featureInterfaceRuSrc from '../../public/assets/landing-design/feature-interface-ru.png?w=1100&format=webp;png&as=picture'
-import featureInterfaceEnSrc from '../../public/assets/landing-design/feature-interface-en.png?w=1100&format=webp;png&as=picture'
-import featureEnhanceRuSrc from '../../public/assets/landing-design/feature-enhance-ru.png?w=1100&format=webp;png&as=picture'
-import featureEnhanceEnSrc from '../../public/assets/landing-design/feature-enhance-en.png?w=1100&format=webp;png&as=picture'
-import stepsInnerRuSrc from '../../public/assets/landing-design/steps-inner-ru.png?w=813&format=webp;png&as=picture'
-import stepsInnerEnSrc from '../../public/assets/landing-design/steps-inner-en.png?w=813&format=webp;png&as=picture'
+// Phase 2.2: ?w=400;1100 generates two srcset entries each. The Picture component
+// passes a `sizes` attribute so the browser picks the 400 px variant on mobile (where
+// the image renders at ~300-360 px wide) and the 1100 px variant on desktop. PageSpeed
+// previously flagged ~93 KB of waste — feature cards on mobile were downloading the
+// 1100 px asset for a 306 px container.
+import featureModelsSrc from '../../public/assets/landing-design/feature-models.png?w=400;1100&format=webp;png&as=picture'
+import featureCreditsSrc from '../../public/assets/landing-design/feature-credits.png?w=400;1100&format=webp;png&as=picture'
+import featureInterfaceRuSrc from '../../public/assets/landing-design/feature-interface-ru.png?w=400;1100&format=webp;png&as=picture'
+import featureInterfaceEnSrc from '../../public/assets/landing-design/feature-interface-en.png?w=400;1100&format=webp;png&as=picture'
+import featureEnhanceRuSrc from '../../public/assets/landing-design/feature-enhance-ru.png?w=400;1100&format=webp;png&as=picture'
+import featureEnhanceEnSrc from '../../public/assets/landing-design/feature-enhance-en.png?w=400;1100&format=webp;png&as=picture'
+import stepsInnerRuSrc from '../../public/assets/landing-design/steps-inner-ru.png?w=430;813&format=webp;png&as=picture'
+import stepsInnerEnSrc from '../../public/assets/landing-design/steps-inner-en.png?w=430;813&format=webp;png&as=picture'
 import canvaSrc from '../../public/assets/partners/canva.png?w=268&format=webp;png&as=picture'
 import freepikSrc from '../../public/assets/partners/freepik.png?w=268&format=webp;png&as=picture'
 import higgsfieldSrc from '../../public/assets/partners/higgsfield.png?w=268&format=webp;png&as=picture'
@@ -298,9 +303,11 @@ function Steps() {
           </div>
           <div className="relative flex min-h-[420px] w-full shrink-0 overflow-hidden rounded-[16px] border border-white/10 bg-[#0e2023] lg:h-[512px] lg:w-[500px]">
             {/* Phase 2.2: steps-inner is the first below-fold image users scroll to; lazy
-                made it pop in 1-2s after scroll on mobile 3G. Eager + low priority lets the
-                browser start the fetch in parallel with critical resources without blocking. */}
-            <Picture data={stepsSrc} width={813} height={638} alt="" loading="eager" className="absolute left-1/2 top-1/2 w-[86%] max-w-[430px] -translate-x-1/2 -translate-y-1/2" />
+                made it pop in 1-2s after scroll on mobile 3G. Eager lets the browser start
+                the fetch in parallel with critical resources. sizes tells the browser to
+                pick the 430px variant on mobile (image renders ~318px wide) instead of
+                downloading the 813px desktop variant. */}
+            <Picture data={stepsSrc} width={813} height={638} alt="" loading="eager" sizes="(max-width: 768px) 320px, 430px" className="absolute left-1/2 top-1/2 w-[86%] max-w-[430px] -translate-x-1/2 -translate-y-1/2" />
           </div>
         </div>
         <div className="mt-16 flex justify-center">
@@ -365,14 +372,17 @@ function FeatureCards() {
 }
 
 function FeatureCard({ title, desc, imgData, imgWidth, imgHeight, imageFirst = false, loading = "lazy" }: { title: string; desc: string; imgData: PictureData; imgWidth: number; imgHeight: number; imageFirst?: boolean; loading?: "eager" | "lazy" }) {
+  // sizes: on mobile single-column grid the card is full viewport minus padding (~320px),
+  // on desktop two-column grid each card is ~500px. Browser picks the right srcset entry.
+  const sizes = "(max-width: 768px) 320px, 500px";
   return (
     <article className="flex min-h-[405px] flex-col overflow-hidden rounded-[12px] border border-white/10 bg-[#0e2023]">
-      {imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt="" loading={loading} className="mx-8 h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
+      {imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt="" loading={loading} sizes={sizes} className="mx-8 h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
       <div className="p-8">
         <h3 className="font-['PT_Root_UI',sans-serif] text-[24px] font-medium leading-[1.12] text-white">{title}</h3>
         <p className="mt-4 whitespace-pre-wrap font-['PT_Root_UI',sans-serif] text-[16px] leading-[1.65] text-white/55">{desc}</p>
       </div>
-      {!imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt="" loading={loading} className="mx-8 mt-auto h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
+      {!imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt="" loading={loading} sizes={sizes} className="mx-8 mt-auto h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
     </article>
   );
 }
