@@ -26,20 +26,24 @@ const { routes, SITE_ORIGIN } = await import(pathToFileURL(MANIFEST_BUNDLE).href
 
 const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 
-if (sitemapRoutes.length === 0) {
-  throw new Error("sitemap.mjs: no routes with prerender != 'none' — manifest mis-loaded?");
+if (sitemapRoutes.length < 12) {
+  throw new Error(`sitemap.mjs: expected at least 12 routes (6 RU + 6 EN) per Phase 3, got ${sitemapRoutes.length}. Manifest mis-loaded or EN entries missing?`);
 }
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${sitemapRoutes.map(r => `  <url>
     <loc>${r.canonical}</loc>
     <lastmod>${BUILD_DATE}</lastmod>
     <changefreq>${r.changefreq}</changefreq>
     <priority>${r.priority.toFixed(1)}</priority>
+    <xhtml:link rel="alternate" hreflang="ru"        href="${r.hreflangAlternates.ru}" />
+    <xhtml:link rel="alternate" hreflang="en"        href="${r.hreflangAlternates.en}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${r.hreflangAlternates.xDefault}" />
   </url>`).join("\n")}
 </urlset>
 `;
 
 await writeFile(resolve(DIST, "sitemap.xml"), xml, "utf-8");
-console.log(`✓ sitemap.xml → ${sitemapRoutes.length} routes (lastmod ${BUILD_DATE})`);
+console.log(`✓ sitemap.xml → ${sitemapRoutes.length} routes (RU + EN, lastmod ${BUILD_DATE})`);
