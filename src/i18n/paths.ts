@@ -17,20 +17,36 @@ export const EN_SIBLINGS = new Set<string>([
 
 export const EN_LANDING = "/en/";
 
-export function toEnTarget(pathname: string): string {
-  if (EN_SIBLINGS.has(pathname)) {
-    return pathname === "/" ? EN_LANDING : "/en" + pathname;
-  }
-  // D-07 / OQ-6: locked route without EN sibling (/account, /success, /dashboard/*)
-  // — switcher routes to EN landing and writes localStorage so the content layer
-  // flips when the user later navigates back to the unprefixed route.
-  return EN_LANDING;
+// Normalize trailing slashes so /privacy and /privacy/ both look up the same
+// sibling. Phase 2 D-07 says the canonical form is without a trailing slash,
+// but `/` and `/en/` are the two exceptions (those keep their slash).
+function stripTrailingSlash(p: string): string {
+  if (p === "/" || p === "/en/") return p;
+  return p.endsWith("/") ? p.slice(0, -1) : p;
 }
 
-export function toRuTarget(pathname: string): string {
-  if (pathname === "/en/" || pathname === "/en") return "/";
-  if (pathname.startsWith("/en/")) return pathname.slice(3); // strips "/en"
-  return "/";
+// Returns the /en/<sibling> URL when the current path has an EN sibling, or null
+// otherwise. Callers (LangSwitcher) treat null as "do not navigate — keep the URL,
+// flip language via storage so the content layer updates in place". This is the
+// fix for the user-reported "switching language on /account/-style pages dumps me
+// back on the EN landing" bug: locked routes without EN siblings (/account,
+// /success, /dashboard/*) should NOT navigate at all.
+export function toEnTarget(pathname: string): string | null {
+  const p = stripTrailingSlash(pathname);
+  if (EN_SIBLINGS.has(p)) {
+    return p === "/" ? EN_LANDING : "/en" + p;
+  }
+  return null;
+}
+
+// Mirror of toEnTarget for EN→RU. Returns the RU URL only when stripping the
+// /en/ prefix actually changes the path; null otherwise (already on an
+// unprefixed route — URL stays, content flips via setLang).
+export function toRuTarget(pathname: string): string | null {
+  const p = stripTrailingSlash(pathname);
+  if (p === "/en") return "/";
+  if (p.startsWith("/en/")) return p.slice(3); // strips "/en"
+  return null;
 }
 
 // Used by <LocalizedLink>: when the user is currently on a /en/* URL, an internal
