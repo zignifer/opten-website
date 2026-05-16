@@ -26,7 +26,7 @@ Every phase respects the locked routes and the 8 ADR-locked decisions from `docs
 - [x] **Phase 2: Per-route prerender + metadata** — resolve head-management strategy; per-route titles/descriptions/canonical/OG (closes audit C-1, C-4) (completed 2026-05-14; verified `.planning/phases/02-per-route-prerender-per-route-metadata/02-VERIFICATION.md`)
 - [x] **Phase 2.1: Hydration speedup & perceived-load optimization** *(INSERTED 2026-05-15)* — fix the hydration gap exposed by Phase 2: route-level code-split, JS preload, explicit `<img>` dimensions, PNG→WebP/AVIF (completed 2026-05-16; verified `.planning/phases/02.1-hydration-and-perf/02.1-VERIFICATION.md`)
 - [x] **Phase 2.2: Mobile-perf + Safari fixes** *(INSERTED 2026-05-16, shipped inline)* — user reported residual sluggishness on mobile Safari after 2.1 shipped. Conditional Paddle SDK loading (only on `/pay`), vendor chunk split (main bundle 328 → 107 KB), self-hosted WOFF2 fonts (eliminated Google Fonts 3-RTT cascade on Safari), `<link rel=preload as=script>` Safari fallback for `modulepreload` (Safari <iOS 17 ignores it), `touch-action: manipulation` to kill the 300 ms tap delay, lazy-loaded EN i18n dict (-40 KB raw / -13 KB gzip on RU visits), mobile-resolution `srcset` for feature cards + steps. Commits `0a73069`..`81284d4`. No `.planning/phases/02.2-*/` directory created — reactive work, tracked via commit history + retroactive note in `02.1-VERIFICATION.md`.
-- [ ] **Phase 3: Bilingual routing** — resolve per-language URL strategy; `/ru/*` `/en/*` siblings + hreflang + dynamic `<html lang>` (closes audit C-5)
+- [x] **Phase 3: Bilingual routing** — resolve per-language URL strategy; `/ru/*` `/en/*` siblings + hreflang + dynamic `<html lang>` (closes audit C-5) (completed 2026-05-16)
 - [ ] **Phase 4: Content surface** — `/about` E-E-A-T page + `/guides/*` HowTo content + FAQ schema (closes audit M-3, M-4, H-3)
 - [ ] **Phase 5: Brand authority** — Product Hunt + Wikipedia + Reddit + YouTube + expanded `sameAs` schema (closes audit H-4, M-5)
 
@@ -149,7 +149,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3)*
 - [x] 03-04-paddle-symmetric-en-pay-and-contract-PLAN.md — Widen Paddle injection to /en/pay + INTEGRATION-CONTRACT §6 + robots.txt defense-in-depth (GEO-C-2)
-- [ ] 03-08-langswitcher-extract-and-wire-PLAN.md — Extract src/app/components/LangSwitcher.tsx + wire 4 consumer sites (GEO-C-1, GEO-C-4)
+- [x] 03-08-langswitcher-extract-and-wire-PLAN.md — Extract src/app/components/LangSwitcher.tsx + wire 4 consumer sites (GEO-C-1, GEO-C-4)
 
 ### Phase 4: Content surface
 **Status**: Backlog. Scope set; detailed planning deferred.
@@ -187,7 +187,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phases 1 and 2 are p
 | 2. Per-route prerender + metadata | 8/8 | Complete   | 2026-05-16 |
 | 2.1. Hydration speedup & perceived-load opt | 7/7 | Complete (PageSpeed Mobile 91 / CLS 0 / TBT 0 ms) | 2026-05-16 |
 | 2.2. Mobile-perf + Safari fixes | inline (~5 commits, no per-task plans) | Complete (shipped inline; retroactive note in `02.1-VERIFICATION.md`) | 2026-05-16 |
-| 3. Bilingual routing | 7/8 | In Progress|  |
+| 3. Bilingual routing | 8/8 | Complete   | 2026-05-16 |
 | 4. Content surface | 0/TBD | Backlog | - |
 | 5. Brand authority | 0/TBD | Backlog | - |
 
