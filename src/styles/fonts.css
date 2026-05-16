@@ -1,24 +1,19 @@
-/* Phase 2.2: self-hosted variable WOFF2 fonts with adjusted-fallback metrics.
+/* Phase 2.2: self-hosted variable WOFF2 fonts.
  *
  * The original Google Fonts @import was a sequential 3-RTT cascade on iOS Safari.
  * Replaced with self-hosted /fonts/*.woff2 + <link rel=preload> in index.html for
- * both fonts. Both fonts use font-display:swap so text is ALWAYS immediately
- * visible — a brief flash of the fallback typeface is much better UX than the H1
- * being invisible for 2.5 s on a real mobile network (font-display:block was
- * tried in c353e5e and produced exactly that — PageSpeed flagged a 2460 ms LCP
- * element-render delay on the H1).
+ * both fonts. font-display:swap keeps text visible during the WOFF2 fetch.
  *
- * Each loaded font is followed by a second @font-face under the SAME family name
- * pointing at the closest available system sans-serif. The fallback inherits
- * ascent/descent/line-gap overrides chosen so its glyph box matches the loaded
- * WOFF2 — no layout shift when the swap happens. (PageSpeed reports CLS = 0 with
- * these values, confirming the box stays stable.)
+ * IMPORTANT: do NOT declare a second @font-face under the same family name with
+ * src:local('Arial'). It looks like a clean "adjusted fallback" trick, but in
+ * practice the browser picks the second face (because local() resolves instantly)
+ * and never swaps to the loaded WOFF2 — the user sees Arial forever. This was
+ * tried in e9b24c6 and produced exactly that bug. Generic-sans-serif from the
+ * CSS font stack (sans-serif keyword) is the safe fallback during the swap window.
  *
  *   PT-Root-UI_VF.woff2  91 KB, covers weights 100-900 (we use 400 / 500 / 700)
  *   Unbounded-VF.woff2  253 KB, covers weights 200-900 (we use 400 / 700)
  */
-
-/* --- PT Root UI (body text) --- */
 
 @font-face {
   font-family: 'PT Root UI';
@@ -30,38 +25,10 @@
 }
 
 @font-face {
-  font-family: 'PT Root UI';
-  src: local('Arial'), local('Helvetica Neue'), local('Helvetica');
-  font-weight: 100 900;
-  font-style: normal;
-  ascent-override: 96%;
-  descent-override: 24%;
-  line-gap-override: 0%;
-  size-adjust: 100%;
-}
-
-/* --- Unbounded (display / headings) --- */
-
-@font-face {
   font-family: 'Unbounded';
   src: url('/fonts/Unbounded-VF.woff2') format('woff2-variations'),
        url('/fonts/Unbounded-VF.woff2') format('woff2');
   font-weight: 200 900;
   font-style: normal;
   font-display: swap;
-}
-
-/* Fallback uses ordinary system sans-serif (Arial / Helvetica) — NOT Impact /
-   Arial Black, which were tried in 39d2f4d and looked visually wrong (the user
-   reported "что это за шрифт вообще не тот"). A plain sans-serif fallback during
-   the ~250-450 ms WOFF2 fetch is far less jarring than a stretched display face. */
-@font-face {
-  font-family: 'Unbounded';
-  src: local('Arial'), local('Helvetica Neue'), local('Helvetica');
-  font-weight: 200 900;
-  font-style: normal;
-  ascent-override: 92%;
-  descent-override: 24%;
-  line-gap-override: 0%;
-  size-adjust: 100%;
 }
