@@ -152,16 +152,40 @@ Plans:
 - [x] 03-08-langswitcher-extract-and-wire-PLAN.md — Extract src/app/components/LangSwitcher.tsx + wire 4 consumer sites (GEO-C-1, GEO-C-4)
 
 ### Phase 4: Content surface
-**Status**: Backlog. Scope set; detailed planning deferred.
+**Status**: Planned 2026-05-17. 7 plans across 6 waves (Wave 1 parallel sidecars + LCP audit; Waves 2-6 strictly sequential due to scripts/seo-routes.ts + routers file ownership). Ready for /gsd-execute-phase 4.
 **Goal**: Establish E-E-A-T signals and indexable answer content so AI assistants have material to cite when answering prompt-engineering questions.
-**Depends on**: Phase 3 (content surface should ship bilingual or with the chosen language strategy applied).
+**Depends on**: Phase 3 (bilingual routing — content surface ships RU + EN where D-02 allows).
 **Requirements**: GEO-D-1, GEO-D-2, GEO-D-3
 **Audit findings closed**: M-3 (no FAQ schema), M-4 (no HowTo content), H-3 (no `/about` E-E-A-T surface)
-**Success Criteria** (sketch, refined during planning):
-  1. `/about` page exists with founder bio, Telegram contact, and credentials sufficient to satisfy E-E-A-T audit.
-  2. At least one `/guides/*` HowTo article exists, structured per schema.org HowTo, with at least three steps.
-  3. Landing page carries `FAQPage` JSON-LD; question/answer pairs sourced from real user questions.
-**Plans**: TBD
+**Success Criteria** (refined during planning):
+  1. `/about` page exists with founder bio, Telegram contact, credentials, and Person schema linked to Organization graph via @id (D-01, D-03; V-01..V-04).
+  2. One anchor `/guides/SLUG` HowTo article exists bilingual (RU + EN), structured per schema.org HowTo with 5-7 steps (D-04..D-06; V-05..V-07).
+  3. Landing pages carry FAQPage JSON-LD; Q/A pairs sourced from Telegram + Chrome Web Store reviews (D-08; V-08..V-10).
+  4. Full schema bundle ships (Organization, SoftwareApplication, WebSite, Product, FAQPage, HowTo, BreadcrumbList, Person) all connected via @id (D-09, D-10; V-11, V-12).
+  5. `/pay` and `/en/pay` promoted to full prerender with pricing facts in initial HTML (D-12; V-15, V-16, V-17). Paddle invariant preserved.
+  6. `llms.txt` + `llms-full.txt` generated at build time (D-11; V-13, V-14).
+  7. Hero preload + X-Frame-Options + Content-Signal land as low-risk sidecars (D-13, D-14; V-18..V-22).
+**Plans**: 7 plans
+
+Plans:
+**Wave 1**
+- [ ] 04-01-PLAN.md — Sidecar headers: vercel.json X-Frame-Options + robots.txt Content-Signal (D-14)
+- [ ] 04-02-PLAN.md — LCP element identification via PageSpeed MCP (Wave-0 prerequisite for D-13)
+
+**Wave 2** *(blocked on Wave 1)*
+- [ ] 04-03-PLAN.md — Schema entity-graph infrastructure + applyJsonLd + applyHeroPreload (D-09, D-10, D-13)
+
+**Wave 3** *(blocked on Wave 2)*
+- [ ] 04-04-PLAN.md — PayPage D-12 promotion: extract PricingStaticBlock + flip to full prerender + Product schema
+
+**Wave 4** *(blocked on Wave 3)*
+- [ ] 04-05-PLAN.md — /about page + Person schema + RU-only nav gate (D-01..D-03, D-16)
+
+**Wave 5** *(blocked on Wave 4)*
+- [ ] 04-06-PLAN.md — Anchor guide bilingual + FaqBlock + landing FAQ + HowTo/FAQPage schemas + EN_SIBLINGS sync (D-04..D-08)
+
+**Wave 6** *(blocked on Wave 5)*
+- [ ] 04-07-PLAN.md — llms.txt + llms-full.txt postbuild script (D-11)
 
 ### Phase 5: Brand authority
 **Status**: Backlog. Scope set; detailed planning deferred.
