@@ -81,10 +81,6 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  useEffect(() => {
-    document.documentElement.lang = lang;
-  }, [lang]);
-
   const t = (key: string): string => {
     const current = dicts[lang];
     if (current && current[key] !== undefined) return current[key];
