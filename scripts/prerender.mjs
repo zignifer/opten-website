@@ -31,6 +31,39 @@ function escapeHtml(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+// Phase 3 GEO-C-4: bake <html lang> per emitted file. Replaces runtime mutator deleted in Plan 01 (RESEARCH.md Pattern 3).
+function applyHtmlLang(html, meta) {
+  const before = html;
+  // ([^>]*) preserves any future siblings like dir="ltr" — Pitfall 3 mitigation.
+  html = html.replace(/<html\s+lang="[^"]*"([^>]*)>/, `<html lang="${escapeAttr(meta.htmlLang)}"$1>`);
+  if (html === before) {
+    throw new Error(`prerender(${meta.path}): no <html lang> matched. index.html structure changed?`);
+  }
+  return html;
+}
+
+// Phase 3 GEO-C-4 / Pitfall 4: update og:locale + inject og:locale:alternate to match <html lang>.
+// og:locale must always match <html lang> — mismatches confuse Open Graph scrapers (RESEARCH.md §Pitfall 4).
+function applyOgLocale(html, meta) {
+  const before = html;
+  const ogLocale = meta.htmlLang === "en" ? "en_US" : "ru_RU";
+  const alternate = meta.htmlLang === "en" ? "ru_RU" : "en_US";
+  // First replace: swap og:locale content value.
+  html = html.replace(
+    /<meta\s+property="og:locale"\s+content="[^"]*"\s*\/?>/,
+    `<meta property="og:locale" content="${escapeAttr(ogLocale)}" />`
+  );
+  if (html === before) {
+    throw new Error(`prerender(${meta.path}): no <meta property="og:locale"> matched. index.html structure changed?`);
+  }
+  // Second replace: inject og:locale:alternate after og:locale (idempotent).
+  html = html.replace(
+    /(<meta\s+property="og:locale"\s+content="[^"]*"\s*\/?>)/,
+    `$1\n    <meta property="og:locale:alternate" content="${escapeAttr(alternate)}" />`
+  );
+  return html;
+}
+
 function applyMeta(html, meta) {
   const before = html;
   html = html.replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(meta.title)}</title>`);
