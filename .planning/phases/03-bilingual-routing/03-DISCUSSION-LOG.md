@@ -95,6 +95,25 @@ Not posed as a multi-option question — fixed in the framing because there's no
 
 ---
 
+## Runtime UX on unprefixed root paths — soft-redirect question (follow-up clarification)
+
+User asked, after the four areas closed: "Will EN users automatically end up on the right language version on `/welcome`, `/pay` etc., or will we redirect them more after Phase 3?"
+
+Clarification gathered:
+- Current (pre-Phase-3) behavior is **already auto-translating content** based on `navigator.language` post-hydration, without redirecting the URL. EN users on `/welcome` already see EN content — just with a ~200–500 ms flash of RU first.
+- Phase 3 as designed preserves this behavior exactly on root paths and **adds** `/en/*` URLs as a second prerendered entry for crawlers + direct sharing.
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Status-quo on root paths (no redirect) | EN users keep seeing the brief RU flash on `/welcome` etc., then content flips to EN. URL stays `/welcome`. `/en/welcome` exists separately, reached via search or header switcher. | ✓ |
+| Soft-redirect on `/welcome` + `/pay` only | Post-hydration `navigate("/en/welcome")` for `navigator.language=en`. Cleaner final URL but doubles flash and adds hydration risk. | |
+| Soft-redirect on all root paths with EN siblings | Includes `/`. Maximum UX win but conflicts with D-02 root canonical and requires D-06 hydration fix first. | |
+
+**User's choice:** Status-quo.
+**Notes:** Becomes D-07 ("no detection-driven URL change on root paths") + D-07b ("only the explicit header language switcher changes URL language during a session"). Soft-redirect alternatives recorded in `<deferred>` for post-launch revisit if EN onboarding conversion turns out to underperform.
+
+---
+
 ## Claude's Discretion
 
 Items the discussion explicitly left to the planner / researcher:

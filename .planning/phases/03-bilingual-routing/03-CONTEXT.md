@@ -67,6 +67,13 @@ The fix closes audit finding **C-5** (no language signaling for EN audience; har
 ### Pre-Phase-3 hygiene
 - **D-06:** Phase 3 **Plan 01 = "diagnose + fix residual hydration mismatch on `/`"**. This lands before any bilingual plan ships, so dynamic `<html lang>` does not compound an open issue (STATE.md "Pre-Phase-3 known mismatch"). Escalation rule (for planner): if root cause turns out to be architectural (3+ commits or unrelated subsystem), split off into a separate mini-phase 2.3 during `/gsd-plan-phase 3` rather than blocking Phase 3 indefinitely.
 
+### Runtime UX on unprefixed roots (NO redirect)
+- **D-07:** On the unprefixed (root) paths — `/`, `/welcome`, `/pay`, `/privacy`, `/terms`, `/refund`, `/success`, `/account`, `/dashboard/download-skill` — `LangContext` keeps its **current behavior**: post-hydration it reads `localStorage.opten_lang` ?? `navigator.language` and flips **content** to that language. **URL does NOT change.** No client-side `navigate("/en/...")`, no `history.replaceState("/en/...")` based on language detection.
+  - Rationale: the existing UX (which already auto-translates content for EN users without a URL change) is preserved exactly. Phase 3 only **adds** `/en/*` URLs as a second, prerendered entry point for AI crawlers and direct sharing — it does NOT subtract anything from the current root-path behavior.
+  - EN flash on root paths is a known status-quo cost (~200–500 ms on slow mobile until JS hydrates and `LangContext` flips). Accepted; revisit only if measured conversion impact justifies a follow-up plan.
+  - Explicitly rejected alternatives: soft-redirect on `/welcome` + `/pay` only (cleaner URL but doubles render flashes and adds hydration risk); soft-redirect on all root paths (would require D-06 fix first AND has the canonical conflict from D-02). Both stay in deferred.
+- **D-07b:** The **only** way URL changes language during a session is the explicit **header language switcher** click (D-05 wires it through `react-router` `useNavigate`). User-initiated, not language-detection-driven.
+
 ### Claude's Discretion
 - **Hreflang placement** — in each prerendered `<head>` (preferred) vs in `sitemap.xml` (allowed by Google but lower-leverage). Planner picks; default to `<head>` because it's read by AI crawlers without sitemap discovery.
 - **Sitemap.xml shape** — pair-listed (current 6 RU + 6 EN entries = 12) vs hreflang-annotated XML (`<xhtml:link rel="alternate">` per URL). Both are valid; planner picks the simpler one.
@@ -175,6 +182,7 @@ The fix closes audit finding **C-5** (no language signaling for EN audience; har
 - **Coordinated `promptscore` extension release to open `/en/welcome` / `/en/pay` based on `navigator.language`** — would need a `manifest.json` bump and the `breaking-change protocol` from `docs/INTEGRATION-CONTRACT.md §5`. Out of scope for this site-side phase.
 - **EN-meta migration to `en.json`** — replacing D-04 ("EN-meta lives in `seo-routes.ts`") with a single-source-of-truth approach via `en.json` is appealing long-term (kills the "duplicated from ru.json" note in `seo-routes.ts`). Defer to a future hygiene phase that touches both i18n and SEO at once.
 - **Server-side `/` → `/en/` redirect for `navigator.language=en` users** — explicitly rejected in D-02 (canonical-vs-redirect conflict, hydration-mismatch amplification). Revisit only if measured EN conversion on `/` is much worse than on `/en/`.
+- **Client-side soft-redirect on locked-route surfaces (`/welcome` / `/pay`) based on `navigator.language`** — explicitly rejected in D-07 (double-render flash, hydration risk). If post-launch measurement shows EN onboarding conversion on `/welcome` significantly underperforming, revisit as a Phase 3.1 follow-up. Don't add it inside Phase 3.
 - **`<html lang>` per-language in `index.html` source template** — the template stays `lang="ru"` (its only consumer is `dist/index.html` which is RU). EN-routes get their `lang` baked by `prerender.mjs` per output file.
 - **Switching the header language switcher to a `<select>` or to flag icons** — UI polish, not a routing concern. Defer.
 - **Phase 4 content (`/about`, `/guides/*`, FAQ)** — explicitly Phase 4 scope; Phase 3 ships bilingual scaffolding so Phase 4 plans land bilingual from day one.
