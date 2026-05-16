@@ -268,7 +268,7 @@ ASVS V14 only (minor — security headers unchanged).
 - `npm run build` exits 0.
 - 12 dist files exist with correct `__PRERENDER_PATH` markers.
 - `dist/en/welcome/index.html` body is English; `dist/welcome/index.html` body is Russian.
-- Manual smoke (Task 4) passes all 7 steps including hydration-warning-free on `/en/welcome` and Paddle modal on `/en/pay`.
+- Manual smoke (Task 4) passes all 7 steps: EN content from first paint, hydration-warning-free on `/en/*`, locked routes preserved, SPA navigation works. (Paddle modal on `/en/pay` is intentionally deferred to Plan 08 Task 5 — Plan 04 has not yet shipped at this checkpoint.)
 
 </verification>
 
@@ -279,7 +279,7 @@ ASVS V14 only (minor — security headers unchanged).
 - [ ] No `react-router-dom` import in either file.
 - [ ] Existing root-path routes are byte-identical to pre-Plan-07 state.
 - [ ] All 12 dist files emit with correct `__PRERENDER_PATH` markers.
-- [ ] Manual checkpoint: zero hydration warnings on `/en/*`, Paddle modal works on `/en/pay`, locked routes still RU, SPA navigation flips lang on URL change.
+- [ ] Manual checkpoint: zero hydration warnings on `/en/*`, locked routes still RU, SPA navigation flips lang on URL change. (Paddle modal on `/en/pay` is verified by Plan 08 Task 5 after Plan 04 ships.)
 
 </success_criteria>
 
