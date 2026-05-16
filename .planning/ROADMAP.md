@@ -110,8 +110,8 @@ Plans:
 
 Plans:
 - [x] 02.1-01-PLAN.md — Register vite-imagetools plugin + TS declaration (Wave 1)
-- [ ] 02.1-02-PLAN.md — Add Picture.tsx component wrapping vite-imagetools <picture> output (Wave 1)
-- [ ] 02.1-03-PLAN.md — Add RouteLoading.tsx Suspense fallback component (Wave 1)
+- [x] 02.1-02-PLAN.md — Add Picture.tsx component wrapping vite-imagetools <picture> output (Wave 1)
+- [x] 02.1-03-PLAN.md — Add RouteLoading.tsx Suspense fallback component (Wave 1)
 - [ ] 02.1-04-PLAN.md — Set explicit width/height/loading attrs on every <img> for CLS=0 (Wave 2)
 - [ ] 02.1-05-PLAN.md — Wrap PNG <img> tags with vite-imagetools <Picture> for WebP delivery (Wave 3)
 - [ ] 02.1-06-PLAN.md — Inject <link rel=modulepreload> into prerendered HTML via prerender.mjs (Wave 3)
