@@ -87,12 +87,26 @@ function applyModulePreload(html) {
   return html.replace("</head>", `${tag}\n  </head>`);
 }
 
+// Phase 2.2: Inject Paddle SDK <script> tag synchronously into /pay only.
+// Integration Contract §6 requires window.Paddle to exist before PayPage interacts with it.
+// Loading the SDK site-wide (previous behavior) cost 500-1500ms render-blocking on mobile 3G
+// for routes that don't use Paddle (/, /welcome, /privacy, /terms, /refund). We now scope the
+// sync tag to /pay/index.html; other routes load Paddle on demand via src/lib/paddle.ts.
+// MUST run BEFORE applyMarker (consumes </head>).
+function applyPaddleScript(html) {
+  const tag = `    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>`;
+  return html.replace("</head>", `${tag}\n  </head>`);
+}
+
 for (const meta of routes) {
   // resolve ogImage default (Phase 2 site-wide og-card-ru.png per Open Question #2)
   const ogImage = meta.ogImage ?? DEFAULT_OG_IMAGE;
   // (ogImage is read but not currently re-injected — index.html already has og-card-ru.png hardcoded; Phase 4+ may swap this per-route)
   let html = applyMeta(template, meta);
   html = applyModulePreload(html);   // Phase 2.1 D-03: must precede applyMarker (which consumes </head>)
+  if (meta.path === "/pay") {
+    html = applyPaddleScript(html);  // Phase 2.2: sync Paddle SDK on /pay only
+  }
   html = applyMarker(html, meta.path);
   if (meta.prerender === "full") {
     const rendered = renderRoute(meta.path);

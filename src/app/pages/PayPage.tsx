@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { useT, useLang } from "../../i18n/LangContext";
+import { ensurePaddle } from "../../lib/paddle";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
 import imgFrame37 from "../../imports/LandingPage/da31c95f5bc0f013c26804882654e49618ec43c7.webp";
 import imgChromeSm from "../../imports/LandingPage/chrome-icon-sm.svg";
@@ -163,6 +164,15 @@ export default function PayPage() {
 
     const handler = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handler);
+
+    // Phase 2.2: warm up Paddle SDK on mount so it's ready by the time user clicks Pay.
+    // On direct /pay hits, prerender.mjs injected the sync <script>, so window.Paddle is
+    // already defined and ensurePaddle() resolves synchronously after Initialize().
+    // On SPA-navigation hits (click from landing), ensurePaddle() injects the script async.
+    ensurePaddle().catch((err) => {
+      console.warn("[Opten] Paddle SDK preload failed:", err);
+    });
+
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
@@ -260,16 +270,26 @@ export default function PayPage() {
       setError(t("pay.error.sessionNotFound"));
       return;
     }
-    if (!window.Paddle) {
-      // Pitfall #2: Paddle.js didn't load (adblock / CSP / network failure).
-      // The <script> tag in index.html is synchronous, so this should be rare —
-      // but when it happens, surface a clear message rather than crash on .Checkout.open.
-      setError(t("pay.error.sdkBlocked"));
-      return;
-    }
     setLoading(true);
     setError(null);
     try {
+      // Phase 2.2: ensure Paddle SDK loaded before opening overlay. On direct /pay hits
+      // this resolves synchronously (sync <script> in /pay/index.html). On SPA-navigation
+      // it awaits the async script tag injected by ensurePaddle(). Failure (adblock / CSP /
+      // network) surfaces as a clear error rather than a Checkout.open crash.
+      try {
+        await ensurePaddle();
+      } catch {
+        setError(t("pay.error.sdkBlocked"));
+        setLoading(false);
+        return;
+      }
+      if (!window.Paddle) {
+        // Defensive: ensurePaddle resolved but Paddle still undefined — treat as blocked.
+        setError(t("pay.error.sdkBlocked"));
+        setLoading(false);
+        return;
+      }
       const res = await fetch(SUPABASE_FUNCTIONS_URL + "/create-payment-paddle", {
         method: "POST",
         headers: {

@@ -20,29 +20,11 @@
   const AccountPage = lazy(() => import("./app/pages/AccountPage.tsx"));
   const DownloadSkillPage = lazy(() => import("./app/pages/DownloadSkillPage.tsx"));
 
-  // === Paddle.js v2 SDK bootstrap — Phase 66 D-14 (FE-05), Phase 67 fix ===
-  // Environment.set MUST come before Initialize (Pitfall #4 — ordering contract).
-  // Guarded by `if (window.Paddle)`: sync script tag in index.html normally guarantees it,
-  // but adblock / CSP / network failure can leave it undefined (Pitfall #2).
-  //
-  // Phase 67 / BG-67-01: Paddle v2 SDK Environment.set() only accepts 'sandbox' —
-  // passing 'production' throws `Cannot read properties of undefined (reading
-  // 'profitwellSnippetBase')` because production is the default and lacks a lookup
-  // entry. Call Environment.set() ONLY for sandbox; production skips it entirely.
-  if (window.Paddle) {
-    const paddleEnv = import.meta.env.VITE_PADDLE_ENV as "sandbox" | "production";
-    const paddleToken = import.meta.env.VITE_PADDLE_CLIENT_TOKEN as string | undefined;
-    if (paddleToken) {
-      if (paddleEnv === "sandbox") {
-        window.Paddle.Environment.set("sandbox");
-      }
-      window.Paddle.Initialize({ token: paddleToken });
-    } else {
-      console.warn("[Opten] VITE_PADDLE_CLIENT_TOKEN is not set — USD payment path unavailable");
-    }
-  } else {
-    console.warn("[Opten] Paddle.js failed to load — USD payment path unavailable");
-  }
+  // Phase 2.2: Paddle bootstrap moved to src/lib/paddle.ts.
+  // /pay/index.html still gets the sync <script> tag via prerender.mjs — direct hits
+  // have window.Paddle ready before PayPage mounts. Non-pay routes skip the SDK
+  // entirely; SPA-navigation to /pay (click from landing) triggers async load via
+  // ensurePaddle() inside PayPage. Integration Contract §6 preserved on /pay.
 
   // === Hydration detector — Phase 2 D-06 (GEO-B-2) ===
   // Two signals must agree for hydrateRoot to be safe:
@@ -56,7 +38,8 @@
   //       window.location.pathname, we are in SPA-fallback territory and must wipe the
   //       stale tree and createRoot. Without this check, React #418/#423 fires on every
   //       extension deep-link load (DownloadSkillPage / AccountPage / SuccessPage).
-  // Paddle bootstrap above runs BEFORE this call — order locked by DEC-integration-contract-paddle-init / BG-67-01.
+  // Paddle bootstrap is now lazy (src/lib/paddle.ts, called by PayPage on mount) —
+  // ordering against this hydration block is irrelevant since Paddle is only consumed on /pay.
 
   const tree = (
     <LangProvider>

@@ -235,11 +235,28 @@ Never rename a key in one repo without the other.
 
 ## 6. Paddle SDK initialization (site-side detail with cross-impact)
 
-Paddle's checkout SDK is initialized in [`src/main.tsx:16-33`](../src/main.tsx#L16-L33).
-The CDN script is loaded **synchronously** in [`index.html:48`](../index.html#L48) — this is intentional and guarantees `window.Paddle` exists before `main.tsx` runs (Pitfall #2 per `BG-67-01`).
+Paddle's checkout SDK is initialized in [`src/lib/paddle.ts`](../src/lib/paddle.ts) via `ensurePaddle()`,
+called from [`PayPage.tsx`](../src/app/pages/PayPage.tsx) on mount and again before `Paddle.Checkout.open()`.
+
+**Per-route loading strategy (Phase 2.2):**
+- The CDN `<script src="paddle.js">` tag is injected **synchronously** into `dist/pay/index.html`
+  by [`scripts/prerender.mjs`](../scripts/prerender.mjs) (`applyPaddleScript`) — direct hits on
+  `/pay` (e.g. from the extension popup's Upgrade CTA) still have `window.Paddle` defined before
+  React mounts. Integration with Pitfall #2 / `BG-67-01` is preserved on the route that needs it.
+- Other prerendered routes (`/`, `/welcome`, `/privacy`, `/terms`, `/refund`) and SPA-fallback
+  routes (`/account`, `/success`, `/dashboard/download-skill`) do NOT load Paddle in HTML.
+  Loading the SDK on every page cost 500-1500 ms of render-blocking on mobile 3G and provided
+  no benefit (only `PayPage` consumes `window.Paddle`).
+- SPA-navigation to `/pay` (user clicks a `<Link to="/pay">` from landing) triggers
+  `ensurePaddle()` inside `PayPage`, which appends the `<script>` tag dynamically and resolves
+  once it loads + `Paddle.Initialize()` has run.
 
 **Don't:**
-- Switch the script tag to `async` or `defer` — `PayPage` will race-condition.
+- Switch the `<script>` tag inside `dist/pay/index.html` to `async` or `defer` — `PayPage` will
+  race-condition on direct hits. (The dynamic loader in `src/lib/paddle.ts` is itself `async`,
+  but it `await`s the load promise inside `handlePayUsd()` before calling `Checkout.open()`.)
+- Re-introduce the `<script src="paddle.js">` tag into the root `index.html` template — it would
+  re-attach to every route's HTML and undo the Phase 2.2 perf win.
 - Call `Environment.set('production')` — Paddle v2 SDK throws on this; only call `Environment.set('sandbox')` or skip entirely (Phase 67 fix).
 
 **Env vars (Vercel):**
