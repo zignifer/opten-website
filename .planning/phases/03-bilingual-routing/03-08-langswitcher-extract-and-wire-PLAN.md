@@ -3,7 +3,7 @@ phase: 03-bilingual-routing
 plan: 08
 type: execute
 wave: 4
-depends_on: [02, 06, 07]
+depends_on: [02, 04, 06, 07]
 files_modified:
   - src/app/components/LangSwitcher.tsx
   - src/app/App.tsx

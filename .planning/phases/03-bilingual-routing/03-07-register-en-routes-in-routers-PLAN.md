@@ -210,16 +210,16 @@ Phase 2 D-06 mirror invariant: this plan modifies BOTH entry-server.tsx and main
     - .planning/phases/03-bilingual-routing/03-RESEARCH.md (Pitfall 1 — hydration warnings on these new routes are a separate concern from Plan 01's fix; this checkpoint catches any new ones introduced by Plans 03-07)
   </read_first>
   <what-built>
-    Plans 01-07 are all in place:
+    Plans landed BEFORE Plan 07 (Wave 1–3): 01, 02, 03, 05, 06, 07. Plan 04 (Paddle widen + INTEGRATION-CONTRACT + robots.txt) is **Wave 4** and ships AFTER Plan 07 — so `/en/pay` does **not** yet carry the Paddle script at this checkpoint. The Paddle modal verification is therefore deferred to Plan 08 Task 5 phase-end smoke (which depends_on [04]).
+
     - Plan 01: deleted document.documentElement.lang write.
     - Plan 02: 13-entry manifest (7 RU + 6 EN).
     - Plan 03: prerender bakes <html lang>, hreflang triplet, og:locale per file.
-    - Plan 04: /en/pay carries Paddle sync script; INTEGRATION-CONTRACT §6 updated; robots.txt extended.
     - Plan 05: sitemap.xml has 12+ entries with xhtml:link annotations.
     - Plan 06: LangProvider URL-driven; SSR-eager en.json for /en/* parity.
     - Plan 07 (this plan): /en/* routes registered in both routers.
 
-    This checkpoint verifies the integrated build behaves correctly before Plan 08 wires the LangSwitcher to URL navigation.
+    This checkpoint verifies routing + EN content rendering. Paddle on `/en/pay` is verified later in Plan 08 Task 5.
   </what-built>
   <how-to-verify>
     1. From the repo root: `npm run build && npm run preview` — preview on `http://localhost:4173/`.
@@ -230,12 +230,12 @@ Phase 2 D-06 mirror invariant: this plan modifies BOTH entry-server.tsx and main
        - DevTools Network panel: a small `en-<hash>.js` chunk loaded? Or did the page ship with en.json content inlined? Either is acceptable per Plan 06 — only the BUNDLE SIZE matters (Plan 06 acceptance covers this).
     3. **/en/ direct hit:** repeat step 2 for `http://localhost:4173/en/`. Same expectations.
     4. **Locked-route preservation:** confirm `http://localhost:4173/welcome`, `/pay`, `/privacy`, `/terms`, `/refund` STILL render their RU content with `<html lang="ru">`. The bilingual addition must not affect the unprefixed canonical paths.
-    5. **/en/pay Paddle modal:** open `http://localhost:4173/en/pay`. Click the upgrade CTA (English copy). Paddle Checkout modal MUST open without console errors. If `window.Paddle is undefined`, Plan 04's widen didn't reach `dist/en/pay/index.html` — re-check Plan 04 acceptance.
+    5. **/en/pay route renders (Paddle modal deferred):** open `http://localhost:4173/en/pay`. Expect: English copy renders, `<html lang="en">` baked, NO console hydration warnings. Paddle modal verification is intentionally deferred to Plan 08 Task 5 (Wave 4) — Plan 04 has NOT yet widened the Paddle injection condition at this checkpoint, so clicking the upgrade CTA here may surface `window.Paddle is undefined`. That is expected at this point in the wave order; do NOT treat it as a failure.
     6. **SPA navigation:** from `http://localhost:4173/en/`, find a link or use the URL bar to navigate to `/en/welcome`. URL changes, content stays English (no flash to RU), header still renders English copy.
     7. **Reverse SPA navigation:** from `http://localhost:4173/welcome` (a RU page), use the URL bar to navigate to `/en/welcome`. URL changes to `/en/welcome`, content flips to English. (The LangSwitcher button itself comes in Plan 08; this manual nav simulates what the switcher will do.)
 
-    If all 7 steps pass, type "approved" and Plan 08 starts.
-    If any step fails (especially #2 or #5), STOP and surface the specific failure with DevTools output. Per phase contract, Plan 08 cannot ship over a broken integrated build.
+    If all 7 steps pass, type "approved" and Wave 4 starts (Plans 04 + 08).
+    If any step fails (especially #2 or the hydration sweep in #5), STOP and surface the specific failure with DevTools output. Per phase contract, Wave 4 cannot ship over a broken integrated build.
   </how-to-verify>
   <resume-signal>Type "approved" to mark Plan 07 green and unblock Wave 4 (Plan 08 — LangSwitcher). Otherwise describe the specific failure and reference the suspect plan.</resume-signal>
 </task>

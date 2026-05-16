@@ -794,7 +794,9 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> All 5 OQs resolved by planner during /gsd-plan-phase iteration: OQ-1 → Plan 08 extracts LangSwitcher; OQ-2 → Plan 05 uses Option A annotated `xhtml:link`; OQ-3 → Plan 08 routes to `/en/` on locked-routes-without-EN; OQ-4 → Plan 06 Task 2(e) uses `typeof window` gate with static-import fallback; OQ-5 → Plan 01 Task 2 uses manual `npm run preview` + DevTools (no Playwright).
 
 1. **Should `LangSwitcher` be extracted to a shared component or remain inlined per consumer (4 sites)?**
    - What we know: 4 consumers (`App.tsx` Navbar, `PayPage.tsx`, `AccountPage.tsx`, `LegalLayout.tsx`) currently inline the toggle. Extraction is cleaner; inlining is smaller diff.

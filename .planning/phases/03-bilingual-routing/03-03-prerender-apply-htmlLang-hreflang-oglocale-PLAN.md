@@ -161,7 +161,7 @@ NEW order after this plan (Plan 04 will widen the Paddle condition):
     - .planning/phases/03-bilingual-routing/03-CONTEXT.md (Claude's Discretion #1 — hreflang in <head> is the chosen approach)
   </read_first>
   <action>
-    Add the third helper `applyHreflang(html, meta)` immediately after `applyOgLocale` (Task 1 added it) and before `applyMeta`. Body per RESEARCH §Pattern 2:
+    Add the third helper `applyHreflang(html, meta)` to the helper-function group at the top of the file, immediately after `applyOgLocale` (which Task 1 inserted right after `escapeHtml`). All three new helpers (`applyHtmlLang`, `applyOgLocale`, `applyHreflang`) sit BETWEEN `escapeHtml` and the pre-existing `applyMeta` — `applyMeta` stays where it was at the original line 34. Body per RESEARCH §Pattern 2:
     - Build a 3-tag block:
       `<link rel="alternate" hreflang="ru"        href="${escapeAttr(meta.hreflangAlternates.ru)}" />`
       `<link rel="alternate" hreflang="en"        href="${escapeAttr(meta.hreflangAlternates.en)}" />`
