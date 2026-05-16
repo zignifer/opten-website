@@ -54,13 +54,16 @@
   - `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"`
 - **Paddle.js v2** loaded synchronously from `cdn.paddle.com` in [`index.html`](../../index.html). Initialized in [`main.tsx`](../../src/main.tsx) (Phase 67 fix: do not call `Environment.set('production')` — only sandbox).
 
-## i18n
+## i18n (post-Phase-3)
 
 - Custom context: [`src/i18n/LangContext.tsx`](../../src/i18n/LangContext.tsx)
-- Two dicts: [`ru.json`](../../src/i18n/ru.json) (~68 KB), [`en.json`](../../src/i18n/en.json) (~41 KB)
-- Detection: `localStorage.opten_lang` → fallback to `navigator.language.startsWith('ru')`
-- Sets `document.documentElement.lang` on switch
-- **No `hreflang` link tags** in `index.html` — SEO gap; see [SEO-AUDIT.md](SEO-AUDIT.md)
+- Two dicts: [`ru.json`](../../src/i18n/ru.json) (~68 KB), [`en.json`](../../src/i18n/en.json) (~41 KB) — EN dict is **lazy-loaded** on demand (Phase 2.2 perf fix, ~13 KB gzip saved on RU visits)
+- Detection precedence: URL `/en/*` prefix → `localStorage.opten_lang_v3` (explicit choice) → legacy `localStorage.opten_lang === "en"` (one-shot migration) → `navigator.language`
+- `LangSwitcher` is the only writer to `opten_lang_v3`; legacy `opten_lang="ru"` is intentionally ignored (was the cause of post-Phase-3 fix `c789dee`)
+- `<html lang>` is **baked at prerender time** per output file (`scripts/prerender.mjs`) — not mutated at runtime (Phase 3 D-06 — runtime DOM mutation caused hydration mismatch)
+- **`hreflang` triplet** (ru, en, x-default) injected into every prerendered `<head>`; sitemap.xml also carries `xhtml:link` reciprocal annotations (Phase 3 GEO-C-2/C-3)
+- `<LocalizedLink>` ([src/app/components/LocalizedLink.tsx](../../src/app/components/LocalizedLink.tsx)) is the canonical internal-navigation primitive — preserves the `/en/` prefix when on EN routes
+- `EN_SIBLINGS` constant lives in [`src/i18n/paths.ts`](../../src/i18n/paths.ts) — must stay in sync with EN entries in `scripts/seo-routes.ts`
 
 ## Vercel-side serverless
 

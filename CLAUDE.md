@@ -37,7 +37,7 @@ Hardcoded constants that are duplicated and must be kept in sync:
 - **Payments:** Paddle.js v2 (synchronous CDN script in `index.html`)
 - **Backend:** plain `fetch` to Supabase REST + Functions (no `@supabase/supabase-js`)
 - **Deploy:** Vercel, one serverless function at `api/download-skill.ts`
-- **i18n:** Custom React context, RU/EN, `localStorage.opten_lang` + `navigator.language` detection
+- **i18n:** Custom React context, RU/EN; URL prefix wins (`/en/*`), then `localStorage.opten_lang_v3` (explicit user choice, written by LangSwitcher), then `navigator.language`. Legacy key `opten_lang` is read **only** when its value is `"en"` for one-shot migration; RU values from the old key are intentionally ignored (they often came from auto-write, not explicit choice). Internal navigation uses `<LocalizedLink>` (drop-in `<Link>` replacement) — on `/en/*` URLs it rewrites internal hrefs to `/en/<sibling>` for the 6 EN-prefixed routes.
 
 No tests, no ESLint config, no `typecheck` script. TS errors surface during
 `vite build` (`npm run build`).
@@ -58,18 +58,24 @@ migrations are deployed from there, not from this repo.
 ## Architecture
 
 ```
-index.html  ─sync→  Paddle.js CDN
+index.html  ─sync→  Paddle.js CDN  (also dist/pay/, dist/en/pay/ — Phase 3 D-03b)
      │
-     └→ main.tsx (Paddle.Initialize) → <LangProvider> → <BrowserRouter>
+     └→ main.tsx → <BrowserRouter> → <LangProvider> → <Routes>
             ↓
-        8 routes: /, /pay, /success, /account, /welcome, /privacy, /terms,
-                  /refund, /dashboard/download-skill
+        14 client routes: 9 RU (/, /pay, /success, /account, /welcome,
+                          /privacy, /terms, /refund, /dashboard/download-skill)
+                          + 6 EN siblings (/en/, /en/pay, /en/welcome,
+                          /en/privacy, /en/terms, /en/refund) — Phase 3
 
-  Site ↔ Extension:    chrome.runtime.sendMessage (externally_connectable, opten.space only)
-  Site → Supabase:     fetch to /functions/v1/* and /rest/v1/*
-  Site → Paddle:       window.Paddle.Checkout.open(...)
-  Site own API:        GET /api/download-skill (Vercel serverless, JWT + Pro-gated)
+  Prerender (postbuild):  scripts/prerender.mjs → 12 dist/**/index.html files
+                          (6 RU + 6 EN, with hreflang triplets + per-page <html lang>)
+  Site ↔ Extension:       chrome.runtime.sendMessage (externally_connectable, opten.space only)
+  Site → Supabase:        fetch to /functions/v1/* and /rest/v1/*
+  Site → Paddle:          window.Paddle.Checkout.open(...)
+  Site own API:           GET /api/download-skill (Vercel serverless, JWT + Pro-gated)
 ```
+
+**Locked routes never get `/en/*` siblings by design** (Phase 3 D-03): `/success` is YooKassa-RUB only, `/account` and `/dashboard/*` are extension-coupled SPA-only routes (Disallow'd in robots.txt). On those routes the LangSwitcher flips language *in place* (storage + state) instead of navigating.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routes, billing flows, and i18n details.
 
@@ -80,17 +86,20 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routes, billing flows, and 
 ```
 api/                     — Vercel serverless functions (currently only download-skill.ts)
 public/                  — static assets, favicons, partner logos, welcome screenshots
+scripts/                 — postbuild (prerender.mjs, sitemap.mjs, seo-routes.ts, entry-server.tsx)
 src/
-├── main.tsx             — entry, Paddle bootstrap, routes
+├── main.tsx             — entry, Paddle bootstrap, 14 routes (9 RU + 6 EN)
 ├── app/
 │   ├── App.tsx          — landing
-│   ├── components/      — shared UI
+│   ├── components/      — shared UI (incl. LangSwitcher, LocalizedLink)
 │   └── pages/           — one file per route
-├── i18n/                — LangContext + ru.json/en.json dicts
+├── i18n/                — LangContext + ru.json/en.json dicts + paths.ts (EN_SIBLINGS)
 ├── imports/             — Figma-Make-generated SVG paths (auto-generated; brittle)
 ├── styles/              — index.css, tailwind.css, theme.css, fonts.css
 └── types/               — TS type defs
 ```
+
+`src/i18n/paths.ts` is the single source of truth for `EN_SIBLINGS` (the 6 routes that get `/en/*` prerendered siblings). It MUST stay in sync with the EN entries in `scripts/seo-routes.ts` — easy to miss when adding a route.
 
 ### Code style
 
@@ -99,11 +108,12 @@ src/
 - Path alias `@` → `./src` available but most imports are relative
 - No formatter configured (no Prettier, no ESLint)
 - React Router 7 syntax (`import { Link } from "react-router"`, not `react-router-dom`)
+- For internal navigation prefer `<LocalizedLink>` over bare `<Link>` — it preserves the `/en/` URL prefix when the user is on an EN route. Bare `<Link>` is still allowed but drops the prefix (was the source of a post-Phase-3 bug)
 
 ### State & storage
 
 - React Context for i18n only
-- `localStorage` for: `opten_lang`, `opten_pay_currency`
+- `localStorage` for: `opten_lang_v3` (i18n, written by LangSwitcher only), `opten_pay_currency`. Legacy `opten_lang` is read-only for one-shot EN migration — do not write to it.
 - All auth and subscription state lives in the **extension's** `chrome.storage.local` (`ps_*` keys) — site reads via `chrome.runtime.sendMessage(...)` only
 
 ### Naming

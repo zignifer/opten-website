@@ -1,6 +1,6 @@
 # External Integrations
 
-**Analysis Date:** 2026-05-16
+**Analysis Date:** 2026-05-17
 
 ## Chrome Extension (Opten / promptscore)
 
@@ -22,7 +22,7 @@
 
 **Fallback path:** Pages also accept `#token=...` URL hash (`PayPage.tsx:154`, `AccountPage.tsx:79`) for direct deep-links from the extension.
 
-**Detection states:** `"detecting" | "not_installed" | "not_logged_in" | "ready"` — `PayPage.tsx:23`, `AccountPage.tsx:14`, `DownloadSkillPage.tsx:10-18` (the latter uses an expanded set).
+**Detection states:** `"detecting" | "not_installed" | "not_logged_in" | "ready"` — `PayPage.tsx:23`, `AccountPage.tsx:14`, `DownloadSkillPage.tsx:10-18`.
 
 ## Supabase
 
@@ -50,8 +50,8 @@
 
 **CDN inclusion:**
 - NOT loaded site-wide. `index.html:88` has only `<link rel="preconnect" href="https://cdn.paddle.com" />`.
-- Sync `<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>` is injected into `dist/pay/index.html` only by `scripts/prerender.mjs:97` (`applyPaddleScript`), gated on `meta.path === "/pay"` at `scripts/prerender.mjs:107`.
-- SPA-navigation to `/pay` (from landing) loads SDK on demand via `src/lib/paddle.ts` (`ensurePaddle()`).
+- Sync `<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>` is injected by `scripts/prerender.mjs` (`applyPaddleScript`, `prerender.mjs:175-180`) into BOTH `dist/pay/index.html` AND `dist/en/pay/index.html` — gated on `meta.path === "/pay" || meta.path === "/en/pay"` at `prerender.mjs:192`. Symmetric `/en/pay` extension landed in commit `5276b51` (Phase 3 D-03b). INTEGRATION-CONTRACT §6 documents the symmetry.
+- SPA-navigation to either `/pay` or `/en/pay` (from landing) loads SDK on demand via `src/lib/paddle.ts` (`ensurePaddle()`).
 
 **Loader (`src/lib/paddle.ts`):**
 - Memoized promise `paddleReady` (`paddle.ts:11`)
@@ -76,8 +76,8 @@
 ## YooKassa
 
 **RUB checkout flow:**
-- Site calls `create-payment` Edge Function (`PayPage.tsx:239`); the function returns `{ confirmation_url }`; site redirects via `window.location.href = data.confirmation_url` (`PayPage.tsx:255`).
-- `return_url` is set inside the Edge Function (extension repo, `create-payment/index.ts`), hardcoded to `https://opten.space/success`. The `/success` route on the site is the binding contract endpoint.
+- Site calls `create-payment` Edge Function (`PayPage.tsx:239`); function returns `{ confirmation_url }`; site redirects via `window.location.href = data.confirmation_url` (`PayPage.tsx:255`).
+- `return_url` is set inside the Edge Function (extension repo, `create-payment/index.ts`), hardcoded to `https://opten.space/success`. The `/success` route is the binding contract endpoint.
 
 **SuccessPage behavior:** YooKassa returns without query params; same `SuccessPage.tsx` renders for both providers.
 
@@ -102,14 +102,13 @@
 - Uses Node `(req, res)` signature (not Web Standard `Request/Response`) for runtime compatibility (`api/download-skill.ts:6-8`).
 - Returns `403 { error: "not_pro", upgrade_url: "/account?upgrade=skill" }` on non-Pro.
 
-**Prerender pipeline (build-time):**
-- `scripts/prerender.mjs` emits per-route HTML into `dist/{route}/index.html` for routes flagged `prerender: "full"` or `"head"` in `scripts/seo-routes.ts`. Injects per-route `<title>`, `<meta>`, `<link rel="canonical">`, `<link rel="modulepreload">`, `window.__PRERENDER_PATH` marker, and the conditional Paddle `<script>` on `/pay` only.
-- `scripts/sitemap.mjs` emits `sitemap.xml`.
+**Prerender pipeline (build-time):** see STACK.md "Build/Dev". Emits 12 HTML files (`dist/index.html`, `dist/pay/`, `dist/welcome/`, `dist/privacy/`, `dist/terms/`, `dist/refund/`, `dist/en/index.html`, `dist/en/pay/`, `dist/en/welcome/`, `dist/en/privacy/`, `dist/en/terms/`, `dist/en/refund/`) plus `dist/sitemap.xml` with 12 `<url>` entries each annotated with `xhtml:link` hreflang ru/en/x-default (`scripts/sitemap.mjs:30,41-43`).
 
 ## Auth / Storage
 
 **Site-owned `localStorage` keys (prefix `opten_`):**
-- `opten_lang` — `"ru" | "en"`. Set/read in `src/i18n/LangContext.tsx:7,10,38`.
+- `opten_lang_v3` — `"ru" | "en"`. Set/read in `src/i18n/LangContext.tsx:20,26,124`. Bumped from `opten_lang` in post-Phase-3 hotfix `c789dee` because the previous key was contaminated by older auto-detect writes that pinned EN-browser visitors to RU forever.
+- `opten_lang` (LEGACY, read-only) — `LangContext.tsx:21,30-31`. Read once for one-shot migration; only honored when value is `"en"` (RU is the default detect result so it is not safe to treat as explicit). Never written.
 - `opten_pay_currency` — `"RUB" | "USD"`. Set/read in `src/app/pages/PayPage.tsx:19,122,133,137`.
 
 **Extension-owned `chrome.storage.local` keys (`ps_*` prefix):**
@@ -122,7 +121,7 @@
 
 | CDN | Purpose | Where |
 |---|---|---|
-| `cdn.paddle.com` | Paddle.js v2 SDK | `scripts/prerender.mjs:97` (injected into `/pay` only); `src/lib/paddle.ts:13` (lazy fallback) |
+| `cdn.paddle.com` | Paddle.js v2 SDK | `scripts/prerender.mjs:175-180,192` (injected into `/pay` AND `/en/pay`); `src/lib/paddle.ts:13` (lazy fallback) |
 | `chromewebstore.google.com` | Install CTAs | `PayPage.tsx:12`, `AccountPage.tsx:8`, `DownloadSkillPage.tsx:117`, `index.html:65,78` |
 | `t.me/v_voronezhtsev` | Contact link | `PayPage.tsx:618`, `AccountPage.tsx:400`, `index.html:79` |
 
@@ -160,6 +159,26 @@ Note: `DownloadSkillPage.tsx` does NOT carry `SUPABASE_URL` / `SUPABASE_ANON_KEY
 - Hardcoded inline (no constant) in `src/app/pages/DownloadSkillPage.tsx:117`
 - Hardcoded inline in `index.html:65,78` (Schema.org JSON-LD)
 
+**`EN_SIBLINGS` — single source of truth + manifest mirror (Phase 3):**
+- `src/i18n/paths.ts:9-16` — runtime `Set<string>` consumed by `LocalizedLink` / `LangSwitcher`.
+- `scripts/seo-routes.ts:33-247` — must contain a matching entry for each EN sibling (the file-level SYNC comment at `paths.ts:2-3` calls this out explicitly). `sitemap.mjs` enforces a runtime floor (`>= 12 routes`, `sitemap.mjs:29-31`).
+
+## Routes (12 prerendered + SPA-only)
+
+**Prerendered (`prerender: "full"` or `"head"` in `scripts/seo-routes.ts`):**
+
+| RU | EN sibling | Tier | Mounted in entry-server? |
+|---|---|---|---|
+| `/` | `/en/` | full | yes |
+| `/welcome` | `/en/welcome` | full | yes |
+| `/privacy` | `/en/privacy` | full | yes |
+| `/terms` | `/en/terms` | full | yes |
+| `/refund` | `/en/refund` | full | yes |
+| `/pay` | `/en/pay` | head | no (head-only — SPA mounts the body) |
+
+**SPA-only (no EN sibling, no prerender):**
+- `/success`, `/account`, `/dashboard/download-skill` — extension-coupled or post-auth; intentionally never prefixed (LangSwitcher stays in place via storage flip, see `paths.ts:34-40` returning `null`).
+
 ## Environment Variables
 
 **Bundled into client (`VITE_*` — public by definition):**
@@ -193,4 +212,4 @@ Note: `DownloadSkillPage.tsx` does NOT carry `SUPABASE_URL` / `SUPABASE_ANON_KEY
 
 ---
 
-*Integration audit: 2026-05-16*
+*Integration audit: 2026-05-17*

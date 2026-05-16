@@ -87,20 +87,25 @@ src/
 └── types/                         — TS type defs (e.g. for window.Paddle)
 ```
 
-## i18n flow
+## i18n flow (post-Phase-3)
 
-1. [`LangContext`](../../src/i18n/LangContext.tsx) initializes from `localStorage.opten_lang` → falls back to `navigator.language.startsWith('ru') ? 'ru' : 'en'`.
-2. `setLang(l)` writes to `localStorage` and re-renders.
-3. `t(key)` looks up the dict for current lang, then falls back to `en`, then to the key string itself.
-4. Side effect: `document.documentElement.lang` is updated on language change.
+1. [`LangContext`](../../src/i18n/LangContext.tsx) initializes language with this precedence (D-05 / D-07):
+   1. **URL prefix** — `/en/` or `/en/*` → "en" (synchronous via `useLocation()`).
+   2. **`localStorage.opten_lang_v3`** — explicit user choice (written only by LangSwitcher).
+   3. **Legacy `localStorage.opten_lang`** — read only when value is `"en"` (one-shot migration; RU values intentionally ignored, see post-release fix `c789dee`).
+   4. **`navigator.language`** — `startsWith('ru') ? 'ru' : 'en'` fallback.
+2. `setLang(l)` writes `opten_lang_v3` synchronously and re-renders. EN dict is lazy-loaded (Phase 2.2) — `loadEnDict()` runs before flipping state to avoid a flash of RU keys.
+3. `t(key)` looks up the dict for current lang, then falls back to `ru`, then to the key string itself.
+4. `document.documentElement.lang` is **NOT** mutated at runtime (Phase 3 D-06 — runtime DOM mutation caused hydration mismatch). It is baked per page at prerender time.
 
-**Implications for SEO:**
-- The initial HTML always ships with `<html lang="ru">` (hardcoded in `index.html`).
-- The `lang` attribute is updated client-side after hydration, which crawlers may or may not honor.
-- There are **no separate URLs per language** — `/` serves both RU and EN content depending on detection. Google sees one URL with content that varies post-hydration. This is a real SEO problem for the EN audience.
-- There are **no `<link rel="alternate" hreflang>` tags**.
+**Bilingual URLs (Phase 3):**
+- 12 prerendered HTML files: 6 RU canonical (`/`, `/pay`, `/welcome`, `/privacy`, `/terms`, `/refund`) and 6 EN siblings (`/en/`, `/en/pay`, `/en/welcome`, `/en/privacy`, `/en/terms`, `/en/refund`).
+- Each prerendered `<head>` carries a `<link rel="alternate" hreflang>` triplet (`ru`, `en`, `x-default → unprefixed RU`) reciprocal between siblings.
+- `<html lang>` baked per route at build time by `scripts/prerender.mjs` (`ru` for unprefixed, `en` for `/en/*`).
+- Locked routes without EN siblings (`/success`, `/account`, `/dashboard/download-skill`) stay RU-only by design — they are `Disallow`'d in `robots.txt` and extension-coupled (D-03).
+- `<LocalizedLink>` (drop-in replacement for `<Link>`) preserves the `/en/` prefix when navigating internally between EN siblings; on locked no-sibling routes the LangSwitcher flips language in place via storage.
 
-See [SEO-AUDIT.md](SEO-AUDIT.md) for the gap list and likely fixes.
+See [SEO-AUDIT.md](SEO-AUDIT.md) for the audit baseline and [.planning/research/GEO-AUDIT-POST-PHASE-3.md](../.planning/research/GEO-AUDIT-POST-PHASE-3.md) for current GEO score (48/100, 2026-05-17).
 
 ## Billing flow — RU (YooKassa)
 

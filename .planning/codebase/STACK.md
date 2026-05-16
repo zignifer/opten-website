@@ -1,6 +1,6 @@
 # Technology Stack
 
-**Analysis Date:** 2026-05-16
+**Analysis Date:** 2026-05-17
 
 ## Languages
 
@@ -17,11 +17,12 @@
 **Environment:**
 - Browser: ES module bundle from Vite 6
 - Vercel serverless (Node.js): single function at `api/download-skill.ts` using `IncomingMessage`/`ServerResponse` signature
+- Node SSR: build-time only (`scripts/entry-server.tsx`, `scripts/seo-routes.ts`) — no runtime SSR
 - No `engines` field in `package.json`; no `.nvmrc`
 
 **Package Manager:**
 - npm — only `package-lock.json` would be authoritative; `pnpm.overrides` block present in `package.json:89-93` pins `vite: 6.3.5` (suggests pnpm-compatible)
-- Lockfile: not visible at repo root (status snapshot does not list one); `pnpm.overrides` implies pnpm support
+- Lockfile: not visible at repo root; `pnpm.overrides` implies pnpm support
 
 ## Frameworks
 
@@ -30,7 +31,7 @@
 - `@vitejs/plugin-react` 4.7.0 — `vite.config.ts:4,11`
 - `react` 18.3.1 (peerDependency) — `package.json:78`
 - `react-dom` 18.3.1 (peerDependency) — `package.json:79`
-- `react-router` 7.13.0 — `package.json:59`, used as `import { BrowserRouter, Routes, Route, Link } from "react-router"` (NOT `react-router-dom`)
+- `react-router` 7.13.0 — `package.json:59`, used as `import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate } from "react-router"` (NOT `react-router-dom`)
 - `tailwindcss` 4.1.12 + `@tailwindcss/vite` 4.1.12 — `vite.config.ts:3,12`
 - `typescript` — not in `devDependencies`; relies on Vite's built-in TS handling. No `tsc` typecheck script.
 
@@ -39,13 +40,13 @@
 
 **Build/Dev:**
 - `vite` (dev + client build) — `vite.config.ts`
-- `vite build --ssr scripts/entry-server.tsx` — React SSR bundle → `.ssr-cache/`
-- `vite build --ssr scripts/seo-routes.ts` — route metadata manifest → `.ssr-meta/`
-- `node scripts/prerender.mjs` — per-route prerender of head + body → `dist/{route}/index.html`
-- `node scripts/sitemap.mjs` — sitemap emission
+- `vite build --ssr scripts/entry-server.tsx` — React SSR bundle → `.ssr-cache/` (mounts 11 routes: 5 RU full-prerender + 6 EN — see entry-server.tsx:28-39)
+- `vite build --ssr scripts/seo-routes.ts` — route metadata manifest → `.ssr-meta/` (12 entries: 6 RU + 6 EN)
+- `node scripts/prerender.mjs` — emits 12 HTML files into `dist/` (was 5 before Phase 3); injects per-route `<title>`, `<meta>`, `<link rel="canonical">`, hreflang triplet, `<html lang>`, og:locale + og:locale:alternate, modulepreload + Safari preload fallback, Paddle SDK tag for `/pay` AND `/en/pay`, `__PRERENDER_PATH` marker
+- `node scripts/sitemap.mjs` — emits `dist/sitemap.xml` with 12 `<url>` entries, each carrying `xhtml:link` hreflang triplets (ru / en / x-default)
 - `rollup-plugin-visualizer` ^7.0.1 — bundle inspection
 - `sharp` ^0.34.5 — image processing (used by `vite-imagetools`)
-- `vite-imagetools` ^6.2.9 — `?w=...&format=webp;png&as=picture` query-string imports; configured with `exclude: ''` so `public/` files are processed (`vite.config.ts:17`)
+- `vite-imagetools` ^6.2.9 — `?w=...&format=webp;png&as=picture` query-string imports; `exclude: ''` so `public/` files are processed (`vite.config.ts:17`)
 - `supabase` ^2.98.2 (devDependency) — Supabase CLI for the linked `opten-seo` project
 
 ## Key Dependencies
@@ -80,6 +81,18 @@
 
 **Notably absent:**
 - `@supabase/supabase-js` — Supabase access is plain `fetch` to REST/Functions endpoints
+
+## i18n Subsystem (Phase 3)
+
+**Custom context, no library.** Source of truth `src/i18n/`:
+- `LangContext.tsx` — `LangProvider` (must live INSIDE `<BrowserRouter>` / `<StaticRouter>` because it calls `useLocation()`); exports `useLang`, `useT`, `useOnEnPath`. Storage key `opten_lang_v3` (bumped from `opten_lang` post-Phase-3 — `LangContext.tsx:20`). Legacy `opten_lang` key is read once for one-shot migration, EN-only (`LangContext.tsx:30-31`); RU values in legacy key are ignored so `navigator.language` gets a fresh chance to win.
+- `paths.ts` — single source of truth for `EN_SIBLINGS` (`/`, `/welcome`, `/pay`, `/privacy`, `/terms`, `/refund`); exports `toEnTarget(pathname)`, `toRuTarget(pathname)`, `localizeHref(href, onEnPath)`. Pure path-rewriters operating against the allow-list (open-redirect mitigation).
+- `ru.json` — statically imported (16.5 KB gzip); always available for SSR + hydration default.
+- `en.json` — statically imported on the SERVER path only (`typeof window === "undefined"`, `LangContext.tsx:62-64`); CLIENT path uses `loadEnDict()` dynamic import to keep ~13 KB gzip off the default bundle.
+
+**Components added in Phase 3 (post-3 follow-up):**
+- `src/app/components/LocalizedLink.tsx` — drop-in `<Link>` replacement that rewrites `to="/pay"` → `to="/en/pay"` when current URL is `/en/*`. Pass-through for non-sibling targets (e.g. `/account`).
+- `src/app/components/LangSwitcher.tsx` — flips lang in `localStorage` + context state, then `navigate()`s to the EN sibling only when one exists (null result = stay on current URL, content layer re-renders in new lang).
 
 ## Configuration
 
@@ -133,4 +146,4 @@ TS errors surface only via `vite build` (`npm run build`).
 
 ---
 
-*Stack analysis: 2026-05-16*
+*Stack analysis: 2026-05-17*
