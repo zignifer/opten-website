@@ -1,21 +1,25 @@
-/* Phase 2.2: self-hosted variable WOFF2 fonts with adjusted-fallback metric overrides.
+/* Phase 2.2: self-hosted variable WOFF2 fonts.
  *
  * The original Google Fonts @import was a sequential 3-RTT cascade on iOS Safari.
  * Replaced with self-hosted /fonts/*.woff2 + <link rel=preload> in index.html for
  * both fonts.
  *
- * Even with WOFF2 self-hosted, font-display:swap caused a visible "jump" on first
- * paint (heading text was rendered in the system fallback, then swapped to Unbounded
- * which has very different metrics — wider, taller, bolder). Fix: declare a SECOND
- * @font-face under the same font-family name pointing at a local system font with
- * ascent/descent/size overrides chosen to match the loaded font's glyph box. The
- * browser uses this rule while the WOFF2 is still downloading; when the WOFF2 lands
- * the first rule (src: url) takes over but the glyph box stays the same → no layout
- * shift, no perceptible jump.
+ * Strategy per font:
  *
- * Override values were eyeballed against the actual fonts in the Playwright preview.
- * If a typeface is swapped in the future, recompute via Malte Ubl's "Faster Web
- * Fonts" generator or the Google Fonts adjusted-fallback table.
+ *   PT Root UI (body text, used everywhere)
+ *     font-display: swap + adjusted-fallback @font-face. Body text MUST be visible
+ *     immediately, so we accept a tiny FOUT from Arial fallback → PT Root UI swap.
+ *     Arial is a close-enough proportional sans, and the second @font-face's
+ *     metric overrides keep the glyph box constant across the swap (no layout shift).
+ *
+ *   Unbounded (display / headings)
+ *     font-display: block. The font is preloaded in <head>, so it usually lands in
+ *     250-450 ms. block tells the browser to render the text INVISIBLE up to 3 s
+ *     while the WOFF2 is in flight, then show it. This avoids showing the heading
+ *     in a totally different fallback typeface (Impact / Arial Black look NOTHING
+ *     like Unbounded — even with size-adjust, the glyph shapes differ jarringly).
+ *     With preload, the invisible window is < 500 ms on a real network — barely
+ *     perceptible. If the font genuinely fails after 3 s, fallback kicks in.
  *
  *   PT-Root-UI_VF.woff2  91 KB, covers weights 100-900 (we use 400 / 500 / 700)
  *   Unbounded-VF.woff2  253 KB, covers weights 200-900 (we use 400 / 700)
@@ -32,7 +36,9 @@
   font-display: swap;
 }
 
-/* Same family name → used as fallback while the WOFF2 above is loading. */
+/* Adjusted-fallback face under the SAME family name. Browser uses this while the
+   WOFF2 above is loading; metric overrides keep glyph box constant on swap so the
+   body text doesn't reflow when the loaded font kicks in. */
 @font-face {
   font-family: 'PT Root UI';
   src: local('Arial'), local('Helvetica Neue'), local('Helvetica');
@@ -52,19 +58,5 @@
        url('/fonts/Unbounded-VF.woff2') format('woff2');
   font-weight: 200 900;
   font-style: normal;
-  font-display: swap;
-}
-
-/* Unbounded is wider and slightly taller than any common system sans-serif —
-   size-adjust:108 % roughly matches its advance width so the H1 doesn't reflow
-   when the loaded font kicks in. */
-@font-face {
-  font-family: 'Unbounded';
-  src: local('Impact'), local('Arial Black'), local('Arial Bold'), local('Arial'), local('Helvetica');
-  font-weight: 200 900;
-  font-style: normal;
-  ascent-override: 95%;
-  descent-override: 25%;
-  line-gap-override: 0%;
-  size-adjust: 108%;
+  font-display: block;
 }
