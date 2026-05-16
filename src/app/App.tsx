@@ -8,6 +8,7 @@ import {
   X,
 } from "lucide-react";
 import { useLang, useT } from "../i18n/LangContext";
+import LangSwitcher from "./components/LangSwitcher";
 import OptenHeroAnimation from "./components/OptenHeroAnimation";
 import { Picture } from "./components/Picture";
 import type { Picture as PictureData } from 'vite-imagetools';
@@ -109,7 +110,6 @@ function InstallButton({ compact = false, label }: { compact?: boolean; label?: 
 
 function Navbar() {
   const t = useT();
-  const { lang, setLang } = useLang();
   const [open, setOpen] = useState(false);
 
   return (
@@ -128,13 +128,7 @@ function Navbar() {
           <a href="#features" className="opacity-90 transition hover:opacity-100">{t("nav.features")}</a>
           <a href="#pricing" className="opacity-90 transition hover:opacity-100">{t("nav.pricing")}</a>
           <a href="#faq" className="opacity-90 transition hover:opacity-100">{t("nav.faq")}</a>
-          <button
-            type="button"
-            onClick={() => setLang(lang === "ru" ? "en" : "ru")}
-            className="bg-transparent font-['PT_Root_UI',sans-serif] text-[14px] text-white/45 transition hover:text-white"
-          >
-            {lang === "ru" ? "EN" : "RU"}
-          </button>
+          <LangSwitcher className="bg-transparent font-['PT_Root_UI',sans-serif] text-[14px] text-white/45 transition hover:text-white" />
         </div>
 
         <Link to="/" className="absolute left-1/2 -translate-x-1/2">
@@ -157,16 +151,7 @@ function Navbar() {
           <a href="#features" onClick={() => setOpen(false)}>{t("nav.features")}</a>
           <a href="#pricing" onClick={() => setOpen(false)}>{t("nav.pricing")}</a>
           <a href="#faq" onClick={() => setOpen(false)}>{t("nav.faq")}</a>
-          <button
-            type="button"
-            onClick={() => {
-              setLang(lang === "ru" ? "en" : "ru");
-              setOpen(false);
-            }}
-            className="w-fit bg-transparent p-0 text-left text-white/60"
-          >
-            {lang === "ru" ? "EN" : "RU"}
-          </button>
+          <LangSwitcher className="w-fit bg-transparent p-0 text-left text-white/60" onSwitch={() => setOpen(false)} />
         </div>
       )}
     </header>
