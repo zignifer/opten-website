@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 2.1 context gathered
-last_updated: "2026-05-16T07:15:16.507Z"
+status: phases-2-and-2.1-closed
+stopped_at: Phases 02 + 02.1 closed; 02.2 (mobile-perf follow-up) shipped inline
+last_updated: "2026-05-16T17:40:00Z"
 last_activity: 2026-05-16
 progress:
-  total_phases: 6
-  completed_phases: 2
-  total_plans: 16
-  completed_plans: 15
-  percent: 94
+  total_phases: 7
+  completed_phases: 3
+  total_plans: 24
+  completed_plans: 24
+  percent: 43
 ---
 
 # Project State
@@ -26,12 +26,13 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 
 ## Current Position
 
-Phase: 02.1 (hydration-and-perf) — EXECUTING
-Plan: 7 of 7
-Status: Phase complete — ready for verification
+Phase: 02.1 (hydration-and-perf) — CLOSED 2026-05-16
+Plan: 7 of 7 shipped + verified (`.planning/phases/02.1-hydration-and-perf/02.1-VERIFICATION.md`)
+Status: Closed. Phase 02.2 (mobile-perf + Safari + WOFF2 + lazy-EN) shipped inline as reactive follow-up.
 Last activity: 2026-05-16
+Next: Phase 3 (bilingual routing) prerequisite — resolve per-language URL strategy (`/ru/*` `/en/*` vs `?lang=` vs subdomain).
 
-Progress: [█████████░] 94%
+Progress: [████░░░░░░] 43% (3 of 7 phases done — Phase 1, 2, 2.1; Phase 2.2 inserted+done; Phases 3, 4, 5 pending)
 
 ## Performance Metrics
 
