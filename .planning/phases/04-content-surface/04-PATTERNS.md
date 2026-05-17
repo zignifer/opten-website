@@ -273,8 +273,8 @@ export interface GuideContent {
   updatedAt: string;   // ISO date — feeds schema dateModified
 }
 export const guide: { ru: GuideContent; en: GuideContent } = {
-  ru: { slug: "midjourney-v7-prompts", title: "Как писать промпты для Midjourney v7", /* … */ },
-  en: { slug: "midjourney-v7-prompts", title: "How to write prompts for Midjourney v7", /* … */ },
+  ru: { slug: "gpt-image-2", title: "Как писать промпты для GPT Image 2", /* … */ },
+  en: { slug: "gpt-image-2", title: "How to write prompts for GPT Image 2", /* … */ },
 };
 ```
 
@@ -282,9 +282,9 @@ export const guide: { ru: GuideContent; en: GuideContent } = {
 
 ```ts
 // src/content/guides/index.ts (or inline in GuidePage.tsx)
-import { guide as midjourneyV7 } from "./midjourney-v7-prompts";
+import { guide as gptImage2 } from "./gpt-image-2";
 export const guidesBySlug = {
-  "midjourney-v7-prompts": midjourneyV7,
+  "gpt-image-2": gptImage2,
 } as const;
 ```
 
