@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: ready_to_plan
-stopped_at: Phase 4 context gathered (`04-CONTEXT.md` committed in `1f0ff0e`); ready for planning.
-last_updated: "2026-05-17T06:47:57.297Z"
-last_activity: 2026-05-17 -- Phase 04 execution started
+stopped_at: Phase 4 fully closed — 6/6 post-deploy UAT items PASS (Paddle/ЮKassa live click confirmed by user). Ready to plan Phase 5.
+last_updated: "2026-05-17T11:30:00.000Z"
+last_activity: 2026-05-17 -- Phase 04 post-deploy UAT completed (6/6 PASS)
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 31
-  completed_plans: 23
-  percent: 67
+  completed_plans: 29
+  percent: 94
 ---
 
 # Project State
@@ -28,13 +28,13 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 
 Phase: 5
 Plan: Not started
-Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (~5 atomic commits `0a73069`..`81284d4`), 3 → 8/8 + 2 post-release fixes (`c789dee`, `bfd164b`)
+Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (~5 atomic commits `0a73069`..`81284d4`), 3 → 8/8 + 2 post-release fixes (`c789dee`, `bfd164b`), 4 → 6/7 plans shipped (04-02 replaced by 04-LCP-AUDIT Option-1 defer) + post-deploy UAT 6/6 PASS.
 Status: Ready to plan
 Last activity: 2026-05-17
-Next: Phase 4 (content surface) — backlog; planning not started.
+Next: Phase 5 (brand authority) — backlog; planning not started.
 
-Milestone phases: 5 of 7 complete (1, 2, 2.1, 2.2, 3). Phases 4-5 backlog.
-Progress: [██████████] 100% of scoped phases through Phase 3
+Milestone phases: 6 of 7 complete (1, 2, 2.1, 2.2, 3, 4). Phase 5 backlog.
+Progress: [█████████░] 94% — Phase 4 fully closed (6/6 post-deploy UAT PASS). Only Phase 5 remains.
 
 ## Performance Metrics
 
@@ -124,16 +124,16 @@ Items acknowledged and carried forward from previous milestone close:
 |----------|------|--------|-------------|
 | Security | CSP header in `vercel.json` | Separate ticket | 2026-05-14 (Phase 1 scope cut) |
 | Hygiene | Audit and dedupe overlapping UI libs (Radix + MUI + Lucide + react-slick + embla) inherited from Figma Make origin | Not scheduled | 2026-05-14 (not a GEO concern) |
+| Phase 4 perf | Mobile LCP ≤ 2.5 s (V-18/V-19) — Unbounded font subsetting; new regression floor 3.5 s (was 3.3 s per 04-LCP-AUDIT, refreshed by 2026-05-17 PSI run) | Separate ticket | 2026-05-17 (Option 1 defer locked in 04-LCP-AUDIT) |
 
 ## Session Continuity
 
 Last session: 2026-05-17
-Stopped at: Phase 4 context gathered (`04-CONTEXT.md` committed in `1f0ff0e`); ready for planning.
+Stopped at: Phase 4 fully closed. Post-deploy UAT 6/6 PASS, including Paddle/ЮKassa live-click on `/pay` + `/en/pay` (user-confirmed 2026-05-17). Mobile LCP measured at 3.5 s vs documented 3.3 s base — treated as PSI lab variance and recorded as the new regression floor for the Unbounded font-subsetting ticket. Only carry-over from Phase 4 to a separate ticket: the LCP fix itself.
 Next action (in order):
 
-  1. **`/gsd-plan-phase 4`** — produce 04-PLAN.md from the 16 captured decisions. Expected plan structure: schema bundle injection (4-5 atomic tasks via `scripts/prerender.mjs`), `/pay` + `/en/pay` full prerender refactor (high-risk billing surface — separate plan task with Playwright + Paddle verification), `/about` page (RU only), anchor `/guides/<slug>` + `/en/guides/<slug>` bilingual pair, FAQ block, llms.txt + llms-full.txt generation, hero preload + X-Frame-Options + Content-Signal.
-  2. **GEO rescore window** — pre-Phase-4 baseline = 48/100 (2026-05-17, `GEO-AUDIT-POST-PHASE-3.md`). After Phase 4 deploy, re-run `/geo audit https://opten.space` — target 65–73/100 per the audit's quick-win estimate.
-  3. **Lessons-learned capture** — Phase 2 hotfix + 02.2 inline pattern + Phase 3 post-release fix loop (D-07b "URL is the only signal" was too strict — needed storage for cross-page persistence). Future anti-patterns reference.
-  4. **Post-Phase-4: Phase 5 brand authority** — Wikipedia/Wikidata, Product Hunt, Reddit, YouTube, expanded `sameAs`. Mostly off-domain marketing work — small code component (sameAs additions only).
+  1. **GEO rescore window** — pre-Phase-4 baseline = 48/100 (2026-05-17, `GEO-AUDIT-POST-PHASE-3.md`). 7–14 days after the Phase 4 deploy (window opens around 2026-05-24, closes around 2026-05-31), re-run `/geo audit https://opten.space` — target 65–73/100 per the audit's quick-win estimate. Capture both `/` and `/en/` for hreflang and bilingual content uplift.
+  2. **`/gsd-plan-phase 5`** — Phase 5 brand authority: Wikipedia/Wikidata seed, Product Hunt launch, Reddit + YouTube presence, expanded `sameAs` array. Mostly off-domain marketing work; the only code component is `sameAs` additions in the Organization/Person schemas built by `scripts/prerender.mjs`. Decide scope before planning — Phase 5 may be partially manual (off-domain) rather than fully atomic-commit-trackable.
+  3. **Lessons-learned capture (for future GSD)** — (a) Phase 2 hotfix pattern, (b) 02.2 inline-commit pattern, (c) Phase 3 post-release fix loop (D-07b "URL is the only signal" was too strict — needed storage for cross-page persistence), (d) Phase 4 LCP Option-1 defer pattern (audit ticket as a phase artifact instead of forcing the perf fix into the content phase). Useful anti-patterns reference for future plan-checker.
 
-Resume file: `.planning/phases/04-content-surface/04-CONTEXT.md`
+Resume file: `.planning/phases/04-content-surface/04-HUMAN-UAT.md` (closure record) and `.planning/PROJECT.md` (read before Phase 5 planning to refresh integration contract).
