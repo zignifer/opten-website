@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in_progress
-stopped_at: Phase 4.1 plan expanded with 3 user-reported bugs (B-01 free-tier copy, B-02 Magnific mentions, B-03 EN /about). Now 13 atomic waves total. Starting wave-by-wave execution.
-last_updated: "2026-05-17T12:30:00.000Z"
-last_activity: 2026-05-17 -- Phase 04.1 plan expanded to 18 findings / 13 waves; execution starting
+status: ready_to_spec
+stopped_at: Phase 4.1 scope captured (18 findings, 3 user-confirmed decisions) in 04.1-CAPTURED-DECISIONS.md. Hand-written ad-hoc plan SCRAPPED in favor of canonical GSD pipeline. Awaiting /gsd-spec-phase 4.1 (or /gsd-autonomous to run the full spec→discuss→plan→execute chain).
+last_updated: "2026-05-17T13:00:00.000Z"
+last_activity: 2026-05-17 -- Phase 04.1 ad-hoc plan rolled back to seed; GSD pipeline to be invoked
 progress:
   total_phases: 7
   completed_phases: 5
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 ## Current Position
 
 Phase: 4.1
-Plan: 04.1-PLAN.md (9 waves)
-Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (~5 atomic commits `0a73069`..`81284d4`), 3 → 8/8 + 2 post-release fixes (`c789dee`, `bfd164b`), 4 → 6/7 plans shipped (04-02 replaced by 04-LCP-AUDIT Option-1 defer) + post-deploy UAT 6/6 PASS, 4.1 → planned (0/13 waves executed; 18 findings total — 9 WR + 6 IN + 3 user-reported bugs).
-Status: Ready to execute
+Plan: NOT YET PLANNED (canonical GSD pipeline pending; 04.1-CAPTURED-DECISIONS.md holds the input seed).
+Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (~5 atomic commits `0a73069`..`81284d4`), 3 → 8/8 + 2 post-release fixes (`c789dee`, `bfd164b`), 4 → 6/7 plans shipped (04-02 replaced by 04-LCP-AUDIT Option-1 defer) + post-deploy UAT 6/6 PASS, 4.1 → scope captured, 0 plan files produced yet.
+Status: Ready to run GSD spec-phase
 Last activity: 2026-05-17
-Next: Execute Phase 4.1 wave-by-wave. Wave 9 (PayPage.tsx) needs explicit approval before commit (extension-coupled). Then Phase 5 (brand authority).
+Next: Run `/gsd-spec-phase 4.1` (or `/gsd-autonomous` for spec→discuss→plan→execute chain). The captured-decisions seed pre-fills the 18-finding scope + 3 user-confirmed decisions.
 
 Milestone phases: 5 of 7 complete (1, 2, 2.1, 2.2, 3, 4 — 4 closed except for the 4.1 cleanup bucket). Phase 4.1 ready; Phase 5 backlog.
 Progress: [███████░░░] 73% — Phase 4 functionally shipped; 4.1 will close the review hangover before Phase 5 starts.
