@@ -53,3 +53,6 @@ User-agent: anthropic-ai
 Allow: /
 
 Sitemap: https://opten.space/sitemap.xml
+
+# Phase 4 D-14: AI-Preferences (IETF draft / Cloudflare proposal)
+Content-Signal: search=yes, ai-train=yes, ai-input=yes
