@@ -16,7 +16,7 @@ export interface FaqItem {
 const ru: FaqItem[] = [
   {
     q: "Что такое Opten и как он работает?",
-    a: "Opten — расширение для Chrome, которое оценивает твой промпт прямо в интерфейсе генератора (Syntx, Higgsfield, Freepik) и одним кликом улучшает его под конкретную модель: Midjourney, Sora, Kling, Nano Banana, GPT Image 2 и ещё 50+. Расширение само определяет модель по странице и применяет правила из её документации — оценка 0–100, до пяти конкретных замечаний и кнопка auto-enhance.",
+    a: "Opten — расширение для Chrome, которое оценивает твой промпт прямо в интерфейсе генератора (Syntx, Higgsfield, Freepik (включая Magnific)) и одним кликом улучшает его под конкретную модель: Midjourney, Sora, Kling, Nano Banana, GPT Image 2 и ещё 50+. Расширение само определяет модель по странице и применяет правила из её документации — оценка 0–100, до пяти конкретных замечаний и кнопка auto-enhance.",
   },
   {
     q: "Сколько стоит Opten?",
@@ -32,14 +32,14 @@ const ru: FaqItem[] = [
   },
   {
     q: "Где работает расширение?",
-    a: "Сейчас полная поддержка: syntx.ai (все страницы генерации), higgsfield.ai (image + video), freepik.com (AI-генераторы и brand mode). Активно расширяем покрытие на других AI-агрегаторов — Aitrix, TensorArt, OpenRouter, Flora, MagAI. Если на твоём любимом сайте Opten ещё не работает — напиши в Telegram @v_voronezhtsev, мы приоритизируем по запросам.",
+    a: "Сейчас полная поддержка: syntx.ai (все страницы генерации), higgsfield.ai (image + video), freepik.com (AI-генераторы, включая Magnific, и brand mode). Активно расширяем покрытие на других AI-агрегаторов — Aitrix, TensorArt, OpenRouter, Flora, MagAI. Если на твоём любимом сайте Opten ещё не работает — напиши в Telegram @v_voronezhtsev, мы приоритизируем по запросам.",
   },
 ];
 
 const en: FaqItem[] = [
   {
     q: "What is Opten and how does it work?",
-    a: "Opten is a Chrome extension that scores your prompt right inside the AI generator's interface (Syntx, Higgsfield, Freepik) and one-click improves it for the specific model: Midjourney, Sora, Kling, Nano Banana, GPT Image 2, and 50+ others. The extension auto-detects the model from the page URL and applies rules from that model's documentation — a 0–100 score, up to five specific issues, and an auto-enhance button.",
+    a: "Opten is a Chrome extension that scores your prompt right inside the AI generator's interface (Syntx, Higgsfield, Freepik (including Magnific)) and one-click improves it for the specific model: Midjourney, Sora, Kling, Nano Banana, GPT Image 2, and 50+ others. The extension auto-detects the model from the page URL and applies rules from that model's documentation — a 0–100 score, up to five specific issues, and an auto-enhance button.",
   },
   {
     q: "How much does Opten cost?",
@@ -55,7 +55,7 @@ const en: FaqItem[] = [
   },
   {
     q: "Where does the extension work?",
-    a: "Currently fully supported: syntx.ai (all generation pages), higgsfield.ai (image + video), freepik.com (AI generators and brand mode). We're actively expanding to other AI aggregators — Aitrix, TensorArt, OpenRouter, Flora, MagAI. If your favorite site isn't supported yet, message @v_voronezhtsev on Telegram and we'll prioritize by request volume.",
+    a: "Currently fully supported: syntx.ai (all generation pages), higgsfield.ai (image + video), freepik.com (AI generators including Magnific, and brand mode). We're actively expanding to other AI aggregators — Aitrix, TensorArt, OpenRouter, Flora, MagAI. If your favorite site isn't supported yet, message @v_voronezhtsev on Telegram and we'll prioritize by request volume.",
   },
 ];
 
