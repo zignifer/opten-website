@@ -51,6 +51,9 @@ export default function WelcomePage() {
       `}</style>
 
       <div className="w-full max-w-[520px] flex flex-col items-center gap-[32px]">
+        <h1 className="font-['PT_Root_UI',sans-serif] font-bold text-[#111] text-[28px] leading-[1.2] text-center md:text-[36px]">
+          {t("welcome.h1")}
+        </h1>
         {/* Auto-slider */}
         <div className="relative w-full overflow-hidden rounded-[12px]">
           {images.map((src, i) => (

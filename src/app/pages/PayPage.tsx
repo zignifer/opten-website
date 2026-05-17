@@ -418,6 +418,9 @@ export default function PayPage() {
         <div aria-hidden="true" className="opten-figma-gradient" />
         <div className="relative z-10 flex flex-col items-center overflow-clip">
           <div className="flex w-full max-w-[1440px] flex-col items-center gap-[40px] px-[20px] py-[32px] md:gap-[48px] md:px-[100px] md:py-[48px]">
+            <h1 className="text-center font-['PT_Root_UI',sans-serif] font-bold text-white text-[28px] leading-[1.2] md:text-[36px]">
+              {t("pay.h1")}
+            </h1>
             {/* Phase 66 (FE-01): RUB/USD pill toggle (D-01 style, D-02 position, D-03 compact width, D-07 i18n keys) */}
             <div
               role="tablist"
