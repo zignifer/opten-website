@@ -120,7 +120,7 @@ export const PERSON_FOUNDER_BLOCK: SchemaBlock = {
 // used to scope nested @id values (e.g. `${pageId}#faq`) so the same builder can produce
 // distinct entities on different routes without @id collisions.
 
-export function faqPageBlock(items: { q: string; a: string }[], pageId: string): SchemaBlock {
+export function faqPageBlock(items: readonly { q: string; a: string }[], pageId: string): SchemaBlock {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",

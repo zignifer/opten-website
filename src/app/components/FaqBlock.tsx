@@ -11,7 +11,7 @@ export interface FaqItem {
 }
 
 interface Props {
-  items: FaqItem[];
+  items: readonly FaqItem[];
   headingKey?: string;
   id?: string;
 }
