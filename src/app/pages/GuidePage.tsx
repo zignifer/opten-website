@@ -9,6 +9,15 @@ import LangSwitcher from "../components/LangSwitcher";
 import FaqBlock from "../components/FaqBlock";
 import { guidesBySlug, type GuideSlug } from "../../content/guides";
 
+// Post-2026-05-17 GEO audit HI-5: visible date block. AI/crawler reads "Опубликовано: 17 мая 2026"
+// directly + the machine-readable <time datetime=ISO> attribute.
+function formatGuideDate(iso: string, lang: "ru" | "en"): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const locale = lang === "ru" ? "ru-RU" : "en-US";
+  return d.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
+}
+
 function NotFoundFallback() {
   const t = useT();
   return (
@@ -53,10 +62,23 @@ export default function GuidePage() {
       </header>
 
       <main className="max-w-[800px] mx-auto px-[20px] pb-[40px]">
-        <h1 className="text-white text-[28px] md:text-[40px] font-medium leading-[1.15] tracking-[-0.6px] mb-[16px]">
+        <h1 className="text-white text-[28px] md:text-[40px] font-medium leading-[1.15] tracking-[-0.6px] mb-[12px]">
           {data.title}
         </h1>
-        <p className="text-[rgba(255,255,255,0.7)] text-[17px] md:text-[18px] leading-[1.6] mb-[40px]">
+        {/* Post-2026-05-17 GEO audit HI-5: visible byline + date. <time> carries machine-readable
+            ISO; visible text gives AI a citation anchor and humans a freshness signal. */}
+        <p className="text-[rgba(255,255,255,0.4)] text-[14px] leading-[1.5] mb-[20px]">
+          {t("guide.publishedLabel")}:{" "}
+          <time dateTime={data.publishedAt}>{formatGuideDate(data.publishedAt, lang)}</time>
+          {data.updatedAt !== data.publishedAt && (
+            <>
+              {" · "}
+              {t("guide.updatedLabel")}:{" "}
+              <time dateTime={data.updatedAt}>{formatGuideDate(data.updatedAt, lang)}</time>
+            </>
+          )}
+        </p>
+        <p className="guide-intro text-[rgba(255,255,255,0.7)] text-[17px] md:text-[18px] leading-[1.6] mb-[40px]">
           {data.intro}
         </p>
 
@@ -110,9 +132,9 @@ export default function GuidePage() {
       {/* Footer chrome (mirrors LegalLayout) */}
       <footer className="max-w-[800px] mx-auto px-[20px] py-[32px] border-t border-[rgba(255,255,255,0.1)]">
         <div className="flex flex-wrap gap-[24px] text-[14px] text-[rgba(255,255,255,0.4)]">
-          {lang === "ru" && (
-            <LocalizedLink to="/about" className="hover:text-white transition-colors no-underline text-inherit">{t("nav.about")}</LocalizedLink>
-          )}
+          {/* Phase 4.1 B-03: /en/about now exists — About link shown in both locales (same fix as
+              src/app/App.tsx footer/nav; this footer was missed in the original audit pass). */}
+          <LocalizedLink to="/about" className="hover:text-white transition-colors no-underline text-inherit">{t("nav.about")}</LocalizedLink>
           <LocalizedLink to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">{t("legal.footer.privacy")}</LocalizedLink>
           <LocalizedLink to="/terms" className="hover:text-white transition-colors no-underline text-inherit">{t("legal.footer.terms")}</LocalizedLink>
           <LocalizedLink to="/refund" className="hover:text-white transition-colors no-underline text-inherit">{t("legal.footer.refund")}</LocalizedLink>
