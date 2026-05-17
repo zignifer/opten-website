@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: ready_to_plan
-stopped_at: Phase 4 fully closed — 6/6 post-deploy UAT items PASS (Paddle/ЮKassa live click confirmed by user). Ready to plan Phase 5.
-last_updated: "2026-05-17T11:30:00.000Z"
-last_activity: 2026-05-17 -- Phase 04 post-deploy UAT completed (6/6 PASS)
+status: ready_to_execute
+stopped_at: Phase 4.1 planned (9 waves / 15 findings from 04-REVIEW.md). Ready for /gsd-execute-phase 4.1 or wave-by-wave execution. Phase 5 (brand authority) follows.
+last_updated: "2026-05-17T12:00:00.000Z"
+last_activity: 2026-05-17 -- Phase 04 closed (6/6 UAT PASS); Phase 04.1 planned with 9 atomic waves
 progress:
-  total_phases: 6
+  total_phases: 7
   completed_phases: 5
-  total_plans: 31
+  total_plans: 40
   completed_plans: 29
-  percent: 94
+  percent: 73
 ---
 
 # Project State
@@ -26,15 +26,15 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 
 ## Current Position
 
-Phase: 5
-Plan: Not started
-Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (~5 atomic commits `0a73069`..`81284d4`), 3 → 8/8 + 2 post-release fixes (`c789dee`, `bfd164b`), 4 → 6/7 plans shipped (04-02 replaced by 04-LCP-AUDIT Option-1 defer) + post-deploy UAT 6/6 PASS.
-Status: Ready to plan
+Phase: 4.1
+Plan: 04.1-PLAN.md (9 waves)
+Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (~5 atomic commits `0a73069`..`81284d4`), 3 → 8/8 + 2 post-release fixes (`c789dee`, `bfd164b`), 4 → 6/7 plans shipped (04-02 replaced by 04-LCP-AUDIT Option-1 defer) + post-deploy UAT 6/6 PASS, 4.1 → planned (0/9 waves executed).
+Status: Ready to execute
 Last activity: 2026-05-17
-Next: Phase 5 (brand authority) — backlog; planning not started.
+Next: Execute Phase 4.1 wave-by-wave. Wave 9 (PayPage.tsx) needs explicit approval before commit (extension-coupled). Then Phase 5 (brand authority).
 
-Milestone phases: 6 of 7 complete (1, 2, 2.1, 2.2, 3, 4). Phase 5 backlog.
-Progress: [█████████░] 94% — Phase 4 fully closed (6/6 post-deploy UAT PASS). Only Phase 5 remains.
+Milestone phases: 5 of 7 complete (1, 2, 2.1, 2.2, 3, 4 — 4 closed except for the 4.1 cleanup bucket). Phase 4.1 ready; Phase 5 backlog.
+Progress: [███████░░░] 73% — Phase 4 functionally shipped; 4.1 will close the review hangover before Phase 5 starts.
 
 ## Performance Metrics
 
@@ -129,11 +129,12 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-05-17
-Stopped at: Phase 4 fully closed. Post-deploy UAT 6/6 PASS, including Paddle/ЮKassa live-click on `/pay` + `/en/pay` (user-confirmed 2026-05-17). Mobile LCP measured at 3.5 s vs documented 3.3 s base — treated as PSI lab variance and recorded as the new regression floor for the Unbounded font-subsetting ticket. Only carry-over from Phase 4 to a separate ticket: the LCP fix itself.
+Stopped at: Phase 4 fully closed (6/6 UAT PASS). Phase 4.1 (cleanup of 04-REVIEW findings) planned — 9 atomic waves covering all 9 warnings + 6 info items. Ready for execution.
 Next action (in order):
 
-  1. **GEO rescore window** — pre-Phase-4 baseline = 48/100 (2026-05-17, `GEO-AUDIT-POST-PHASE-3.md`). 7–14 days after the Phase 4 deploy (window opens around 2026-05-24, closes around 2026-05-31), re-run `/geo audit https://opten.space` — target 65–73/100 per the audit's quick-win estimate. Capture both `/` and `/en/` for hreflang and bilingual content uplift.
-  2. **`/gsd-plan-phase 5`** — Phase 5 brand authority: Wikipedia/Wikidata seed, Product Hunt launch, Reddit + YouTube presence, expanded `sameAs` array. Mostly off-domain marketing work; the only code component is `sameAs` additions in the Organization/Person schemas built by `scripts/prerender.mjs`. Decide scope before planning — Phase 5 may be partially manual (off-domain) rather than fully atomic-commit-trackable.
-  3. **Lessons-learned capture (for future GSD)** — (a) Phase 2 hotfix pattern, (b) 02.2 inline-commit pattern, (c) Phase 3 post-release fix loop (D-07b "URL is the only signal" was too strict — needed storage for cross-page persistence), (d) Phase 4 LCP Option-1 defer pattern (audit ticket as a phase artifact instead of forcing the perf fix into the content phase). Useful anti-patterns reference for future plan-checker.
+  1. **Execute Phase 4.1 waves 1-8** — `scripts/prerender.mjs`, `scripts/seo-routes.ts`, `scripts/llms.mjs`, `FaqBlock.tsx`, new `scripts/verify-faq-mainentity.mjs`, `App.tsx` + i18n dicts, `AboutPage.tsx`, `entry-server.tsx` assert in `prerender.mjs`. All low-risk; auto-commit per `feedback_commit_policy.md` (code outside the integration contract surface is OK to commit autonomously after this approval round).
+  2. **Wave 9 — PayPage.tsx — REQUIRES APPROVAL** — fixes WR-04 (detectExtension race) + IN-02 (`/#faq` lang-aware). Extension-coupled surface; per `feedback_autonomy_and_caution.md` I stop and confirm before committing.
+  3. **GEO rescore window** — pre-Phase-4 baseline = 48/100 (2026-05-17, `GEO-AUDIT-POST-PHASE-3.md`). 7–14 days after Phase 4 / 4.1 deploys (window opens ~2026-05-24, closes ~2026-05-31), re-run `/geo audit https://opten.space` — target 65–73/100. Capture both `/` and `/en/`.
+  4. **`/gsd-plan-phase 5`** — Phase 5 brand authority: Wikipedia/Wikidata seed, Product Hunt launch, Reddit + YouTube presence, expanded `sameAs` array. Mostly off-domain marketing work; small code component (sameAs additions only). Plan after Phase 4.1 closes.
 
-Resume file: `.planning/phases/04-content-surface/04-HUMAN-UAT.md` (closure record) and `.planning/PROJECT.md` (read before Phase 5 planning to refresh integration contract).
+Resume file: `.planning/phases/04.1-content-surface-cleanup/04.1-PLAN.md`.
