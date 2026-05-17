@@ -12,6 +12,7 @@ import PrivacyPage from "../src/app/pages/PrivacyPage.tsx";
 import TermsPage from "../src/app/pages/TermsPage.tsx";
 import RefundPage from "../src/app/pages/RefundPage.tsx";
 import PayPage from "../src/app/pages/PayPage.tsx";
+import AboutPage from "../src/app/pages/AboutPage.tsx";
 import "../src/styles/index.css";
 import { LangProvider } from "../src/i18n/LangContext";
 import { RouteLoading } from "../src/app/components/RouteLoading";
@@ -33,7 +34,8 @@ export function renderRoute(path: string): string {
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/refund" element={<RefundPage />} />
             <Route path="/pay" element={<PayPage />} />
-            {/* Phase 4 D-12: /pay AND /en/pay are now SSR-mounted (flipped from head-only to full prerender). /success /account /dashboard/* remain SPA-only — intentionally NOT mounted here. */}
+            <Route path="/about" element={<AboutPage />} />
+            {/* Phase 4 D-12: /pay AND /en/pay are now SSR-mounted (flipped from head-only to full prerender). Phase 4 D-01/D-02: /about is RU-only — no /en/about mount. /success /account /dashboard/* remain SPA-only — intentionally NOT mounted here. */}
             <Route path="/en/"        element={<App />} />
             <Route path="/en/welcome" element={<WelcomePage />} />
             <Route path="/en/privacy" element={<PrivacyPage />} />

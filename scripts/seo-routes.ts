@@ -372,6 +372,39 @@ export const routes: RouteMeta[] = [
     ],
   },
 
+  // Phase 4 D-01 / D-02: RU-only /about entry. NO /en/about sibling — deferred to Phase 4.1.
+  // hreflang.en falls back to landing per D-02 (NOT to a non-existent /en/about).
+  {
+    path: "/about",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/about`,
+      en: `${SITE_ORIGIN}/`,           // D-02 — no /en/about; fallback to landing
+      xDefault: `${SITE_ORIGIN}/about`,
+    },
+    title: "О проекте Opten — кто стоит за расширением",
+    description: "Opten — личный проект Влада Воронежцева, AI-блогера и автора Chrome-расширения для оценки промптов. История создания, контакты, реквизиты.",
+    canonical: `${SITE_ORIGIN}/about`,
+    ogTitle: "О проекте Opten",
+    ogDescription: "История создания Opten — расширения для оценки промптов под конкретную AI-модель.",
+    prerender: "full",
+    changefreq: "yearly",
+    priority: 0.5,
+    // Phase 4 D-09: Org + Person (founder) + breadcrumb (Главная → О проекте).
+    // PERSON_FOUNDER_BLOCK still has image commented per locked decision option (c) — photo deferred.
+    schema: [
+      ORG_BLOCK,
+      PERSON_FOUNDER_BLOCK,
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "О проекте", url: `${SITE_ORIGIN}/about` },
+        ],
+        `${SITE_ORIGIN}/about`,
+      ),
+    ],
+  },
+
   // Phase 3 D-04: EN siblings (6 entries). EN ogImage = DEFAULT_OG_IMAGE_EN. SYNC: title/description duplicated from src/i18n/en.json — see line 2 SYNC policy.
   {
     path: "/en/",
