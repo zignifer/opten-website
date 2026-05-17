@@ -239,11 +239,28 @@ export const routes: RouteMeta[] = [
     canonical: `${SITE_ORIGIN}/pay`,
     ogTitle: "Тарифы Opten — Pro с 300 генерациями в месяц",
     ogDescription: "Перейди на Pro и улучшай промпты в один клик. 199₽/мес или $2.99/мес. Начни бесплатно.",
-    prerender: "head",
+    prerender: "full", // Phase 4 D-12: flipped from "head" so PricingStaticBlock body lands in initial HTML
     changefreq: "monthly",
     priority: 0.8,
-    // Phase 4 D-09: Org only — Product schema added in Plan 04-04 alongside D-12 full-prerender flip.
-    schema: [ORG_BLOCK],
+    // Phase 4 D-09 / D-12: Org + Product (multi-currency offers) + breadcrumb.
+    schema: [
+      ORG_BLOCK,
+      productBlock(
+        [
+          { name: "Pro Monthly (RU)", price: "199", currency: "RUB" },
+          { name: "Pro Monthly", price: "2.99", currency: "USD" },
+          { name: "Free tier", price: "0", currency: "USD" },
+        ],
+        `${SITE_ORIGIN}/pay`,
+      ),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Тарифы", url: `${SITE_ORIGIN}/pay` },
+        ],
+        `${SITE_ORIGIN}/pay`,
+      ),
+    ],
   },
   {
     path: "/welcome",
@@ -390,11 +407,27 @@ export const routes: RouteMeta[] = [
     ogTitle: "Opten pricing — Pro with 300 checks per month",
     ogDescription: "Upgrade to Pro and improve prompts in one click. $2.99/mo or 199₽/mo. Start for free.",
     ogImage: DEFAULT_OG_IMAGE_EN,
-    prerender: "head",
+    prerender: "full", // Phase 4 D-12
     changefreq: "monthly",
     priority: 0.8,
-    // Phase 4 D-09: Org only — Product schema added in Plan 04-04 alongside D-12 full-prerender flip.
-    schema: [ORG_BLOCK],
+    schema: [
+      ORG_BLOCK,
+      productBlock(
+        [
+          { name: "Pro Monthly (RU)", price: "199", currency: "RUB" },
+          { name: "Pro Monthly", price: "2.99", currency: "USD" },
+          { name: "Free tier", price: "0", currency: "USD" },
+        ],
+        `${SITE_ORIGIN}/en/pay`,
+      ),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Pricing", url: `${SITE_ORIGIN}/en/pay` },
+        ],
+        `${SITE_ORIGIN}/en/pay`,
+      ),
+    ],
   },
   {
     path: "/en/welcome",
