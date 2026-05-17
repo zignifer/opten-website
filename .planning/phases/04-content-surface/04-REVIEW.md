@@ -28,7 +28,12 @@ findings:
   warning: 9
   info: 6
   total: 17
-status: issues_found
+critical_resolved:
+  - CR-01  # fixed in commit eee40f6 — applyJsonLd escapes <,>,& to < > &
+  - CR-02  # fixed in commit eee40f6 — RU /refund description aligned 7 → 3 days
+warnings_status: deferred-phase-4.1
+info_status: deferred-phase-4.1
+status: critical_resolved
 ---
 
 # Phase 4: Code Review Report
