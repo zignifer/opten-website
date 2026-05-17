@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to run GSD spec-phase
-stopped_at: Phase 4.1 complete — 13/13 plans shipped + review fixes + WR-04 user-decided copy reword. 8/8 ROADMAP criteria PASS code/build level. Post-deploy UAT deferred. Phase 5 (Brand authority) is mostly off-site work — needs human-driven launch sequence, not GSD execution.
-last_updated: "2026-05-17T13:52:00.373Z"
+stopped_at: "Phase 4.1 fully shipped (17 commits, 8/8 ROADMAP criteria PASS code/build). User stopped /gsd-autonomous before Phase 5 (Brand authority): off-site work — Product Hunt launch, Wikipedia entry, Reddit/YouTube — not auto-executable. Phase 5 remains [ ] in ROADMAP as backlog; resume with /gsd-spec-phase 5 (or revisit roadmap) when launch bandwidth is available."
+last_updated: "2026-05-17T14:05:07.419Z"
 last_activity: 2026-05-17
 progress:
   total_phases: 7
@@ -128,8 +128,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-17T13:52:00.359Z
-Stopped at: Phase 4.1 complete — 13/13 plans shipped + review fixes + WR-04 user-decided copy reword. 8/8 ROADMAP criteria PASS code/build level. Post-deploy UAT deferred. Phase 5 (Brand authority) is mostly off-site work — needs human-driven launch sequence, not GSD execution.
+Last session: 2026-05-17T14:05:07.408Z
+Stopped at: Phase 4.1 fully shipped (17 commits, 8/8 ROADMAP criteria PASS code/build). User stopped /gsd-autonomous before Phase 5 (Brand authority): off-site work — Product Hunt launch, Wikipedia entry, Reddit/YouTube — not auto-executable. Phase 5 remains [ ] in ROADMAP as backlog; resume with /gsd-spec-phase 5 (or revisit roadmap) when launch bandwidth is available.
 Next action (in order):
 
   1. **Execute Phase 4.1 waves 1-8** — `scripts/prerender.mjs`, `scripts/seo-routes.ts`, `scripts/llms.mjs`, `FaqBlock.tsx`, new `scripts/verify-faq-mainentity.mjs`, `App.tsx` + i18n dicts, `AboutPage.tsx`, `entry-server.tsx` assert in `prerender.mjs`. All low-risk; auto-commit per `feedback_commit_policy.md` (code outside the integration contract surface is OK to commit autonomously after this approval round).
