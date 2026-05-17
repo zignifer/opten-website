@@ -270,6 +270,63 @@ export function productBlock(plans: { name: string; price: string; currency: str
   return product;
 }
 
+// Post-2026-05-17 GEO audit HI-4: Article wrapper gives AI a canonical author+date attribution that
+// HowTo/FAQPage alone don't carry. `type: "TechArticle"` for technical guides, `"Article"` for /about.
+// Cross-refs PERSON_FOUNDER_BLOCK as `author` and ORG_BLOCK as `publisher` via existing @id graph.
+export function articleBlock(opts: {
+  pageId: string;
+  type?: "Article" | "TechArticle";
+  headline: string;
+  description: string;
+  datePublished: string;
+  dateModified: string;
+  inLanguage: "ru-RU" | "en-US";
+  articleSection?: string;
+  image?: string;
+}): SchemaBlock {
+  return {
+    "@context": "https://schema.org",
+    "@type": opts.type ?? "Article",
+    "@id": `${opts.pageId}#article`,
+    headline: opts.headline,
+    description: opts.description,
+    author: PERSON_FOUNDER_REF,
+    publisher: ORG_REF,
+    datePublished: opts.datePublished,
+    dateModified: opts.dateModified,
+    inLanguage: opts.inLanguage,
+    mainEntityOfPage: opts.pageId,
+    ...(opts.articleSection ? { articleSection: opts.articleSection } : {}),
+    ...(opts.image ? { image: opts.image } : {}),
+  };
+}
+
+// Post-2026-05-17 GEO audit ME-4: speakable declares which CSS-selected fragments are voice-ready
+// for Google Assistant / Perplexity voice mode. Empty everywhere → instant +8 in audit ME-4.
+export function webPageBlock(opts: {
+  pageId: string;
+  url: string;
+  name: string;
+  inLanguage: "ru-RU" | "en-US";
+  cssSelector: string[];
+  about?: { "@id": string };
+}): SchemaBlock {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${opts.pageId}#webpage`,
+    url: opts.url,
+    name: opts.name,
+    isPartOf: WEBSITE_REF,
+    inLanguage: opts.inLanguage,
+    ...(opts.about ? { about: opts.about } : {}),
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: opts.cssSelector,
+    },
+  };
+}
+
 export function breadcrumbBlock(items: { name: string; url: string }[], pageId: string): SchemaBlock {
   return {
     "@context": "https://schema.org",
@@ -303,7 +360,21 @@ export const routes: RouteMeta[] = [
     changefreq: "weekly",
     priority: 1.0,
     // Phase 4 D-09 / D-08 / V-10: Org + SoftwareApp + WebSite + FAQPage landing graph.
-    schema: [ORG_BLOCK, SOFTWARE_APP_BLOCK, WEBSITE_BLOCK, faqPageBlock(landingFaq.ru, `${SITE_ORIGIN}/`)],
+    // Post-2026-05-17 audit ME-4: +WebPage with speakable on H1 + FAQ Q&A (voice/AI extraction).
+    schema: [
+      ORG_BLOCK,
+      SOFTWARE_APP_BLOCK,
+      WEBSITE_BLOCK,
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/`,
+        url: `${SITE_ORIGIN}/`,
+        name: "Opten — AI prompt scorer",
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".faq-question", ".faq-answer"],
+        about: SOFTWARE_APP_REF,
+      }),
+      faqPageBlock(landingFaq.ru, `${SITE_ORIGIN}/`),
+    ],
   },
   {
     path: "/pay",
@@ -471,9 +542,20 @@ export const routes: RouteMeta[] = [
     priority: 0.5,
     // Phase 4 D-09: Org + Person (founder) + breadcrumb (Главная → О проекте).
     // PERSON_FOUNDER_BLOCK still has image commented per locked decision option (c) — photo deferred.
+    // Post-2026-05-17 audit HI-4: +Article gives AI canonical author+date for /about copy.
     schema: [
       ORG_BLOCK,
       PERSON_FOUNDER_BLOCK,
+      articleBlock({
+        pageId: `${SITE_ORIGIN}/about`,
+        type: "Article",
+        headline: "О проекте Opten — кто стоит за расширением",
+        description: "Opten — личный проект Влада Воронежцева, AI-блогера и автора Chrome-расширения для оценки промптов.",
+        datePublished: "2026-05-17",
+        dateModified: "2026-05-17",
+        inLanguage: "ru-RU",
+        articleSection: "About",
+      }),
       breadcrumbBlock(
         [
           { name: "Главная", url: `${SITE_ORIGIN}/` },
@@ -501,8 +583,27 @@ export const routes: RouteMeta[] = [
     prerender: "full",
     changefreq: "monthly",
     priority: 0.7,
+    // Post-2026-05-17 audit HI-4/HI-5/ME-4: +TechArticle (author/datePublished/dateModified attribution
+    // for AI), +WebPage with speakable on H1 + intro + section headings.
     schema: [
       ORG_BLOCK,
+      articleBlock({
+        pageId: `${SITE_ORIGIN}/guides/gpt-image-2`,
+        type: "TechArticle",
+        headline: gptImage2Guide.ru.title,
+        description: "Структура промпта, шаблон Change/Preserve/Constraints, итерация вместо overload — 5 шагов от случайной генерации к точному результату в GPT Image 2.",
+        datePublished: gptImage2Guide.ru.publishedAt,
+        dateModified: gptImage2Guide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "AI prompt engineering",
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/guides/gpt-image-2`,
+        url: `${SITE_ORIGIN}/guides/gpt-image-2`,
+        name: gptImage2Guide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".guide-intro", "h2"],
+      }),
       howToBlock(
         gptImage2Guide.ru.steps.map((s) => ({ title: s.title, body: s.body })),
         `${SITE_ORIGIN}/guides/gpt-image-2`,
@@ -541,7 +642,21 @@ export const routes: RouteMeta[] = [
     changefreq: "weekly",
     priority: 1.0,
     // Phase 4 D-09 / D-08 / V-10: Org + SoftwareApp + WebSite + EN FAQPage (separate from RU set — Q/A localized).
-    schema: [ORG_BLOCK, SOFTWARE_APP_BLOCK, WEBSITE_BLOCK, faqPageBlock(landingFaq.en, `${SITE_ORIGIN}/en/`)],
+    // Post-2026-05-17 audit ME-4: +WebPage with speakable on H1 + FAQ Q&A.
+    schema: [
+      ORG_BLOCK,
+      SOFTWARE_APP_BLOCK,
+      WEBSITE_BLOCK,
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/`,
+        url: `${SITE_ORIGIN}/en/`,
+        name: "Opten — AI prompt scorer",
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".faq-question", ".faq-answer"],
+        about: SOFTWARE_APP_REF,
+      }),
+      faqPageBlock(landingFaq.en, `${SITE_ORIGIN}/en/`),
+    ],
   },
   {
     path: "/en/pay",
@@ -714,6 +829,16 @@ export const routes: RouteMeta[] = [
     schema: [
       ORG_BLOCK,
       PERSON_FOUNDER_BLOCK,
+      articleBlock({
+        pageId: `${SITE_ORIGIN}/en/about`,
+        type: "Article",
+        headline: "About Opten — who's behind the extension",
+        description: "Opten is a personal project by Vlad Voronezhtsev, AI blogger and creator of the Chrome extension for prompt scoring.",
+        datePublished: "2026-05-17",
+        dateModified: "2026-05-17",
+        inLanguage: "en-US",
+        articleSection: "About",
+      }),
       breadcrumbBlock(
         [
           { name: "Home", url: `${SITE_ORIGIN}/en/` },
@@ -744,6 +869,23 @@ export const routes: RouteMeta[] = [
     priority: 0.7,
     schema: [
       ORG_BLOCK,
+      articleBlock({
+        pageId: `${SITE_ORIGIN}/en/guides/gpt-image-2`,
+        type: "TechArticle",
+        headline: gptImage2Guide.en.title,
+        description: "Structure, Change/Preserve/Constraints template, iterate-don't-overload — 5 steps from random output to precise GPT Image 2 results.",
+        datePublished: gptImage2Guide.en.publishedAt,
+        dateModified: gptImage2Guide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "AI prompt engineering",
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/guides/gpt-image-2`,
+        url: `${SITE_ORIGIN}/en/guides/gpt-image-2`,
+        name: gptImage2Guide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".guide-intro", "h2"],
+      }),
       howToBlock(
         gptImage2Guide.en.steps.map((s) => ({ title: s.title, body: s.body })),
         `${SITE_ORIGIN}/en/guides/gpt-image-2`,
