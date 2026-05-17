@@ -15,13 +15,18 @@
  *   Unbounded-VF.woff2  253 KB, covers weights 200-900 (we use 400 / 700)
  */
 
+/* Post-2026-05-17 GEO audit CR-4: font-display: optional kills the swap-shift that produced
+ * CLS 0.129 on RU mobile (long Cyrillic words reflow when PT Root UI replaces the system fallback
+ * after several hundred ms on slow networks). With `optional` the browser keeps the system font
+ * forever if PT Root UI hasn't arrived within ~100ms — visually nearly identical for body text,
+ * zero CLS. Preload also dropped in index.html so the file doesn't compete with the LCP element. */
 @font-face {
   font-family: 'PT Root UI';
   src: url('/fonts/PT-Root-UI_VF.woff2') format('woff2-variations'),
        url('/fonts/PT-Root-UI_VF.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 
 @font-face {

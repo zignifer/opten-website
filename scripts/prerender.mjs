@@ -244,8 +244,12 @@ function applyJsonLd(html, meta) {
 // Runs on every route (preloads must be on every prerendered file).
 // Phase 4.1 IN-05: paths lifted to a single source-of-truth constant; regexes are
 // derived per-iteration so the literal paths read as plain strings (easier to audit).
+// Post-2026-05-17 GEO audit CR-4: PT Root UI preload dropped to unblock mobile LCP (was 3.5s on
+// RU mobile, with CLS 0.129 from the swap-shift). PT Root UI's @font-face now uses
+// `font-display: optional` (src/styles/fonts.css) — the browser keeps the system fallback until
+// the file arrives, no swap shift, no CLS. Unbounded stays preloaded because it's the H1 hero
+// (LCP element on every prerendered route).
 const REQUIRED_FONT_PRELOADS = [
-  "/fonts/PT-Root-UI_VF.woff2",
   "/fonts/Unbounded-VF.woff2",
 ];
 function applyHeroPreloadGuard(html, meta) {
