@@ -10,6 +10,7 @@
   import PayPage from "./app/pages/PayPage.tsx";
   import AboutPage from "./app/pages/AboutPage.tsx";
   import GuidePage from "./app/pages/GuidePage.tsx";
+  import NotFound from "./app/pages/NotFound.tsx";
   import "./styles/index.css";
   import { LangProvider } from "./i18n/LangContext";
   import { RouteLoading } from "./app/components/RouteLoading";
@@ -71,6 +72,8 @@
             <Route path="/en/refund"  element={<RefundPage />} />
             <Route path="/en/about"   element={<AboutPage />} /> {/* Phase 4.1 B-03: EN sibling for /about */}
             <Route path="/en/guides/:slug" element={<GuidePage />} />
+            {/* Phase 4.2 / Wave 3 (P1-1): catch-all 404. MUST be LAST — React Router 7 matches in declaration order, so any earlier `*` would shadow specific routes. NotFound injects <meta name="robots" content="noindex,nofollow"> at runtime to stop search engines from indexing typo'd URLs as duplicates of the landing. Status code stays 200 (Vercel SPA rewrite is unchanged; HTTP 404 is deferred to Phase 6 per CONTEXT D-3). */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </LangProvider>

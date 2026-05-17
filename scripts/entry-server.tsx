@@ -14,6 +14,7 @@ import RefundPage from "../src/app/pages/RefundPage.tsx";
 import PayPage from "../src/app/pages/PayPage.tsx";
 import AboutPage from "../src/app/pages/AboutPage.tsx";
 import GuidePage from "../src/app/pages/GuidePage.tsx";
+import NotFound from "../src/app/pages/NotFound.tsx";
 import "../src/styles/index.css";
 import { LangProvider } from "../src/i18n/LangContext";
 import { RouteLoading } from "../src/app/components/RouteLoading";
@@ -46,6 +47,8 @@ export function renderRoute(path: string): string {
             <Route path="/en/pay"     element={<PayPage />} />
             <Route path="/en/about"   element={<AboutPage />} />
             <Route path="/en/guides/:slug" element={<GuidePage />} />
+            {/* Phase 4.2 / Wave 3 (P1-1): catch-all 404 mirrored for SSR parity (defense in depth — prerender.mjs only iterates seo-routes.ts entries, so NotFound is never SSR-rendered today; mirror prevents a future typo'd manifest entry from silently rendering empty). */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </LangProvider>
