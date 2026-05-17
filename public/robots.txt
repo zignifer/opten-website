@@ -7,6 +7,12 @@ Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
 
+# Post-2026-05-17 GEO audit HI-8 / cross-platform synergy: each AI crawler addressed explicitly
+# instead of relying on the wildcard. Even though `User-agent: *` covers them, explicit blocks
+# (a) survive future wildcard edits, (b) match each vendor's documentation, (c) carry the full
+# Disallow set (previously anthropic-ai/Applebot-Extended/cohere-ai lacked Disallow entirely).
+
+# OpenAI — ChatGPT training corpus
 User-agent: GPTBot
 Allow: /
 Disallow: /account
@@ -16,6 +22,27 @@ Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
 
+# OpenAI — ChatGPT browse mode (live user-initiated fetches)
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /account
+Disallow: /en/account
+Disallow: /success
+Disallow: /en/success
+Disallow: /dashboard/
+Disallow: /en/dashboard/
+
+# OpenAI — SearchGPT / ChatGPT Search (separate product from GPTBot)
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /account
+Disallow: /en/account
+Disallow: /success
+Disallow: /en/success
+Disallow: /dashboard/
+Disallow: /en/dashboard/
+
+# Anthropic — Claude crawler
 User-agent: ClaudeBot
 Allow: /
 Disallow: /account
@@ -25,6 +52,17 @@ Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
 
+# Anthropic — legacy crawler name still referenced in some docs
+User-agent: anthropic-ai
+Allow: /
+Disallow: /account
+Disallow: /en/account
+Disallow: /success
+Disallow: /en/success
+Disallow: /dashboard/
+Disallow: /en/dashboard/
+
+# Perplexity — search engine
 User-agent: PerplexityBot
 Allow: /
 Disallow: /account
@@ -34,6 +72,7 @@ Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
 
+# Google — Gemini training corpus (separate flag from Googlebot)
 User-agent: Google-Extended
 Allow: /
 Disallow: /account
@@ -43,14 +82,85 @@ Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
 
+# Microsoft Bing — feeds Bing Copilot
+User-agent: Bingbot
+Allow: /
+Disallow: /account
+Disallow: /en/account
+Disallow: /success
+Disallow: /en/success
+Disallow: /dashboard/
+Disallow: /en/dashboard/
+
+# Yandex — critical for RU audience
+User-agent: YandexBot
+Allow: /
+Disallow: /account
+Disallow: /en/account
+Disallow: /success
+Disallow: /en/success
+Disallow: /dashboard/
+Disallow: /en/dashboard/
+
+# Apple — Apple Intelligence training
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /account
+Disallow: /en/account
+Disallow: /success
+Disallow: /en/success
+Disallow: /dashboard/
+Disallow: /en/dashboard/
 
+# Cohere — Command-R training corpus
 User-agent: cohere-ai
 Allow: /
+Disallow: /account
+Disallow: /en/account
+Disallow: /success
+Disallow: /en/success
+Disallow: /dashboard/
+Disallow: /en/dashboard/
 
-User-agent: anthropic-ai
+# Meta — Llama training corpus
+User-agent: Meta-ExternalAgent
 Allow: /
+Disallow: /account
+Disallow: /en/account
+Disallow: /success
+Disallow: /en/success
+Disallow: /dashboard/
+Disallow: /en/dashboard/
+
+# Amazon — Alexa / Amazon Bedrock training
+User-agent: Amazonbot
+Allow: /
+Disallow: /account
+Disallow: /en/account
+Disallow: /success
+Disallow: /en/success
+Disallow: /dashboard/
+Disallow: /en/dashboard/
+
+# Common Crawl — feeds the open-source LLM corpus that most non-frontier models are trained on
+User-agent: CCBot
+Allow: /
+Disallow: /account
+Disallow: /en/account
+Disallow: /success
+Disallow: /en/success
+Disallow: /dashboard/
+Disallow: /en/dashboard/
+
+# ByteDance — Doubao / TikTok training corpus
+User-agent: Bytespider
+Allow: /
+Disallow: /account
+Disallow: /en/account
+Disallow: /success
+Disallow: /en/success
+Disallow: /dashboard/
+Disallow: /en/dashboard/
 
 Sitemap: https://opten.space/sitemap.xml
 
