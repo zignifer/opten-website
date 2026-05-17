@@ -110,6 +110,7 @@ function InstallButton({ compact = false, label }: { compact?: boolean; label?: 
 
 function Navbar() {
   const t = useT();
+  const { lang } = useLang();
   const [open, setOpen] = useState(false);
 
   return (
@@ -128,6 +129,10 @@ function Navbar() {
           <a href="#features" className="opacity-90 transition hover:opacity-100">{t("nav.features")}</a>
           <a href="#pricing" className="opacity-90 transition hover:opacity-100">{t("nav.pricing")}</a>
           <a href="#faq" className="opacity-90 transition hover:opacity-100">{t("nav.faq")}</a>
+          {/* Phase 4 D-01 / D-16: About link, RU-only — hide-entirely option per CONTEXT D-16 (no /en/about exists). */}
+          {lang === "ru" && (
+            <LocalizedLink to="/about" className="opacity-90 transition hover:opacity-100">{t("nav.about")}</LocalizedLink>
+          )}
           <LangSwitcher className="bg-transparent font-['PT_Root_UI',sans-serif] text-[14px] text-white/45 transition hover:text-white" />
         </div>
 
@@ -151,6 +156,10 @@ function Navbar() {
           <a href="#features" onClick={() => setOpen(false)}>{t("nav.features")}</a>
           <a href="#pricing" onClick={() => setOpen(false)}>{t("nav.pricing")}</a>
           <a href="#faq" onClick={() => setOpen(false)}>{t("nav.faq")}</a>
+          {/* Phase 4 D-01 / D-16: About link, RU-only (mobile menu mirror of desktop nav). */}
+          {lang === "ru" && (
+            <LocalizedLink to="/about" onClick={() => setOpen(false)}>{t("nav.about")}</LocalizedLink>
+          )}
           <LangSwitcher className="w-fit bg-transparent p-0 text-left text-white/60" onSwitch={() => setOpen(false)} />
         </div>
       )}
@@ -500,6 +509,10 @@ function Footer() {
           <span>{t("cta.freeLabel")}</span>
         </div>
         <div className="mt-20 flex flex-wrap justify-center gap-x-5 gap-y-4 font-['PT_Root_UI',sans-serif] text-[16px] text-white/40 sm:gap-8">
+          {/* Phase 4 D-01 / D-16: About link, RU-only (footer mirror). */}
+          {lang === "ru" && (
+            <LocalizedLink to="/about" className="hover:text-white">{t("nav.about")}</LocalizedLink>
+          )}
           <LocalizedLink to="/privacy" className="hover:text-white">{t("footer.privacy")}</LocalizedLink>
           <LocalizedLink to="/terms" className="hover:text-white">{t("footer.terms")}</LocalizedLink>
           <LocalizedLink to="/refund" className="hover:text-white">{t("footer.refund")}</LocalizedLink>
