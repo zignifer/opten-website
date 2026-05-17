@@ -397,14 +397,14 @@ export const routes: RouteMeta[] = [
     ],
   },
 
-  // Phase 4 D-01 / D-02: RU-only /about entry. NO /en/about sibling — deferred to Phase 4.1.
-  // hreflang.en falls back to landing per D-02 (NOT to a non-existent /en/about).
+  // Phase 4 D-01 / D-02 / Phase 4.1 B-03: RU /about entry, now with reciprocal EN sibling at /en/about.
+  // hreflang.en flipped from `/` (D-02 fallback) to `/en/about` (true sibling — B-03 closure).
   {
     path: "/about",
     htmlLang: "ru",
     hreflangAlternates: {
       ru: `${SITE_ORIGIN}/about`,
-      en: `${SITE_ORIGIN}/`,           // D-02 — no /en/about; fallback to landing
+      en: `${SITE_ORIGIN}/en/about`,    // Phase 4.1 B-03: reciprocal pair
       xDefault: `${SITE_ORIGIN}/about`,
     },
     title: "О проекте Opten — кто стоит за расширением",
@@ -634,6 +634,38 @@ export const routes: RouteMeta[] = [
           { name: "Refund Policy", url: `${SITE_ORIGIN}/en/refund` },
         ],
         `${SITE_ORIGIN}/en/refund`,
+      ),
+    ],
+  },
+
+  // Phase 4.1 B-03: /en/about EN sibling. Mirrors the RU /about entry — Org + Person (founder) + breadcrumb (Home → About).
+  // PERSON_FOUNDER_BLOCK is shared with the RU entry (same @id graph node) so search engines see one Person across both locales.
+  {
+    path: "/en/about",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/about`,
+      en: `${SITE_ORIGIN}/en/about`,
+      xDefault: `${SITE_ORIGIN}/about`,
+    },
+    title: "About Opten — who's behind the extension",
+    description: "Opten is a personal project by Vlad Voronezhtsev, AI blogger and creator of the Chrome extension for prompt scoring. Origin story, contacts, legal details.",
+    canonical: `${SITE_ORIGIN}/en/about`,
+    ogTitle: "About Opten",
+    ogDescription: "Origin story of Opten — the extension for scoring prompts against specific AI models.",
+    ogImage: DEFAULT_OG_IMAGE_EN,
+    prerender: "full",
+    changefreq: "yearly",
+    priority: 0.5,
+    schema: [
+      ORG_BLOCK,
+      PERSON_FOUNDER_BLOCK,
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "About", url: `${SITE_ORIGIN}/en/about` },
+        ],
+        `${SITE_ORIGIN}/en/about`,
       ),
     ],
   },

@@ -37,13 +37,14 @@ export function renderRoute(path: string): string {
             <Route path="/pay" element={<PayPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/guides/:slug" element={<GuidePage />} />
-            {/* Phase 4 D-12: /pay AND /en/pay are now SSR-mounted (flipped from head-only to full prerender). Phase 4 D-01/D-02: /about is RU-only — no /en/about mount. Phase 4 D-06: /guides/:slug bilingual. /success /account /dashboard/* remain SPA-only — intentionally NOT mounted here. */}
+            {/* Phase 4 D-12: /pay AND /en/pay are SSR-mounted. Phase 4 D-06: /guides/:slug bilingual. Phase 4.1 B-03: /en/about now mounted (RU-only restriction lifted). /success /account /dashboard/* remain SPA-only — intentionally NOT mounted here. */}
             <Route path="/en/"        element={<App />} />
             <Route path="/en/welcome" element={<WelcomePage />} />
             <Route path="/en/privacy" element={<PrivacyPage />} />
             <Route path="/en/terms"   element={<TermsPage />} />
             <Route path="/en/refund"  element={<RefundPage />} />
             <Route path="/en/pay"     element={<PayPage />} />
+            <Route path="/en/about"   element={<AboutPage />} />
             <Route path="/en/guides/:slug" element={<GuidePage />} />
           </Routes>
         </Suspense>

@@ -69,6 +69,7 @@
             <Route path="/en/privacy" element={<PrivacyPage />} />
             <Route path="/en/terms"   element={<TermsPage />} />
             <Route path="/en/refund"  element={<RefundPage />} />
+            <Route path="/en/about"   element={<AboutPage />} /> {/* Phase 4.1 B-03: EN sibling for /about */}
             <Route path="/en/guides/:slug" element={<GuidePage />} />
           </Routes>
         </Suspense>

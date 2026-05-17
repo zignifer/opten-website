@@ -133,9 +133,120 @@ const ru: AboutContent = {
   ],
 };
 
-// EN body intentionally `null` in W12a — populated in W12b after the user-approved translation lands.
-// Consumers MUST guard with `aboutContent[lang] ?? aboutContent.ru` so the EN render path falls
-// through to RU until W12b lands. Once W12b populates this, the fallback becomes a no-op.
-const en: AboutContent | null = null;
+// Phase 4.1 W12b (B-03): EN body populated. Translation reviewed and approved by founder.
+// Mirrors the RU structure: 4 sections (origin / why prompts / what you get / contact).
+// First-person, founder voice; same register as RU; all factual claims preserved
+// (subscriber counts, supported sites incl. Magnific via Freepik, pricing in both currencies,
+// IP / Paddle Merchant of Record details, /terms + /refund LocalizedLinks).
+const en: AboutContent = {
+  sections: [
+    {
+      heading: "How Opten came to be",
+      body: (
+        <>
+          <p className="mb-[14px]">
+            I'm Vlad Voronezhtsev — I make YouTube Shorts about AI image and video generation
+            (channel <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>,
+            4,500+ subscribers, 54 videos, around 7 million views in a year). I'm a web designer
+            by trade, but in 2024 I went all in on AI creative work: Midjourney, Kling, Veo, Sora,
+            Nano Banana, Seedance — I tried just about everything that shipped.
+          </p>
+          <p className="mb-[14px]">
+            The more content I made, the more I kept seeing the same pattern: people open Syntx,
+            Higgsfield, Freepik or Magnific, write a prompt "off the cuff", get a mediocre result —
+            and conclude that the model is bad. When in fact there's a powerful model under the hood,
+            it just doesn't understand what they want. Prompting is a skill. Nobody really teaches it.
+          </p>
+          <p className="mb-[14px]">
+            I started Opten in fall 2025 for myself — I needed a tool that would show in real time
+            how well my prompt "lands" for a specific model and what to improve. The personal experiment
+            quickly turned into something bigger: thousands of my viewers had the same pain. That's
+            how the Chrome extension came about.
+          </p>
+        </>
+      ),
+    },
+    {
+      heading: "Why prompts specifically",
+      body: (
+        <>
+          <p className="mb-[14px]">
+            The core problem Opten solves: <strong className="text-white font-semibold">every model is written differently</strong>.
+            Kling reacts to one phrasing of motion, Sora to another, Midjourney loves cinematography
+            jargon, Nano Banana wants short dense descriptions with no filler. There are no universal
+            "10 tips for writing a prompt": what works for Flux produces garbage in Imagen.
+          </p>
+          <p className="mb-[14px]">
+            I assembled 60 skill files for specific models — Seedance (all versions), Seedream,
+            Kling with motion control, Midjourney 7/8/niji/video, GPT Image, Flux, Nano Banana, Imagen,
+            Luma Ray, Sora 2, Veo 3/3.1, Runway, MiniMax Hailuo, Pixverse, LTX, Wan, Qwen, Grok Imagine
+            and others. Plus two fallback modes for when you try something rare. Each skill file is
+            a set of rules distilled from the model's official documentation and my own generation
+            experience.
+          </p>
+          <p className="mb-[14px]">
+            Opten doesn't just score a prompt 0–100 and surface up to five specific issues.
+            It also does <strong className="text-white font-semibold">auto-enhance</strong> — one click rewrites the prompt for the selected model.
+            Parallel rewrite: hit it, get an improved version a second later.
+          </p>
+        </>
+      ),
+    },
+    {
+      heading: "What you get",
+      body: (
+        <>
+          <p className="mb-[14px]">
+            Install the extension → open your favourite AI generator (Syntx, Higgsfield, Freepik,
+            Magnific — support is widening) → write a prompt as usual → Opten scores it silently right
+            inside the interface, without pulling you into a separate window.
+          </p>
+          <p className="mb-[14px]">What you get:</p>
+          <ul className="mt-[8px] mb-[16px] pl-[24px] list-disc">
+            <li className="mb-[8px]"><strong className="text-white font-semibold">0–100 score</strong> against the rules of the specific model — you see immediately how strong the prompt is.</li>
+            <li className="mb-[8px]"><strong className="text-white font-semibold">Up to five concrete callouts</strong> with pass/fail/neutral icons. Not "try again", but "no lighting style specified, add soft daylight".</li>
+            <li className="mb-[8px]"><strong className="text-white font-semibold">Auto-enhance</strong> — improved prompt in one click. No "here are ten tips" — just ready text you can copy or apply with a button.</li>
+            <li className="mb-[8px]"><strong className="text-white font-semibold">Multimodal</strong> — Opten accounts for the reference images you already attached. It won't suggest adding something that's already in the preview.</li>
+            <li className="mb-[8px]"><strong className="text-white font-semibold">Auto-detected model</strong> — no need to tell it "this is Kling" by hand; Opten looks at the page URL and DOM markup.</li>
+            <li className="mb-[8px]"><strong className="text-white font-semibold">Privacy</strong> — your prompts and references <strong className="text-white font-semibold">are not stored on Opten servers</strong>. Analysis runs through Claude Haiku 4.5 behind a private Vercel proxy, pure pass-through.</li>
+            <li className="mb-[8px]"><strong className="text-white font-semibold">RU / EN</strong> — the interface picks up the browser language.</li>
+          </ul>
+          <p className="mb-[14px]">
+            On pricing: <strong className="text-white font-semibold">install and registration are free</strong>. Pro is 199 ₽/mo auto-renewed
+            through YooKassa, or 299 ₽ one-time without a monthly subscription. For USD payments —
+            Paddle, around $2.99/mo or $4.99 one-time. That's five times cheaper than PromptPerfect
+            ($9.99), and Opten works across dozens of interfaces rather than just inside its own chat.
+          </p>
+        </>
+      ),
+    },
+    {
+      heading: "Contact",
+      body: (
+        <>
+          <p className="mb-[14px]">
+            If you'd like to reach out — bug reports, requests for support of a specific model, or
+            just to talk about generation — the easiest way to reach me is Telegram:{" "}
+            <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v_voronezhtsev</a>.
+            That's also where my channel "Vlad Voronezhtsev | About AI" lives — long-form breakdowns,
+            prompts, links and behind-the-scenes go there.
+          </p>
+          <p className="mb-[14px]">
+            YouTube — <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>.
+            Short tutorials and trends.
+          </p>
+          <p className="mb-[14px]">
+            <strong className="text-white font-semibold">Legally</strong>, Opten operates in Russia as IE Voronezhtsev Vladislav Pavlovich,
+            INN 723016676391, Tyumen. For international payments via Paddle — IE Nikolai Shupletsov
+            as Merchant of Record (a standard Paddle arrangement; unrelated to the product itself).
+            Full details, terms of service, and refund policy are in the{" "}
+            <LocalizedLink to="/terms" className="text-[#9cfb51] underline hover:text-white transition-colors">Terms of Use</LocalizedLink> and{" "}
+            <LocalizedLink to="/refund" className="text-[#9cfb51] underline hover:text-white transition-colors">Refund Policy</LocalizedLink>.
+          </p>
+        </>
+      ),
+    },
+  ],
+};
 
 export const aboutContent = { ru, en } as const;
