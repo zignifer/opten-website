@@ -115,6 +115,8 @@ function Divider() {
 export default function PayPage() {
   const t = useT();
   const { lang } = useLang();
+  // Phase 4.1 IN-02: lang-aware anchor — prevents EN users on /en/pay being routed to RU landing for FAQ scroll
+  const homeHash = lang === "en" ? "/en/#faq" : "/#faq";
 
   // Phase 66 D-04 + FE-02 + Phase 4 D-12 (SSR safety): currency state with lang-driven default
   // and manual override. SSR initializes from lang only — localStorage is browser-only and would
@@ -198,26 +200,32 @@ export default function PayPage() {
     }
     // Try each known extension ID until one responds
     let tried = 0;
+    // Phase 4.1 WR-04: idempotency guard — once any callback observes a positive result
+    // (token OR not_logged_in), late-firing callbacks for other IDs must NOT overwrite state.
+    let resolved = false;
     for (const id of EXTENSION_IDS) {
       try {
         chrome.runtime.sendMessage(id, { type: "GET_AUTH_TOKEN" }, (response: any) => {
+          if (resolved) return;
           tried++;
           if (chrome.runtime.lastError || !response) {
-            if (tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
+            if (!resolved && tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
             return;
           }
           if (response.token) {
+            resolved = true;
             setToken(response.token);
             if (response.email) setEmail(response.email);
             setExtStatus("ready");
             fetchSubscription(response.token);
           } else {
+            resolved = true;
             setExtStatus("not_logged_in");
           }
         });
       } catch {
         tried++;
-        if (tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
+        if (!resolved && tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
       }
     }
   };
@@ -383,7 +391,7 @@ export default function PayPage() {
           <div className="hidden md:flex flex-1 gap-[24px] items-center font-['PT_Root_UI',sans-serif] text-[14px] text-white">
             <LocalizedLink to="/" className="hover:opacity-80 transition-opacity">{t("nav.home")}</LocalizedLink>
             <LocalizedLink to="/pay" className="hover:opacity-80 transition-opacity">{t("nav.pricing")}</LocalizedLink>
-            <a href="/#faq" className="hover:opacity-80 transition-opacity">{t("nav.faq")}</a>
+            <a href={homeHash} className="hover:opacity-80 transition-opacity">{t("nav.faq")}</a>
             <LangSwitcher className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]" />
           </div>
           <div className="absolute left-1/2 -translate-x-1/2">
