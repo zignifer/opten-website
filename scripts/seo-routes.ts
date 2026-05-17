@@ -7,6 +7,17 @@
 //   "/terms"   ↔ "/en/terms"     "/refund"  ↔ "/en/refund"
 // xDefault always = RU sibling (D-02 root canonical).
 
+// Phase 4 D-09: schema.org JSON-LD block shape. Loose typing — schema.org has
+// hundreds of types; we lean on the Rich Results Test rather than the TS compiler
+// for correctness. The index signature lets us add arbitrary schema properties
+// (mainEntity, offers, step, etc.) without per-type interface fatigue.
+export interface SchemaBlock {
+  "@context"?: string;
+  "@type": string;
+  "@id"?: string;
+  [key: string]: unknown;
+}
+
 export interface RouteMeta {
   path: string;                         // canonical pathname (D-07: bare, no trailing slash except "/")
   htmlLang: "ru" | "en";               // Phase 3 D-04: language tag baked per-route at prerender time
@@ -24,11 +35,175 @@ export interface RouteMeta {
   prerender: "full" | "head" | "none"; // D-02 tier
   changefreq: "weekly" | "monthly" | "yearly";
   priority: number;                     // 0..1 — matches Phase 1 sitemap priorities
+  schema?: SchemaBlock[];               // Phase 4 D-09: optional schema.org JSON-LD blocks; consumed by prerender.mjs applyJsonLd
 }
 
 export const SITE_ORIGIN = "https://opten.space";
 export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/og-card-ru.png`;
 export const DEFAULT_OG_IMAGE_EN = `${SITE_ORIGIN}/og-card-en.png`; // Phase 3 D-04 — EN OG card (already in public/ from Phase 1 GEO-A-4)
+
+// Phase 4 D-09: external URLs used by multiple schema blocks.
+const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
+const FOUNDER_TELEGRAM_URL = "https://t.me/v_voronezhtsev";
+
+// Phase 4 D-10: @id reference pointers — used inside schema blocks to cross-link the entity graph
+// without inlining the full block (avoids duplication and gives crawlers a single canonical entity per @id).
+const ORG_REF = { "@id": `${SITE_ORIGIN}/#org` };
+const WEBSITE_REF = { "@id": `${SITE_ORIGIN}/#website` };
+const SOFTWARE_APP_REF = { "@id": `${SITE_ORIGIN}/#software-app` };
+const PERSON_FOUNDER_REF = { "@id": `${SITE_ORIGIN}/#person-founder` };
+
+// Phase 4 D-09: full reusable schema-block constants. Each block is the canonical declaration
+// of its @id-keyed entity; other blocks reference them via *_REF pointers above.
+
+export const ORG_BLOCK: SchemaBlock = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `${SITE_ORIGIN}/#org`,
+  name: "Opten",
+  legalName: "ИП Воронежцев В.П.",
+  url: `${SITE_ORIGIN}/`,
+  logo: `${SITE_ORIGIN}/favicon-192x192.png`,
+  founder: PERSON_FOUNDER_REF,
+  sameAs: [
+    CHROME_STORE_URL,
+    FOUNDER_TELEGRAM_URL,
+  ],
+};
+
+export const WEBSITE_BLOCK: SchemaBlock = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${SITE_ORIGIN}/#website`,
+  url: `${SITE_ORIGIN}/`,
+  name: "Opten",
+  inLanguage: ["ru-RU", "en-US"],
+  publisher: ORG_REF,
+};
+
+export const SOFTWARE_APP_BLOCK: SchemaBlock = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "@id": `${SITE_ORIGIN}/#software-app`,
+  name: "Opten",
+  applicationCategory: "BrowserApplication",
+  operatingSystem: "Chrome",
+  url: `${SITE_ORIGIN}/`,
+  downloadUrl: CHROME_STORE_URL,
+  publisher: ORG_REF,
+  offers: [
+    { "@type": "Offer", price: "0",    priceCurrency: "USD", name: "Free tier" },
+    { "@type": "Offer", price: "2.99", priceCurrency: "USD", name: "Pro Monthly" },
+    { "@type": "Offer", price: "199",  priceCurrency: "RUB", name: "Pro Monthly (RU)" },
+  ],
+};
+
+// Phase 4 D-09: defined at module scope, wired onto /about only in Plan 04-05 (per D-03).
+export const PERSON_FOUNDER_BLOCK: SchemaBlock = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": `${SITE_ORIGIN}/#person-founder`,
+  name: "Виктор Воронежцев",
+  url: `${SITE_ORIGIN}/about`,
+  jobTitle: "Founder, Opten",
+  worksFor: ORG_REF,
+  sameAs: [FOUNDER_TELEGRAM_URL],
+  // image: `${SITE_ORIGIN}/assets/about/founder.jpg`,  // D-03 / 04-LCP-AUDIT lock: ship without photo (option c) — Plan 04-05 keeps this commented; future Phase 4.1 hotfix uncomments when asset lands.
+};
+
+// Phase 4 D-09: pure builder helpers — page-specific schema blocks. Each takes a pageId URL
+// used to scope nested @id values (e.g. `${pageId}#faq`) so the same builder can produce
+// distinct entities on different routes without @id collisions.
+
+export function faqPageBlock(items: { q: string; a: string }[], pageId: string): SchemaBlock {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${pageId}#faq`,
+    mainEntity: items.map((it) => ({
+      "@type": "Question",
+      name: it.q,
+      acceptedAnswer: { "@type": "Answer", text: it.a },
+    })),
+  };
+}
+
+export function howToBlock(steps: { title: string; body: string }[], pageId: string, name: string): SchemaBlock {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "@id": `${pageId}#howto`,
+    name,
+    step: steps.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.title,
+      text: s.body,
+    })),
+  };
+}
+
+// Phase 4 D-09: Product block — used by /pay in Plan 04-04 (D-12 full-prerender flip). Accepts an
+// array of plan-tier objects and emits a Product with `offers` as an AggregateOffer when ≥2 tiers,
+// or a single Offer when 1. Per Google's Rich Results spec, AggregateOffer requires
+// lowPrice/highPrice/priceCurrency; we compute those from the input array.
+export function productBlock(plans: { name: string; price: string; currency: string }[], pageId: string): SchemaBlock {
+  const product: SchemaBlock = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "@id": `${pageId}#product`,
+    name: "Opten Pro",
+    description: "Opten Pro subscription — AI prompt scoring and one-click improvement for 43+ image generation models.",
+    brand: ORG_REF,
+    // Anchor product back to the SoftwareApplication entity so the graph stays connected.
+    isRelatedTo: SOFTWARE_APP_REF,
+  };
+  if (plans.length === 1) {
+    product.offers = {
+      "@type": "Offer",
+      name: plans[0].name,
+      price: plans[0].price,
+      priceCurrency: plans[0].currency,
+      availability: "https://schema.org/InStock",
+    };
+  } else {
+    // AggregateOffer when multi-currency / multi-tier.
+    // lowPrice/highPrice are scoped per-currency only when currencies are identical; otherwise
+    // we keep the raw `offers` array — Google accepts either shape on Product.
+    const currencies = new Set(plans.map((p) => p.currency));
+    product.offers = currencies.size === 1
+      ? {
+          "@type": "AggregateOffer",
+          priceCurrency: plans[0].currency,
+          lowPrice: plans.reduce((min, p) => (parseFloat(p.price) < parseFloat(min) ? p.price : min), plans[0].price),
+          highPrice: plans.reduce((max, p) => (parseFloat(p.price) > parseFloat(max) ? p.price : max), plans[0].price),
+          offerCount: plans.length,
+          availability: "https://schema.org/InStock",
+        }
+      : plans.map((p) => ({
+          "@type": "Offer",
+          name: p.name,
+          price: p.price,
+          priceCurrency: p.currency,
+          availability: "https://schema.org/InStock",
+        }));
+  }
+  return product;
+}
+
+export function breadcrumbBlock(items: { name: string; url: string }[], pageId: string): SchemaBlock {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "@id": `${pageId}#breadcrumb`,
+    itemListElement: items.map((it, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: it.name,
+      item: it.url,
+    })),
+  };
+}
 
 export const routes: RouteMeta[] = [
   // --- RU entries (6) ---
@@ -48,6 +223,8 @@ export const routes: RouteMeta[] = [
     prerender: "full",
     changefreq: "weekly",
     priority: 1.0,
+    // Phase 4 D-09: Org + SoftwareApp + WebSite landing graph. FAQPage added in Plan 04-06.
+    schema: [ORG_BLOCK, SOFTWARE_APP_BLOCK, WEBSITE_BLOCK],
   },
   {
     path: "/pay",
@@ -65,6 +242,8 @@ export const routes: RouteMeta[] = [
     prerender: "head",
     changefreq: "monthly",
     priority: 0.8,
+    // Phase 4 D-09: Org only — Product schema added in Plan 04-04 alongside D-12 full-prerender flip.
+    schema: [ORG_BLOCK],
   },
   {
     path: "/welcome",
@@ -82,6 +261,17 @@ export const routes: RouteMeta[] = [
     prerender: "full",
     changefreq: "monthly",
     priority: 0.6,
+    // Phase 4 D-09: Org + breadcrumb (Главная → Добро пожаловать).
+    schema: [
+      ORG_BLOCK,
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Добро пожаловать", url: `${SITE_ORIGIN}/welcome` },
+        ],
+        `${SITE_ORIGIN}/welcome`,
+      ),
+    ],
   },
   {
     path: "/privacy",
@@ -99,6 +289,16 @@ export const routes: RouteMeta[] = [
     prerender: "full",
     changefreq: "yearly",
     priority: 0.3,
+    schema: [
+      ORG_BLOCK,
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Политика конфиденциальности", url: `${SITE_ORIGIN}/privacy` },
+        ],
+        `${SITE_ORIGIN}/privacy`,
+      ),
+    ],
   },
   {
     path: "/terms",
@@ -116,6 +316,16 @@ export const routes: RouteMeta[] = [
     prerender: "full",
     changefreq: "yearly",
     priority: 0.3,
+    schema: [
+      ORG_BLOCK,
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Условия использования", url: `${SITE_ORIGIN}/terms` },
+        ],
+        `${SITE_ORIGIN}/terms`,
+      ),
+    ],
   },
   {
     path: "/refund",
@@ -133,6 +343,16 @@ export const routes: RouteMeta[] = [
     prerender: "full",
     changefreq: "yearly",
     priority: 0.3,
+    schema: [
+      ORG_BLOCK,
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Политика возврата", url: `${SITE_ORIGIN}/refund` },
+        ],
+        `${SITE_ORIGIN}/refund`,
+      ),
+    ],
   },
 
   // Phase 3 D-04: EN siblings (6 entries). EN ogImage = DEFAULT_OG_IMAGE_EN. SYNC: title/description duplicated from src/i18n/en.json — see line 2 SYNC policy.
@@ -153,6 +373,8 @@ export const routes: RouteMeta[] = [
     prerender: "full",
     changefreq: "weekly",
     priority: 1.0,
+    // Phase 4 D-09: schema is language-agnostic (per schema.org) — reuse RU landing blocks. FAQPage added in Plan 04-06.
+    schema: [ORG_BLOCK, SOFTWARE_APP_BLOCK, WEBSITE_BLOCK],
   },
   {
     path: "/en/pay",
@@ -171,6 +393,8 @@ export const routes: RouteMeta[] = [
     prerender: "head",
     changefreq: "monthly",
     priority: 0.8,
+    // Phase 4 D-09: Org only — Product schema added in Plan 04-04 alongside D-12 full-prerender flip.
+    schema: [ORG_BLOCK],
   },
   {
     path: "/en/welcome",
@@ -189,6 +413,16 @@ export const routes: RouteMeta[] = [
     prerender: "full",
     changefreq: "monthly",
     priority: 0.6,
+    schema: [
+      ORG_BLOCK,
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Welcome", url: `${SITE_ORIGIN}/en/welcome` },
+        ],
+        `${SITE_ORIGIN}/en/welcome`,
+      ),
+    ],
   },
   {
     path: "/en/privacy",
@@ -207,6 +441,16 @@ export const routes: RouteMeta[] = [
     prerender: "full",
     changefreq: "yearly",
     priority: 0.3,
+    schema: [
+      ORG_BLOCK,
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Privacy Policy", url: `${SITE_ORIGIN}/en/privacy` },
+        ],
+        `${SITE_ORIGIN}/en/privacy`,
+      ),
+    ],
   },
   {
     path: "/en/terms",
@@ -225,6 +469,16 @@ export const routes: RouteMeta[] = [
     prerender: "full",
     changefreq: "yearly",
     priority: 0.3,
+    schema: [
+      ORG_BLOCK,
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Terms of Service", url: `${SITE_ORIGIN}/en/terms` },
+        ],
+        `${SITE_ORIGIN}/en/terms`,
+      ),
+    ],
   },
   {
     path: "/en/refund",
@@ -243,5 +497,15 @@ export const routes: RouteMeta[] = [
     prerender: "full",
     changefreq: "yearly",
     priority: 0.3,
+    schema: [
+      ORG_BLOCK,
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Refund Policy", url: `${SITE_ORIGIN}/en/refund` },
+        ],
+        `${SITE_ORIGIN}/en/refund`,
+      ),
+    ],
   },
 ];
