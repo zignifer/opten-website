@@ -32,13 +32,26 @@ export default function AboutPage() {
         </div>
       </header>
 
-      {/* Hero — initials placeholder (locked decision option c — photo deferred to Phase 4.1+ hotfix) */}
+      {/* Hero — founder photo. Phase 4.2 P1-6 (deferred from synthesis): real photo
+          replaces the initials placeholder. Asset is 400×400 (1x) + 800×800 (2x) WebP
+          with a JPEG fallback served from Person.image in Org/Person schema. */}
       <section className="max-w-[800px] mx-auto px-[20px] pt-[16px] pb-[40px] flex flex-col md:flex-row gap-[24px] md:gap-[32px] items-center md:items-start">
-        <div className="shrink-0 size-[96px] md:size-[120px] rounded-full bg-gradient-to-br from-[#9cfb51] to-[#5fb821] flex items-center justify-center">
-          <span className="font-['Unbounded',sans-serif] text-[36px] md:text-[44px] font-bold text-[#011417] tracking-[-1px] select-none" aria-hidden="true">
-            ВВ
-          </span>
-        </div>
+        <picture className="shrink-0">
+          <source
+            type="image/webp"
+            srcSet="/founder.webp 1x, /founder@2x.webp 2x"
+          />
+          <img
+            src="/founder.jpg"
+            srcSet="/founder.jpg 1x, /founder@2x.webp 2x"
+            width="120"
+            height="120"
+            alt={t("about.heroAlt")}
+            loading="eager"
+            decoding="async"
+            className="size-[96px] md:size-[120px] rounded-full object-cover bg-[#011417]"
+          />
+        </picture>
         <div className="flex flex-col items-center md:items-start gap-[8px] text-center md:text-left">
           <h1 className="text-white text-[32px] md:text-[40px] font-medium leading-[1.1] tracking-[-0.8px]">
             Влад Воронежцев

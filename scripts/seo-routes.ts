@@ -154,7 +154,12 @@ export const PERSON_FOUNDER_BLOCK: SchemaBlock = {
   ],
   worksFor: ORG_REF,
   sameAs: [FOUNDER_TELEGRAM_URL, FOUNDER_YOUTUBE_URL],
-  // image: `${SITE_ORIGIN}/assets/about/founder.jpg`,  // D-03 / 04-LCP-AUDIT lock: ship without photo (option c) — Plan 04-05 keeps this commented; future Phase 4.1 hotfix uncomments when asset lands.
+  // Post-v1.0 hotfix (2026-05-18): user-supplied founder photo landed.
+  // Closes deferred P1-6 from the 2026-05-17 SEO/GEO synthesis. Asset is
+  // 400×400 raster (Google Rich Results validator prefers raster over WebP
+  // for Person.image — the visible <picture> on /about serves WebP@1x/@2x
+  // with this JPEG as fallback).
+  image: `${SITE_ORIGIN}/founder.jpg`,
 };
 
 // Phase 4 D-09: pure builder helpers — page-specific schema blocks. Each takes a pageId URL
