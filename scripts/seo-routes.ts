@@ -50,6 +50,9 @@ export const DEFAULT_OG_IMAGE_EN = `${SITE_ORIGIN}/og-card-en.png`; // Phase 3 D
 // Phase 4 D-09: external URLs used by multiple schema blocks.
 const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 const FOUNDER_TELEGRAM_URL = "https://t.me/v_voronezhtsev";
+// Post-2026-05-17 GEO audit: founder's AI-blogger YouTube — primary external authority signal,
+// previously not linked in sameAs (audit CR-2). 4500+ subs, 54 videos, ~7M views over the past year.
+const FOUNDER_YOUTUBE_URL = "https://www.youtube.com/@v.voronezhtsev";
 
 // Phase 4 D-10: @id reference pointers — used inside schema blocks to cross-link the entity graph
 // without inlining the full block (avoids duplication and gives crawlers a single canonical entity per @id).
@@ -69,10 +72,22 @@ export const ORG_BLOCK: SchemaBlock = {
   legalName: "ИП Воронежцев В.П.",
   url: `${SITE_ORIGIN}/`,
   logo: `${SITE_ORIGIN}/favicon-192x192.png`,
+  // Post-audit: description + foundingDate + contactPoint give AI systems a complete entity card
+  // (was barebones name/url/logo only). foundingDate = official Opten launch 2026-04-22.
+  description: "Opten — Chrome-расширение для AI-оценки и улучшения промптов под 60+ моделей генерации изображений и видео (Midjourney, GPT Image 2, Kling, Sora и др.).",
+  foundingDate: "2026-04-22",
   founder: PERSON_FOUNDER_REF,
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    email: "zignifer@gmail.com",
+    url: FOUNDER_TELEGRAM_URL,
+    availableLanguage: ["ru", "en"],
+  },
   sameAs: [
     CHROME_STORE_URL,
     FOUNDER_TELEGRAM_URL,
+    FOUNDER_YOUTUBE_URL,
   ],
 };
 
@@ -91,11 +106,24 @@ export const SOFTWARE_APP_BLOCK: SchemaBlock = {
   "@type": "SoftwareApplication",
   "@id": `${SITE_ORIGIN}/#software-app`,
   name: "Opten",
+  // Post-audit: description, screenshot, softwareVersion, aggregateRating — required by Google for
+  // SoftwareApp rich result and the strongest trust signals for AI citations.
+  // softwareVersion synced from C:\Projects\promptscore\manifest.json (extension repo, single source of truth).
+  description: "Chrome extension that scores AI prompts against 60+ image and video generation models (Midjourney, GPT Image 2, Kling, Sora, Nano Banana, Flux, Imagen) and rewrites them in one click directly inside the generator's UI.",
   applicationCategory: "BrowserApplication",
   operatingSystem: "Chrome",
+  softwareVersion: "1.3.6",
+  screenshot: DEFAULT_OG_IMAGE_EN,
   url: `${SITE_ORIGIN}/`,
   downloadUrl: CHROME_STORE_URL,
   publisher: ORG_REF,
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "5",
+    reviewCount: "2",
+    bestRating: "5",
+    worstRating: "1",
+  },
   offers: [
     { "@type": "Offer", price: "2.99", priceCurrency: "USD", name: "Pro Monthly" },
     { "@type": "Offer", price: "199",  priceCurrency: "RUB", name: "Pro Monthly (RU)" },
@@ -103,15 +131,31 @@ export const SOFTWARE_APP_BLOCK: SchemaBlock = {
 };
 
 // Phase 4 D-09: defined at module scope, wired onto /about only in Plan 04-05 (per D-03).
+// Post-2026-05-17 GEO audit CR-1: name was "Виктор Воронежцев" — schema-vs-body conflict (visible
+// text везде "Влад Воронежцев"). Audit confirmed independently by 4/5 agents + Codex CLI.
+// Fixed by promoting "Влад" to canonical name and keeping the legal form as alternateName.
 export const PERSON_FOUNDER_BLOCK: SchemaBlock = {
   "@context": "https://schema.org",
   "@type": "Person",
   "@id": `${SITE_ORIGIN}/#person-founder`,
-  name: "Виктор Воронежцев",
+  name: "Влад Воронежцев",
+  alternateName: "Воронежцев Владислав Павлович",
+  givenName: "Владислав",
+  familyName: "Воронежцев",
   url: `${SITE_ORIGIN}/about`,
   jobTitle: "Founder, Opten",
+  description: "AI-блогер, автор Chrome-расширения Opten для оценки промптов под конкретные AI-модели.",
+  knowsAbout: [
+    "AI image generation",
+    "Prompt engineering",
+    "Midjourney",
+    "GPT Image 2",
+    "Kling",
+    "Sora",
+    "Flux",
+  ],
   worksFor: ORG_REF,
-  sameAs: [FOUNDER_TELEGRAM_URL],
+  sameAs: [FOUNDER_TELEGRAM_URL, FOUNDER_YOUTUBE_URL],
   // image: `${SITE_ORIGIN}/assets/about/founder.jpg`,  // D-03 / 04-LCP-AUDIT lock: ship without photo (option c) — Plan 04-05 keeps this commented; future Phase 4.1 hotfix uncomments when asset lands.
 };
 
@@ -172,9 +216,19 @@ export function productBlock(plans: { name: string; price: string; currency: str
     "@id": `${pageId}#product`,
     name: "Opten Pro",
     description: "Opten Pro subscription — AI prompt scoring and one-click improvement for 43+ image generation models.",
+    // Post-audit: Google requires `image` for Product rich result; aggregateRating is the single
+    // strongest social-proof signal for AI citation of pricing pages.
+    image: [DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_EN],
     brand: ORG_REF,
     // Anchor product back to the SoftwareApplication entity so the graph stays connected.
     isRelatedTo: SOFTWARE_APP_REF,
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "5",
+      reviewCount: "2",
+      bestRating: "5",
+      worstRating: "1",
+    },
   };
   if (plans.length === 1) {
     product.offers = {
