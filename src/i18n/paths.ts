@@ -1,5 +1,5 @@
 // Phase 3 follow-up (post-3): single source of truth for EN-sibling rewrites.
-// SYNC: EN_SIBLINGS MUST match the 6 EN entries in scripts/seo-routes.ts.
+// SYNC: EN_SIBLINGS MUST match the 8 EN entries in scripts/seo-routes.ts.
 // Update both files whenever an EN route is added or removed.
 //
 // Open-Redirect mitigation (RESEARCH.md §Security T-03-22 preserved):

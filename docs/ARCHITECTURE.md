@@ -99,9 +99,10 @@ src/
 4. `document.documentElement.lang` is **NOT** mutated at runtime (Phase 3 D-06 — runtime DOM mutation caused hydration mismatch). It is baked per page at prerender time.
 
 **Bilingual URLs (Phase 3):**
-- 12 prerendered HTML files: 6 RU canonical (`/`, `/pay`, `/welcome`, `/privacy`, `/terms`, `/refund`) and 6 EN siblings (`/en/`, `/en/pay`, `/en/welcome`, `/en/privacy`, `/en/terms`, `/en/refund`).
+- 16 prerendered HTML files: 8 RU canonical (`/`, `/pay`, `/welcome`, `/privacy`, `/terms`, `/refund`, `/about`, `/guides/gpt-image-2`) and 8 EN siblings (`/en/`, `/en/pay`, `/en/welcome`, `/en/privacy`, `/en/terms`, `/en/refund`, `/en/about`, `/en/guides/gpt-image-2`).
 - Each prerendered `<head>` carries a `<link rel="alternate" hreflang>` triplet (`ru`, `en`, `x-default → unprefixed RU`) reciprocal between siblings.
 - `<html lang>` baked per route at build time by `scripts/prerender.mjs` (`ru` for unprefixed, `en` for `/en/*`).
+- **Hreflang locale code policy:** hreflang annotations use language-only codes (`ru`, `en`, `x-default`) in both `scripts/prerender.mjs#applyHreflang` and `scripts/sitemap.mjs` xhtml:link entries, while schema-level `inLanguage` stays region-specific (`ru-RU`, `en-US`) in `scripts/seo-routes.ts`. Both are valid per Google's documentation; the mix is intentional — language-only hreflang targets the broadest audience (RU readers globally, not just RU-from-Russia), while schema-level region tags give AI systems a precise origin signal for the content. Do not "unify" these — the asymmetry is the policy.
 - Locked routes without EN siblings (`/success`, `/account`, `/dashboard/download-skill`) stay RU-only by design — they are `Disallow`'d in `robots.txt` and extension-coupled (D-03).
 - `<LocalizedLink>` (drop-in replacement for `<Link>`) preserves the `/en/` prefix when navigating internally between EN siblings; on locked no-sibling routes the LangSwitcher flips language in place via storage.
 

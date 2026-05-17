@@ -111,8 +111,7 @@ export const SOFTWARE_APP_BLOCK: SchemaBlock = {
   "@type": "SoftwareApplication",
   "@id": `${SITE_ORIGIN}/#software-app`,
   name: "Opten",
-  // Post-audit: description, screenshot, softwareVersion, aggregateRating — required by Google for
-  // SoftwareApp rich result and the strongest trust signals for AI citations.
+  // Post-audit: description, screenshot, softwareVersion — required by Google for SoftwareApp rich result.
   // softwareVersion synced from C:\Projects\promptscore\manifest.json (extension repo, single source of truth).
   description: "Chrome extension that scores AI prompts against 60+ image and video generation models (Midjourney, GPT Image 2, Kling, Sora, Nano Banana, Flux, Imagen) and rewrites them in one click directly inside the generator's UI.",
   applicationCategory: "BrowserApplication",
@@ -122,13 +121,7 @@ export const SOFTWARE_APP_BLOCK: SchemaBlock = {
   url: `${SITE_ORIGIN}/`,
   downloadUrl: CHROME_STORE_URL,
   publisher: ORG_REF,
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "5",
-    reviewCount: "2",
-    bestRating: "5",
-    worstRating: "1",
-  },
+  // Phase 4.2 P0-5 / CONTEXT D-4: aggregateRating removed — hardcoded 5.0/2 did not match live Chrome Web Store. Restore when ≥10 honest reviews accumulate (Phase 5).
   offers: [
     { "@type": "Offer", price: "2.99", priceCurrency: "USD", name: "Pro Monthly" },
     { "@type": "Offer", price: "199",  priceCurrency: "RUB", name: "Pro Monthly (RU)" },
@@ -220,20 +213,13 @@ export function productBlock(plans: { name: string; price: string; currency: str
     "@type": "Product",
     "@id": `${pageId}#product`,
     name: "Opten Pro",
-    description: "Opten Pro subscription — AI prompt scoring and one-click improvement for 43+ image generation models.",
-    // Post-audit: Google requires `image` for Product rich result; aggregateRating is the single
-    // strongest social-proof signal for AI citation of pricing pages.
+    description: "Opten Pro subscription — AI prompt scoring and one-click improvement for 60+ image generation models.",
+    // Post-audit: Google requires `image` for Product rich result.
     image: [DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_EN],
     brand: ORG_REF,
     // Anchor product back to the SoftwareApplication entity so the graph stays connected.
     isRelatedTo: SOFTWARE_APP_REF,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "5",
-      reviewCount: "2",
-      bestRating: "5",
-      worstRating: "1",
-    },
+    // Phase 4.2 P0-5 / CONTEXT D-4: aggregateRating removed — hardcoded 5.0/2 did not match live Chrome Web Store. Restore when ≥10 honest reviews accumulate (Phase 5).
   };
   if (plans.length === 1) {
     product.offers = {
@@ -357,10 +343,10 @@ export const routes: RouteMeta[] = [
       xDefault: `${SITE_ORIGIN}/`,
     },
     title: "Opten — AI-оценка и улучшение промптов для генерации изображений",
-    description: "Opten оценивает промпт под конкретную нейросеть, показывает ошибки и исправляет их в один клик. Работает с 43+ моделями прямо в интерфейсе генератора.",
+    description: "Opten оценивает промпт под конкретную нейросеть, показывает ошибки и исправляет их в один клик. Работает с 60+ моделями прямо в интерфейсе генератора.",
     canonical: `${SITE_ORIGIN}/`,
     ogTitle: "Opten — не сливай кредиты на плохие промпты",
-    ogDescription: "AI-оценка и улучшение промптов для 43+ моделей генерации изображений. Прямо в интерфейсе генератора.",
+    ogDescription: "AI-оценка и улучшение промптов для 60+ моделей генерации изображений. Прямо в интерфейсе генератора.",
     prerender: "full",
     changefreq: "weekly",
     priority: 1.0,
@@ -640,10 +626,10 @@ export const routes: RouteMeta[] = [
       xDefault: `${SITE_ORIGIN}/`,
     },
     title: "Opten — AI prompt scoring and improvement for image generation",
-    description: "Opten evaluates your prompt for the specific AI model, shows what's wrong, and fixes it in one click. Works with 43+ models right inside the generator interface.",
+    description: "Opten evaluates your prompt for the specific AI model, shows what's wrong, and fixes it in one click. Works with 60+ models right inside the generator interface.",
     canonical: `${SITE_ORIGIN}/en/`,
     ogTitle: "Opten — stop wasting credits on bad prompts",
-    ogDescription: "AI prompt scoring and improvement for 43+ image generation models. Right inside the generator interface.",
+    ogDescription: "AI prompt scoring and improvement for 60+ image generation models. Right inside the generator interface.",
     ogImage: DEFAULT_OG_IMAGE_EN,
     prerender: "full",
     changefreq: "weekly",

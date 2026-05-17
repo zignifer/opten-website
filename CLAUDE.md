@@ -64,13 +64,16 @@ index.html  ─sync→  Paddle.js CDN  (also dist/pay/, dist/en/pay/ — Phase 3
      │
      └→ main.tsx → <BrowserRouter> → <LangProvider> → <Routes>
             ↓
-        14 client routes: 9 RU (/, /pay, /success, /account, /welcome,
-                          /privacy, /terms, /refund, /dashboard/download-skill)
-                          + 6 EN siblings (/en/, /en/pay, /en/welcome,
-                          /en/privacy, /en/terms, /en/refund) — Phase 3
+        16 client routes: 9 RU (/, /pay, /success, /account, /welcome,
+                          /privacy, /terms, /refund, /about, /dashboard/download-skill,
+                          /guides/:slug)
+                          + 8 EN siblings (/en/, /en/pay, /en/welcome,
+                          /en/privacy, /en/terms, /en/refund, /en/about,
+                          /en/guides/:slug) — Phase 4.1 B-03 added /en/about;
+                          Phase 4 D-06 added bilingual /guides/:slug
 
-  Prerender (postbuild):  scripts/prerender.mjs → 12 dist/**/index.html files
-                          (6 RU + 6 EN, with hreflang triplets + per-page <html lang>)
+  Prerender (postbuild):  scripts/prerender.mjs → 16 dist/**/index.html files
+                          (8 RU + 8 EN, with hreflang triplets + per-page <html lang>)
   Site ↔ Extension:       chrome.runtime.sendMessage (externally_connectable, opten.space only)
   Site → Supabase:        fetch to /functions/v1/* and /rest/v1/*
   Site → Paddle:          window.Paddle.Checkout.open(...)

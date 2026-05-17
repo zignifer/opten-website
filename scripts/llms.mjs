@@ -25,7 +25,7 @@ if (prerenderedRoutes.length < 16) {
 }
 
 const SUMMARY =
-  "Opten — AI prompt scorer Chrome extension that evaluates and improves prompts for 43+ image-generation models (Midjourney, GPT Image 2, Kling, Sora, Nano Banana, etc.). This site sells, services, and onboards extension users.";
+  "Opten — AI prompt scorer Chrome extension that evaluates and improves prompts for 60+ image-generation models (Midjourney, GPT Image 2, Kling, Sora, Nano Banana, etc.). This site sells, services, and onboards extension users.";
 
 // Section grouping — routes that don't match any rule below are bucketed as Other.
 const SECTIONS = [
