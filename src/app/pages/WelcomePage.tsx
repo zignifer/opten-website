@@ -57,10 +57,10 @@ export default function WelcomePage() {
             <img
               key={src}
               src={src}
-              alt="Opten extension"
+              alt={t(`welcome.slide${i + 1}.alt`)}
               width="1051"
               height="800"
-              loading="eager"
+              loading={i === 0 ? "eager" : "lazy"}
               className="w-full block transition-opacity duration-700"
               style={{
                 opacity: i === idx ? 1 : 0,
