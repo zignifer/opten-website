@@ -1,0 +1,79 @@
+# CODEX SEO+GEO РЕВЬЮ — 2026-05-17
+
+## Общий вердикт
+Текущий `dist/` уже не похож на старую SPA-заглушку из `GEO-AUDIT.md`: есть 16 prerendered HTML-страниц, `sitemap.xml`, `robots.txt`, canonical/hreflang, OG/Twitter, JSON-LD, `/about`, guide-страница и сгенерированные `llms.txt` / `llms-full.txt`. Классическое SEO выглядит сильным для маленького SaaS-сайта, но GEO проседает из-за ошибок entity consistency: схема `Person` не совпадает с видимым автором, `llms.txt` имеет мелкие генерационные дефекты, а новая guide-страница почти не связана внутренними ссылками. Оценка: SEO 8/10, GEO 7/10.
+
+## Критичные проблемы (Critical)
+1. **[Entity / E-E-A-T]** В JSON-LD указан другой человек, чем в видимом контенте `/about`. В [dist/about/index.html](../../dist/about/index.html) `Person` schema содержит `"name": "Виктор Воронежцев"` и `"@id": "https://opten.space/#person-founder"`, а видимый `<h1>` на той же странице: `<h1 ...>Влад Воронежцев</h1>`. Текст ниже дополнительно подтверждает: `Я Влад Воронежцев`, юридический блок: `ИП Воронежцев Владислав Павлович`. На EN-странице та же проблема: [dist/en/about/index.html](../../dist/en/about/index.html) содержит `"name": "Виктор Воронежцев"`, но видимый текст говорит `I'm Vlad Voronezhtsev`. Для AI-поиска это критично: граф сущностей говорит crawlers одно, E-E-A-T страница говорит другое.
+2. **[GEO / llms-full]** `llms-full.txt` декларирует усечение “to keep the file under 50 KB”, но фактический файл больше лимита. В [dist/llms-full.txt](../../dist/llms-full.txt) начало: `# Opten (truncated)` и `legal pages ... omitted ... to keep the file under 50 KB`; фактический размер файла в `dist` — 55 426 bytes. Скрипт [scripts/llms.mjs](../../scripts/llms.mjs) проверяет `SIZE_CAP_BYTES = 50_000`, но после удаления legal-секции не делает повторную проверку. Для AI-клиентов это риск: файл обещает компактный индекс, но всё ещё выходит за заявленный budget.
+
+## Быстрые победы (Quick Wins)
+1. **[Person schema]** Исправить `PERSON_FOUNDER_BLOCK.name` в [scripts/seo-routes.ts](../../scripts/seo-routes.ts) с `"Виктор Воронежцев"` на фактическое имя из страницы: RU `Влад Воронежцев` / юридически `Владислав Павлович Воронежцев`, EN `Vlad Voronezhtsev`. Ожидаемый эффект: снять главный конфликт E-E-A-T/entity graph.
+2. **[llms.txt]** Добавить `public/llms.txt` или явно документировать, что canonical llms-файлы создаются только postbuild в `dist/`. Сейчас [public/llms.txt](../../public/llms.txt) отсутствует, хотя [dist/llms.txt](../../dist/llms.txt) есть. Эффект: меньше риска сломать AI-файл при смене build/deploy pipeline.
+3. **[llms grouping]** Исправить группировку EN About. В [dist/llms.txt](../../dist/llms.txt) `/about` находится в `## About`, а `/en/about` попал в `## Other`: `- [About Opten — who's behind the extension](https://opten.space/en/about)`. Причина видна в [scripts/llms.mjs](../../scripts/llms.mjs): `{ name: "About", match: (p) => p === "/about" }`. Эффект: более чистый AI TOC.
+4. **[Internal links]** Добавить ссылку на `/guides/gpt-image-2` и `/en/guides/gpt-image-2` из landing/footer/about. Поиск по [dist/index.html](../../dist/index.html), [dist/en/index.html](../../dist/en/index.html), [dist/about/index.html](../../dist/about/index.html), [dist/en/about/index.html](../../dist/en/about/index.html) не находит `guides/gpt-image-2`. Сейчас guide discoverable через sitemap/llms, но не через видимый HTML-граф. Эффект: улучшение crawl depth и тематического кластера.
+5. **[EN social tags]** Локализовать `og:image:alt` и `meta keywords` на EN-страницах. Например [dist/en/index.html](../../dist/en/index.html) имеет `og:image:alt` на русском: `Opten — улучшай промпты перед генерацией`, и `meta name="keywords"` тоже RU: `промпты, AI, нейросети...`. Keywords почти не влияют на Google, но для AI-парсеров это шум.
+
+## Долгосрочные улучшения (Long-term)
+1. **[Topical authority]** Развить `/guides/*` в полноценный контентный кластер: Midjourney, Kling, Sora, Nano Banana, Flux, Veo. Сейчас есть один сильный guide с `HowTo` + `FAQPage`, но один URL не создаёт достаточную topical authority.
+2. **[Third-party authority]** Добавить в `Organization.sameAs` больше проверяемых профилей: YouTube-канал, Product Hunt, GitHub/Chrome Web Store, возможно LinkedIn/X. Сейчас в JSON-LD есть Chrome Web Store и Telegram; на `/about` видимый контент ссылается на YouTube, но `sameAs` у `Person` содержит только Telegram.
+3. **[Review / rating schema]** Добавить `aggregateRating` только после появления реальных публичных оценок, например из Chrome Web Store. Сейчас `SoftwareApplication` содержит `offers`, но не содержит рейтинг; лучше не синтетизировать его без источника.
+4. **[Robots policy]** Уточнить стратегию для `Google-Extended` и `Applebot-Extended`: текущий `robots.txt` разрешает `ai-train=yes`, что хорошо для максимальной GEO-видимости, но это сознательное согласие на AI training/input. Если бизнесу нужно только индексирование, политику стоит пересмотреть.
+5. **[Measurement]** Добавить Search Console / Bing Webmaster / Vercel Analytics или Plausible. В проверенных HTML нет `google-site-verification` и нет аналитических тегов; без этого сложно измерять эффект от GEO/SEO-итераций.
+
+## Детальные находки по разделам
+### A. hreflang и canonical
+Сильная сторона: canonical и hreflang triplets есть на проверенных страницах и выглядят взаимно согласованными. Примеры из [dist/index.html](../../dist/index.html): `<link rel="canonical" href="https://opten.space/" />`, `hreflang="ru" href="https://opten.space/"`, `hreflang="en" href="https://opten.space/en/"`, `hreflang="x-default" href="https://opten.space/"`. Для `/about`: [dist/about/index.html](../../dist/about/index.html) указывает canonical `https://opten.space/about`, EN sibling `https://opten.space/en/about`, x-default `https://opten.space/about`; [dist/en/about/index.html](../../dist/en/about/index.html) отвечает canonical `https://opten.space/en/about` с теми же reciprocal alternates.
+
+Есть важная документационная рассинхронизация: [CLAUDE.md](../../CLAUDE.md) всё ещё говорит про “14 client routes” и “12 dist/**/index.html files”, а фактический `dist` содержит 16 HTML-файлов: `/`, `/pay`, `/privacy`, `/terms`, `/refund`, `/welcome`, `/about`, `/guides/gpt-image-2` и 8 EN siblings. Это не ломает SEO, но повышает риск будущих ошибок при изменении маршрутов.
+
+### B. Structured Data / JSON-LD
+JSON-LD присутствует и покрывает ключевые типы. [dist/index.html](../../dist/index.html) содержит 4 блока: `Organization`, `SoftwareApplication`, `WebSite`, `FAQPage`. `SoftwareApplication` включает `applicationCategory: "BrowserApplication"`, `operatingSystem: "Chrome"`, `downloadUrl` на Chrome Web Store и offers: USD `$2.99`, RUB `199`. `/pay` и `/en/pay` имеют `Product` + `Offer` + `BreadcrumbList`; guide-страницы имеют `HowTo`, `FAQPage`, `BreadcrumbList`; legal и welcome страницы имеют `Organization` + breadcrumbs.
+
+Главный дефект схемы — `Person.name`: фактический автор в HTML `Влад Воронежцев` / `Vlad Voronezhtsev`, а JSON-LD говорит `Виктор Воронежцев`. Также `Person.sameAs` содержит только Telegram, хотя видимый `/about` ссылается на YouTube: `https://youtube.com/@v.voronezhtsev`. Для GEO лучше добавить этот URL в `sameAs`, потому что AI-системы сопоставляют сущности по внешним профилям.
+
+### C. llms.txt и AI-краулеры
+[public/llms.txt](../../public/llms.txt) отсутствует. При этом postbuild генерирует [dist/llms.txt](../../dist/llms.txt) и [dist/llms-full.txt](../../dist/llms-full.txt), а [package.json](../../package.json) подтверждает цепочку: `node scripts/prerender.mjs && node scripts/sitemap.mjs && node scripts/llms.mjs`. Если Vercel публикует именно `dist`, AI-файлы должны отдаваться. Риск в том, что canonical source отсутствует в `public`, а генератор пока имеет дефекты.
+
+Качество `dist/llms.txt` хорошее по сути: есть summary `Opten — AI prompt scorer Chrome extension...`, разделы Marketing/Pricing/Welcome/About/Guides/Legal. Но `/en/about` ошибочно попадает в `Other`, а не в `About`. `llms-full.txt` содержит полезный plain text всех нерегальных страниц, но фактический размер 55 426 bytes против заявленного `SIZE_CAP_BYTES = 50_000`.
+
+AI crawler allowances в [public/robots.txt](../../public/robots.txt) сильные: `GPTBot`, `ClaudeBot`, `PerplexityBot`, `Google-Extended`, `Applebot-Extended`, `cohere-ai`, `anthropic-ai` явно разрешены. Также есть экспериментальный `Content-Signal: search=yes, ai-train=yes, ai-input=yes`. Это максимизирует GEO-видимость, но политически означает согласие не только на поиск, но и на training/input.
+
+### D. Sitemap и robots.txt
+[dist/sitemap.xml](../../dist/sitemap.xml) существует и покрывает все 16 prerendered URL. Для каждой пары есть `xhtml:link` с `hreflang="ru"`, `hreflang="en"`, `hreflang="x-default"`. Пример для guide: `https://opten.space/guides/gpt-image-2` и `https://opten.space/en/guides/gpt-image-2` оба присутствуют с reciprocal alternates. `lastmod` везде `2026-05-17`, что соответствует текущему аудиту, но при будущих сборках важно не обновлять все даты механически без изменения контента.
+
+[public/robots.txt](../../public/robots.txt) и [dist/robots.txt](../../dist/robots.txt) совпадают. Хорошо: `Sitemap: https://opten.space/sitemap.xml`, `Disallow: /account`, `/success`, `/dashboard/` и EN variants. Замечание: `/api/` не disallow, хотя публичный API сейчас один и защищён JWT; это не критично, но можно явно закрыть `/api/` от индекса.
+
+### E. Meta теги (title/description/OG)
+Per-route titles/descriptions есть и уникальны. Примеры: [dist/index.html](../../dist/index.html) title `Opten — AI-оценка и улучшение промптов для генерации изображений`; [dist/en/index.html](../../dist/en/index.html) title `Opten — AI prompt scoring and improvement for image generation`; [dist/pay/index.html](../../dist/pay/index.html) title `Тарифы Opten — Pro-подписка для улучшения промптов`; [dist/en/pay/index.html](../../dist/en/pay/index.html) title `Opten pricing — Pro subscription for prompt improvement`.
+
+OG/Twitter покрытие хорошее: `og:type`, `og:url`, `og:title`, `og:description`, `og:image`, dimensions `1200x630`, `twitter:card=summary_large_image`. Файлы [public/og-card-ru.png](../../public/og-card-ru.png) и [public/og-card-en.png](../../public/og-card-en.png) существуют. Дефект: EN-страницы используют EN image, но `og:image:alt` остаётся русским: `Opten — улучшай промпты перед генерацией`. `meta keywords` тоже RU на EN страницах; это слабый сигнал, но его легко поправить или удалить.
+
+### F. E-E-A-T и страница /about
+`/about` теперь реально существует и prerendered. Это большое улучшение против старого GEO-аудита. В HTML есть авторская история, YouTube-канал, Telegram, юридическая информация: `ИП Воронежцев Владислав Павлович, ИНН 723016676391, Тюмень`, а EN-версия объясняет Paddle Merchant of Record: `IE Nikolai Shupletsov as Merchant of Record`. Это сильный E-E-A-T сигнал для small creator SaaS.
+
+Проблемы: schema `Person.name` конфликтует с видимым именем; EN `/about` визуально показывает `<h1>Влад Воронежцев</h1>` кириллицей, хотя surrounding copy на английском говорит `Vlad Voronezhtsev`. Для англоязычных AI-систем лучше использовать латиницу в EN H1 или добавить `alternateName`.
+
+### G. Core Web Vitals сигналы
+HTML содержит хорошие preload-сигналы. На всех проверенных страницах есть font preloads: `<link rel="preload" href="/fonts/PT-Root-UI_VF.woff2" as="font" ...>` и `<link rel="preload" href="/fonts/Unbounded-VF.woff2" as="font" ...>`. CSS подтверждает `font-display: swap` в [src/styles/fonts.css](../../src/styles/fonts.css). Есть `modulepreload` для vendor chunks и Safari fallback через `<link rel="preload" as="script" ...>`.
+
+Paddle ограничен pay-страницами: [dist/pay/index.html](../../dist/pay/index.html) и [dist/en/pay/index.html](../../dist/en/pay/index.html) содержат `<link rel="preconnect" href="https://cdn.paddle.com" />` и sync `<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>`, а landing этого не содержит. Это хорошее решение для LCP/TTI на marketing routes. Из оставшихся HTML-сигналов: много изображений имеют `width`/`height`, ниже fold часто `loading="lazy"`. Отдельный Lighthouse не запускался, поэтому это вывод только по HTML/CSS-сигналам.
+
+## Расхождения с GEO-AUDIT.md
+1. **Claim:** “opten.space is a Vite SPA with no server-side rendering... every public route returns byte-identical index.html with empty `<div id="root">`.” → **Reality:** `dist` содержит 16 prerendered `index.html` файлов, и [dist/index.html](../../dist/index.html) имеет полный SSR body: `<div id="root"><!--$--><div class="w-full...">...<h1 ...>Не сливай кредиты</h1>...`.
+2. **Claim:** “robots.txt, sitemap.xml, and llms.txt do not exist.” → **Reality:** [public/robots.txt](../../public/robots.txt) есть, [dist/robots.txt](../../dist/robots.txt) есть, [dist/sitemap.xml](../../dist/sitemap.xml) есть, [dist/llms.txt](../../dist/llms.txt) есть. Только [public/llms.txt](../../public/llms.txt) отсутствует.
+3. **Claim:** “Zero structured data — no JSON-LD anywhere.” → **Reality:** [dist/index.html](../../dist/index.html) содержит 4 `<script type="application/ld+json">` блока; `/about` содержит `Organization`, `Person`, `BreadcrumbList`; guide содержит `HowTo` + `FAQPage`.
+4. **Claim:** “All 7 routes share one `<title>` / `<meta description>` (RU only).” → **Reality:** titles/descriptions per-route и per-language разные. Пример: [dist/en/pay/index.html](../../dist/en/pay/index.html) title `Opten pricing — Pro subscription for prompt improvement`, canonical `https://opten.space/en/pay`.
+5. **Claim:** “No language signaling for the EN audience; `<html lang="ru">` hardcoded; no hreflang.” → **Reality:** [dist/en/index.html](../../dist/en/index.html) начинается с `<html lang="en">` и содержит reciprocal hreflang `ru`, `en`, `x-default`.
+6. **Claim:** “No `llms.txt` — emerging standard for AI assistants.” → **Reality:** [dist/llms.txt](../../dist/llms.txt) есть и содержит curated TOC, но имеет дефект группировки `/en/about`; [dist/llms-full.txt](../../dist/llms-full.txt) есть, но превышает собственный лимит.
+7. **Claim:** “No OG card — only a 310×310 favicon.” → **Reality:** [dist/index.html](../../dist/index.html) использует `https://opten.space/og-card-ru.png`, [dist/en/index.html](../../dist/en/index.html) использует `https://opten.space/og-card-en.png`, dimensions `1200x630`.
+8. **Claim:** “No author / team / About page surface for E-E-A-T.” → **Reality:** [dist/about/index.html](../../dist/about/index.html) и [dist/en/about/index.html](../../dist/en/about/index.html) существуют и содержат founder story, contacts, YouTube, Telegram, legal details. Но JSON-LD `Person.name` конфликтует с видимым автором.
+9. **Claim:** “No `<link rel="canonical">`; no `<link rel="alternate" hreflang>`.” → **Reality:** canonical/hreflang есть на всех проверенных HTML; sitemap также содержит `xhtml:link` alternates.
+10. **Claim:** “No `<link rel="preconnect" href="https://cdn.paddle.com">`.” → **Reality:** [dist/pay/index.html](../../dist/pay/index.html) и [dist/en/pay/index.html](../../dist/en/pay/index.html) содержат Paddle preconnect и sync Paddle script; неплатёжные страницы не грузят Paddle.
+
+## Рекомендуемые следующие шаги
+1. **[XS]** Исправить `Person` JSON-LD: имя, `alternateName`, EN transliteration, YouTube в `sameAs`.
+2. **[S]** Доработать `scripts/llms.mjs`: включить `/en/about` в About, повторно enforce `SIZE_CAP_BYTES` после truncation, при необходимости сократить guide bodies.
+3. **[XS]** Локализовать `og:image:alt` и убрать/локализовать `meta keywords` на EN routes.
+4. **[S]** Добавить видимые внутренние ссылки на guide из landing/about/footer и, если планируется контент-кластер, добавить `/guides` index вместо orphan article.
+5. **[M]** Обновить документацию `CLAUDE.md` / архитектурные docs под фактические 16 prerendered routes, чтобы будущие SEO/i18n изменения не опирались на устаревшие 12/14-route assumptions.
