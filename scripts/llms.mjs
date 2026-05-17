@@ -5,7 +5,7 @@
 // Build chain order: must run AFTER scripts/sitemap.mjs (which runs after scripts/prerender.mjs).
 
 import { readFile, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { dirname, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -77,17 +77,55 @@ function extractText(html) {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
+    // Phase 04.1 WR-07: decode numeric decimal entities (&#nnn;) — defensive: drop invalid code points.
+    .replace(/&#(\d+);/g, (_, n) => {
+      const num = Number(n);
+      if (!Number.isFinite(num) || num < 0 || num > 0x10ffff) return "";
+      try {
+        return String.fromCodePoint(num);
+      } catch {
+        return "";
+      }
+    })
+    // Phase 04.1 WR-07: decode numeric hex entities (&#xHHHH; / &#XHHHH;).
+    .replace(/&#x([0-9a-fA-F]+);/gi, (_, h) => {
+      const num = parseInt(h, 16);
+      if (!Number.isFinite(num) || num < 0 || num > 0x10ffff) return "";
+      try {
+        return String.fromCodePoint(num);
+      } catch {
+        return "";
+      }
+    })
+    // Phase 04.1 WR-07: strip any remaining named entity (&name;) rather than leak it as raw text.
+    // Runs AFTER the explicit named-entity decoders above so they win.
+    .replace(/&[a-zA-Z][a-zA-Z0-9]*;/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
 
 async function bodyForRoute(meta) {
+  // Phase 04.1 WR-06: input-edge rejection. meta.path comes from the SSR-bundled manifest;
+  // if a future edit injects an unexpected value (e.g. "../../etc/passwd"),
+  // resolve(DIST, "../../...") would silently target a file outside dist/. Reject at the edge.
+  if (meta.path.includes("..") || meta.path.includes("\\")) {
+    throw new Error(
+      `llms.mjs: refusing suspicious meta.path "${meta.path}" (contains '..' or backslash — possible path traversal)`,
+    );
+  }
   const outPath =
     meta.path === "/"
       ? resolve(DIST, "index.html")
       : meta.path === "/en/"
         ? resolve(DIST, "en", "index.html")
         : resolve(DIST, meta.path.replace(/^\//, ""), "index.html");
+  // Phase 04.1 WR-06: defense-in-depth escape-boundary assertion. The "/" special case yields
+  // exactly DIST + sep + "index.html"; the startsWith(DIST + sep) check covers everything else.
+  if (outPath !== resolve(DIST, "index.html") && !outPath.startsWith(DIST + sep)) {
+    throw new Error(
+      `llms.mjs: outPath "${outPath}" escapes DIST "${DIST}" for meta.path "${meta.path}"`,
+    );
+  }
   let html;
   try {
     html = await readFile(outPath, "utf-8");
