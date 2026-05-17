@@ -19,37 +19,32 @@ Primary audience: Russian-speaking AI image-prompt power users + Pro tier upsell
 
 The site must reliably **sell, service, and onboard extension users without breaking the shipped integration contract with the extension binary**. If everything else fails, locked routes (`/welcome`, `/pay`, `/success`, `/account`, `/dashboard/download-skill`) and the four-message `externally_connectable` API to the extension must keep working.
 
-## Current Milestone
+## Current State
+
+**v1.0 — GEO Optimization — SHIPPED 2026-05-17.**
+
+GEO Score 12/100 → ~72.6/100 (target ~80+ after Phase 4.2 deploy bakes in over 7-14 days). 7 phases shipped end-to-end across the GSD pipeline; 2 phases (brand authority, scale-ready architecture) closed as deferred-to-v2 since they are off-site marketing or content-strategy-prerequisite work, respectively. Integration contract with the Opten Chrome extension preserved end-to-end.
+
+Archive: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) · [milestones/v1.0-REQUIREMENTS.md](milestones/v1.0-REQUIREMENTS.md).
+
+## Next Milestone Goals (TBD)
+
+No active milestone. Picking material for v2 (preserved from v1.0 deferred phases):
+
+1. **Brand authority** — Product Hunt launch, Wikipedia/Wikidata entry, Reddit + Habr + YouTube seeding, expanded `sameAs` schema. Mostly off-site marketing; small code component (sameAs additions) when authority URLs are real.
+2. **Scale-ready content architecture** — refactor route inventory from 6 hand-listed files into a single RouteRecord data model; archetype builders (`LandingPage`, `GuideArticle`, `GuideHub`, `ComparisonPage`, `ChangelogPage`); build-time gates (duplicate keyword, wordCount, citability). Prerequisite for any programmatic SEO rollout.
+3. **Post-deploy v1.0 follow-ups** — Bing token replacement (operational), GEO rescore window 7-14 days after Phase 4.2 deploy, manual UAT of X-Robots-Tag edge materialization.
+
+Run `/gsd-new-milestone` to start the next milestone (requirements + roadmap will be defined fresh).
+
+<details>
+<summary>Previous milestone state (v1.0 in-flight description, archived 2026-05-17)</summary>
 
 **GEO Optimization** — raise opten.space GEO score from **12/100 → ~30/100 (Phase 1) → higher (Phases 2-5)** by adding static foundations and gradually layering prerender, bilingual paths, content surface, and brand authority. Success metric for Phase 1: GEO score moves from 12 → ~30 within 14 days of deploying Phase 1 (measured by the `geo-seo-claude` audit tool).
 
-## Requirements
+Detailed requirements (REQ-GEO-A-1..8 active, REQ-GEO-B/C/D/E deferred) preserved in `.planning/milestones/v1.0-REQUIREMENTS.md`.
 
-See `.planning/REQUIREMENTS.md` for the full list. Headline:
-
-### Validated
-
-<!-- Shipped and confirmed valuable. -->
-
-(None yet in this milestone — Phase 1 in flight)
-
-### Active (v1 of this milestone)
-
-- [ ] **REQ-GEO-A-1..8** — 8 atomic static-GEO commits (Phase 1: robots.txt, sitemap.xml, llms.txt, OG hero cards, inline JSON-LD, OG meta replacement, Paddle preconnect, security headers in vercel.json)
-
-### Deferred (v2 / future phases)
-
-- **REQ-GEO-B** — per-route prerender + per-route metadata (Phase 2)
-- **REQ-GEO-C** — bilingual routing strategy (Phase 3)
-- **REQ-GEO-D** — content surface: /about, /guides/*, FAQ schema (Phase 4)
-- **REQ-GEO-E** — brand authority: Product Hunt, Wikipedia, Reddit, YouTube, sameAs schema (Phase 5)
-
-### Out of Scope (this milestone)
-
-- **CSP header** — conflicts with Paddle inline script; separate ticket. Not silently to be added inside Phase 1's vercel.json edit.
-- **`@supabase/supabase-js` SDK** — site uses plain fetch; not switching.
-- **Tests / ESLint / typecheck script** — codebase has none; not adding inside a GEO milestone. Verification gate stays `npm run build` + `npm run preview` + manual curl.
-- **Renaming any locked route** — replacement requires a redirect from the old path (per integration contract).
+</details>
 
 ## Context
 
