@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-05-16 against extension `manifest.json` version **1.3.5**.
+> **Last sync:** 2026-05-17 against extension `manifest.json` version **1.3.6**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -113,7 +113,7 @@ chrome.runtime.sendMessage(id, { type: "GET_SUBSCRIPTION" }, (response) => {
   //   card_last4: null,
   //   card_type: null,
   //   has_card: false,
-  //   limit: 300,          // L3C-01 (260428): free-tier intentionally shows 300, not 10
+  //   limit: 300,          // L3C-01 (260428): free-аккаунт displays 0/300 — free даёт 0 операций, Pro даёт 300
   //   remaining: number,
   // }
   //
@@ -123,7 +123,7 @@ chrome.runtime.sendMessage(id, { type: "GET_SUBSCRIPTION" }, (response) => {
 
 **Field-level notes:**
 - `plan === 'cancelled'` means the user cancelled but is still inside the paid period. **Treat it as Pro for access purposes** (download skill, no upgrade nag). The `expires_at` is when access actually ends. This mirrors `api/download-skill.ts:78-85`.
-- `limit: 300` for Free is the L3C-01 marketing display (popup shows `0/300`). The proxy still enforces `FREE_LIMIT=10` server-side. Do not "fix" this on the site unless the env var is also flipped.
+- `limit: 300` for Free is the L3C-01 product positioning (free-аккаунт даёт 0 операций; popup shows `0/300` так как 300 — это Pro-лимит, на который нацелен апгрейд). Server-side proxy ещё enforces legacy `FREE_LIMIT=10`; нужно flip через `vercel env add FREE_LIMIT=0 production` после публикации v1.3.6 в CWS, чтобы серверный лимит совпал с popup-отображением.
 - Forward-compatibility rule: **the site MUST NOT assume the response is exhaustive.** Future fields may be added.
 
 #### `CANCEL_SUBSCRIPTION`

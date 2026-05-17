@@ -4,8 +4,10 @@
 React 18 + TypeScript + Tailwind 4, SPA, deployed on Vercel.
 
 Three jobs: (1) marketing surface (landing in RU/EN), (2) billing surface
-(`/pay`, `/account`, `/success` for YooKassa RUB + Paddle USD), (3) Pro-only
-utilities (`/dashboard/download-skill` skill ZIP download).
+(`/pay`, `/account`, `/success` for YooKassa RUB + Paddle USD — Pro is the
+only purchasable tier; free-аккаунт даёт 0 операций, нужен для логина), (3)
+Pro-only utilities (`/dashboard/download-skill` — streams `opten.zip` Claude
+Skill bundle sourced from the extension repo's `opten/` dir, Phase 73).
 
 The site is **not the product** — the extension is. The site exists to sell,
 service, and onboard extension users.
@@ -49,8 +51,8 @@ See [docs/TECH.md](docs/TECH.md) for full picture.
 | Repo | Path | Role |
 |------|------|------|
 | opten-website (this) | `C:\Projects\opten-website` | Public site |
-| promptscore (private) | `C:\Projects\promptscore` | Chrome extension + Supabase Edge Functions + migrations + Paddle/YooKassa webhooks |
-| opten-proxy (private) | `C:\Projects\promptscore-proxy` | Vercel proxy for the extension's AI requests (not used by the site) |
+| promptscore (private) | `C:\Projects\promptscore` | Chrome extension (Opten v1.3.6, MV3) + Supabase Edge Functions + migrations + Paddle/YooKassa webhooks. Extension works on 4 platforms: syntx.ai, higgsfield.ai, freepik.com, magnific.com |
+| opten-proxy (private) | `C:\Projects\promptscore-proxy` | Vercel proxy for the extension's AI requests + 63 model-specific skill files in `skills/*.md` (61 model + 2 fallback). Not used by the site directly, but the same skill files are bundled into the Pro-only `opten.zip` Claude Skill served via this repo's `/api/download-skill` |
 
 The extension repo owns the Supabase project — all Edge Functions and
 migrations are deployed from there, not from this repo.
