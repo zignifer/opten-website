@@ -274,6 +274,13 @@ for (const meta of routes) {
   html = applyMarker(html, meta.path);
   if (meta.prerender === "full") {
     const rendered = renderRoute(meta.path);
+    // Phase 4.1 IN-03: defense-in-depth — if entry-server.tsx is missing a <Route> for this path,
+    // renderToString returns an empty fragment / Suspense fallback (~50 chars). The 200-char threshold
+    // distinguishes that from a real rendered React tree (legitimate body is ~thousands of chars even
+    // for the smallest legal page).
+    if (rendered.length < 200) {
+      throw new Error(`prerender(${meta.path}): SSR body is suspiciously short (${rendered.length} chars). Expected >200 chars for full-tier route — entry-server.tsx may be missing a <Route> for this path.`);
+    }
     html = applyBody(html, rendered);
   }
   // For "head" tier (e.g., /pay): leave body empty, head is already overridden.
