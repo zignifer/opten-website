@@ -96,10 +96,10 @@ const ru: AboutContent = {
             <li className="mb-[8px]"><strong className="text-white font-semibold">RU / EN</strong> — интерфейс сам подхватывает язык браузера.</li>
           </ul>
           <p className="mb-[14px]">
-            По цене: <strong className="text-white font-semibold">10 проверок в месяц бесплатно</strong>. Pro — 199 ₽/мес с автопродлением
+            По цене: <strong className="text-white font-semibold">установка и регистрация бесплатны</strong>. Pro — 199 ₽/мес с автопродлением
             через ЮKassa, либо 299 ₽ разово без подписки на месяц. Для платежей в долларах — Paddle,
-            около $2.99. Это в пять раз дешевле PromptPerfect ($9.99), и при этом Opten работает в десятках
-            интерфейсов, а не только в собственном чате.
+            около $2.99/мес или $4.99 разово. Это в пять раз дешевле PromptPerfect ($9.99), и при этом
+            Opten работает в десятках интерфейсов, а не только в собственном чате.
           </p>
         </>
       ),

@@ -97,7 +97,6 @@ export const SOFTWARE_APP_BLOCK: SchemaBlock = {
   downloadUrl: CHROME_STORE_URL,
   publisher: ORG_REF,
   offers: [
-    { "@type": "Offer", price: "0",    priceCurrency: "USD", name: "Free tier" },
     { "@type": "Offer", price: "2.99", priceCurrency: "USD", name: "Pro Monthly" },
     { "@type": "Offer", price: "199",  priceCurrency: "RUB", name: "Pro Monthly (RU)" },
   ],
@@ -264,7 +263,7 @@ export const routes: RouteMeta[] = [
     description: "Выберите тариф Opten Pro: 300 проверок в месяц, улучшение промптов в один клик. Оплата через ЮKassa (₽) или Paddle ($).",
     canonical: `${SITE_ORIGIN}/pay`,
     ogTitle: "Тарифы Opten — Pro с 300 генерациями в месяц",
-    ogDescription: "Перейди на Pro и улучшай промпты в один клик. 199₽/мес или $2.99/мес. Начни бесплатно.",
+    ogDescription: "Перейди на Pro и улучшай промпты в один клик. 199₽/мес или 299₽ разово.",
     prerender: "full", // Phase 4 D-12 (post-revert f9dfdb1): full prerender keeps the runtime-conditional pricing cards in initial HTML with visible prices, so Product schema validates against visible content.
     changefreq: "monthly",
     priority: 0.8,
@@ -502,7 +501,7 @@ export const routes: RouteMeta[] = [
     description: "Choose your Opten Pro plan: 300 checks per month, one-click prompt improvement. Pay via YooKassa (₽) or Paddle ($).",
     canonical: `${SITE_ORIGIN}/en/pay`,
     ogTitle: "Opten pricing — Pro with 300 checks per month",
-    ogDescription: "Upgrade to Pro and improve prompts in one click. $2.99/mo or 199₽/mo. Start for free.",
+    ogDescription: "Upgrade to Pro and improve prompts in one click. $2.99/mo or $4.99 one-time.",
     ogImage: DEFAULT_OG_IMAGE_EN,
     prerender: "full", // Phase 4 D-12 (post-revert f9dfdb1): full prerender keeps the runtime-conditional pricing cards in initial HTML with visible prices, so Product schema validates against visible content.
     changefreq: "monthly",

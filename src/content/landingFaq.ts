@@ -19,8 +19,8 @@ const ru: FaqItem[] = [
     a: "Opten — расширение для Chrome, которое оценивает твой промпт прямо в интерфейсе генератора (Syntx, Higgsfield, Freepik) и одним кликом улучшает его под конкретную модель: Midjourney, Sora, Kling, Nano Banana, GPT Image 2 и ещё 50+. Расширение само определяет модель по странице и применяет правила из её документации — оценка 0–100, до пяти конкретных замечаний и кнопка auto-enhance.",
   },
   {
-    q: "Сколько стоит и есть ли бесплатная версия?",
-    a: "Бесплатно — 10 проверок промптов в месяц. Этого хватает попробовать на нескольких генерациях. Pro — 199 ₽/мес с автопродлением через ЮKassa (300 проверок в месяц) или 299 ₽ разово без подписки. Для долларовых платежей через Paddle — около $2.99/мес. Это в пять раз дешевле PromptPerfect ($9.99), и Opten работает не только в собственном чате, а внутри привычных генераторов.",
+    q: "Сколько стоит Opten?",
+    a: "Pro — 199₽/мес с автопродлением через ЮKassa или 299₽ разово без подписки. Для долларовых платежей через Paddle — $2.99/мес или $4.99 разово. Установка расширения и регистрация бесплатны. Это в пять раз дешевле PromptPerfect ($9.99), и Opten работает не только в собственном чате, а внутри привычных генераторов (Syntx, Higgsfield, Freepik).",
   },
   {
     q: "Какие модели поддерживаются?",
@@ -42,8 +42,8 @@ const en: FaqItem[] = [
     a: "Opten is a Chrome extension that scores your prompt right inside the AI generator's interface (Syntx, Higgsfield, Freepik) and one-click improves it for the specific model: Midjourney, Sora, Kling, Nano Banana, GPT Image 2, and 50+ others. The extension auto-detects the model from the page URL and applies rules from that model's documentation — a 0–100 score, up to five specific issues, and an auto-enhance button.",
   },
   {
-    q: "How much does it cost and is there a free tier?",
-    a: 'Free tier: 10 prompt checks per month, enough to try Opten on a handful of generations. Pro: 199 ₽/mo with auto-renewal via YooKassa (300 checks per month), or 299 ₽ one-time without subscription. For USD payments via Paddle — around $2.99/mo. This is five times cheaper than PromptPerfect ($9.99), and Opten works inside familiar generators rather than in its own chat.',
+    q: "How much does Opten cost?",
+    a: "Pro — $2.99/mo (via Paddle) or $4.99 one-time without subscription. For ruble payments via YooKassa — 199₽/mo or 299₽ one-time. Installing the extension and creating an account are free. This is five times cheaper than PromptPerfect ($9.99), and Opten works inside familiar generators (Syntx, Higgsfield, Freepik) rather than its own chat window.",
   },
   {
     q: "Which models are supported?",
