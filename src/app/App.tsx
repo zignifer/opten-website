@@ -185,11 +185,6 @@ function Hero() {
           {t("hero.subtitle1")}
           <strong>{t("hero.subtitle2")}</strong>
         </p>
-        {/* Post-2026-05-17 GEO audit ME-1: definitional answer-block under hero — names entity, lists
-            supported models + host sites + price in one paragraph so AI systems can cite verbatim. */}
-        <p className="mt-6 w-full max-w-[820px] font-['PT_Root_UI',sans-serif] text-[14px] leading-[1.55] text-white/55 md:text-[15px]">
-          {t("hero.definitional")}
-        </p>
         <div className="mt-12 hidden w-full justify-center overflow-visible min-[1066px]:flex">
           <div className="w-[680px] max-w-full overflow-visible">
             <OptenHeroAnimation />
@@ -507,10 +502,12 @@ function Footer() {
         <div className="mt-14 flex justify-center">
           <InstallButton />
         </div>
-        <div className="mt-8 flex items-center justify-center gap-3 font-['PT_Root_UI',sans-serif] text-[18px] text-white">
-          <Check className="size-[18px] stroke-[1.8]" />
-          <span>{t("cta.freeLabel")}</span>
-        </div>
+        {/* Post-2026-05-17 GEO audit ME-1: definitional answer-block — names entity, lists supported
+            models + host sites + price in one paragraph so AI systems can cite verbatim. Placed in
+            footer (under final CTA) rather than under hero per user feedback 2026-05-17. */}
+        <p className="mx-auto mt-8 w-full max-w-[760px] font-['PT_Root_UI',sans-serif] text-[14px] leading-[1.6] text-white/55 md:text-[15px]">
+          {t("hero.definitional")}
+        </p>
         <div className="mt-20 flex flex-wrap justify-center gap-x-5 gap-y-4 font-['PT_Root_UI',sans-serif] text-[16px] text-white/40 sm:gap-8">
           {/* Phase 4.1 B-03: About link enabled for both locales (footer mirror). */}
           <LocalizedLink to="/about" className="hover:text-white">{t("nav.about")}</LocalizedLink>
