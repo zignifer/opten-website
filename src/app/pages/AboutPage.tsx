@@ -4,12 +4,18 @@
 // approved by user 2026-05-17 per D-07 (no LLM-generated body on E-E-A-T pages).
 // Hero renders initials placeholder per locked decision option (c) — photo deferred.
 
-import { useT } from "../../i18n/LangContext";
+import { useT, useLang } from "../../i18n/LangContext";
 import LangSwitcher from "../components/LangSwitcher";
 import LocalizedLink from "../components/LocalizedLink";
+// Phase 4.1 W12a: body content extracted to a per-language data file so W12b can
+// add the EN sibling without bloating this component. Fallback to RU until W12b
+// populates aboutContent.en (currently null sentinel).
+import { aboutContent } from "../../content/about";
 
 export default function AboutPage() {
   const t = useT();
+  const { lang } = useLang();
+  const content = aboutContent[lang] ?? aboutContent.ru;
 
   return (
     <div className="min-h-screen bg-black font-['PT_Root_UI',sans-serif]">
@@ -52,94 +58,15 @@ export default function AboutPage() {
       </section>
 
       {/* Body content — human-written, sourced from author's Obsidian vault, approved by user 2026-05-17.
-          Section headings inlined (RU-only page; no useT for headings — keeps body translatable as one unit later). */}
+          Phase 4.1 W12a: section data lives in src/content/about.tsx (per-language). EN populated in W12b. */}
       <main className="max-w-[800px] mx-auto px-[20px] pb-[80px]">
         <article className="about-content text-[rgba(255,255,255,0.78)] text-[16px] leading-[1.7]">
-          <h2 className="text-white text-[24px] font-medium mt-[48px] mb-[18px] leading-[1.3] tracking-[-0.4px] first:mt-0">Откуда взялся Opten</h2>
-          <p className="mb-[14px]">
-            Я Влад Воронежцев — снимаю YouTube Shorts про нейросети для генерации картинок и видео
-            (канал <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>,
-            4 500+ подписчиков, 54 ролика, около 7 млн просмотров за год). По профессии я веб-дизайнер,
-            а с 2024-го года ушёл в AI-креатив с головой: Midjourney, Kling, Veo, Sora, Nano Banana,
-            Seedance — пробовал почти всё, что вышло.
-          </p>
-          <p className="mb-[14px]">
-            Чем больше я делал контент, тем чаще видел один и тот же паттерн: люди заходят в Syntx,
-            Higgsfield или Freepik, пишут промпт «в лоб», получают посредственный результат — и думают,
-            что это нейросеть плохая. Хотя на самом деле под капотом сидит мощная модель, но она не
-            понимает, чего от неё хотят. Промпт — это навык. Просто никто его толком не учит.
-          </p>
-          <p className="mb-[14px]">
-            Opten я начал делать осенью 2025-го для себя — нужен был инструмент, который покажет
-            в реальном времени, насколько мой промпт «попадает» в конкретную модель и что в нём улучшить.
-            Из личного эксперимента быстро вышло, что эта же боль есть у тысяч моих зрителей. Так появилось
-            расширение для Chrome.
-          </p>
-
-          <h2 className="text-white text-[24px] font-medium mt-[48px] mb-[18px] leading-[1.3] tracking-[-0.4px] first:mt-0">Почему именно про промпты</h2>
-          <p className="mb-[14px]">
-            Главная проблема, которую закрывает Opten — <strong className="text-white font-semibold">каждая модель пишется по-своему</strong>.
-            Kling реагирует на одну формулировку движения, Sora — на другую, Midjourney любит технические
-            термины из кинематографа, Nano Banana — короткие, плотные описания без воды. Универсальных
-            «10 советов как писать промпт» не существует: то, что работает в Flux, в Imagen даёт мусор.
-          </p>
-          <p className="mb-[14px]">
-            Я собрал 60 skill-файлов под конкретные модели — Seedance (все версии), Seedream,
-            Kling с motion-control, Midjourney 7/8/niji/video, GPT Image, Flux, Nano Banana, Imagen,
-            Luma Ray, Sora 2, Veo 3/3.1, Runway, MiniMax Hailuo, Pixverse, LTX, Wan, Qwen, Grok Imagine
-            и другие. Плюс два fallback-режима на случай если вы пробуете что-то редкое. Каждый skill —
-            это правила, склеенные из официальной документации конкретной модели и моего собственного
-            опыта генераций.
-          </p>
-          <p className="mb-[14px]">
-            Сам Opten не просто оценивает промпт по 0–100 и подсвечивает до пяти конкретных проблем.
-            Он умеет <strong className="text-white font-semibold">auto-enhance</strong> — одним кликом переписывает промпт под выбранную модель.
-            Параллельный rewrite — нажал, через секунду получил улучшенную версию.
-          </p>
-
-          <h2 className="text-white text-[24px] font-medium mt-[48px] mb-[18px] leading-[1.3] tracking-[-0.4px] first:mt-0">Что вы получаете</h2>
-          <p className="mb-[14px]">
-            Установил расширение → зашёл в любимый AI-генератор (Syntx, Higgsfield, Freepik — поддержка
-            ширится) → пишешь промпт как обычно → Opten молча его оценивает прямо в интерфейсе, не уводя
-            в отдельное окно.
-          </p>
-          <p className="mb-[14px]">Что получаешь:</p>
-          <ul className="mt-[8px] mb-[16px] pl-[24px] list-disc">
-            <li className="mb-[8px]"><strong className="text-white font-semibold">Оценка 0–100</strong> по правилам конкретной модели — видно сразу, насколько промпт сильный.</li>
-            <li className="mb-[8px]"><strong className="text-white font-semibold">До пяти конкретных замечаний</strong> с иконками pass/fail/neutral. Не «попробуй ещё раз», а «не указан стиль освещения, добавь soft daylight».</li>
-            <li className="mb-[8px]"><strong className="text-white font-semibold">Auto-enhance</strong> — улучшенный промпт за один клик. Никаких «вот десять советов» — сразу готовый текст, который можно скопировать или применить кнопкой.</li>
-            <li className="mb-[8px]"><strong className="text-white font-semibold">Multimodal</strong> — Opten учитывает референсные изображения, которые вы уже приложили. Не предлагает добавить то, что и так висит в превью.</li>
-            <li className="mb-[8px]"><strong className="text-white font-semibold">Автоопределение модели</strong> — не нужно вручную говорить «это Kling»; Opten смотрит на URL и DOM-разметку страницы.</li>
-            <li className="mb-[8px]"><strong className="text-white font-semibold">Privacy</strong> — ваши промпты и референсы <strong className="text-white font-semibold">не сохраняются на серверах Opten</strong>. Анализ идёт через Claude Haiku 4.5 за приватным Vercel-прокси, чисто транзитом.</li>
-            <li className="mb-[8px]"><strong className="text-white font-semibold">RU / EN</strong> — интерфейс сам подхватывает язык браузера.</li>
-          </ul>
-          <p className="mb-[14px]">
-            По цене: <strong className="text-white font-semibold">10 проверок в месяц бесплатно</strong>. Pro — 199 ₽/мес с автопродлением
-            через ЮKassa, либо 299 ₽ разово без подписки на месяц. Для платежей в долларах — Paddle,
-            около $2.99. Это в пять раз дешевле PromptPerfect ($9.99), и при этом Opten работает в десятках
-            интерфейсов, а не только в собственном чате.
-          </p>
-
-          <h2 className="text-white text-[24px] font-medium mt-[48px] mb-[18px] leading-[1.3] tracking-[-0.4px] first:mt-0">Контакты</h2>
-          <p className="mb-[14px]">
-            Если хотите связаться лично, написать про баг, попросить добавить поддержку конкретной модели
-            или просто обсудить генерации — мне удобнее всего в Telegram:{" "}
-            <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v_voronezhtsev</a>.
-            Там же мой канал «Влад Воронежцев | Про нейросети» — туда я выкладываю длинные разборы, промпты,
-            ссылки и закулисье.
-          </p>
-          <p className="mb-[14px]">
-            YouTube — <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>.
-            Там короткие туториалы и тренды.
-          </p>
-          <p className="mb-[14px]">
-            <strong className="text-white font-semibold">Юридически</strong> Opten работает в России от ИП Воронежцев Владислав Павлович,
-            ИНН 723016676391, Тюмень. Для международных платежей через Paddle — IE Nikolai Shupletsov
-            как Merchant of Record (это стандартная схема для Paddle, к самому продукту отношения не имеет).
-            Полные реквизиты, оферта и политика возврата — в{" "}
-            <LocalizedLink to="/terms" className="text-[#9cfb51] underline hover:text-white transition-colors">Условиях использования</LocalizedLink> и{" "}
-            <LocalizedLink to="/refund" className="text-[#9cfb51] underline hover:text-white transition-colors">Политике возврата</LocalizedLink>.
-          </p>
+          {content.sections.map((section, i) => (
+            <div key={i}>
+              <h2 className="text-white text-[24px] font-medium mt-[48px] mb-[18px] leading-[1.3] tracking-[-0.4px] first:mt-0">{section.heading}</h2>
+              {section.body}
+            </div>
+          ))}
         </article>
       </main>
 
