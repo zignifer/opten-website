@@ -46,14 +46,24 @@ export default function AboutPage() {
           <p className="text-[rgba(255,255,255,0.6)] text-[16px] md:text-[18px] leading-[1.5]">
             {t("about.tagline")}
           </p>
-          <a
-            href="https://t.me/v_voronezhtsev"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-[12px] inline-flex items-center gap-[8px] rounded-[100px] bg-white px-[20px] py-[10px] font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] no-underline hover:opacity-90 transition-opacity"
-          >
-            {t("about.contactCta")}
-          </a>
+          <div className="mt-[12px] flex flex-wrap items-center gap-[10px] justify-center md:justify-start">
+            <a
+              href="https://t.me/v_voronezhtsev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-[8px] rounded-[100px] bg-white px-[20px] py-[10px] font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] no-underline hover:opacity-90 transition-opacity"
+            >
+              {t("about.contactCta")}
+            </a>
+            {/* Post-2026-05-17 GEO audit ME-7: email contact alongside Telegram. AI systems
+                prefer ContactPoint.email for "how do I reach the founder" queries. */}
+            <a
+              href="mailto:zignifer@gmail.com"
+              className="inline-flex items-center gap-[8px] rounded-[100px] border border-[rgba(255,255,255,0.2)] px-[20px] py-[10px] font-['PT_Root_UI',sans-serif] text-[14px] font-medium text-white no-underline hover:bg-white/5 transition-colors"
+            >
+              {t("about.emailCta")}
+            </a>
+          </div>
         </div>
       </section>
 
