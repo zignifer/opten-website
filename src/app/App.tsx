@@ -383,11 +383,14 @@ function FeatureCard({ title, desc, imgData, imgWidth, imgHeight, imageFirst = f
   );
 }
 
+// Phase 4 D-08: id was "faq" historically — it scrolled the navbar #faq link to this Privacy section
+// (mislabel). Renamed to "privacy" so the navbar #faq link can correctly scroll to the actual FAQ
+// block mounted below by <FaqBlock id="faq" />.
 function Privacy() {
   const t = useT();
   const { lang } = useLang();
   return (
-    <section id="faq" className="bg-[#011417] px-5 py-[70px] md:py-24">
+    <section id="privacy" className="bg-[#011417] px-5 py-[70px] md:py-24">
       <div className="mx-auto grid w-full max-w-[1240px] gap-y-5 lg:grid-cols-[460px_1fr] lg:gap-[200px]">
         <h2 className="w-full min-w-0 text-center font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] text-white md:text-[52px] lg:text-left">{titleCaseEn(t("privacy.sectionTitle"), lang)}</h2>
         <div className="flex w-full min-w-0 flex-col lg:-mt-10">
