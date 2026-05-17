@@ -11,11 +11,12 @@
 // the next page does not inherit a stale noindex.
 
 import { useEffect } from "react";
-import { useT } from "../../i18n/LangContext";
+import { useT, useLang } from "../../i18n/LangContext";
 import LocalizedLink from "../components/LocalizedLink";
 
 export default function NotFound() {
   const t = useT();
+  const { lang } = useLang();
 
   useEffect(() => {
     // Set page title (locale-aware).
@@ -48,7 +49,11 @@ export default function NotFound() {
         meta?.setAttribute("content", previousContent);
       }
     };
-  }, [t]);
+    // Depend on `lang` (stable across renders) rather than `t` (fresh closure
+    // each LangProvider render — would cause unnecessary inject/cleanup churn).
+    // t(key) is semantically a pure function of lang for this component.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   return (
     <main className="min-h-screen bg-white flex items-center justify-center px-[20px] py-[96px] font-['PT_Root_UI',sans-serif]">

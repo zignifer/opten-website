@@ -25,13 +25,18 @@ const TIMEOUT_MS = 5000;
 
 async function findKey() {
   const files = await readdir(PUBLIC);
-  const match = files.find((f) => /^[a-f0-9]{8,128}\.txt$/.test(f));
-  if (!match) {
+  const matches = files.filter((f) => /^[a-f0-9]{8,128}\.txt$/.test(f));
+  if (matches.length === 0) {
     throw new Error(
       "indexnow: no key file in public/ — generate one with `node -e \"console.log(require('crypto').randomBytes(16).toString('hex'))\"` and save as public/<key>.txt containing the same key",
     );
   }
-  return match.replace(".txt", "");
+  if (matches.length > 1) {
+    throw new Error(
+      `indexnow: multiple key files in public/ (${matches.join(", ")}). Keep exactly one — IndexNow ownership tied to a single key.`,
+    );
+  }
+  return matches[0].replace(".txt", "");
 }
 
 async function extractUrls() {
