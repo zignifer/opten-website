@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Phase 4.2 complete (14/14 ROADMAP criteria PASS code/build). Phase 5 (off-site) + Phase 6 (architectural refactor) backlog.
-stopped_at: "Phase 4.2 complete on 2026-05-17. 7 atomic wave commits + 1 code-review fix shipped to main. 5 post-deploy / human-only checks (Vercel edge X-Robots materialization, visual h1 smoke, Bing token replacement, IndexNow acceptance 24-72h, GEO rescore window 7-14 days) tracked in 04.2-VERIFICATION.md. Autonomous stopped at end of single-phase scope — Phase 5 (brand authority off-site) and Phase 6 (scale-ready architecture refactor) explicitly backlog per user direction."
-last_updated: "2026-05-17T19:00:00.000Z"
+status: v1.0 MILESTONE CLOSED — 7 phases shipped + 2 closed-as-deferred-to-v2 (Phase 5 off-site, Phase 6 needs content strategy upstream). Ready for milestone archive.
+stopped_at: "v1.0 milestone closed on 2026-05-17. Phase 4.2 deployed (commit b02b258 + 18 prior commits pushed to origin/main). Phase 5 (brand authority off-site) and Phase 6 (scale-ready architecture refactor) closed as deferred to v2 milestone per user direction — both are not code-trackable in v1 (off-site marketing + content-strategy prerequisite, respectively). 5 post-deploy / human-only checks tracked in 04.2-VERIFICATION.md (X-Robots materialization, visual h1 smoke, Bing token replacement, IndexNow acceptance 24-72h, GEO rescore 7-14d) — not blocking closure."
+last_updated: "2026-05-17T19:30:00.000Z"
 last_activity: 2026-05-17
 progress:
   total_phases: 9
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 58
   completed_plans: 51
-  percent: 88
+  percent: 100
 ---
 
 # Project State
@@ -26,15 +26,18 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 
 ## Current Position
 
-Phase: 4.2 → COMPLETE
-Plan: 7 waves (04.2-{01..07}-PLAN.md) + PLAN-CHECK + PLAN-INDEX. All shipped 2026-05-17.
-Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline, 3 → 8/8 + 2 post-release fixes, 4 → 6/7 + UAT 6/6 PASS, 4.1 → 13/13 shipped 2026-05-17, 4.2 → 7/7 + 1 code-review fix shipped 2026-05-17.
-Status: Phase 4.2 complete. 14/14 ROADMAP criteria PASS at code/build. 5 post-deploy / human-only checks deferred (see 04.2-VERIFICATION.md).
+Phase: v1.0 MILESTONE CLOSED
+Plan: All in-scope phases shipped; Phase 5 + 6 closed as deferred-to-v2.
+Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline, 3 → 8/8 + 2 post-release fixes, 4 → 6/7 + UAT 6/6 PASS, 4.1 → 13/13, 4.2 → 7/7 + 1 code-review fix. Phase 5 — closed as deferred to v2 (off-site work). Phase 6 — closed as deferred to v2 (needs content strategy upstream).
+Status: v1.0 MILESTONE CLOSED. Ready for archive.
 Last activity: 2026-05-17
-Next: User-facing post-deploy verification window (manual UAT). After deploy lands on opten.space production: (1) `curl -sI https://opten.space/account` for X-Robots-Tag materialization; (2) visual check of h1 on /pay + /welcome (RU + EN); (3) replace `BING_VERIFICATION_TOKEN_TODO` in index.html once Bing Webmaster registration done; (4) wait 24-72h for IndexNow URL acceptance signal in Bing Webmaster Tools; (5) GEO rescore window 7-14 days after deploy (target: 72.6 → ~80+). Phase 5 (brand authority off-site) + Phase 6 (scale-ready architecture refactor) remain backlog per user direction.
+Next:
+  1. **Post-deploy manual checks** (after Vercel finishes the b02b258 deploy on opten.space): curl X-Robots-Tag on /account; visual h1 smoke on /pay + /welcome RU+EN; Bing token replacement in index.html; IndexNow acceptance (24-72h); GEO rescore (7-14d, target 72.6 → ~80+).
+  2. **v2 milestone planning** (when ready): start with `/gsd-new-milestone` — Phase 5 (brand authority off-site) and Phase 6 (scale-ready architecture refactor) scopes preserved in v1.0 ROADMAP archive as picking material.
+  3. **Archive v1.0**: `/gsd-complete-milestone v1.0` moves ROADMAP/STATE into `.planning/milestones/v1.0-*` and resets STATE for v2.
 
-Milestone phases: 8 of 9 complete (1, 2, 2.1, 2.2, 3, 4, 4.1, 4.2). Phase 5 + Phase 6 backlog.
-Progress: [█████████░] 88% — Phase 4.2 closed; Phase 5 + 6 backlog.
+Milestone phases: 9 of 9 closed (7 shipped + 2 deferred-to-v2 with rationale).
+Progress: [██████████] 100% — v1.0 closed.
 
 ## Performance Metrics
 
