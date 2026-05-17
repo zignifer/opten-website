@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to run GSD spec-phase
-stopped_at: Phase 4.1 context gathered
-last_updated: "2026-05-17T11:45:43.357Z"
+stopped_at: Phase 4.1 complete — 13/13 plans shipped + review fixes + WR-04 user-decided copy reword. 8/8 ROADMAP criteria PASS code/build level. Post-deploy UAT deferred. Phase 5 (Brand authority) is mostly off-site work — needs human-driven launch sequence, not GSD execution.
+last_updated: "2026-05-17T13:52:00.373Z"
 last_activity: 2026-05-17
 progress:
   total_phases: 7
-  completed_phases: 3
-  total_plans: 31
-  completed_plans: 29
-  percent: 94
+  completed_phases: 4
+  total_plans: 44
+  completed_plans: 42
+  percent: 95
 ---
 
 # Project State
@@ -128,8 +128,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-17T11:45:43.346Z
-Stopped at: Phase 4.1 context gathered
+Last session: 2026-05-17T13:52:00.359Z
+Stopped at: Phase 4.1 complete — 13/13 plans shipped + review fixes + WR-04 user-decided copy reword. 8/8 ROADMAP criteria PASS code/build level. Post-deploy UAT deferred. Phase 5 (Brand authority) is mostly off-site work — needs human-driven launch sequence, not GSD execution.
 Next action (in order):
 
   1. **Execute Phase 4.1 waves 1-8** — `scripts/prerender.mjs`, `scripts/seo-routes.ts`, `scripts/llms.mjs`, `FaqBlock.tsx`, new `scripts/verify-faq-mainentity.mjs`, `App.tsx` + i18n dicts, `AboutPage.tsx`, `entry-server.tsx` assert in `prerender.mjs`. All low-risk; auto-commit per `feedback_commit_policy.md` (code outside the integration contract surface is OK to commit autonomously after this approval round).
@@ -137,4 +137,4 @@ Next action (in order):
   3. **GEO rescore window** — pre-Phase-4 baseline = 48/100 (2026-05-17, `GEO-AUDIT-POST-PHASE-3.md`). 7–14 days after Phase 4 / 4.1 deploys (window opens ~2026-05-24, closes ~2026-05-31), re-run `/geo audit https://opten.space` — target 65–73/100. Capture both `/` and `/en/`.
   4. **`/gsd-plan-phase 5`** — Phase 5 brand authority: Wikipedia/Wikidata seed, Product Hunt launch, Reddit + YouTube presence, expanded `sameAs` array. Mostly off-domain marketing work; small code component (sameAs additions only). Plan after Phase 4.1 closes.
 
-Resume file: .planning/phases/04.1-content-surface-cleanup/04.1-CONTEXT.md
+Resume file: .planning/phases/04.1-content-surface-cleanup/04.1-VERIFICATION.md
