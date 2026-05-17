@@ -293,7 +293,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phases 1 and 2 are p
 | 3. Bilingual routing | 8/8 | Complete   | 2026-05-16 |
 | 4. Content surface | 6/7 (04-02 replaced by 04-LCP-AUDIT Option-1 defer) + UAT 6/6 | Complete | 2026-05-17 |
 | 4.1. Content surface cleanup | 13/13 + review fixes | Complete (8/8 ROADMAP criteria PASS code/build; post-deploy UAT deferred) | 2026-05-17 |
-| 4.2. SEO/GEO polish (post-synthesis) | 0/TBD | Scope captured — ready for `/gsd-spec-phase 4.2` | - |
+| 4.2. SEO/GEO polish (post-synthesis) | 2/7 | In Progress|  |
 | 5. Brand authority | 0/TBD | Backlog (off-site, not auto-executable) | - |
 | 6. Scale-ready content architecture | 0/TBD | Backlog (deferred until content strategy decided) | - |
 

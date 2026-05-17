@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to run GSD spec-phase 4.2
-stopped_at: ""
-last_updated: "2026-05-17T22:00:00.000Z"
+stopped_at: Phase 4.1 closed; dual Codex CLI SEO/GEO review completed (with + without GEO frame); synthesis written; Phase 4.2 inserted with 5 P0 + 7 P1 + 3 decisions captured. Ready to run `/gsd-autonomous` on Phase 4.2.
+last_updated: "2026-05-17T17:35:56.946Z"
 last_activity: 2026-05-17
 progress:
   total_phases: 9
-  completed_phases: 7
-  total_plans: 44
-  completed_plans: 42
-  percent: 78
+  completed_phases: 4
+  total_plans: 51
+  completed_plans: 44
+  percent: 86
 ---
 
 # Project State
@@ -34,7 +34,7 @@ Last activity: 2026-05-17
 Next: Run `/gsd-spec-phase 4.2` (or `/gsd-autonomous` for spec→discuss→plan→execute chain). Scope seed: 5 P0 + 7 P1 actionable items + 3 decisions (D-1 definitional paragraph placement, D-2 canonical model count, D-3 hreflang locale policy) from the synthesis. Phase 5 (brand authority) remains backlog — off-site work, not auto-executable. Phase 6 (scale-ready architecture) remains backlog — deferred until content strategy decided.
 
 Milestone phases: 7 of 9 complete (1, 2, 2.1, 2.2, 3, 4, 4.1). Phase 4.2 ready to spec; Phases 5 + 6 backlog.
-Progress: [████████░░] 78% — Phase 4.1 closed; 4.2 will close the post-dual-Codex-review polish bucket before Phase 5/6 unblock.
+Progress: [█████████░] 86%
 
 ## Performance Metrics
 
@@ -69,6 +69,7 @@ Progress: [████████░░] 78% — Phase 4.1 closed; 4.2 will cl
 | Phase 03-bilingual-routing P01 | 5min | 1 tasks | 1 files |
 | Phase 03-bilingual-routing P02 | 8min | 2 tasks | 1 files |
 | Phase 03-bilingual-routing P05 | 5min | 1 tasks | 1 files |
+| Phase 04.2 P02 | 90s | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,8 @@ Full log in PROJECT.md Key Decisions table — 8 ADR-locked decisions from `docs
 - [Phase ?]: pathToFileURL() for dynamic import on Windows — bare C:\ absolute paths rejected by Node ESM loader
 - [Phase ?]: Deleted useEffect document.documentElement.lang write from LangContext in isolation (D-06) — build-time html lang baking deferred to Plan 03
 - [Phase ?]: 03-05: Option A annotated xhtml:link per URL guarantees hreflang reciprocity by construction from manifest field
+- [Phase ?]: Phase 4.2 Plan 02: Delete public/sitemap.xml entirely (no stub/comment replacement) — scripts/sitemap.mjs single-sources dist/sitemap.xml
+- [Phase ?]: Phase 4.2 Plan 02: Block /api/ at robots.txt level via Disallow /api/ + /en/api/ in all 16 blocks; X-Robots-Tag header layer deferred to Wave 7 (approval-gated)
 
 ### Pending Todos
 
@@ -129,7 +132,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-17T22:00:00.000Z
+Last session: 2026-05-17T17:35:36.175Z
 Stopped at: Phase 4.1 closed; dual Codex CLI SEO/GEO review completed (with + without GEO frame); synthesis written; Phase 4.2 inserted with 5 P0 + 7 P1 + 3 decisions captured. Ready to run `/gsd-autonomous` on Phase 4.2.
 Next action (in order):
 
@@ -140,4 +143,4 @@ Next action (in order):
   5. **GEO rescore window** — pre-4.2 baseline = 72.6/100 (Codex GEO 2026-05-17). 7-14 days after Phase 4.2 deploys, re-run `/geo audit https://opten.space` — target 78-82/100. Capture both `/` and `/en/`.
   6. **Phase 5 + Phase 6 remain backlog** — Phase 5 off-site (Product Hunt, Wikipedia, Reddit); Phase 6 architectural refactor (route inventory unification, archetype builders) — surface when content strategy is decided.
 
-Resume file: .planning/research/SEO-REVIEW-SYNTHESIS-2026-05-17.md
+Resume file: None
