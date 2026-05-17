@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to run GSD spec-phase 4.2
-stopped_at: Phase 4.1 closed; dual Codex CLI SEO/GEO review completed (with + without GEO frame); synthesis written; Phase 4.2 inserted with 5 P0 + 7 P1 + 3 decisions captured. Ready to run `/gsd-autonomous` on Phase 4.2.
-last_updated: "2026-05-17T17:35:56.946Z"
+status: Phase 4.2 complete (14/14 ROADMAP criteria PASS code/build). Phase 5 (off-site) + Phase 6 (architectural refactor) backlog.
+stopped_at: "Phase 4.2 complete on 2026-05-17. 7 atomic wave commits + 1 code-review fix shipped to main. 5 post-deploy / human-only checks (Vercel edge X-Robots materialization, visual h1 smoke, Bing token replacement, IndexNow acceptance 24-72h, GEO rescore window 7-14 days) tracked in 04.2-VERIFICATION.md. Autonomous stopped at end of single-phase scope — Phase 5 (brand authority off-site) and Phase 6 (scale-ready architecture refactor) explicitly backlog per user direction."
+last_updated: "2026-05-17T19:00:00.000Z"
 last_activity: 2026-05-17
 progress:
   total_phases: 9
-  completed_phases: 4
-  total_plans: 51
-  completed_plans: 44
-  percent: 86
+  completed_phases: 8
+  total_plans: 58
+  completed_plans: 51
+  percent: 88
 ---
 
 # Project State
@@ -26,15 +26,15 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 
 ## Current Position
 
-Phase: 4.2
-Plan: NOT YET PLANNED (canonical GSD pipeline pending; scope captured in `.planning/research/SEO-REVIEW-SYNTHESIS-2026-05-17.md`).
-Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (~5 atomic commits `0a73069`..`81284d4`), 3 → 8/8 + 2 post-release fixes (`c789dee`, `bfd164b`), 4 → 6/7 plans shipped (04-02 replaced by 04-LCP-AUDIT Option-1 defer) + post-deploy UAT 6/6 PASS, 4.1 → 13/13 shipped 2026-05-17, 4.2 → scope captured 2026-05-17, 0 plan files produced yet.
-Status: Ready to run GSD spec-phase 4.2
+Phase: 4.2 → COMPLETE
+Plan: 7 waves (04.2-{01..07}-PLAN.md) + PLAN-CHECK + PLAN-INDEX. All shipped 2026-05-17.
+Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline, 3 → 8/8 + 2 post-release fixes, 4 → 6/7 + UAT 6/6 PASS, 4.1 → 13/13 shipped 2026-05-17, 4.2 → 7/7 + 1 code-review fix shipped 2026-05-17.
+Status: Phase 4.2 complete. 14/14 ROADMAP criteria PASS at code/build. 5 post-deploy / human-only checks deferred (see 04.2-VERIFICATION.md).
 Last activity: 2026-05-17
-Next: Run `/gsd-spec-phase 4.2` (or `/gsd-autonomous` for spec→discuss→plan→execute chain). Scope seed: 5 P0 + 7 P1 actionable items + 3 decisions (D-1 definitional paragraph placement, D-2 canonical model count, D-3 hreflang locale policy) from the synthesis. Phase 5 (brand authority) remains backlog — off-site work, not auto-executable. Phase 6 (scale-ready architecture) remains backlog — deferred until content strategy decided.
+Next: User-facing post-deploy verification window (manual UAT). After deploy lands on opten.space production: (1) `curl -sI https://opten.space/account` for X-Robots-Tag materialization; (2) visual check of h1 on /pay + /welcome (RU + EN); (3) replace `BING_VERIFICATION_TOKEN_TODO` in index.html once Bing Webmaster registration done; (4) wait 24-72h for IndexNow URL acceptance signal in Bing Webmaster Tools; (5) GEO rescore window 7-14 days after deploy (target: 72.6 → ~80+). Phase 5 (brand authority off-site) + Phase 6 (scale-ready architecture refactor) remain backlog per user direction.
 
-Milestone phases: 7 of 9 complete (1, 2, 2.1, 2.2, 3, 4, 4.1). Phase 4.2 ready to spec; Phases 5 + 6 backlog.
-Progress: [█████████░] 86%
+Milestone phases: 8 of 9 complete (1, 2, 2.1, 2.2, 3, 4, 4.1, 4.2). Phase 5 + Phase 6 backlog.
+Progress: [█████████░] 88% — Phase 4.2 closed; Phase 5 + 6 backlog.
 
 ## Performance Metrics
 
