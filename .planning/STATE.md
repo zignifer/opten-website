@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to run GSD spec-phase
-stopped_at: "Phase 4.1 fully shipped (17 commits, 8/8 ROADMAP criteria PASS code/build). User stopped /gsd-autonomous before Phase 5 (Brand authority): off-site work — Product Hunt launch, Wikipedia entry, Reddit/YouTube — not auto-executable. Phase 5 remains [ ] in ROADMAP as backlog; resume with /gsd-spec-phase 5 (or revisit roadmap) when launch bandwidth is available."
-last_updated: "2026-05-17T14:05:07.419Z"
+status: Ready to run GSD spec-phase 4.2
+stopped_at: ""
+last_updated: "2026-05-17T22:00:00.000Z"
 last_activity: 2026-05-17
 progress:
-  total_phases: 7
-  completed_phases: 4
+  total_phases: 9
+  completed_phases: 7
   total_plans: 44
   completed_plans: 42
-  percent: 95
+  percent: 78
 ---
 
 # Project State
@@ -26,15 +26,15 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 
 ## Current Position
 
-Phase: 4.1
-Plan: NOT YET PLANNED (canonical GSD pipeline pending; 04.1-CAPTURED-DECISIONS.md holds the input seed).
-Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (~5 atomic commits `0a73069`..`81284d4`), 3 → 8/8 + 2 post-release fixes (`c789dee`, `bfd164b`), 4 → 6/7 plans shipped (04-02 replaced by 04-LCP-AUDIT Option-1 defer) + post-deploy UAT 6/6 PASS, 4.1 → scope captured, 0 plan files produced yet.
-Status: Ready to run GSD spec-phase
+Phase: 4.2
+Plan: NOT YET PLANNED (canonical GSD pipeline pending; scope captured in `.planning/research/SEO-REVIEW-SYNTHESIS-2026-05-17.md`).
+Plans: 1 → 8/8, 2 → 8/8, 2.1 → 7/7, 2.2 → inline (~5 atomic commits `0a73069`..`81284d4`), 3 → 8/8 + 2 post-release fixes (`c789dee`, `bfd164b`), 4 → 6/7 plans shipped (04-02 replaced by 04-LCP-AUDIT Option-1 defer) + post-deploy UAT 6/6 PASS, 4.1 → 13/13 shipped 2026-05-17, 4.2 → scope captured 2026-05-17, 0 plan files produced yet.
+Status: Ready to run GSD spec-phase 4.2
 Last activity: 2026-05-17
-Next: Run `/gsd-spec-phase 4.1` (or `/gsd-autonomous` for spec→discuss→plan→execute chain). The captured-decisions seed pre-fills the 18-finding scope + 3 user-confirmed decisions.
+Next: Run `/gsd-spec-phase 4.2` (or `/gsd-autonomous` for spec→discuss→plan→execute chain). Scope seed: 5 P0 + 7 P1 actionable items + 3 decisions (D-1 definitional paragraph placement, D-2 canonical model count, D-3 hreflang locale policy) from the synthesis. Phase 5 (brand authority) remains backlog — off-site work, not auto-executable. Phase 6 (scale-ready architecture) remains backlog — deferred until content strategy decided.
 
-Milestone phases: 5 of 7 complete (1, 2, 2.1, 2.2, 3, 4 — 4 closed except for the 4.1 cleanup bucket). Phase 4.1 ready; Phase 5 backlog.
-Progress: [███████░░░] 73% — Phase 4 functionally shipped; 4.1 will close the review hangover before Phase 5 starts.
+Milestone phases: 7 of 9 complete (1, 2, 2.1, 2.2, 3, 4, 4.1). Phase 4.2 ready to spec; Phases 5 + 6 backlog.
+Progress: [████████░░] 78% — Phase 4.1 closed; 4.2 will close the post-dual-Codex-review polish bucket before Phase 5/6 unblock.
 
 ## Performance Metrics
 
@@ -129,13 +129,15 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-17T14:05:07.408Z
-Stopped at: Phase 4.1 fully shipped (17 commits, 8/8 ROADMAP criteria PASS code/build). User stopped /gsd-autonomous before Phase 5 (Brand authority): off-site work — Product Hunt launch, Wikipedia entry, Reddit/YouTube — not auto-executable. Phase 5 remains [ ] in ROADMAP as backlog; resume with /gsd-spec-phase 5 (or revisit roadmap) when launch bandwidth is available.
+Last session: 2026-05-17T22:00:00.000Z
+Stopped at: Phase 4.1 closed; dual Codex CLI SEO/GEO review completed (with + without GEO frame); synthesis written; Phase 4.2 inserted with 5 P0 + 7 P1 + 3 decisions captured. Ready to run `/gsd-autonomous` on Phase 4.2.
 Next action (in order):
 
-  1. **Execute Phase 4.1 waves 1-8** — `scripts/prerender.mjs`, `scripts/seo-routes.ts`, `scripts/llms.mjs`, `FaqBlock.tsx`, new `scripts/verify-faq-mainentity.mjs`, `App.tsx` + i18n dicts, `AboutPage.tsx`, `entry-server.tsx` assert in `prerender.mjs`. All low-risk; auto-commit per `feedback_commit_policy.md` (code outside the integration contract surface is OK to commit autonomously after this approval round).
-  2. **Wave 9 — PayPage.tsx — REQUIRES APPROVAL** — fixes WR-04 (detectExtension race) + IN-02 (`/#faq` lang-aware). Extension-coupled surface; per `feedback_autonomy_and_caution.md` I stop and confirm before committing.
-  3. **GEO rescore window** — pre-Phase-4 baseline = 48/100 (2026-05-17, `GEO-AUDIT-POST-PHASE-3.md`). 7–14 days after Phase 4 / 4.1 deploys (window opens ~2026-05-24, closes ~2026-05-31), re-run `/geo audit https://opten.space` — target 65–73/100. Capture both `/` and `/en/`.
-  4. **`/gsd-plan-phase 5`** — Phase 5 brand authority: Wikipedia/Wikidata seed, Product Hunt launch, Reddit + YouTube presence, expanded `sameAs` array. Mostly off-domain marketing work; small code component (sameAs additions only). Plan after Phase 4.1 closes.
+  1. **`/gsd-spec-phase 4.2`** — formalize SPEC from the synthesis seed (`.planning/research/SEO-REVIEW-SYNTHESIS-2026-05-17.md`). Likely auto-classifies the 5 P0 + 7 P1 + 3 decisions into ambiguity scoring.
+  2. **`/gsd-discuss-phase 4.2`** — resolve the 3 conflicts (D-1 definitional paragraph hero vs footer; D-2 canonical model count `43+` vs `60+`; D-3 hreflang `ru`/`en` vs `ru-RU`/`en-US`) + clarify CSP scope (P1-2) + Bing Webmaster account ownership (P1-4).
+  3. **`/gsd-plan-phase 4.2`** — wave structure with approval gates around P0-3 (h1 on /pay + /welcome), P0-4 (X-Robots header), and P1-2 (CSP) since they touch extension-coupled surface.
+  4. **`/gsd-execute-phase 4.2`** — atomic commits; non-extension-coupled work auto-commits per `feedback_commit_policy.md`; extension-coupled waves stop for approval per `feedback_autonomy_and_caution.md`.
+  5. **GEO rescore window** — pre-4.2 baseline = 72.6/100 (Codex GEO 2026-05-17). 7-14 days after Phase 4.2 deploys, re-run `/geo audit https://opten.space` — target 78-82/100. Capture both `/` and `/en/`.
+  6. **Phase 5 + Phase 6 remain backlog** — Phase 5 off-site (Product Hunt, Wikipedia, Reddit); Phase 6 architectural refactor (route inventory unification, archetype builders) — surface when content strategy is decided.
 
-Resume file: .planning/phases/04.1-content-surface-cleanup/04.1-VERIFICATION.md
+Resume file: .planning/research/SEO-REVIEW-SYNTHESIS-2026-05-17.md
