@@ -383,14 +383,14 @@ function FeatureCard({ title, desc, imgData, imgWidth, imgHeight, imageFirst = f
   );
 }
 
-// Phase 4 D-08: id was "faq" historically — it scrolled the navbar #faq link to this Privacy section
-// (mislabel). Renamed to "privacy" so the navbar #faq link can correctly scroll to the actual FAQ
-// block mounted below by <FaqBlock id="faq" />.
+// IN-04: section renamed from id="privacy" to id="trust" to avoid slug collision with the /privacy legal route.
+// History: Phase 4 D-08 originally renamed it from "faq" (mislabel) to "privacy" so the navbar #faq link
+// could correctly scroll to the actual FAQ block mounted below by <FaqBlock id="faq" />.
 function Privacy() {
   const t = useT();
   const { lang } = useLang();
   return (
-    <section id="privacy" className="bg-[#011417] px-5 py-[70px] md:py-24">
+    <section id="trust" className="bg-[#011417] px-5 py-[70px] md:py-24">
       <div className="mx-auto grid w-full max-w-[1240px] gap-y-5 lg:grid-cols-[460px_1fr] lg:gap-[200px]">
         <h2 className="w-full min-w-0 text-center font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] text-white md:text-[52px] lg:text-left">{titleCaseEn(t("privacy.sectionTitle"), lang)}</h2>
         <div className="flex w-full min-w-0 flex-col lg:-mt-10">
@@ -425,17 +425,8 @@ function Pricing() {
     <section id="pricing" className="bg-[#011417] px-5 py-[70px] md:py-24">
       <div className="mx-auto max-w-[800px]">
         <SectionTitle className="w-[calc(100vw-24px)] md:w-auto">
-          {isRu ? (
-            <>
-              <span className="md:hidden">Скачай бесплатно. <Accent>Перейди на Pro,</Accent> когда будешь готов.</span>
-              <span className="hidden md:inline">Скачай бесплатно.<br /><Accent>Перейди на Pro,</Accent><br />когда будешь готов.</span>
-            </>
-          ) : (
-            <>
-              <span className="md:hidden">Start Free. <Accent>Upgrade To Pro</Accent> When You're Ready.</span>
-              <span className="hidden md:inline">Start Free.<br /><Accent>Upgrade To Pro</Accent><br />When You're Ready.</span>
-            </>
-          )}
+          <span className="md:hidden">{t("pricing.heading.lead")}<Accent>{t("pricing.heading.accent")}</Accent>{t("pricing.heading.tail")}</span>
+          <span className="hidden md:inline">{t("pricing.heading.lead")}<br /><Accent>{t("pricing.heading.accent")}</Accent><br />{t("pricing.heading.tail")}</span>
         </SectionTitle>
         <div className="mt-[60px] grid gap-6 md:mt-16 md:grid-cols-2">
           <PlanCard
