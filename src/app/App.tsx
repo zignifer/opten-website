@@ -185,6 +185,11 @@ function Hero() {
           {t("hero.subtitle1")}
           <strong>{t("hero.subtitle2")}</strong>
         </p>
+        {/* Post-2026-05-17 GEO audit ME-1: definitional answer-block under hero — names entity, lists
+            supported models + host sites + price in one paragraph so AI systems can cite verbatim. */}
+        <p className="mt-6 w-full max-w-[820px] font-['PT_Root_UI',sans-serif] text-[14px] leading-[1.55] text-white/55 md:text-[15px]">
+          {t("hero.definitional")}
+        </p>
         <div className="mt-12 hidden w-full justify-center overflow-visible min-[1066px]:flex">
           <div className="w-[680px] max-w-full overflow-visible">
             <OptenHeroAnimation />
@@ -223,6 +228,12 @@ function Partners() {
               <PartnerCanva />
             </div>
           </div>
+          {/* Post-2026-05-17 GEO audit CR-5: explicit non-affiliation disclaimer for the partner
+              logo bar. Trademark fair-use + AI systems must not interpret Higgsfield/Freepik/Canva
+              as official Opten partnerships. */}
+          <p className="mt-4 max-w-[640px] text-center font-['PT_Root_UI',sans-serif] text-[12px] leading-[1.5] text-white/35">
+            {t("partners.disclaimer")}
+          </p>
         </div>
       </div>
     </section>
