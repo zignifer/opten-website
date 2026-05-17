@@ -179,6 +179,47 @@ function applyPaddleScript(html) {
   return html.replace("</head>", `${tag}\n  </head>`);
 }
 
+// Phase 4 D-09 / D-10: inject schema.org JSON-LD blocks per route into <head>.
+// Reads meta.schema from the manifest (optional field; if undefined or empty, no-op).
+// JSON.stringify with 2-space indent, then each line indented 4 more spaces for <head> alignment.
+// MUST run BEFORE applyMarker / applyPaddleScript / applyModulePreload — all consume </head>.
+function applyJsonLd(html, meta) {
+  if (!meta.schema || meta.schema.length === 0) return html;
+  const blocks = meta.schema
+    .map((block) => {
+      const body = JSON.stringify(block, null, 2)
+        .split("\n")
+        .map((l) => "    " + l)
+        .join("\n");
+      return `    <script type="application/ld+json">\n${body}\n    </script>`;
+    })
+    .join("\n");
+  const before = html;
+  html = html.replace("</head>", `${blocks}\n  </head>`);
+  if (html === before) {
+    throw new Error(`prerender(${meta.path}): no </head> anchor for JSON-LD. index.html structure changed?`);
+  }
+  return html;
+}
+
+// Phase 4 D-13 (per 04-LCP-AUDIT Option 1 — user-selected 2026-05-17):
+// build-time regression guard, NOT mutation. The LCP-blocking fonts are preloaded in
+// index.html since Phase 2.2. If anyone deletes those <link rel=preload> tags, every
+// prerendered route loses them — fail loudly instead of silently regressing LCP.
+// Runs on every route (preloads must be on every prerendered file).
+const FONT_PRELOAD_REGEXES = [
+  /<link\s+rel="preload"\s+href="\/fonts\/PT-Root-UI_VF\.woff2"[^>]*as="font"/,
+  /<link\s+rel="preload"\s+href="\/fonts\/Unbounded-VF\.woff2"[^>]*as="font"/,
+];
+function applyHeroPreloadGuard(html, meta) {
+  for (const re of FONT_PRELOAD_REGEXES) {
+    if (!re.test(html)) {
+      throw new Error(`prerender(${meta.path}): missing font preload ${re} — Phase 2.2 regression. See .planning/phases/04-content-surface/04-LCP-AUDIT.md.`);
+    }
+  }
+  return html; // unchanged
+}
+
 for (const meta of routes) {
   // resolve ogImage default (Phase 2 site-wide og-card-ru.png per Open Question #2)
   const ogImage = meta.ogImage ?? DEFAULT_OG_IMAGE;
@@ -187,6 +228,8 @@ for (const meta of routes) {
   html = applyHtmlLang(html, meta);         // Phase 3 GEO-C-4: bake <html lang> per file
   html = applyHreflang(html, meta);         // Phase 3 GEO-C-3: inject hreflang triplet after canonical (must follow applyMeta)
   html = applyOgLocale(html, meta);         // Phase 3 GEO-C-4 / Pitfall 4: update og:locale + alternate
+  html = applyJsonLd(html, meta);           // Phase 4 D-09: inject schema.org JSON-LD blocks (must precede helpers that consume </head>)
+  html = applyHeroPreloadGuard(html, meta); // Phase 4 D-13 (LCP-AUDIT Option 1): assert Phase 2.2 font preloads survived; throws if missing
   html = applyModulePreload(html);          // Phase 2.1 D-03: must precede applyMarker (which consumes </head>)
   html = applySafariPreloadFallback(html);  // Phase 2.2 Safari fix: must run after applyModulePreload so it sees all module hrefs
   if (meta.path === "/pay" || meta.path === "/en/pay") {
