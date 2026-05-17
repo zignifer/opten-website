@@ -153,6 +153,20 @@ export function howToBlock(steps: { title: string; body: string }[], pageId: str
 // or a single Offer when 1. Per Google's Rich Results spec, AggregateOffer requires
 // lowPrice/highPrice/priceCurrency; we compute those from the input array.
 export function productBlock(plans: { name: string; price: string; currency: string }[], pageId: string): SchemaBlock {
+  // Phase 04.1 WR-05: normalize + validate prices at function entry. parseFloat happily eats
+  // "199 руб" or locale-comma strings ("199,99") and returns NaN/199 silently, which then
+  // propagates into AggregateOffer lowPrice/highPrice math. Number() is strict — non-finite
+  // throws with file/line context so a future translator typo fails the build, not Rich Results.
+  // Keep the original formatted string `p.price` for schema output; `_n` is internal min/max only.
+  const parsed = plans.map((p) => {
+    const n = Number(p.price);
+    if (!Number.isFinite(n)) {
+      throw new Error(
+        `productBlock(${pageId}): non-finite price "${p.price}" for plan "${p.name}" — expected a number-parseable string (e.g. "199" or "2.99")`,
+      );
+    }
+    return { ...p, _n: n };
+  });
   const product: SchemaBlock = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -176,22 +190,29 @@ export function productBlock(plans: { name: string; price: string; currency: str
     // lowPrice/highPrice are scoped per-currency only when currencies are identical; otherwise
     // we keep the raw `offers` array — Google accepts either shape on Product.
     const currencies = new Set(plans.map((p) => p.currency));
-    product.offers = currencies.size === 1
-      ? {
-          "@type": "AggregateOffer",
-          priceCurrency: plans[0].currency,
-          lowPrice: plans.reduce((min, p) => (parseFloat(p.price) < parseFloat(min) ? p.price : min), plans[0].price),
-          highPrice: plans.reduce((max, p) => (parseFloat(p.price) > parseFloat(max) ? p.price : max), plans[0].price),
-          offerCount: plans.length,
-          availability: "https://schema.org/InStock",
-        }
-      : plans.map((p) => ({
-          "@type": "Offer",
-          name: p.name,
-          price: p.price,
-          priceCurrency: p.currency,
-          availability: "https://schema.org/InStock",
-        }));
+    if (currencies.size === 1) {
+      // Pick the formatted string corresponding to the min/max numeric for lowPrice/highPrice output.
+      const minN = parsed.reduce((m, p) => Math.min(m, p._n), Infinity);
+      const maxN = parsed.reduce((m, p) => Math.max(m, p._n), -Infinity);
+      const minPrice = parsed.find((p) => p._n === minN)!.price;
+      const maxPrice = parsed.find((p) => p._n === maxN)!.price;
+      product.offers = {
+        "@type": "AggregateOffer",
+        priceCurrency: plans[0].currency,
+        lowPrice: minPrice,
+        highPrice: maxPrice,
+        offerCount: plans.length,
+        availability: "https://schema.org/InStock",
+      };
+    } else {
+      product.offers = plans.map((p) => ({
+        "@type": "Offer",
+        name: p.name,
+        price: p.price,
+        priceCurrency: p.currency,
+        availability: "https://schema.org/InStock",
+      }));
+    }
   }
   return product;
 }
@@ -244,17 +265,17 @@ export const routes: RouteMeta[] = [
     canonical: `${SITE_ORIGIN}/pay`,
     ogTitle: "Тарифы Opten — Pro с 300 генерациями в месяц",
     ogDescription: "Перейди на Pro и улучшай промпты в один клик. 199₽/мес или $2.99/мес. Начни бесплатно.",
-    prerender: "full", // Phase 4 D-12: flipped from "head" so PricingStaticBlock body lands in initial HTML
+    prerender: "full", // Phase 4 D-12 (post-revert f9dfdb1): full prerender keeps the runtime-conditional pricing cards in initial HTML with visible prices, so Product schema validates against visible content.
     changefreq: "monthly",
     priority: 0.8,
     // Phase 4 D-09 / D-12: Org + Product (multi-currency offers) + breadcrumb.
+    // Phase 04.1 WR-02: Free-tier Offer entry dropped — Pro is the Product, the free tier is acquisition copy.
     schema: [
       ORG_BLOCK,
       productBlock(
         [
           { name: "Pro Monthly (RU)", price: "199", currency: "RUB" },
           { name: "Pro Monthly", price: "2.99", currency: "USD" },
-          { name: "Free tier", price: "0", currency: "USD" },
         ],
         `${SITE_ORIGIN}/pay`,
       ),
@@ -435,10 +456,12 @@ export const routes: RouteMeta[] = [
         gptImage2Guide.ru.title,
       ),
       faqPageBlock(gptImage2Guide.ru.faq, `${SITE_ORIGIN}/guides/gpt-image-2`),
+      // Phase 04.1 WR-03: collapsed 3-level breadcrumb (root → /guides index → article) to 2 levels
+      // (root → article). The /guides index page does not exist — linking to it produces a soft-404.
+      // Revisit when a second guide is added (one-guide index has poor UX, not worth shipping now).
       breadcrumbBlock(
         [
           { name: "Главная", url: `${SITE_ORIGIN}/` },
-          { name: "Гайды", url: `${SITE_ORIGIN}/guides` },
           { name: gptImage2Guide.ru.title, url: `${SITE_ORIGIN}/guides/gpt-image-2` },
         ],
         `${SITE_ORIGIN}/guides/gpt-image-2`,
@@ -481,16 +504,16 @@ export const routes: RouteMeta[] = [
     ogTitle: "Opten pricing — Pro with 300 checks per month",
     ogDescription: "Upgrade to Pro and improve prompts in one click. $2.99/mo or 199₽/mo. Start for free.",
     ogImage: DEFAULT_OG_IMAGE_EN,
-    prerender: "full", // Phase 4 D-12
+    prerender: "full", // Phase 4 D-12 (post-revert f9dfdb1): full prerender keeps the runtime-conditional pricing cards in initial HTML with visible prices, so Product schema validates against visible content.
     changefreq: "monthly",
     priority: 0.8,
+    // Phase 04.1 WR-02: Free-tier Offer entry dropped — Pro is the Product, the free tier is acquisition copy.
     schema: [
       ORG_BLOCK,
       productBlock(
         [
           { name: "Pro Monthly (RU)", price: "199", currency: "RUB" },
           { name: "Pro Monthly", price: "2.99", currency: "USD" },
-          { name: "Free tier", price: "0", currency: "USD" },
         ],
         `${SITE_ORIGIN}/en/pay`,
       ),
@@ -642,10 +665,11 @@ export const routes: RouteMeta[] = [
         gptImage2Guide.en.title,
       ),
       faqPageBlock(gptImage2Guide.en.faq, `${SITE_ORIGIN}/en/guides/gpt-image-2`),
+      // Phase 04.1 WR-03: collapsed 3-level breadcrumb (root → /en/guides index → article) to 2 levels
+      // (root → article). The /en/guides index page does not exist — linking to it produces a soft-404.
       breadcrumbBlock(
         [
           { name: "Home", url: `${SITE_ORIGIN}/en/` },
-          { name: "Guides", url: `${SITE_ORIGIN}/en/guides` },
           { name: gptImage2Guide.en.title, url: `${SITE_ORIGIN}/en/guides/gpt-image-2` },
         ],
         `${SITE_ORIGIN}/en/guides/gpt-image-2`,
