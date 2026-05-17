@@ -183,11 +183,23 @@ function applyPaddleScript(html) {
 // Reads meta.schema from the manifest (optional field; if undefined or empty, no-op).
 // JSON.stringify with 2-space indent, then each line indented 4 more spaces for <head> alignment.
 // MUST run BEFORE applyMarker / applyPaddleScript / applyModulePreload — all consume </head>.
+//
+// Phase 4 D-09 / CR-01 fix: HTML-escape `<`, `>`, `&` to Unicode escapes (</>/&)
+// so the HTML tokenizer can never see `</script>`, `<!--`, or `<![CDATA[` inside the JSON
+// payload. This is the standard guidance from schema.org JSON-LD spec and Google's
+// "JSON-LD on a page" docs — JSON.stringify is NOT HTML-safe on its own.
+function escapeJsonLd(jsonStr) {
+  return jsonStr
+    .replace(/</g, "\\u003C")
+    .replace(/>/g, "\\u003E")
+    .replace(/&/g, "\\u0026");
+}
+
 function applyJsonLd(html, meta) {
   if (!meta.schema || meta.schema.length === 0) return html;
   const blocks = meta.schema
     .map((block) => {
-      const body = JSON.stringify(block, null, 2)
+      const body = escapeJsonLd(JSON.stringify(block, null, 2))
         .split("\n")
         .map((l) => "    " + l)
         .join("\n");
