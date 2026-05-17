@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import LangSwitcher from "./components/LangSwitcher";
 import LocalizedLink from "./components/LocalizedLink";
+import FaqBlock from "./components/FaqBlock";
+import { landingFaq } from "../content/landingFaq";
 import OptenHeroAnimation from "./components/OptenHeroAnimation";
 import { Picture } from "./components/Picture";
 import type { Picture as PictureData } from 'vite-imagetools';
@@ -543,6 +545,7 @@ function GradientBlob({ className }: { className?: string }) {
 
 export default function App() {
   const t = useT();
+  const { lang } = useLang();
 
   useEffect(() => {
     document.title = t("meta.title");
@@ -557,6 +560,8 @@ export default function App() {
       <FeatureCards />
       <Privacy />
       <Pricing />
+      {/* Phase 4 D-08 / GEO-D-3: landing FAQ block — schema in seo-routes.ts mirrors landingFaq[lang] (V-10). */}
+      <FaqBlock items={landingFaq[lang]} />
       <Footer />
     </div>
   );

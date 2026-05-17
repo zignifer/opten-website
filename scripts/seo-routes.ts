@@ -1,6 +1,11 @@
 // Phase 2 GEO-B-1 / D-03: Per-route metadata manifest (RU only — D-05).
 // SYNC: title/description strings duplicated from src/i18n/ru.json — keep both in step until Phase 3 introduces a unified i18n→manifest pipeline.
 
+// Phase 4 D-06 / D-08 / V-10: imports from src/content for HowTo + FAQ schema sources.
+// This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
+import { guide as gptImage2Guide } from "../src/content/guides/gpt-image-2";
+import { landingFaq } from "../src/content/landingFaq";
+
 // Phase 3 D-01/D-02: cluster pairs (reciprocal hreflang per RESEARCH.md Pitfall 5):
 //   "/"        ↔ "/en/"          "/pay"     ↔ "/en/pay"
 //   "/welcome" ↔ "/en/welcome"   "/privacy" ↔ "/en/privacy"
@@ -223,8 +228,8 @@ export const routes: RouteMeta[] = [
     prerender: "full",
     changefreq: "weekly",
     priority: 1.0,
-    // Phase 4 D-09: Org + SoftwareApp + WebSite landing graph. FAQPage added in Plan 04-06.
-    schema: [ORG_BLOCK, SOFTWARE_APP_BLOCK, WEBSITE_BLOCK],
+    // Phase 4 D-09 / D-08 / V-10: Org + SoftwareApp + WebSite + FAQPage landing graph.
+    schema: [ORG_BLOCK, SOFTWARE_APP_BLOCK, WEBSITE_BLOCK, faqPageBlock(landingFaq.ru, `${SITE_ORIGIN}/`)],
   },
   {
     path: "/pay",
@@ -405,6 +410,42 @@ export const routes: RouteMeta[] = [
     ],
   },
 
+  // Phase 4 D-04 / D-06: anchor guide RU entry. EN sibling below in the EN section.
+  {
+    path: "/guides/gpt-image-2",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/guides/gpt-image-2`,
+      en: `${SITE_ORIGIN}/en/guides/gpt-image-2`,
+      xDefault: `${SITE_ORIGIN}/guides/gpt-image-2`,
+    },
+    title: gptImage2Guide.ru.title,
+    description: "Структура промпта, шаблон Change/Preserve/Constraints, итерация вместо overload — 5 шагов от случайной генерации к точному результату в GPT Image 2.",
+    canonical: `${SITE_ORIGIN}/guides/gpt-image-2`,
+    ogTitle: gptImage2Guide.ru.title,
+    ogDescription: "5 шагов + 5 FAQ-вопросов от автора Opten.",
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      howToBlock(
+        gptImage2Guide.ru.steps.map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/guides/gpt-image-2`,
+        gptImage2Guide.ru.title,
+      ),
+      faqPageBlock(gptImage2Guide.ru.faq, `${SITE_ORIGIN}/guides/gpt-image-2`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Гайды", url: `${SITE_ORIGIN}/guides` },
+          { name: gptImage2Guide.ru.title, url: `${SITE_ORIGIN}/guides/gpt-image-2` },
+        ],
+        `${SITE_ORIGIN}/guides/gpt-image-2`,
+      ),
+    ],
+  },
+
   // Phase 3 D-04: EN siblings (6 entries). EN ogImage = DEFAULT_OG_IMAGE_EN. SYNC: title/description duplicated from src/i18n/en.json — see line 2 SYNC policy.
   {
     path: "/en/",
@@ -423,8 +464,8 @@ export const routes: RouteMeta[] = [
     prerender: "full",
     changefreq: "weekly",
     priority: 1.0,
-    // Phase 4 D-09: schema is language-agnostic (per schema.org) — reuse RU landing blocks. FAQPage added in Plan 04-06.
-    schema: [ORG_BLOCK, SOFTWARE_APP_BLOCK, WEBSITE_BLOCK],
+    // Phase 4 D-09 / D-08 / V-10: Org + SoftwareApp + WebSite + EN FAQPage (separate from RU set — Q/A localized).
+    schema: [ORG_BLOCK, SOFTWARE_APP_BLOCK, WEBSITE_BLOCK, faqPageBlock(landingFaq.en, `${SITE_ORIGIN}/en/`)],
   },
   {
     path: "/en/pay",
@@ -571,6 +612,43 @@ export const routes: RouteMeta[] = [
           { name: "Refund Policy", url: `${SITE_ORIGIN}/en/refund` },
         ],
         `${SITE_ORIGIN}/en/refund`,
+      ),
+    ],
+  },
+
+  // Phase 4 D-06: anchor guide EN sibling.
+  {
+    path: "/en/guides/gpt-image-2",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/guides/gpt-image-2`,
+      en: `${SITE_ORIGIN}/en/guides/gpt-image-2`,
+      xDefault: `${SITE_ORIGIN}/guides/gpt-image-2`,
+    },
+    title: gptImage2Guide.en.title,
+    description: "Structure, Change/Preserve/Constraints template, iterate-don't-overload — 5 steps from random output to precise GPT Image 2 results.",
+    canonical: `${SITE_ORIGIN}/en/guides/gpt-image-2`,
+    ogTitle: gptImage2Guide.en.title,
+    ogDescription: "5 steps + 5 FAQ items by the author of Opten.",
+    ogImage: DEFAULT_OG_IMAGE_EN,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      howToBlock(
+        gptImage2Guide.en.steps.map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/guides/gpt-image-2`,
+        gptImage2Guide.en.title,
+      ),
+      faqPageBlock(gptImage2Guide.en.faq, `${SITE_ORIGIN}/en/guides/gpt-image-2`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Guides", url: `${SITE_ORIGIN}/en/guides` },
+          { name: gptImage2Guide.en.title, url: `${SITE_ORIGIN}/en/guides/gpt-image-2` },
+        ],
+        `${SITE_ORIGIN}/en/guides/gpt-image-2`,
       ),
     ],
   },

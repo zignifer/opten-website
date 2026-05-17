@@ -26,8 +26,8 @@ const { routes, SITE_ORIGIN } = await import(pathToFileURL(MANIFEST_BUNDLE).href
 
 const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 
-if (sitemapRoutes.length < 13) {
-  throw new Error(`sitemap.mjs: expected at least 13 routes (6 RU + 6 EN + /about per Phase 4 D-01), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+if (sitemapRoutes.length < 15) {
+  throw new Error(`sitemap.mjs: expected at least 15 routes (6 RU + 6 EN + /about + 2 guide siblings per Phase 4 D-01/D-06), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>

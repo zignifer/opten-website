@@ -13,6 +13,7 @@ export const EN_SIBLINGS = new Set<string>([
   "/privacy",
   "/terms",
   "/refund",
+  "/guides/gpt-image-2", // Phase 4 D-06: anchor guide bilingual sibling
 ]);
 
 export const EN_LANDING = "/en/";

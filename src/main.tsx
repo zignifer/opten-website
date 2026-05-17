@@ -9,6 +9,7 @@
   import WelcomePage from "./app/pages/WelcomePage.tsx";
   import PayPage from "./app/pages/PayPage.tsx";
   import AboutPage from "./app/pages/AboutPage.tsx";
+  import GuidePage from "./app/pages/GuidePage.tsx";
   import "./styles/index.css";
   import { LangProvider } from "./i18n/LangContext";
   import { RouteLoading } from "./app/components/RouteLoading";
@@ -59,14 +60,16 @@
             <Route path="/account" element={<AccountPage />} />
             <Route path="/welcome" element={<WelcomePage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/guides/:slug" element={<GuidePage />} />
             <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
-            {/* Phase 3 D-01/D-03b: /en/* siblings. Mirror of entry-server.tsx EN routes + /en/pay (head-only, client-mount-only). __PRERENDER_PATH discriminator (lines 65-66) handles these unchanged — meta.path strings written by applyMarker include "/en/welcome" etc. */}
+            {/* Phase 3 D-01/D-03b: /en/* siblings. Mirror of entry-server.tsx EN routes + /en/pay (head-only, client-mount-only). __PRERENDER_PATH discriminator (lines 65-66) handles these unchanged — meta.path strings written by applyMarker include "/en/welcome" etc. Phase 4 D-06: /en/guides/:slug bilingual anchor. */}
             <Route path="/en/"        element={<App />} />
             <Route path="/en/pay"     element={<PayPage />} />
             <Route path="/en/welcome" element={<WelcomePage />} />
             <Route path="/en/privacy" element={<PrivacyPage />} />
             <Route path="/en/terms"   element={<TermsPage />} />
             <Route path="/en/refund"  element={<RefundPage />} />
+            <Route path="/en/guides/:slug" element={<GuidePage />} />
           </Routes>
         </Suspense>
       </LangProvider>
