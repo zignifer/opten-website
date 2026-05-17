@@ -1,7 +1,7 @@
 // Phase 2 GEO-B-2 / D-02 / D-06: Build-time SSR entry — exports renderRoute(path).
 // Decouples the SSR tree from src/main.tsx (which calls createRoot at module load — crashes in Node).
-// Only the 5 full-prerender marketing routes are mounted (D-02 full-prerender tier).
-// /pay is head-only (D-02), /success /account /dashboard/* are SPA-only — intentionally NOT mounted here.
+// Phase 4 D-12: /pay AND /en/pay are now SSR-mounted alongside the legal/welcome surface.
+// /success /account /dashboard/* remain SPA-only.
 
 import { Suspense } from "react";
 import { renderToString } from "react-dom/server";
@@ -11,6 +11,7 @@ import WelcomePage from "../src/app/pages/WelcomePage.tsx";
 import PrivacyPage from "../src/app/pages/PrivacyPage.tsx";
 import TermsPage from "../src/app/pages/TermsPage.tsx";
 import RefundPage from "../src/app/pages/RefundPage.tsx";
+import PayPage from "../src/app/pages/PayPage.tsx";
 import "../src/styles/index.css";
 import { LangProvider } from "../src/i18n/LangContext";
 import { RouteLoading } from "../src/app/components/RouteLoading";
@@ -31,12 +32,14 @@ export function renderRoute(path: string): string {
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/refund" element={<RefundPage />} />
-            {/* NOTE: /pay AND /en/pay are head-only (D-02 + D-03b), /success /account /dashboard/* are SPA-only — intentionally NOT mounted here. */}
+            <Route path="/pay" element={<PayPage />} />
+            {/* Phase 4 D-12: /pay AND /en/pay are now SSR-mounted (flipped from head-only to full prerender). /success /account /dashboard/* remain SPA-only — intentionally NOT mounted here. */}
             <Route path="/en/"        element={<App />} />
             <Route path="/en/welcome" element={<WelcomePage />} />
             <Route path="/en/privacy" element={<PrivacyPage />} />
             <Route path="/en/terms"   element={<TermsPage />} />
             <Route path="/en/refund"  element={<RefundPage />} />
+            <Route path="/en/pay"     element={<PayPage />} />
           </Routes>
         </Suspense>
       </LangProvider>

@@ -138,6 +138,7 @@
   "pay.error.network": "Network error. Check your connection and try again.",
   "pay.error.sdkBlocked": "Payment service unavailable. Disable ad blocker and refresh the page.",
   "pay.alreadyActive": "Subscription already active",
+  "pay.ctaRail.label": "Extension installed — ready to pay?",
   "account.title": "Subscription Management",
   "account.ext.detecting": "Connecting to extension...",
   "account.ext.notInstalled.title": "Opten extension not found",

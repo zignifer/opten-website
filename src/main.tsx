@@ -7,15 +7,16 @@
   import TermsPage from "./app/pages/TermsPage.tsx";
   import RefundPage from "./app/pages/RefundPage.tsx";
   import WelcomePage from "./app/pages/WelcomePage.tsx";
+  import PayPage from "./app/pages/PayPage.tsx";
   import "./styles/index.css";
   import { LangProvider } from "./i18n/LangContext";
   import { RouteLoading } from "./app/components/RouteLoading";
 
-  // Phase 2.1 D-01: SPA-fallback routes only — NEVER add App/Welcome/Privacy/Terms/Refund here.
+  // Phase 4 D-12: PayPage is now eager (SSR-prerendered body) — the lazy block below covers only
+  // SuccessPage / AccountPage / DownloadSkillPage which remain SPA-only.
   // renderToString in entry-server.tsx cannot resolve React.lazy() — only routes that never
   // enter the hydrateRoot path are safe to lazy-load (RESEARCH.md "Suspense + hydrateRoot at
   // Route Level" lines 329–363). Phase 2 hotfix 80b16be is the precedent.
-  const PayPage = lazy(() => import("./app/pages/PayPage.tsx"));
   const SuccessPage = lazy(() => import("./app/pages/SuccessPage.tsx"));
   const AccountPage = lazy(() => import("./app/pages/AccountPage.tsx"));
   const DownloadSkillPage = lazy(() => import("./app/pages/DownloadSkillPage.tsx"));
