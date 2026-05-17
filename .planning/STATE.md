@@ -115,6 +115,7 @@ Full log in PROJECT.md Key Decisions table — 8 ADR-locked decisions from `docs
 | ID | Slug | Date | Files | Notes |
 |----|------|------|-------|-------|
 | 260516-pmk | normalize-mobile-landing-section-spacing | 2026-05-16 | 1 | Mobile-only: section gaps→140, heading→content→60, hero top −19. Build ✓, Playwright-замеры подтвердили все 9 целевых гэпов. |
+| 260517-t5i | seo-geo-audit-batch | 2026-05-17 | 11 | Post 2026-05-17 GEO audit P0+P1+часть P2. 10 атомарных коммитов: Person name fix (CR-1), YouTube sameAs (CR-2/3), Article+WebPage speakable schemas, robots.txt 8 AI bots, PT Root UI font-display optional (CR-4 mobile CLS), hero definitional абзац + partners disclaimer (CR-5), visible guide dates, founder email, llms.txt /en/about, per-route sitemap lastmod, per-route meta author. Expected GEO score 63 → 75-78. Build ✓, 16 routes prerendered, FAQ parity gate OK. |
 
 ## Deferred Items
 
