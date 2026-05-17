@@ -169,23 +169,23 @@ Plans:
 
 Plans:
 **Wave 1**
-- [ ] 04-01-PLAN.md — Sidecar headers: vercel.json X-Frame-Options + robots.txt Content-Signal (D-14)
+- [x] 04-01-PLAN.md — Sidecar headers: vercel.json X-Frame-Options + robots.txt Content-Signal (D-14)
 - [ ] 04-02-PLAN.md — LCP element identification via PageSpeed MCP (Wave-0 prerequisite for D-13)
 
 **Wave 2** *(blocked on Wave 1)*
-- [ ] 04-03-PLAN.md — Schema entity-graph infrastructure + applyJsonLd + applyHeroPreload (D-09, D-10, D-13)
+- [x] 04-03-PLAN.md — Schema entity-graph infrastructure + applyJsonLd + applyHeroPreload (D-09, D-10, D-13)
 
 **Wave 3** *(blocked on Wave 2)*
-- [ ] 04-04-PLAN.md — PayPage D-12 promotion: extract PricingStaticBlock + flip to full prerender + Product schema
+- [x] 04-04-PLAN.md — PayPage D-12 promotion: extract PricingStaticBlock + flip to full prerender + Product schema
 
 **Wave 4** *(blocked on Wave 3)*
-- [ ] 04-05-PLAN.md — /about page + Person schema + RU-only nav gate (D-01..D-03, D-16)
+- [x] 04-05-PLAN.md — /about page + Person schema + RU-only nav gate (D-01..D-03, D-16)
 
 **Wave 5** *(blocked on Wave 4)*
-- [ ] 04-06-PLAN.md — Anchor guide bilingual + FaqBlock + landing FAQ + HowTo/FAQPage schemas + EN_SIBLINGS sync (D-04..D-08)
+- [x] 04-06-PLAN.md — Anchor guide bilingual + FaqBlock + landing FAQ + HowTo/FAQPage schemas + EN_SIBLINGS sync (D-04..D-08)
 
 **Wave 6** *(blocked on Wave 5)*
-- [ ] 04-07-PLAN.md — llms.txt + llms-full.txt postbuild script (D-11)
+- [x] 04-07-PLAN.md — llms.txt + llms-full.txt postbuild script (D-11)
 
 ### Phase 5: Brand authority
 **Status**: Backlog. Scope set; detailed planning deferred.
