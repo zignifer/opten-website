@@ -17,10 +17,10 @@ const { routes } = await import(pathToFileURL(MANIFEST_BUNDLE).href);
 
 const prerenderedRoutes = routes.filter((r) => r.prerender !== "none");
 
-// Floor check: after Phase 4 expected count is 15 (12 baseline + /about per 04-05 + 2 guide siblings per 04-06).
-if (prerenderedRoutes.length < 15) {
+// Floor check: after Phase 4.1 expected count is 16 (12 baseline + /about per 04-05 + 2 guide siblings per 04-06 + /en/about per 04.1 B-03).
+if (prerenderedRoutes.length < 16) {
   throw new Error(
-    `llms.mjs: expected at least 15 prerendered routes (12 baseline + /about (04-05) + 2 guide siblings (04-06)), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
+    `llms.mjs: expected at least 16 prerendered routes (12 baseline + /about (04-05) + 2 guide siblings (04-06) + /en/about (04.1 B-03)), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
   );
 }
 

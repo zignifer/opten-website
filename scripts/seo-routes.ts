@@ -36,7 +36,7 @@ export interface RouteMeta {
   canonical: string;                    // absolute URL for <link rel="canonical"> AND <meta og:url>
   ogTitle: string;                      // <meta property="og:title">
   ogDescription: string;               // <meta property="og:description">
-  ogImage?: string;                     // absolute URL; Phase 2 keeps og-card-ru.png site-wide (PROJECT.md decision)
+  ogImage?: string;                     // absolute URL; Phase 4.1 WR-01: EN routes set DEFAULT_OG_IMAGE_EN here, RU routes leave undefined and applyOgImage falls back to DEFAULT_OG_IMAGE = og-card-ru.png
   prerender: "full" | "head" | "none"; // D-02 tier
   changefreq: "weekly" | "monthly" | "yearly";
   priority: number;                     // 0..1 — matches Phase 1 sitemap priorities

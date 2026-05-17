@@ -130,7 +130,7 @@ export default function PayPage() {
     if (typeof window === "undefined") return;
     const stored = window.localStorage.getItem(CURRENCY_STORAGE_KEY);
     if (stored === "RUB" || stored === "USD") {
-      setCurrencyState(stored as Currency);
+      setCurrencyState(stored);
     }
     // Only runs once on mount to hydrate from localStorage; lang-change reset is in the next effect.
     // eslint-disable-next-line react-hooks/exhaustive-deps

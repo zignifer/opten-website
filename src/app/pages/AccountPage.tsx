@@ -63,6 +63,10 @@ function cardBrandName(type: string | null, t: (key: string) => string): string 
 export default function AccountPage() {
   const t = useT();
   const { lang } = useLang();
+  // Phase 4.1 WR-03 (IN-02 sibling — same pattern as PayPage Wave 9): lang-aware FAQ anchor.
+  // /account has no /en/account sibling per Phase 3 D-03 (extension-coupled SPA-only route);
+  // EN users who flip language stay on /account but their FAQ click must go to /en/#faq, not /#faq.
+  const homeHash = lang === "en" ? "/en/#faq" : "/#faq";
   const [token, setToken] = useState<string | null>(null);
   const [extStatus, setExtStatus] = useState<ExtStatus>("detecting");
   const [sub, setSub] = useState<Subscription | null>(null);
@@ -205,7 +209,7 @@ export default function AccountPage() {
           <div className="hidden md:flex flex-1 gap-[24px] items-center font-['PT_Root_UI',sans-serif] text-[14px] text-white">
             <LocalizedLink to="/" className="hover:opacity-80 transition-opacity">{t("nav.home")}</LocalizedLink>
             <LocalizedLink to="/pay" className="hover:opacity-80 transition-opacity">{t("nav.pricing")}</LocalizedLink>
-            <a href="/#faq" className="hover:opacity-80 transition-opacity">{t("nav.faq")}</a>
+            <a href={homeHash} className="hover:opacity-80 transition-opacity">{t("nav.faq")}</a>
             <LangSwitcher className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]" />
           </div>
           <Logo />
