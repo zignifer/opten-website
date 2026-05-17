@@ -32,7 +32,9 @@ const SECTIONS = [
   { name: "Marketing", match: (p) => p === "/" || p === "/en/" },
   { name: "Pricing", match: (p) => p === "/pay" || p === "/en/pay" },
   { name: "Welcome", match: (p) => p === "/welcome" || p === "/en/welcome" },
-  { name: "About", match: (p) => p === "/about" },
+  // Post-2026-05-17 GEO audit HI-1: both RU and EN /about belong under one heading.
+  // Previously only "/about" matched here, so "/en/about" silently fell through to "Other".
+  { name: "About", match: (p) => p === "/about" || p === "/en/about" },
   { name: "Guides", match: (p) => /^\/(en\/)?guides\//.test(p) },
   {
     name: "Legal",
@@ -148,8 +150,11 @@ if (Buffer.byteLength(llmsFullTxt, "utf-8") > SIZE_CAP_BYTES) {
       .filter((r) => sectionOf(r.path) !== "Legal")
       .map(bodyForRoute),
   );
+  // Post-2026-05-17 GEO audit HI-1: "(truncated)" was misleading — AI systems read it as
+  // "this content is incomplete", which lowers citation confidence. The legal pages are
+  // intentionally omitted, not lost; the new header makes that explicit.
   const note =
-    "# Opten (truncated)\n\n# Note: legal pages (privacy, terms, refund) omitted from llms-full.txt to keep the file under 50 KB. Full legal copy is available at the URLs listed in llms.txt.\n\n";
+    "# Opten — full content (legal pages excluded)\n\n# Note: legal pages (privacy, terms, refund) omitted from llms-full.txt to keep the file under 50 KB. Full legal copy is available at the URLs listed in llms.txt.\n\n";
   llmsFullTxt = note + kept.filter(Boolean).join("\n\n---\n\n");
   truncated = true;
 }
