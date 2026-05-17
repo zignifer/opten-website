@@ -37,11 +37,16 @@ export interface RouteMeta {
   ogTitle: string;                      // <meta property="og:title">
   ogDescription: string;               // <meta property="og:description">
   ogImage?: string;                     // absolute URL; Phase 4.1 WR-01: EN routes set DEFAULT_OG_IMAGE_EN here, RU routes leave undefined and applyOgImage falls back to DEFAULT_OG_IMAGE = og-card-ru.png
+  author?: string;                      // Post-2026-05-17 GEO audit ME-10: per-route <meta name="author">. Set on routes with a named human byline (/about, /guides/*); other routes keep the template's generic "Opten".
   prerender: "full" | "head" | "none"; // D-02 tier
   changefreq: "weekly" | "monthly" | "yearly";
   priority: number;                     // 0..1 — matches Phase 1 sitemap priorities
   schema?: SchemaBlock[];               // Phase 4 D-09: optional schema.org JSON-LD blocks; consumed by prerender.mjs applyJsonLd
 }
+
+// Post-2026-05-17 GEO audit ME-10: shared author string for routes with a human byline.
+// Match PERSON_FOUNDER_BLOCK.name so meta + JSON-LD don't disagree (audit CR-1 root-cause class).
+export const FOUNDER_NAME = "Влад Воронежцев";
 
 export const SITE_ORIGIN = "https://opten.space";
 export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/og-card-ru.png`;
@@ -537,6 +542,7 @@ export const routes: RouteMeta[] = [
     canonical: `${SITE_ORIGIN}/about`,
     ogTitle: "О проекте Opten",
     ogDescription: "История создания Opten — расширения для оценки промптов под конкретную AI-модель.",
+    author: FOUNDER_NAME,
     prerender: "full",
     changefreq: "yearly",
     priority: 0.5,
@@ -580,6 +586,7 @@ export const routes: RouteMeta[] = [
     canonical: `${SITE_ORIGIN}/guides/gpt-image-2`,
     ogTitle: gptImage2Guide.ru.title,
     ogDescription: "5 шагов + 5 FAQ-вопросов от автора Opten.",
+    author: FOUNDER_NAME,
     prerender: "full",
     changefreq: "monthly",
     priority: 0.7,
@@ -823,6 +830,7 @@ export const routes: RouteMeta[] = [
     ogTitle: "About Opten",
     ogDescription: "Origin story of Opten — the extension for scoring prompts against specific AI models.",
     ogImage: DEFAULT_OG_IMAGE_EN,
+    author: FOUNDER_NAME,
     prerender: "full",
     changefreq: "yearly",
     priority: 0.5,
@@ -864,6 +872,7 @@ export const routes: RouteMeta[] = [
     ogTitle: gptImage2Guide.en.title,
     ogDescription: "5 steps + 5 FAQ items by the author of Opten.",
     ogImage: DEFAULT_OG_IMAGE_EN,
+    author: FOUNDER_NAME,
     prerender: "full",
     changefreq: "monthly",
     priority: 0.7,

@@ -115,6 +115,15 @@ function applyMeta(html, meta) {
   html = html.replace(/<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/, `<meta property="og:description" content="${escapeAttr(meta.ogDescription)}" />`);
   html = html.replace(/<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/, `<meta name="twitter:title" content="${escapeAttr(meta.ogTitle)}" />`);
   html = html.replace(/<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/, `<meta name="twitter:description" content="${escapeAttr(meta.ogDescription)}" />`);
+  // Post-2026-05-17 GEO audit ME-10: per-route <meta name="author">. The source template ships
+  // content="Opten" — for routes with a named human author (/about, /guides/*) it should reflect
+  // the actual byline so AI systems attribute citations to a person rather than the brand.
+  if (meta.author) {
+    html = html.replace(
+      /<meta\s+name="author"\s+content="[^"]*"\s*\/?>/,
+      `<meta name="author" content="${escapeAttr(meta.author)}" />`,
+    );
+  }
   // Inject canonical after theme-color anchor (no canonical exists in source today — D-07)
   html = html.replace(
     /<meta name="theme-color"[^>]*\/?>/,
