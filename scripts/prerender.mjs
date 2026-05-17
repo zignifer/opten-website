@@ -20,7 +20,7 @@ const SSR_BUNDLE = resolve(ROOT, ".ssr-cache", "entry-server.js");
 const MANIFEST_BUNDLE = resolve(ROOT, ".ssr-meta", "seo-routes.js");
 
 const { renderRoute } = await import(pathToFileURL(SSR_BUNDLE).href);
-const { routes, SITE_ORIGIN, DEFAULT_OG_IMAGE } = await import(pathToFileURL(MANIFEST_BUNDLE).href);
+const { routes, SITE_ORIGIN, DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_EN } = await import(pathToFileURL(MANIFEST_BUNDLE).href);
 
 const template = await readFile(resolve(DIST, "index.html"), "utf-8");
 
@@ -29,6 +29,10 @@ function escapeAttr(s) {
 }
 function escapeHtml(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+// Escapes regex metacharacters so a literal path string can be safely interpolated into `new RegExp(...)`.
+function escapeRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 // Phase 3 GEO-C-4: bake <html lang> per emitted file. Replaces runtime mutator deleted in Plan 01 (RESEARCH.md Pattern 3).
@@ -80,6 +84,25 @@ function applyOgLocale(html, meta) {
     /(<meta\s+property="og:locale"\s+content="[^"]*"\s*\/?>)/,
     `$1\n    <meta property="og:locale:alternate" content="${escapeAttr(alternate)}" />`
   );
+  return html;
+}
+
+// Phase 4.1 WR-01: swap og:image + twitter:image per-route.
+// EN routes carry `ogImage: DEFAULT_OG_IMAGE_EN` in their RouteMeta and ship og-card-en.png;
+// RU routes (no ogImage set) fall through to DEFAULT_OG_IMAGE = og-card-ru.png.
+// Mirrors applyOgLocale fail-fast pattern (Rule 1: throw if either anchor is missing).
+function applyOgImage(html, meta) {
+  const ogImageUrl = meta.ogImage ?? DEFAULT_OG_IMAGE;
+  const ogImageRe = /<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/;
+  const twitterImageRe = /<meta\s+name="twitter:image"\s+content="[^"]*"\s*\/?>/;
+  if (!ogImageRe.test(html)) {
+    throw new Error(`prerender(${meta.path}): no <meta property="og:image"> matched. index.html structure changed?`);
+  }
+  if (!twitterImageRe.test(html)) {
+    throw new Error(`prerender(${meta.path}): no <meta name="twitter:image"> matched. index.html structure changed?`);
+  }
+  html = html.replace(ogImageRe, `<meta property="og:image" content="${escapeAttr(ogImageUrl)}" />`);
+  html = html.replace(twitterImageRe, `<meta name="twitter:image" content="${escapeAttr(ogImageUrl)}" />`);
   return html;
 }
 
@@ -219,27 +242,28 @@ function applyJsonLd(html, meta) {
 // index.html since Phase 2.2. If anyone deletes those <link rel=preload> tags, every
 // prerendered route loses them — fail loudly instead of silently regressing LCP.
 // Runs on every route (preloads must be on every prerendered file).
-const FONT_PRELOAD_REGEXES = [
-  /<link\s+rel="preload"\s+href="\/fonts\/PT-Root-UI_VF\.woff2"[^>]*as="font"/,
-  /<link\s+rel="preload"\s+href="\/fonts\/Unbounded-VF\.woff2"[^>]*as="font"/,
+// Phase 4.1 IN-05: paths lifted to a single source-of-truth constant; regexes are
+// derived per-iteration so the literal paths read as plain strings (easier to audit).
+const REQUIRED_FONT_PRELOADS = [
+  "/fonts/PT-Root-UI_VF.woff2",
+  "/fonts/Unbounded-VF.woff2",
 ];
 function applyHeroPreloadGuard(html, meta) {
-  for (const re of FONT_PRELOAD_REGEXES) {
+  for (const fontPath of REQUIRED_FONT_PRELOADS) {
+    const re = new RegExp(`<link\\s+rel="preload"\\s+href="${escapeRegex(fontPath)}"[^>]*as="font"`);
     if (!re.test(html)) {
-      throw new Error(`prerender(${meta.path}): missing font preload ${re} — Phase 2.2 regression. See .planning/phases/04-content-surface/04-LCP-AUDIT.md.`);
+      throw new Error(`prerender(${meta.path}): missing font preload ${fontPath} — Phase 2.2 regression. See .planning/phases/04-content-surface/04-LCP-AUDIT.md.`);
     }
   }
   return html; // unchanged
 }
 
 for (const meta of routes) {
-  // resolve ogImage default (Phase 2 site-wide og-card-ru.png per Open Question #2)
-  const ogImage = meta.ogImage ?? DEFAULT_OG_IMAGE;
-  // (ogImage is read but not currently re-injected — index.html already has og-card-ru.png hardcoded; Phase 4+ may swap this per-route)
   let html = applyMeta(template, meta);
   html = applyHtmlLang(html, meta);         // Phase 3 GEO-C-4: bake <html lang> per file
   html = applyHreflang(html, meta);         // Phase 3 GEO-C-3: inject hreflang triplet after canonical (must follow applyMeta)
   html = applyOgLocale(html, meta);         // Phase 3 GEO-C-4 / Pitfall 4: update og:locale + alternate
+  html = applyOgImage(html, meta);          // Phase 4.1 WR-01: swap og:image + twitter:image per-route (EN routes ship og-card-en.png; RU routes keep og-card-ru.png)
   html = applyJsonLd(html, meta);           // Phase 4 D-09: inject schema.org JSON-LD blocks (must precede helpers that consume </head>)
   html = applyHeroPreloadGuard(html, meta); // Phase 4 D-13 (LCP-AUDIT Option 1): assert Phase 2.2 font preloads survived; throws if missing
   html = applyModulePreload(html);          // Phase 2.1 D-03: must precede applyMarker (which consumes </head>)
