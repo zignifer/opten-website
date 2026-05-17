@@ -6,6 +6,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # Post-2026-05-17 GEO audit HI-8 / cross-platform synergy: each AI crawler addressed explicitly
 # instead of relying on the wildcard. Even though `User-agent: *` covers them, explicit blocks
@@ -21,6 +23,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # OpenAI — ChatGPT browse mode (live user-initiated fetches)
 User-agent: ChatGPT-User
@@ -31,6 +35,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # OpenAI — SearchGPT / ChatGPT Search (separate product from GPTBot)
 User-agent: OAI-SearchBot
@@ -41,6 +47,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # Anthropic — Claude crawler
 User-agent: ClaudeBot
@@ -51,6 +59,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # Anthropic — legacy crawler name still referenced in some docs
 User-agent: anthropic-ai
@@ -61,6 +71,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # Perplexity — search engine
 User-agent: PerplexityBot
@@ -71,6 +83,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # Google — Gemini training corpus (separate flag from Googlebot)
 User-agent: Google-Extended
@@ -81,6 +95,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # Microsoft Bing — feeds Bing Copilot
 User-agent: Bingbot
@@ -91,6 +107,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # Yandex — critical for RU audience
 User-agent: YandexBot
@@ -101,6 +119,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # Apple — Apple Intelligence training
 User-agent: Applebot-Extended
@@ -111,6 +131,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # Cohere — Command-R training corpus
 User-agent: cohere-ai
@@ -121,6 +143,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # Meta — Llama training corpus
 User-agent: Meta-ExternalAgent
@@ -131,6 +155,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # Amazon — Alexa / Amazon Bedrock training
 User-agent: Amazonbot
@@ -141,6 +167,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # Common Crawl — feeds the open-source LLM corpus that most non-frontier models are trained on
 User-agent: CCBot
@@ -151,6 +179,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 # ByteDance — Doubao / TikTok training corpus
 User-agent: Bytespider
@@ -161,6 +191,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /api/
+Disallow: /en/api/
 
 Sitemap: https://opten.space/sitemap.xml
 
