@@ -28,7 +28,7 @@ Every phase respects the locked routes and the 8 ADR-locked decisions from `docs
 - [x] **Phase 2.2: Mobile-perf + Safari fixes** *(INSERTED 2026-05-16, shipped inline)* — user reported residual sluggishness on mobile Safari after 2.1 shipped. Conditional Paddle SDK loading (only on `/pay`), vendor chunk split (main bundle 328 → 107 KB), self-hosted WOFF2 fonts (eliminated Google Fonts 3-RTT cascade on Safari), `<link rel=preload as=script>` Safari fallback for `modulepreload` (Safari <iOS 17 ignores it), `touch-action: manipulation` to kill the 300 ms tap delay, lazy-loaded EN i18n dict (-40 KB raw / -13 KB gzip on RU visits), mobile-resolution `srcset` for feature cards + steps. Commits `0a73069`..`81284d4`. No `.planning/phases/02.2-*/` directory created — reactive work, tracked via commit history + retroactive note in `02.1-VERIFICATION.md`.
 - [x] **Phase 3: Bilingual routing** — resolve per-language URL strategy; `/ru/*` `/en/*` siblings + hreflang + dynamic `<html lang>` (closes audit C-5) (completed 2026-05-16)
 - [x] **Phase 4: Content surface** — `/about` E-E-A-T page + `/guides/*` HowTo content + FAQ schema (closes audit M-3, M-4, H-3) (completed 2026-05-17; post-deploy UAT 6/6 PASS — see `phases/04-content-surface/04-HUMAN-UAT.md`)
-- [ ] **Phase 4.1: Content surface cleanup** *(INSERTED 2026-05-17)* — close the 9 warnings + 6 info findings from `04-REVIEW.md` (WR-01..09 + IN-01..06). Surgical per-file atomic commits; no new product surface. Plan: `phases/04.1-content-surface-cleanup/04.1-PLAN.md`.
+- [ ] **Phase 4.1: Content surface cleanup** *(INSERTED 2026-05-17)* — close the 9 warnings + 6 info findings from `04-REVIEW.md` (WR-01..09 + IN-01..06) PLUS 3 user-reported bugs (B-01 free-tier copy purge, B-02 Magnific mentions, B-03 EN /about sibling). 13 atomic waves; W12b adds new product surface (/en/about). Plan: `phases/04.1-content-surface-cleanup/04.1-PLAN.md`.
 - [ ] **Phase 5: Brand authority** — Product Hunt + Wikipedia + Reddit + YouTube + expanded `sameAs` schema (closes audit H-4, M-5)
 
 ## Phase Details
@@ -214,7 +214,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phases 1 and 2 are p
 | 2.2. Mobile-perf + Safari fixes | inline (~5 commits, no per-task plans) | Complete (shipped inline; retroactive note in `02.1-VERIFICATION.md`) | 2026-05-16 |
 | 3. Bilingual routing | 8/8 | Complete   | 2026-05-16 |
 | 4. Content surface | 6/7 (04-02 replaced by 04-LCP-AUDIT Option-1 defer) + UAT 6/6 | Complete | 2026-05-17 |
-| 4.1. Content surface cleanup | 0/9 | Planned, ready to execute | - |
+| 4.1. Content surface cleanup | 0/13 | In progress (W1 starting) | - |
 | 5. Brand authority | 0/TBD | Backlog | - |
 
 ---
