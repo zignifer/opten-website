@@ -33,17 +33,25 @@ export default function BlogListPage() {
   const [queryInput, setQueryInput] = useState(queryParam);
 
   // Debounce the search input → URL. Skip on first render when input matches URL state.
+  // Functional updater (prev => …) reads the CURRENT URL state when the timeout fires —
+  // critical, otherwise a tag/page change between keystroke and debounce would be stomped
+  // by the stale snapshot we captured at effect setup (codex review P2).
   useEffect(() => {
     if (queryInput === queryParam) return;
     const handle = window.setTimeout(() => {
-      const next = new URLSearchParams(searchParams);
-      if (queryInput.trim()) {
-        next.set("q", queryInput.trim());
-      } else {
-        next.delete("q");
-      }
-      next.delete("page");
-      setSearchParams(next, { replace: true });
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          if (queryInput.trim()) {
+            next.set("q", queryInput.trim());
+          } else {
+            next.delete("q");
+          }
+          next.delete("page");
+          return next;
+        },
+        { replace: true },
+      );
     }, SEARCH_DEBOUNCE_MS);
     return () => window.clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps

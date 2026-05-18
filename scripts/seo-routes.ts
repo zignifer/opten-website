@@ -688,9 +688,8 @@ export const routes: RouteMeta[] = [
       }),
       itemListBlock(
         [
-          // Phase 5 B-04: gpt-image-2 still lives at /guides/gpt-image-2 (URL flip in B-07).
-          // The ItemList ref must match the canonical URL or Rich Results flags it as broken.
-          { url: `${SITE_ORIGIN}/guides/gpt-image-2`, name: gptImage2Guide.ru.title, datePublished: gptImage2Guide.ru.publishedAt },
+          // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/gpt-image-2`, name: gptImage2Guide.ru.title, datePublished: gptImage2Guide.ru.publishedAt },
         ],
         `${SITE_ORIGIN}/blog`,
       ),
@@ -1039,7 +1038,8 @@ export const routes: RouteMeta[] = [
       }),
       itemListBlock(
         [
-          { url: `${SITE_ORIGIN}/en/guides/gpt-image-2`, name: gptImage2Guide.en.title, datePublished: gptImage2Guide.en.publishedAt },
+          // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/gpt-image-2`, name: gptImage2Guide.en.title, datePublished: gptImage2Guide.en.publishedAt },
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
