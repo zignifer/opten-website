@@ -8,19 +8,20 @@ import type { BlogPost, BlogPostLocale } from "./types";
 
 const PUBLISHED = "2026-05-17";
 
-// Phase 5 B-01: placeholder cover until Codex CLI / GPT Image 2 generation lands in C8.
-// /og-card-ru.png and /og-card-en.png already exist (Phase 1 GEO-A-4) and meet the
-// Rich Results carousel ≥1200px-wide bar — safe interim choice that keeps og:image valid.
+// Phase 5 B-08: generated cover via scripts/gen-blog-covers.mjs (sharp → JPEG + WebP @1x/@2x).
+// 1600×900 (16:9) — opten-design gradient-blob aesthetic, no text baked in so the same asset
+// serves both RU and EN. Style: deep teal-black bg (#011417) with cyan-teal blob upper-right
+// and a lime-green (#9cfb51) micro-accent lower-left. Rich Results carousel needs ≥1200px wide.
 const COVER_RU = {
-  src: "/og-card-ru.png",
-  width: 1200,
-  height: 630,
+  src: "/blog/gpt-image-2/cover.webp",
+  width: 1600,
+  height: 900,
   alt: "Гайд: как писать промпты для GPT Image 2",
 };
 const COVER_EN = {
-  src: "/og-card-en.png",
-  width: 1200,
-  height: 630,
+  src: "/blog/gpt-image-2/cover.webp",
+  width: 1600,
+  height: 900,
   alt: "Guide: how to write prompts for GPT Image 2",
 };
 
