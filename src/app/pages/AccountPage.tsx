@@ -215,6 +215,17 @@ export default function AccountPage() {
             {t("account.title")}
           </h1>
 
+          {/* Signed-in account email (codex review P3). Visible identity check before billing
+              actions — replaces the email pill that used to live in the bespoke navbar. */}
+          {email && (
+            <div className="mx-auto flex items-center gap-[10px] rounded-full bg-white/8 px-[16px] py-[8px] text-[14px] text-white/85">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 8a3 3 0 100-6 3 3 0 000 6zM8 9.5c-3 0-5 1.34-5 3V14h10v-1.5c0-1.66-2-3-5-3z" fill="rgba(255,255,255,0.7)" />
+              </svg>
+              <span className="font-['PT_Root_UI',sans-serif] break-all">{email}</span>
+            </div>
+          )}
+
           {/* Extension status */}
           {extStatus === "detecting" && (
             <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] p-[24px] text-center">

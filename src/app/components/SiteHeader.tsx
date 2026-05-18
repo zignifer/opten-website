@@ -17,7 +17,7 @@ import { useEffect, useRef, useState } from "react";
 import { Menu, User, X } from "lucide-react";
 import LangSwitcher from "./LangSwitcher";
 import LocalizedLink from "./LocalizedLink";
-import { useT, useOnEnPath } from "../../i18n/LangContext";
+import { useT, useLang } from "../../i18n/LangContext";
 
 interface SiteHeaderProps {
   variant?: "landing" | "page";
@@ -38,16 +38,16 @@ function Logo() {
 
 export default function SiteHeader({ variant = "page" }: SiteHeaderProps): JSX.Element {
   const t = useT();
-  const onEnPath = useOnEnPath();
+  const { lang } = useLang();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
-  // Compose anchor hrefs based on variant. On `page` we send the user to the landing
-  // route and then to the in-page anchor — the browser handles the scroll on first paint
-  // (useNavigate({hash}) is unreliable across cold loads). On `landing` the bare hash
-  // triggers smooth-scroll within the current page.
-  const homeHref = onEnPath ? "/en/" : "/";
+  // codex review P2: home href must follow the user's chosen language, not just the URL prefix.
+  // On locked routes without an EN sibling (/account, /success, /dashboard/*) the URL stays
+  // unprefixed but the user may already be in EN via storage; sending them to /#faq would
+  // dump them onto the RU landing. `lang` is the source of truth.
+  const homeHref = lang === "en" ? "/en/" : "/";
   const anchor = (hash: string): string => {
     if (variant === "landing") return `#${hash}`;
     return `${homeHref}#${hash}`;
