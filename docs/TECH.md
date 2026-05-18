@@ -1,7 +1,7 @@
 # Tech Stack — opten.space
 
-> Snapshot taken 2026-05-14. Re-run discovery when `package.json` or build
-> tooling changes meaningfully.
+> Snapshot taken 2026-05-14, refreshed 2026-05-18 (post-v1.0 + blog migration).
+> Re-run discovery when `package.json` or build tooling changes meaningfully.
 
 ## Build & runtime
 
@@ -14,15 +14,12 @@
 ## Routing
 
 - **React Router 7.13.0** (`react-router` package, not `react-router-dom` — v7 unified API)
-- All 8 routes declared in [`src/main.tsx`](../../src/main.tsx):
-  - `/` — landing (`App.tsx`)
-  - `/pay` — checkout (YooKassa + Paddle)
-  - `/success` — post-payment confirmation
-  - `/privacy` `/terms` `/refund` — legal
-  - `/account` — subscription management
-  - `/welcome` — first-install greeting
-  - `/dashboard/download-skill` — Pro-only skill ZIP download
-- **`vercel.json` rewrite:** all non-`/api/` paths → `/index.html` (SPA fallback)
+- **18 client routes** declared in [`src/main.tsx`](../../src/main.tsx) + a catch-all 404:
+  - **Prerendered, full-tier (9 RU + 9 EN siblings):** `/`, `/pay`, `/welcome`, `/about`, `/blog`, `/blog/:slug`, `/privacy`, `/terms`, `/refund` (plus `/en/*` mirrors)
+  - **SPA-only (no EN siblings, `X-Robots-Tag: noindex`):** `/account`, `/success`, `/dashboard/download-skill`
+  - **Catch-all** `<Route path="*">` → `<NotFound>` (locale-aware, injects `<meta robots=noindex>` at runtime)
+- **Legacy redirects** (`vercel.json` `redirects[]`): `/guides`, `/en/guides`, `/guides/gpt-image-2`, `/en/guides/gpt-image-2` → `/blog`, `/en/blog`, `/blog/gpt-image-2`, `/en/blog/gpt-image-2` (Phase 5 B-07)
+- **`vercel.json` rewrite:** all non-`/api/` paths → `/index.html` (SPA fallback at runtime; the prerendered HTML files in `dist/<route>/index.html` are what AI crawlers and link-unfurl bots see on first byte)
 
 ## Styling
 
@@ -88,15 +85,25 @@ public-by-design (it's the `anon` role).
 
 ```json
 {
-  "build": "vite build",
+  "build": "vite build && vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache --emptyOutDir && vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta && node scripts/prerender.mjs && node scripts/sitemap.mjs && node scripts/llms.mjs && node scripts/verify-faq-mainentity.mjs && node scripts/indexnow.mjs",
   "dev": "vite"
 }
 ```
 
-- No `test` script — there are no tests in this repo.
+- The build chain is the SEO surface. In order:
+  1. `vite build` → SPA bundle in `dist/`
+  2. `vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache` → SSR React bundle for prerender
+  3. `vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta` → per-route metadata manifest
+  4. `node scripts/prerender.mjs` → 18 `dist/<route>/index.html` files with per-route `<head>`, JSON-LD, `<html lang>`, hreflang
+  5. `node scripts/sitemap.mjs` → `dist/sitemap.xml` with per-route `<lastmod>` (git mtime). **Has a floor check that fails the build if route count drops.**
+  6. `node scripts/llms.mjs` → `dist/llms.txt` + `dist/llms-full.txt`. Same floor check.
+  7. `node scripts/verify-faq-mainentity.mjs` → asserts visible FAQ DOM ≡ JSON-LD `FAQPage.mainEntity`. Build-time gate.
+  8. `node scripts/indexnow.mjs` → pings Bing IndexNow with the updated URL set. Non-fatal on network failure.
+- Ad-hoc: `node scripts/smoke-blog.mjs` (requires `npx playwright install chromium` once) — Playwright smoke for the blog flows.
+- No `test` script — no Vitest/Jest.
 - No `lint` script — no ESLint config.
-- No `typecheck` script — TS errors only surface during Vite build.
-- Build output goes to `dist/` (gitignored).
+- No `typecheck` script — TS errors only surface during the `vite build` step.
+- Build output goes to `dist/` (gitignored). Two intermediate dirs `.ssr-cache/` and `.ssr-meta/` are also gitignored.
 
 ## Deployment
 
@@ -104,6 +111,19 @@ public-by-design (it's the `anon` role).
 - Auto-deploy on push to `main`.
 - Custom domain: `opten.space`.
 - Per recent commit messages, the active Vercel project name is `opten-website2` (commit `e7e1767`).
+
+## Content & SEO tooling
+
+- **Per-route metadata**: [`scripts/seo-routes.ts`](../../scripts/seo-routes.ts) — single source of truth. Each route declares `title`, `description`, `canonical`, `ogImage`, `hreflangAlternates`, `prerender` tier, and a `schema: SchemaBlock[]` array built from typed helpers (`faqPageBlock`, `howToBlock`, `productBlock`, `articleBlock`, `webPageBlock`, `breadcrumbBlock`, `collectionPageBlock`, `itemListBlock`, `blogPostingBlock`, plus reusable `ORG_BLOCK` / `WEBSITE_BLOCK` / `SOFTWARE_APP_BLOCK` / `PERSON_FOUNDER_BLOCK` consts cross-linked via `@id` references — Phase 4 D-10).
+- **Blog content**: [`src/content/blog/`](../../src/content/blog/) — one file per post implementing `BlogPost = { ru, en }`. Cover images in [`public/blog/<slug>/`](../../public/blog/). See [CONTENT-AUTHORING.md](CONTENT-AUTHORING.md).
+- **Static crawler files** (rooted in `public/`, served verbatim):
+  - `robots.txt` — explicit blocks for 16 user-agents (Google/Bing/Yandex + 13 AI crawlers); `Content-Signal: search=yes, ai-train=yes, ai-input=yes` (Cloudflare AI-Preferences draft).
+  - `llms.txt`, `llms-full.txt` — emitted by `scripts/llms.mjs` at build time (the `public/` versions are fallback only).
+  - `sitemap.xml` — emitted by `scripts/sitemap.mjs` at build time with per-route `<lastmod>` from git mtime.
+- **OG cards** at `public/og-card-{ru,en}.png` (1200×630). EN routes set `ogImage: DEFAULT_OG_IMAGE_EN`; RU routes inherit `DEFAULT_OG_IMAGE` (RU card). Per-post covers (blog) override this.
+- **Headers** (`vercel.json`):
+  - Global: `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-Frame-Options: SAMEORIGIN`.
+  - Per-path `X-Robots-Tag: noindex, nofollow` on `/account`, `/en/account`, `/success`, `/dashboard/*`, `/api/*` (Phase 4.2 P0-4b).
 
 ## Dependency hygiene flags
 

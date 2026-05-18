@@ -12,6 +12,7 @@ Public site for the Opten Chrome extension. This note is the map of content for 
 ## Core docs
 
 - [[docs/INTEGRATION-CONTRACT]] — **binding interface with the Chrome extension** (read before touching billing/auth/routes)
+- [[docs/CONTENT-AUTHORING]] — **GEO+SEO playbook for new pages, blog posts, images** (read before any content change)
 - [[docs/TECH]] — stack snapshot
 - [[docs/ARCHITECTURE]] — routes, billing flows, i18n
 - [[docs/SEO-AUDIT]] — SEO baseline + gap analysis
@@ -33,18 +34,15 @@ The project uses **[GSD (Get Shit Done)](https://github.com/jasonkneen/get-shit-
 
 ## Active work
 
-### GEO milestone — AI-search optimization
+### v1.0 (GEO Optimization) — CLOSED 2026-05-17
 
-GEO score 12/100 → target ~30 after Phase 1. One milestone, 5 phases.
+GEO score 12/100 → ~72.6 (target ~80+ after deploy bakes in). 7 phases shipped end-to-end; archive at [[.planning/milestones/v1.0-ROADMAP|v1.0-ROADMAP]] + [[.planning/milestones/v1.0-REQUIREMENTS|v1.0-REQUIREMENTS]].
 
-- **Phase 1 — Static foundations** (ready to execute):
-  - [[.planning/phases/01-static-geo-foundations/1-SPEC|1-SPEC]] — what & why (8 falsifiable requirements)
-  - [[.planning/phases/01-static-geo-foundations/1-PLAN|1-PLAN]] — 8 atomic tasks with commits
-- **Phases 2–5** (backlog — see [[.planning/ROADMAP|ROADMAP]]):
-  - Phase 2 — Per-route prerender + metadata
-  - Phase 3 — Bilingual routing (`/ru/*` `/en/*` + hreflang)
-  - Phase 4 — Content surface (`/about`, `/guides/*`, FAQ schema)
-  - Phase 5 — Brand authority (Product Hunt, Wikipedia, Reddit, YouTube, sameAs)
+A post-v1.0 hotfix series (2026-05-17..18) added the blog surface (`/blog`, `/blog/:slug`), retired `/guides/*` URLs, unified `<SiteHeader>` / `<SiteFooter>`, and synced docs. Tracked inline in [[.planning/STATE|STATE]] §"Post-v1.0 hotfix series" — not a formal GSD phase.
+
+### Next milestone (v2) — TBD
+
+No active milestone. Run `/gsd-new-milestone` to start v2 from the candidates listed in [[.planning/ROADMAP|ROADMAP]] (brand authority off-site work, scale-ready architecture refactor, or new direction).
 
 ## Project instructions
 

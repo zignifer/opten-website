@@ -14,6 +14,15 @@ aliases:
 
 - **v1.0 — GEO Optimization** *(2026-05-14 → 2026-05-17, closed 2026-05-17)* — Static GEO foundations + per-route prerender + bilingual routing + content surface + SEO/GEO polish. 7 phases shipped, 2 closed as deferred-to-v2 (brand authority off-site, scale-ready architecture). GEO Score 12 → ~72.6 (target ~80+ after deploy bakes in). Archive: [v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) · [v1.0-REQUIREMENTS.md](milestones/v1.0-REQUIREMENTS.md).
 
+## Post-v1.0 hotfix series (2026-05-17 → 2026-05-18, not a formal milestone)
+
+Shipped in-place between milestones. See [STATE.md](STATE.md) §"Post-v1.0 hotfix series" for the full log.
+
+- Blog migration: retired `/guides/*`, added `/blog` + `/blog/:slug` with BlogPosting + WebPage(speakable) + HowTo + FAQPage + BreadcrumbList. EN_SIBLINGS grew to 9. Vercel 301 redirects in place.
+- Unified `<SiteHeader>` + `<SiteFooter>` across landing, blog, content pages.
+- Hero / mobile filter polish; AccountPage email pill restore.
+- Docs sync (2026-05-18): new `docs/CONTENT-AUTHORING.md` GEO+SEO playbook; CLAUDE.md / AGENTS.md / docs/ARCHITECTURE.md / docs/TECH.md refreshed for the 18-route post-blog state.
+
 ## Active milestone
 
 *(No active milestone — run `/gsd-new-milestone` to start the next one.)*

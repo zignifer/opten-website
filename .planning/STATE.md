@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: none
 milestone_name: "(none — v1.0 closed 2026-05-17, no active milestone)"
-status: Idle — v1.0 milestone closed and archived; run `/gsd-new-milestone` to start next milestone.
+status: Idle — v1.0 milestone closed and archived; post-v1.0 blog migration + UI polish shipped as hotfix series 2026-05-17..18. Run `/gsd-new-milestone` to start v2.
 stopped_at: ""
-last_updated: "2026-05-17T20:00:00.000Z"
-last_activity: 2026-05-17
+last_updated: "2026-05-18T00:00:00.000Z"
+last_activity: 2026-05-18
 progress:
   total_phases: 0
   completed_phases: 0
@@ -28,8 +28,8 @@ See: .planning/PROJECT.md (updated 2026-05-17 with v1.0 shipped state)
 
 Phase: (no active phase)
 Plan: (no active plan)
-Status: Idle.
-Last activity: 2026-05-17 — v1.0 milestone closed.
+Status: Idle — between milestones. Post-v1.0 hotfix series shipped 2026-05-17..18 (see below); milestone artifact not opened (treated as in-place polish, not a new GSD phase).
+Last activity: 2026-05-18 — post-v1.0 docs sync (CLAUDE/AGENTS/ARCHITECTURE/TECH refreshed, new CONTENT-AUTHORING.md guide).
 
 Next:
   1. **Post-deploy verification window for v1.0 Phase 4.2** (next 7–14 days):
@@ -39,6 +39,19 @@ Next:
      - Wait 24-72h for IndexNow URL acceptance signal in Bing Webmaster Tools
      - 7–14 days after deploy: run `/geo audit https://opten.space` for the GEO rescore (target 72.6 → ~80+)
   2. **Start v2 when ready**: `/gsd-new-milestone` — picks fresh from the v2 candidates listed in `.planning/ROADMAP.md` (brand authority off-site work, scale-ready architecture refactor, or new direction entirely).
+
+## Post-v1.0 hotfix series (2026-05-17..18)
+
+Shipped between v1.0 close and v2 open. Tracked here for context; not a formal GSD phase.
+
+- **Blog migration (commits 6ffb65d..47d6a2b, "C1..C8 + codex review fix").** Retired the `/guides/*` URL space in favor of `/blog`. Relocated `src/content/guides/` to `src/content/blog/` with a new `BlogPost = { ru, en }` shape (intro / sections / steps / faq). Added `/blog` hub (`BlogListPage`, CollectionPage + ItemList) and `/blog/:slug` post page (BlogPosting + WebPage(speakable) + HowTo + FAQPage + BreadcrumbList). Legacy `/guides/*` URLs return Vercel 301 redirects. Generated per-post cover images at `public/blog/<slug>/cover.jpg`. EN_SIBLINGS grew to 9 entries; sitemap + llms floor checks bumped to 18. Codex review fixes: debounced search race in BlogListPage, ItemList canonical URLs pointing at /blog not legacy /guides.
+- **Unified SiteHeader + SiteFooter (commits 4a3c58e, 05248f4, 4088f48).** Replaced bespoke landing `Navbar()` and per-page footers with a single `<SiteHeader variant="landing" | "page">` and shared `<SiteFooter>`. Hamburger menu on every viewport; LangSwitcher repositioned left; AccountPage header now uses the shared shell.
+- **Hero / blog visual polish (commits cf5e3a9, be6d5b6, 1883a93).** Blog hero gradient mirrors landing (no harsh crop line); mask gradient removes horizontal seam below hero; mobile filter is now a full-width select instead of a chip row.
+- **Account fix (commit fd35b28).** Restored signed-in email pill in header + fixed empty Account button after the SiteHeader unification.
+- **Local dev hygiene (commit 4000be7).** Gitignored `.codex/` (local MCP server config).
+- **Docs (this session, 2026-05-18).** New [docs/CONTENT-AUTHORING.md](../docs/CONTENT-AUTHORING.md) — GEO+SEO playbook for new pages/posts/images. Refreshed CLAUDE.md, AGENTS.md, docs/ARCHITECTURE.md, docs/TECH.md to reflect blog routes, unified header/footer, 18-route inventory.
+
+Net: site now has a working blog surface (1 post: `gpt-image-2`), unified UI shell, and a written authoring contract that next agents can follow without re-deriving the patterns. GEO rescore window for v1.0 + this series opens ~2026-05-24..31.
 
 ## v1.0 final stats
 
