@@ -727,7 +727,7 @@ export const routes: RouteMeta[] = [
     canonical: `${SITE_ORIGIN}/blog/gpt-image-2`,
     ogTitle: gptImage2Guide.ru.title,
     ogDescription: gptImage2Guide.ru.excerpt,
-    // ogImage falls through to DEFAULT_OG_IMAGE (og-card-ru.png) until a bespoke post cover ships.
+    ogImage: `${SITE_ORIGIN}${gptImage2Guide.ru.cover.src}`,
     author: FOUNDER_NAME,
     prerender: "full",
     changefreq: "monthly",
@@ -743,8 +743,7 @@ export const routes: RouteMeta[] = [
         inLanguage: "ru-RU",
         articleSection: "Гайд",
         keywords: gptImage2Guide.ru.tags,
-        // Uses the same cover as visible <img> + og:image for consistency. PNG defaults to
-        // og-card-ru.png (1200×630) until a bespoke post cover ships.
+        // Uses the same cover as visible <img> + og:image for consistency.
         image: {
           url: `${SITE_ORIGIN}${gptImage2Guide.ru.cover.src}`,
           width: gptImage2Guide.ru.cover.width,
@@ -1072,8 +1071,7 @@ export const routes: RouteMeta[] = [
     canonical: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
     ogTitle: gptImage2Guide.en.title,
     ogDescription: gptImage2Guide.en.excerpt,
-    // EN routes default to DEFAULT_OG_IMAGE_EN (og-card-en.png) when ogImage is unset.
-    ogImage: DEFAULT_OG_IMAGE_EN,
+    ogImage: `${SITE_ORIGIN}${gptImage2Guide.en.cover.src}`,
     author: FOUNDER_NAME,
     prerender: "full",
     changefreq: "monthly",

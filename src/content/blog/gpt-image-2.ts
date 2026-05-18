@@ -8,21 +8,19 @@ import type { BlogPost, BlogPostLocale } from "./types";
 
 const PUBLISHED = "2026-05-17";
 
-// Cover: site-wide OG card placeholder until a proper post-specific illustration ships.
-// Both og-card-ru.png and og-card-en.png exist in public/ (Phase 1 GEO-A-4) and clear the
-// Rich Results carousel ≥1200px bar. A bespoke cover should be a hand-crafted illustration
-// (Midjourney / GPT Image / a designer) rather than a programmatic SVG blob.
+// Cover: bespoke post-specific illustration. No in-image text so the same asset works for
+// RU and EN while keeping OG / BlogPosting.image / visible <img> in sync.
 const COVER_RU = {
-  src: "/og-card-ru.png",
-  width: 1200,
-  height: 630,
-  alt: "Гайд: как писать промпты для GPT Image 2",
+  src: "/blog/gpt-image-2/cover.jpg",
+  width: 1600,
+  height: 900,
+  alt: "Обложка гайда про структурированные промпты для GPT Image 2",
 };
 const COVER_EN = {
-  src: "/og-card-en.png",
-  width: 1200,
-  height: 630,
-  alt: "Guide: how to write prompts for GPT Image 2",
+  src: "/blog/gpt-image-2/cover.jpg",
+  width: 1600,
+  height: 900,
+  alt: "Cover image for a guide to structured GPT Image 2 prompts",
 };
 
 const ru: BlogPostLocale = {
