@@ -10,8 +10,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useLang, useT } from "../../i18n/LangContext";
-import LocalizedLink from "../components/LocalizedLink";
 import SiteHeader from "../components/SiteHeader";
+import SiteFooter from "../components/SiteFooter";
 import BlogPostCard from "../components/BlogPostCard";
 import { allBlogPosts } from "../../content/blog";
 import type { BlogTag } from "../../content/blog/types";
@@ -130,29 +130,25 @@ export default function BlogListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
       <SiteHeader variant="page" />
 
-      <main className="mx-auto max-w-[1100px] px-[20px] pb-[80px] pt-[120px] sm:pt-[140px]">
-        <h1 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] tracking-[-0.6px] text-white sm:text-[44px] md:text-[52px]">
-          {t("blog.heading")}
-        </h1>
-        <p className="blog-intro mt-[20px] max-w-[760px] text-[17px] leading-[1.6] text-white/70 md:text-[18px]">
-          {t("blog.intro")}
-        </p>
+      {/* Hero — centered title + intro, with the signature gradient blob behind */}
+      <section className="relative px-[20px] pt-[120px] sm:pt-[160px]">
+        <div aria-hidden="true" className="opten-figma-gradient" />
+        <div className="relative z-10 mx-auto max-w-[800px] text-center">
+          <h1 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] tracking-[-0.6px] text-white sm:text-[44px] md:text-[52px]">
+            {t("blog.heading")}
+          </h1>
+          <p className="blog-intro mx-auto mt-[20px] max-w-[680px] text-[17px] leading-[1.6] text-white/70 md:text-[18px]">
+            {t("blog.intro")}
+          </p>
+        </div>
+      </section>
 
-        <div className="mt-[40px] flex flex-col gap-[16px]">
-          <label className="relative block w-full max-w-[480px]">
-            <span className="sr-only">{t("blog.search.placeholder")}</span>
-            <input
-              type="search"
-              value={queryInput}
-              onChange={(e) => setQueryInput(e.target.value)}
-              placeholder={t("blog.search.placeholder")}
-              className="h-[44px] w-full rounded-full border border-white/10 bg-white/5 px-[20px] text-[14px] text-white placeholder:text-white/35 transition focus:border-white/30 focus:bg-white/8 focus:outline-none"
-            />
-          </label>
-
+      <main className="relative z-10 mx-auto max-w-[1100px] px-[20px] pb-[80px] pt-[40px]">
+        {/* Filter chips (left) + search (right) in a single row on wide screens, wraps on narrow */}
+        <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-[8px]" role="group" aria-label={t("blog.filter.label")}>
             <button
               type="button"
@@ -185,6 +181,17 @@ export default function BlogListPage() {
               );
             })}
           </div>
+
+          <label className="relative block w-full sm:w-[300px] sm:shrink-0">
+            <span className="sr-only">{t("blog.search.placeholder")}</span>
+            <input
+              type="search"
+              value={queryInput}
+              onChange={(e) => setQueryInput(e.target.value)}
+              placeholder={t("blog.search.placeholder")}
+              className="h-[40px] w-full rounded-full border border-white/10 bg-white/5 px-[18px] text-[14px] text-white placeholder:text-white/35 transition focus:border-white/30 focus:bg-white/8 focus:outline-none"
+            />
+          </label>
         </div>
 
         {pagePosts.length === 0 ? (
@@ -244,23 +251,7 @@ export default function BlogListPage() {
         )}
       </main>
 
-      <footer className="mx-auto max-w-[1100px] border-t border-white/10 px-[20px] py-[32px]">
-        <div className="flex flex-wrap gap-[24px] text-[13px] text-white/45">
-          <LocalizedLink to="/about" className="no-underline text-inherit transition hover:text-white">
-            {t("nav.about")}
-          </LocalizedLink>
-          <LocalizedLink to="/privacy" className="no-underline text-inherit transition hover:text-white">
-            {t("legal.footer.privacy")}
-          </LocalizedLink>
-          <LocalizedLink to="/terms" className="no-underline text-inherit transition hover:text-white">
-            {t("legal.footer.terms")}
-          </LocalizedLink>
-          <LocalizedLink to="/refund" className="no-underline text-inherit transition hover:text-white">
-            {t("legal.footer.refund")}
-          </LocalizedLink>
-          <span>{t("legal.footer.copyright")}</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

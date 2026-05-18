@@ -14,6 +14,7 @@ import { useParams } from "react-router";
 import { useT, useLang } from "../../i18n/LangContext";
 import LocalizedLink from "../components/LocalizedLink";
 import SiteHeader from "../components/SiteHeader";
+import SiteFooter from "../components/SiteFooter";
 import BlogPostCard from "../components/BlogPostCard";
 import FaqBlock from "../components/FaqBlock";
 import { blogPostsBySlug, allBlogPosts, type BlogSlug } from "../../content/blog";
@@ -91,15 +92,18 @@ export default function BlogPostPage() {
       <SiteHeader variant="page" />
 
       <main className="mx-auto max-w-[800px] px-[20px] pb-[60px] pt-[120px] sm:pt-[140px]">
-        {/* Breadcrumb (visible mirror of JSON-LD BreadcrumbList) */}
-        <nav aria-label="Breadcrumb" className="mb-[24px] text-[13px] text-white/45">
+        {/* Breadcrumb (visible mirror of JSON-LD BreadcrumbList) — current page shown as truncated
+            text node (no link), so users see they're on a leaf inside /blog. */}
+        <nav aria-label="Breadcrumb" className="mb-[24px] flex flex-wrap items-center gap-x-[8px] gap-y-[4px] text-[13px] text-white/45">
           <LocalizedLink to="/" className="no-underline text-inherit transition hover:text-white">
             {t("nav.home")}
           </LocalizedLink>
-          <span className="mx-[8px]">/</span>
+          <span aria-hidden="true">/</span>
           <LocalizedLink to="/blog" className="no-underline text-inherit transition hover:text-white">
             {t("nav.blog")}
           </LocalizedLink>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page" className="max-w-full truncate text-white/75">{data.title}</span>
         </nav>
 
         {/* Category badge */}
@@ -216,18 +220,7 @@ export default function BlogPostPage() {
           </div>
         )}
 
-        {/* Tags row at the article foot — visible mirror of BlogPosting.keywords */}
-        <div className="mt-[40px] flex flex-wrap items-center gap-[8px] border-t border-white/10 pt-[24px] text-[12px] text-white/55">
-          {data.tags.map((tag) => (
-            <LocalizedLink
-              key={tag}
-              to={`/blog?tag=${tag}`}
-              className="rounded-full border border-white/10 bg-white/5 px-[12px] py-[5px] text-inherit no-underline transition hover:bg-white/10 hover:text-white"
-            >
-              {tagLabel(tag)}
-            </LocalizedLink>
-          ))}
-        </div>
+        {/* Tags are surfaced in the byline + JSON-LD keywords; no duplicate pill row at the foot. */}
       </main>
 
       {/* FAQ — FaqBlock id preserved so verify-faq-mainentity.mjs regex (id="[^"]*faq[^"]*") matches */}
@@ -235,13 +228,14 @@ export default function BlogPostPage() {
         <FaqBlock items={faq} headingKey="blog.faqHeading" id="blog-faq" />
       )}
 
-      {/* Related posts (or "Browse all" CTA when only this post exists) */}
-      <section className="mx-auto max-w-[1100px] px-[20px] pb-[48px]">
+      {/* Related posts (or "Browse all" CTA when only this post exists) — width-aligned with the
+          800px article column so the section reads as part of the post, not a sitewide widget. */}
+      <section className="mx-auto max-w-[800px] px-[20px] pb-[60px]">
         <h2 className="mb-[20px] font-['Unbounded',sans-serif] text-[22px] font-medium leading-[1.2] tracking-[-0.4px] text-white md:text-[28px]">
           {t("blog.relatedHeading")}
         </h2>
         {related.length > 0 ? (
-          <div className="grid gap-[20px] sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-[20px] sm:grid-cols-2">
             {related.map(({ slug: s, post }) => (
               <BlogPostCard key={s} post={{ slug: s, ...post[lang] }} tagLabel={tagLabel} />
             ))}
@@ -256,23 +250,7 @@ export default function BlogPostPage() {
         )}
       </section>
 
-      <footer className="mx-auto max-w-[1100px] border-t border-white/10 px-[20px] py-[32px]">
-        <div className="flex flex-wrap gap-[24px] text-[13px] text-white/45">
-          <LocalizedLink to="/about" className="no-underline text-inherit transition hover:text-white">
-            {t("nav.about")}
-          </LocalizedLink>
-          <LocalizedLink to="/privacy" className="no-underline text-inherit transition hover:text-white">
-            {t("legal.footer.privacy")}
-          </LocalizedLink>
-          <LocalizedLink to="/terms" className="no-underline text-inherit transition hover:text-white">
-            {t("legal.footer.terms")}
-          </LocalizedLink>
-          <LocalizedLink to="/refund" className="no-underline text-inherit transition hover:text-white">
-            {t("legal.footer.refund")}
-          </LocalizedLink>
-          <span>{t("legal.footer.copyright")}</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

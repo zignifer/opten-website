@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useT, useLang } from "../../i18n/LangContext";
-import LangSwitcher from "../components/LangSwitcher";
 import LocalizedLink from "../components/LocalizedLink";
+import SiteHeader from "../components/SiteHeader";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
 
 const SUPABASE_FUNCTIONS_URL = "https://vuywydhwkqmihfztpkgl.supabase.co/functions/v1";
@@ -203,31 +203,9 @@ export default function AccountPage() {
         }
       `}</style>
 
-      {/* ─── Navbar ─── */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-[8px]" : "py-[21px]"}`}>
-        <div className={`max-w-[1100px] mx-[8px] lg:mx-auto flex items-center justify-between rounded-[1000px] py-[8px] pl-[24px] pr-[8px] transition-all duration-300 ${scrolled ? "bg-[rgba(0,0,0,0.6)] backdrop-blur-[12px]" : "bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px]"}`}>
-          <div className="hidden md:flex flex-1 gap-[24px] items-center font-['PT_Root_UI',sans-serif] text-[14px] text-white">
-            <LocalizedLink to="/" className="hover:opacity-80 transition-opacity">{t("nav.home")}</LocalizedLink>
-            <LocalizedLink to="/pay" className="hover:opacity-80 transition-opacity">{t("nav.pricing")}</LocalizedLink>
-            <a href={homeHash} className="hover:opacity-80 transition-opacity">{t("nav.faq")}</a>
-            <LangSwitcher className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]" />
-          </div>
-          <Logo />
-          <div className="flex-1 flex justify-end ml-auto md:ml-0">
-            {email ? (
-              <div className="bg-[rgba(255,255,255,0.1)] flex gap-[8px] items-center justify-center p-[10px] px-[16px] rounded-[100px]">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 7a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM7 8.17c-2.53 0-4.17 1.11-4.17 2.5V12h8.34v-1.33c0-1.39-1.64-2.5-4.17-2.5z" fill="rgba(255,255,255,0.7)"/></svg>
-                <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.7)]">{email}</span>
-              </div>
-            ) : (
-              <LocalizedLink to="/account" className="btn-hover bg-white flex gap-[8px] items-center justify-center p-[12px] px-[20px] rounded-[100px] cursor-pointer border-none no-underline">
-                <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 7.5a3 3 0 100-6 3 3 0 000 6zM7.5 9C4.46 9 2 10.34 2 12v1.5h11V12c0-1.66-2.46-3-5.5-3z" fill="#181818"/></svg>
-                <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-[#181818] text-center whitespace-nowrap">{t("nav.account")}</span>
-              </LocalizedLink>
-            )}
-          </div>
-        </div>
-      </nav>
+      {/* Phase 5 follow-up: unified SiteHeader replaces bespoke navbar. Email is surfaced in
+          the page main column below; the header itself stays consistent across the site. */}
+      <SiteHeader variant="page" />
 
       {/* ─── Content ─── */}
       <section className="flex-1 pt-[140px] pb-[80px] px-[20px]">

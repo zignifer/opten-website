@@ -78,36 +78,38 @@ export default function SiteHeader({ variant = "page" }: SiteHeaderProps): JSX.E
   return (
     <header className="fixed left-0 right-0 top-0 z-50 px-4 pt-5">
       <nav className="mx-auto flex max-w-[1100px] items-center justify-between rounded-full bg-[rgba(0,0,0,0.34)] py-2 pl-2 pr-2 text-white backdrop-blur-md sm:pl-3">
-        <button
-          ref={buttonRef}
-          type="button"
-          aria-label={t("nav.menuToggle")}
-          aria-expanded={open}
-          aria-controls="site-header-menu"
-          onClick={() => setOpen((v) => !v)}
-          className="grid size-10 place-items-center rounded-full bg-white/5 transition hover:bg-white/10"
-        >
-          {open ? <X size={19} /> : <Menu size={19} />}
-        </button>
+        {/* Left cluster: hamburger + LangSwitcher */}
+        <div className="flex items-center gap-2">
+          <button
+            ref={buttonRef}
+            type="button"
+            aria-label={t("nav.menuToggle")}
+            aria-expanded={open}
+            aria-controls="site-header-menu"
+            onClick={() => setOpen((v) => !v)}
+            className="grid size-10 place-items-center rounded-full bg-white/5 transition hover:bg-white/10"
+          >
+            {open ? <X size={19} /> : <Menu size={19} />}
+          </button>
+          <LangSwitcher
+            className="font-['PT_Root_UI',sans-serif] text-[14px] text-white/55 transition hover:text-white bg-transparent border-none cursor-pointer px-2"
+            onSwitch={closeMenu}
+          />
+        </div>
 
         <LocalizedLink to="/" className="absolute left-1/2 -translate-x-1/2" onClick={closeMenu}>
           <Logo />
         </LocalizedLink>
 
-        <div className="flex items-center gap-2">
-          <LangSwitcher
-            className="font-['PT_Root_UI',sans-serif] text-[14px] text-white/55 transition hover:text-white bg-transparent border-none cursor-pointer px-2"
-            onSwitch={closeMenu}
-          />
-          <LocalizedLink
-            to="/account"
-            className="inline-flex h-[40px] items-center gap-2 rounded-full bg-white px-3 sm:px-4 font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 no-underline"
-            onClick={closeMenu}
-          >
-            <User size={16} fill="currentColor" />
-            <span className="hidden sm:inline">{t("nav.account")}</span>
-          </LocalizedLink>
-        </div>
+        {/* Right cluster: Account button */}
+        <LocalizedLink
+          to="/account"
+          className="inline-flex h-[40px] items-center gap-2 rounded-full bg-white px-3 sm:px-4 font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 no-underline"
+          onClick={closeMenu}
+        >
+          <User size={16} fill="currentColor" />
+          <span className="hidden sm:inline">{t("nav.account")}</span>
+        </LocalizedLink>
       </nav>
 
       {open && (

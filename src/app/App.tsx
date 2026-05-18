@@ -7,6 +7,8 @@ import {
 import LocalizedLink from "./components/LocalizedLink";
 import FaqBlock from "./components/FaqBlock";
 import SiteHeader from "./components/SiteHeader";
+import SiteFooter from "./components/SiteFooter";
+import InstallButton from "./components/InstallButton";
 import { landingFaq } from "../content/landingFaq";
 import OptenHeroAnimation from "./components/OptenHeroAnimation";
 import { Picture } from "./components/Picture";
@@ -80,32 +82,8 @@ function BrowserIcons({ size = "lg" }: { size?: "sm" | "lg" }) {
   );
 }
 
-function InstallButton({ compact = false, label }: { compact?: boolean; label?: string }) {
-  const t = useT();
-  return (
-    <a
-      href={STORE_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={cx(
-        "group inline-flex items-center justify-center rounded-full bg-white text-[#011417] shadow-[0_1px_0_rgba(255,255,255,0.2)_inset] transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(156,251,81,0.18)]",
-        compact ? "gap-2 px-3 py-2 text-[13px] font-bold" : "w-[calc(100vw-32px)] max-w-[390px] gap-2 px-[10px] py-[10px] pr-4 sm:w-auto sm:max-w-none sm:gap-3 sm:pr-6"
-      )}
-    >
-      <BrowserIcons size={compact ? "sm" : "lg"} />
-      <span className={cx("min-w-0 font-['PT_Root_UI',sans-serif] leading-[1.25]", compact && "whitespace-nowrap")}>
-        {compact ? (
-          label ?? t("hero.installBtn")
-        ) : (
-          <span className="flex flex-col text-left">
-            <span className="whitespace-nowrap text-[13px] font-normal sm:text-[14px]">{t("hero.installBtnSub")}</span>
-            <span className="whitespace-nowrap text-[17px] font-bold sm:text-[18px]">{label ?? t("hero.installBtn")}</span>
-          </span>
-        )}
-      </span>
-    </a>
-  );
-}
+// Phase 5 follow-up: InstallButton extracted to src/app/components/InstallButton.tsx
+// so SiteFooter (used on blog/account/other pages) can reuse it.
 
 // Phase 5 B-03: Navbar() removed — replaced by <SiteHeader /> shared with /blog pages.
 // Hamburger menu is now uniform across mobile and desktop; LangSwitcher + Account stay visible.
@@ -429,43 +407,7 @@ function PlanCard({ title, price, period, features, buttonText, dark = false }: 
   );
 }
 
-function Footer() {
-  const t = useT();
-  const { lang } = useLang();
-  return (
-    <footer className="relative overflow-hidden bg-[#011417] px-5 pb-8 pt-[70px] text-center md:pt-28">
-      <div aria-hidden="true" className="opten-footer-gradient" />
-      <div className="relative z-10 mx-auto max-w-[900px]">
-        <h2 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.12] text-white md:text-[60px]">
-          {lang === "ru" ? (
-            <>Хватит гадать. Генерируй<br /><Accent>с первой попытки.</Accent></>
-          ) : (
-            <>Stop Guessing. Generate<br /><Accent>On The First Try.</Accent></>
-          )}
-        </h2>
-        <p className="mt-8 font-['PT_Root_UI',sans-serif] text-[18px] text-white">{t("cta.subtitle")}</p>
-        <div className="mt-14 flex justify-center">
-          <InstallButton />
-        </div>
-        {/* Post-2026-05-17 GEO audit ME-1: definitional answer-block — names entity, lists supported
-            models + host sites + price in one paragraph so AI systems can cite verbatim. Placed in
-            footer (under final CTA) rather than under hero per user feedback 2026-05-17. */}
-        <p className="mx-auto mt-8 w-full max-w-[760px] font-['PT_Root_UI',sans-serif] text-[14px] leading-[1.6] text-white/55 md:text-[15px]">
-          {t("hero.definitional")}
-        </p>
-        <div className="mt-20 flex flex-wrap justify-center gap-x-5 gap-y-4 font-['PT_Root_UI',sans-serif] text-[16px] text-white/40 sm:gap-8">
-          {/* Phase 4.1 B-03: About link enabled for both locales (footer mirror). */}
-          <LocalizedLink to="/about" className="hover:text-white">{t("nav.about")}</LocalizedLink>
-          <LocalizedLink to="/privacy" className="hover:text-white">{t("footer.privacy")}</LocalizedLink>
-          <LocalizedLink to="/terms" className="hover:text-white">{t("footer.terms")}</LocalizedLink>
-          <LocalizedLink to="/refund" className="hover:text-white">{t("footer.refund")}</LocalizedLink>
-          <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="hover:text-white">{t("footer.contact")}</a>
-        </div>
-        <p className="mt-4 font-['PT_Root_UI',sans-serif] text-[16px] text-white/30">{t("footer.copyright")}</p>
-      </div>
-    </footer>
-  );
-}
+// Phase 5 follow-up: Footer() extracted to src/app/components/SiteFooter.tsx — shared across landing, blog, and content pages.
 
 function SectionTitle({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
@@ -503,7 +445,7 @@ export default function App() {
       <Pricing />
       {/* Phase 4 D-08 / GEO-D-3: landing FAQ block — schema in seo-routes.ts mirrors landingFaq[lang] (V-10). */}
       <FaqBlock items={landingFaq[lang]} />
-      <Footer />
+      <SiteFooter />
     </div>
   );
 }
