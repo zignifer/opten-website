@@ -16,6 +16,7 @@ export const EN_SIBLINGS = new Set<string>([
   "/about", // Phase 4.1 B-03: EN sibling added (was Phase 4 RU-only per D-01/D-02)
   "/guides/gpt-image-2", // Phase 4 D-06: anchor guide bilingual sibling (retired in B-07)
   "/blog", // Phase 5 B-04: blog listing
+  "/blog/gpt-image-2", // Phase 5 B-05: blog post (new canonical URL for gpt-image-2)
 ]);
 
 export const EN_LANDING = "/en/";

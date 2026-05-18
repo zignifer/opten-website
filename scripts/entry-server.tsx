@@ -15,6 +15,7 @@ import PayPage from "../src/app/pages/PayPage.tsx";
 import AboutPage from "../src/app/pages/AboutPage.tsx";
 import GuidePage from "../src/app/pages/GuidePage.tsx";
 import BlogListPage from "../src/app/pages/BlogListPage.tsx";
+import BlogPostPage from "../src/app/pages/BlogPostPage.tsx";
 import NotFound from "../src/app/pages/NotFound.tsx";
 import "../src/styles/index.css";
 import { LangProvider } from "../src/i18n/LangContext";
@@ -39,8 +40,9 @@ export function renderRoute(path: string): string {
             <Route path="/pay" element={<PayPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/guides/:slug" element={<GuidePage />} />
-            {/* Phase 5 B-04: /blog hub. /blog/:slug post page lands in B-05. */}
+            {/* Phase 5 B-04 + B-05: /blog hub and bilingual post page. */}
             <Route path="/blog" element={<BlogListPage />} />
+            <Route path="/blog/:slug" element={<BlogPostPage />} />
             {/* Phase 4 D-12: /pay AND /en/pay are SSR-mounted. Phase 4 D-06: /guides/:slug bilingual. Phase 4.1 B-03: /en/about now mounted (RU-only restriction lifted). /success /account /dashboard/* remain SPA-only — intentionally NOT mounted here. */}
             <Route path="/en/"        element={<App />} />
             <Route path="/en/welcome" element={<WelcomePage />} />
@@ -51,6 +53,7 @@ export function renderRoute(path: string): string {
             <Route path="/en/about"   element={<AboutPage />} />
             <Route path="/en/guides/:slug" element={<GuidePage />} />
             <Route path="/en/blog" element={<BlogListPage />} />
+            <Route path="/en/blog/:slug" element={<BlogPostPage />} />
             {/* Phase 4.2 / Wave 3 (P1-1): catch-all 404 mirrored for SSR parity (defense in depth — prerender.mjs only iterates seo-routes.ts entries, so NotFound is never SSR-rendered today; mirror prevents a future typo'd manifest entry from silently rendering empty). */}
             <Route path="*" element={<NotFound />} />
           </Routes>

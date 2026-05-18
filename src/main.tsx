@@ -11,6 +11,7 @@
   import AboutPage from "./app/pages/AboutPage.tsx";
   import GuidePage from "./app/pages/GuidePage.tsx";
   import BlogListPage from "./app/pages/BlogListPage.tsx";
+  import BlogPostPage from "./app/pages/BlogPostPage.tsx";
   import NotFound from "./app/pages/NotFound.tsx";
   import "./styles/index.css";
   import { LangProvider } from "./i18n/LangContext";
@@ -63,8 +64,9 @@
             <Route path="/welcome" element={<WelcomePage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/guides/:slug" element={<GuidePage />} />
-            {/* Phase 5 B-04: /blog hub. /blog/:slug post page lands in B-05. */}
+            {/* Phase 5 B-04 + B-05: /blog hub and bilingual post page. */}
             <Route path="/blog" element={<BlogListPage />} />
+            <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
             {/* Phase 3 D-01/D-03b: /en/* siblings. Mirror of entry-server.tsx EN routes + /en/pay (head-only, client-mount-only). __PRERENDER_PATH discriminator (lines 65-66) handles these unchanged — meta.path strings written by applyMarker include "/en/welcome" etc. Phase 4 D-06: /en/guides/:slug bilingual anchor. */}
             <Route path="/en/"        element={<App />} />
@@ -76,6 +78,7 @@
             <Route path="/en/about"   element={<AboutPage />} /> {/* Phase 4.1 B-03: EN sibling for /about */}
             <Route path="/en/guides/:slug" element={<GuidePage />} />
             <Route path="/en/blog" element={<BlogListPage />} />
+            <Route path="/en/blog/:slug" element={<BlogPostPage />} />
             {/* Phase 4.2 / Wave 3 (P1-1): catch-all 404. MUST be LAST — React Router 7 matches in declaration order, so any earlier `*` would shadow specific routes. NotFound injects <meta name="robots" content="noindex,nofollow"> at runtime to stop search engines from indexing typo'd URLs as duplicates of the landing. Status code stays 200 (Vercel SPA rewrite is unchanged; HTTP 404 is deferred to Phase 6 per CONTEXT D-3). */}
             <Route path="*" element={<NotFound />} />
           </Routes>

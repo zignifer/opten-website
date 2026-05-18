@@ -17,10 +17,10 @@ const { routes } = await import(pathToFileURL(MANIFEST_BUNDLE).href);
 
 const prerenderedRoutes = routes.filter((r) => r.prerender !== "none");
 
-// Floor check: Phase 5 B-04 added /blog + /en/blog → 18 prerendered routes.
-if (prerenderedRoutes.length < 18) {
+// Floor check: Phase 5 B-04 added /blog + /en/blog; B-05 added /blog/gpt-image-2 + /en/blog/gpt-image-2.
+if (prerenderedRoutes.length < 20) {
   throw new Error(
-    `llms.mjs: expected at least 18 prerendered routes (16 from Phase 4.1 + /blog + /en/blog from Phase 5 B-04), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
+    `llms.mjs: expected at least 20 prerendered routes (16 from Phase 4.1 + 2 blog hub + 2 blog post siblings from Phase 5 B-04/B-05), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
   );
 }
 

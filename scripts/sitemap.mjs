@@ -28,8 +28,8 @@ const { routes, SITE_ORIGIN } = await import(pathToFileURL(MANIFEST_BUNDLE).href
 
 const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 
-if (sitemapRoutes.length < 18) {
-  throw new Error(`sitemap.mjs: expected at least 18 routes (16 from Phase 4.1 + /blog + /en/blog from Phase 5 B-04), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+if (sitemapRoutes.length < 20) {
+  throw new Error(`sitemap.mjs: expected at least 20 routes (16 from Phase 4.1 + /blog + /en/blog + /blog/gpt-image-2 + /en/blog/gpt-image-2 from Phase 5 B-04/B-05), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 // Post-2026-05-17 GEO audit ME-12: per-route lastmod via git mtime of the source file driving
@@ -46,8 +46,10 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/guides/gpt-image-2":     "src/content/blog/gpt-image-2.ts",
   "/en/guides/gpt-image-2":  "src/content/blog/gpt-image-2.ts",
-  "/blog":                   "src/content/blog/index.ts",
-  "/en/blog":                "src/content/blog/index.ts",
+  "/blog":                       "src/content/blog/index.ts",
+  "/en/blog":                    "src/content/blog/index.ts",
+  "/blog/gpt-image-2":           "src/content/blog/gpt-image-2.ts",
+  "/en/blog/gpt-image-2":        "src/content/blog/gpt-image-2.ts",
   "/pay":                    "src/app/pages/PayPage.tsx",
   "/en/pay":                 "src/app/pages/PayPage.tsx",
   "/welcome":                "src/app/pages/WelcomePage.tsx",

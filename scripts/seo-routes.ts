@@ -711,7 +711,70 @@ export const routes: RouteMeta[] = [
     ],
   },
 
+  // Phase 5 B-05: /blog/gpt-image-2 — new canonical URL for the GPT Image 2 post.
+  // Coexists with the legacy /guides/gpt-image-2 entry below until B-07 (Vercel 301 redirect).
+  // Uses BlogPosting (more specific than the legacy entry's TechArticle) — Google's preferred
+  // schema for blog posts in Rich Results.
+  {
+    path: "/blog/gpt-image-2",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/gpt-image-2`,
+      en: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
+      xDefault: `${SITE_ORIGIN}/blog/gpt-image-2`,
+    },
+    title: gptImage2Guide.ru.title,
+    description: gptImage2Guide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/gpt-image-2`,
+    ogTitle: gptImage2Guide.ru.title,
+    ogDescription: gptImage2Guide.ru.excerpt,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/gpt-image-2`,
+        headline: gptImage2Guide.ru.title,
+        description: gptImage2Guide.ru.description,
+        datePublished: gptImage2Guide.ru.publishedAt,
+        dateModified: gptImage2Guide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: gptImage2Guide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${gptImage2Guide.ru.cover.src}`,
+          width: gptImage2Guide.ru.cover.width,
+          height: gptImage2Guide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/gpt-image-2`,
+        url: `${SITE_ORIGIN}/blog/gpt-image-2`,
+        name: gptImage2Guide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (gptImage2Guide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/gpt-image-2`,
+        gptImage2Guide.ru.title,
+      ),
+      faqPageBlock(gptImage2Guide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/gpt-image-2`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: gptImage2Guide.ru.title, url: `${SITE_ORIGIN}/blog/gpt-image-2` },
+        ],
+        `${SITE_ORIGIN}/blog/gpt-image-2`,
+      ),
+    ],
+  },
+
   // Phase 4 D-04 / D-06: anchor guide RU entry. EN sibling below in the EN section.
+  // Phase 5 B-05: retained for one commit alongside /blog/gpt-image-2 — retired in B-07.
   {
     path: "/guides/gpt-image-2",
     htmlLang: "ru",
@@ -1048,7 +1111,68 @@ export const routes: RouteMeta[] = [
     ],
   },
 
+  // Phase 5 B-05: /en/blog/gpt-image-2 EN sibling. Mirrors /blog/gpt-image-2.
+  {
+    path: "/en/blog/gpt-image-2",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/gpt-image-2`,
+      en: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
+      xDefault: `${SITE_ORIGIN}/blog/gpt-image-2`,
+    },
+    title: gptImage2Guide.en.title,
+    description: gptImage2Guide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
+    ogTitle: gptImage2Guide.en.title,
+    ogDescription: gptImage2Guide.en.excerpt,
+    ogImage: DEFAULT_OG_IMAGE_EN,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
+        headline: gptImage2Guide.en.title,
+        description: gptImage2Guide.en.description,
+        datePublished: gptImage2Guide.en.publishedAt,
+        dateModified: gptImage2Guide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: gptImage2Guide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${gptImage2Guide.en.cover.src}`,
+          width: gptImage2Guide.en.cover.width,
+          height: gptImage2Guide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
+        url: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
+        name: gptImage2Guide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (gptImage2Guide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/gpt-image-2`,
+        gptImage2Guide.en.title,
+      ),
+      faqPageBlock(gptImage2Guide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/gpt-image-2`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: gptImage2Guide.en.title, url: `${SITE_ORIGIN}/en/blog/gpt-image-2` },
+        ],
+        `${SITE_ORIGIN}/en/blog/gpt-image-2`,
+      ),
+    ],
+  },
+
   // Phase 4 D-06: anchor guide EN sibling.
+  // Phase 5 B-05: retained for one commit alongside /en/blog/gpt-image-2 — retired in B-07.
   {
     path: "/en/guides/gpt-image-2",
     htmlLang: "en",

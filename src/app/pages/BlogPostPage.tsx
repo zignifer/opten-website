@@ -1,0 +1,278 @@
+// Phase 5 B-05: blog post page (/blog/:slug + /en/blog/:slug).
+// Renamed from GuidePage.tsx — supports the new BlogPostLocale shape (body.intro +
+// optional sections / steps / faq). Uses <SiteHeader variant="page"> so the unified
+// hamburger menu (with Blog link) is consistent across the site.
+//
+// SEO-aligned DOM mirrors the JSON-LD emitted by scripts/seo-routes.ts:
+//   - <h1> + .blog-intro = WebPage.speakable.cssSelector
+//   - <time datetime=ISO> matches BlogPosting.datePublished/dateModified
+//   - "/blog" breadcrumb anchor is reflected in BreadcrumbList @id #breadcrumb
+//
+// SSR-safe: useParams + useLang resolve under StaticRouter.
+
+import { useParams } from "react-router";
+import { useT, useLang } from "../../i18n/LangContext";
+import LocalizedLink from "../components/LocalizedLink";
+import SiteHeader from "../components/SiteHeader";
+import BlogPostCard from "../components/BlogPostCard";
+import FaqBlock from "../components/FaqBlock";
+import { blogPostsBySlug, allBlogPosts, type BlogSlug } from "../../content/blog";
+import type { BlogTag } from "../../content/blog/types";
+
+function formatPostDate(iso: string, lang: "ru" | "en"): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const locale = lang === "ru" ? "ru-RU" : "en-US";
+  return d.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
+}
+
+function tagToKey(tag: BlogTag): string {
+  switch (tag) {
+    case "ai-image-gen":
+      return "aiImageGen";
+    case "ai-video-gen":
+      return "aiVideoGen";
+    case "prompt-engineering":
+      return "promptEngineering";
+    case "model-deep-dive":
+      return "modelDeepDive";
+    case "workflow":
+      return "workflow";
+    case "release-notes":
+      return "releaseNotes";
+  }
+}
+
+function NotFoundFallback() {
+  const t = useT();
+  return (
+    <div className="min-h-screen bg-[#011417] font-['PT_Root_UI',sans-serif] flex flex-col items-center justify-center px-[20px]">
+      <h1 className="text-white text-[28px] md:text-[32px] font-medium mb-[12px]">
+        {t("guide.notFound.title")}
+      </h1>
+      <p className="text-[rgba(255,255,255,0.6)] text-[16px] mb-[24px]">
+        {t("guide.notFound.body")}
+      </p>
+      <LocalizedLink
+        to="/blog"
+        className="rounded-[100px] bg-white px-[24px] py-[12px] text-[#011417] text-[14px] font-bold no-underline"
+      >
+        {t("blog.backToList")}
+      </LocalizedLink>
+    </div>
+  );
+}
+
+export default function BlogPostPage() {
+  const { slug } = useParams<{ slug: string }>();
+  const { lang } = useLang();
+  const t = useT();
+
+  const postEntry = slug ? blogPostsBySlug[slug as BlogSlug] : undefined;
+  const data = postEntry?.[lang];
+  if (!data) {
+    return <NotFoundFallback />;
+  }
+  const steps = data.body.steps ?? [];
+  const sections = data.body.sections ?? [];
+  const faq = data.body.faq ?? [];
+
+  const tagLabel = (tag: BlogTag): string => t(`blog.tag.${tagToKey(tag)}`);
+
+  // Related posts: explicit `related[]` if defined, else other recent posts.
+  const explicitRelated = (data.related ?? [])
+    .map((s) => allBlogPosts.find((b) => b.slug === s))
+    .filter((b): b is NonNullable<typeof b> => Boolean(b));
+  const fallbackRelated = allBlogPosts.filter((b) => b.slug !== data.slug).slice(0, 3);
+  const related = (explicitRelated.length ? explicitRelated : fallbackRelated).slice(0, 3);
+
+  return (
+    <div className="min-h-screen bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
+      <SiteHeader variant="page" />
+
+      <main className="mx-auto max-w-[800px] px-[20px] pb-[60px] pt-[120px] sm:pt-[140px]">
+        {/* Breadcrumb (visible mirror of JSON-LD BreadcrumbList) */}
+        <nav aria-label="Breadcrumb" className="mb-[24px] text-[13px] text-white/45">
+          <LocalizedLink to="/" className="no-underline text-inherit transition hover:text-white">
+            {t("nav.home")}
+          </LocalizedLink>
+          <span className="mx-[8px]">/</span>
+          <LocalizedLink to="/blog" className="no-underline text-inherit transition hover:text-white">
+            {t("nav.blog")}
+          </LocalizedLink>
+        </nav>
+
+        {/* Category badge */}
+        <span className="inline-flex w-fit items-center rounded-full bg-[rgba(156,251,81,0.15)] px-[10px] py-[3px] text-[11px] font-bold uppercase tracking-[1px] text-[#9cfb51]">
+          {t(`blog.category.${data.category === "deep-dive" ? "deepDive" : data.category}`)}
+        </span>
+
+        <h1 className="mt-[16px] font-['Unbounded',sans-serif] text-[28px] font-medium leading-[1.15] tracking-[-0.6px] text-white md:text-[40px]">
+          {data.title}
+        </h1>
+
+        {/* Byline + dates + reading time. Visible attribution for AI citation (HI-5 carryover). */}
+        <p className="mt-[16px] text-[14px] leading-[1.55] text-white/45">
+          <span className="text-white/70">{t("blog.byline")}</span>
+          {" · "}
+          <time dateTime={data.publishedAt}>{formatPostDate(data.publishedAt, lang)}</time>
+          {data.updatedAt !== data.publishedAt && (
+            <>
+              {" · "}
+              {t("blog.updatedLabel")}: <time dateTime={data.updatedAt}>{formatPostDate(data.updatedAt, lang)}</time>
+            </>
+          )}
+          {" · "}
+          {data.readingTimeMin} {t("blog.readingTime")}
+        </p>
+
+        {/* Cover image — 16:9, ≥1200px wide for Rich Results carousel */}
+        <figure className="mt-[28px] overflow-hidden rounded-[12px] border border-white/10 bg-[#0e2023]">
+          <img
+            src={data.cover.src}
+            alt={data.cover.alt}
+            width={data.cover.width}
+            height={data.cover.height}
+            loading="eager"
+            className="block h-auto w-full"
+          />
+        </figure>
+
+        {/* GEO citability: definitional answer-block in the first 40-60 words. */}
+        <p className="blog-intro mt-[32px] text-[17px] leading-[1.6] text-white/75 md:text-[18px]">
+          {data.body.intro}
+        </p>
+
+        {/* Optional ordered steps (HowTo source) */}
+        {steps.length > 0 && (
+          <ol className="mt-[40px] flex flex-col gap-[40px]">
+            {steps.map((step, i) => (
+              <li key={i} className="border-t border-white/10 pt-[28px]">
+                <div className="mb-[12px] flex items-baseline gap-[12px]">
+                  <span className="font-['Unbounded',sans-serif] text-[22px] font-bold leading-[1] text-[#9cfb51] md:text-[28px]">
+                    {i + 1}.
+                  </span>
+                  <h2 className="text-[20px] font-medium leading-[1.3] tracking-[-0.4px] text-white md:text-[24px]">
+                    {step.title}
+                  </h2>
+                </div>
+                <p className="mb-[16px] text-[16px] leading-[1.7] text-white/78">{step.body}</p>
+                {step.before && step.after && (
+                  <div className="mt-[16px] grid gap-[12px] md:grid-cols-2">
+                    <div className="rounded-[8px] border border-[rgba(212,24,61,0.2)] bg-[rgba(212,24,61,0.08)] p-[16px]">
+                      <p className="mb-[8px] text-[12px] font-bold uppercase tracking-[1px] text-[#d4183d]">
+                        {t("guide.beforeLabel")}
+                      </p>
+                      <pre className="whitespace-pre-wrap font-mono text-[13px] leading-[1.6] text-white/70">{step.before}</pre>
+                    </div>
+                    <div className="rounded-[8px] border border-[rgba(156,251,81,0.2)] bg-[rgba(156,251,81,0.06)] p-[16px]">
+                      <p className="mb-[8px] text-[12px] font-bold uppercase tracking-[1px] text-[#9cfb51]">
+                        {t("guide.afterLabel")}
+                      </p>
+                      <pre className="whitespace-pre-wrap font-mono text-[13px] leading-[1.6] text-white/85">{step.after}</pre>
+                    </div>
+                  </div>
+                )}
+                {step.imageSrc && (
+                  <img
+                    src={step.imageSrc}
+                    alt={step.title}
+                    loading="lazy"
+                    width="800"
+                    height="450"
+                    className="mt-[16px] w-full rounded-[8px] border border-white/10"
+                  />
+                )}
+              </li>
+            ))}
+          </ol>
+        )}
+
+        {/* Optional prose sections (essay-style posts) */}
+        {sections.length > 0 && (
+          <div className="mt-[40px] flex flex-col gap-[32px]">
+            {sections.map((sec, i) => (
+              <section key={i} className="border-t border-white/10 pt-[24px]">
+                <h2 className="mb-[12px] text-[22px] font-medium leading-[1.3] tracking-[-0.4px] text-white md:text-[24px]">
+                  {sec.heading}
+                </h2>
+                {sec.body.split("\n\n").map((paragraph, p) => (
+                  <p key={p} className="mb-[14px] text-[16px] leading-[1.7] text-white/78">
+                    {paragraph}
+                  </p>
+                ))}
+                {sec.image && (
+                  <img
+                    src={sec.image.src}
+                    alt={sec.image.alt}
+                    width={sec.image.width}
+                    height={sec.image.height}
+                    loading="lazy"
+                    className="mt-[12px] w-full rounded-[8px] border border-white/10"
+                  />
+                )}
+              </section>
+            ))}
+          </div>
+        )}
+
+        {/* Tags row at the article foot — visible mirror of BlogPosting.keywords */}
+        <div className="mt-[40px] flex flex-wrap items-center gap-[8px] border-t border-white/10 pt-[24px] text-[12px] text-white/55">
+          {data.tags.map((tag) => (
+            <LocalizedLink
+              key={tag}
+              to={`/blog?tag=${tag}`}
+              className="rounded-full border border-white/10 bg-white/5 px-[12px] py-[5px] text-inherit no-underline transition hover:bg-white/10 hover:text-white"
+            >
+              {tagLabel(tag)}
+            </LocalizedLink>
+          ))}
+        </div>
+      </main>
+
+      {/* FAQ — FaqBlock id preserved so verify-faq-mainentity.mjs regex (id="[^"]*faq[^"]*") matches */}
+      {faq.length > 0 && (
+        <FaqBlock items={faq} headingKey="blog.faqHeading" id="blog-faq" />
+      )}
+
+      {/* Related posts (or "Browse all" CTA when only this post exists) */}
+      <section className="mx-auto max-w-[1100px] px-[20px] pb-[48px]">
+        <h2 className="mb-[20px] font-['Unbounded',sans-serif] text-[22px] font-medium leading-[1.2] tracking-[-0.4px] text-white md:text-[28px]">
+          {t("blog.relatedHeading")}
+        </h2>
+        {related.length > 0 ? (
+          <div className="grid gap-[20px] sm:grid-cols-2 lg:grid-cols-3">
+            {related.map(({ slug: s, post }) => (
+              <BlogPostCard key={s} post={{ slug: s, ...post[lang] }} tagLabel={tagLabel} />
+            ))}
+          </div>
+        ) : (
+          <LocalizedLink
+            to="/blog"
+            className="inline-flex items-center gap-[8px] rounded-full border border-white/10 bg-white/5 px-[20px] py-[12px] text-[14px] text-white/85 no-underline transition hover:bg-white/10 hover:text-white"
+          >
+            {t("blog.viewAllPosts")} →
+          </LocalizedLink>
+        )}
+      </section>
+
+      <footer className="mx-auto max-w-[1100px] border-t border-white/10 px-[20px] py-[32px]">
+        <div className="flex flex-wrap gap-[24px] text-[13px] text-white/45">
+          <LocalizedLink to="/about" className="no-underline text-inherit transition hover:text-white">
+            {t("nav.about")}
+          </LocalizedLink>
+          <LocalizedLink to="/privacy" className="no-underline text-inherit transition hover:text-white">
+            {t("legal.footer.privacy")}
+          </LocalizedLink>
+          <LocalizedLink to="/terms" className="no-underline text-inherit transition hover:text-white">
+            {t("legal.footer.terms")}
+          </LocalizedLink>
+          <LocalizedLink to="/refund" className="no-underline text-inherit transition hover:text-white">
+            {t("legal.footer.refund")}
+          </LocalizedLink>
+          <span>{t("legal.footer.copyright")}</span>
+        </div>
+      </footer>
+    </div>
+  );
+}
