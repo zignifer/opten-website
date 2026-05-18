@@ -774,18 +774,21 @@ export const routes: RouteMeta[] = [
   },
 
   // Phase 4 D-04 / D-06: anchor guide RU entry. EN sibling below in the EN section.
-  // Phase 5 B-05: retained for one commit alongside /blog/gpt-image-2 — retired in B-07.
+  // Phase 5 B-06: canonical and hreflang now POINT FORWARD to /blog/gpt-image-2.
+  // The /guides/* URL still exists (prerendered file) but tells crawlers the real home is /blog/*.
+  // B-07 deletes this entry and adds the 301 redirect in vercel.json — for one commit, both
+  // URLs serve but search engines consolidate to the /blog canonical (forward-pointing pattern).
   {
     path: "/guides/gpt-image-2",
     htmlLang: "ru",
     hreflangAlternates: {
-      ru: `${SITE_ORIGIN}/guides/gpt-image-2`,
-      en: `${SITE_ORIGIN}/en/guides/gpt-image-2`,
-      xDefault: `${SITE_ORIGIN}/guides/gpt-image-2`,
+      ru: `${SITE_ORIGIN}/blog/gpt-image-2`,
+      en: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
+      xDefault: `${SITE_ORIGIN}/blog/gpt-image-2`,
     },
     title: gptImage2Guide.ru.title,
     description: "Структура промпта, шаблон Change/Preserve/Constraints, итерация вместо overload — 5 шагов от случайной генерации к точному результату в GPT Image 2.",
-    canonical: `${SITE_ORIGIN}/guides/gpt-image-2`,
+    canonical: `${SITE_ORIGIN}/blog/gpt-image-2`,
     ogTitle: gptImage2Guide.ru.title,
     ogDescription: "5 шагов + 5 FAQ-вопросов от автора Opten.",
     author: FOUNDER_NAME,
@@ -1172,18 +1175,19 @@ export const routes: RouteMeta[] = [
   },
 
   // Phase 4 D-06: anchor guide EN sibling.
-  // Phase 5 B-05: retained for one commit alongside /en/blog/gpt-image-2 — retired in B-07.
+  // Phase 5 B-06: canonical and hreflang now POINT FORWARD to /en/blog/gpt-image-2.
+  // See RU sibling above for the rationale (forward-pointing canonical pattern).
   {
     path: "/en/guides/gpt-image-2",
     htmlLang: "en",
     hreflangAlternates: {
-      ru: `${SITE_ORIGIN}/guides/gpt-image-2`,
-      en: `${SITE_ORIGIN}/en/guides/gpt-image-2`,
-      xDefault: `${SITE_ORIGIN}/guides/gpt-image-2`,
+      ru: `${SITE_ORIGIN}/blog/gpt-image-2`,
+      en: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
+      xDefault: `${SITE_ORIGIN}/blog/gpt-image-2`,
     },
     title: gptImage2Guide.en.title,
     description: "Structure, Change/Preserve/Constraints template, iterate-don't-overload — 5 steps from random output to precise GPT Image 2 results.",
-    canonical: `${SITE_ORIGIN}/en/guides/gpt-image-2`,
+    canonical: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
     ogTitle: gptImage2Guide.en.title,
     ogDescription: "5 steps + 5 FAQ items by the author of Opten.",
     ogImage: DEFAULT_OG_IMAGE_EN,
