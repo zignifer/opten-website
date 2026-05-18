@@ -1,15 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLang, useT } from "../i18n/LangContext";
 import {
   Check,
-  Menu,
   Rocket,
-  User,
-  X,
 } from "lucide-react";
-import LangSwitcher from "./components/LangSwitcher";
 import LocalizedLink from "./components/LocalizedLink";
 import FaqBlock from "./components/FaqBlock";
+import SiteHeader from "./components/SiteHeader";
 import { landingFaq } from "../content/landingFaq";
 import OptenHeroAnimation from "./components/OptenHeroAnimation";
 import { Picture } from "./components/Picture";
@@ -110,60 +107,8 @@ function InstallButton({ compact = false, label }: { compact?: boolean; label?: 
   );
 }
 
-function Navbar() {
-  const t = useT();
-  const [open, setOpen] = useState(false);
-
-  return (
-    <header className="fixed left-0 right-0 top-0 z-50 px-4 pt-5">
-      <nav className="mx-auto flex max-w-[1100px] items-center justify-between rounded-full bg-[rgba(0,0,0,0.34)] py-2 pl-5 pr-2 text-white backdrop-blur-md md:pl-6">
-        <button
-          type="button"
-          aria-label="Menu"
-          onClick={() => setOpen((value) => !value)}
-          className="grid size-10 place-items-center rounded-full bg-white/5 md:hidden"
-        >
-          {open ? <X size={19} /> : <Menu size={19} />}
-        </button>
-
-        <div className="hidden flex-1 items-center gap-6 font-['PT_Root_UI',sans-serif] text-[14px] md:flex">
-          <a href="#features" className="opacity-90 transition hover:opacity-100">{t("nav.features")}</a>
-          <a href="#pricing" className="opacity-90 transition hover:opacity-100">{t("nav.pricing")}</a>
-          <a href="#faq" className="opacity-90 transition hover:opacity-100">{t("nav.faq")}</a>
-          {/* Phase 4.1 B-03: /en/about now exists as a full EN sibling — link is shown in both locales.
-              LocalizedLink rewrites the href to /en/about when the user is on an /en/* URL. */}
-          <LocalizedLink to="/about" className="opacity-90 transition hover:opacity-100">{t("nav.about")}</LocalizedLink>
-          <LangSwitcher className="bg-transparent font-['PT_Root_UI',sans-serif] text-[14px] text-white/45 transition hover:text-white" />
-        </div>
-
-        <LocalizedLink to="/" className="absolute left-1/2 -translate-x-1/2">
-          <Logo />
-        </LocalizedLink>
-
-        <div className="flex flex-1 items-center justify-end gap-2">
-          <LocalizedLink
-            to="/account"
-            className="inline-flex h-[44px] items-center gap-2 rounded-full bg-white px-4 font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5"
-          >
-            <User size={16} fill="currentColor" />
-            <span className="hidden lg:inline">{t("nav.account")}</span>
-          </LocalizedLink>
-        </div>
-      </nav>
-
-      {open && (
-        <div className="mx-auto mt-2 flex max-w-[1100px] flex-col gap-4 rounded-[20px] border border-white/10 bg-[#071d1a] p-5 font-['PT_Root_UI',sans-serif] text-white shadow-2xl md:hidden">
-          <a href="#features" onClick={() => setOpen(false)}>{t("nav.features")}</a>
-          <a href="#pricing" onClick={() => setOpen(false)}>{t("nav.pricing")}</a>
-          <a href="#faq" onClick={() => setOpen(false)}>{t("nav.faq")}</a>
-          {/* Phase 4.1 B-03: About link enabled for both locales (mobile mirror). */}
-          <LocalizedLink to="/about" onClick={() => setOpen(false)}>{t("nav.about")}</LocalizedLink>
-          <LangSwitcher className="w-fit bg-transparent p-0 text-left text-white/60" onSwitch={() => setOpen(false)} />
-        </div>
-      )}
-    </header>
-  );
-}
+// Phase 5 B-03: Navbar() removed — replaced by <SiteHeader /> shared with /blog pages.
+// Hamburger menu is now uniform across mobile and desktop; LangSwitcher + Account stay visible.
 
 function Hero() {
   const t = useT();
@@ -549,7 +494,7 @@ export default function App() {
 
   return (
     <div className="w-full max-w-[100vw] overflow-x-hidden bg-[#011417] text-white">
-      <Navbar />
+      <SiteHeader variant="landing" />
       <Hero />
       <Partners />
       <Steps />

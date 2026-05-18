@@ -23,6 +23,8 @@
   "nav.faq": "FAQ",
   "nav.account": "My Account",
   "nav.home": "Home",
+  "nav.blog": "Blog",
+  "nav.menuToggle": "Open menu",
   "hero.badge": "Works with 60+ generation models",
   "hero.title": "Stop wasting credits on bad prompts",
   "hero.subtitle1": "Opten evaluates your prompt for the specific AI model, shows what's wrong, and fixes it in one click. ",
