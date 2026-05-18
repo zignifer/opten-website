@@ -1,0 +1,68 @@
+// Phase 5 B-01: blog content type — supersedes the Phase 4 GuideContent type.
+// Same shape as guides under the hood (steps + faq optional), with extras for the listing
+// surface: cover image, excerpt/description for cards & meta, tags + category for filtering,
+// readingTimeMin for the byline. Author is implicit — single-author site, uses FOUNDER_NAME
+// from scripts/seo-routes.ts:49 everywhere a byline renders.
+
+export type BlogTag =
+  | "ai-image-gen"
+  | "ai-video-gen"
+  | "prompt-engineering"
+  | "model-deep-dive"
+  | "workflow"
+  | "release-notes";
+
+export type BlogCategory = "guide" | "deep-dive" | "comparison" | "news";
+
+export interface BlogImage {
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+}
+
+export interface BlogFaqItem {
+  q: string;
+  a: string;
+}
+
+export interface BlogStep {
+  title: string;
+  body: string;
+  before?: string;
+  after?: string;
+  imageSrc?: string;
+}
+
+export interface BlogSection {
+  heading: string;
+  body: string;
+  image?: BlogImage;
+}
+
+export interface BlogPostBody {
+  intro: string;              // first 40-60 words = definitional answer-block (GEO citability)
+  sections?: BlogSection[];   // prose blocks (h2 + body)
+  steps?: BlogStep[];         // ordered list → HowTo schema source
+  faq?: BlogFaqItem[];        // → FAQPage schema source
+}
+
+export interface BlogPostLocale {
+  slug: string;
+  title: string;
+  excerpt: string;            // 140-180 chars (cards + meta description)
+  description: string;        // 150-160 chars (<meta name=description>)
+  category: BlogCategory;
+  tags: BlogTag[];            // 2-4 tags
+  cover: BlogImage;           // ≥1200px wide for Rich Results carousel; ideally 1600×900
+  readingTimeMin: number;
+  publishedAt: string;        // ISO yyyy-mm-dd
+  updatedAt: string;
+  body: BlogPostBody;
+  related?: string[];         // slugs (max 3)
+}
+
+export interface BlogPost {
+  ru: BlogPostLocale;
+  en: BlogPostLocale;
+}

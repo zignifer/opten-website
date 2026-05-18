@@ -2,8 +2,10 @@
 // SYNC: title/description strings duplicated from src/i18n/ru.json — keep both in step until Phase 3 introduces a unified i18n→manifest pipeline.
 
 // Phase 4 D-06 / D-08 / V-10: imports from src/content for HowTo + FAQ schema sources.
+// Phase 5 B-01: gptImage2 guide relocated to src/content/blog/ — body shape now wraps
+// intro/steps/faq under `body: { ... }`. URL still /guides/gpt-image-2 until B-07.
 // This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
-import { guide as gptImage2Guide } from "../src/content/guides/gpt-image-2";
+import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
 import { landingFaq } from "../src/content/landingFaq";
 
 // Phase 3 D-01/D-02: cluster pairs (reciprocal hreflang per RESEARCH.md Pitfall 5):
@@ -603,11 +605,11 @@ export const routes: RouteMeta[] = [
         cssSelector: ["h1", ".guide-intro", "h2"],
       }),
       howToBlock(
-        gptImage2Guide.ru.steps.map((s) => ({ title: s.title, body: s.body })),
+        (gptImage2Guide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
         `${SITE_ORIGIN}/guides/gpt-image-2`,
         gptImage2Guide.ru.title,
       ),
-      faqPageBlock(gptImage2Guide.ru.faq, `${SITE_ORIGIN}/guides/gpt-image-2`),
+      faqPageBlock(gptImage2Guide.ru.body.faq ?? [], `${SITE_ORIGIN}/guides/gpt-image-2`),
       // Phase 04.1 WR-03: collapsed 3-level breadcrumb (root → /guides index → article) to 2 levels
       // (root → article). The /guides index page does not exist — linking to it produces a soft-404.
       // Revisit when a second guide is added (one-guide index has poor UX, not worth shipping now).
@@ -887,11 +889,11 @@ export const routes: RouteMeta[] = [
         cssSelector: ["h1", ".guide-intro", "h2"],
       }),
       howToBlock(
-        gptImage2Guide.en.steps.map((s) => ({ title: s.title, body: s.body })),
+        (gptImage2Guide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
         `${SITE_ORIGIN}/en/guides/gpt-image-2`,
         gptImage2Guide.en.title,
       ),
-      faqPageBlock(gptImage2Guide.en.faq, `${SITE_ORIGIN}/en/guides/gpt-image-2`),
+      faqPageBlock(gptImage2Guide.en.body.faq ?? [], `${SITE_ORIGIN}/en/guides/gpt-image-2`),
       // Phase 04.1 WR-03: collapsed 3-level breadcrumb (root → /en/guides index → article) to 2 levels
       // (root → article). The /en/guides index page does not exist — linking to it produces a soft-404.
       breadcrumbBlock(

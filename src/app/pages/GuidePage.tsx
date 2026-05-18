@@ -7,7 +7,8 @@ import { useT, useLang } from "../../i18n/LangContext";
 import LocalizedLink from "../components/LocalizedLink";
 import LangSwitcher from "../components/LangSwitcher";
 import FaqBlock from "../components/FaqBlock";
-import { guidesBySlug, type GuideSlug } from "../../content/guides";
+// Phase 5 B-01: content moved to src/content/blog/; URL still /guides/:slug until B-07.
+import { blogPostsBySlug, type BlogSlug } from "../../content/blog";
 
 // Post-2026-05-17 GEO audit HI-5: visible date block. AI/crawler reads "Опубликовано: 17 мая 2026"
 // directly + the machine-readable <time datetime=ISO> attribute.
@@ -40,11 +41,13 @@ export default function GuidePage() {
   const { lang } = useLang();
   const t = useT();
 
-  const guideEntry = slug ? guidesBySlug[slug as GuideSlug] : undefined;
+  const guideEntry = slug ? blogPostsBySlug[slug as BlogSlug] : undefined;
   const data = guideEntry?.[lang];
   if (!data) {
     return <NotFoundFallback />;
   }
+  const steps = data.body.steps ?? [];
+  const faq = data.body.faq ?? [];
 
   return (
     <div className="min-h-screen bg-black font-['PT_Root_UI',sans-serif]">
@@ -79,11 +82,11 @@ export default function GuidePage() {
           )}
         </p>
         <p className="guide-intro text-[rgba(255,255,255,0.7)] text-[17px] md:text-[18px] leading-[1.6] mb-[40px]">
-          {data.intro}
+          {data.body.intro}
         </p>
 
         <ol className="guide-steps flex flex-col gap-[40px]">
-          {data.steps.map((step, i) => (
+          {steps.map((step, i) => (
             <li key={i} className="border-t border-[rgba(255,255,255,0.08)] pt-[28px]">
               <div className="flex items-baseline gap-[12px] mb-[12px]">
                 <span className="font-['Unbounded',sans-serif] text-[22px] md:text-[28px] font-bold text-[#9cfb51] leading-[1]">
@@ -127,7 +130,7 @@ export default function GuidePage() {
         </ol>
       </main>
 
-      <FaqBlock items={data.faq} headingKey="guide.faqHeading" id="guide-faq" />
+      <FaqBlock items={faq} headingKey="guide.faqHeading" id="guide-faq" />
 
       {/* Footer chrome (mirrors LegalLayout) */}
       <footer className="max-w-[800px] mx-auto px-[20px] py-[32px] border-t border-[rgba(255,255,255,0.1)]">

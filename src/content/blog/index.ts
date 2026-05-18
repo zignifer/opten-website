@@ -1,0 +1,19 @@
+// Phase 5 B-01: blog barrel. Single source of truth for blog post slugs.
+// Append new posts here; src/app/pages/BlogListPage.tsx + scripts/seo-routes.ts
+// + src/i18n/paths.ts + scripts/sitemap.mjs PATH_TO_SOURCE must stay in sync.
+
+import { post as gptImage2 } from "./gpt-image-2";
+import type { BlogPost } from "./types";
+
+export const blogPostsBySlug = {
+  "gpt-image-2": gptImage2,
+} as const;
+
+export type BlogSlug = keyof typeof blogPostsBySlug;
+
+// Sorted newest-first by RU publishedAt (RU/EN dates are kept in sync per locale-parity policy).
+export const allBlogPosts: { slug: BlogSlug; post: BlogPost }[] = (Object.keys(blogPostsBySlug) as BlogSlug[])
+  .map((slug) => ({ slug, post: blogPostsBySlug[slug] }))
+  .sort((a, b) => b.post.ru.publishedAt.localeCompare(a.post.ru.publishedAt));
+
+export type { BlogPost } from "./types";
