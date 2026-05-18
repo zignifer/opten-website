@@ -773,67 +773,8 @@ export const routes: RouteMeta[] = [
     ],
   },
 
-  // Phase 4 D-04 / D-06: anchor guide RU entry. EN sibling below in the EN section.
-  // Phase 5 B-06: canonical and hreflang now POINT FORWARD to /blog/gpt-image-2.
-  // The /guides/* URL still exists (prerendered file) but tells crawlers the real home is /blog/*.
-  // B-07 deletes this entry and adds the 301 redirect in vercel.json — for one commit, both
-  // URLs serve but search engines consolidate to the /blog canonical (forward-pointing pattern).
-  {
-    path: "/guides/gpt-image-2",
-    htmlLang: "ru",
-    hreflangAlternates: {
-      ru: `${SITE_ORIGIN}/blog/gpt-image-2`,
-      en: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
-      xDefault: `${SITE_ORIGIN}/blog/gpt-image-2`,
-    },
-    title: gptImage2Guide.ru.title,
-    description: "Структура промпта, шаблон Change/Preserve/Constraints, итерация вместо overload — 5 шагов от случайной генерации к точному результату в GPT Image 2.",
-    canonical: `${SITE_ORIGIN}/blog/gpt-image-2`,
-    ogTitle: gptImage2Guide.ru.title,
-    ogDescription: "5 шагов + 5 FAQ-вопросов от автора Opten.",
-    author: FOUNDER_NAME,
-    prerender: "full",
-    changefreq: "monthly",
-    priority: 0.7,
-    // Post-2026-05-17 audit HI-4/HI-5/ME-4: +TechArticle (author/datePublished/dateModified attribution
-    // for AI), +WebPage with speakable on H1 + intro + section headings.
-    schema: [
-      ORG_BLOCK,
-      articleBlock({
-        pageId: `${SITE_ORIGIN}/guides/gpt-image-2`,
-        type: "TechArticle",
-        headline: gptImage2Guide.ru.title,
-        description: "Структура промпта, шаблон Change/Preserve/Constraints, итерация вместо overload — 5 шагов от случайной генерации к точному результату в GPT Image 2.",
-        datePublished: gptImage2Guide.ru.publishedAt,
-        dateModified: gptImage2Guide.ru.updatedAt,
-        inLanguage: "ru-RU",
-        articleSection: "AI prompt engineering",
-      }),
-      webPageBlock({
-        pageId: `${SITE_ORIGIN}/guides/gpt-image-2`,
-        url: `${SITE_ORIGIN}/guides/gpt-image-2`,
-        name: gptImage2Guide.ru.title,
-        inLanguage: "ru-RU",
-        cssSelector: ["h1", ".guide-intro", "h2"],
-      }),
-      howToBlock(
-        (gptImage2Guide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
-        `${SITE_ORIGIN}/guides/gpt-image-2`,
-        gptImage2Guide.ru.title,
-      ),
-      faqPageBlock(gptImage2Guide.ru.body.faq ?? [], `${SITE_ORIGIN}/guides/gpt-image-2`),
-      // Phase 04.1 WR-03: collapsed 3-level breadcrumb (root → /guides index → article) to 2 levels
-      // (root → article). The /guides index page does not exist — linking to it produces a soft-404.
-      // Revisit when a second guide is added (one-guide index has poor UX, not worth shipping now).
-      breadcrumbBlock(
-        [
-          { name: "Главная", url: `${SITE_ORIGIN}/` },
-          { name: gptImage2Guide.ru.title, url: `${SITE_ORIGIN}/guides/gpt-image-2` },
-        ],
-        `${SITE_ORIGIN}/guides/gpt-image-2`,
-      ),
-    ],
-  },
+  // Phase 5 B-07: legacy /guides/gpt-image-2 RU entry removed; redirected to /blog/gpt-image-2
+  // via vercel.json. articleBlock import retained — still used by /about entries.
 
   // Phase 3 D-04: EN siblings (6 entries). EN ogImage = DEFAULT_OG_IMAGE_EN. SYNC: title/description duplicated from src/i18n/en.json — see line 2 SYNC policy.
   {
@@ -1174,61 +1115,6 @@ export const routes: RouteMeta[] = [
     ],
   },
 
-  // Phase 4 D-06: anchor guide EN sibling.
-  // Phase 5 B-06: canonical and hreflang now POINT FORWARD to /en/blog/gpt-image-2.
-  // See RU sibling above for the rationale (forward-pointing canonical pattern).
-  {
-    path: "/en/guides/gpt-image-2",
-    htmlLang: "en",
-    hreflangAlternates: {
-      ru: `${SITE_ORIGIN}/blog/gpt-image-2`,
-      en: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
-      xDefault: `${SITE_ORIGIN}/blog/gpt-image-2`,
-    },
-    title: gptImage2Guide.en.title,
-    description: "Structure, Change/Preserve/Constraints template, iterate-don't-overload — 5 steps from random output to precise GPT Image 2 results.",
-    canonical: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
-    ogTitle: gptImage2Guide.en.title,
-    ogDescription: "5 steps + 5 FAQ items by the author of Opten.",
-    ogImage: DEFAULT_OG_IMAGE_EN,
-    author: FOUNDER_NAME,
-    prerender: "full",
-    changefreq: "monthly",
-    priority: 0.7,
-    schema: [
-      ORG_BLOCK,
-      articleBlock({
-        pageId: `${SITE_ORIGIN}/en/guides/gpt-image-2`,
-        type: "TechArticle",
-        headline: gptImage2Guide.en.title,
-        description: "Structure, Change/Preserve/Constraints template, iterate-don't-overload — 5 steps from random output to precise GPT Image 2 results.",
-        datePublished: gptImage2Guide.en.publishedAt,
-        dateModified: gptImage2Guide.en.updatedAt,
-        inLanguage: "en-US",
-        articleSection: "AI prompt engineering",
-      }),
-      webPageBlock({
-        pageId: `${SITE_ORIGIN}/en/guides/gpt-image-2`,
-        url: `${SITE_ORIGIN}/en/guides/gpt-image-2`,
-        name: gptImage2Guide.en.title,
-        inLanguage: "en-US",
-        cssSelector: ["h1", ".guide-intro", "h2"],
-      }),
-      howToBlock(
-        (gptImage2Guide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
-        `${SITE_ORIGIN}/en/guides/gpt-image-2`,
-        gptImage2Guide.en.title,
-      ),
-      faqPageBlock(gptImage2Guide.en.body.faq ?? [], `${SITE_ORIGIN}/en/guides/gpt-image-2`),
-      // Phase 04.1 WR-03: collapsed 3-level breadcrumb (root → /en/guides index → article) to 2 levels
-      // (root → article). The /en/guides index page does not exist — linking to it produces a soft-404.
-      breadcrumbBlock(
-        [
-          { name: "Home", url: `${SITE_ORIGIN}/en/` },
-          { name: gptImage2Guide.en.title, url: `${SITE_ORIGIN}/en/guides/gpt-image-2` },
-        ],
-        `${SITE_ORIGIN}/en/guides/gpt-image-2`,
-      ),
-    ],
-  },
+  // Phase 5 B-07: legacy /en/guides/gpt-image-2 EN entry removed; redirected to /en/blog/gpt-image-2
+  // via vercel.json.
 ];

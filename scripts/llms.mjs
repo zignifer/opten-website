@@ -17,10 +17,10 @@ const { routes } = await import(pathToFileURL(MANIFEST_BUNDLE).href);
 
 const prerenderedRoutes = routes.filter((r) => r.prerender !== "none");
 
-// Floor check: Phase 5 B-04 added /blog + /en/blog; B-05 added /blog/gpt-image-2 + /en/blog/gpt-image-2.
-if (prerenderedRoutes.length < 20) {
+// Floor check: Phase 5 B-07 retired /guides/* (-2) → 18 prerendered routes (14 baseline + /about siblings + 4 blog).
+if (prerenderedRoutes.length < 18) {
   throw new Error(
-    `llms.mjs: expected at least 20 prerendered routes (16 from Phase 4.1 + 2 blog hub + 2 blog post siblings from Phase 5 B-04/B-05), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
+    `llms.mjs: expected at least 18 prerendered routes (14 baseline + /about siblings + 4 blog after Phase 5 B-07), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
   );
 }
 
@@ -35,8 +35,8 @@ const SECTIONS = [
   // Post-2026-05-17 GEO audit HI-1: both RU and EN /about belong under one heading.
   // Previously only "/about" matched here, so "/en/about" silently fell through to "Other".
   { name: "About", match: (p) => p === "/about" || p === "/en/about" },
-  { name: "Guides", match: (p) => /^\/(en\/)?guides\//.test(p) },
-  // Phase 5 B-04: blog hub (/blog + /en/blog) and posts (/blog/:slug + /en/blog/:slug).
+  // Phase 5 B-04 + B-07: blog hub (/blog + /en/blog) and posts (/blog/:slug + /en/blog/:slug).
+  // Guides matcher removed in B-07 — /guides/* URLs retired in favor of /blog/* (301 redirect).
   { name: "Blog", match: (p) => /^\/(en\/)?blog(\/|$)/.test(p) },
   {
     name: "Legal",

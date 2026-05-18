@@ -9,7 +9,7 @@
   import WelcomePage from "./app/pages/WelcomePage.tsx";
   import PayPage from "./app/pages/PayPage.tsx";
   import AboutPage from "./app/pages/AboutPage.tsx";
-  import GuidePage from "./app/pages/GuidePage.tsx";
+  // Phase 5 B-07: GuidePage retired — /guides/* redirects to /blog/* via vercel.json.
   import BlogListPage from "./app/pages/BlogListPage.tsx";
   import BlogPostPage from "./app/pages/BlogPostPage.tsx";
   import NotFound from "./app/pages/NotFound.tsx";
@@ -63,8 +63,7 @@
             <Route path="/account" element={<AccountPage />} />
             <Route path="/welcome" element={<WelcomePage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/guides/:slug" element={<GuidePage />} />
-            {/* Phase 5 B-04 + B-05: /blog hub and bilingual post page. */}
+            {/* Phase 5 B-04 + B-05: /blog hub and bilingual post page. /guides/* retired in B-07. */}
             <Route path="/blog" element={<BlogListPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
@@ -76,7 +75,6 @@
             <Route path="/en/terms"   element={<TermsPage />} />
             <Route path="/en/refund"  element={<RefundPage />} />
             <Route path="/en/about"   element={<AboutPage />} /> {/* Phase 4.1 B-03: EN sibling for /about */}
-            <Route path="/en/guides/:slug" element={<GuidePage />} />
             <Route path="/en/blog" element={<BlogListPage />} />
             <Route path="/en/blog/:slug" element={<BlogPostPage />} />
             {/* Phase 4.2 / Wave 3 (P1-1): catch-all 404. MUST be LAST — React Router 7 matches in declaration order, so any earlier `*` would shadow specific routes. NotFound injects <meta name="robots" content="noindex,nofollow"> at runtime to stop search engines from indexing typo'd URLs as duplicates of the landing. Status code stays 200 (Vercel SPA rewrite is unchanged; HTTP 404 is deferred to Phase 6 per CONTEXT D-3). */}

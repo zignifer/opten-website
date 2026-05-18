@@ -1,4 +1,10 @@
 {
+  "redirects": [
+    { "source": "/guides/gpt-image-2",    "destination": "/blog/gpt-image-2",    "permanent": true },
+    { "source": "/en/guides/gpt-image-2", "destination": "/en/blog/gpt-image-2", "permanent": true },
+    { "source": "/guides",                "destination": "/blog",                "permanent": true },
+    { "source": "/en/guides",             "destination": "/en/blog",             "permanent": true }
+  ],
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
