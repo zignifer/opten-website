@@ -191,9 +191,12 @@ export default function AccountPage() {
 
 
   return (
-    <div className="w-full min-h-screen bg-black flex flex-col font-['PT_Root_UI',sans-serif]">
+    <div className="account-page w-full min-h-screen bg-black flex flex-col font-['PT_Root_UI',sans-serif]">
       <style>{`
-        a { text-decoration: none; color: inherit; }
+        /* Phase 5 follow-up: scoped to .account-page so the bare 'a { color: inherit }' rule
+           below doesn't bleed into <SiteHeader>'s Account button (whose Tailwind text-[#011417]
+           was being overridden to white-on-white, making the button look empty on /account). */
+        .account-page > section a { text-decoration: none; color: inherit; }
         .btn-hover {
           transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
@@ -203,9 +206,21 @@ export default function AccountPage() {
         }
       `}</style>
 
-      {/* Phase 5 follow-up: unified SiteHeader replaces bespoke navbar. Email is surfaced in
-          the page main column below; the header itself stays consistent across the site. */}
-      <SiteHeader variant="page" />
+      {/* Phase 5 follow-up: unified SiteHeader. When the user is signed in, the right cluster
+          of the header surfaces an email pill (matching the pre-refactor bespoke navbar) so
+          the user sees which account they're managing without scrolling. Falls back to the
+          default Account button when no email is available. */}
+      <SiteHeader
+        variant="page"
+        rightSlot={email ? (
+          <div className="inline-flex h-[40px] items-center gap-[8px] rounded-full bg-[rgba(255,255,255,0.1)] px-[16px] font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.7)]">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M7 7a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM7 8.17c-2.53 0-4.17 1.11-4.17 2.5V12h8.34v-1.33c0-1.39-1.64-2.5-4.17-2.5z" fill="rgba(255,255,255,0.7)" />
+            </svg>
+            <span className="hidden sm:inline">{email}</span>
+          </div>
+        ) : undefined}
+      />
 
       {/* ─── Content ─── */}
       <section className="flex-1 pt-[140px] pb-[80px] px-[20px]">
@@ -214,17 +229,6 @@ export default function AccountPage() {
           <h1 className="text-white text-[32px] md:text-[40px] font-medium leading-[1.1] tracking-[-0.8px] text-center">
             {t("account.title")}
           </h1>
-
-          {/* Signed-in account email (codex review P3). Visible identity check before billing
-              actions — replaces the email pill that used to live in the bespoke navbar. */}
-          {email && (
-            <div className="mx-auto flex items-center gap-[10px] rounded-full bg-white/8 px-[16px] py-[8px] text-[14px] text-white/85">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M8 8a3 3 0 100-6 3 3 0 000 6zM8 9.5c-3 0-5 1.34-5 3V14h10v-1.5c0-1.66-2-3-5-3z" fill="rgba(255,255,255,0.7)" />
-              </svg>
-              <span className="font-['PT_Root_UI',sans-serif] break-all">{email}</span>
-            </div>
-          )}
 
           {/* Extension status */}
           {extStatus === "detecting" && (

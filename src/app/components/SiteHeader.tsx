@@ -21,6 +21,9 @@ import { useT, useLang } from "../../i18n/LangContext";
 
 interface SiteHeaderProps {
   variant?: "landing" | "page";
+  /** Optional override for the right cluster. Defaults to the Account button.
+   *  Use to surface page-specific identity affordances (e.g. signed-in email pill on /account). */
+  rightSlot?: React.ReactNode;
 }
 
 function Logo() {
@@ -36,7 +39,7 @@ function Logo() {
   );
 }
 
-export default function SiteHeader({ variant = "page" }: SiteHeaderProps): JSX.Element {
+export default function SiteHeader({ variant = "page", rightSlot }: SiteHeaderProps): JSX.Element {
   const t = useT();
   const { lang } = useLang();
   const [open, setOpen] = useState(false);
@@ -101,15 +104,18 @@ export default function SiteHeader({ variant = "page" }: SiteHeaderProps): JSX.E
           <Logo />
         </LocalizedLink>
 
-        {/* Right cluster: Account button */}
-        <LocalizedLink
-          to="/account"
-          className="inline-flex h-[40px] items-center gap-2 rounded-full bg-white px-3 sm:px-4 font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 no-underline"
-          onClick={closeMenu}
-        >
-          <User size={16} fill="currentColor" />
-          <span className="hidden sm:inline">{t("nav.account")}</span>
-        </LocalizedLink>
+        {/* Right cluster: Account button by default; pages can override via `rightSlot`
+            (e.g. /account swaps in an email pill when the user is signed in). */}
+        {rightSlot ?? (
+          <LocalizedLink
+            to="/account"
+            className="inline-flex h-[40px] items-center gap-2 rounded-full bg-white px-3 sm:px-4 font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 no-underline"
+            onClick={closeMenu}
+          >
+            <User size={16} fill="currentColor" />
+            <span className="hidden sm:inline">{t("nav.account")}</span>
+          </LocalizedLink>
+        )}
       </nav>
 
       {open && (
