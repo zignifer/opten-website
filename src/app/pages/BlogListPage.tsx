@@ -133,12 +133,23 @@ export default function BlogListPage() {
     <div className="min-h-screen bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
       <SiteHeader variant="page" />
 
-      {/* Hero — centered title + intro. Mirrors the landing Hero section structure:
-          overflow-hidden + bg-[#011417] so the .opten-figma-gradient blob (which sits at
-          top:-640px, blur 285px) is clipped to the section background without producing
-          the harsh horizontal cut we had when the gradient leaked past a short section. */}
-      <section className="relative overflow-hidden bg-[#011417] px-5 pb-16 pt-[131px] md:min-h-[460px] md:pb-20 md:pt-[190px]">
-        <div aria-hidden="true" className="opten-figma-gradient" />
+      {/* Hero — centered title + intro. Mirrors the landing Hero section structure but with
+          mask-image on the gradient layer: the landing Hero is 850px tall and the gradient
+          fades naturally inside that height; the blog hero is much shorter, so without a mask
+          the .opten-figma-gradient blob (top:-640px, blur 285px) hits the section's bottom
+          edge with full opacity and produces a hard horizontal seam. The mask gradient
+          (black-to-transparent over the last ~30% of the section) blends it into the page bg. */}
+      <section className="relative overflow-hidden bg-[#011417] px-5 pb-16 pt-[131px] md:min-h-[520px] md:pb-20 md:pt-[190px]">
+        <div
+          aria-hidden="true"
+          className="opten-figma-gradient"
+          style={{
+            WebkitMaskImage:
+              "linear-gradient(to bottom, black 0%, black 65%, transparent 100%)",
+            maskImage:
+              "linear-gradient(to bottom, black 0%, black 65%, transparent 100%)",
+          }}
+        />
         <div className="relative z-10 mx-auto max-w-[800px] text-center">
           <h1 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] tracking-[-0.6px] text-white sm:text-[44px] md:text-[52px]">
             {t("blog.heading")}
