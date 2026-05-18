@@ -17,10 +17,10 @@ const { routes } = await import(pathToFileURL(MANIFEST_BUNDLE).href);
 
 const prerenderedRoutes = routes.filter((r) => r.prerender !== "none");
 
-// Floor check: after Phase 4.1 expected count is 16 (12 baseline + /about per 04-05 + 2 guide siblings per 04-06 + /en/about per 04.1 B-03).
-if (prerenderedRoutes.length < 16) {
+// Floor check: Phase 5 B-04 added /blog + /en/blog → 18 prerendered routes.
+if (prerenderedRoutes.length < 18) {
   throw new Error(
-    `llms.mjs: expected at least 16 prerendered routes (12 baseline + /about (04-05) + 2 guide siblings (04-06) + /en/about (04.1 B-03)), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
+    `llms.mjs: expected at least 18 prerendered routes (16 from Phase 4.1 + /blog + /en/blog from Phase 5 B-04), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
   );
 }
 
@@ -36,6 +36,8 @@ const SECTIONS = [
   // Previously only "/about" matched here, so "/en/about" silently fell through to "Other".
   { name: "About", match: (p) => p === "/about" || p === "/en/about" },
   { name: "Guides", match: (p) => /^\/(en\/)?guides\//.test(p) },
+  // Phase 5 B-04: blog hub (/blog + /en/blog) and posts (/blog/:slug + /en/blog/:slug).
+  { name: "Blog", match: (p) => /^\/(en\/)?blog(\/|$)/.test(p) },
   {
     name: "Legal",
     match: (p) => /^\/(en\/)?(privacy|terms|refund)$/.test(p),

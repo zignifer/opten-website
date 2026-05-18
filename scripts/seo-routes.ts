@@ -657,6 +657,60 @@ export const routes: RouteMeta[] = [
     ],
   },
 
+  // Phase 5 B-04: /blog hub. Empty ItemList for now — gets populated when /blog/:slug posts are
+  // added in B-05. Listing page only emits CollectionPage + ItemList + WebPage + BreadcrumbList.
+  {
+    path: "/blog",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog`,
+      en: `${SITE_ORIGIN}/en/blog`,
+      xDefault: `${SITE_ORIGIN}/blog`,
+    },
+    title: "Блог Opten — гайды по AI-генерации изображений и видео",
+    description: "Гайды по AI-генерации, разборы моделей и заметки о промпт-инжиниринге. Без воды, на примерах. Бесплатно, на русском и английском.",
+    canonical: `${SITE_ORIGIN}/blog`,
+    ogTitle: "Блог Opten",
+    ogDescription: "Гайды по AI-генерации изображений и видео, разборы моделей и заметки о промпт-инжиниринге.",
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "weekly",
+    priority: 0.8,
+    schema: [
+      ORG_BLOCK,
+      WEBSITE_BLOCK,
+      collectionPageBlock({
+        pageId: `${SITE_ORIGIN}/blog`,
+        url: `${SITE_ORIGIN}/blog`,
+        name: "Блог Opten",
+        description: "Гайды по AI-генерации, разборы моделей и заметки о промпт-инжиниринге.",
+        inLanguage: "ru-RU",
+      }),
+      itemListBlock(
+        [
+          // Phase 5 B-04: gpt-image-2 still lives at /guides/gpt-image-2 (URL flip in B-07).
+          // The ItemList ref must match the canonical URL or Rich Results flags it as broken.
+          { url: `${SITE_ORIGIN}/guides/gpt-image-2`, name: gptImage2Guide.ru.title, datePublished: gptImage2Guide.ru.publishedAt },
+        ],
+        `${SITE_ORIGIN}/blog`,
+      ),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog`,
+        url: `${SITE_ORIGIN}/blog`,
+        name: "Блог Opten",
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro"],
+      }),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+        ],
+        `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
   // Phase 4 D-04 / D-06: anchor guide RU entry. EN sibling below in the EN section.
   {
     path: "/guides/gpt-image-2",
@@ -938,6 +992,58 @@ export const routes: RouteMeta[] = [
           { name: "About", url: `${SITE_ORIGIN}/en/about` },
         ],
         `${SITE_ORIGIN}/en/about`,
+      ),
+    ],
+  },
+
+  // Phase 5 B-04: /en/blog hub. Mirror of /blog with EN copy and en-US schema language.
+  {
+    path: "/en/blog",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog`,
+      en: `${SITE_ORIGIN}/en/blog`,
+      xDefault: `${SITE_ORIGIN}/blog`,
+    },
+    title: "Opten Blog — guides for AI image and video generation",
+    description: "Guides for AI image and video generation, model deep dives, and prompt-engineering notes. No fluff, just worked examples. Free, RU + EN.",
+    canonical: `${SITE_ORIGIN}/en/blog`,
+    ogTitle: "Opten Blog",
+    ogDescription: "Guides for AI image and video generation, model deep dives, and prompt-engineering notes.",
+    ogImage: DEFAULT_OG_IMAGE_EN,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "weekly",
+    priority: 0.8,
+    schema: [
+      ORG_BLOCK,
+      WEBSITE_BLOCK,
+      collectionPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog`,
+        url: `${SITE_ORIGIN}/en/blog`,
+        name: "Opten Blog",
+        description: "Guides for AI image and video generation, model deep dives, and prompt-engineering notes.",
+        inLanguage: "en-US",
+      }),
+      itemListBlock(
+        [
+          { url: `${SITE_ORIGIN}/en/guides/gpt-image-2`, name: gptImage2Guide.en.title, datePublished: gptImage2Guide.en.publishedAt },
+        ],
+        `${SITE_ORIGIN}/en/blog`,
+      ),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog`,
+        url: `${SITE_ORIGIN}/en/blog`,
+        name: "Opten Blog",
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro"],
+      }),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+        ],
+        `${SITE_ORIGIN}/en/blog`,
       ),
     ],
   },
