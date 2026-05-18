@@ -339,6 +339,98 @@ export function breadcrumbBlock(items: { name: string; url: string }[], pageId: 
   };
 }
 
+// Phase 5 B-02: blog-listing schema. `CollectionPage` is the canonical schema.org type for
+// "a page that lists entries"; Google treats the legacy `Blog` type as an alias of CollectionPage
+// in Rich Results — picking one (CollectionPage) avoids duplicate-entity warnings. Pair with
+// an itemListBlock (sibling, not nested) for the post inventory — AI Overviews follow @id refs
+// to the post pages rather than reading inline BlogPosting payloads.
+export function collectionPageBlock(opts: {
+  pageId: string;
+  url: string;
+  name: string;
+  description: string;
+  inLanguage: "ru-RU" | "en-US";
+}): SchemaBlock {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${opts.pageId}#collection`,
+    url: opts.url,
+    name: opts.name,
+    description: opts.description,
+    inLanguage: opts.inLanguage,
+    isPartOf: WEBSITE_REF,
+    publisher: ORG_REF,
+  };
+}
+
+// Phase 5 B-02: ItemList — enumerates visible posts on a listing as ListItem refs (url only,
+// NOT inline BlogPosting payloads). itemListOrder=ItemListOrderDescending signals newest-first
+// to crawlers. Empty list is legal (numberOfItems: 0) — only emit when the listing has zero
+// posts you intend to surface (unlikely; left for completeness).
+export function itemListBlock(
+  items: { url: string; name: string; datePublished?: string }[],
+  pageId: string,
+): SchemaBlock {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": `${pageId}#itemlist`,
+    itemListOrder: "https://schema.org/ItemListOrderDescending",
+    numberOfItems: items.length,
+    itemListElement: items.map((it, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: it.url,
+      name: it.name,
+      ...(it.datePublished ? { datePublished: it.datePublished } : {}),
+    })),
+  };
+}
+
+// Phase 5 B-02: BlogPosting — more specific than the generic Article; preferred by Google for
+// blog posts in Rich Results. author/publisher resolved via @id refs to the existing entity
+// graph (PERSON_FOUNDER_REF / ORG_REF) — no denormalization. `keywords` is the comma-joined
+// tag string (Google convention; AI Overview reads it for topical extraction). `articleBody`
+// intentionally OMITTED — Google explicitly does not use it, and inlining the body inflates
+// payload pointlessly. Image MUST be ≥1200px wide for the Rich Results carousel; we pass an
+// {url,width,height} object so the spec validator is satisfied.
+export function blogPostingBlock(opts: {
+  pageId: string;
+  headline: string;
+  description: string;
+  datePublished: string;
+  dateModified: string;
+  inLanguage: "ru-RU" | "en-US";
+  articleSection: string;
+  keywords: string[];
+  image: { url: string; width: number; height: number };
+  wordCount?: number;
+}): SchemaBlock {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${opts.pageId}#blogposting`,
+    mainEntityOfPage: opts.pageId,
+    headline: opts.headline,
+    description: opts.description,
+    image: {
+      "@type": "ImageObject",
+      url: opts.image.url,
+      width: opts.image.width,
+      height: opts.image.height,
+    },
+    author: PERSON_FOUNDER_REF,
+    publisher: ORG_REF,
+    datePublished: opts.datePublished,
+    dateModified: opts.dateModified,
+    inLanguage: opts.inLanguage,
+    articleSection: opts.articleSection,
+    keywords: opts.keywords.join(", "),
+    ...(opts.wordCount ? { wordCount: opts.wordCount } : {}),
+  };
+}
+
 export const routes: RouteMeta[] = [
   // --- RU entries (6) ---
   {
