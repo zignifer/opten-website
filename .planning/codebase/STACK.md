@@ -1,149 +1,222 @@
 # Technology Stack
 
-**Analysis Date:** 2026-05-17
+**Analysis Date:** 2026-05-18
 
 ## Languages
 
 **Primary:**
-- TypeScript — `src/**/*.{ts,tsx}`, `api/download-skill.ts`, `scripts/{entry-server.tsx,seo-routes.ts}`
-- TSX — React components
+- TypeScript (transpiled via Vite) — `src/**/*.{ts,tsx}`, `api/download-skill.ts`, `scripts/{entry-server.tsx,seo-routes.ts}`
+- JavaScript (ESM `.mjs`) — build scripts (`scripts/prerender.mjs`, `scripts/sitemap.mjs`, `scripts/llms.mjs`, `scripts/verify-faq-mainentity.mjs`, `scripts/indexnow.mjs`, `scripts/smoke-blog.mjs`, `scripts/mock-vercel-server.mjs`)
 
 **Secondary:**
-- JavaScript (ESM `.mjs`) — `scripts/prerender.mjs`, `scripts/sitemap.mjs`, `scripts/mock-vercel-server.mjs`
 - JSON — i18n dicts `src/i18n/{ru,en}.json`
+- HTML — `index.html` template + prerendered routes
 
 ## Runtime
 
 **Environment:**
-- Browser: ES module bundle from Vite 6
-- Vercel serverless (Node.js): single function at `api/download-skill.ts` using `IncomingMessage`/`ServerResponse` signature
-- Node SSR: build-time only (`scripts/entry-server.tsx`, `scripts/seo-routes.ts`) — no runtime SSR
+- Browser: ES module bundle from Vite 6 (SPA with SSR-prerendered routes)
+- Vercel serverless (Node.js): single function `api/download-skill.ts` using `IncomingMessage`/`ServerResponse` signature
+- Node.js (build-time only): SSR for prerender via `scripts/entry-server.tsx`, route metadata via `scripts/seo-routes.ts`
 - No `engines` field in `package.json`; no `.nvmrc`
 
 **Package Manager:**
-- npm — only `package-lock.json` would be authoritative; `pnpm.overrides` block present in `package.json:89-93` pins `vite: 6.3.5` (suggests pnpm-compatible)
-- Lockfile: not visible at repo root; `pnpm.overrides` implies pnpm support
+- npm (primary) — `package-lock.json` committed
+- `pnpm.overrides: { vite: "6.3.5" }` in `package.json` (suggests pnpm compatibility)
 
 ## Frameworks
 
 **Core:**
-- `vite` 6.3.5 — `package.json:74`, config `vite.config.ts`
-- `@vitejs/plugin-react` 4.7.0 — `vite.config.ts:4,11`
-- `react` 18.3.1 (peerDependency) — `package.json:78`
-- `react-dom` 18.3.1 (peerDependency) — `package.json:79`
-- `react-router` 7.13.0 — `package.json:59`, used as `import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate } from "react-router"` (NOT `react-router-dom`)
-- `tailwindcss` 4.1.12 + `@tailwindcss/vite` 4.1.12 — `vite.config.ts:3,12`
-- `typescript` — not in `devDependencies`; relies on Vite's built-in TS handling. No `tsc` typecheck script.
+- Vite 6.3.5 (pinned via `pnpm.overrides`) — bundler (`npm run dev` dev server, `npm run build` production build)
+- @vitejs/plugin-react 4.7.0 — React fast refresh
+- @tailwindcss/vite 4.1.12 — Tailwind CSS integration (required by Figma Make export origin; do not remove)
+- React 18.3.1 (peerDependency, optional in `package.json`) — UI layer
+- react-dom 18.3.1 (peerDependency) — React rendering
+- React Router 7.13.0 — client-side routing (import from `"react-router"`, NOT `"react-router-dom"`)
 
-**Testing:**
-- None. No test runner, no `*.test.*` / `*.spec.*` files.
+**Styling:**
+- Tailwind CSS 4.1.12 via @tailwindcss/vite (no separate PostCSS config; `postcss.config.mjs` is empty)
+- tw-animate-css 1.3.8 — animation utilities
 
-**Build/Dev:**
-- `vite` (dev + client build) — `vite.config.ts`
-- `vite build --ssr scripts/entry-server.tsx` — React SSR bundle → `.ssr-cache/` (mounts 11 routes: 5 RU full-prerender + 6 EN — see entry-server.tsx:28-39)
-- `vite build --ssr scripts/seo-routes.ts` — route metadata manifest → `.ssr-meta/` (12 entries: 6 RU + 6 EN)
-- `node scripts/prerender.mjs` — emits 12 HTML files into `dist/` (was 5 before Phase 3); injects per-route `<title>`, `<meta>`, `<link rel="canonical">`, hreflang triplet, `<html lang>`, og:locale + og:locale:alternate, modulepreload + Safari preload fallback, Paddle SDK tag for `/pay` AND `/en/pay`, `__PRERENDER_PATH` marker
-- `node scripts/sitemap.mjs` — emits `dist/sitemap.xml` with 12 `<url>` entries, each carrying `xhtml:link` hreflang triplets (ru / en / x-default)
-- `rollup-plugin-visualizer` ^7.0.1 — bundle inspection
-- `sharp` ^0.34.5 — image processing (used by `vite-imagetools`)
-- `vite-imagetools` ^6.2.9 — `?w=...&format=webp;png&as=picture` query-string imports; `exclude: ''` so `public/` files are processed (`vite.config.ts:17`)
-- `supabase` ^2.98.2 (devDependency) — Supabase CLI for the linked `opten-seo` project
-
-## Key Dependencies
-
-**UI primitives (Radix UI):**
-- `@radix-ui/react-accordion` 1.2.3, `react-alert-dialog` 1.1.6, `react-aspect-ratio` 1.1.2, `react-avatar` 1.1.3, `react-checkbox` 1.1.4, `react-collapsible` 1.1.3, `react-context-menu` 2.2.6, `react-dialog` 1.1.6, `react-dropdown-menu` 2.1.6, `react-hover-card` 1.1.6, `react-label` 2.1.2, `react-menubar` 1.1.6, `react-navigation-menu` 1.2.5, `react-popover` 1.1.6, `react-progress` 1.1.2, `react-radio-group` 1.2.3, `react-scroll-area` 1.2.3, `react-select` 2.1.6, `react-separator` 1.1.2, `react-slider` 1.2.3, `react-slot` 1.1.2, `react-switch` 1.1.3, `react-tabs` 1.1.3, `react-toggle` 1.1.2, `react-toggle-group` 1.1.2, `react-tooltip` 1.1.8 — `package.json:16-41`
-
-**Icons:**
-- `lucide-react` 0.487.0 — `package.json:49` (split into own vendor chunk, `vite.config.ts:40`)
-- `@mui/icons-material` 7.3.5 — `package.json:13`
-- `@mui/material` 7.3.5 + `@emotion/react` 11.14.0 + `@emotion/styled` 11.14.1 — `package.json:11-14`
-
-**Animation:**
-- `motion` 12.23.24 — `package.json:50`
-- `tw-animate-css` 1.3.8 — `package.json:64`
-- `canvas-confetti` 1.9.4 — `package.json:42`
+**UI Component Libraries:**
+- Radix UI ~25 primitives (accordion, alert-dialog, aspect-ratio, avatar, checkbox, collapsible, context-menu, dialog, dropdown-menu, hover-card, label, menubar, navigation-menu, popover, progress, radio-group, scroll-area, select, separator, slider, slot, switch, tabs, toggle, toggle-group, tooltip) — headless behavior, styled via Tailwind
+- MUI (Material-UI) 7.3.5 + @mui/icons-material 7.3.5 — selective use for icon glyphs and styles
+- Lucide React 0.487.0 — lighter icon alternative
+- motion 12.23.24 — scroll-reveal animations (Framer Motion successor)
+- embla-carousel-react 8.6.0 — carousel component
+- react-slick 0.31.0 — second carousel library (consolidation candidate)
+- sonner 2.0.3 — toast notifications
+- canvas-confetti 1.9.4 — confetti effect
 
 **Forms:**
-- `react-hook-form` 7.55.0 — `package.json:55`
-- `input-otp` 1.4.2 — `package.json:48`
+- react-hook-form 7.55.0 — form state and validation
 
-**Payments:**
-- `Paddle.js v2` — loaded from CDN `https://cdn.paddle.com/paddle/v2/paddle.js`, NOT an npm dependency. Loader at `src/lib/paddle.ts:13`. Types at `src/types/paddle.d.ts`.
+**Other UI/Data:**
+- recharts 2.15.2 — charting (status: unclear if actively used; potential dead weight)
+- react-day-picker 8.10.1 — date picker component
+- input-otp 1.4.2 — OTP input
+- next-themes 0.4.6 — theme management (status: unknown why in SPA)
 
-**Utility libs:**
-- `clsx` 2.1.1, `class-variance-authority` 0.7.1, `tailwind-merge` 3.2.0 — `package.json:43-44,63`
-- `date-fns` 3.6.0 — `package.json:46`
-- `cmdk` 1.1.1, `sonner` 2.0.3, `vaul` 1.1.2, `next-themes` 0.4.6 — `package.json:45,62,65,51`
+**Drag-and-drop & Layout:**
+- react-dnd 16.0.1, react-dnd-html5-backend 16.0.1 — drag-and-drop
+- react-responsive-masonry 2.7.1 — masonry layout
+- react-resizable-panels 2.1.7 — resizable panel UI
+- vaul 1.1.2 — drawer component
 
-**Carousels/charts/misc:**
-- `embla-carousel-react` 8.6.0, `react-slick` 0.31.0, `react-day-picker` 8.10.1, `react-dnd` 16.0.1 + `react-dnd-html5-backend` 16.0.1, `react-popper` 2.3.0, `@popperjs/core` 2.11.8, `react-resizable-panels` 2.1.7, `react-responsive-masonry` 2.7.1, `recharts` 2.15.2 — `package.json:47,60,52-54,56-58,61`
+**Utility Libraries:**
+- clsx 2.1.1, class-variance-authority 0.7.1 — classname/variant utilities
+- tailwind-merge 3.2.0 — merge Tailwind class conflicts
+- date-fns 3.6.0 — date formatting
+- cmdk 1.1.1 — command palette
+- react-popper 2.3.0, @popperjs/core 2.11.8 — positioning engine
 
-**Notably absent:**
-- `@supabase/supabase-js` — Supabase access is plain `fetch` to REST/Functions endpoints
+**CSS-in-JS (dependency of MUI):**
+- @emotion/react 11.14.0, @emotion/styled 11.14.1
 
-## i18n Subsystem (Phase 3)
+**Build & Image Tools:**
+- vite-imagetools 6.2.9 — image optimization via query-string transforms (`?w=...&format=webp;png&as=picture`); configured with `exclude: ''` to process `public/` files
+- sharp 0.34.5 — image resizing (used in build scripts via imagetools)
+- rollup-plugin-visualizer 7.0.1 — bundle analysis
+- supabase 2.98.2 (devDependency) — Supabase CLI (for linked `opten-seo` project, not this repo's deployment)
 
-**Custom context, no library.** Source of truth `src/i18n/`:
-- `LangContext.tsx` — `LangProvider` (must live INSIDE `<BrowserRouter>` / `<StaticRouter>` because it calls `useLocation()`); exports `useLang`, `useT`, `useOnEnPath`. Storage key `opten_lang_v3` (bumped from `opten_lang` post-Phase-3 — `LangContext.tsx:20`). Legacy `opten_lang` key is read once for one-shot migration, EN-only (`LangContext.tsx:30-31`); RU values in legacy key are ignored so `navigator.language` gets a fresh chance to win.
-- `paths.ts` — single source of truth for `EN_SIBLINGS` (`/`, `/welcome`, `/pay`, `/privacy`, `/terms`, `/refund`); exports `toEnTarget(pathname)`, `toRuTarget(pathname)`, `localizeHref(href, onEnPath)`. Pure path-rewriters operating against the allow-list (open-redirect mitigation).
-- `ru.json` — statically imported (16.5 KB gzip); always available for SSR + hydration default.
-- `en.json` — statically imported on the SERVER path only (`typeof window === "undefined"`, `LangContext.tsx:62-64`); CLIENT path uses `loadEnDict()` dynamic import to keep ~13 KB gzip off the default bundle.
+**Notably Absent:**
+- No `@supabase/supabase-js` — Supabase access is plain `fetch` to REST/Functions endpoints
+- No test runner (Vitest, Jest, Mocha)
+- No ESLint, Prettier, or other formatters
+- No TypeScript compiler (`tsc`) in scripts
 
-**Components added in Phase 3 (post-3 follow-up):**
-- `src/app/components/LocalizedLink.tsx` — drop-in `<Link>` replacement that rewrites `to="/pay"` → `to="/en/pay"` when current URL is `/en/*`. Pass-through for non-sibling targets (e.g. `/account`).
-- `src/app/components/LangSwitcher.tsx` — flips lang in `localStorage` + context state, then `navigate()`s to the EN sibling only when one exists (null result = stay on current URL, content layer re-renders in new lang).
+## Payment Gateway
 
-## Configuration
+**Paddle.js v2:**
+- Loaded from CDN `https://cdn.paddle.com/paddle/v2/paddle.js`
+- Synchronously injected into prerendered `/pay/index.html` and `/en/pay/index.html` via `scripts/prerender.mjs` (Phase 2.2 + Phase 3 D-03b optimization)
+- Lazily loaded on SPA-navigation via `src/lib/paddle.ts:ensurePaddle()` (other routes)
+- Initialization: `Paddle.Initialize({ token: VITE_PADDLE_CLIENT_TOKEN })`
+- Environment: `Paddle.Environment.set("sandbox")` only when `VITE_PADDLE_ENV === "sandbox"` (Phase 67 fix: do NOT call for production)
+- Types: `src/types/paddle.d.ts` augments `window.Paddle`
+
+## Internationalization (Custom, No i18next)
+
+**Implementation:**
+- `src/i18n/LangContext.tsx` — React Context (must be INSIDE BrowserRouter because it uses `useLocation()`)
+- `src/i18n/ru.json` (~68 KB) — Russian translations (statically imported, always available)
+- `src/i18n/en.json` (~41 KB, lazy-loaded on client) — English translations (dynamic import to save ~13 KB gzip on RU visits)
+- `src/i18n/paths.ts` — `EN_SIBLINGS` constant defining 6 prerendered EN-prefix routes + siblings
+
+**Detection order:**
+1. URL prefix `/en/*`
+2. `localStorage.opten_lang_v3` (explicit user choice, written by LangSwitcher only)
+3. Legacy `localStorage.opten_lang === "en"` (one-shot migration; RU values ignored)
+4. `navigator.language`
+
+**Components:**
+- `<LocalizedLink>` — internal navigation primitive that preserves `/en/` prefix on EN routes
+- `LangSwitcher` — flips language in storage + context, navigates to EN sibling or stays in place
+
+**Prerendered HTML:**
+- `<html lang>` baked at prerender time per `scripts/prerender.mjs`, not mutated at runtime
+- `hreflang` triplets (ru, en, x-default) injected into every prerendered `<head>`
+
+## Backend Integration
+
+**API Client:**
+- Plain `fetch` (no `@supabase/supabase-js` SDK) to Supabase REST and Edge Functions
+
+**Supabase Configuration (hardcoded in 3 site files + extension repo):**
+- `SUPABASE_URL = "https://vuywydhwkqmihfztpkgl.supabase.co"`
+- `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"`
+
+**Hardcoded Extension IDs (duplicated in 3 files):**
+- `EXTENSION_IDS = ["iphkppgbobpilmphloffcalicmejacfl", "kcmcaeenfmfnpiaihicecnfnagejpcog"]` (Chrome Web Store + unpacked dev)
+
+## Configuration Files
 
 **Vite (`vite.config.ts`):**
 - Plugins: `react()`, `tailwindcss()`, `imagetools({ exclude: '' })`
-- Alias `@` → `./src` (`vite.config.ts:22`)
-- `assetsInclude: ['**/*.svg', '**/*.csv']` (`vite.config.ts:27`)
-- `manualChunks` (client build only): `vendor-router`, `vendor-react`, `vendor-lucide` (`vite.config.ts:36-42`)
-- `server.historyApiFallback: true` (SPA dev fallback) (`vite.config.ts:49`)
+- Alias: `@ → ./src`
+- Asset includes: `**/*.svg`, `**/*.csv`
+- Vendor chunks (client build only): `vendor-router`, `vendor-react`, `vendor-lucide`
+- SPA fallback dev: `server.historyApiFallback: true`
+- SSR: no special config (handled by `vite build --ssr`)
+
+**PostCSS (`postcss.config.mjs`):**
+- Empty (Tailwind 4 via @tailwindcss/vite handles all PostCSS setup)
 
 **TypeScript:**
-- No `tsconfig.json` visible at root via Read; type checking happens at Vite build time
-- No `typecheck` npm script
-
-**Lint/Format:**
-- No ESLint config
-- No Prettier config
+- No `tsconfig.json` present; Vite handles TS transpilation
+- No `tsc` or `typecheck` npm script
+- TS errors surface only during `npm run build` (Vite build step)
 
 **Vercel (`vercel.json`):**
-- SPA rewrite: `/((?!api/).*) → /index.html` (`vercel.json:3`)
-- Security headers: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(self "https://*.paddle.com")` (`vercel.json:6-13`)
-- Function bundling: `api/download-skill.ts` includes `api/_assets/**` (`vercel.json:15-19`)
+- Redirects: `/guides/*` → `/blog/*` (Phase 5 B-07)
+- Rewrites: `/((?!api/).*) → /index.html` (SPA fallback)
+- Headers: security, X-Robots-Tag, Permissions-Policy (Paddle)
+- Functions: `api/download-skill.ts` with `includeFiles: "api/_assets/**"`
 
-**Tailwind 4:**
-- Pure Vite plugin (no `tailwind.config.js`); theme tokens in `src/styles/theme.css`; entry `src/styles/index.css`; webfonts in `src/styles/fonts.css`
+**Tailwind (`src/styles/theme.css`):**
+- Theme tokens (no separate `tailwind.config.js`); entry `src/styles/index.css`; fonts `src/styles/fonts.css`
 
-## Platform Requirements
+**Environment (Vercel):**
+- `VITE_PADDLE_ENV` — `"sandbox"` | `"production"` (public, bundled at build)
+- `VITE_PADDLE_CLIENT_TOKEN` — Paddle public client token (public, bundled at build)
+- No secrets in this repo; real secrets live in extension repo's Edge Functions
 
-**Development:**
-- Node.js (version unpinned)
-- `npm run dev` → Vite dev server, port 5173
+## Build Pipeline
 
-**Production:**
-- Vercel — auto-deploy on push to `main`, project name `opten-website2` (per recent commits)
-- Custom domain: `opten.space` (HTTPS)
-- No semver / version field useful for releases (`package.json:4` is `0.0.1` boilerplate)
+**npm scripts:**
+```json
+{
+  "build": "vite build && vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache --emptyOutDir && vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta && node scripts/prerender.mjs && node scripts/sitemap.mjs && node scripts/llms.mjs && node scripts/verify-faq-mainentity.mjs && node scripts/indexnow.mjs",
+  "dev": "vite"
+}
+```
 
-## Scripts
+**Build sequence (production):**
+1. `vite build` → SPA bundle to `dist/`, vendor chunks (router, React, lucide)
+2. `vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache` → SSR React renderer
+3. `vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta` → per-route metadata manifest
+4. `node scripts/prerender.mjs` → 18 prerendered HTML files (9 RU + 9 EN):
+   - Full prerender: `/`, `/welcome`, `/about`, `/blog`, `/privacy`, `/terms`, `/refund` + EN siblings
+   - Blog posts: `/blog/:slug` + `/en/blog/:slug` (dynamic per `src/content/blog/`)
+   - Head-only: `/pay`, `/en/pay` (Paddle SDK injected, body loaded by React)
+   - Injects per-route `<title>`, `<meta>`, `<link rel="canonical">`, hreflang triplets, `<html lang>`, og:locale, JSON-LD schema, modulepreload, Paddle `<script>` for `/pay` routes
+5. `node scripts/sitemap.mjs` → `dist/sitemap.xml` with per-route `<lastmod>` from git mtime; fails if route count < 18
+6. `node scripts/llms.mjs` → `dist/llms.txt` + `dist/llms-full.txt` (AI-crawler opt-in); fails if route count < 18
+7. `node scripts/verify-faq-mainentity.mjs` → assert visible FAQ DOM matches JSON-LD FAQPage.mainEntity
+8. `node scripts/indexnow.mjs` → Bing IndexNow notification (non-fatal)
 
-`package.json:6-9`:
-- `dev`: `vite`
-- `build`: `vite build && vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache --emptyOutDir && vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta && node scripts/prerender.mjs && node scripts/sitemap.mjs`
+**Ad-hoc:**
+- `node scripts/smoke-blog.mjs` — Playwright smoke tests (requires `npx playwright install chromium` once)
 
-**Absent scripts (deliberate):**
-- No `test`
-- No `lint`
-- No `typecheck`
-- No `format`
+**Excluded from version control:**
+- `dist/` — build output
+- `.ssr-cache/`, `.ssr-meta/` — intermediate build artifacts
+- `node_modules/` — dependencies
 
-TS errors surface only via `vite build` (`npm run build`).
+**Scripts not present (deliberate):**
+- No `test` script
+- No `lint` script
+- No `typecheck` script
+- No `format` script
+
+## Deployment
+
+**Platform:** Vercel
+- Project: `opten-website2` (per recent commits)
+- Deploy: auto on push to `main`
+- Domain: `opten.space` (HTTPS)
+- SPA fallback: `/((?!api/).*) → /index.html` in vercel.json
+
+**No release versioning** — every push to `main` is a release. No semver in `package.json` (version is `0.0.1` boilerplate). Hotfix iteration speed is high; breaking changes with the extension must be coordinated manually (see `docs/INTEGRATION-CONTRACT.md`).
+
+## Dependency Audit Notes
+
+**UI ecosystem overlap:** Radix + MUI + Lucide + react-slick + embla-carousel represent three overlapping icon/component systems. Worth consolidating (e.g., replace MUI icons with Lucide, drop react-slick if embla suffices).
+
+**Figma Make export origin:** `package.json` `name` is `@figma/my-make-file`. Auto-generated SVG-path imports under `src/imports/` are from Figma; edits there are brittle — regenerate from Figma rather than hand-edit.
+
+**No lockfile mismatch tooling:** `package-lock.json` is committed; npm-based (not yarn, pnpm).
 
 ---
 
-*Stack analysis: 2026-05-17*
+*Stack analysis: 2026-05-18*
