@@ -727,9 +727,7 @@ export const routes: RouteMeta[] = [
     canonical: `${SITE_ORIGIN}/blog/gpt-image-2`,
     ogTitle: gptImage2Guide.ru.title,
     ogDescription: gptImage2Guide.ru.excerpt,
-    // Phase 5 B-08: post-specific cover (1600×900 JPEG) — Facebook/Twitter prefer JPEG for og:image
-    // social previews; the visible page <img> uses WebP@1x/@2x for performance.
-    ogImage: `${SITE_ORIGIN}/blog/gpt-image-2/cover.jpg`,
+    // ogImage falls through to DEFAULT_OG_IMAGE (og-card-ru.png) until a bespoke post cover ships.
     author: FOUNDER_NAME,
     prerender: "full",
     changefreq: "monthly",
@@ -745,10 +743,10 @@ export const routes: RouteMeta[] = [
         inLanguage: "ru-RU",
         articleSection: "Гайд",
         keywords: gptImage2Guide.ru.tags,
-        // Phase 5 B-08: JPEG variant for schema.org image (Google Rich Results validator prefers
-        // raster JPEG over WebP for the carousel; visible <picture> on the post uses WebP@1x/@2x).
+        // Uses the same cover as visible <img> + og:image for consistency. PNG defaults to
+        // og-card-ru.png (1200×630) until a bespoke post cover ships.
         image: {
-          url: `${SITE_ORIGIN}/blog/gpt-image-2/cover.jpg`,
+          url: `${SITE_ORIGIN}${gptImage2Guide.ru.cover.src}`,
           width: gptImage2Guide.ru.cover.width,
           height: gptImage2Guide.ru.cover.height,
         },
@@ -1074,8 +1072,8 @@ export const routes: RouteMeta[] = [
     canonical: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
     ogTitle: gptImage2Guide.en.title,
     ogDescription: gptImage2Guide.en.excerpt,
-    // Phase 5 B-08: post-specific cover (shared between RU and EN — no text baked in).
-    ogImage: `${SITE_ORIGIN}/blog/gpt-image-2/cover.jpg`,
+    // EN routes default to DEFAULT_OG_IMAGE_EN (og-card-en.png) when ogImage is unset.
+    ogImage: DEFAULT_OG_IMAGE_EN,
     author: FOUNDER_NAME,
     prerender: "full",
     changefreq: "monthly",
@@ -1091,9 +1089,8 @@ export const routes: RouteMeta[] = [
         inLanguage: "en-US",
         articleSection: "Guide",
         keywords: gptImage2Guide.en.tags,
-        // Phase 5 B-08: JPEG variant for schema.org image.
         image: {
-          url: `${SITE_ORIGIN}/blog/gpt-image-2/cover.jpg`,
+          url: `${SITE_ORIGIN}${gptImage2Guide.en.cover.src}`,
           width: gptImage2Guide.en.cover.width,
           height: gptImage2Guide.en.cover.height,
         },

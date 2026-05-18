@@ -130,11 +130,14 @@ export default function BlogListPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
+    <div className="min-h-screen bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
       <SiteHeader variant="page" />
 
-      {/* Hero — centered title + intro, with the signature gradient blob behind */}
-      <section className="relative px-[20px] pt-[120px] sm:pt-[160px]">
+      {/* Hero — centered title + intro. Mirrors the landing Hero section structure:
+          overflow-hidden + bg-[#011417] so the .opten-figma-gradient blob (which sits at
+          top:-640px, blur 285px) is clipped to the section background without producing
+          the harsh horizontal cut we had when the gradient leaked past a short section. */}
+      <section className="relative overflow-hidden bg-[#011417] px-5 pb-16 pt-[131px] md:min-h-[460px] md:pb-20 md:pt-[190px]">
         <div aria-hidden="true" className="opten-figma-gradient" />
         <div className="relative z-10 mx-auto max-w-[800px] text-center">
           <h1 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] tracking-[-0.6px] text-white sm:text-[44px] md:text-[52px]">
@@ -146,7 +149,7 @@ export default function BlogListPage() {
         </div>
       </section>
 
-      <main className="relative z-10 mx-auto max-w-[1100px] px-[20px] pb-[80px] pt-[40px]">
+      <main className="mx-auto max-w-[1100px] px-[20px] pb-[80px] pt-[40px]">
         {/* Filter chips (left) + search (right) in a single row on wide screens, wraps on narrow */}
         <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-[8px]" role="group" aria-label={t("blog.filter.label")}>
