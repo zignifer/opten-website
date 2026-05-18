@@ -1,6 +1,0 @@
-[mcp_servers.obsidian]
-args = [
-    "@bitbonsai/mcpvault@latest",
-    "c:/Projects/opten-website",
-]
-command = "npx"
