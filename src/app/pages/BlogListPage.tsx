@@ -161,9 +161,44 @@ export default function BlogListPage() {
       </section>
 
       <main className="mx-auto max-w-[1100px] px-[20px] pb-[80px] pt-[40px]">
-        {/* Filter chips (left) + search (right) in a single row on wide screens, wraps on narrow */}
-        <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-center gap-[8px]" role="group" aria-label={t("blog.filter.label")}>
+        {/* Filter controls. Mobile (< sm): native <select> as a full-width dropdown stacked
+            above the search input — both 100% width, same height, same pill shape. Desktop
+            (≥ sm): horizontal chip-row on the left, fixed-width search on the right. */}
+        <div className="flex flex-col gap-[12px] sm:flex-row sm:items-center sm:justify-between">
+          {/* Mobile dropdown — hidden ≥ sm */}
+          <label className="relative block w-full sm:hidden">
+            <span className="sr-only">{t("blog.filter.label")}</span>
+            <select
+              value={activeTag}
+              onChange={(e) => selectTag((e.target.value || "") as BlogTag | "")}
+              className="h-[40px] w-full appearance-none rounded-full border border-white/10 bg-white/5 px-[18px] pr-[40px] text-[14px] text-white transition focus:border-white/30 focus:bg-white/8 focus:outline-none"
+            >
+              <option value="" className="bg-[#0e2023] text-white">
+                {t("blog.filter.all")}
+              </option>
+              {tagSet.map((tag) => (
+                <option key={tag} value={tag} className="bg-[#0e2023] text-white">
+                  {tagLabel(tag)}
+                </option>
+              ))}
+            </select>
+            {/* Caret — pointer-events-none so the select still opens on tap */}
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 16 16"
+              className="pointer-events-none absolute right-[16px] top-1/2 h-[12px] w-[12px] -translate-y-1/2 text-white/55"
+              fill="none"
+            >
+              <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </label>
+
+          {/* Desktop chip row — hidden < sm */}
+          <div
+            className="hidden flex-wrap items-center gap-[8px] sm:flex"
+            role="group"
+            aria-label={t("blog.filter.label")}
+          >
             <button
               type="button"
               onClick={() => selectTag("")}
@@ -196,6 +231,7 @@ export default function BlogListPage() {
             })}
           </div>
 
+          {/* Search — full width on mobile, fixed 300px on ≥ sm */}
           <label className="relative block w-full sm:w-[300px] sm:shrink-0">
             <span className="sr-only">{t("blog.search.placeholder")}</span>
             <input
