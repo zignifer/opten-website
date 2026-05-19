@@ -33,6 +33,8 @@ export default function SiteFooter(): JSX.Element {
         <div className="mt-20 flex flex-wrap justify-center gap-x-5 gap-y-4 font-['PT_Root_UI',sans-serif] text-[16px] text-white/40 sm:gap-8">
           <LocalizedLink to="/about" className="hover:text-white">{t("nav.about")}</LocalizedLink>
           <LocalizedLink to="/blog" className="hover:text-white">{t("nav.blog")}</LocalizedLink>
+          {/* Phase v2.0 MODELS-A-11: Models hub link */}
+          <LocalizedLink to="/models" className="hover:text-white">{t("nav.models")}</LocalizedLink>
           <LocalizedLink to="/privacy" className="hover:text-white">{t("footer.privacy")}</LocalizedLink>
           <LocalizedLink to="/terms" className="hover:text-white">{t("footer.terms")}</LocalizedLink>
           <LocalizedLink to="/refund" className="hover:text-white">{t("footer.refund")}</LocalizedLink>

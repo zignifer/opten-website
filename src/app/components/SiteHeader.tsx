@@ -153,6 +153,14 @@ export default function SiteHeader({ variant = "page", rightSlot }: SiteHeaderPr
           >
             {t("nav.blog")}
           </LocalizedLink>
+          {/* Phase v2.0 MODELS-A-11: Models hub entry next to Blog */}
+          <LocalizedLink
+            to="/models"
+            onClick={closeMenu}
+            className="block rounded-[12px] px-4 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white no-underline"
+          >
+            {t("nav.models")}
+          </LocalizedLink>
           <a
             href={anchor("faq")}
             onClick={closeMenu}

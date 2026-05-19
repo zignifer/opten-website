@@ -152,6 +152,16 @@ function Partners() {
           <p className="mt-4 max-w-[640px] text-center font-['PT_Root_UI',sans-serif] text-[12px] leading-[1.5] text-white/35">
             {t("partners.disclaimer")}
           </p>
+          {/* Phase v2.0 MODELS-A-11: deep link to the new models catalog below the
+              platform-partners bar. The partner logos are PLATFORMS (where Opten works);
+              the "All 62+ models" CTA is the MODELS catalog (what Opten knows). Two
+              orthogonal axes — keep them visually separated. */}
+          <LocalizedLink
+            to="/models"
+            className="mt-6 inline-flex items-center gap-[8px] rounded-full border border-white/15 bg-white/5 px-[20px] py-[10px] font-['PT_Root_UI',sans-serif] text-[14px] text-white/85 no-underline transition hover:border-white/30 hover:bg-white/10 hover:text-white"
+          >
+            {t("models.landing.allButton")} →
+          </LocalizedLink>
         </div>
       </div>
     </section>
