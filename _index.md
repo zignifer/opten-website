@@ -52,17 +52,16 @@ No active milestone. Run `/gsd-new-milestone` to start v2 from the candidates li
 
 ## Auto-memory (Claude Code)
 
-Project-scoped memory persisted across Claude Code sessions. Stored outside the repo in `%USERPROFILE%\.claude\projects\C--Projects-opten-website\memory\` and surfaced into the vault via the NTFS junction `.claude-memory/` (gitignored — local only).
+Project-scoped memory persisted across Claude Code sessions. Stored outside the repo in `%USERPROFILE%\.claude\projects\C--Projects-opten-website\memory\` and surfaced into the vault as `.claude-memory/` via NTFS junction (gitignored — local only).
 
-- [[.claude-memory/MEMORY|MEMORY]] — index of all saved memories (loaded into every Claude Code session)
-- [[.claude-memory/capture-policy]] — what gets auto-saved, where, and why
-- [[.claude-memory/feedback_communication_style]] — отвечать на русском, без жаргона
-- [[.claude-memory/feedback_workflow_methodology]] — opten-website uses GSD (not Superpowers)
-- [[.claude-memory/feedback_commit_policy]] — auto-commit `.planning/` and `docs/`; code needs approval
-- [[.claude-memory/feedback_autonomy_and_caution]] — autonomous after approval; extra care around extension-coupled surfaces
-- [[.claude-memory/reference_supabase_cli]] — `npx supabase` per-project; linked to `opten-seo`
-- [[.claude-memory/reference_pagespeed_mcp]] — `mcp__pagespeed__*` for Lighthouse metrics
-- [[.claude-memory/reference_promptscore_repo]] — extension repo at `C:\Projects\promptscore`
+- [[.claude-memory/MEMORY|.claude-memory/MEMORY]] — full index of saved memories, links to all entries
+
+> [!info] Setup on a fresh machine
+> The junction is local. To recreate it after a fresh clone, run in PowerShell:
+> ```powershell
+> $target = Join-Path $env:USERPROFILE '.claude\projects\C--Projects-opten-website\memory'
+> New-Item -ItemType Junction -Path '.claude-memory' -Target $target
+> ```
 
 ## Design references
 

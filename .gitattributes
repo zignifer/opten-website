@@ -1,0 +1,7 @@
+# Force LF on JSON config files Obsidian touches frequently —
+# prevents CRLF flip-flop in diffs.
+.obsidian/*.json text eol=lf
+*.json text eol=lf
+
+# Markdown should also stay LF for cross-platform vault consistency
+*.md text eol=lf
