@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: none
-milestone_name: "(none — v1.0 closed 2026-05-17, no active milestone)"
-status: Idle — v1.0 milestone closed and archived; post-v1.0 blog migration + UI polish shipped as hotfix series 2026-05-17..18. Run `/gsd-new-milestone` to start v2.
+milestone: v2.0
+milestone_name: "Programmatic SEO — Model Pages"
+status: Phase 1 in progress — models infrastructure setup (TS types, registry parser, React components, SEO routes). Reference page gpt-image-2 будет вручную, потом Phase 2 spawn 7 параллельных агентов для 62 моделей.
 stopped_at: ""
-last_updated: "2026-05-18T00:00:00.000Z"
-last_activity: 2026-05-18
+last_updated: "2026-05-19T00:00:00.000Z"
+last_activity: 2026-05-19
 progress:
-  total_phases: 0
+  total_phases: 2
   completed_phases: 0
-  total_plans: 0
+  total_plans: 13
   completed_plans: 0
   percent: 0
 ---
@@ -26,19 +26,20 @@ See: .planning/PROJECT.md (updated 2026-05-17 with v1.0 shipped state)
 
 ## Current Position
 
-Phase: (no active phase)
-Plan: (no active plan)
-Status: Idle — between milestones. Post-v1.0 hotfix series shipped 2026-05-17..18 (see below); milestone artifact not opened (treated as in-place polish, not a new GSD phase).
-Last activity: 2026-05-18 — post-v1.0 docs sync (CLAUDE/AGENTS/ARCHITECTURE/TECH refreshed, new CONTENT-AUTHORING.md guide).
+Milestone: **v2.0 — Programmatic SEO — Model Pages**
+Phase: **Phase 1 — Models Infrastructure** (in progress)
+Plan: см. `.planning/phases/01-models-infrastructure/1-PLAN.md`
+Status: Phase 1 запущена 2026-05-19. На этой стадии настройка TS-типов, парсера скиллов, React-компонентов, расширение seo-routes.ts. Эталонная страница `gpt-image-2` пишется вручную как образец для Phase 2.
+Last activity: 2026-05-19 — milestone v2.0 set up, Phase 1 в работе.
 
 Next:
-  1. **Post-deploy verification window for v1.0 Phase 4.2** (next 7–14 days):
-     - `curl -sI https://opten.space/account` → check `x-robots-tag: noindex, nofollow` materialized at the Vercel edge
-     - Visual h1 smoke on `/pay`, `/en/pay`, `/welcome`, `/en/welcome` after deploy completes
-     - Replace `BING_VERIFICATION_TOKEN_TODO` in `index.html` once you finish Bing Webmaster registration; push
-     - Wait 24-72h for IndexNow URL acceptance signal in Bing Webmaster Tools
-     - 7–14 days after deploy: run `/geo audit https://opten.space` for the GEO rescore (target 72.6 → ~80+)
-  2. **Start v2 when ready**: `/gsd-new-milestone` — picks fresh from the v2 candidates listed in `.planning/ROADMAP.md` (brand authority off-site work, scale-ready architecture refactor, or new direction entirely).
+  1. **Phase 1 completion** — 13 атомарных плана (MODELS-A-1..13). Финальный build green + Rich Results Test на /models/gpt-image-2.
+  2. **Phase 2** — spawn 7 параллельных Claude Code агентов для генерации 62 контент-файлов. Main-session верификация. Build → 126 HTML. IndexNow ping.
+  3. **Post-deploy v2.0 window** (7-14 дней после Phase 2 деплоя): мониторинг GSC «Coverage» отчёта, ожидаем ≥60% URL Indexed.
+
+Параллельные открытые задачи (отложены):
+  - v1.0 Phase 4.2 post-deploy GEO rescore (target ~80+) — окно открыто, но фокус на v2.0
+  - Bing token replacement — операционная задача, не блокирует
 
 ## Post-v1.0 hotfix series (2026-05-17..18)
 

@@ -3,7 +3,7 @@ tags:
   - gsd
   - roadmap
 kind: roadmap
-milestone: "next"
+milestone: "v2.0"
 aliases:
   - Roadmap
 ---
@@ -23,20 +23,68 @@ Shipped in-place between milestones. See [STATE.md](STATE.md) §"Post-v1.0 hotfi
 - Hero / mobile filter polish; AccountPage email pill restore.
 - Docs sync (2026-05-18): new `docs/CONTENT-AUTHORING.md` GEO+SEO playbook; CLAUDE.md / AGENTS.md / docs/ARCHITECTURE.md / docs/TECH.md refreshed for the 18-route post-blog state.
 
-## Active milestone
+## Active milestone — v2.0 Programmatic SEO — Model Pages
 
-*(No active milestone — run `/gsd-new-milestone` to start the next one.)*
+**Defined:** 2026-05-19
+**Source:** `~/Desktop/Opten_Programmatic_SEO_Plan.md` (стратегия Влада, зафиксирована 2026-05-18)
+**Goal:** Превратить 62 markdown-скилла из `C:\Projects\promptscore-proxy\skills\` в 126 публичных URL на opten.space (62 модели × RU/EN + 2 хаба `/models` / `/en/models`). Каждая модельная страница — самостоятельная статья: Quick-Facts таблица, структура промпта, типичные ошибки, примеры до/после, FAQ, три CTA в Chrome Web Store.
+**Success metric:** ≥60% URL в Google Search Console «Indexed» через 7-14 дней после деплоя Phase 2; первые impressions в GSC по long-tail-запросам уровня «kling 2.6 промпт».
 
-## v2 candidates (from v1.0 deferred work)
+Detailed requirements: [REQUIREMENTS.md](REQUIREMENTS.md).
 
-These are **not committed yet** — they're the picking material for the next milestone, preserved verbatim from the v1.0 ROADMAP archive:
+### Phases
 
-1. **Brand authority** *(was v1.0 Phase 5)* — Product Hunt launch, Wikipedia/Wikidata entry, Reddit + Habr + YouTube seeding, expanded `sameAs` schema after authority URLs acquired. Mostly off-site marketing work; small code component (sameAs additions to Organization JSON-LD) when authority URLs are real. See `.planning/milestones/v1.0-ROADMAP.md` § "Phase 5: Brand authority" for the original scope sketch.
-2. **Scale-ready content architecture** *(was v1.0 Phase 6)* — refactor route inventory (currently spread across 6 files: `scripts/seo-routes.ts`, `src/main.tsx`, `scripts/entry-server.tsx`, `src/i18n/paths.ts`, `scripts/sitemap.mjs` `PATH_TO_SOURCE`, `scripts/llms.mjs`), schema templating (`LandingPage`, `PricingPage`, `GuideArticle`, `GuideHub`, `ComparisonPage`, `ChangelogPage` archetypes), and build-time gates (duplicate `primaryKeyword`, `wordCount ≥ 300`, citability check). Prerequisite for any programmatic SEO rollout. See `.planning/milestones/v1.0-ROADMAP.md` § "Phase 6: Scale-ready content architecture".
-3. **Post-deploy follow-ups from v1.0 Phase 4.2** — Bing token replacement (operational, not code), GEO rescore window 7-14 days after Phase 4.2 deploy, manual UAT of X-Robots-Tag edge materialization. Tracked in `.planning/phases/04.2-seo-geo-polish-post-synthesis/04.2-VERIFICATION.md`.
+**Phase Numbering (v2.0):** fresh-restart counter — Phase 1 + Phase 2. Не путать с v1.0 фазами в `.planning/milestones/v1.0-ROADMAP.md` (закрытыми).
+
+- [ ] **Phase 1: Models Infrastructure** — TS-типы (`ModelMeta`/`ModelLocale`/`ModelContent`), парсер скиллов (`build-models-registry.mjs`), реестр `_registry.ts` (62 модели), React-компоненты (`ModelPage`, `ModelsHubPage`, `ModelQuickFacts`, `InlineOptenCallout`, `ModelInstallCta`, `RelatedModels`), расширение `seo-routes.ts` (`softwareApplicationModelBlock` + `buildModelRoute`), обновление `paths.ts`/`main.tsx`/`entry-server.tsx`/`sitemap.mjs`/`llms.mjs`/`SiteHeader`/`SiteFooter`/`App.tsx`. К концу фазы — 1 эталонная страница `/models/gpt-image-2` (вручную) + хаб с одной карточкой. Build зелёный.
+- [ ] **Phase 2: Models Content Generation + Publication** — Spawn 7 параллельных general-purpose Claude Code агентов, каждый получает 8-9 скилл-MD + эталон + types + критерии. Каждый пишет 8-9 `<slug>.ts` файлов. Main session верифицирует 5 случайных + 2 фиксированных моделей. Build → 126 HTML. IndexNow пинг.
+
+### Phase Details
+
+#### Phase 1: Models Infrastructure
+**Goal:** К концу фазы `npm run build` зелёный, эталонная страница `/models/gpt-image-2` рендерится с полным контентом (вручную), хаб открывается с одной карточкой.
+**Status:** Ready to execute (design approved 2026-05-19).
+**Depends on:** Nothing (v1.0 foundation в проде).
+**Requirements:** MODELS-A-1..13
+**Risks closed:** R2 (циркулярный импорт paths.ts ↔ content/models) — митигация: `MODEL_SLUGS` экспортируется отдельно от `allModels` (light import без React).
+**Success Criteria:**
+  1. `npm run build` зелёный.
+  2. `dist/models/index.html`, `dist/en/models/index.html`, `dist/models/gpt-image-2/index.html`, `dist/en/models/gpt-image-2/index.html` существуют.
+  3. `dist/sitemap.xml` ≥22 URL.
+  4. `dist/llms.txt` содержит секцию `## Models` с 4 entry.
+  5. Rich Results Test на `/models/gpt-image-2`: SoftwareApplication + Article + FAQPage + BreadcrumbList — без ошибок.
+  6. `verify-faq-mainentity.mjs` зелёный.
+  7. Visual smoke в браузере: header/footer/landing → modal ссылки работают, LangSwitcher `/models` ↔ `/en/models` работает.
+**Plans:** см. [1-PLAN.md](phases/01-models-infrastructure/1-PLAN.md).
+
+#### Phase 2: Models Content Generation + Publication
+**Goal:** 62 модели заполнены качественным контентом, 126 prerendered HTML, IndexNow пингован.
+**Status:** Blocked by Phase 1.
+**Depends on:** Phase 1.
+**Requirements:** MODELS-B-1..6
+**Success Criteria:**
+  1. 62 новых `.ts` файла в `src/content/models/` через 7 параллельных агентов.
+  2. Main-session-верификация на 5 случайных + 2 фиксированных проходит.
+  3. `npm run build` зелёный, 126 HTML в `dist/models/` + `dist/en/models/` (62 RU + 62 EN + 2 хаба).
+  4. `sitemap.xml` ≥144 URL.
+  5. `llms.txt` секция Models содержит все 62 модельные страницы + 2 хаба.
+  6. IndexNow принят (`api.indexnow.org` 200/202).
+  7. Через 7-14 дней: ≥60% URL в GSC «Indexed».
+**Plans:** см. [2-PLAN.md](phases/02-models-content/2-PLAN.md).
+
+## Out of scope for v2.0 (later milestones)
+
+Из плана Влада — Stages 2-5, не блокируют MVP:
+
+1. **Stage 2** — Уникальные cover-картинки для топ-15 (по данным GSC через 2-3 недели после Phase 2), ручные правки контента, внутренние ссылки из блог-постов на модели.
+2. **Stage 3** — `/compare/<a>-vs-<b>` страницы (~30 пар × 2 языка = 60 новых URL).
+3. **Stage 4** — SEO-полировка (Image sitemap, AVIF, Speakable, Wikipedia mentions, priceValidUntil, HTML sitemap, RSS, реальный HTTP 404, Bing-токен, h1-check).
+4. **Stage 5** — `/use-cases/*`, `/troubleshoot/*`, `/skills/*` (с email-захватом).
+
+Brand authority и scale-ready architecture (из v1.0 deferred-to-v2) остаются picking-material для v3.
 
 ---
 
 *Roadmap created: 2026-05-14*
 *v1.0 closed: 2026-05-17*
-*Next milestone: TBD — run `/gsd-new-milestone` when ready.*
+*v2.0 defined: 2026-05-19*

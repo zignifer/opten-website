@@ -21,21 +21,26 @@ The site must reliably **sell, service, and onboard extension users without brea
 
 ## Current State
 
-**v1.0 — GEO Optimization — SHIPPED 2026-05-17.**
+**v2.0 — Programmatic SEO — Model Pages — IN PROGRESS (defined 2026-05-19).**
 
-GEO Score 12/100 → ~72.6/100 (target ~80+ after Phase 4.2 deploy bakes in over 7-14 days). 7 phases shipped end-to-end across the GSD pipeline; 2 phases (brand authority, scale-ready architecture) closed as deferred-to-v2 since they are off-site marketing or content-strategy-prerequisite work, respectively. Integration contract with the Opten Chrome extension preserved end-to-end.
+Цель: превратить 62 готовых markdown-скилла из `C:\Projects\promptscore-proxy\skills\` в 126 публичных URL на opten.space (62 × RU/EN + 2 хаба `/models` и `/en/models`). Стратегия — `~/Desktop/Opten_Programmatic_SEO_Plan.md` (план Влада, 2026-05-18). Phase 1 = инфраструктура + эталонная `gpt-image-2` страница вручную. Phase 2 = генерация 62 контент-файлов через 7 параллельных Claude Code агентов.
 
-Archive: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) · [milestones/v1.0-REQUIREMENTS.md](milestones/v1.0-REQUIREMENTS.md).
+Success metric: ≥60% URL в Google Search Console «Indexed» через 7-14 дней после деплоя Phase 2; первые impressions по long-tail запросам уровня «kling 2.6 промпт».
 
-## Next Milestone Goals (TBD)
+Active artefacts: [REQUIREMENTS.md](REQUIREMENTS.md) · [ROADMAP.md](ROADMAP.md) · [STATE.md](STATE.md).
 
-No active milestone. Picking material for v2 (preserved from v1.0 deferred phases):
+### Shipped previously
 
-1. **Brand authority** — Product Hunt launch, Wikipedia/Wikidata entry, Reddit + Habr + YouTube seeding, expanded `sameAs` schema. Mostly off-site marketing; small code component (sameAs additions) when authority URLs are real.
-2. **Scale-ready content architecture** — refactor route inventory from 6 hand-listed files into a single RouteRecord data model; archetype builders (`LandingPage`, `GuideArticle`, `GuideHub`, `ComparisonPage`, `ChangelogPage`); build-time gates (duplicate keyword, wordCount, citability). Prerequisite for any programmatic SEO rollout.
-3. **Post-deploy v1.0 follow-ups** — Bing token replacement (operational), GEO rescore window 7-14 days after Phase 4.2 deploy, manual UAT of X-Robots-Tag edge materialization.
+- **v1.0 — GEO Optimization — SHIPPED 2026-05-17.** GEO Score 12/100 → ~72.6/100. 7 phases shipped, 2 closed deferred-to-v2 (brand authority, scale-ready architecture). Archive: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) · [milestones/v1.0-REQUIREMENTS.md](milestones/v1.0-REQUIREMENTS.md).
 
-Run `/gsd-new-milestone` to start the next milestone (requirements + roadmap will be defined fresh).
+## Future Milestone Candidates (after v2.0)
+
+После v2.0 (Programmatic SEO MVP) — следующие направления из плана Влада + остатков v1.0:
+
+1. **v2.1 — Programmatic SEO Stage 2-3** — уникальные cover-картинки для топ-15 моделей (по данным GSC) + `/compare/<a>-vs-<b>` страницы (~60 новых URL).
+2. **v2.2 — SEO Polish** — Image sitemap, AVIF pipeline, Speakable schema, Wikipedia mentions, priceValidUntil, HTML sitemap, RSS, реальный HTTP 404, Bing-токен, build-time h1-check.
+3. **v3.0 — Brand authority** — Product Hunt launch, Wikipedia/Wikidata entry, Reddit + Habr + YouTube seeding, expanded `sameAs` schema.
+4. **Scale-ready content architecture** — refactor route inventory из 6 hand-listed файлов в единую RouteRecord data model; archetype builders. Откладывается до момента когда программатика моделей покажет необходимость абстракции.
 
 <details>
 <summary>Previous milestone state (v1.0 in-flight description, archived 2026-05-17)</summary>
