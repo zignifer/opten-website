@@ -36,7 +36,7 @@ Detailed requirements: [REQUIREMENTS.md](REQUIREMENTS.md).
 
 **Phase Numbering (v2.0):** fresh-restart counter — Phase 1 + Phase 2. Не путать с v1.0 фазами в `.planning/milestones/v1.0-ROADMAP.md` (закрытыми).
 
-- [ ] **Phase 1: Models Infrastructure** — TS-типы (`ModelMeta`/`ModelLocale`/`ModelContent`), парсер скиллов (`build-models-registry.mjs`), реестр `_registry.ts` (62 модели), React-компоненты (`ModelPage`, `ModelsHubPage`, `ModelQuickFacts`, `InlineOptenCallout`, `ModelInstallCta`, `RelatedModels`), расширение `seo-routes.ts` (`softwareApplicationModelBlock` + `buildModelRoute`), обновление `paths.ts`/`main.tsx`/`entry-server.tsx`/`sitemap.mjs`/`llms.mjs`/`SiteHeader`/`SiteFooter`/`App.tsx`. К концу фазы — 1 эталонная страница `/models/gpt-image-2` (вручную) + хаб с одной карточкой. Build зелёный.
+- [x] **Phase 1: Models Infrastructure** *(completed 2026-05-19)* — TS-типы (`ModelMeta`/`ModelLocale`/`ModelContent`), парсер скиллов (`build-models-registry.mjs`), реестр `_registry.ts` (62 модели), React-компоненты (`ModelPage`, `ModelsHubPage`, `ModelQuickFacts`, `InlineOptenCallout`, `ModelInstallCta`, `RelatedModels`), расширение `seo-routes.ts` (`softwareApplicationModelBlock` + `buildModelRoute`), обновление `paths.ts`/`main.tsx`/`entry-server.tsx`/`sitemap.mjs`/`llms.mjs`/`SiteHeader`/`SiteFooter`/`App.tsx`. Build зелёный (22 prerendered routes). См. `.planning/phases/01-models-infrastructure/1-SUMMARY.md`.
 - [ ] **Phase 2: Models Content Generation + Publication** — Spawn 7 параллельных general-purpose Claude Code агентов, каждый получает 8-9 скилл-MD + эталон + types + критерии. Каждый пишет 8-9 `<slug>.ts` файлов. Main session верифицирует 5 случайных + 2 фиксированных моделей. Build → 126 HTML. IndexNow пинг.
 
 ### Phase Details
