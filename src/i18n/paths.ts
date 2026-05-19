@@ -1,22 +1,32 @@
 // Phase 3 follow-up (post-3): single source of truth for EN-sibling rewrites.
-// SYNC: EN_SIBLINGS MUST match the 8 EN entries in scripts/seo-routes.ts.
-// Update both files whenever an EN route is added or removed.
+// SYNC: EN_SIBLINGS MUST match the EN entries in scripts/seo-routes.ts.
+// Static entries below + dynamic /models/<slug> entries (Phase v2.0 MODELS-A-7)
+// derived from src/content/models/slugs.ts. Update both files when adding routes.
 //
 // Open-Redirect mitigation (RESEARCH.md §Security T-03-22 preserved):
 // Targets are computed from a pure path-rewrite operating against the allow-list
 // only. No user-controlled strings (search, hash, postMessage) flow into navigate().
 
-export const EN_SIBLINGS = new Set<string>([
+// Phase v2.0 MODELS-A-7: light-import — `slugs.ts` only re-exports a string[],
+// no React or content modules pulled into the i18n bundle (R2 mitigation).
+import { MODEL_SLUGS_WITH_CONTENT } from "../content/models/slugs";
+
+const STATIC_EN_SIBLINGS: readonly string[] = [
   "/",
   "/welcome",
   "/pay",
   "/privacy",
   "/terms",
   "/refund",
-  "/about", // Phase 4.1 B-03: EN sibling added (was Phase 4 RU-only per D-01/D-02)
-  "/blog", // Phase 5 B-04: blog listing
-  "/blog/gpt-image-2", // Phase 5 B-05/B-07: blog post (replaces retired /guides/gpt-image-2)
-]);
+  "/about", // Phase 4.1 B-03
+  "/blog", // Phase 5 B-04
+  "/blog/gpt-image-2", // Phase 5 B-05/B-07
+  "/models", // Phase v2.0 MODELS-A-7
+];
+
+const MODEL_PATHS = MODEL_SLUGS_WITH_CONTENT.map((slug) => `/models/${slug}`);
+
+export const EN_SIBLINGS = new Set<string>([...STATIC_EN_SIBLINGS, ...MODEL_PATHS]);
 
 export const EN_LANDING = "/en/";
 

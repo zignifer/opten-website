@@ -17,10 +17,12 @@ const { routes } = await import(pathToFileURL(MANIFEST_BUNDLE).href);
 
 const prerenderedRoutes = routes.filter((r) => r.prerender !== "none");
 
-// Floor check: Phase 5 B-07 retired /guides/* (-2) → 18 prerendered routes (14 baseline + /about siblings + 4 blog).
-if (prerenderedRoutes.length < 18) {
+// Floor check: Phase v2.0 MODELS-A-10 bumped 18 → 22 to account for /models +
+// /en/models hub + /models/gpt-image-2 + /en/models/gpt-image-2 reference page
+// added in Phase 1. Phase 2 will bump again (→ 144) once 62 content files land.
+if (prerenderedRoutes.length < 22) {
   throw new Error(
-    `llms.mjs: expected at least 18 prerendered routes (14 baseline + /about siblings + 4 blog after Phase 5 B-07), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
+    `llms.mjs: expected at least 22 prerendered routes (18 baseline + 4 models after v2.0 Phase 1), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
   );
 }
 
@@ -38,6 +40,9 @@ const SECTIONS = [
   // Phase 5 B-04 + B-07: blog hub (/blog + /en/blog) and posts (/blog/:slug + /en/blog/:slug).
   // Guides matcher removed in B-07 — /guides/* URLs retired in favor of /blog/* (301 redirect).
   { name: "Blog", match: (p) => /^\/(en\/)?blog(\/|$)/.test(p) },
+  // Phase v2.0 MODELS-A-10: programmatic model pages (/models hub + /models/:slug)
+  // grouped under one Models heading regardless of locale.
+  { name: "Models", match: (p) => /^\/(en\/)?models(\/|$)/.test(p) },
   {
     name: "Legal",
     match: (p) => /^\/(en\/)?(privacy|terms|refund)$/.test(p),

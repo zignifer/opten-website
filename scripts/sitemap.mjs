@@ -28,8 +28,11 @@ const { routes, SITE_ORIGIN } = await import(pathToFileURL(MANIFEST_BUNDLE).href
 
 const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 
-if (sitemapRoutes.length < 18) {
-  throw new Error(`sitemap.mjs: expected at least 18 routes (14 baseline + /about siblings + 4 blog: /blog + /en/blog + /blog/gpt-image-2 + /en/blog/gpt-image-2 after Phase 5 B-07 retired the /guides/* URLs), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+// Phase v2.0 MODELS-A-9: floor bumped 18 → 22 to account for /models + /en/models
+// hub + /models/gpt-image-2 + /en/models/gpt-image-2 reference page added in
+// Phase 1. Phase 2 will bump this again (→ 144) once 62 content files land.
+if (sitemapRoutes.length < 22) {
+  throw new Error(`sitemap.mjs: expected at least 22 routes (18 baseline + /models + /en/models + /models/gpt-image-2 + /en/models/gpt-image-2 after v2.0 Phase 1), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 // Post-2026-05-17 GEO audit ME-12: per-route lastmod via git mtime of the source file driving
@@ -39,6 +42,9 @@ if (sitemapRoutes.length < 18) {
 //
 // path → primary source file. Both locale siblings share the same source (and therefore the same
 // lastmod) — that's correct: bilingual edits to /about always touch src/content/about.tsx.
+//
+// Phase v2.0 MODELS-A-9: model paths handled by sourceForRoute() function below
+// (dynamic — would otherwise need 124 hand-listed entries by end of Phase 2).
 const PATH_TO_SOURCE = {
   "/":                       "src/app/App.tsx",
   "/en/":                    "src/app/App.tsx",
@@ -58,7 +64,19 @@ const PATH_TO_SOURCE = {
   "/en/terms":               "src/app/pages/TermsPage.tsx",
   "/refund":                 "src/app/pages/RefundPage.tsx",
   "/en/refund":              "src/app/pages/RefundPage.tsx",
+  "/models":                 "src/content/models/index.ts",
+  "/en/models":              "src/content/models/index.ts",
 };
+
+// Phase v2.0 MODELS-A-9: dynamic mapping for /models/<slug> paths. Each model
+// route is driven by its individual content file in src/content/models/<slug>.ts.
+function sourceForRoute(route) {
+  const explicit = PATH_TO_SOURCE[route.path];
+  if (explicit) return explicit;
+  const match = route.path.match(/^\/(en\/)?models\/(.+)$/);
+  if (match) return `src/content/models/${match[2]}.ts`;
+  return null;
+}
 
 function gitMtime(relativePath) {
   try {
@@ -78,7 +96,7 @@ function gitMtime(relativePath) {
 }
 
 function lastmodForRoute(route) {
-  const source = PATH_TO_SOURCE[route.path];
+  const source = sourceForRoute(route);
   if (!source) return BUILD_DATE;
   return gitMtime(source) ?? BUILD_DATE;
 }

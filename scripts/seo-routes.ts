@@ -7,6 +7,12 @@
 // This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
 import { landingFaq } from "../src/content/landingFaq";
+// Phase v2.0 MODELS-A-6: programmatic model pages. allModels is the registry +
+// content barrel. Only models with `content !== undefined` produce a route in
+// the loop below — in Phase 1 that's only the manual gpt-image-2 reference;
+// Phase 2 fills the rest.
+import { allModels } from "../src/content/models";
+import type { ModelEntry, ModelMeta } from "../src/content/models/types";
 
 // Phase 3 D-01/D-02: cluster pairs (reciprocal hreflang per RESEARCH.md Pitfall 5):
 //   "/"        ↔ "/en/"          "/pay"     ↔ "/en/pay"
@@ -268,6 +274,35 @@ export function productBlock(plans: { name: string; price: string; currency: str
   return product;
 }
 
+// Phase v2.0 MODELS-A-6: SoftwareApplication block for an AI MODEL (distinct
+// from SOFTWARE_APP_BLOCK above which describes Opten the extension). Each
+// /models/<slug> page emits one of these to surface the model as a structured
+// entity — applicationCategory maps to type, brand to vendor, isRelatedTo
+// anchors it to the Opten extension so the graph stays connected.
+export function softwareApplicationModelBlock(opts: {
+  pageId: string;
+  modelName: string;
+  modelType: "image" | "video";
+  vendor: string;
+  description: string;
+  url?: string;
+  sameAs?: string[];
+}): SchemaBlock {
+  const block: SchemaBlock = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "@id": `${opts.pageId}#model`,
+    name: opts.modelName,
+    description: opts.description,
+    applicationCategory: opts.modelType === "video" ? "VideoApplication" : "GraphicsApplication",
+    brand: { "@type": "Organization", name: opts.vendor },
+    isRelatedTo: SOFTWARE_APP_REF,
+  };
+  if (opts.url) block.url = opts.url;
+  if (opts.sameAs && opts.sameAs.length > 0) block.sameAs = opts.sameAs;
+  return block;
+}
+
 // Post-2026-05-17 GEO audit HI-4: Article wrapper gives AI a canonical author+date attribution that
 // HowTo/FAQPage alone don't carry. `type: "TechArticle"` for technical guides, `"Article"` for /about.
 // Cross-refs PERSON_FOUNDER_BLOCK as `author` and ORG_BLOCK as `publisher` via existing @id graph.
@@ -430,6 +465,176 @@ export function blogPostingBlock(opts: {
     ...(opts.wordCount ? { wordCount: opts.wordCount } : {}),
   };
 }
+
+// --- Phase v2.0 MODELS-A-6: programmatic model route helpers -------------
+
+// Strip "by X" suffix and parenthetical from the platform string for use as a
+// user-facing platform label (e.g. "Kling AI (klingai.com) by Kuaishou" → "Kling AI").
+function platformLabel(meta: ModelMeta): string {
+  return meta.platform.split(/\s+by\s+|\s+\(/)[0].trim();
+}
+
+function modelArticleSection(meta: ModelMeta, lang: "ru" | "en"): string {
+  if (lang === "ru") return meta.type === "video" ? "Видео-модель" : "Image-модель";
+  return meta.type === "video" ? "Video model" : "Image model";
+}
+
+function buildModelRoute(entry: ModelEntry, lang: "ru" | "en"): RouteMeta {
+  if (!entry.content) {
+    throw new Error(`buildModelRoute called for ${entry.slug} without content — filter callers by entry.content`);
+  }
+  const { meta } = entry;
+  const locale = entry.content[lang];
+  const path = lang === "ru" ? `/models/${meta.slug}` : `/en/models/${meta.slug}`;
+  const ruUrl = `${SITE_ORIGIN}/models/${meta.slug}`;
+  const enUrl = `${SITE_ORIGIN}/en/models/${meta.slug}`;
+  const pageUrl = lang === "ru" ? ruUrl : enUrl;
+  const inLanguage = lang === "ru" ? "ru-RU" : "en-US";
+  const hubName = lang === "ru" ? "Модели" : "Models";
+  const homeName = lang === "ru" ? "Главная" : "Home";
+  const hubUrl = lang === "ru" ? `${SITE_ORIGIN}/models` : `${SITE_ORIGIN}/en/models`;
+  const homeUrl = lang === "ru" ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}/en/`;
+
+  return {
+    path,
+    htmlLang: lang,
+    hreflangAlternates: {
+      ru: ruUrl,
+      en: enUrl,
+      xDefault: ruUrl,
+    },
+    title: locale.title,
+    description: locale.description,
+    canonical: pageUrl,
+    ogTitle: locale.title,
+    ogDescription: locale.description,
+    ogImage: lang === "ru" ? DEFAULT_OG_IMAGE : DEFAULT_OG_IMAGE_EN,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      WEBSITE_BLOCK,
+      articleBlock({
+        pageId: pageUrl,
+        type: "TechArticle",
+        headline: locale.title,
+        description: locale.description,
+        datePublished: meta.publishedAt,
+        dateModified: meta.updatedAt,
+        inLanguage,
+        articleSection: modelArticleSection(meta, lang),
+      }),
+      softwareApplicationModelBlock({
+        pageId: pageUrl,
+        modelName: meta.name,
+        modelType: meta.type,
+        vendor: meta.vendor,
+        description: locale.intro,
+        url: meta.platformUrl || undefined,
+      }),
+      SOFTWARE_APP_BLOCK,
+      webPageBlock({
+        pageId: pageUrl,
+        url: pageUrl,
+        name: locale.title,
+        inLanguage,
+        cssSelector: ["h1", ".model-intro", "h2"],
+      }),
+      faqPageBlock(locale.faq, pageUrl),
+      breadcrumbBlock(
+        [
+          { name: homeName, url: homeUrl },
+          { name: hubName, url: hubUrl },
+          { name: meta.name, url: pageUrl },
+        ],
+        pageUrl,
+      ),
+    ],
+  };
+}
+
+function buildModelsHubRoute(lang: "ru" | "en", modelsWithContent: ModelEntry[]): RouteMeta {
+  const path = lang === "ru" ? "/models" : "/en/models";
+  const ruUrl = `${SITE_ORIGIN}/models`;
+  const enUrl = `${SITE_ORIGIN}/en/models`;
+  const pageUrl = lang === "ru" ? ruUrl : enUrl;
+  const inLanguage = lang === "ru" ? "ru-RU" : "en-US";
+  const homeName = lang === "ru" ? "Главная" : "Home";
+  const homeUrl = lang === "ru" ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}/en/`;
+  const title = lang === "ru"
+    ? "Поддерживаемые AI-модели — каталог Opten"
+    : "Supported AI models — Opten catalog";
+  const description = lang === "ru"
+    ? "Каталог из 60+ AI-моделей генерации изображений и видео, в которых работает Opten: Midjourney, Sora, Kling, Flux, Veo, Imagen и др."
+    : "Catalog of 60+ AI image and video models supported by Opten: Midjourney, Sora, Kling, Flux, Veo, Imagen, and more.";
+  const hubName = lang === "ru" ? "Модели" : "Models";
+
+  return {
+    path,
+    htmlLang: lang,
+    hreflangAlternates: {
+      ru: ruUrl,
+      en: enUrl,
+      xDefault: ruUrl,
+    },
+    title,
+    description,
+    canonical: pageUrl,
+    ogTitle: title,
+    ogDescription: description,
+    ogImage: lang === "ru" ? DEFAULT_OG_IMAGE : DEFAULT_OG_IMAGE_EN,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "weekly",
+    priority: 0.8,
+    schema: [
+      ORG_BLOCK,
+      WEBSITE_BLOCK,
+      collectionPageBlock({
+        pageId: pageUrl,
+        url: pageUrl,
+        name: title,
+        description,
+        inLanguage,
+      }),
+      itemListBlock(
+        modelsWithContent.map((m) => ({
+          url: lang === "ru" ? `${SITE_ORIGIN}/models/${m.slug}` : `${SITE_ORIGIN}/en/models/${m.slug}`,
+          name: m.meta.name,
+        })),
+        pageUrl,
+      ),
+      webPageBlock({
+        pageId: pageUrl,
+        url: pageUrl,
+        name: title,
+        inLanguage,
+        cssSelector: ["h1", ".model-intro"],
+      }),
+      breadcrumbBlock(
+        [
+          { name: homeName, url: homeUrl },
+          { name: hubName, url: pageUrl },
+        ],
+        pageUrl,
+      ),
+    ],
+  };
+}
+
+const modelsWithContent = allModels.filter((m): m is ModelEntry & { content: NonNullable<typeof m.content> } =>
+  m.content !== undefined,
+);
+const modelRouteEntries: RouteMeta[] = [
+  buildModelsHubRoute("ru", modelsWithContent),
+  buildModelsHubRoute("en", modelsWithContent),
+  ...modelsWithContent.flatMap((entry) => [
+    buildModelRoute(entry, "ru"),
+    buildModelRoute(entry, "en"),
+  ]),
+];
 
 export const routes: RouteMeta[] = [
   // --- RU entries (6) ---
@@ -1119,4 +1324,10 @@ export const routes: RouteMeta[] = [
 
   // Phase 5 B-07: legacy /en/guides/gpt-image-2 EN entry removed; redirected to /en/blog/gpt-image-2
   // via vercel.json.
+
+  // Phase v2.0 MODELS-A-6: programmatic model pages — hub (RU + EN) and one
+  // RouteMeta per (model, locale) for every model with content !== undefined.
+  // Phase 1 ships only the gpt-image-2 reference = 4 new routes (2 hubs + 2
+  // page locales). Phase 2 expands modelsWithContent to all 62 → 126 routes.
+  ...modelRouteEntries,
 ];
