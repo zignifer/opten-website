@@ -8,10 +8,10 @@ last_updated: "2026-05-19T00:00:00.000Z"
 last_activity: 2026-05-19
 progress:
   total_phases: 2
-  completed_phases: 0
-  total_plans: 13
-  completed_plans: 0
-  percent: 0
+  completed_phases: 1
+  total_plans: 19
+  completed_plans: 13
+  percent: 68
 ---
 
 # Project State
@@ -27,10 +27,11 @@ See: .planning/PROJECT.md (updated 2026-05-17 with v1.0 shipped state)
 ## Current Position
 
 Milestone: **v2.0 — Programmatic SEO — Model Pages**
-Phase: **Phase 1 — Models Infrastructure** (in progress)
+Phase: **Phase 1 — Models Infrastructure** (✅ completed 2026-05-19)
 Plan: см. `.planning/phases/01-models-infrastructure/1-PLAN.md`
-Status: Phase 1 запущена 2026-05-19. На этой стадии настройка TS-типов, парсера скиллов, React-компонентов, расширение seo-routes.ts. Эталонная страница `gpt-image-2` пишется вручную как образец для Phase 2.
-Last activity: 2026-05-19 — milestone v2.0 set up, Phase 1 в работе.
+Verification: см. `.planning/phases/01-models-infrastructure/1-VERIFICATION.md` — все 8 критериев passed
+Status: Phase 1 закрыта. 4 новых prerendered HTML существуют, sitemap + llms.txt + IndexNow обновились, verify-faq-mainentity зелёный. Следующий шаг — Phase 2 (spawn 7 параллельных агентов для оставшихся 61 моделей).
+Last activity: 2026-05-19 — Phase 1 shipped (5 wave commits, build green).
 
 Next:
   1. **Phase 1 completion** — 13 атомарных плана (MODELS-A-1..13). Финальный build green + Rich Results Test на /models/gpt-image-2.
