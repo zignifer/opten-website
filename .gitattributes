@@ -1,7 +1,13 @@
-# Force LF on JSON config files Obsidian touches frequently —
-# prevents CRLF flip-flop in diffs.
-.obsidian/*.json text eol=lf
-*.json text eol=lf
-
-# Markdown should also stay LF for cross-platform vault consistency
-*.md text eol=lf
+# Normalize line endings in the git index, but leave working-tree files
+# alone so Obsidian / IDEs writing CRLF on Windows do not show up as
+# phantom-modified in `git status`. `text` (without eol=lf) tells git
+# "this is a text file — store LF in the index, write whatever the
+# platform prefers in the working tree". This eliminates the flip-flop
+# without forcing one convention on every editor.
+*.md text
+*.json text
+*.ts text
+*.tsx text
+*.js text
+*.mjs text
+*.css text
