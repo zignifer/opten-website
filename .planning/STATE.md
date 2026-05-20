@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: "Programmatic SEO — Model Pages"
-status: Phase 2 SHIPPED (2026-05-20) — 62 model content files generated, verified 62/62, wired into 144 routes, 126 prerendered HTML, pushed to main (a9b3a5c). Vercel deploying. Only remaining item is the 7-14 day post-deploy GSC monitoring window (2-07).
+status: v2.0 CLOSED (2026-05-20) — Programmatic SEO Model Pages shipped (62 pages × RU/EN + 2 hubs, 144 routes), archived to milestones/v2.0-*. Idle between milestones. Only carried-forward item: MODELS-B-6 GSC indexing monitoring (~2026-05-27..06-03). Next: /gsd-new-milestone.
 stopped_at: ""
-last_updated: "2026-05-20T04:30:00.000Z"
+last_updated: "2026-05-20T11:30:00.000Z"
 last_activity: 2026-05-20
 progress:
   total_phases: 2
   completed_phases: 2
   total_plans: 20
   completed_plans: 19
-  percent: 95
+  percent: 100
 ---
 
 # Project State
@@ -21,8 +21,8 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-17 with v1.0 shipped state)
 
 **Core value:** Sell, service, and onboard extension users without breaking the shipped integration contract with the Opten Chrome extension.
-**Current focus:** v2.0 Phase 2 shipped 2026-05-20 — 62 programmatic model pages live. Post-deploy GSC monitoring window open.
-**Active milestone:** v2.0 — Programmatic SEO — Model Pages (Phase 1 + Phase 2 shipped; monitoring window remains).
+**Current focus:** Idle between milestones. v2.0 closed 2026-05-20 (archived to `milestones/v2.0-*`). Next: `/gsd-new-milestone`.
+**Active milestone:** None. v2.0 — Programmatic SEO — Model Pages closed 2026-05-20. Carried forward: MODELS-B-6 GSC indexing monitoring (~2026-05-27..06-03).
 
 ## Current Position
 
@@ -93,8 +93,20 @@ Milestone-level v1.0 decisions are preserved in `.planning/milestones/v1.0-ROADM
 
 (none active — v1.0 Phase 4.2 verification artifacts in `.planning/phases/04.2-seo-geo-polish-post-synthesis/04.2-VERIFICATION.md` list the post-deploy manual checks above as next-action items)
 
+## Deferred Items
+
+Acknowledged and deferred at v2.0 close (2026-05-20). Pre-close artifact audit (`gsd-sdk query audit-open`) flagged 7 open items — all stale v1.0 leftovers, not v2.0 blockers:
+
+| Category | Item | Status |
+|----------|------|--------|
+| quick_task | 260516-pmk-normalize-mobile-landing-section-spacing | missing (v1.0, shipped; artifact file absent) |
+| uat_gap | phase 03 (03-HUMAN-UAT.md) | resolved (0 open scenarios) |
+| verification_gap | phase 02 (02-VERIFICATION.md, v1.0 per-route-prerender) ×5 | stale v1.0 phase artifacts, not cleaned up |
+
+These belong to the v1.0 phase directories still living in `.planning/phases/` (never archived). Run `/gsd-cleanup` to retroactively archive v1.0 + v2.0 phase dirs.
+
 ## Session Continuity
 
-Last session: 2026-05-17T20:00:00.000Z
-Stopped at: v1.0 milestone closed and archived. PROJECT.md updated. ROADMAP.md collapsed. REQUIREMENTS.md deleted (fresh per next milestone). Phase artifacts in `.planning/phases/` will be cleaned up after archive verification.
-Resume file: `.planning/milestones/v1.0-ROADMAP.md` (for historical reference) or `/gsd-new-milestone` (for next milestone start).
+Last session: 2026-05-20 (v2.0 close)
+Stopped at: v2.0 milestone closed and archived. ROADMAP.md collapsed, REQUIREMENTS.md archived → `milestones/v2.0-REQUIREMENTS.md` and removed, PROJECT.md updated, Phase 2 SUMMARY written, git tag `v2.0` created. Idle between milestones.
+Resume: `.planning/milestones/v2.0-ROADMAP.md` (historical) or `/gsd-new-milestone` (next milestone). Phase directories (v1.0 + v2.0) still in `.planning/phases/` — `/gsd-cleanup` to archive.
