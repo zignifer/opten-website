@@ -28,11 +28,12 @@ const { routes, SITE_ORIGIN } = await import(pathToFileURL(MANIFEST_BUNDLE).href
 
 const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 
-// Phase v2.0 MODELS-A-9: floor bumped 18 → 22 to account for /models + /en/models
-// hub + /models/gpt-image-2 + /en/models/gpt-image-2 reference page added in
-// Phase 1. Phase 2 will bump this again (→ 144) once 62 content files land.
-if (sitemapRoutes.length < 22) {
-  throw new Error(`sitemap.mjs: expected at least 22 routes (18 baseline + /models + /en/models + /models/gpt-image-2 + /en/models/gpt-image-2 after v2.0 Phase 1), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+// Phase v2.0 MODELS-B-3b: floor bumped 22 → 144 now that all 62 model content
+// files landed. 144 = 18 baseline + 2 hubs (/models + /en/models) + 124 model
+// pages (62 RU + 62 EN). The 3 SPA-only routes (/success, /account,
+// /dashboard/*) carry prerender:"none" and are excluded from sitemapRoutes.
+if (sitemapRoutes.length < 144) {
+  throw new Error(`sitemap.mjs: expected at least 144 routes (18 baseline + 2 model hubs + 124 model pages after v2.0 Phase 2), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 // Post-2026-05-17 GEO audit ME-12: per-route lastmod via git mtime of the source file driving
