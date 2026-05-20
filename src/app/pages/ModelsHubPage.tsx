@@ -99,30 +99,36 @@ export default function ModelsHubPage() {
     <div className="min-h-screen bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
       <SiteHeader variant="page" />
 
-      <main className="mx-auto max-w-[1080px] px-[20px] pb-[60px] pt-[120px] sm:pt-[140px]">
-        <nav
-          aria-label="Breadcrumb"
-          className="mb-[24px] flex flex-wrap items-center gap-x-[8px] gap-y-[4px] text-[13px] text-white/45"
-        >
-          <LocalizedLink to="/" className="no-underline text-inherit transition hover:text-white">
-            {t("nav.home")}
-          </LocalizedLink>
-          <span aria-hidden="true">/</span>
-          <span aria-current="page" className="text-white/75">{t("nav.models")}</span>
-        </nav>
+      {/* Hero — centered title + intro + gradient, mirrors BlogListPage. The
+          blog hero is md:min-h-[520px]; this one is sized to its content (no
+          min-h) so the gap down to the filter row is roughly half the blog's.
+          Mask fades the gradient blob into the page bg (no hard seam). */}
+      <section className="relative overflow-hidden bg-[#011417] px-5 pb-16 pt-[131px] md:pb-20 md:pt-[190px]">
+        <div
+          aria-hidden="true"
+          className="opten-figma-gradient"
+          style={{
+            WebkitMaskImage:
+              "linear-gradient(to bottom, black 0%, black 65%, transparent 100%)",
+            maskImage:
+              "linear-gradient(to bottom, black 0%, black 65%, transparent 100%)",
+          }}
+        />
+        <div className="relative z-10 mx-auto max-w-[800px] text-center">
+          <h1 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] tracking-[-0.6px] text-white sm:text-[44px] md:text-[52px]">
+            {t("models.hub.heading")}
+          </h1>
+          <p className="model-intro mx-auto mt-[20px] max-w-[680px] text-[17px] leading-[1.6] text-white/70 md:text-[18px]">
+            {t("models.hub.intro")}
+          </p>
+        </div>
+      </section>
 
-        <h1 className="font-['Unbounded',sans-serif] text-[32px] font-medium leading-[1.15] tracking-[-0.6px] text-white md:text-[44px]">
-          {t("models.hub.heading")}
-        </h1>
-
-        <p className="model-intro mt-[20px] max-w-[760px] text-[17px] leading-[1.6] text-white/75 md:text-[18px]">
-          {t("models.hub.intro")}
-        </p>
-
+      <main className="mx-auto max-w-[1100px] px-[20px] pb-[80px] pt-[40px]">
         {/* Filter controls — mirrors BlogListPage. Mobile (< sm): native <select>
             stacked above a full-width search input. Desktop (≥ sm): chip row on
             the left, fixed-width search on the right. */}
-        <div className="mt-[14px] flex flex-col gap-[12px] sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-[12px] sm:flex-row sm:items-center sm:justify-between">
           {/* Mobile dropdown — hidden ≥ sm */}
           <label className="relative block w-full sm:hidden">
             <span className="sr-only">{t("models.hub.filterLabel")}</span>
