@@ -28,7 +28,7 @@
   "nav.menuToggle": "Open menu",
   "common.yes": "Yes",
   "common.no": "No",
-  "models.hub.heading": "Supported AI models",
+  "models.hub.heading": "AI models",
   "models.hub.intro": "Catalog of AI image and video models that Opten works with. Each page breaks down prompt structure, common mistakes, and examples for a specific model — Midjourney, Sora, Kling, Flux, Veo, Imagen, and more.",
   "models.hub.filterLabel": "Filter by type",
   "models.hub.filterAll": "All",

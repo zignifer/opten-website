@@ -150,7 +150,7 @@ export default function BlogListPage() {
           the .opten-figma-gradient blob (top:-640px, blur 285px) hits the section's bottom
           edge with full opacity and produces a hard horizontal seam. The mask gradient
           (black-to-transparent over the last ~30% of the section) blends it into the page bg. */}
-      <section className="relative overflow-hidden bg-[#011417] px-5 pb-16 pt-[131px] md:min-h-[520px] md:pb-20 md:pt-[190px]">
+      <section className="relative overflow-hidden bg-[#011417] px-5 pb-16 pt-[131px] md:pb-20 md:pt-[190px]">
         <div
           aria-hidden="true"
           className="opten-figma-gradient"
