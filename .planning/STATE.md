@@ -32,6 +32,11 @@ Plan: см. `.planning/phases/02-models-content/2-PLAN.md`
 Status: Phase 2 закрыта. 62 контент-файла (RU+EN) сгенерированы 7 параллельными агентами, verify-models-content 62/62 зелёный, все 62 модели в routes (144 prerendered routes), 126 model HTML в dist/models + dist/en/models, sitemap 144 URL, llms.txt 144, FAQ-parity gate зелёный. Запушено в main (`a9b3a5c`), Vercel автодеплоит → IndexNow пингует 144 URL при сборке.
 Last activity: 2026-05-20 — Phase 2 shipped (8 коммитов: 7 контент-батчей + 1 инфра-wire), build green, Playwright + Codex review passed, push authorized by user.
 
+Post-Phase-2 hotfixes (2026-05-20, pushed 6dbc26a):
+  - **EN meta localization (`c867910`)** — `meta.name/platform/duration/resolution` приходят из `_registry.ts` (парсятся дословно из RU скилл-MD), поэтому 58/62 модели показывали русский на /en/* (Quick Facts, related-карточки, хаб, breadcrumb, SoftwareApplication schema). Добавлен ручной `src/content/models/metaEn.ts` (EN-оверрайды по slug) + хелпер `metaField` (выбирает EN на EN, чистит stray `**`). Прокинут во все рендер-сайты + seo-routes. Генератор regen-safe (metaEn.ts не трогает). verify-models-content теперь падает, если в EN-meta осталась кириллица.
+  - **EN head meta localization (`6dbc26a`)** — `index.html` отдаёт `keywords`, `og:image:alt`, author-byline по-русски; prerender локализовал per-route теги, но не эти. `applyMeta` теперь меняет keywords + og:image:alt на английские и транслитерирует автора (Влад Воронежцев → Vlad Voronezhtsev) при `htmlLang === "en"`. RU не тронут.
+  - Codex LOW (неполнота verify) частично закрыта EN-meta-cyrillic гейтом. Codex MEDIUM (вшить verify-models-content в build) всё ещё deferred — нужен Vercel Node ≥22.18.
+
 Next:
   1. **Post-deploy v2.0 window** (7-14 дней, ~2026-05-27..06-03): мониторинг GSC «Coverage» по `site:opten.space/models/`. Цель ≥60% URL Indexed (plan 2-07 / MODELS-B-6). Если меньше — diagnostic анализ (тонкий контент, дубликаты, robots.txt) + план корректировок.
   2. **Stage 2 (v2.1)** — ручная правка контента топ-15 моделей (out of scope для Phase 2).
