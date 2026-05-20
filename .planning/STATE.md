@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: "Programmatic SEO — Model Pages"
-status: Phase 1 in progress — models infrastructure setup (TS types, registry parser, React components, SEO routes). Reference page gpt-image-2 будет вручную, потом Phase 2 spawn 7 параллельных агентов для 62 моделей.
+status: Phase 2 SHIPPED (2026-05-20) — 62 model content files generated, verified 62/62, wired into 144 routes, 126 prerendered HTML, pushed to main (a9b3a5c). Vercel deploying. Only remaining item is the 7-14 day post-deploy GSC monitoring window (2-07).
 stopped_at: ""
-last_updated: "2026-05-19T00:00:00.000Z"
-last_activity: 2026-05-19
+last_updated: "2026-05-20T04:30:00.000Z"
+last_activity: 2026-05-20
 progress:
   total_phases: 2
-  completed_phases: 1
-  total_plans: 19
-  completed_plans: 13
-  percent: 68
+  completed_phases: 2
+  total_plans: 20
+  completed_plans: 19
+  percent: 95
 ---
 
 # Project State
@@ -21,26 +21,29 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-17 with v1.0 shipped state)
 
 **Core value:** Sell, service, and onboard extension users without breaking the shipped integration contract with the Opten Chrome extension.
-**Current focus:** Idle — between milestones.
-**Active milestone:** None. v1.0 (GEO Optimization) closed 2026-05-17. Archive: `.planning/milestones/v1.0-{ROADMAP,REQUIREMENTS}.md`.
+**Current focus:** v2.0 Phase 2 shipped 2026-05-20 — 62 programmatic model pages live. Post-deploy GSC monitoring window open.
+**Active milestone:** v2.0 — Programmatic SEO — Model Pages (Phase 1 + Phase 2 shipped; monitoring window remains).
 
 ## Current Position
 
 Milestone: **v2.0 — Programmatic SEO — Model Pages**
-Phase: **Phase 1 — Models Infrastructure** (✅ completed 2026-05-19)
-Plan: см. `.planning/phases/01-models-infrastructure/1-PLAN.md`
-Verification: см. `.planning/phases/01-models-infrastructure/1-VERIFICATION.md` — все 8 критериев passed
-Status: Phase 1 закрыта. 4 новых prerendered HTML существуют, sitemap + llms.txt + IndexNow обновились, verify-faq-mainentity зелёный. Следующий шаг — Phase 2 (spawn 7 параллельных агентов для оставшихся 61 моделей).
-Last activity: 2026-05-19 — Phase 1 shipped (5 wave commits, build green).
+Phase: **Phase 2 — Models Content Generation + Publication** (✅ shipped 2026-05-20)
+Plan: см. `.planning/phases/02-models-content/2-PLAN.md`
+Status: Phase 2 закрыта. 62 контент-файла (RU+EN) сгенерированы 7 параллельными агентами, verify-models-content 62/62 зелёный, все 62 модели в routes (144 prerendered routes), 126 model HTML в dist/models + dist/en/models, sitemap 144 URL, llms.txt 144, FAQ-parity gate зелёный. Запушено в main (`a9b3a5c`), Vercel автодеплоит → IndexNow пингует 144 URL при сборке.
+Last activity: 2026-05-20 — Phase 2 shipped (8 коммитов: 7 контент-батчей + 1 инфра-wire), build green, Playwright + Codex review passed, push authorized by user.
 
 Next:
-  1. **Phase 1 completion** — 13 атомарных плана (MODELS-A-1..13). Финальный build green + Rich Results Test на /models/gpt-image-2.
-  2. **Phase 2** — spawn 7 параллельных Claude Code агентов для генерации 62 контент-файлов. Main-session верификация. Build → 126 HTML. IndexNow ping.
-  3. **Post-deploy v2.0 window** (7-14 дней после Phase 2 деплоя): мониторинг GSC «Coverage» отчёта, ожидаем ≥60% URL Indexed.
+  1. **Post-deploy v2.0 window** (7-14 дней, ~2026-05-27..06-03): мониторинг GSC «Coverage» по `site:opten.space/models/`. Цель ≥60% URL Indexed (plan 2-07 / MODELS-B-6). Если меньше — diagnostic анализ (тонкий контент, дубликаты, robots.txt) + план корректировок.
+  2. **Stage 2 (v2.1)** — ручная правка контента топ-15 моделей (out of scope для Phase 2).
+
+Deferred follow-ups (из Codex review Phase 2, 2026-05-20 — non-blocking, защита от будущих регрессий, контент уже корректен 62/62):
+  - **[MEDIUM] Встроить `scripts/verify-models-content.mjs` в build-цепочку** (рядом с verify-faq-mainentity.mjs в package.json). Caveat: скрипт делает raw-`.ts` dynamic import → нужен Node ≥22.18 на Vercel. Сначала подтвердить версию Node на Vercel (доступно через Vercel MCP / dashboard), потом вшивать. Пользователь отложил 2026-05-20.
+  - **[LOW] Расширить verify-скрипт** на проверку вложенных обязательных полей (section.heading/body, example.before/after, mistake.title/explain, faq.q, h1). Сейчас частично подстраховано типами при `vite build`.
 
 Параллельные открытые задачи (отложены):
-  - v1.0 Phase 4.2 post-deploy GEO rescore (target ~80+) — окно открыто, но фокус на v2.0
+  - v1.0 Phase 4.2 post-deploy GEO rescore (target ~80+) — окно открыто
   - Bing token replacement — операционная задача, не блокирует
+  - **SPA client-nav `<title>` не обновляется** на per-route (пред-существующее, не Phase 2). Prerendered HTML title корректен → SEO не затронут. Косметика для UX вкладки браузера.
 
 ## Post-v1.0 hotfix series (2026-05-17..18)
 
