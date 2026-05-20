@@ -24,13 +24,24 @@ export default function BlogListPage() {
   const t = useT();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const activeTag = (searchParams.get("tag") ?? "") as BlogTag | "";
-  const pageParam = Number.parseInt(searchParams.get("page") ?? "1", 10);
+  // Until hydrated, mirror the SSR render (prerendered with no query params →
+  // unfiltered, page 1, empty search) so a direct-load / refresh of a filtered
+  // URL (?tag, ?q, ?page) doesn't throw a hydration mismatch — the prerender
+  // always emits page 1 of the full inventory. After mount we flip to the URL.
+  const [hydrated, setHydrated] = useState(false);
+  const activeTag = (hydrated ? searchParams.get("tag") ?? "" : "") as BlogTag | "";
+  const pageParam = Number.parseInt((hydrated ? searchParams.get("page") : null) ?? "1", 10);
   const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
-  const queryParam = searchParams.get("q") ?? "";
+  const queryParam = hydrated ? searchParams.get("q") ?? "" : "";
 
-  // Controlled input value (debounced into searchParams). Initial value matches URL on mount.
-  const [queryInput, setQueryInput] = useState(queryParam);
+  // Controlled input value (debounced into searchParams). Starts empty to match
+  // SSR; synced from the URL after mount.
+  const [queryInput, setQueryInput] = useState("");
+  useEffect(() => {
+    setHydrated(true);
+    setQueryInput(searchParams.get("q") ?? "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Debounce the search input → URL. Skip on first render when input matches URL state.
   // Functional updater (prev => …) reads the CURRENT URL state when the timeout fires —
