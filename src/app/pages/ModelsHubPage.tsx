@@ -14,7 +14,7 @@ import { useLang, useT } from "../../i18n/LangContext";
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 import LocalizedLink from "../components/LocalizedLink";
-import { allModels } from "../../content/models";
+import { allModels, HUB_HIDDEN_SLUGS } from "../../content/models";
 import { metaField } from "../../content/models/metaEn";
 
 type FilterValue = "" | "image" | "video";
@@ -62,12 +62,14 @@ export default function ModelsHubPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryInput]);
 
-  const imageCount = useMemo(() => allModels.filter((m) => m.meta.type === "image").length, []);
-  const videoCount = useMemo(() => allModels.filter((m) => m.meta.type === "video").length, []);
+  // General/umbrella models are kept live but hidden from the hub grid + counts.
+  const hubModels = useMemo(() => allModels.filter((m) => !HUB_HIDDEN_SLUGS.has(m.slug)), []);
+  const imageCount = useMemo(() => hubModels.filter((m) => m.meta.type === "image").length, [hubModels]);
+  const videoCount = useMemo(() => hubModels.filter((m) => m.meta.type === "video").length, [hubModels]);
 
   const filteredModels = useMemo(() => {
     const q = queryParam.toLowerCase().trim();
-    return allModels.filter((m) => {
+    return hubModels.filter((m) => {
       if (typeFilter && m.meta.type !== typeFilter) return false;
       if (!q) return true;
       const name = (metaField(m.meta, "name", lang) ?? "").toLowerCase();
@@ -75,7 +77,7 @@ export default function ModelsHubPage() {
       const intro = m.content ? m.content[lang].intro.toLowerCase() : "";
       return `${name} ${vendor} ${intro}`.includes(q);
     });
-  }, [typeFilter, queryParam, lang]);
+  }, [hubModels, typeFilter, queryParam, lang]);
 
   function selectType(next: FilterValue) {
     const params = new URLSearchParams(searchParams);
@@ -90,7 +92,7 @@ export default function ModelsHubPage() {
   }
 
   const filters: { value: FilterValue; label: string; count: number }[] = [
-    { value: "", label: t("models.hub.filterAll"), count: allModels.length },
+    { value: "", label: t("models.hub.filterAll"), count: hubModels.length },
     { value: "image", label: t("models.hub.filterImage"), count: imageCount },
     { value: "video", label: t("models.hub.filterVideo"), count: videoCount },
   ];

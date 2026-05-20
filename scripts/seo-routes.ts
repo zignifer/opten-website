@@ -11,7 +11,7 @@ import { landingFaq } from "../src/content/landingFaq";
 // content barrel. Only models with `content !== undefined` produce a route in
 // the loop below — in Phase 1 that's only the manual gpt-image-2 reference;
 // Phase 2 fills the rest.
-import { allModels } from "../src/content/models";
+import { allModels, HUB_HIDDEN_SLUGS } from "../src/content/models";
 import { metaField } from "../src/content/models/metaEn";
 import type { ModelEntry, ModelMeta } from "../src/content/models/types";
 
@@ -601,10 +601,12 @@ function buildModelsHubRoute(lang: "ru" | "en", modelsWithContent: ModelEntry[])
         inLanguage,
       }),
       itemListBlock(
-        modelsWithContent.map((m) => ({
-          url: lang === "ru" ? `${SITE_ORIGIN}/models/${m.slug}` : `${SITE_ORIGIN}/en/models/${m.slug}`,
-          name: metaField(m.meta, "name", lang) ?? m.meta.name,
-        })),
+        modelsWithContent
+          .filter((m) => !HUB_HIDDEN_SLUGS.has(m.slug))
+          .map((m) => ({
+            url: lang === "ru" ? `${SITE_ORIGIN}/models/${m.slug}` : `${SITE_ORIGIN}/en/models/${m.slug}`,
+            name: metaField(m.meta, "name", lang) ?? m.meta.name,
+          })),
         pageUrl,
       ),
       webPageBlock({
