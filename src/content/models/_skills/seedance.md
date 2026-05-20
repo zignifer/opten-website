@@ -6,7 +6,7 @@
 ## Идентификация
 
 - **model_id:** seedance
-- **model_name:** Seedance 2.0
+- **model_name:** Seedance (общий)
 - **type:** video
 - **platform:** 即梦 (Jimeng) by ByteDance
 - **best_language:** Chinese (zh), English works but Chinese prompts perform better on the native platform. On syntx.ai English is standard.

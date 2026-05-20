@@ -171,6 +171,7 @@ export const META_EN: Record<string, MetaEnFields> = {
     resolution: "720p native, upscale to 4K",
   },
   "seedance": {
+    name: "Seedance (general)",
     duration: "4–15 seconds per run",
     resolution: "Up to 2K",
   },

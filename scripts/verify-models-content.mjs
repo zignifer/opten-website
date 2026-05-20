@@ -193,7 +193,7 @@ async function main() {
   } else {
     const files = await readdir(MODELS_DIR);
     slugs = files
-      .filter((f) => f.endsWith(".ts") && !f.startsWith("_") && f !== "index.ts" && f !== "slugs.ts" && f !== "types.ts")
+      .filter((f) => f.endsWith(".ts") && !f.startsWith("_") && f !== "index.ts" && f !== "slugs.ts" && f !== "types.ts" && f !== "metaEn.ts")
       .map((f) => f.replace(/\.ts$/, ""));
 
     if (mode === "sample") {

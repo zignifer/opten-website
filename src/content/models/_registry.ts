@@ -746,7 +746,7 @@ export const MODELS_REGISTRY: ModelMeta[] = [
   },
   {
     slug: "seedance",
-    name: "Seedance 2.0",
+    name: "Seedance (общий)",
     type: "video",
     vendor: "ByteDance",
     platform: "即梦 (Jimeng) by ByteDance",
