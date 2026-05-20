@@ -5,8 +5,9 @@
 // Body copy is parametrized with {modelName} and {platform}, taken from
 // ModelMeta; the i18n strings use {name}/{platform} placeholders.
 
-import { useT } from "../../i18n/LangContext";
+import { useT, useLang } from "../../i18n/LangContext";
 import type { ModelMeta } from "../../content/models/types";
+import { metaField } from "../../content/models/metaEn";
 
 const STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 
@@ -21,21 +22,22 @@ function interpolate(template: string, params: Record<string, string>): string {
   return template.replace(/\{(\w+)\}/g, (_, k) => params[k] ?? `{${k}}`);
 }
 
-function platformName(meta: ModelMeta): string {
+function platformName(meta: ModelMeta, lang: "ru" | "en"): string {
   // Take everything before " by " or before " (" to get a clean platform label,
   // e.g. "Kling AI (klingai.com) by Kuaishou" → "Kling AI"
-  const stripped = meta.platform.split(/\s+by\s+|\s+\(/)[0];
+  const stripped = (metaField(meta, "platform", lang) ?? "").split(/\s+by\s+|\s+\(/)[0];
   return stripped.trim();
 }
 
 export default function InlineOptenCallout({ variant, meta }: Props) {
   const t = useT();
+  const { lang } = useLang();
   const bodyKey = variant === "after-features"
     ? "models.callout.afterFeatures"
     : "models.callout.afterMistakes";
   const body = interpolate(t(bodyKey), {
-    name: meta.name,
-    platform: platformName(meta),
+    name: metaField(meta, "name", lang) ?? meta.name,
+    platform: platformName(meta, lang),
   });
 
   return (

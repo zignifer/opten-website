@@ -14,6 +14,7 @@ import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 import LocalizedLink from "../components/LocalizedLink";
 import { allModels } from "../../content/models";
+import { metaField } from "../../content/models/metaEn";
 
 type FilterValue = "" | "image" | "video";
 
@@ -114,7 +115,7 @@ export default function ModelsHubPage() {
             const typeLabel = m.meta.type === "video"
               ? t("models.quickFacts.typeVideo")
               : t("models.quickFacts.typeImage");
-            const platformLabel = m.meta.platform.split(/\s+by\s+|\s+\(/)[0].trim();
+            const platformLabel = (metaField(m.meta, "platform", lang) ?? "").split(/\s+by\s+|\s+\(/)[0].trim();
             const description = m.content
               ? m.content[lang].intro
               : `${platformLabel} · ${m.meta.vendor}`;
@@ -132,7 +133,7 @@ export default function ModelsHubPage() {
                   {typeLabel}
                 </span>
                 <h2 className="text-[17px] font-medium leading-[1.3] tracking-[-0.3px] text-white transition group-hover:text-[#9cfb51]">
-                  {m.meta.name}
+                  {metaField(m.meta, "name", lang)}
                 </h2>
                 <p className="text-[13px] leading-[1.5] text-white/55 line-clamp-3">
                   {description.length > 140 ? description.slice(0, 137).trimEnd() + "…" : description}

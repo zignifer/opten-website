@@ -12,6 +12,7 @@ import { landingFaq } from "../src/content/landingFaq";
 // the loop below — in Phase 1 that's only the manual gpt-image-2 reference;
 // Phase 2 fills the rest.
 import { allModels } from "../src/content/models";
+import { metaField } from "../src/content/models/metaEn";
 import type { ModelEntry, ModelMeta } from "../src/content/models/types";
 
 // Phase 3 D-01/D-02: cluster pairs (reciprocal hreflang per RESEARCH.md Pitfall 5):
@@ -528,7 +529,7 @@ function buildModelRoute(entry: ModelEntry, lang: "ru" | "en"): RouteMeta {
       }),
       softwareApplicationModelBlock({
         pageId: pageUrl,
-        modelName: meta.name,
+        modelName: metaField(meta, "name", lang) ?? meta.name,
         modelType: meta.type,
         vendor: meta.vendor,
         description: locale.intro,
@@ -547,7 +548,7 @@ function buildModelRoute(entry: ModelEntry, lang: "ru" | "en"): RouteMeta {
         [
           { name: homeName, url: homeUrl },
           { name: hubName, url: hubUrl },
-          { name: meta.name, url: pageUrl },
+          { name: metaField(meta, "name", lang) ?? meta.name, url: pageUrl },
         ],
         pageUrl,
       ),
@@ -602,7 +603,7 @@ function buildModelsHubRoute(lang: "ru" | "en", modelsWithContent: ModelEntry[])
       itemListBlock(
         modelsWithContent.map((m) => ({
           url: lang === "ru" ? `${SITE_ORIGIN}/models/${m.slug}` : `${SITE_ORIGIN}/en/models/${m.slug}`,
-          name: m.meta.name,
+          name: metaField(m.meta, "name", lang) ?? m.meta.name,
         })),
         pageUrl,
       ),

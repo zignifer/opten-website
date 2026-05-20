@@ -6,6 +6,7 @@
 import { useT, useLang } from "../../i18n/LangContext";
 import LocalizedLink from "./LocalizedLink";
 import { getRelatedModels } from "../../content/models";
+import { metaField } from "../../content/models/metaEn";
 import type { ModelMeta } from "../../content/models/types";
 
 interface Props {
@@ -30,7 +31,7 @@ export default function RelatedModels({ currentSlug, type }: Props) {
           const typeLabel = m.meta.type === "video"
             ? t("models.quickFacts.typeVideo")
             : t("models.quickFacts.typeImage");
-          const platformLabel = m.meta.platform.split(/\s+by\s+|\s+\(/)[0].trim();
+          const platformLabel = (metaField(m.meta, "platform", lang) ?? "").split(/\s+by\s+|\s+\(/)[0].trim();
           const description = m.content
             ? m.content[lang].intro
             : `${typeLabel} · ${platformLabel}`;
@@ -44,7 +45,7 @@ export default function RelatedModels({ currentSlug, type }: Props) {
                 {typeLabel}
               </span>
               <h3 className="text-[17px] font-medium leading-[1.3] tracking-[-0.3px] text-white transition group-hover:text-[#9cfb51]">
-                {m.meta.name}
+                {metaField(m.meta, "name", lang)}
               </h3>
               <p className="text-[13px] leading-[1.5] text-white/55 line-clamp-3">
                 {description.length > 140 ? description.slice(0, 137).trimEnd() + "…" : description}

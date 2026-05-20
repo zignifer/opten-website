@@ -166,6 +166,26 @@ async function checkFile(slug) {
   return { slug, ok: errors.length === 0, errors };
 }
 
+async function checkMetaEnCyrillic() {
+  // EN pages must never show Russian in the free-text meta fields (name,
+  // platform, duration, resolution). Those come from _registry.ts (parsed
+  // verbatim from the RU skill MDs); src/content/models/metaEn.ts supplies the
+  // EN overrides. This gate fails if any EN-resolved value still has Cyrillic.
+  const reg = await import(pathToFileURL(join(MODELS_DIR, "_registry.ts")).href);
+  const { metaField } = await import(pathToFileURL(join(MODELS_DIR, "metaEn.ts")).href);
+  const fields = ["name", "platform", "duration", "resolution"];
+  const failures = [];
+  for (const meta of reg.MODELS_REGISTRY) {
+    for (const f of fields) {
+      const en = metaField(meta, f, "en");
+      if (en && hasCyrillic(en)) {
+        failures.push(`${meta.slug}.${f}: EN meta has Cyrillic — add a metaEn.ts override (got "${en.slice(0, 40)}…")`);
+      }
+    }
+  }
+  return failures;
+}
+
 async function main() {
   let slugs;
   if (mode === "explicit") {
@@ -204,7 +224,15 @@ async function main() {
       }
     }
   }
-  if (failed.length > 0) {
+  const metaFailures = await checkMetaEnCyrillic();
+  if (metaFailures.length === 0) {
+    console.log(`\n✓ EN meta: no Cyrillic in name/platform/duration/resolution.`);
+  } else {
+    console.log(`\n✗ EN meta: ${metaFailures.length} Cyrillic leak(s):`);
+    for (const m of metaFailures) console.log(`    ${m}`);
+  }
+
+  if (failed.length > 0 || metaFailures.length > 0) {
     process.exit(1);
   }
 }

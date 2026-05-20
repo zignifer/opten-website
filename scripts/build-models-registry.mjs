@@ -5,6 +5,13 @@
 // each skill MD, normalizes the values, and emits a TS file with a typed array
 // of ModelMeta. Run after sync-skills.mjs whenever skills change upstream.
 //
+// NOTE: name/platform/duration/resolution are parsed VERBATIM from the RU skill
+// MDs, so they come out in Russian. The /en/* pages get English via the
+// hand-maintained src/content/models/metaEn.ts overrides — this generator never
+// touches that file (regen-safe). When a new model lands or its RU meta
+// changes, add/refresh its metaEn.ts entry; scripts/verify-models-content.mjs
+// fails the build if any EN-resolved meta field still contains Cyrillic.
+//
 // Usage:  node scripts/build-models-registry.mjs
 //
 // Source:  src/content/models/_skills/*.md

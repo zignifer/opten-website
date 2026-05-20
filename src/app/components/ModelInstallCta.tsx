@@ -3,9 +3,10 @@
 // + Chrome Web Store install button. Reuses the existing <InstallButton>
 // for consistency with the landing page.
 
-import { useT } from "../../i18n/LangContext";
+import { useT, useLang } from "../../i18n/LangContext";
 import InstallButton from "./InstallButton";
 import type { ModelMeta } from "../../content/models/types";
+import { metaField } from "../../content/models/metaEn";
 
 interface Props {
   meta: ModelMeta;
@@ -17,7 +18,10 @@ function interpolate(template: string, params: Record<string, string>): string {
 
 export default function ModelInstallCta({ meta }: Props) {
   const t = useT();
-  const heading = interpolate(t("models.installCta.heading"), { name: meta.name });
+  const { lang } = useLang();
+  const heading = interpolate(t("models.installCta.heading"), {
+    name: metaField(meta, "name", lang) ?? meta.name,
+  });
 
   return (
     <section

@@ -5,6 +5,7 @@
 
 import { useT, useLang } from "../../i18n/LangContext";
 import type { ModelMeta } from "../../content/models/types";
+import { metaField } from "../../content/models/metaEn";
 
 interface Props {
   meta: ModelMeta;
@@ -51,18 +52,21 @@ export default function ModelQuickFacts({ meta }: Props) {
   if (meta.vendor) {
     rows.push({ label: t("models.quickFacts.vendor"), value: meta.vendor });
   }
-  if (meta.platform) {
-    rows.push({ label: t("models.quickFacts.platform"), value: meta.platform });
+  const platform = metaField(meta, "platform", lang);
+  if (platform) {
+    rows.push({ label: t("models.quickFacts.platform"), value: platform });
   }
   const length = formatPromptLength(meta, t);
   if (length) {
     rows.push({ label: t("models.quickFacts.promptLength"), value: length });
   }
-  if (meta.duration) {
-    rows.push({ label: t("models.quickFacts.duration"), value: meta.duration });
+  const duration = metaField(meta, "duration", lang);
+  if (duration) {
+    rows.push({ label: t("models.quickFacts.duration"), value: duration });
   }
-  if (meta.resolution) {
-    rows.push({ label: t("models.quickFacts.resolution"), value: meta.resolution });
+  const resolution = metaField(meta, "resolution", lang);
+  if (resolution) {
+    rows.push({ label: t("models.quickFacts.resolution"), value: resolution });
   }
   if (meta.features && meta.features.length > 0) {
     rows.push({ label: t("models.quickFacts.modes"), value: meta.features.join(", ") });

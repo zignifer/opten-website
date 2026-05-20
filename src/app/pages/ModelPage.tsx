@@ -19,6 +19,7 @@ import InlineOptenCallout from "../components/InlineOptenCallout";
 import ModelInstallCta from "../components/ModelInstallCta";
 import RelatedModels from "../components/RelatedModels";
 import { getModelBySlug } from "../../content/models";
+import { metaField } from "../../content/models/metaEn";
 
 function formatDate(iso: string, lang: "ru" | "en"): string {
   const d = new Date(iso);
@@ -64,7 +65,8 @@ export default function ModelPage() {
     : t("models.quickFacts.typeImage");
 
   // Fallback heading + intro when content is not generated yet (Phase 1 stub).
-  const heading = locale?.h1 ?? `${meta.name}: ${typeLabel.toLowerCase()}`;
+  const localizedName = metaField(meta, "name", lang) ?? meta.name;
+  const heading = locale?.h1 ?? `${localizedName}: ${typeLabel.toLowerCase()}`;
   const intro = locale?.intro ?? "";
 
   return (
@@ -85,7 +87,7 @@ export default function ModelPage() {
             {t("nav.models")}
           </LocalizedLink>
           <span aria-hidden="true">/</span>
-          <span aria-current="page" className="max-w-full truncate text-white/75">{meta.name}</span>
+          <span aria-current="page" className="max-w-full truncate text-white/75">{localizedName}</span>
         </nav>
 
         {/* Type badge */}
