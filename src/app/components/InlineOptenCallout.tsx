@@ -9,7 +9,7 @@ import { useT, useLang } from "../../i18n/LangContext";
 import type { ModelMeta } from "../../content/models/types";
 import { metaField } from "../../content/models/metaEn";
 
-const STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
+const STORE_URL = "https://chromewebstore.google.com/detail/opten-%E2%80%94-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 
 type Variant = "after-features" | "after-mistakes";
 

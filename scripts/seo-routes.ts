@@ -62,7 +62,7 @@ export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/og-card-ru.png`;
 export const DEFAULT_OG_IMAGE_EN = `${SITE_ORIGIN}/og-card-en.png`; // Phase 3 D-04 — EN OG card (already in public/ from Phase 1 GEO-A-4)
 
 // Phase 4 D-09: external URLs used by multiple schema blocks.
-const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
+const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/opten-%E2%80%94-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 const FOUNDER_TELEGRAM_URL = "https://t.me/v_voronezhtsev";
 // Post-2026-05-17 GEO audit: founder's AI-blogger YouTube — primary external authority signal,
 // previously not linked in sameAs (audit CR-2). 4500+ subs, 54 videos, ~7M views over the past year.
@@ -105,6 +105,15 @@ export const ORG_BLOCK: SchemaBlock = {
   ],
 };
 
+// EN sibling of ORG_BLOCK — same @id / entity, English description for /en/* pages.
+// Audit fix: the RU description was leaking onto EN pages. legalName stays Cyrillic
+// ("ИП Воронежцев В.П.") — it's the real registered legal name (schema.org legalName).
+export const ORG_BLOCK_EN: SchemaBlock = {
+  ...ORG_BLOCK,
+  description:
+    "Opten is a Chrome extension for AI-powered scoring and one-click improvement of prompts across 60+ image and video generation models (Midjourney, GPT Image 2, Kling, Sora, etc.).",
+};
+
 export const WEBSITE_BLOCK: SchemaBlock = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -134,6 +143,8 @@ export const SOFTWARE_APP_BLOCK: SchemaBlock = {
   offers: [
     { "@type": "Offer", price: "2.99", priceCurrency: "USD", name: "Pro Monthly" },
     { "@type": "Offer", price: "199",  priceCurrency: "RUB", name: "Pro Monthly (RU)" },
+    { "@type": "Offer", price: "4.99", priceCurrency: "USD", name: "Pro One-time" },
+    { "@type": "Offer", price: "299",  priceCurrency: "RUB", name: "Pro One-time (RU)" },
   ],
 };
 
@@ -515,7 +526,7 @@ function buildModelRoute(entry: ModelEntry, lang: "ru" | "en"): RouteMeta {
     changefreq: "monthly",
     priority: 0.7,
     schema: [
-      ORG_BLOCK,
+      lang === "en" ? ORG_BLOCK_EN : ORG_BLOCK,
       WEBSITE_BLOCK,
       articleBlock({
         pageId: pageUrl,
@@ -591,7 +602,7 @@ function buildModelsHubRoute(lang: "ru" | "en", modelsWithContent: ModelEntry[])
     changefreq: "weekly",
     priority: 0.8,
     schema: [
-      ORG_BLOCK,
+      lang === "en" ? ORG_BLOCK_EN : ORG_BLOCK,
       WEBSITE_BLOCK,
       collectionPageBlock({
         pageId: pageUrl,
@@ -698,6 +709,8 @@ export const routes: RouteMeta[] = [
         [
           { name: "Pro Monthly (RU)", price: "199", currency: "RUB" },
           { name: "Pro Monthly", price: "2.99", currency: "USD" },
+          { name: "Pro One-time (RU)", price: "299", currency: "RUB" },
+          { name: "Pro One-time", price: "4.99", currency: "USD" },
         ],
         `${SITE_ORIGIN}/pay`,
       ),
@@ -1006,7 +1019,7 @@ export const routes: RouteMeta[] = [
     // Phase 4 D-09 / D-08 / V-10: Org + SoftwareApp + WebSite + EN FAQPage (separate from RU set — Q/A localized).
     // Post-2026-05-17 audit ME-4: +WebPage with speakable on H1 + FAQ Q&A.
     schema: [
-      ORG_BLOCK,
+      ORG_BLOCK_EN,
       SOFTWARE_APP_BLOCK,
       WEBSITE_BLOCK,
       webPageBlock({
@@ -1039,11 +1052,13 @@ export const routes: RouteMeta[] = [
     priority: 0.8,
     // Phase 04.1 WR-02: Free-tier Offer entry dropped — Pro is the Product, the free tier is acquisition copy.
     schema: [
-      ORG_BLOCK,
+      ORG_BLOCK_EN,
       productBlock(
         [
           { name: "Pro Monthly (RU)", price: "199", currency: "RUB" },
           { name: "Pro Monthly", price: "2.99", currency: "USD" },
+          { name: "Pro One-time (RU)", price: "299", currency: "RUB" },
+          { name: "Pro One-time", price: "4.99", currency: "USD" },
         ],
         `${SITE_ORIGIN}/en/pay`,
       ),
@@ -1074,7 +1089,7 @@ export const routes: RouteMeta[] = [
     changefreq: "monthly",
     priority: 0.6,
     schema: [
-      ORG_BLOCK,
+      ORG_BLOCK_EN,
       breadcrumbBlock(
         [
           { name: "Home", url: `${SITE_ORIGIN}/en/` },
@@ -1102,7 +1117,7 @@ export const routes: RouteMeta[] = [
     changefreq: "yearly",
     priority: 0.3,
     schema: [
-      ORG_BLOCK,
+      ORG_BLOCK_EN,
       breadcrumbBlock(
         [
           { name: "Home", url: `${SITE_ORIGIN}/en/` },
@@ -1130,7 +1145,7 @@ export const routes: RouteMeta[] = [
     changefreq: "yearly",
     priority: 0.3,
     schema: [
-      ORG_BLOCK,
+      ORG_BLOCK_EN,
       breadcrumbBlock(
         [
           { name: "Home", url: `${SITE_ORIGIN}/en/` },
@@ -1158,7 +1173,7 @@ export const routes: RouteMeta[] = [
     changefreq: "yearly",
     priority: 0.3,
     schema: [
-      ORG_BLOCK,
+      ORG_BLOCK_EN,
       breadcrumbBlock(
         [
           { name: "Home", url: `${SITE_ORIGIN}/en/` },
@@ -1190,7 +1205,7 @@ export const routes: RouteMeta[] = [
     changefreq: "yearly",
     priority: 0.5,
     schema: [
-      ORG_BLOCK,
+      ORG_BLOCK_EN,
       PERSON_FOUNDER_BLOCK,
       articleBlock({
         pageId: `${SITE_ORIGIN}/en/about`,
@@ -1232,7 +1247,7 @@ export const routes: RouteMeta[] = [
     changefreq: "weekly",
     priority: 0.8,
     schema: [
-      ORG_BLOCK,
+      ORG_BLOCK_EN,
       WEBSITE_BLOCK,
       collectionPageBlock({
         pageId: `${SITE_ORIGIN}/en/blog`,
@@ -1285,7 +1300,7 @@ export const routes: RouteMeta[] = [
     changefreq: "monthly",
     priority: 0.7,
     schema: [
-      ORG_BLOCK,
+      ORG_BLOCK_EN,
       blogPostingBlock({
         pageId: `${SITE_ORIGIN}/en/blog/gpt-image-2`,
         headline: gptImage2Guide.en.title,

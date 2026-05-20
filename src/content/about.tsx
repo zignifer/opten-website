@@ -61,7 +61,7 @@ const ru: AboutContent = {
             «10 советов как писать промпт» не существует: то, что работает в Flux, в Imagen даёт мусор.
           </p>
           <p className="mb-[14px]">
-            Я собрал 60 skill-файлов под конкретные модели — Seedance (все версии), Seedream,
+            Я собрал 60+ skill-файлов под конкретные модели — Seedance (все версии), Seedream,
             Kling с motion-control, Midjourney 7/8/niji/video, GPT Image, Flux, Nano Banana, Imagen,
             Luma Ray, Sora 2, Veo 3/3.1, Runway, MiniMax Hailuo, Pixverse, LTX, Wan, Qwen, Grok Imagine
             и другие. Плюс два fallback-режима на случай если вы пробуете что-то редкое. Каждый skill —
@@ -177,7 +177,7 @@ const en: AboutContent = {
             "10 tips for writing a prompt": what works for Flux produces garbage in Imagen.
           </p>
           <p className="mb-[14px]">
-            I assembled 60 skill files for specific models — Seedance (all versions), Seedream,
+            I assembled 60+ skill files for specific models — Seedance (all versions), Seedream,
             Kling with motion control, Midjourney 7/8/niji/video, GPT Image, Flux, Nano Banana, Imagen,
             Luma Ray, Sora 2, Veo 3/3.1, Runway, MiniMax Hailuo, Pixverse, LTX, Wan, Qwen, Grok Imagine
             and others. Plus two fallback modes for when you try something rare. Each skill file is

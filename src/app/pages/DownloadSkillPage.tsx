@@ -114,7 +114,7 @@ export default function DownloadSkillPage() {
             <p style={msgStyle}>{t("download.noExtensionLine1")}</p>
             <p style={msgStyle}>
               <a
-                href="https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl"
+                href="https://chromewebstore.google.com/detail/opten-%E2%80%94-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl"
                 style={linkStyle}
               >
                 {t("download.installExt")}

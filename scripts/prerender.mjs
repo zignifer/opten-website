@@ -328,4 +328,39 @@ for (const meta of routes) {
   await writeFile(outPath, html, "utf-8");
   console.log(`✓ ${meta.path} → ${outPath.replace(ROOT, "")} (${meta.prerender})`);
 }
+
+// soft-404: emit dist/404.html so Vercel serves a real HTTP 404 (with baked noindex) for any
+// path not matched by a static file or the scoped SPA rewrites in vercel.json. Deliberately NOT
+// added to the routes manifest, so it never inflates sitemap.xml / the route-count floor. The
+// sentinel path "/__404__" can never equal a real location.pathname, so main.tsx always takes the
+// createRoot branch (clean SPA mount of NotFound, no hydration mismatch / React #418/#423).
+{
+  const notFoundMeta = {
+    path: "/__404__",
+    htmlLang: "ru",
+    title: "404 — страница не найдена | Opten",
+    description: "Запрошенная страница не найдена. Вернитесь на главную opten.space.",
+    canonical: `${SITE_ORIGIN}/`,
+    ogTitle: "404 — страница не найдена | Opten",
+    ogDescription: "Запрошенная страница не найдена.",
+    ogImage: DEFAULT_OG_IMAGE,
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/`, en: `${SITE_ORIGIN}/en/`, xDefault: `${SITE_ORIGIN}/` },
+  };
+  let html404 = applyMeta(template, notFoundMeta);
+  html404 = applyHtmlLang(html404, notFoundMeta);
+  html404 = applyHreflang(html404, notFoundMeta);
+  html404 = applyOgLocale(html404, notFoundMeta);
+  html404 = applyOgImage(html404, notFoundMeta);
+  html404 = applyHeroPreloadGuard(html404, notFoundMeta);
+  html404 = applyModulePreload(html404);
+  html404 = applySafariPreloadFallback(html404);
+  // Bake noindex into the static <head> — non-JS crawlers must see it on the 404 (the runtime
+  // injection in NotFound.tsx is JS-only, too late for them). MUST precede applyMarker (consumes </head>).
+  html404 = html404.replace("</head>", `    <meta name="robots" content="noindex,nofollow" />\n  </head>`);
+  html404 = applyMarker(html404, "/__404__");
+  html404 = applyBody(html404, renderRoute("/__404__"));
+  await writeFile(resolve(DIST, "404.html"), html404, "utf-8");
+  console.log(`✓ /__404__ → /dist/404.html (noindex baked, sentinel marker)`);
+}
+
 console.log(`✓ prerender complete: ${routes.filter(r => r.prerender !== "none").length} routes emitted`);

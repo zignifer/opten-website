@@ -6,7 +6,9 @@
     { "source": "/en/guides",             "destination": "/en/blog",             "permanent": true }
   ],
   "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/account", "destination": "/index.html" },
+    { "source": "/success", "destination": "/index.html" },
+    { "source": "/dashboard/download-skill", "destination": "/index.html" }
   ],
   "headers": [
     {

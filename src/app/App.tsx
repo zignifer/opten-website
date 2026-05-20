@@ -33,7 +33,7 @@ import freepikSrc from '../../public/assets/partners/freepik.png?w=268&format=we
 import higgsfieldSrc from '../../public/assets/partners/higgsfield.png?w=268&format=webp;png&as=picture'
 import syntxSrc from '../../public/assets/partners/syntx.png?w=268&format=webp;png&as=picture'
 
-const STORE_URL = "https://chromewebstore.google.com/detail/opten-—-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
+const STORE_URL = "https://chromewebstore.google.com/detail/opten-%E2%80%94-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 const ASSET_ROOT = "/assets/landing-design";
 
 const partnerSrcMap = {
@@ -238,7 +238,7 @@ function Steps() {
                 the fetch in parallel with critical resources. sizes tells the browser to
                 pick the 430px variant on mobile (image renders ~318px wide) instead of
                 downloading the 813px desktop variant. */}
-            <Picture data={stepsSrc} width={813} height={638} alt="" loading="eager" sizes="(max-width: 768px) 320px, 430px" className="absolute left-1/2 top-1/2 w-[86%] max-w-[430px] -translate-x-1/2 -translate-y-1/2" />
+            <Picture data={stepsSrc} width={813} height={638} alt={t("steps.screenshot.alt")} loading="eager" sizes="(max-width: 768px) 320px, 430px" className="absolute left-1/2 top-1/2 w-[86%] max-w-[430px] -translate-x-1/2 -translate-y-1/2" />
           </div>
         </div>
         <div className="mt-16 flex justify-center">
@@ -289,10 +289,10 @@ function FeatureCards() {
           {/* Phase 2.2: first feature card is closest to viewport on the typical mobile scroll
               path; load it eagerly (low priority) so users don't see a 1-2s blank below the
               steps section. Cards 2-4 stay lazy. */}
-          <FeatureCard title={t("features.card1.title")} desc={t("features.card1.desc")} imgData={featureModelsSrc} imgWidth={1100} imgHeight={424} loading="eager" />
-          <FeatureCard title={t("features.card2.title")} desc={t("features.card2.desc")} imgData={suffix === "ru" ? featureInterfaceRuSrc : featureInterfaceEnSrc} imgWidth={1100} imgHeight={424} imageFirst />
-          <FeatureCard title={t("features.card3.title")} desc={t("features.card3.desc")} imgData={featureCreditsSrc} imgWidth={1100} imgHeight={424} />
-          <FeatureCard title={t("features.card4.title")} desc={t("features.card4.desc")} imgData={suffix === "ru" ? featureEnhanceRuSrc : featureEnhanceEnSrc} imgWidth={1100} imgHeight={372} />
+          <FeatureCard title={t("features.card1.title")} desc={t("features.card1.desc")} alt={t("features.card1.alt")} imgData={featureModelsSrc} imgWidth={1100} imgHeight={424} loading="eager" />
+          <FeatureCard title={t("features.card2.title")} desc={t("features.card2.desc")} alt={t("features.card2.alt")} imgData={suffix === "ru" ? featureInterfaceRuSrc : featureInterfaceEnSrc} imgWidth={1100} imgHeight={424} imageFirst />
+          <FeatureCard title={t("features.card3.title")} desc={t("features.card3.desc")} alt={t("features.card3.alt")} imgData={featureCreditsSrc} imgWidth={1100} imgHeight={424} />
+          <FeatureCard title={t("features.card4.title")} desc={t("features.card4.desc")} alt={t("features.card4.alt")} imgData={suffix === "ru" ? featureEnhanceRuSrc : featureEnhanceEnSrc} imgWidth={1100} imgHeight={372} />
         </div>
         <div className="mt-16 flex justify-center">
           <InstallButton />
@@ -302,18 +302,18 @@ function FeatureCards() {
   );
 }
 
-function FeatureCard({ title, desc, imgData, imgWidth, imgHeight, imageFirst = false, loading = "lazy" }: { title: string; desc: string; imgData: PictureData; imgWidth: number; imgHeight: number; imageFirst?: boolean; loading?: "eager" | "lazy" }) {
+function FeatureCard({ title, desc, alt, imgData, imgWidth, imgHeight, imageFirst = false, loading = "lazy" }: { title: string; desc: string; alt: string; imgData: PictureData; imgWidth: number; imgHeight: number; imageFirst?: boolean; loading?: "eager" | "lazy" }) {
   // sizes: on mobile single-column grid the card is full viewport minus padding (~320px),
   // on desktop two-column grid each card is ~500px. Browser picks the right srcset entry.
   const sizes = "(max-width: 768px) 320px, 500px";
   return (
     <article className="flex min-h-[405px] flex-col overflow-hidden rounded-[12px] border border-white/10 bg-[#0e2023]">
-      {imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt="" loading={loading} sizes={sizes} className="mx-8 h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
+      {imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt={alt} loading={loading} sizes={sizes} className="mx-8 h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
       <div className="p-8">
         <h3 className="font-['PT_Root_UI',sans-serif] text-[24px] font-medium leading-[1.12] text-white">{title}</h3>
         <p className="mt-4 whitespace-pre-wrap font-['PT_Root_UI',sans-serif] text-[16px] leading-[1.65] text-white/55">{desc}</p>
       </div>
-      {!imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt="" loading={loading} sizes={sizes} className="mx-8 mt-auto h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
+      {!imageFirst && <Picture data={imgData} width={imgWidth} height={imgHeight} alt={alt} loading={loading} sizes={sizes} className="mx-8 mt-auto h-auto w-[calc(100%-64px)] rounded-[4px] object-contain" />}
     </article>
   );
 }
@@ -447,14 +447,16 @@ export default function App() {
   return (
     <div className="w-full max-w-[100vw] overflow-x-hidden bg-[#011417] text-white">
       <SiteHeader variant="landing" />
-      <Hero />
-      <Partners />
-      <Steps />
-      <FeatureCards />
-      <Privacy />
-      <Pricing />
-      {/* Phase 4 D-08 / GEO-D-3: landing FAQ block — schema in seo-routes.ts mirrors landingFaq[lang] (V-10). */}
-      <FaqBlock items={landingFaq[lang]} />
+      <main>
+        <Hero />
+        <Partners />
+        <Steps />
+        <FeatureCards />
+        <Privacy />
+        <Pricing />
+        {/* Phase 4 D-08 / GEO-D-3: landing FAQ block — schema in seo-routes.ts mirrors landingFaq[lang] (V-10). */}
+        <FaqBlock items={landingFaq[lang]} />
+      </main>
       <SiteFooter />
     </div>
   );

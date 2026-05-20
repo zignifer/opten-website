@@ -24,7 +24,7 @@ const ru: FaqItem[] = [
   },
   {
     q: "Какие модели поддерживаются?",
-    a: "Около 60 моделей, в том числе: Seedance (все версии), Seedream, Kling с motion-control, Midjourney 7/8/niji/video, GPT Image 2, Flux, Nano Banana, Imagen, Luma Ray, Sora 2, Veo 3/3.1, Runway, MiniMax Hailuo, Pixverse, LTX, Wan, Qwen, Grok Imagine и другие. Если ты пробуешь редкую модель — Opten применяет fallback-режим с базовыми правилами вместо вылета с ошибкой.",
+    a: "60+ моделей, в том числе: Seedance (все версии), Seedream, Kling с motion-control, Midjourney 7/8/niji/video, GPT Image 2, Flux, Nano Banana, Imagen, Luma Ray, Sora 2, Veo 3/3.1, Runway, MiniMax Hailuo, Pixverse, LTX, Wan, Qwen, Grok Imagine и другие. Если ты пробуешь редкую модель — Opten применяет fallback-режим с базовыми правилами вместо вылета с ошибкой.",
   },
   {
     q: "Сохраняет ли Opten мои промпты на серверах?",
@@ -47,7 +47,7 @@ const en: FaqItem[] = [
   },
   {
     q: "Which models are supported?",
-    a: "About 60 models including: Seedance (all versions), Seedream, Kling with motion-control, Midjourney 7/8/niji/video, GPT Image 2, Flux, Nano Banana, Imagen, Luma Ray, Sora 2, Veo 3/3.1, Runway, MiniMax Hailuo, Pixverse, LTX, Wan, Qwen, Grok Imagine and more. For rare models Opten falls back to a baseline rule set instead of throwing an error.",
+    a: "60+ models including: Seedance (all versions), Seedream, Kling with motion-control, Midjourney 7/8/niji/video, GPT Image 2, Flux, Nano Banana, Imagen, Luma Ray, Sora 2, Veo 3/3.1, Runway, MiniMax Hailuo, Pixverse, LTX, Wan, Qwen, Grok Imagine and more. For rare models Opten falls back to a baseline rule set instead of throwing an error.",
   },
   {
     q: "Does Opten store my prompts on its servers?",
