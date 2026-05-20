@@ -39,7 +39,7 @@ Hardcoded constants that are duplicated and must be kept in sync:
 - **Payments:** Paddle.js v2 (synchronous CDN script in `index.html`)
 - **Backend:** plain `fetch` to Supabase REST + Functions (no `@supabase/supabase-js`)
 - **Deploy:** Vercel, one serverless function at `api/download-skill.ts`
-- **i18n:** Custom React context, RU/EN; URL prefix wins (`/en/*`), then `localStorage.opten_lang_v3` (explicit user choice, written by LangSwitcher), then `navigator.language`. Legacy key `opten_lang` is read **only** when its value is `"en"` for one-shot migration; RU values from the old key are intentionally ignored. Internal navigation uses `<LocalizedLink>` (drop-in `<Link>` replacement) — on `/en/*` URLs it rewrites internal hrefs to `/en/<sibling>` for the 9 EN-prefixed routes (see `EN_SIBLINGS` in `src/i18n/paths.ts`).
+- **i18n:** Custom React context, RU/EN; URL prefix wins (`/en/*`), then `localStorage.opten_lang_v3` (explicit user choice, written by LangSwitcher), then `navigator.language`. Legacy key `opten_lang` is read **only** when its value is `"en"` for one-shot migration; RU values from the old key are intentionally ignored. Internal navigation uses `<LocalizedLink>` (drop-in `<Link>` replacement) — on `/en/*` URLs it rewrites internal hrefs to `/en/<sibling>` for the EN-prefixed routes — 9 static + 62 model slugs (see `EN_SIBLINGS` in `src/i18n/paths.ts`, built from `src/content/models/slugs.ts`).
 
 No tests, no ESLint config, no `typecheck` script. TS errors surface during
 `vite build` (`npm run build`).
@@ -64,17 +64,19 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
      │
      └→ main.tsx → <BrowserRouter> → <LangProvider> → <Routes>
             ↓
-        18 client routes + catch-all 404:
-          RU (9): /, /pay, /welcome, /about, /blog, /blog/:slug,
+        ~22 client route patterns + catch-all 404 → 144 prerendered routes:
+          Marketing/billing RU (9): /, /pay, /welcome, /about, /blog, /blog/:slug,
                   /privacy, /terms, /refund
+          Models RU (Phase v2.0): /models hub + /models/:slug (62 model pages)
           RU SPA-only (3, X-Robots-Tag noindex): /success, /account,
                                                   /dashboard/download-skill
-          EN (9): /en/ + sibling for each prerendered RU route
+          EN: /en/ sibling for each prerendered RU route + /en/models(/:slug)
           Catch-all: <Route path="*"> → NotFound (runtime noindex injection)
 
-  Prerender (postbuild):  scripts/prerender.mjs → 18 dist/<route>/index.html files
-                          (9 RU + 9 EN, with hreflang triplets + baked <html lang>)
-                          + sitemap.xml + llms.txt + IndexNow ping
+  Prerender (postbuild):  scripts/prerender.mjs → 144 dist/<route>/index.html files
+                          (18 baseline + 2 model hubs + 124 model pages — 62 RU + 62 EN —
+                          with hreflang triplets + baked <html lang>)
+                          + sitemap.xml (144 URL) + llms.txt + IndexNow ping
                           + FaqBlock ↔ FAQPage parity assertion
   Site ↔ Extension:       chrome.runtime.sendMessage (externally_connectable, opten.space only)
   Site → Supabase:        fetch to /functions/v1/* and /rest/v1/*
@@ -106,8 +108,11 @@ scripts/                 — build pipeline:
                              verify-faq-mainentity.mjs — FAQ ↔ FAQPage build-time gate
                              indexnow.mjs         — Bing IndexNow ping
                              smoke-blog.mjs       — ad-hoc Playwright smoke for /blog
+                             sync-skills.mjs      — copies promptscore-proxy skills/*.md → src/content/models/_skills/
+                             build-models-registry.mjs — parses _skills/*.md → _registry.ts (62 ModelMeta; AUTO-GEN)
+                             verify-models-content.mjs — model content + EN-meta-cyrillic gate (run manually, not in build)
 src/
-├── main.tsx             — entry, 18 routes + catch-all, hydrate-vs-mount discriminator
+├── main.tsx             — entry, ~22 route patterns (incl. /models hub + /models/:slug, RU+EN) + catch-all, hydrate-vs-mount discriminator
 ├── app/
 │   ├── App.tsx          — landing
 │   ├── components/      — shared UI:
@@ -116,11 +121,19 @@ src/
 │   │     FaqBlock — semantic <dl>; source-of-truth for FAQPage schema
 │   │     BlogPostCard, Picture, InstallButton, OptenHeroAnimation, RouteLoading
 │   │     layout/, figma/, ui/ — wrappers, fallbacks, Radix-derived primitives
-│   └── pages/           — one file per route (incl. BlogListPage, BlogPostPage, AboutPage, NotFound)
+│   └── pages/           — one file per route (incl. BlogListPage, BlogPostPage, AboutPage,
+│                          ModelsHubPage, ModelPage, NotFound)
 ├── content/             — humans edit here, consumed by pages + SEO manifest:
 │   ├── about.tsx        — AboutPage body data
 │   ├── landingFaq.ts    — landing FAQ; mirrored 1:1 into FAQPage schema
-│   └── blog/            — one TS file per post, BlogPost = { ru, en }
+│   ├── blog/            — one TS file per post, BlogPost = { ru, en }
+│   └── models/          — Phase v2.0 programmatic SEO. 62 <slug>.ts content files
+│                          (ModelContent = { ru, en }) + _registry.ts (AUTO-GEN, 62
+│                          ModelMeta; do not hand-edit without also fixing _skills) +
+│                          _skills/*.md (RU source) + metaEn.ts (EN overrides for free-text
+│                          meta name/platform/duration/resolution + metaField helper) +
+│                          index.ts (allModels barrel + HUB_HIDDEN_SLUGS) + slugs.ts
+│                          (light import for paths.ts) + types.ts
 ├── i18n/                — LangContext + ru.json/en.json + paths.ts (EN_SIBLINGS)
 ├── imports/             — Figma-Make-generated SVG paths (auto-generated; brittle)
 ├── lib/                 — paddle.ts (ensurePaddle lazy loader, Phase 2.2)
@@ -128,9 +141,11 @@ src/
 └── types/               — TS type defs
 ```
 
-`src/i18n/paths.ts` is the single source of truth for `EN_SIBLINGS` (the 9 routes that get `/en/*` prerendered siblings). It MUST stay in sync with the EN entries in `scripts/seo-routes.ts` — easy to miss when adding a route.
+`src/i18n/paths.ts` is the single source of truth for `EN_SIBLINGS` (9 static routes + every `/models/<slug>`, derived from `src/content/models/slugs.ts`). It MUST stay in sync with the EN entries in `scripts/seo-routes.ts` — easy to miss when adding a route.
 
 **Adding a new page or blog post touches 6 files in sync** (route, manifest, EN siblings, sitemap, llms.txt, dicts) plus optional content/blog files. The full checklist + GEO/SEO patterns are in [docs/CONTENT-AUTHORING.md](docs/CONTENT-AUTHORING.md) — read that before touching content.
+
+**Model pages (Phase v2.0) follow a different flow:** they are generated, not hand-listed. Source = `src/content/models/_skills/*.md` (synced from promptscore-proxy via `sync-skills.mjs`) → `build-models-registry.mjs` emits `_registry.ts` (62 `ModelMeta`) → one `<slug>.ts` content file per model (`ModelContent = { ru, en }`). `seo-routes.ts` expands all models with content into routes; `slugs.ts` drives `EN_SIBLINGS`. Free-text meta (name/platform/duration/resolution) is RU-only in the registry → English comes from hand-maintained `metaEn.ts` overrides via the `metaField(meta, field, lang)` helper (the build has no gate for this; run `node scripts/verify-models-content.mjs` to catch Cyrillic leaking into EN). `HUB_HIDDEN_SLUGS` (in `index.ts`) hides 11 general/umbrella models from the `/models` grid + ItemList schema while keeping their pages live.
 
 ### Code style
 
@@ -215,10 +230,11 @@ the **extension repo's** Supabase Edge Function secrets.
 
 ## Content & SEO — read before adding pages, posts, or images
 
-The site shipped v1.0 (GEO Optimization, 12 → ~72.6 score, 7 phases) with a
-hand-listed route inventory and a JSON-LD entity graph that is enforced by
-build-time gates. **Adding content is a coordinated 6-file change**, not a
-one-shot file write.
+The site shipped v1.0 (GEO Optimization, 12 → ~72.6 score, 7 phases) and v2.0
+(Programmatic SEO — 62 model pages × RU/EN + 2 hubs = 144 prerendered routes,
+shipped 2026-05-20) with a JSON-LD entity graph enforced by build-time gates.
+**Adding a marketing/blog page is a coordinated 6-file change** (model pages
+follow the generated flow above), not a one-shot file write.
 
 Non-negotiables (the full set lives in `docs/CONTENT-AUTHORING.md`):
 

@@ -1,6 +1,6 @@
 # Tech Stack — opten.space
 
-> Snapshot taken 2026-05-14, refreshed 2026-05-18 (post-v1.0 + blog migration).
+> Snapshot taken 2026-05-14, refreshed 2026-05-20 (post-v2.0 — programmatic model pages).
 > Re-run discovery when `package.json` or build tooling changes meaningfully.
 
 ## Build & runtime
@@ -14,8 +14,9 @@
 ## Routing
 
 - **React Router 7.13.0** (`react-router` package, not `react-router-dom` — v7 unified API)
-- **18 client routes** declared in [`src/main.tsx`](../../src/main.tsx) + a catch-all 404:
+- **~22 client route patterns** declared in [`src/main.tsx`](../../src/main.tsx) + a catch-all 404, expanding to **144 prerendered routes**:
   - **Prerendered, full-tier (9 RU + 9 EN siblings):** `/`, `/pay`, `/welcome`, `/about`, `/blog`, `/blog/:slug`, `/privacy`, `/terms`, `/refund` (plus `/en/*` mirrors)
+  - **Model pages (Phase v2.0):** `/models` hub + `/models/:slug` (62 models) + `/en/*` mirrors = 2 hubs + 124 model pages
   - **SPA-only (no EN siblings, `X-Robots-Tag: noindex`):** `/account`, `/success`, `/dashboard/download-skill`
   - **Catch-all** `<Route path="*">` → `<NotFound>` (locale-aware, injects `<meta robots=noindex>` at runtime)
 - **Legacy redirects** (`vercel.json` `redirects[]`): `/guides`, `/en/guides`, `/guides/gpt-image-2`, `/en/guides/gpt-image-2` → `/blog`, `/en/blog`, `/blog/gpt-image-2`, `/en/blog/gpt-image-2` (Phase 5 B-07)
@@ -94,11 +95,12 @@ public-by-design (it's the `anon` role).
   1. `vite build` → SPA bundle in `dist/`
   2. `vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache` → SSR React bundle for prerender
   3. `vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta` → per-route metadata manifest
-  4. `node scripts/prerender.mjs` → 18 `dist/<route>/index.html` files with per-route `<head>`, JSON-LD, `<html lang>`, hreflang
+  4. `node scripts/prerender.mjs` → 144 `dist/<route>/index.html` files with per-route `<head>`, JSON-LD, `<html lang>`, hreflang (also localizes the static `keywords`/`og:image:alt`/author head tags on EN routes)
   5. `node scripts/sitemap.mjs` → `dist/sitemap.xml` with per-route `<lastmod>` (git mtime). **Has a floor check that fails the build if route count drops.**
   6. `node scripts/llms.mjs` → `dist/llms.txt` + `dist/llms-full.txt`. Same floor check.
   7. `node scripts/verify-faq-mainentity.mjs` → asserts visible FAQ DOM ≡ JSON-LD `FAQPage.mainEntity`. Build-time gate.
   8. `node scripts/indexnow.mjs` → pings Bing IndexNow with the updated URL set. Non-fatal on network failure.
+- **Out-of-build model tooling** (run manually, NOT in the `build` chain): `node scripts/sync-skills.mjs` (copies promptscore-proxy `skills/*.md` → `src/content/models/_skills/`), `node scripts/build-models-registry.mjs` (parses `_skills/*.md` → AUTO-GEN `_registry.ts`, 62 `ModelMeta`), `node scripts/verify-models-content.mjs` (model content + EN-meta-cyrillic gate — a follow-up wants this wired into the build once Vercel Node ≥22.18 is confirmed).
 - Ad-hoc: `node scripts/smoke-blog.mjs` (requires `npx playwright install chromium` once) — Playwright smoke for the blog flows.
 - No `test` script — no Vitest/Jest.
 - No `lint` script — no ESLint config.
@@ -114,8 +116,9 @@ public-by-design (it's the `anon` role).
 
 ## Content & SEO tooling
 
-- **Per-route metadata**: [`scripts/seo-routes.ts`](../../scripts/seo-routes.ts) — single source of truth. Each route declares `title`, `description`, `canonical`, `ogImage`, `hreflangAlternates`, `prerender` tier, and a `schema: SchemaBlock[]` array built from typed helpers (`faqPageBlock`, `howToBlock`, `productBlock`, `articleBlock`, `webPageBlock`, `breadcrumbBlock`, `collectionPageBlock`, `itemListBlock`, `blogPostingBlock`, plus reusable `ORG_BLOCK` / `WEBSITE_BLOCK` / `SOFTWARE_APP_BLOCK` / `PERSON_FOUNDER_BLOCK` consts cross-linked via `@id` references — Phase 4 D-10).
+- **Per-route metadata**: [`scripts/seo-routes.ts`](../../scripts/seo-routes.ts) — single source of truth. Each route declares `title`, `description`, `canonical`, `ogImage`, `hreflangAlternates`, `prerender` tier, and a `schema: SchemaBlock[]` array built from typed helpers (`faqPageBlock`, `howToBlock`, `productBlock`, `articleBlock`, `webPageBlock`, `breadcrumbBlock`, `collectionPageBlock`, `itemListBlock`, `blogPostingBlock`, `softwareApplicationModelBlock`, plus reusable `ORG_BLOCK` / `WEBSITE_BLOCK` / `SOFTWARE_APP_BLOCK` / `PERSON_FOUNDER_BLOCK` consts cross-linked via `@id` references — Phase 4 D-10). Model routes built by `buildModelRoute` / `buildModelsHubRoute`.
 - **Blog content**: [`src/content/blog/`](../../src/content/blog/) — one file per post implementing `BlogPost = { ru, en }`. Cover images in [`public/blog/<slug>/`](../../public/blog/). See [CONTENT-AUTHORING.md](CONTENT-AUTHORING.md).
+- **Model content (Phase v2.0)**: [`src/content/models/`](../../src/content/models/) — 62 `<slug>.ts` files implementing `ModelContent = { ru, en }`, an AUTO-GEN `_registry.ts` (62 `ModelMeta` parsed from RU `_skills/*.md`), and `metaEn.ts` (hand-maintained EN overrides for the free-text meta fields + `metaField` helper). `index.ts` exports `allModels` + `HUB_HIDDEN_SLUGS` (11 umbrella models hidden from the hub grid/ItemList but kept live).
 - **Static crawler files** (rooted in `public/`, served verbatim):
   - `robots.txt` — explicit blocks for 16 user-agents (Google/Bing/Yandex + 13 AI crawlers); `Content-Signal: search=yes, ai-train=yes, ai-input=yes` (Cloudflare AI-Preferences draft).
   - `llms.txt`, `llms-full.txt` — emitted by `scripts/llms.mjs` at build time (the `public/` versions are fallback only).

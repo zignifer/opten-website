@@ -54,6 +54,19 @@ If you're adding a **blog post**, also:
 
 That's the full list. The build catches several mistakes (sitemap floor, FAQ parity), but it cannot catch a missing EN entry in `EN_SIBLINGS` or a forgotten dict key — those ship silently broken.
 
+### Model pages are the exception (Phase v2.0 — generated, not hand-listed)
+
+The "6 files in sync" rule above is for **marketing + blog pages**. The 62 `/models/<slug>` pages are **generated** and do NOT touch `main.tsx` per-slug, the dict, or `EN_SIBLINGS` manually:
+
+- **Routes:** `src/main.tsx` declares `/models/:slug` and `/en/models/:slug` once (param routes). `scripts/seo-routes.ts` expands every model with content into `RouteMeta` via `buildModelRoute` / `buildModelsHubRoute` — no per-model entry to maintain.
+- **EN siblings:** `src/content/models/slugs.ts` (`MODEL_SLUGS_WITH_CONTENT`) feeds `EN_SIBLINGS` automatically. Add a slug here when its `<slug>.ts` content file lands.
+- **Content:** one `src/content/models/<slug>.ts` (`ModelContent = { ru, en }`). The Quick-Facts meta comes from the AUTO-GEN `_registry.ts` (parsed from RU `_skills/*.md` by `build-models-registry.mjs`).
+- **EN meta:** the registry's free-text meta (name/platform/duration/resolution) is **Russian** — supply English in `src/content/models/metaEn.ts` (resolved by `metaField(meta, field, lang)`). **No build gate enforces this** — run `node scripts/verify-models-content.mjs` to catch Cyrillic leaking onto `/en/*` (it also checks intro length, FAQ count, RU/EN parity).
+- **Hub visibility:** general/umbrella models (bare-brand name with versioned siblings) go in `HUB_HIDDEN_SLUGS` (`index.ts`) — hidden from the `/models` grid + ItemList schema, but kept live + sitemap'd.
+- **Floors:** `sitemap.mjs` + `llms.mjs` floor is 144 (18 baseline + 2 hubs + 124 model pages). Adding/removing models shifts this.
+
+Full pipeline diagram: [ARCHITECTURE.md](ARCHITECTURE.md) §"Models content pipeline".
+
 ---
 
 ## 2. Naming and URL design
