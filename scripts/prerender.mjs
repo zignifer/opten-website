@@ -119,9 +119,29 @@ function applyMeta(html, meta) {
   // content="Opten" — for routes with a named human author (/about, /guides/*) it should reflect
   // the actual byline so AI systems attribute citations to a person rather than the brand.
   if (meta.author) {
+    // FOUNDER_NAME ships in Cyrillic ("Влад Воронежцев"); use the Latin
+    // transliteration on EN routes so /en/* pages carry no Russian byline.
+    const authorValue =
+      meta.htmlLang === "en" && meta.author === "Влад Воронежцев"
+        ? "Vlad Voronezhtsev"
+        : meta.author;
     html = html.replace(
       /<meta\s+name="author"\s+content="[^"]*"\s*\/?>/,
-      `<meta name="author" content="${escapeAttr(meta.author)}" />`,
+      `<meta name="author" content="${escapeAttr(authorValue)}" />`,
+    );
+  }
+  // index.html ships <meta keywords> and <meta og:image:alt> in Russian (the
+  // site's default locale) and applyMeta otherwise leaves them untouched. Swap
+  // them to English on EN routes so /en/* pages carry no Russian head metadata
+  // (og:image itself already points at og-card-en.png via applyOgImage).
+  if (meta.htmlLang === "en") {
+    html = html.replace(
+      /<meta\s+name="keywords"\s+content="[^"]*"\s*\/?>/,
+      `<meta name="keywords" content="Opten, prompts, AI, neural networks, Midjourney, DALL-E, Stable Diffusion, Flux, image generation, Chrome extension" />`,
+    );
+    html = html.replace(
+      /<meta\s+property="og:image:alt"\s+content="[^"]*"\s*\/?>/,
+      `<meta property="og:image:alt" content="Opten — improve your prompts before generating" />`,
     );
   }
   // Inject canonical after theme-color anchor (no canonical exists in source today — D-07)
