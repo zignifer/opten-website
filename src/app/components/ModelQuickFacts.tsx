@@ -88,7 +88,7 @@ export default function ModelQuickFacts({ meta }: Props) {
       className="my-[32px] rounded-[12px] border border-white/10 bg-[#0e2023] p-[20px] md:p-[24px]"
       aria-label={t("models.quickFacts.heading")}
     >
-      <h2 className="mb-[16px] font-['Unbounded','Unbounded_Fallback',sans-serif] text-[18px] font-medium leading-[1.2] tracking-[-0.4px] text-white md:text-[20px]">
+      <h2 className="mb-[16px] font-['Unbounded',sans-serif] text-[18px] font-medium leading-[1.2] tracking-[-0.4px] text-white md:text-[20px]">
         {t("models.quickFacts.heading")}
       </h2>
       <dl className="grid gap-y-[10px] text-[14px] md:text-[15px]">

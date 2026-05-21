@@ -137,7 +137,7 @@ export default function ModelPage() {
           {typeLabel}
         </span>
 
-        <h1 className="mt-[16px] font-['Unbounded','Unbounded_Fallback',sans-serif] text-[28px] font-medium leading-[1.15] tracking-[-0.6px] text-white md:text-[40px]">
+        <h1 className="mt-[16px] font-['Unbounded',sans-serif] text-[28px] font-medium leading-[1.15] tracking-[-0.6px] text-white md:text-[40px]">
           {heading}
         </h1>
 

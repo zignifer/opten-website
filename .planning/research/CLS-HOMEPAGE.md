@@ -80,3 +80,17 @@ Both passes converged on the **same root cause and fix shape**. Codex's independ
    (`'Unbounded_Fallback'` → `'Unbounded Fallback'` at build, matching the @font-face name; Unbounded stays FIRST so the real font wins once loaded — avoids the same-family footgun in `fonts.css:7-13`).
 3. `unicode-range` on the fallback face is omitted (Codex suggested matching the subset ranges; unnecessary here since the family is referenced only by H1 stacks, and omitting it avoids an uncovered-glyph micro-shift).
 4. Re-measure `/` mobile after deploy — expect CLS → ~0, LCP unchanged.
+
+---
+
+## 5. Post-deploy outcome + final decision (2026-05-21)
+
+The metric-matched fallback was shipped (commit 65eadbb) and measured — **it did NOT move the lab CLS** (`/` mobile stayed 0.057–0.063 across runs; LCP improved to 2.4s, score 96). Investigation with an in-browser `PerformanceObserver('layout-shift', {buffered:true})` capture (the only working path — PageSpeed MCP doesn't expose CLS elements, the keyless Lighthouse API is rate-limited, and `run_code_unsafe` lacks `setTimeout`) **confirmed the shifting elements**: the InstallButton (`div.mt-12`) and the Partners `<section>` move down at ~6.5s when Unbounded finishes loading and the hero H1 grows — exactly the predicted hero-H1 swap reflow.
+
+Why the fix didn't register in the lab:
+- In a browser that HAS one of the `local()` fonts (this capture's Chromium had Liberation Sans → the fallback was active, `font-family` confirmed as `Unbounded, "Unbounded Fallback", sans-serif`), the residual shift was only ~0.016 — the fallback helped but didn't fully zero it (a single `size-adjust` from the *average* glyph width can't exactly match a *specific* headline's wrap point).
+- Lighthouse's headless Chrome most likely has **none** of the listed `local()` fonts (Arial/Helvetica/Liberation/Arimo/Roboto), so 'Unbounded Fallback' has no usable src there → it collapses to bare `sans-serif`, un-adjusted → the lab CLS is unchanged. The fix would still help real devices (Windows/Android have Arial/Roboto), but that can't be shown in the lab number.
+
+A fully robust, font-independent fix exists (reserve the hero H1 height per breakpoint/locale), but it is fiddly and copy-coupled.
+
+**Decision (user, option 3): accept CLS 0.057.** It is comfortably within Google's "good" threshold (<0.1), and the headline win — LCP 5.7s → 2.4s, score 66 → 96 — is the prize. The ineffective metric-fallback was **reverted** for a clean tree (the 17 font stacks back to `font-['Unbounded',sans-serif]`, the 'Unbounded Fallback' @font-face removed). This document is kept as the record of the root-cause analysis should field CLS data later justify the reserved-height fix.

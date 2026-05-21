@@ -57,7 +57,7 @@ export default function BlogPostCard({ post, tagLabel }: BlogPostCardProps) {
         <span className="inline-flex w-fit items-center rounded-full bg-[rgba(156,251,81,0.15)] px-[10px] py-[3px] text-[11px] font-bold uppercase tracking-[1px] text-[#9cfb51]">
           {t(categoryLabelKey(post.category))}
         </span>
-        <h3 className="font-['Unbounded','Unbounded_Fallback',sans-serif] text-[18px] font-medium leading-[1.25] tracking-[-0.3px] text-white line-clamp-2">
+        <h3 className="font-['Unbounded',sans-serif] text-[18px] font-medium leading-[1.25] tracking-[-0.3px] text-white line-clamp-2">
           {post.title}
         </h3>
         <p className="text-[14px] leading-[1.55] text-white/65 line-clamp-3">{post.excerpt}</p>

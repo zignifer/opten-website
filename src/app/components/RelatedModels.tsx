@@ -23,7 +23,7 @@ export default function RelatedModels({ currentSlug, type }: Props) {
 
   return (
     <section className="mx-auto max-w-[800px] px-[20px] pb-[60px]">
-      <h2 className="mb-[20px] font-['Unbounded','Unbounded_Fallback',sans-serif] text-[22px] font-medium leading-[1.2] tracking-[-0.4px] text-white md:text-[28px]">
+      <h2 className="mb-[20px] font-['Unbounded',sans-serif] text-[22px] font-medium leading-[1.2] tracking-[-0.4px] text-white md:text-[28px]">
         {t("models.related.heading")}
       </h2>
       <div className="grid gap-[16px] sm:grid-cols-2 md:grid-cols-3">

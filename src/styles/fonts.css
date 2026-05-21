@@ -42,26 +42,3 @@
   font-style: normal;
   font-display: swap;
 }
-
-/* Speed/CLS fix: metric-matched fallback for Unbounded (the hero-H1 LCP font,
- * font-display: swap). Unbounded is a wide display face (xAvgCharWidth ~0.74em vs
- * ~0.44em for Arial); without this, the big multi-line hero H1 reflows to more
- * lines when the web font swaps in after first paint on throttled mobile, pushing
- * content down (CLS 0.057 on the homepage). This fallback (a SEPARATE family name —
- * NOT the same-family local() footgun warned about above) is scaled to occupy the
- * same box as Unbounded, so the swap is shift-free. Overrides derived from the
- * subset Unbounded (upm 1000, hhea asc/desc 995/-245, xAvgCharWidth 0.74em) against
- * Arial via the fontaine/@capsizecss formula: size-adjust = widthRatio,
- * ascent/descent-override = metric / size-adjust. Multi-local() so Android/Linux
- * (no Arial) land on a metric-similar base (Roboto ~0.449em) instead of bare
- * sans-serif. Unbounded stays FIRST in the stack, so the real font wins once loaded. */
-@font-face {
-  font-family: 'Unbounded Fallback';
-  src: local('Arial'), local('Helvetica Neue'), local('Liberation Sans'), local('Arimo'), local('Roboto');
-  font-weight: 400 700;
-  font-style: normal;
-  size-adjust: 167.65%;
-  ascent-override: 59.35%;
-  descent-override: 14.61%;
-  line-gap-override: 0%;
-}

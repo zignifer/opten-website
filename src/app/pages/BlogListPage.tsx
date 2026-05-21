@@ -162,7 +162,7 @@ export default function BlogListPage() {
           }}
         />
         <div className="relative z-10 mx-auto max-w-[800px] text-center">
-          <h1 className="font-['Unbounded','Unbounded_Fallback',sans-serif] text-[36px] font-bold leading-[1.1] tracking-[-0.6px] text-white sm:text-[44px] md:text-[52px]">
+          <h1 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] tracking-[-0.6px] text-white sm:text-[44px] md:text-[52px]">
             {t("blog.heading")}
           </h1>
           <p className="blog-intro mx-auto mt-[20px] max-w-[680px] text-[17px] leading-[1.6] text-white/70 md:text-[18px]">

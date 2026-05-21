@@ -16,7 +16,7 @@ export default function SiteFooter(): JSX.Element {
     <footer className="relative overflow-hidden bg-[#011417] px-5 pb-8 pt-[70px] text-center md:pt-28">
       <div aria-hidden="true" className="opten-footer-gradient" />
       <div className="relative z-10 mx-auto max-w-[900px]">
-        <h2 className="font-['Unbounded','Unbounded_Fallback',sans-serif] text-[36px] font-bold leading-[1.12] text-white md:text-[60px]">
+        <h2 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.12] text-white md:text-[60px]">
           {lang === "ru" ? (
             <>Хватит гадать. Генерируй<br /><Accent>с первой попытки.</Accent></>
           ) : (
