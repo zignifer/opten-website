@@ -111,7 +111,7 @@ export default function BlogPostPage() {
           {t(`blog.category.${data.category === "deep-dive" ? "deepDive" : data.category}`)}
         </span>
 
-        <h1 className="mt-[16px] font-['Unbounded',sans-serif] text-[28px] font-medium leading-[1.15] tracking-[-0.6px] text-white md:text-[40px]">
+        <h1 className="mt-[16px] font-['Unbounded','Unbounded_Fallback',sans-serif] text-[28px] font-medium leading-[1.15] tracking-[-0.6px] text-white md:text-[40px]">
           {data.title}
         </h1>
 
@@ -153,7 +153,7 @@ export default function BlogPostPage() {
             {steps.map((step, i) => (
               <li key={i} className="border-t border-white/10 pt-[28px]">
                 <div className="mb-[12px] flex items-baseline gap-[12px]">
-                  <span className="font-['Unbounded',sans-serif] text-[22px] font-bold leading-[1] text-[#9cfb51] md:text-[28px]">
+                  <span className="font-['Unbounded','Unbounded_Fallback',sans-serif] text-[22px] font-bold leading-[1] text-[#9cfb51] md:text-[28px]">
                     {i + 1}.
                   </span>
                   <h2 className="text-[20px] font-medium leading-[1.3] tracking-[-0.4px] text-white md:text-[24px]">
@@ -231,7 +231,7 @@ export default function BlogPostPage() {
       {/* Related posts (or "Browse all" CTA when only this post exists) — width-aligned with the
           800px article column so the section reads as part of the post, not a sitewide widget. */}
       <section className="mx-auto max-w-[800px] px-[20px] pb-[60px]">
-        <h2 className="mb-[20px] font-['Unbounded',sans-serif] text-[22px] font-medium leading-[1.2] tracking-[-0.4px] text-white md:text-[28px]">
+        <h2 className="mb-[20px] font-['Unbounded','Unbounded_Fallback',sans-serif] text-[22px] font-medium leading-[1.2] tracking-[-0.4px] text-white md:text-[28px]">
           {t("blog.relatedHeading")}
         </h2>
         {related.length > 0 ? (

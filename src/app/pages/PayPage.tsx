@@ -467,7 +467,7 @@ export default function PayPage() {
                     <div className="flex flex-col gap-[40px]">
                       <div className="flex flex-col gap-[12px]">
                         <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-white tracking-[-0.48px]">{t("pricing.onetime.subtitle")}</p>
-                        <span className="font-['Unbounded',sans-serif] text-[48px] font-bold leading-[1.1] text-[#9cfb51]">{currency === "USD" ? t("pricing.onetime.priceUsd") : t("pricing.onetime.price")}</span>
+                        <span className="font-['Unbounded','Unbounded_Fallback',sans-serif] text-[48px] font-bold leading-[1.1] text-[#9cfb51]">{currency === "USD" ? t("pricing.onetime.priceUsd") : t("pricing.onetime.price")}</span>
                       </div>
                       <Divider />
                       <div className="flex flex-col gap-[12px]">
@@ -514,7 +514,7 @@ export default function PayPage() {
                       <div className="flex flex-col gap-[8px]">
                         <p className="font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[24px] text-[#011417] tracking-[-0.48px]">{t("pricing.pro.subtitle")}</p>
                         <div className="flex gap-[6px] items-end">
-                          <span className="font-['Unbounded',sans-serif] text-[48px] font-bold leading-[1.1] text-[#011417]">{currency === "USD" ? t("pricing.pro.priceUsd") : t("pricing.pro.price")}</span>
+                          <span className="font-['Unbounded','Unbounded_Fallback',sans-serif] text-[48px] font-bold leading-[1.1] text-[#011417]">{currency === "USD" ? t("pricing.pro.priceUsd") : t("pricing.pro.price")}</span>
                           <span className="pb-1 font-['PT_Root_UI',sans-serif] text-[16px] leading-[2] text-[#011417]/60">{t("pricing.pro.period")}</span>
                         </div>
                       </div>

@@ -30,7 +30,7 @@ export default function ModelInstallCta({ meta }: Props) {
     >
       <h2
         id="model-install-cta"
-        className="mb-[20px] font-['Unbounded',sans-serif] text-[24px] font-medium leading-[1.2] tracking-[-0.4px] text-white md:text-[30px]"
+        className="mb-[20px] font-['Unbounded','Unbounded_Fallback',sans-serif] text-[24px] font-medium leading-[1.2] tracking-[-0.4px] text-white md:text-[30px]"
       >
         {heading}
       </h2>

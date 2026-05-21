@@ -99,7 +99,7 @@ function Hero() {
     <section className="relative overflow-hidden bg-[#011417] px-5 pb-24 pt-[131px] md:min-h-[850px] md:pb-28 md:pt-[190px]">
       <div aria-hidden="true" className="opten-figma-gradient" />
       <div className="relative z-10 mx-auto flex w-full max-w-[1000px] flex-col items-center text-center">
-        <h1 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.08] text-white sm:text-[54px] md:text-[62px]">
+        <h1 className="font-['Unbounded','Unbounded_Fallback',sans-serif] text-[36px] font-bold leading-[1.08] text-white sm:text-[54px] md:text-[62px]">
           <Accent>{accentTitle}</Accent>
           {restTitle ? <><br />{restTitle}</> : null}
         </h1>
@@ -327,7 +327,7 @@ function Privacy() {
   return (
     <section id="trust" className="bg-[#011417] px-5 py-[70px] md:py-24">
       <div className="mx-auto grid w-full max-w-[1240px] gap-y-5 lg:grid-cols-[460px_1fr] lg:gap-[200px]">
-        <h2 className="w-full min-w-0 text-center font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] text-white md:text-[52px] lg:text-left">{titleCaseEn(t("privacy.sectionTitle"), lang)}</h2>
+        <h2 className="w-full min-w-0 text-center font-['Unbounded','Unbounded_Fallback',sans-serif] text-[36px] font-bold leading-[1.1] text-white md:text-[52px] lg:text-left">{titleCaseEn(t("privacy.sectionTitle"), lang)}</h2>
         <div className="flex w-full min-w-0 flex-col lg:-mt-10">
           <PrivacyItem title={t("privacy.item1.title")} desc={t("privacy.item1.desc")} />
           <PrivacyItem title={t("privacy.item2.title")} desc={t("privacy.item2.desc")} />
@@ -390,7 +390,7 @@ function PlanCard({ title, price, period, features, buttonText, dark = false }: 
       <div>
         <h3 className="font-['PT_Root_UI',sans-serif] text-[24px] font-medium leading-[1.1] tracking-[-0.48px]">{title}</h3>
         <div className="mt-8 flex items-end gap-2">
-          <span className={cx("font-['Unbounded',sans-serif] text-[48px] font-bold leading-[1.1] tracking-[-0.96px]", dark && "text-[#9cfb51]")}>{price}</span>
+          <span className={cx("font-['Unbounded','Unbounded_Fallback',sans-serif] text-[48px] font-bold leading-[1.1] tracking-[-0.96px]", dark && "text-[#9cfb51]")}>{price}</span>
           {period ? <span className={cx("pb-1 font-['PT_Root_UI',sans-serif] text-[16px] leading-[2]", dark ? "text-white/55" : "text-[#011417]/60")}>{period}</span> : null}
         </div>
         <div className={cx("my-12 h-px", dark ? "bg-white/10" : "bg-[#011417]/12")} />
@@ -421,7 +421,7 @@ function PlanCard({ title, price, period, features, buttonText, dark = false }: 
 
 function SectionTitle({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <h2 className={cx("mx-auto text-center font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] text-white sm:text-[46px] md:text-[52px]", className)}>
+    <h2 className={cx("mx-auto text-center font-['Unbounded','Unbounded_Fallback',sans-serif] text-[36px] font-bold leading-[1.1] text-white sm:text-[46px] md:text-[52px]", className)}>
       {children}
     </h2>
   );
