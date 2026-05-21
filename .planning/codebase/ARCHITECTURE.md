@@ -1,307 +1,331 @@
-<!-- refreshed: 2026-05-18 -->
-# Architecture — opten.space
+<!-- refreshed: 2026-05-21 -->
+# Architecture
 
-**Analysis Date:** 2026-05-18
+**Analysis Date:** 2026-05-21
 
 ## System Overview
 
 ```text
-┌─────────────────────────────────────────────────────────────────────┐
-│  Browser (SPA + prerendered RU + EN HTML shells)                    │
-│                                                                     │
-│  index.html  ──preload──>  /fonts/*.woff2                           │
-│       │       ──preconnect─> cdn.paddle.com   (only on /pay,/en/pay) │
-│       ▼                                                             │
-│  src/main.tsx  ── createRoot | hydrateRoot ──>  <App>               │
-│       │                                                             │
-│       ├─ <BrowserRouter>                                            │
-│       │     └─ <LangProvider>   (URL-prefix → localStorage → nav)   │
-│       │           └─ <Suspense fallback={RouteLoading}>             │
-│       │                 └─ <Routes>   18 declarations               │
-│       │                      ├─ 9 RU (incl. SPA-only /success,     │
-│       │                      │        /account, /dashboard/*)       │
-│       │                      ├─ 9 EN siblings under /en/*           │
-│       │                      └─ catch-all <Route path="*">          │
-│       └─ hydration guard: window.__PRERENDER_PATH === pathname      │
-└──────┬─────────────────────┬────────────────────────┬───────────────┘
-       │ chrome.runtime.     │ fetch                  │ window.Paddle
-       │   sendMessage       │                        │   .Checkout
-       ▼                     ▼                        ▼
-┌────────────────┐  ┌──────────────────────┐  ┌────────────────────┐
-│ Opten Chrome   │  │ Supabase             │  │ Paddle.js v2 CDN   │
-│ extension      │  │  - /functions/v1/*   │  │  + Paddle backend  │
-│ (externally_   │  │  - /rest/v1/*        │  │                    │
-│  connectable)  │  │  - /auth/v1/user     │  └────────────────────┘
-└────────────────┘  └──────────────────────┘
-                              ▲
-                              │ JWT validation, subscriptions lookup
-                              │
-                    ┌──────────────────────────────┐
-                    │ /api/download-skill          │
-                    │ (Vercel serverless,          │
-                    │  api/download-skill.ts)      │
-                    └──────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                      Index HTML + Vite Bundle                            │
+│              (main.tsx: Router + LangProvider + Routes)                   │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  ┌─────────────────────┐  ┌──────────────────────┐  ┌────────────────┐  │
+│  │  Prerendered Pages  │  │   SPA-Only Routes    │  │  Dynamic Model │  │
+│  │  (Marketing/Billing)│  │  (Account/Success)   │  │  Content Pages │  │
+│  │ `src/app/pages/`    │  │ `src/app/pages/`     │  │ `/models/:slug`│  │
+│  └─────────────────────┘  └──────────────────────┘  └────────────────┘  │
+│                                                                            │
+└──────────────┬───────────────────────────────┬──────────────────────────┘
+               │                               │
+               ▼                               ▼
+    ┌──────────────────────────┐    ┌──────────────────────────┐
+    │    Entry (Hydrate)       │    │   Lazy Components        │
+    │  entry-server.tsx (SSR)  │    │  (Suspense boundaries)   │
+    │  .ssr-cache/             │    │  - SuccessPage           │
+    │  renderRoute(path)       │    │  - AccountPage           │
+    │                          │    │  - DownloadSkillPage     │
+    └──────────────────────────┘    └──────────────────────────┘
+               │
+               ▼
+    ┌──────────────────────────────────────────────────────────┐
+    │         I18n Layer (LangContext + localStorage)          │
+    │  Detects: URL prefix (/en/*) > localStorage > navigator   │
+    │  Source: ru.json / en.json (eager)                        │
+    │  Router wrapper: StaticRouter (SSR) / BrowserRouter (CSR) │
+    └──────────────────────────────────────────────────────────┘
+               │
+               ▼
+    ┌──────────────────────────────────────────────────────────┐
+    │  Content & Components                                     │
+    │  Shared: SiteHeader, SiteFooter, LocalizedLink, FaqBlock │
+    │  Marketing: Landing sections, Pricing, Privacy          │
+    │  Blog: BlogListPage, BlogPostPage                        │
+    │  Models: ModelsHubPage (62 cards), ModelPage (detail)    │
+    │  Build-injected: data-island scripts (#opten-model)      │
+    └──────────────────────────────────────────────────────────┘
+               │
+               ▼
+    ┌──────────────────────────────────────────────────────────┐
+    │   Build-Time Output (scripts/ pipeline)                  │
+    │  - 144 prerendered HTML (18 base + 2 hubs + 124 models)  │
+    │  - SEO routes manifest (seo-routes.ts)                   │
+    │  - Sitemap.xml + llms.txt + IndexNow ping                │
+    │  - FAQBlock ↔ FAQPage parity verification                │
+    │  - Model data-islands (#opten-model) per route           │
+    └──────────────────────────────────────────────────────────┘
+               │
+               ▼
+    ┌──────────────────────────────────────────────────────────┐
+    │    External Integration Points                            │
+    │  - Supabase: /functions/v1/* + /rest/v1/* (fetch)        │
+    │  - Paddle.js: window.Paddle.Checkout (CDN synced on /pay)│
+    │  - Chrome Runtime: chrome.runtime.sendMessage (ext auth)  │
+    │  - Vercel: /api/download-skill (serverless)              │
+    └──────────────────────────────────────────────────────────┘
 ```
-
-## Rendering Model
-
-- **SPA with build-time prerender shells.** Not SSR at request time.
-- Build chain in `package.json:7`:
-  1. `vite build` — client SPA bundle → `dist/`.
-  2. `vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache` — SSR bundle (app mount only).
-  3. `vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta` — route manifest (RU + EN entries).
-  4. `node scripts/prerender.mjs` — emits per-route `dist/{route}/index.html` for every manifest entry whose `prerender: "full"` or `"head"`.
-  5. `node scripts/sitemap.mjs` — sitemap regeneration; throws if fewer than 18 routes are found (9 RU + 9 EN floor, Phase 5).
-  6. `node scripts/llms.mjs` — AI crawler index (llms.txt + llms-full.txt).
-  7. `node scripts/verify-faq-mainentity.mjs` — build gate: visible FAQ DOM must match FAQPage schema.
-  8. `node scripts/indexnow.mjs` — Bing IndexNow ping (non-fatal).
-- **18 emitted HTML shells** = 9 RU (`/`, `/pay`, `/welcome`, `/about`, `/blog`, `/blog/<slug>`, `/privacy`, `/terms`, `/refund`) + 9 EN siblings (`/en/` + same paths).
-- Prerender tiers (`scripts/seo-routes.ts`):
-  - `full` — both `<head>` and `<body>` prerendered. RU: `/`, `/welcome`, `/about`, `/blog`, `/blog/<slug>`, `/privacy`, `/terms`, `/refund`. EN: `/en/` + same.
-  - `head` — meta-only; body stays empty `#root`. RU: `/pay`. EN: `/en/pay`.
-  - SPA-only (not in manifest, no shell emitted) — `/success`, `/account`, `/dashboard/download-skill`. Vercel SPA-fallback serves `dist/index.html` (prerendered for `/`) and hydration guard discards the stale tree.
-- `scripts/entry-server.tsx` mounts the full-prerender routes only (9 RU + 9 EN). Importing SuccessPage/AccountPage/DownloadSkillPage would crash SSR.
-- `LangProvider` lives **inside** both `<BrowserRouter>` (client) and `<StaticRouter>` (SSR) so its `useLocation()` call has a router context.
-- Hydration guard in `src/main.tsx:88-96`: hydrate only when `#root` has children AND `window.__PRERENDER_PATH === location.pathname`; otherwise wipe + `createRoot`. The marker is injected per-route by `scripts/prerender.mjs`.
-- Vercel SPA fallback rewrite: `vercel.json:3` — `/((?!api/).*) → /index.html`. Affects SPA-only routes and catch-all 404.
-
-## Route Table (post-v1.0)
-
-| Path | Component file | Purpose | Prerender tier | Locked? |
-|------|----------------|---------|---------------|---------|
-| `/` | `src/app/App.tsx` | Landing (RU) | full | no |
-| `/pay` | `src/app/pages/PayPage.tsx` (lazy) | Pricing + Paddle/YooKassa | head | **yes** — extension popup CTA |
-| `/success` | `src/app/pages/SuccessPage.tsx` (lazy) | Post-payment thank-you | none (SPA only) | **yes** — YooKassa `return_url` |
-| `/welcome` | `src/app/pages/WelcomePage.tsx` | Post-install onboarding (RU) | full | **yes** — extension on-install navigate |
-| `/about` | `src/app/pages/AboutPage.tsx` | E-E-A-T founder page (RU) | full | no (Phase 4.1 B-03) |
-| `/blog` | `src/app/pages/BlogListPage.tsx` | Blog hub — search + filter + cards | full | no (Phase 5 B-04) |
-| `/blog/:slug` | `src/app/pages/BlogPostPage.tsx` | Blog post (RU + EN; slug neutral) | full (per-slug) | no (Phase 5 B-05/B-07) |
-| `/account` | `src/app/pages/AccountPage.tsx` (lazy) | Subscription mgmt | none (SPA only) | no |
-| `/privacy` | `src/app/pages/PrivacyPage.tsx` | Legal (RU) | full | no |
-| `/terms` | `src/app/pages/TermsPage.tsx` | Legal (RU) | full | no |
-| `/refund` | `src/app/pages/RefundPage.tsx` | Legal (RU) | full | no |
-| `/dashboard/download-skill` | `src/app/pages/DownloadSkillPage.tsx` (lazy) | Pro-gated ZIP download | none (SPA only) | no |
-| `/en/*` | (EN siblings) | Bilingual mirrors, same RU components | full/head | no |
-| `*` | `src/app/pages/NotFound.tsx` | Catch-all 404 (runtime noindex) | none (SPA only) | no (Phase 4.2) |
-
-**18 prerendered Routes** in `src/main.tsx` (9 RU + 9 EN). Same React components serve both languages — `LangProvider` flips content. Lazy-loaded routes (PayPage, SuccessPage, AccountPage, DownloadSkillPage) never enter SSR.
-
-**3 SPA-only RU routes** (`/success`, `/account`, `/dashboard/download-skill`) intentionally have **no EN siblings** — language flip via storage rather than URL navigation. `LangSwitcher` detects this and skips navigate.
-
-**Catch-all route** (`<Route path="*">`):
-- Renders `<NotFound>` component.
-- Injects `<meta name="robots" content="noindex,nofollow">` at runtime.
-- Locale-aware fallback text via `useT()`.
-- HTTP status stays 200 (Vercel SPA rewrite unchanged; 404 response deferred to Phase 6).
 
 ## Component Responsibilities
 
 | Component | Responsibility | File |
 |-----------|----------------|------|
-| `main.tsx` | Entry, router, hydration decision, 18 Route declarations + catch-all | `src/main.tsx` |
-| `entry-server.tsx` | SSR entry — `renderRoute(path)` for full-prerender routes only | `scripts/entry-server.tsx` |
-| `seo-routes.ts` | Per-route SEO meta manifest (RU + EN, 18 entries + catch-all) | `scripts/seo-routes.ts` (47.8 KB) |
-| `prerender.mjs` | Postbuild splicer — per-route HTML emission, hreflang, lang, og:locale, marker | `scripts/prerender.mjs` |
-| `sitemap.mjs` | Postbuild sitemap generator (18-route floor, Phase 5) | `scripts/sitemap.mjs` |
-| `llms.mjs` | AI-crawler index (llms.txt + llms-full.txt) | `scripts/llms.mjs` |
-| `verify-faq-mainentity.mjs` | Build gate — FAQ parity check | `scripts/verify-faq-mainentity.mjs` |
-| `LangProvider` | URL-prefix → storage → navigator detection; lazy EN dict; t() lookup | `src/i18n/LangContext.tsx` |
-| `paths.ts` | EN_SIBLINGS allow-list + `toEnTarget`/`toRuTarget`/`localizeHref` | `src/i18n/paths.ts` |
-| `LangSwitcher` | Storage write + conditional navigate (no-op on non-sibling routes) | `src/app/components/LangSwitcher.tsx` |
-| `LocalizedLink` | Drop-in `<Link>` that rewrites hrefs to /en/ on /en/* paths | `src/app/components/LocalizedLink.tsx` |
-| `SiteHeader` | Unified hamburger nav (variant: "landing" for App.tsx, "page" for all others) | `src/app/components/SiteHeader.tsx` (Phase 5 B-03) |
-| `SiteFooter` | Shared CTA + nav footer | `src/app/components/SiteFooter.tsx` (Phase 5 B-03) |
-| `App` (landing) | Hero, features, partners, CTAs, landing FAQ | `src/app/App.tsx` |
-| `PayPage` | Currency selector, Paddle SDK init, YooKassa fetch, sub fetch, ext detect | `src/app/pages/PayPage.tsx` |
-| `AccountPage` | Subscription summary, cancel/update card, ext detect | `src/app/pages/AccountPage.tsx` |
-| `AboutPage` | Founder E-E-A-T page with Person schema | `src/app/pages/AboutPage.tsx` (Phase 4.1 B-03) |
-| `BlogListPage` | Blog hub — CollectionPage + client filter/search | `src/app/pages/BlogListPage.tsx` (Phase 5 B-04) |
-| `BlogPostPage` | Blog post — BlogPosting + HowTo + FAQ + WebPage speakable | `src/app/pages/BlogPostPage.tsx` (Phase 5 B-05) |
-| `NotFound` | Catch-all 404 — locale-aware, injects runtime noindex | `src/app/pages/NotFound.tsx` (Phase 4.2) |
-| `DownloadSkillPage` | Pro-gated ZIP fetch from `/api/download-skill` | `src/app/pages/DownloadSkillPage.tsx` |
-| `SuccessPage` | Static thank-you, logs Paddle txn from `?_ptxn=` | `src/app/pages/SuccessPage.tsx` |
-| `BlogPostCard` | Blog grid card with cover, title, excerpt, tags, reading time | `src/app/components/BlogPostCard.tsx` (Phase 5) |
-| `FaqBlock` | Semantic `<dl>` FAQ — source-of-truth for FAQPage schema | `src/app/components/FaqBlock.tsx` |
-| `ensurePaddle()` | Idempotent Paddle SDK loader + Initialize() | `src/lib/paddle.ts` |
-| `OptenHeroAnimation` | Landing hero animation | `src/app/components/OptenHeroAnimation.tsx` |
-| `Picture` | `<picture>` wrapper for `vite-imagetools` `?as=picture` imports | `src/app/components/Picture.tsx` |
-| `RouteLoading` | Suspense fallback for lazy routes | `src/app/components/RouteLoading.tsx` |
-| `LegalLayout` | Shared chrome for /privacy, /terms, /refund | `src/app/components/layout/LegalLayout.tsx` |
-| `download-skill` handler | JWT verify → Supabase sub check → stream opten.zip | `api/download-skill.ts` |
+| BrowserRouter | Client-side SPA routing | `src/main.tsx` |
+| StaticRouter | Build-time SSR routing | `scripts/entry-server.tsx` |
+| LangProvider | i18n detection & context (URL prefix > localStorage > navigator) | `src/i18n/LangContext.tsx` |
+| App | Landing page entry point; 7 sections (Hero, Partners, Steps, Features, Privacy, Pricing, FAQ) | `src/app/App.tsx` |
+| SiteHeader | Unified hamburger header with LangSwitcher; shared across all pages | `src/app/components/SiteHeader.tsx` |
+| SiteFooter | Shared footer with InstallButton CTA | `src/app/components/SiteFooter.tsx` |
+| LocalizedLink | <Link> drop-in that preserves /en/ prefix when on EN routes | `src/app/components/LocalizedLink.tsx` |
+| FaqBlock | Semantic <dl> block; source-of-truth for FAQ schema (mirrored to FAQPage JSON-LD) | `src/app/components/FaqBlock.tsx` |
+| BlogListPage | Listing hub for /blog; card grid, tags, pagination | `src/app/pages/BlogListPage.tsx` |
+| BlogPostPage | Single blog post page; integrates cover, body, schema | `src/app/pages/BlogPostPage.tsx` |
+| ModelsHubPage | Programmatic model hub; 62 cards with type/platform filters + HUB_HIDDEN_SLUGS logic | `src/app/pages/ModelsHubPage.tsx` |
+| ModelPage | Single model page; quick facts + content sections + FAQ + related models | `src/app/pages/ModelPage.tsx` |
+| PayPage | Billing surface; YooKassa RUB + Paddle USD; Extension Integration Contract §6 (sync Paddle on /pay/index.html only) | `src/app/pages/PayPage.tsx` |
+| AccountPage | Pro account page (SPA-only, extension-coupled); lazy-loaded | `src/app/pages/AccountPage.tsx` |
+| SuccessPage | YooKassa return_url landing (SPA-only); lazy-loaded | `src/app/pages/SuccessPage.tsx` |
+| DownloadSkillPage | Pro-only opten.zip download; JWT + extension-coupled; serverless backend | `src/app/pages/DownloadSkillPage.tsx` |
+| NotFound | Catch-all 404; injects noindex at runtime | `src/app/pages/NotFound.tsx` |
 
-## i18n Flow (URL + storage + navigator)
+## Pattern Overview
 
-```
-                                ┌────────────────────────────────────┐
-                                │  LangProvider mounted under Router │
-                                └────────────────────────────────────┘
-                                              │
-                                              ▼ useLocation().pathname
-                                  ┌──────────────────────────────┐
-                                  │  detectLangFromPath(pathname)│
-                                  └──────────────────────────────┘
-                                              │
-            ┌─────────────────────────────────┼─────────────────────────────────┐
-            ▼ startsWith("/en/")              ▼ no match                         │
-       lang = "en"                    detectLangFromStorage():                   │
-       (loadEnDict on demand,         1. localStorage.opten_lang_v3              │
-        flash of RU keys ~ms,         2. legacy localStorage.opten_lang === "en" │
-        SSR uses static enFallback)      (one-shot migration; "ru" ignored)      │
-                                       3. navigator.language startsWith "ru"    │
-                                              │                                  │
-                                              ▼                                  │
-                                          "ru" or "en" (default RU when SSR)     │
-```
+**Overall:** Prerender-hydrate hybrid with SSR-synchronized i18n and data-islands for programmatic content.
 
-- **URL prefix wins.** `LangProvider` runs `detectLangFromPath(location.pathname)` on every location change. `/en/*` → en, anything else → fall through to storage/navigator.
-- **Storage key was bumped.** Phase 3 switched from `opten_lang` to `opten_lang_v3` to discard stale `"ru"` values. Legacy `opten_lang` read once — honored only when value is exactly `"en"`.
-- **SSR safety.** `enFallback` (statically imported `en.json`) is populated synchronously on server so `/en/*` SSR renders EN dict on first paint; clients still hit lazy `loadEnDict()`.
-- **LocalizedLink.** Every internal `<Link>` in prerendered shell goes through `LocalizedLink`, which calls `useOnEnPath()` and routes through `localizeHref(href, onEnPath)`. On `/en/*`, sibling targets are rewritten to `/en/...`.
-- **LangSwitcher is two-mode.** Always writes `setLang()` (storage + state), then computes a target via `toEnTarget`/`toRuTarget`. If target is `null` (locked SPA-only route) or equals current pathname, skips `navigate()` — user stays, content re-renders in new language.
+**Key Characteristics:**
+- **Dual-entry SSR:** `entry-server.tsx` (renderRoute for prerender) + `main.tsx` (hydrate/mount discriminator)
+- **Hydration safety:** `__PRERENDER_PATH` marker in emitted HTML prevents React #418/#423 when extension deep-links to SPA-only routes
+- **i18n first-class:** URL prefix (/en/*) wins over storage/browser language; <html lang> baked at prerender
+- **Programmatic SEO:** 62 model pages × 2 languages (124 routes) + 2 hubs generated from `_registry.ts` + content modules
+- **Data-islands:** Model content injected as `<script type="application/json" id="opten-model">` to avoid eager 62-file glob in entry chunk
+- **Extension coupling:** Locked routes (/welcome, /pay, /success, /account, /dashboard/download-skill) and duplicated constants (EXTENSION_IDS, SUPABASE_URL) tied to extension binaries via Integration Contract
 
-## Hreflang & SEO Triplet
+## Layers
 
-`scripts/prerender.mjs` bakes three artifacts into every emitted shell:
+**Client Bundle (Vite):**
+- Purpose: React SPA with routing, i18n, UI components, and lazy-loaded content
+- Location: `src/main.tsx` entry; `src/app/` components & pages; `src/i18n/` context; `src/lib/paddle.ts` lazy-loader
+- Contains: Router, LangProvider, 22 route patterns, Suspense boundaries, Tailwind styling
+- Depends on: React Router 7, React 18.3, Radix UI, i18n dicts (ru.json, en.json)
+- Used by: Browser (hydration on prerendered HTML, SPA for non-prerendered routes)
 
-1. **`<html lang>`** — `applyHtmlLang` replaces source `<html lang="ru">` with `meta.htmlLang` (`"ru"` or `"en"`). Phase 3 D-06: never mutated at runtime.
-2. **Hreflang alternates** — `applyHreflang` injects three `<link rel="alternate">` tags (ru, en, x-default) after canonical. All from `meta.hreflangAlternates` in `seo-routes.ts`.
-3. **og:locale + og:locale:alternate** — `applyOgLocale` swaps `og:locale` to `en_US`/`ru_RU` to match `<html lang>` and injects alternate locale tag.
+**SSR Bundle (.ssr-cache):**
+- Purpose: Build-time pre-rendering of 144 routes to static HTML
+- Location: `scripts/entry-server.tsx` (renderRoute export)
+- Contains: React components rendered to strings; no browser APIs
+- Depends on: React Router (StaticRouter), LangProvider, same component tree as client
+- Used by: `scripts/prerender.mjs` (emits dist/<route>/index.html)
 
-Sitemap (`scripts/sitemap.mjs`) re-emits triplet as `xhtml:link` entries per `<url>` so search engines see consistent reciprocity.
+**Metadata Bundle (.ssr-meta):**
+- Purpose: Route manifest with per-route metadata (title, description, schema, lang, hreflang)
+- Location: `scripts/seo-routes.ts` (routes export + schema blocks)
+- Contains: 144 RouteMeta entries (9 marketing RU + 9 EN + 2 hubs + 62 models RU + 62 EN), JSON-LD schema blocks
+- Depends on: `src/content/models` (model registry + content); `src/content/landingFaq`
+- Used by: `prerender.mjs` (applies meta to each emitted HTML), sitemap.mjs, llms.mjs
 
-x-default canonical is always the RU sibling (D-02). Manifest fails fast if `index.html` structure changes — every `applyX` helper asserts its anchor matched.
+**Content Layer:**
+- Purpose: Human-authored content modules consumed at build-time
+- Location: `src/content/blog/<slug>.ts`, `src/content/models/<slug>.ts`, `src/content/models/_registry.ts`
+- Contains: Blog posts (RU + EN), model content (RU + EN), model metadata registry
+- Depends on: Content types (`types.ts`), i18n metadata (`metaEn.ts`)
+- Used by: seo-routes.ts (schema generation), pages (page rendering)
 
-## Data Flows
+**Build Pipeline:**
+- Purpose: Orchestrate SSR, prerendering, SEO verification, and asset optimization
+- Location: `scripts/{entry-server,prerender,seo-routes,sitemap,llms,verify-*}.mjs`
+- Contains: SSR renderers, HTML splicing, schema validation, sitemap generation, JSON-LD parity checks
+- Depends on: Vite build outputs (.ssr-cache, .ssr-meta, dist/), file system operations
+- Used by: `npm run build` (invoked by Vercel on deployment)
 
-### A. Site ↔ Extension (chrome.runtime.sendMessage)
+## Data Flow
 
-1. Page mounts (PayPage / AccountPage / DownloadSkillPage).
-2. Iterate `EXTENSION_IDS = ["iphkppgbobpilmphloffcalicmejacfl" (CWS), "kcmcaeenfmfnpiaihicecnfnagejpcog" (dev)]`.
-3. `chrome.runtime.sendMessage(id, { type: "GET_AUTH_TOKEN" }, cb)` — uses extension's `externally_connectable` manifest (opten.space only).
-4. Response: `{ token, email }` or `chrome.runtime.lastError` → status transitions.
-5. Token is Supabase JWT; used for all subsequent REST + function calls.
-6. Site never persists token — auth lives in extension `chrome.storage.local` (`ps_*` keys).
+### Primary Request Path (Prerendered Route / `/` → `dist/index.html`)
 
-### B. Site → Supabase
+1. **Static HTML loaded** (`dist/index.html`) — emitted by prerender.mjs with:
+   - `<html lang="ru">` (baked at prerender)
+   - `<meta name="description">` + og:* tags (from seo-routes.ts)
+   - `<link rel="canonical">` + hreflang triplet (ru/en/x-default)
+   - Prerendered body (from renderRoute)
+   - `<script type="application/json" id="opten-model">` (model data-island, if /models/:slug)
+   - `window.__PRERENDER_PATH = "/"` marker
 
-- Direct `fetch` (no `@supabase/supabase-js`).
-- Base URL: `SUPABASE_URL = "https://vuywydhwkqmihfztpkgl.supabase.co"`.
-- Anon key: `SUPABASE_ANON_KEY` (public JWT).
-- Endpoints: `get-subscription`, `create-payment`, `create-payment-paddle`, `cancel-subscription`, `cancel-subscription-paddle`, `/auth/v1/user`.
-- Edge Functions live in **extension repo** (`C:\Projects\promptscore`), not here.
+2. **Client bundle hydration** (`src/main.tsx`):
+   - Checks: `root.hasChildNodes() && (__PRERENDER_PATH === location.pathname)`
+   - If match → `hydrateRoot()` (preserves server tree)
+   - Else → `createRoot()` (wipes stale HTML, mounts client tree)
 
-### C. Site → Paddle
+3. **LangProvider initializes**:
+   - URL prefix wins: `pathname.startsWith("/en/")` → lang = "en"
+   - Else: localStorage "opten_lang_v3" (if set explicitly via LangSwitcher)
+   - Else: `navigator.language.startsWith("ru")` → "ru" | "en"
+   - Result: context value emitted matches prerendered <html lang>
 
-1. On `/pay` and `/en/pay`, prerendered head includes sync `<script src="cdn.paddle.com/paddle/v2/paddle.js">` (injected by `prerender.mjs:applyPaddleScript`).
-2. On SPA navigation, `ensurePaddle()` (`src/lib/paddle.ts`) injects async.
-3. After load: `Paddle.Environment.set("sandbox")` (only in sandbox mode), then `Paddle.Initialize({ token: VITE_PADDLE_CLIENT_TOKEN })`.
-4. CTA opens `Paddle.Checkout.open({...})` overlay; on success Paddle redirects to `/success?_ptxn=txn_…`.
+4. **Route match & page render**:
+   - React Router resolves `/` → `<App />`
+   - Component tree renders with i18n context active
+   - FaqBlock content pulls from landingFaq[lang]
 
-### D. Browser → /api/download-skill (Vercel serverless)
+5. **Interaction:**
+   - LangSwitcher click: navigate to `/en/` (LocalizedLink preserves /en prefix)
+   - Install button: window.open(STORE_URL)
+   - Pricing CTA: navigate to `/pay` (PayPage lazy-loads Paddle.js if needed)
 
-1. `DownloadSkillPage` obtains JWT via flow A.
-2. `GET /api/download-skill` with `Authorization: Bearer <jwt>`.
-3. Serverless validates JWT against `${SUPABASE_URL}/auth/v1/user`.
-4. Queries `subscriptions` table via REST: `plan='pro' AND status IN ('active','cancelled')`.
-5. On success: streams `api/_assets/opten.zip` (6.5KB, bundled via `vercel.json:includeFiles`); CORS limited to `https://opten.space`.
+### SPA Navigation Path (Landing → Blog Post / `/blog/foo`)
 
-## Blog Content Pipeline (Phase 5)
+1. **Click <LocalizedLink to="/blog/foo">**
+2. **localizeHref check:** onEnPath=true, target has EN sibling → rewrite to "/en/blog/foo"
+3. **React Router navigates** (client-side, no full page load)
+4. **BlogPostPage component mounts**:
+   - useParams extracts slug="foo"
+   - Imports blog content module (eager for prerendered slugs, lazy for SPA nav to new posts)
+   - Renders cover, intro, sections, FAQ block
+   - FaqBlock schema mirrors JSON-LD in seo-routes.ts (parity via verify-faq-mainentity.mjs)
 
-```
-src/content/blog/<slug>.ts
-  ├─ export const post: BlogPost = { ru, en }
-  │  └─ ru/en: { slug, title, excerpt, description, category, tags,
-  │            cover: {src, width, height, alt}, readingTimeMin,
-  │            publishedAt, updatedAt,
-  │            body: { intro, sections?, steps?, faq? }, related?: [...] }
-  │
-  ├─ src/content/blog/index.ts (barrel)
-  │  └─ blogPostsBySlug + allBlogPosts (sorted newest-first by publishedAt)
-  │
-  ├─ BlogListPage (UI: filter/search/grid)
-  │  └─ Renders CollectionPage schema + ItemList schema
-  │
-  ├─ BlogPostPage (UI: cover, intro, sections/steps, FAQ, related posts)
-  │  └─ Renders BlogPosting + WebPage(speakable) + HowTo + FAQPage + BreadcrumbList
-  │
-  ├─ scripts/seo-routes.ts
-  │  └─ Reads blogPostsBySlug
-  │  └─ Generates 2 RouteMeta entries per post (RU + EN)
-  │  └─ Embeds blogPostingBlock(image ≥1200px for Rich Results)
-  │  └─ Embeds webPageBlock(speakable: [".blog-intro", "h2"])
-  │  └─ Embeds howToBlock if body.steps present
-  │  └─ Embeds faqPageBlock if body.faq present
-  │
-  └─ Prerender + sitemap + llms + verify-faq gates
-     └─ dist/blog/<slug>/index.html emitted
-     └─ sitemap.xml + llms.txt auto-include blog routes
-     └─ FAQ parity enforced by verify-faq-mainentity.mjs
-```
+### Extension Deep-Link Path (Ext → `/account` or `/success`)
 
-Cover image: `public/blog/<slug>/cover.jpg` (≥1600×900, no in-image text — one asset for RU + EN + OG).
+1. **chrome.runtime.sendMessage** from extension (externally_connectable: ["opten.space"])
+2. **Extension navigates window to `/account`** (deep-link via `chrome.tabs.update`)
+3. **Vercel SPA rewrite:** /((?!api/).*) → /index.html (serves dist/index.html)
+4. **HTML lands in browser:**
+   - `__PRERENDER_PATH = "/"` (index.html prerendered for `/`)
+   - Current `location.pathname = "/account"` (no match)
+5. **Hydration discriminator triggers:**
+   - `root.hasChildNodes() && __PRERENDER_PATH !== location.pathname` → false
+   - Creates fresh tree: `createRoot().render(tree)`
+6. **React Router matches** `<Route path="/account" element={<AccountPage />}>`
+7. **AccountPage.lazy() loads** (SuccessPage, AccountPage, DownloadSkillPage are lazy)
+8. **LangProvider detects:**
+   - No /en/ prefix, no localStorage (first load)
+   - Default to RU (D-07 Pitfall)
+   - LangSwitcher on AccountPage flips in-place (navigate = null, setLang only)
 
-SEO DOM mirrors JSON-LD: `.blog-intro` matches `WebPage.speakable.cssSelector`; `<h2>` are table-of-contents anchors in HowTo; FAQ `<dt>/<dd>` match FAQPage mainEntity items.
+### Model Page Content Loading (Speed/Phase B)
 
-## Billing Flow
+**SSR + Initial Hydration (`/models/gpt-4o`):**
+1. prerender.mjs emits HTML for /models/gpt-4o with prerendered body
+2. seo-routes.ts buildModelRoute() sets modelIsland = { slug, meta, content }
+3. prerender.mjs injects: `<script type="application/json" id="opten-model">{modelIsland}</script>`
+4. ModelPage mounts, useModelEntry calls getModelBySlug("gpt-4o")
+5. index.client.ts loadModelBySlug() reads #opten-model data-island synchronously → entry present before render → hydration match
 
-```
-Lang detection (LangProvider) ──► default currency
-                                  (ru → RUB, en → USD)
-                                  override stored in localStorage.opten_pay_currency
-        │
-        ▼
-PayPage currency toggle  (works on /pay and /en/pay)
-        │
-        ├─ RUB path ─► fetch Supabase /functions/v1/create-payment
-        │              ─► returns confirmation_url
-        │              ─► window.location.assign(confirmation_url)
-        │              ─► YooKassa hosted page ─► webhook syncs subscriptions
-        │              ─► YooKassa return_url = /success
-        │
-        └─ USD path ─► ensurePaddle() ─► Paddle.Checkout.open({
-                                              items, customer, custom
-                                          })
-                       ─► overlay closes ─► Paddle webhook syncs subscriptions
-                       ─► page.success or close
-```
+**Client SPA Nav to Uncached Model (Landing → `/models/unknownmodel`):**
+1. ModelPage mounts, slug="unknownmodel"
+2. getModelBySlug() returns undefined (not in island)
+3. useModelEntry falls back to loadModelBySlug(slug)
+4. index.client.ts lazy-loads from per-model chunk (e.g., `./unknownmodel.client.js`)
+5. Loading state shown briefly, entry resolves, content renders
 
-Locked URLs: `/pay`, `/success` (extension hardlinks). `/en/pay` is not locked — added Phase 4 for SEO.
+**State Management:**
+- i18n: LangContext + localStorage "opten_lang_v3" (explicit user choice only)
+- Extension state: chrome.storage.local (ps_* keys, read via sendMessage)
+- Model content: data-island cache + lazy per-model chunks (index.client.ts)
+- Payment state: Paddle.Checkout listeners + Supabase REST to verify order
 
-## State Summary
+## Key Abstractions
 
-| Concern | Where it lives | Notes |
-|---------|----------------|-------|
-| Current language | `localStorage.opten_lang_v3` (or URL prefix) | URL wins; storage records explicit choice; navigator is fallback. Default RU on SSR. |
-| i18n dict | Bundled RU + lazy-loaded EN (client) / static EN fallback (SSR) | 68 KB RU, ~41 KB EN (gzip). |
-| Pay-page currency | `useState` + `localStorage.opten_pay_currency` | Manual override survives one mount, resets on real lang change. |
-| Auth token (JWT) | Per-page `useState` only | Fetched on mount via `chrome.runtime.sendMessage()`. Never persisted by site. |
-| Subscription | Per-page `useState` | Fetched on demand from Supabase Edge Function. |
-| Theme | Hardcoded dark | No next-themes. |
-| **Source of truth** | **Extension's `chrome.storage.local`** under `ps_*` keys | Site reads via sendMessage only. |
+**LocalizedLink:**
+- Purpose: <Link> drop-in that rewrites internal hrefs to /en/* when on EN routes
+- Examples: `src/app/components/LocalizedLink.tsx`
+- Pattern: useOnEnPath() + localizeHref() check against EN_SIBLINGS set
 
-**The site has no persistent server-side state of its own.** All persistence is browser-local or in Supabase (extension-owned).
+**Data Island:**
+- Purpose: Inject model content inline as JSON script to avoid eager glob in entry chunk
+- Examples: ModelIslandData interface in seo-routes.ts, #opten-model element in prerendered HTML, index.client.ts readIsland()
+- Pattern: prerender.mjs writes script tag, ModelPage reads #opten-model textContent and JSON.parse
+
+**Hydration Discriminator:**
+- Purpose: Detect SSR-prerendered HTML vs. SPA-fallback HTML to prevent React #418/#423
+- Examples: `src/main.tsx` lines 96-104
+- Pattern: window.__PRERENDER_PATH === location.pathname check
+
+**Lazy Component + Suspense:**
+- Purpose: Keep SuccessPage, AccountPage, DownloadSkillPage out of SSR (prevent renderToString crashes on browser APIs)
+- Examples: `src/main.tsx` lines 28-30
+- Pattern: React.lazy() + <Suspense fallback={<RouteLoading />}>
+
+**Dynamic Route Expansion:**
+- Purpose: Generate 62 model pages from registry + content modules
+- Examples: seo-routes.ts MODELS_REGISTRY loop, src/content/models/index.ts contentModules glob
+- Pattern: Build-time config + import.meta.glob() eager resolution
 
 ## Entry Points
 
-- `index.html` — SPA shell, meta, JSON-LD. Paddle preconnect/script NOT here; injected per-route by prerender.mjs.
-- `src/main.tsx` — Boots React, hydrate-vs-render decision, 18 Routes + catch-all.
-- `scripts/entry-server.tsx` — SSR entry, `renderRoute(path)`.
-- `scripts/seo-routes.ts` — 18 RouteMeta + catch-all entry, consumed by prerender + sitemap.
-- `api/download-skill.ts` — Only serverless function.
+**Browser (SPA):**
+- Location: `src/main.tsx`
+- Triggers: Page load (HTML), SPA navigation (React Router)
+- Responsibilities: Hydration detection, Router setup, LangProvider wrapping, Suspense boundary
+
+**Build (Prerender):**
+- Location: `scripts/prerender.mjs`
+- Triggers: `npm run build` (vite build → vite build --ssr → prerender.mjs)
+- Responsibilities: Loop routes from seo-routes.ts, SSR each path, splice meta, inject markers, write dist/<route>/index.html
+
+**API (Extension Download):**
+- Location: `api/download-skill.ts` (Vercel serverless)
+- Triggers: GET /api/download-skill?token=JWT (from extension)
+- Responsibilities: Verify JWT, check Pro tier, stream opten.zip from promptscore-proxy skills
 
 ## Architectural Constraints
 
-- **No SSR at request time.** Everything prerendered + client-mounted. Vercel only runs `/api/download-skill`.
-- **SPA fallback is destructive.** Vercel rewrites unknown paths to `/index.html`. Hydration guard mandatory.
-- **Lazy routes must stay lazy.** Eager import breaks SSR build.
-- **LangProvider inside Router.** Both client + SSR contexts.
-- **EN_SIBLINGS = single source of truth.** All path rewrites go through `src/i18n/paths.ts`.
-- **EN_SIBLINGS ↔ seo-routes.ts parity.** Must stay in sync; sitemap floor check catches drift.
-- **Hardcoded coupling.** `EXTENSION_IDS`, `SUPABASE_URL`, `SUPABASE_ANON_KEY` duplicated across PayPage/AccountPage/DownloadSkillPage/api — any change updates all four.
-- **Locked routes.** `/welcome`, `/pay`, `/success` (extension hardlinks); `/account`, `/dashboard/*` (extension-coupled SPA-only).
-- **No `/en/` siblings for SPA-only routes.** By design (Phase 3 D-03) — preserve auth state via storage.
-- **No tests, no ESLint, no `typecheck` script.** TS errors surface during `vite build`.
+- **Hydration timing:** __PRERENDER_PATH marker must be written BEFORE hydrateRoot() check; SSR tree structure must exactly match client tree (comments count)
+- **i18n synchronization:** <html lang> baked at prerender; runtime lang mutations are forbidden (Phase 3 D-06); dicts.en must be eagerly available on /en/* routes to prevent hydration mismatch
+- **Global state:** localStorage only (opten_lang_v3, opten_pay_currency); no module-level singletons except paddleReady promise (idempotent) and dicts (immutable after boot)
+- **Circular imports:** None detected; content/models/index.ts deliberately does NOT import from index.client.ts (vite alias + build-time swapping handles it)
+- **Route duplication:** 22 client patterns in main.tsx MUST match entry-server.tsx routes exactly (Rule 1 rule: both define RU + EN variants)
+- **Extension coupling:** EXTENSION_IDS, SUPABASE_URL, SUPABASE_ANON_KEY hardcoded in 3 pages + api/download-skill.ts; changes here are breaking changes to shipped extension binaries
+- **Data-island injection:** prerender.mjs must run AFTER all SSR outputs; order matters (entry-server.js + seo-routes.js must be ready before splicing)
+
+## Anti-Patterns
+
+### Bare <Link> on /en/* Routes
+
+**What happens:** Developer writes `<Link to="/pay">` inside a /en/welcome component
+**Why it's wrong:** React Router's Link doesn't know about URL localization; on /en/* the navigation resets to /pay (RU), breaking the language prefix and causing the page to re-render as RU even if the user is reading EN
+**Do this instead:** Use `<LocalizedLink to="/pay">` — it calls localizeHref(to, onEnPath) internally and rewrites to "/en/pay" when needed (`src/app/components/LocalizedLink.tsx`)
+
+### Storing Localized Strings in localStorage
+
+**What happens:** Caching `"опten"` vs `"Opten"` in localStorage during initial render leads to hardcoded language mismatches
+**Why it's wrong:** i18n dicts are the single source of truth; storing derived strings creates drift and breaks SPA language switches
+**Do this instead:** Store only the lang selection: `localStorage.setItem("opten_lang_v3", lang)` where lang is "ru" | "en". Always look up strings via `useT()` (`src/i18n/LangContext.tsx` lines 112–124)
+
+### Mutating document.documentElement.lang at Runtime
+
+**What happens:** Some SSR frameworks runtime-mutate the HTML lang tag; React does NOT re-render the <html> tag, so the mutation is invisible to crawlers (Phase 3 D-06)
+**Why it's wrong:** Crawlers see the prerendered <html lang> only; baking it per-route at prerender time is the only way to signal language correctly
+**Do this instead:** Never mutate <html lang> at runtime. Prerender.mjs writes lang per-route via applyHtmlLang() (`scripts/prerender.mjs` lines 38–47)
+
+### Importing Full Content Barrel into Routes without Data-Island
+
+**What happens:** ModelPage imports `src/content/models` (eager glob of 62 .ts files); the eager glob ships the entire registry in the entry chunk (~200 KB)
+**Why it's wrong:** Slows down every page load, wastes bandwidth for users who never visit model pages
+**Do this instead:** Use data-islands for prerendered routes, lazy per-model chunks for SPA nav. Vite alias swaps `@/content/models` to `index.client.ts` for the browser build (vite.config.ts lines 29–34), while SSR keeps the eager barrel for renderRoute
+
+### Forgetting EN_SIBLINGS Sync
+
+**What happens:** Developer adds a new route (e.g., `/guides/new-post`) in main.tsx and seo-routes.ts but forgets to add "/guides/new-post" to EN_SIBLINGS in paths.ts
+**Why it's wrong:** <LocalizedLink to="/guides/new-post"> on /en/* routes doesn't rewrite the href, link resolves to "/guides/new-post" instead of "/en/guides/new-post"
+**Do this instead:** Update three files in sync: (1) main.tsx (RU + EN route patterns), (2) seo-routes.ts (manifest entry), (3) paths.ts (EN_SIBLINGS set). See `src/i18n/paths.ts` comments lines 1–4
+
+## Error Handling
+
+**Strategy:** Graceful degradation with runtime context injection.
+
+**Patterns:**
+- **Hydration mismatch (React #418/#423):** Discriminator falls back to createRoot + full client re-render (no hard crash)
+- **Missing model content:** ModelPage shows QuickFacts + InstallCta only; content loads async or shows "loading" state
+- **Paddle SDK load failure:** ensurePaddle() rejects with error; PayPage logs warning but doesn't crash
+- **404 routes:** NotFound catches all via `<Route path="*">`, injects noindex, offers home link (doesn't throw)
+- **Supabase fetch errors:** Callers (AccountPage, PayPage) handle fetch rejection; no global error boundary (yet)
+
+## Cross-Cutting Concerns
+
+**Logging:** console.warn for missing env vars (VITE_PADDLE_CLIENT_TOKEN); console.error for SDK load failures (Paddle, model lazy-load). No structured logger (minimal overhead)
+
+**Validation:** TypeScript compiler catches most errors at build time. Runtime: React Router validates route match, LangProvider validates detectLangFromPath result, verify-faq-mainentity.mjs asserts FAQ DOM ↔ schema parity
+
+**Authentication:** Extension owns auth. Site reads user state via chrome.runtime.sendMessage (extension origin isolation). Pro tier gated in PayPage + DownloadSkillPage via JWT verification (api/download-skill.ts)
 
 ---
 
-*Architecture analysis: 2026-05-18 — post-v1.0 (GEO Optimization milestone, 2026-05-14..17) + blog migration hotfix. Covers prerender pipeline, hydration, i18n routing, blog content, extension coupling, billing, and build-time gates.*
+*Architecture analysis: 2026-05-21*

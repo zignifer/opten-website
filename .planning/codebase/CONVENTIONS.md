@@ -1,233 +1,274 @@
 # Coding Conventions
 
-**Analysis Date:** 2026-05-18
+**Analysis Date:** 2026-05-21
 
 ## Naming Patterns
 
 **Files:**
-- React components: PascalCase `.tsx`, one component per file — `src/app/pages/PayPage.tsx`, `src/app/components/OptenHeroAnimation.tsx`, `src/app/components/layout/LegalLayout.tsx`, `src/app/components/LangSwitcher.tsx`, `src/app/components/LocalizedLink.tsx`
-- shadcn/Radix UI primitives: lowercase kebab-case under `src/app/components/ui/` — `button.tsx`, `dropdown-menu.tsx`, `alert-dialog.tsx` (mostly untouched scaffold)
-- Non-component TS modules: lowercase — `src/lib/paddle.ts`, `src/i18n/LangContext.tsx`, `src/i18n/paths.ts`, `src/app/components/ui/utils.ts`
-- Type-only declarations: `.d.ts` — `src/types/paddle.d.ts`, `src/types/imagetools.d.ts`
-- i18n dictionaries: `ru.json`, `en.json` at `src/i18n/`
-- Build scripts: lowercase under `scripts/` — `scripts/prerender.mjs`, `scripts/sitemap.mjs`, `scripts/seo-routes.ts`, `scripts/entry-server.tsx`, `scripts/smoke-blog.mjs`
-- Auto-generated Figma-Make imports: `src/imports/<ScreenName>/` — do not hand-edit (see Anti-Conventions)
+- React components: PascalCase `.tsx`, one component per file — `SiteHeader.tsx`, `FaqBlock.tsx`, `LocalizedLink.tsx`, `LangSwitcher.tsx`
+- Non-component TS modules: lowercase — `LangContext.tsx`, `paths.ts`, `paddle.ts`, `landingFaq.ts`
+- Page files: PascalCase + "Page" suffix — `PayPage.tsx`, `AccountPage.tsx`, `ModelPage.tsx`, `BlogPostPage.tsx`
+- UI primitives (shadcn/Radix): lowercase kebab-case — `button.tsx`, `dropdown-menu.tsx`, `alert-dialog.tsx`
+- Build scripts: lowercase kebab-case — `verify-faq-mainentity.mjs`, `build-models-registry.mjs`, `smoke-blog.mjs`
+- Auto-generated Figma imports: `src/imports/<ScreenName>/` — do NOT hand-edit
 
 **Functions:**
-- camelCase for utilities — `detectLangFromPath`, `detectLangFromStorage`, `loadEnDict`, `localizeHref`, `toEnTarget`, `toRuTarget`, `stripTrailingSlash`, `charDelay`, `titleCaseEn`, `langToCurrency`
-- PascalCase for React components — `Button`, `LegalLayout`, `OptenHeroAnimation`, `LangProvider`, `LangSwitcher`, `LocalizedLink`
-- Local helper components inside a file are also PascalCase — `Accent`, `Logo`, `BrowserIcons`, `InstallButton`, `ChromeIconSmall`, `CheckIcon` in various page files
+- React components: PascalCase — `SiteHeader()`, `FaqBlock()`, `App()`, `LangProvider()`
+- Event handlers: camelCase with semantic prefix — `handleError()`, `handleClick()`, `closeMenu()`
+- Utility functions: camelCase — `titleCaseEn()`, `formatDate()`, `detectLangFromStorage()`, `localizeHref()`
+- Local helper components inside a file: PascalCase — `Accent()`, `Logo()`, `ChromeIconSmall()`, `PartnerLink()`
 
 **Variables:**
-- camelCase for locals and state
-- UPPER_SNAKE_CASE for module-level constants — `STORAGE_KEY`, `LEGACY_STORAGE_KEY`, `CURRENCY_STORAGE_KEY`, `SUPABASE_ANON_KEY`, `SUPABASE_FUNCTIONS_URL`, `EXTENSION_IDS`, `CHROME_STORE_URL`, `EN_SIBLINGS`, `EN_LANDING`, `SITE_ORIGIN`, `DEFAULT_OG_IMAGE`, `DEFAULT_OG_IMAGE_EN`
+- State variables: camelCase — `lang`, `extStatus`, `loadingSub`, `error`, `email`
+- Booleans: camelCase, often with `is`/`has`/`can`/`did` prefix — `didError`, `hasChildNodes`, `pathMatches`, `scrolled`
+- Loop/temporary: camelCase — `tried`, `srcSuffix`, `locale`, `px`
+- Refs: camelCase with `Ref` suffix — `panelRef`, `buttonRef`
 
-**Types:**
-- PascalCase interfaces and type aliases — `LangContextValue`, `RouteMeta`, `Subscription`, `ExtStatus`, `Currency`, `Lang`, `Phase`, `BlogPost`, `BlogPostLocale`, `BlogPostBody`, `BlogFaqItem`, `BlogStep`, `BlogSection`
-- No `I`-prefix convention
+**Types & Interfaces:**
+- PascalCase, named semantically — `Props`, `SiteHeaderProps`, `FaqItem`, `Subscription`, `ExtStatus`, `Currency`, `Lang`
+- No `I`-prefix (not used in this codebase)
 
-**i18n keys:**
-- Dot-namespaced strings — `account.ext.notInstalled.desc1`, `legal.backLink`, `welcome.step1.title`, `nav.blog`, `faq.heading`, `blog.empty.title`, `about.bio.p1`. Looked up via `useT()(key)`; fallback chain is current-lang → RU → key itself.
+**Constants (Module-level):**
+- UPPER_SNAKE_CASE for critical configuration
+  - Extension identifiers: `EXTENSION_IDS` (duplicated across `PayPage.tsx`, `AccountPage.tsx`, `DownloadSkillPage.tsx`, `api/download-skill.ts` — **SYNC required per INTEGRATION-CONTRACT**)
+  - Supabase credentials: `SUPABASE_FUNCTIONS_URL`, `SUPABASE_ANON_KEY` (duplicated, **SYNC required**)
+  - External links: `CHROME_STORE_URL`, `STORE_URL`
+  - i18n: `STORAGE_KEY`, `LEGACY_STORAGE_KEY` (i18n storage keys)
+  - UI: `CURRENCY_STORAGE_KEY` (payment preference)
+  - Paths: `ASSET_ROOT`, `BASE`, `DIST` (in build scripts)
 
-**Storage keys:**
-- `localStorage` (site-owned): `opten_` prefix — `opten_lang_v3` (`src/i18n/LangContext.tsx:20`), `opten_pay_currency` (`src/app/pages/PayPage.tsx`)
-  - **`opten_lang_v3` is the post-Phase-3 key.** The legacy `opten_lang` is read only as a one-shot migration and only when its value is exactly `"en"` (RU values from old auto-detect are intentionally discarded). Do NOT revive the old key name.
-- `chrome.storage.local` (extension-owned, read-only here): `ps_*` prefix. The site does NOT read these directly — only via `chrome.runtime.sendMessage` to the extension (see `docs/INTEGRATION-CONTRACT.md` §5).
+**i18n Keys:**
+- Dot-namespaced structure in `ru.json`/`en.json` — `hero.title`, `partners.label`, `pricing.heading.accent`, `account.error.loadSubFailed`, `faq.heading`
+- Accessed via `t()` helper: `t("hero.title")` (see `LangContext.tsx`)
+
+**localStorage Keys:**
+- `opten_lang_v3` — explicit user language choice (written by `LangSwitcher` only, read at boot)
+- `opten_lang` — legacy key, read-only for one-shot EN migration (RU values ignored intentionally)
+- `opten_pay_currency` — selected payment currency (RUB or USD)
+
+**Extension Storage Keys (read-only via `chrome.runtime.sendMessage`):**
+- `ps_*` prefix — extension-owned (site never reads directly, only via message API)
 
 ## Code Style
 
 **Formatting:**
-- No Prettier config in repo (`.prettierrc*` absent).
-- No formatter enforced. Indentation is 2 spaces everywhere observed. Double-quoted strings dominate; single quotes appear in vite-imagetools URLs.
-- Trailing commas in multi-line object/array literals (consistent across files).
+- NO Prettier config (`.prettierrc*` absent)
+- NO ESLint config (`.eslintrc*` absent at root)
+- Manual formatting: 2-space indentation observed consistently, double-quoted strings preferred, trailing commas in multi-line literals
 
-**Linting / type-checking:**
-- No ESLint config in repo root (`.eslintrc*` absent — only nested `node_modules` configs match).
-- No `typecheck` script in `package.json` (only `dev` and `build`).
-- TS errors surface only during `npm run build` — via `@vitejs/plugin-react` in the client bundle and the two `vite build --ssr` invocations (`scripts/entry-server.tsx` and `scripts/seo-routes.ts`). A file with broken types may still compile if the offending construct is stripped by SWC; type checking is best-effort.
-
-## Import Organization
-
-**Order (observed pattern, no enforcer):**
-1. React / hooks (`from "react"`)
-2. Router (`from "react-router"` — Router v7 syntax, NEVER `react-router-dom`)
-3. Third-party libs (`lucide-react`, `motion`, `date-fns`, etc.)
-4. Internal modules — relative paths (`../../i18n/LangContext`, `../../i18n/paths`, `../components/Picture`, `../components/LocalizedLink`)
-5. Asset imports — relative, often with vite-imagetools query strings (`?w=...&format=webp;png&as=picture`)
-6. Type imports — `import type { ... }`
-
-Example: `src/app/App.tsx:1-35`, `src/app/components/LangSwitcher.tsx:16-18`.
+**Import Organization:**
+1. React + hooks: `import { useState, useEffect } from "react"`
+2. React Router: `import { Link, useParams } from "react-router"` (v7 only, NOT `react-router-dom`)
+3. Context/i18n: `import { useT, useLang } from "../../i18n/LangContext"`
+4. Local components: relative paths — `import LocalizedLink from "../components/LocalizedLink"`
+5. Content/utilities: `import { landingFaq } from "../content/landingFaq"`
+6. Libraries: `import { Menu, X } from "lucide-react"`
+7. Assets: `import featureModelsSrc from '../../public/assets/...'`
+8. Stylesheets: `import "./styles/index.css"`
 
 **Path Aliases:**
-- `@` → `./src` is configured in `vite.config.ts` but **unused in source** — verified via grep, zero `@/` imports in `src/`. All imports are relative. New code should follow the relative convention or commit to `@/` consistently.
+- `@` → `./src` configured but **not used** — all imports are relative paths
+- New code should follow relative convention for consistency
 
-**No `tsconfig.json`:**
-- Project has no root `tsconfig.json` (verified via Glob). `@vitejs/plugin-react` parses TS without one; type information is best-effort.
+**TypeScript:**
+- `tsconfig.json` not present at repo root — TS errors surface during `npm run build` via `vite build`
+- NO separate `typecheck` script
+- Type errors checked at bundle time only — best-effort, lossy
 
-## Internal Navigation
+**JSX/TSX:**
+- React Router 7 syntax: `import { Link } from "react-router"`
+- **MUST use `<LocalizedLink>` for internal navigation** to preserve `/en/*` URL prefix (not bare `<Link>`)
+- Props always typed via interfaces: `interface Props { items: readonly FaqItem[] }`
+- Components destructure props: `export default function FaqBlock({ items, headingKey = "faq.heading", id = "faq" }: Props)`
+- Return type annotation: explicit `JSX.Element` or implicit (modern React)
 
-**Use `LocalizedLink`, not bare `Link`.** Post-Phase-3 the canonical internal-navigation primitive is `src/app/components/LocalizedLink.tsx` (a thin wrapper around `react-router` `<Link>`).
+**CSS & Tailwind:**
+- Tailwind 4 via `@tailwindcss/vite` plugin
+- All styling via utility classes in JSX — NO component scoped CSS
+- Arbitrary Tailwind values: `text-[#9cfb51]`, `px-[20px]` (design tokens from Figma)
+- Custom fonts via Tailwind: `font-['Unbounded',sans-serif]`, `font-['PT_Root_UI',sans-serif]`
+- Every `<img>` has explicit `width` and `height` for CLS guard
 
-```tsx
-import LocalizedLink from "../../components/LocalizedLink";
-// then:
-<LocalizedLink to="/pay">{t("nav.pricing")}</LocalizedLink>
-```
-
-**Behavior contract** (header comment in `LocalizedLink.tsx:1-10`):
-
-- On `/en/*` URLs, `to="/pay"` is rewritten to `"/en/pay"` for the routes in `EN_SIBLINGS` (`/`, `/welcome`, `/pay`, `/privacy`, `/terms`, `/refund`, `/about`, `/blog`, `/blog/:slug`).
-- On `/en/*` URLs, `to="/account"` stays as `"/account"` (no EN sibling — content layer keeps language via `localStorage` + `LangProvider`).
-- On unprefixed paths, URL stays unprefixed regardless of detected language (D-07 contract preserved).
-- Non-string `to` props pass through unchanged.
-
-**Why this exists:** the original bare-`<Link>` usage stripped the `/en/` prefix on every click after the user explicitly switched to EN, snapping them back to RU. The fix is `LocalizedLink` plus the SYNC contract below.
-
-Consumers: `App.tsx`, `PayPage.tsx`, `AccountPage.tsx`, `LegalLayout.tsx`, `SuccessPage.tsx`, `DownloadSkillPage.tsx`, `BlogPostPage.tsx`, `BlogListPage.tsx`. New marketing/billing pages MUST use `LocalizedLink`.
-
-**External links and hash/mailto anchors** stay as bare `<a href=...>` — `LocalizedLink` only handles in-app paths beginning with `/`.
-
-## EN_SIBLINGS SYNC Contract
-
-`src/i18n/paths.ts` exports `EN_SIBLINGS` as the **single source of truth** for which top-level routes have an `/en/...` sibling:
-
-```ts
-export const EN_SIBLINGS = new Set<string>([
-  "/", "/welcome", "/pay", "/privacy", "/terms", "/refund", "/about", "/blog", 
-  // Note: /blog/:slug is parameterized; EN sibling is /en/blog/:slug (automatic via route matching)
-]);
-```
-
-**SYNC rule (called out in the file header):** `EN_SIBLINGS` MUST stay in step with the EN entries (`path: "/en/..."`) in `scripts/seo-routes.ts` and the EN `<Route>` mounts in `src/main.tsx` and `scripts/entry-server.tsx`. Adding or removing an EN route requires updating all three files. The files together drive:
-
-- `LocalizedLink` rewrite decisions (`paths.ts` via `localizeHref`).
-- `LangSwitcher` navigate targets (`paths.ts` via `toEnTarget` / `toRuTarget`).
-- Prerendered HTML output, hreflang triplets, sitemap entries (`seo-routes.ts` consumed by `scripts/prerender.mjs` + `scripts/sitemap.mjs`).
-- `/en/*` route mounts in `src/main.tsx` and `scripts/entry-server.tsx`.
-
-Add a new EN route → edit (1) `scripts/seo-routes.ts` manifest, (2) `src/i18n/paths.ts` `EN_SIBLINGS`, (3) `src/main.tsx` `<Route path="/en/...">`, (4) `scripts/entry-server.tsx` `<Route>` (unless head-only like `/en/pay`). Missing any of these breaks SPA navigation, prerender, or SEO.
-
-**See also:** `docs/CONTENT-AUTHORING.md` §1 — the full "6 files in sync" checklist for adding a new page or blog post.
-
-## Language-Switcher Storage Discipline
-
-`LangSwitcher` (`src/app/components/LangSwitcher.tsx`) is the **only** allowed writer of `localStorage.opten_lang_v3`. `setLang(nextLang)` flips React state and storage synchronously; if the current URL has an EN sibling (or vice versa), it then calls `navigate(target)`. On no-sibling routes (`/account`, `/success`, `/dashboard/*`) `toEnTarget` returns `null` and the switcher deliberately skips `navigate()` — language flips in place via storage + context, URL is preserved.
-
-**Forbidden patterns:**
-
-- `localStorage.setItem("opten_lang_v3", ...)` outside `LangContext.setLang` / `LangSwitcher`. The previous codebase had auto-write-on-detect; that's the bug the v3 rename fixed. `LangProvider` reads storage but never writes it on its own.
-- Reviving inline `setLang(lang === "ru" ? "en" : "ru")` in pages. Inline switchers were removed in Plan 08; reintroducing them duplicates the EN_SIBLINGS allow-list and reopens the open-redirect attack surface mitigated by `paths.ts`.
-- Passing user-controlled strings (search params, hashes, postMessage payloads) into `navigate()`. `LangSwitcher` computes its target only from `EN_SIBLINGS` lookups — keep new switchable surfaces on the same allow-list pattern.
-
-## Error Handling
-
-**Patterns:**
-- `try { ... } catch (e) { ... }` around async fetch/Paddle/`chrome.runtime.sendMessage` calls (e.g. `src/app/pages/AccountPage.tsx`, `src/app/pages/PayPage.tsx`).
-- Errors usually mapped to a string state field rendered inline (`setError(t("..."))`), not thrown. No global error boundary.
-- `chrome.runtime.sendMessage` is wrapped in iteration over `EXTENSION_IDS` because `chrome.runtime.lastError` fires for the non-installed ID — this is by design.
-- SSR guards: `if (typeof window === "undefined")` checks for components used in prerendered routes (e.g., `LangContext.tsx`, `PayPage.tsx`)
-
-**Fail-fast at build time:** every `apply*` helper in `scripts/prerender.mjs` follows the `if (html === before) throw new Error(...)` pattern. New build-time HTML mutators MUST include the same no-match guard — Phase 2 D-08 relies on loud-fail at build rather than silent SEO regressions in production.
-
-## Logging
-
-**Framework:** none. Plain `console.log` / `console.warn` / `console.error` only. No structured logging, no remote telemetry, no Sentry.
+**Helper Functions:**
+- Simple utility for class composition:
+  ```typescript
+  function cx(...classes: Array<string | false | null | undefined>) {
+    return classes.filter(Boolean).join(" ");
+  }
+  ```
+- Use instead of `clsx` library (which is available but not in core pattern)
 
 ## Comments
 
-**Phase / decision / bug refs** — numbering is shared with the extension repo (`C:\Projects\promptscore`) when changes span both repos; site-only sweeps reuse the same scheme to keep grep behavior consistent:
+**When to Comment:**
+- **Phase references:** `// Phase 73:`, `// Phase 66 D-04:` — matches extension repo numbering when changes span both repos
+- **Design decisions:** `// D-04:`, `// D-08:` — reasoning for non-obvious patterns
+- **Bug references:** `// BG-67-01:`, `// IN-04:` — incident/decision tracker
+- **Complex blocks:** explain SSR guards, hydration logic, state transitions
+- **SYNC markers:** `// SYNC:` for constants/manifests that must stay in step (e.g., `EXTENSION_IDS` across 4 files, `EN_SIBLINGS` in paths.ts vs seo-routes.ts)
 
-- `// Phase N:` — site-local or cross-repo phase number. Examples: `// Phase 2.1 D-04:` (`src/main.tsx:16`), `// Phase 2.2:` (perf/hydration sweep), `// Phase 3 D-05:` (`src/main.tsx:50`), `// Phase 3 Pitfall 6:` (`src/i18n/LangContext.tsx:4,24,56`).
-- `// Phase 66 D-04 + FE-02:` — cross-repo phase tag (extension Phase 66 = pricing/billing). Example: `src/app/pages/PayPage.tsx:19`.
-- `// D-NN:` — design decision marker. Examples: `// D-01:`, `// D-05:`, `// D-07:` (Phase 3 routing-contract decisions referenced repeatedly across `LangContext.tsx`, `paths.ts`, `LangSwitcher.tsx`).
-- `// BG-NN-NN:` — bug reference. Example: `src/lib/paddle.ts` (`BG-67-01: Paddle v2 SDK Environment.set('production') throws`).
-- `// Post-Phase-3:` / `// Phase 3 follow-up:` — fixes that landed after the phase was closed (Bugs 1–3 in `03-POST-RELEASE.md`). Pattern is "name the phase, mark as post-release" — used in `LocalizedLink.tsx:1`, `paths.ts:1`, `LangContext.tsx:13,160`, `LangSwitcher.tsx:1`.
-
-Other comment shapes:
-
-- Long header comments explaining tricky integration constraints — see `src/main.tsx:14-48` (hydration detector rationale), `src/styles/fonts.css:1-26` (font-display strategy), `src/i18n/LangContext.tsx:13-22` (storage-key rationale), `src/app/components/LocalizedLink.tsx:1-10` (behavior contract).
-- `// SYNC:` markers for duplicated-but-must-stay-in-step constants (`paths.ts:2` on `EN_SIBLINGS` ↔ `scripts/seo-routes.ts` EN entries, `scripts/seo-routes.ts:2` on title/description strings ↔ `src/i18n/*.json`). Treat these as compiler hints: changing one side without the other is a real bug, not just a style nit.
-- Inline `// ...` for non-obvious lines; no JSDoc/TSDoc usage observed.
-
-## Component Patterns
-
-**Functional components only.** No class components.
-
-**Default exports for pages and the post-Phase-3 navigation primitives, named exports for shared hooks/providers:**
-- Pages use `export default function PageName()` — `WelcomePage`, `PayPage`, `LegalLayout`, `App`, `BlogPostPage`, `BlogListPage`.
-- Navigation primitives default-export the component, named-export config/hooks alongside if needed — `LocalizedLink` (default), `LangSwitcher` (default).
-- Hooks and providers use named exports — `useT`, `useLang`, `useOnEnPath`, `LangProvider`, `LangContext` from `src/i18n/LangContext.tsx`.
-- Pure helpers are named exports — `toEnTarget`, `toRuTarget`, `localizeHref`, `EN_SIBLINGS`, `EN_LANDING` from `src/i18n/paths.ts`.
-- UI primitives mix both — `button.tsx` exports `{ Button, buttonVariants }`.
-
-**shadcn/Radix UI primitives:**
-- All files under `src/app/components/ui/` follow the shadcn pattern: `class-variance-authority` for variants + `cn(...)` (clsx + tailwind-merge) helper from `src/app/components/ui/utils.ts`. See `button.tsx` for the canonical shape.
-- Most primitives are dormant scaffold — only a handful are actually imported by app code.
-
-**Internationalization access pattern:**
-```tsx
-const t = useT();
-const { lang, setLang } = useLang();
-// then: t("account.ext.notInstalled.desc1"), lang === "ru"
+**Examples from codebase:**
+```typescript
+// Phase 3 D-05: URL-prefix takes precedence over localStorage + navigator (GEO-C-4).
+// Phase 2.2: fetchPriority dropped — React 18.3 doesn't normalize the camelCase JSX prop...
+// Phase 4.1 WR-03: lang-aware FAQ anchor
+// SYNC: EN_SIBLINGS MUST match the EN entries in scripts/seo-routes.ts
 ```
-Always destructure from `useLang()`; never reach into the context directly. After Plan 08, `setLang` is only consumed by `LangSwitcher` — pages that previously used it for inline switchers no longer destructure it.
 
-**No global state library.** Only `LangContext` for i18n; everything else is local component state or `localStorage`. Auth/subscription state lives in the **extension** and is fetched via `chrome.runtime.sendMessage`.
+**NOT used:**
+- JSDoc/TSDoc (mostly absent except prop descriptions in interfaces)
+- Lengthy boilerplate comments
 
-**Blog content types (Phase 5):**
-- `src/content/blog/types.ts` defines `BlogPost`, `BlogPostLocale`, `BlogPostBody`, `BlogStep`, `BlogFaqItem`, `BlogSection`, `BlogImage`
-- Each blog post is a TS file implementing `{ ru, en }` locale pair (e.g., `src/content/blog/gpt-image-2.ts`)
-- Barrel export in `src/content/blog/index.ts` sorted newest-first by `publishedAt`
-- Schema source-of-truth: `body.intro` (40-60 word definitional block), `body.steps` → HowTo schema, `body.faq` → FAQPage schema
-- See `docs/CONTENT-AUTHORING.md` for full conventions
+## Error Handling
 
-**No shared layout component for marketing pages.** `App.tsx` (landing) and `WelcomePage.tsx` each render their own header/footer markup. Only legal pages share `src/app/components/layout/LegalLayout.tsx`. `LangSwitcher` is rendered 5 times (2 in `App.tsx`, 1 each in `PayPage.tsx`, `AccountPage.tsx`, `LegalLayout.tsx`) — passing `className` for site-specific Tailwind, plus `onSwitch` only on the mobile-menu instance.
+**Pattern — Try/Catch with State-Driven UI:**
+```typescript
+// AccountPage.tsx
+const fetchSubscription = async (authToken: string) => {
+  setLoadingSub(true);
+  try {
+    const res = await fetch(SUPABASE_FUNCTIONS_URL + "/get-subscription", {
+      headers: { "Authorization": "Bearer " + authToken },
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setSub(data);
+    } else {
+      setError("Ошибка подписки: " + (data._debug_auth_error || data.error || res.status));
+    }
+  } catch {
+    setError(t("account.error.loadSubFailed"));
+  } finally {
+    setLoadingSub(false);
+  }
+};
+```
 
-**Animation:** custom timeline driven by `setTimeout` chains in `src/app/components/OptenHeroAnimation.tsx`. The `motion` package is in `package.json` but currently has zero imports in `src/` — keep it out unless a clear use case appears.
+**Patterns:**
+- Network errors: try/catch, display via state (`[error, setError]`)
+- Missing dependencies: throw with descriptor: `throw new Error("useCarousel must be used within a <Carousel />")`
+- Extension API: loop over `EXTENSION_IDS`, catch each, fallback if all fail:
+  ```typescript
+  for (const id of EXTENSION_IDS) {
+    try {
+      chrome.runtime.sendMessage(id, { type: "GET_AUTH_TOKEN" }, (response) => {
+        if (chrome.runtime.lastError || !response) {
+          // Try next ID
+        }
+      });
+    } catch {
+      // Next iteration
+    }
+  }
+  ```
 
-**MUI / react-hook-form:** `@mui/icons-material` has zero imports in `src/`. `react-hook-form` appears only inside the unused `src/app/components/ui/form.tsx` shadcn primitive. Neither is part of the live UI surface today — do not assume they're wired up.
+**No global error boundaries** — site uses SSR prerendering, not client-side error recovery
 
-## SSR / Prerender Constraints
+## Logging
 
-The site is SSR-prerendered for 18 routes (9 RU + 9 EN). Conventions that come from this:
+**Framework:** native `console` only
 
-- **Components used in prerendered routes must not depend on `window`, `localStorage`, or `navigator` during the initial render.** Guards like `if (typeof window === "undefined")` in `LangContext.tsx:25, 62` are the canonical shape.
-- **Routes mounted in `src/main.tsx` and `scripts/entry-server.tsx` must mirror each other** for every prerendered path. A mount in `main.tsx` without a counterpart in `entry-server.tsx` prerenders an empty `<div id="root">`; a mount in `entry-server.tsx` without `main.tsx` triggers React #418/#423 during hydration.
-- **`React.lazy()` is only safe for SPA-only routes** — `entry-server.tsx` cannot resolve lazy chunks during `renderToString`. The lazy-loaded pages (`SuccessPage`, `AccountPage`, `DownloadSkillPage`) are intentionally NOT mounted in `entry-server.tsx`. See `src/main.tsx:20-27`.
+**Patterns:**
+- Build scripts: `console.log()` for progress, `console.error()` for failures, `throw new Error()` for halt
+- Client-side: console statements not used in production (Vite minification strips them)
+- Error reporting to user: state-driven (`[error, setError]`), displayed in-page
 
-## CSS / Styling
+**Example (scripts/smoke-blog.mjs):**
+```javascript
+function assert(cond, label) {
+  if (cond) {
+    console.log(`  ✓ ${label}`);
+    pass++;
+  } else {
+    console.log(`  ✗ ${label}`);
+    fail++;
+  }
+}
+```
 
-- Tailwind 4 via `@tailwindcss/vite` plugin (`vite.config.ts`). No `tailwind.config.js` — Tailwind 4 uses CSS-first config.
-- Single CSS entry: `src/styles/index.css` imports `fonts.css`, `tailwind.css`, `theme.css` (in that order).
-- Theme tokens live in `src/styles/theme.css` as CSS custom properties on `:root` (`--background`, `--foreground`, `--primary`, `--radius`, etc.). Use the token, not the literal color — e.g. `bg-primary` not `bg-[#030213]`.
-- Fonts self-hosted as variable WOFF2 from `/public/fonts/`, declared in `src/styles/fonts.css`. `PT Root UI` uses `font-display: swap` with an adjusted-fallback face; `Unbounded` uses `font-display: block` with `<link rel=preload>` in `index.html`. Don't switch back to Google Fonts `@import` — see comment header in `fonts.css:1-26`.
-- Component-level styles: Tailwind utility classes inline in JSX. Arbitrary values (`text-[#9cfb51]`, `text-[14px]`, `px-[20px]`) are common — design tokens come from Figma exports, not a constrained palette.
-- Hardcoded font-family in className strings: `font-['PT_Root_UI',sans-serif]` and `font-['PT_Root_UI:Medium',sans-serif]` appear inline. Pattern is inconsistent — some files inherit body font, others re-declare.
+## State Management
 
-## Function & Module Design
+**React Context only** — no Redux, Zustand, or other libraries
+- `LangContext` (`src/i18n/LangContext.tsx`) — singleton for i18n (`lang`, `setLang`, `t()`)
 
-**Function size:** mostly short helpers (≤ 10 lines) plus a few large page components (`PayPage.tsx`, `AccountPage.tsx`, `BlogPostPage.tsx`) that exceed 300 lines and mix data fetching, Paddle integration, and JSX in a single default export. No `useMemo`/extraction pattern enforced — split only when something concrete breaks. New cross-page concerns (i18n routing, language storage, blog content) get their own small modules instead (`paths.ts`, `LocalizedLink.tsx`, `LangSwitcher.tsx`, `src/content/blog/`) — that's the precedent set by the Phase 3 post-release work.
+**localStorage:**
+- Reads at boot: `LangContext` checks `opten_lang_v3` → legacy `opten_lang` → `navigator.language`
+- Writes only from `LangSwitcher` on explicit user click
+- NO auto-writes (prevents pinning users to stale language)
 
-**Module exports:** one default export per page component / per stand-alone navigation primitive; named exports for hooks, providers, pure helpers, and shadcn primitives. Barrel files for `src/content/blog/index.ts` (re-exports posts) and build outputs.
+**Extension State (Read-Only):**
+- Auth/subscription lives in extension's `chrome.storage.local` (`ps_*` keys)
+- Site queries via `chrome.runtime.sendMessage(..., callback)` (externally_connectable, one-way)
+- Site NEVER writes to extension storage
 
-**Constants placement:** module-top, above the component. Duplicated across files (`EXTENSION_IDS`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_FUNCTIONS_URL`, `CHROME_STORE_URL`) — see CONCERNS / INTEGRATION-CONTRACT. Changing one without the others breaks the extension link. `EN_SIBLINGS`, `SITE_ORIGIN`, `DEFAULT_OG_IMAGE` have one canonical home (`paths.ts` and `seo-routes.ts` respectively) and are reused by import; new constants should follow the canonical-home pattern, not the duplicate pattern.
+**Component State:** `useState()`, `useRef()` for local scope
 
-## Anti-Conventions / Avoid
+## Function Design
 
-- **Never hand-edit `src/imports/**`.** It's auto-generated by Figma Make — SVG path data, image-hash filenames, opaque `Frame5`/`Frame161` helper components. The landing page (`src/app/App.tsx`) was hand-rebuilt from `imports/LandingPage/LandingPage.tsx`; `App.tsx` is the source of truth, the import is reference-only.
-- **Don't import from `react-router-dom`.** This project is on React Router v7 — always `import { Link, ... } from "react-router"`. Verified: 0 occurrences in `src/` and `scripts/`.
-- **Don't use bare `<Link>` for internal navigation.** Use `LocalizedLink` so the `/en/` prefix is preserved. The only legitimate bare `<Link>` is inside `LocalizedLink.tsx` itself.
-- **Don't add a `tsconfig.json` casually.** Vite + `@vitejs/plugin-react` work without one. Introducing strict TS now will surface a wall of errors in `imports/` and `ui/` scaffold files — quarantine them via `exclude` if you add a config.
-- **Don't add `@/` imports next to relative ones in the same file.** Pick one. Current codebase is 100% relative.
-- **Don't drop new module-level constants for `EXTENSION_IDS` / `SUPABASE_*` without updating every duplicate.** They're hardcoded in `src/app/pages/PayPage.tsx`, `AccountPage.tsx`, `DownloadSkillPage.tsx`, and `api/download-skill.ts` — keep them in sync. See `docs/INTEGRATION-CONTRACT.md`.
-- **Don't rename routes** `/welcome`, `/pay`, `/success` — they're referenced by already-shipped extension binaries. `/en/welcome` and `/en/pay` are additions, never renames or redirects of the locked routes.
-- **Don't switch Paddle to async `<script defer>` in `index.html`** — see Phase 2.2 commit history; current strategy is sync on `/pay` AND `/en/pay` only (prerender injects the tag for both) and `ensurePaddle()` for SPA-nav cases.
-- **Don't reach into `chrome.storage.local` directly.** The site never imports a Supabase JS client and never owns auth tokens — all extension state flows through `chrome.runtime.sendMessage`.
-- **Don't write to `localStorage.opten_lang_v3` outside `LangContext.setLang`.** Auto-writes on detect are what caused the EN-pinned-to-RU bug; the new key was specifically picked to throw away the contaminated history. `LangProvider` reads but never writes.
-- **Don't revive the legacy `opten_lang` key.** It's read only as a one-shot migration for explicit-EN choices; intentionally never written. A new key (`opten_lang_v4`, etc.) would be required if storage semantics need to change again.
-- **Don't mutate `<html lang>` at runtime via `document.documentElement.lang = ...`.** That was the root cause of the Phase 2.2-carried hydration mismatch on `/` (Plan 01 of Phase 3 deleted the offending `useEffect`). `<html lang>` is baked at build time per route via `applyHtmlLang` in `scripts/prerender.mjs` and does NOT change during SPA navigation — that's the documented D-07 behavior.
-- **Don't forget the 6-file SYNC when adding a new route or blog post.** See `docs/CONTENT-AUTHORING.md` §1 — missing one file breaks prerender, sitemap, or SPA navigation.
+**Size:**
+- Components: ~100–300 LOC (e.g., `SiteHeader.tsx` is 150 LOC)
+- Utilities: 5–50 LOC (e.g., `titleCaseEn()`, `formatDate()`)
+- Pages: can exceed 300 LOC when mixing data fetching + JSX (e.g., `PayPage.tsx`, `AccountPage.tsx`)
+
+**Parameters:**
+- Destructured props object: `{ items, headingKey = "faq.heading", id = "faq" }`
+- Default values in destructure: `headingKey = "faq.heading"`
+- Optional callbacks: `rightSlot?: React.ReactNode`
+
+**Return Values:**
+- Components: `JSX.Element` (explicit or implicit)
+- Functions: always typed (e.g., `fetchSubscription(token: string): Promise<void>`)
+- "Not found" returns: `null` (e.g., `toEnTarget(pathname): string | null`)
+
+## Module Design
+
+**Exports:**
+- One default export per file (rule of thumb)
+- Named exports for utilities and types: `export interface FaqItem`, `export const EN_SIBLINGS`
+- Barrel files: `src/content/blog/index.ts` exports `{ allBlogPosts, blogPostsBySlug }`
+
+**No Circular Imports:**
+- Clean dependency tree: pages → components → i18n → utilities
+- Sibling imports avoided (use parent barrel file)
+
+**Constants Placement:**
+- Module-top, above components/functions
+- Critical duplicates (like `EXTENSION_IDS`) must be kept in sync across all files per `docs/INTEGRATION-CONTRACT.md`
+
+## Anti-Patterns to Avoid
+
+**Routing & Navigation:**
+- DO NOT: use bare `<Link>` for internal navigation → use `<LocalizedLink>` (post-Phase-3 bug fix)
+- DO NOT: rename locked routes `/welcome`, `/pay`, `/success` — referenced by extension binaries
+- DO NOT: write to `localStorage.opten_lang_v3` outside `LangContext.setLang` — caused EN-pinned-to-RU bug
+- DO NOT: mutate `<html lang>` at runtime — baked at build time per route, never changes during SPA nav
+
+**Constants & Config:**
+- DO NOT: add duplicate module-level constants without updating INTEGRATION-CONTRACT.md sync requirements
+- DO NOT: forget 6-file SYNC when adding a new route: `seo-routes.ts`, `paths.ts EN_SIBLINGS`, `main.tsx`, `entry-server.tsx`, `sitemap/llms manifests`, `i18n dicts`
+- DO NOT: revive legacy `opten_lang` key for writing — it's read-only migration only
+
+**TypeScript & Imports:**
+- DO NOT: add `tsconfig.json` lightly — triggers wall of errors in `imports/` and `ui/` scaffold
+- DO NOT: mix `@/` and relative imports in same file — pick one (codebase is 100% relative)
+- DO NOT: import from `react-router-dom` — this is React Router v7, use `react-router`
+
+**Figma & Auto-Generated:**
+- DO NOT: hand-edit `src/imports/**` — auto-generated by Figma Make (source of truth is `App.tsx`, not the import)
+- DO NOT: commit updated Figma imports without reviewing the hand-rebuilt landing
+
+## Storage Keys & SYNC
+
+**Critical SYNC Points:**
+
+| Constant | Files | Reason |
+|----------|-------|--------|
+| `EXTENSION_IDS` | `PayPage.tsx`, `AccountPage.tsx`, `DownloadSkillPage.tsx`, `api/download-skill.ts` | Hardcoded extension identifiers for message API |
+| `SUPABASE_FUNCTIONS_URL`, `SUPABASE_ANON_KEY` | Same 4 files + extension's `config/api.js` | API credentials for Supabase Edge Functions |
+| `EN_SIBLINGS` | `src/i18n/paths.ts`, `scripts/seo-routes.ts`, `src/main.tsx`, `scripts/entry-server.tsx` | Routes with `/en/*` siblings (LocalizedLink, prerender, SPA mount) |
+
+**See:** `docs/INTEGRATION-CONTRACT.md` for binding interface contract.
 
 ---
 
-*Convention analysis: 2026-05-18 — covers v1.0 (GEO Optimization) + Phase 5 (blog migration). Cross-reference [[CONTENT-AUTHORING.md]] for route registration + blog conventions.*
+*Convention analysis: 2026-05-21 — covers v1.0 (GEO) + v2.0 (models) + Phase 5 (blog). Cross-reference [[CONTENT-AUTHORING.md]] for route registration checklist.*

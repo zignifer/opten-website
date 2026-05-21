@@ -1,25 +1,32 @@
 # Testing Patterns
 
-**Analysis Date:** 2026-05-18
+**Analysis Date:** 2026-05-21
 
 ## Test Framework
 
-**None in-repo.**
+**NONE in-repo.** This is a deliberately test-free codebase.
 
-- No Vitest, Jest, Mocha, or Node test runner configured. No `vitest.config.*`, `jest.config.*`, or `playwright.config.*` in the repo (only inside `node_modules/`).
-- No `*.test.*` or `*.spec.*` files under `src/`, `api/`, or `scripts/`.
-- No test-related `devDependencies` in `package.json` (no `vitest`, `jest`, `@testing-library/*`, `playwright`, `cypress`, `msw`).
-- No `test` script in `package.json` — only `dev` and `build`.
+- No Vitest, Jest, Mocha, or Node test runner configured
+- No `.vitest.config.*`, `jest.config.*`, or `playwright.config.*` in repo root
+- No `*.test.*` or `*.spec.*` files under `src/`, `api/`, or `scripts/`
+- No test-related devDependencies: no `vitest`, `jest`, `@testing-library/*`, `playwright`, `cypress`
+- No `test` script in `package.json` (only `dev` and `build`)
 
-There is no unit, integration, or in-repo E2E test framework. Quality gates are enforced by `npm run build` and manual UAT patterns documented in `.planning/phases/*/HUMAN-UAT.md`.
+**Quality gates:** enforced by `npm run build` (build-time guards) and manual UAT via `.planning/phases/*/HUMAN-UAT.md` executed by orchestrator.
 
 ## Test File Organization
 
-Not applicable — no first-party tests in the repo. Manual UAT scripts live in `.planning/phases/<phase>/<phase>-HUMAN-UAT.md` and are written + executed by the orchestrator, not committed as runnable code.
+Not applicable — no unit/integration tests. Manual UAT scripts live in `.planning/phases/<phase>/<phase>-HUMAN-UAT.md` and are documented/executed as markdown tables, not runnable code.
+
+## Test Structure
+
+Not applicable — no test framework means no test structure conventions.
 
 ## Mocking
 
-Not applicable to test code (none exists). One related helper for manual QA: `scripts/mock-vercel-server.mjs` — a Node HTTP server that emulates Vercel's static-file-precedence-over-rewrite behavior. Serves `dist/` so that `dist/en/welcome/index.html` (etc.) wins over SPA fallback to `dist/index.html`, mirroring production. Used only for local Playwright/PageSpeed runs — not part of the build pipeline.
+Not applicable to test code (none exists). One related helper for manual QA:
+
+**scripts/mock-vercel-server.mjs** — Node HTTP server that emulates Vercel's static-file-precedence-over-SPA-fallback behavior. Serves `dist/` so that `dist/en/welcome/index.html` (etc.) wins over fallback to `dist/index.html`, mirroring production. Used for local Playwright/PageSpeed runs — NOT part of build pipeline.
 
 ## Coverage
 
@@ -27,52 +34,54 @@ None measured. No coverage tool installed.
 
 ## Build-Time Quality Gates
 
-The single in-repo automated quality check is `npm run build` (defined in `package.json`), which chains:
+The single in-repo automated quality check: `npm run build` chains 8 sequential steps:
 
 ```bash
-vite build                                                              # Client bundle
-vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache         # SSR bundle
-vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta             # Manifest
-node scripts/prerender.mjs                                             # Static HTML per route
-node scripts/sitemap.mjs                                               # Sitemap + floor checks
-node scripts/llms.mjs                                                  # llms.txt + floor checks
-node scripts/verify-faq-mainentity.mjs                                 # FAQ ↔ FAQPage parity
-node scripts/indexnow.mjs                                              # Bing IndexNow ping
+vite build                                          # Client SPA bundle
+vite build --ssr scripts/entry-server.tsx          # SSR tree for prerender
+vite build --ssr scripts/seo-routes.ts             # Manifest (routes + schema)
+node scripts/prerender.mjs                          # Static HTML per route (144 files)
+node scripts/sitemap.mjs                            # sitemap.xml + floor checks
+node scripts/llms.mjs                               # llms.txt + llms-full.txt + floor checks
+node scripts/verify-faq-mainentity.mjs              # FAQ ↔ FAQPage parity (V-10)
+node scripts/verify-fonts.mjs                       # Font size bounds + WOFF2 magic
+node scripts/indexnow.mjs                           # Bing IndexNow ping
+node scripts/generate-summaries.mjs                 # (optional AI summaries for models)
 ```
 
-**TypeScript errors surface here** via `@vitejs/plugin-react` and the two `vite build --ssr` steps. There is **no `typecheck` script** and **no root `tsconfig.json`** — TS checking is best-effort and lossy: a file with broken types may still compile if the construct is stripped by SWC.
+**TypeScript errors surface here** via `@vitejs/plugin-react` and the two `vite build --ssr` invocations. No `typecheck` script exists — TS checking is best-effort and lossy.
 
-**No ESLint config** (`.eslintrc*` absent at root). **No formatter** (`.prettierrc*` absent).
+### Fail-Fast Guards (Build-Time Assertions)
 
-### Fail-Fast Guards in Build Scripts
-
-Build scripts implement defensive `throw` calls that act as lightweight correctness gates:
+Every build-time mutator follows defensive pattern: **if regex anchor doesn't match, throw**. This prevents silent SEO/structure regressions in production.
 
 **prerender.mjs:**
-- Every `apply*` helper (e.g., `applyHtmlLang`, `applyHreflang`, `applyOgLocale`) throws `if (html === before)` when its regex anchor doesn't match
-- Pattern: `if (html === before) throw new Error('prerender(${meta.path}): no anchor matched...')`
-- Surfaces SEO/structure drift loudly at build time instead of silently emitting broken `<head>` markup (Phase 2 D-08)
-- Example from line 43: `if (!htmlLangRe.test(html)) throw new Error(...)`
+```javascript
+// Every apply* helper throws if anchor not found
+function applyHtmlLang(html, lang) {
+  const before = html;
+  html = html.replace(/<html\s+[^>]*>/, `<html lang="${lang}">`);
+  if (html === before) throw new Error(`prerender: could not apply lang to HTML — structure changed?`);
+  return html;
+}
+```
 
-**verify-faq-mainentity.mjs** (Phase 4.1 WR-09):
-- Enforces V-10 (FaqBlock visible Q/A set == FAQPage mainEntity set)
-- Fails the build if routes with `FAQPage` schema have diverged Q/A between visible DOM and JSON-LD
-- Floor check: expects ≥4 FAQPage routes (landing RU + EN, blog post RU + EN per Phase 4 D-08)
-- Pattern: `if (faqRoutes.length < 4) throw new Error(...)`
+**verify-faq-mainentity.mjs (Phase 4.1 WR-09):**
+- Enforces V-10: visible FaqBlock Q/A set == FAQPage schema mainEntity set
+- Floor check: `if (faqRoutes.length < 4) throw new Error(...)`
+- Reads prerendered HTML, extracts JSON-LD, compares questions between DOM and schema
 
-**sitemap.mjs:**
-- Floor check: `if (sitemapRoutes.length < N) throw new Error(...)`
-- Catches a mis-loaded manifest or forgotten route registration
+**verify-fonts.mjs (Phase 2):**
+- Font file existence: must be present
+- Font size bounds: minKB < actual < maxKB (prevents truncation or accidental un-subsetting)
+- WOFF2 magic header validation: `if (header !== "wOF2") throw`
+- @font-face declarations: must have subset weight ranges
 
-**llms.mjs:**
-- Floor check: `if (prerenderedRoutes.length < N) throw new Error(...)`
-- Verifies llms.txt and llms-full.txt are generated with expected route count
+**sitemap.mjs / llms.mjs:**
+- Floor checks: `if (sitemapRoutes.length < N) throw` catches mis-loaded manifest
+- llms.txt content-type must be text/plain
 
-**productBlock validation** (in scripts/seo-routes.ts):
-- Price strings must be `Number()`-strict in `productBlock`
-- Throws at build if a price is non-numeric
-
-When adding a new build-time HTML mutator or manifest entry, follow the same `if (before === after) throw` pattern.
+When adding a build-time HTML mutator, follow the same `if (before === after) throw` pattern.
 
 ## Smoke Testing
 
@@ -80,70 +89,85 @@ When adding a new build-time HTML mutator or manifest entry, follow the same `if
 
 ```bash
 npx playwright install chromium              # One-time setup
-node scripts/smoke-blog.mjs                  # Ad-hoc invocation (not part of npm run build)
+node scripts/smoke-blog.mjs                  # Ad-hoc invocation (NOT part of npm run build)
 ```
 
-This script is **not part of `npm run build`** — invoked ad-hoc before blog-impacting commits.
+NOT part of build pipeline — invoked ad-hoc before blog-impacting commits.
 
 **What it does:**
-1. Spawns a Python HTTP server against `dist/` on port 8765
+1. Spawns Python HTTP server against `dist/` on port 8765
 2. Launches Chromium via `playwright-core` (headless)
-3. Navigates to blog routes and asserts JSON-LD shape + DOM structure
+3. Navigates to blog routes and asserts JSON-LD + DOM structure
 
-**Test surface:**
+**Test surface — `/blog/` (listing):**
+- Asserts `CollectionPage`, `ItemList`, `BreadcrumbList` JSON-LD types present
+- Canonical URL matches expected path
+- hreflang triplets ≥3 tags present
+- H1 text contains "Блог" (or EN equivalent)
+- `.blog-intro` selector for speakable schema (exactly 1)
+- ≥1 `BlogPostCard` rendered (H3 count)
 
-- `/blog/` (listing page):
-  - Asserts `CollectionPage`, `ItemList`, `BreadcrumbList` JSON-LD types present
-  - Checks canonical URL, hreflang triplets (≥3 tags)
-  - Verifies H1 text, `.blog-intro` selector for speakable schema
-  - Confirms ≥1 post card rendered
+**Test surface — `/blog/<slug>` (post):**
+- Asserts `BlogPosting`, `FAQPage`, `HowTo`, `BreadcrumbList` present
+- Canonical URL correct
+- og:image points at `/blog/<slug>/cover.jpg`
+- `.blog-intro` selector present (exactly 1)
+- `<time datetime=ISO>` in ISO 8601 format
+- Hamburger button rendered
 
-- `/blog/<slug>` (post page):
-  - Asserts `BlogPosting`, `FAQPage`, `HowTo`, `BreadcrumbList` JSON-LD types present
-  - Checks canonical URL, og:image points at cover.jpg
-  - Verifies `.blog-intro` selector, `<time datetime>` ISO format
-  - Confirms hamburger button presence
+**Test surface — `/en/blog/<slug>` (EN sibling):**
+- `BlogPosting` JSON-LD present
+- `<html lang="en">` attribute set
 
-- `/en/blog/<slug>` (EN sibling):
-  - Checks `BlogPosting` JSON-LD present
-  - Verifies `<html lang="en">` attribute
+**Test surface — `/` (landing):**
+- Hamburger button present
+- Can click to reveal blog link in menu
+- No inline navbar (menu-only)
 
-- Landing `/`:
-  - Confirms hamburger button, can click to reveal blog link
-  - Tests no inline nav (menu-only)
+**Output:** pass/fail count per assertion to stdout. Exit code 0 (all pass) or 1 (any fail).
 
-- Legacy `/guides/<slug>` redirect check:
-  - Asserts 404 locally (Vercel will 301 → `/blog/<slug>` in production per vercel.json)
+## Unit Testing
 
-**Output:** pass/fail count to stdout, exits with code 0 (all pass) or 1 (any fail).
+Not done. No unit test framework configured.
 
-## Manual QA Surfaces (Beyond Scripts)
+## Integration Testing
 
-**Local dev:**
+Not done. No in-repo integration test suite.
+
+## E2E Testing
+
+**Smoke script only** (ad-hoc Playwright against prerendered `dist/`). NO CI/CD-gated E2E framework.
+
+**Cannot verify via script:**
+- Full Paddle/YooKassa payment flow (would charge real cards)
+- Extension integration (`chrome.runtime.sendMessage` with real extension installed)
+- Real user auth/subscription state flows
+
+## Manual QA Surfaces
+
+**npm run dev:**
 ```bash
 npm run dev  # Runs on http://localhost:5173 with Vite HMR
 ```
-Standard Vite HMR. Use Chrome DevTools. Note: dev mode runs without prerender, so SSR-vs-CSR differences (especially `<html lang>`) only show up against `vite preview` or Vercel.
+Standard Vite dev server with hot reload. Use Chrome DevTools for debugging. Note: dev mode skips prerender — SSR vs CSR differences (especially `<html lang>` baking) only visible in production/vite preview.
 
-**vite preview:**
+**vite preview (post-build):**
 ```bash
 npm run build
 npx vite preview --host 127.0.0.1 --port 4180
 ```
-Serves `dist/` as a static server with SPA fallback. Quirks (documented post-Phase-3):
-- Trailing slashes: `/pay/` leaves `location.pathname === "/pay/"` (not in `EN_SIBLINGS`, so `LangSwitcher` falls back to `/en/`). Production-safe: Vercel normalizes via cleanUrls.
-- Fallback precedence: `vite preview` falls back to `dist/index.html` for unmatched paths, masking the prerender-vs-fallback discriminator. Use `node scripts/mock-vercel-server.mjs` for accurate Vercel behavior simulation locally.
+Serves `dist/` as static with SPA fallback. Known quirk: vite preview falls back to `dist/index.html` for unmatched paths, masking the prerender-vs-fallback discriminator. Use `node scripts/mock-vercel-server.mjs` for accurate Vercel behavior simulation locally.
 
 **Vercel previews:**
-- Every push to a non-`main` branch builds a preview URL via Vercel
+- Every push to non-`main` branch builds a preview URL
 - `main` deploys to production (`opten.space`) — no staging environment
 
-**Extension coupling (site-side only):**
-- To exercise `/pay`, `/account`, `/welcome`, `/dashboard/download-skill` end-to-end you need the Opten Chrome extension installed and listed in `EXTENSION_IDS` (`src/app/pages/PayPage.tsx`, `AccountPage.tsx`, `DownloadSkillPage.tsx`, `api/download-skill.ts`)
-- Site-side QA without extension can only test `extStatus === "not_installed"` UI branch
+**Extension coupling (QA):**
+- To exercise `/pay`, `/account`, `/welcome`, `/dashboard/download-skill` end-to-end, extension must be installed and ID must be in `EXTENSION_IDS` (`src/app/pages/PayPage.tsx`, `AccountPage.tsx`, `DownloadSkillPage.tsx`, `api/download-skill.ts`)
+- Site-only QA without extension can only test `extStatus === "not_installed"` UI branch
 
 **Paddle sandbox:**
-- Set Vercel env `VITE_PADDLE_ENV=sandbox` + sandbox `VITE_PADDLE_CLIENT_TOKEN` on a preview deployment to test USD checkout without charging real cards
+- Set Vercel env `VITE_PADDLE_ENV=sandbox` + sandbox `VITE_PADDLE_CLIENT_TOKEN` on preview deployment to test USD checkout without charges
 - Production uses regular project settings
 
 **YooKassa:**
@@ -152,111 +176,105 @@ Serves `dist/` as a static server with SPA fallback. Quirks (documented post-Pha
 
 ## Manual UAT Pattern
 
-Phase verification includes a **HUMAN-UAT.md** file per phase (e.g., `.planning/phases/04-content-surface/04-HUMAN-UAT.md`) with scripted test scenarios:
+Phase completion includes **HUMAN-UAT.md** per phase with scripted test scenarios:
 
-**Example from Phase 4 UAT (2026-05-17):**
+**Example structure (6-item checklist):**
 
 | Test | Expected | Result |
 |------|----------|--------|
 | Google Rich Results on all routes | 0 errors (Organization, SoftwareApplication, WebSite, Person, HowTo, FAQPage, Product, BreadcrumbList) | PASS — human-verified |
-| Paddle/YooKassa modal E2E on /pay | With extension + logged in, CTA rail appears, checkout opens | PASS — both USD + RUB paths tested |
-| Mobile LCP post-deploy | Baseline 3.3s (no regression vs Phase 3.3s baseline) | PASS — 3.5s within measurement variance (±0.2s) |
-| X-Frame-Options edge header | `curl -sI https://opten.space/` returns `X-Frame-Options: SAMEORIGIN` | PASS — Vercel edge header applied |
-| Content-Signal in robots.txt | `curl -s https://opten.space/robots.txt` includes `Content-Signal: ...` | PASS — present in live file |
+| Paddle/YooKassa modal E2E on /pay | With extension + logged in, CTA rail appears, checkout opens | PASS — both USD + RUB tested |
+| Mobile LCP post-deploy | Baseline 3.3s (no regression vs Phase 3.3s) | PASS — 3.5s within variance |
+| X-Frame-Options edge header | `curl -sI https://opten.space/` includes `X-Frame-Options: SAMEORIGIN` | PASS — Vercel edge header applied |
+| Content-Signal in robots.txt | `curl -s https://opten.space/robots.txt` includes Content-Signal directive | PASS — present in live file |
 | llms.txt content-type | `curl -sI https://opten.space/llms.txt` returns `Content-Type: text/plain` | PASS — both llms.txt and llms-full.txt match |
 
-**Outputs:** Results written to phase's `<phase>-HUMAN-UAT.md` or `<phase>-VERIFICATION.md`. Nothing survives the phase as runnable code — only markdown records.
+**Output:** results written to phase's `.md` file. Nothing survives as runnable code — markdown records only.
 
 ## MCP-Driven Verification Workflow
 
-Phase verification runs through two MCP servers from the orchestrator's host (not CI):
+Phase verification runs through two MCP servers from orchestrator's host (not CI):
 
 ### Playwright MCP — functional/UAT sweeps
 
-Used as the de-facto E2E framework. The orchestrator scripts a short Playwright run against **prerendered `dist/`** served by `vite preview` after `npm run build`. 
+De-facto E2E framework. Orchestrator scripts Playwright run against prerendered `dist/` served by `vite preview` after `npm run build`.
 
 **Steps:**
 1. `npm run build`
 2. `npx vite preview --host 127.0.0.1 --port 4180` in background
-3. Playwright navigates direct-hit URLs (`/`, `/en/`, `/welcome`, `/en/welcome`, `/pay`, `/en/pay`, `/privacy`, `/en/privacy`, `/account`)
-4. Per-page assertions: `<html lang>` attribute, body content language, `window.Paddle` presence on `/pay` + `/en/pay`, zero React hydration errors (#418/#423), zero generic console errors
+3. Playwright navigates direct-hit URLs: `/`, `/en/`, `/welcome`, `/en/welcome`, `/pay`, `/en/pay`, `/privacy`, `/en/privacy`, `/account`
+4. Per-page assertions: `<html lang>` attribute, body content language, `window.Paddle` presence on `/pay` + `/en/pay`, zero React hydration errors, zero console errors
 
-**Outputs:** sweep table in phase SUMMARY file. Nothing committed as runnable code — results in markdown only.
-
-**What it verifies:**
-- `<html lang>` baked at build
+**Verifies:**
+- `<html lang>` baked at build time
 - Prerendered body content per language
 - `__PRERENDER_PATH` marker matches `location.pathname`
-- Hydration is clean
+- Hydration clean (no React #418/#423 mismatch)
 - `LocalizedLink` rewrites preserve `/en/` prefix
-- `LangSwitcher` produces right `navigate()` target (or correctly skips on no-sibling routes)
-- Paddle CDN script present + `window.Paddle` is real object after load
-- `chrome.runtime.sendMessage` branch falls through cleanly when extension absent
+- `LangSwitcher` produces correct `navigate()` target (or skips on no-sibling routes)
+- Paddle CDN script present + `window.Paddle` real object after load
+- `chrome.runtime.sendMessage` branch falls cleanly when extension absent
 
-**What it cannot verify:**
+**Cannot verify:**
 - Full payment flow against Paddle sandbox (would charge real card)
 - YooKassa flow (server-side, extension repo's Supabase)
-- Real extension-installed scenarios (`EXTENSION_IDS` deep links, message-passing)
+- Real extension-installed scenarios
 
-### PageSpeed Insights MCP — performance/Lighthouse
+### PageSpeed Insights MCP — Lighthouse
 
-Used during Phase 2.x perf work and Phase 3+ post-release verification. Pulls Lighthouse metrics for mobile and desktop against deployed Vercel URL. Results quoted in phase SUMMARY/POST-RELEASE files (e.g., `03-POST-RELEASE.md` "PageSpeed `/en/` mobile LCP 3.5 s"). NOT committed as CI gate; no in-repo budget file.
+Used during perf work. Pulls Lighthouse metrics for mobile/desktop against deployed Vercel URL. Results quoted in phase SUMMARY files (e.g., `03-POST-RELEASE.md` "LCP 3.5 s"). NOT committed as CI gate — advisory only.
 
-## Test Types
+## Test Types Summary
 
 | Type | Status | Notes |
 |------|--------|-------|
-| Unit tests (Vitest/Jest) | None | No framework installed |
-| Component tests (Testing Library) | None | No framework installed |
-| Integration tests | None | No framework installed |
-| In-repo E2E (Playwright in `tests/`) | None | Smoke script in `scripts/` only |
-| Orchestrator Playwright sweeps | Used per-phase | Results in `.planning/phases/<phase>/*-SUMMARY.md` |
-| Visual regression | None | Design drift caught by human UAT + PageSpeed audit |
-| Lighthouse/perf in CI | None | PageSpeed Insights MCP used ad-hoc |
-| Build-time structural checks | Yes | `verify-faq-mainentity.mjs`, sitemap/llms floor checks |
-| Static dist/ checks | Ad-hoc Node scripts | Commit hreflang counts, `<xhtml:link>` reciprocity, Paddle script tags |
+| Unit tests (Vitest/Jest) | None | No framework |
+| Component tests (Testing Library) | None | No framework |
+| Integration tests | None | No framework |
+| In-repo E2E (Playwright in `tests/`) | None | smoke-blog.mjs only |
+| Orchestrator Playwright sweeps | Per-phase | Results in `.planning/phases/<phase>/*-SUMMARY.md` |
+| Visual regression | None | Human UAT + PageSpeed audit |
+| Lighthouse/perf | Ad-hoc | PageSpeed Insights MCP |
+| Build-time checks | Yes | verify-faq-mainentity.mjs, sitemap/llms floors, fonts |
+| Static `dist/` checks | Ad-hoc Node | hreflang counts, `<xhtml:link>` reciprocity, Paddle tags |
 
-## What Verification Looks Like — Canonical Example
+## Canonical Verification Example
 
-From `04-VERIFICATION.md` (Phase 4 — content surface):
+From Phase 4 (content surface):
 
-1. **`npm run build`** — confirms compile + prerender. Required to pass.
+1. **`npm run build`** — compile + prerender must pass (required)
 
-2. **Static `dist/` checks** via one-off Node scripts:
-   - Count `<link rel="alternate" hreflang>` tags per HTML file
-   - Confirm reciprocity between cluster pairs (RU ↔ EN ↔ x-default)
+2. **Static `dist/` checks via Node scripts:**
+   - Count `<link rel="alternate" hreflang>` tags per HTML
+   - Confirm reciprocity between RU ↔ EN ↔ x-default pairs
    - grep `<script src="https://cdn.paddle.com/paddle/v2/paddle.js">` on `dist/pay/index.html` and `dist/en/pay/index.html`
    - Verify `window.__PRERENDER_PATH = "/blog/gpt-image-2"` markers
 
 3. **Playwright sweep via MCP** against `vite preview`:
-   - Behaviors needing real browser (`LangSwitcher` clicks, hydration, `window.Paddle`, `LocalizedLink` rewriting)
+   - Test browser-dependent behaviors: `LangSwitcher` clicks, hydration clean, `window.Paddle`, `LocalizedLink` rewriting
 
-4. **Human UAT** (6-item checklist in `04-HUMAN-UAT.md`):
-   - Google Rich Results Tool audit
+4. **Human UAT** (6-item checklist):
+   - Google Rich Results audit
    - Paddle/YooKassa E2E with extension
    - Mobile LCP post-deploy
-   - Edge headers (`X-Frame-Options`, etc.)
+   - Edge headers
    - Content-Signal directive
    - llms.txt content-type
 
-Neither Playwright nor UAT code survives the phase — runs documented in markdown only.
+Neither Playwright code nor UAT documentation survives the phase — results in markdown only.
 
-## Risk: Extension Integration Unverified
+## Critical Integration Gaps (No Test Coverage)
 
-The site's most critical contract — boundary with Opten Chrome extension — has **zero automated coverage**:
+The site's most critical contract — boundary with Opten Chrome extension — has **ZERO automated verification**:
 
-- `chrome.runtime.sendMessage` shapes (`type: "GET_USER"`, etc.) in `docs/INTEGRATION-CONTRACT.md` §2 — no test asserts payload
-- `EXTENSION_IDS` duplicated across `PayPage.tsx`, `AccountPage.tsx`, `DownloadSkillPage.tsx`, `api/download-skill.ts` — no test catches drift
+- `chrome.runtime.sendMessage` shapes (`type: "GET_AUTH_TOKEN"`, etc.) in `docs/INTEGRATION-CONTRACT.md` §2 — no test asserts payload
+- `EXTENSION_IDS` duplicated across 4 files — no test catches drift
 - Locked routes `/welcome`, `/pay`, `/success` — no test verifies they exist
-- Supabase Function URLs + JWT hardcoded — no test catches typos
-- `EN_SIBLINGS` ↔ `scripts/seo-routes.ts` SYNC contract relies on hand-written comments — drift breaks SPA navigation
+- Supabase Function URLs + JWT hardcoded — no test verifies syntax
+- `EN_SIBLINGS` ↔ `seo-routes.ts` SYNC contract relies on comments — drift breaks SPA nav
 
-**Implication:** every change touching billing, auth, integration contract, locked routes, or EN-sibling set must be **manually validated against extension + real browser before merge**. The two repos rely on **manual coordination + `docs/INTEGRATION-CONTRACT.md` as binding spec** rather than executable tests.
-
-## Common Test Patterns
-
-Not applicable — no test code exists in the repo. Patterns that DO exist are conventions for build-time guards (captured above) and MCP-driven sweeps (documented above).
+**Implication:** every change touching billing, auth, integration contract, locked routes, or EN-sibling set must be **manually validated against real extension + browser before merge**. Repos rely on **manual coordination + `docs/INTEGRATION-CONTRACT.md` as binding spec** rather than executable tests.
 
 ---
 
-*Testing analysis: 2026-05-18 — covers v1.0 (GEO Optimization) + Phase 5 (blog migration). Includes smoke-blog.mjs Playwright smoke pattern and build-time verification gates.*
+*Testing analysis: 2026-05-21 — covers v1.0 (GEO) + v2.0 (models) + Phase 5 (blog). Includes smoke-blog.mjs Playwright smoke pattern and build-time verification gates.*

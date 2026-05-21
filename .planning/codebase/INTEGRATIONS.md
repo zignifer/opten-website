@@ -1,246 +1,164 @@
 # External Integrations
 
-**Analysis Date:** 2026-05-18
+**Analysis Date:** 2026-05-21
 
-## Chrome Extension (Opten / promptscore)
+## APIs & External Services
 
-**Mechanism:** Chrome `externally_connectable` message API — extension manifest (`C:\Projects\promptscore\manifest.json`) whitelists `https://opten.space/*`; site calls `chrome.runtime.sendMessage(extensionId, message, callback)`.
+**Supabase (Auth + Subscriptions):**
+- Project (production): `https://vuywydhwkqmihfztpkgl.supabase.co` (owned by extension repo `C:\Projects\promptscore`)
+- Access: Plain `fetch` with `Authorization: Bearer <jwt>` + `apikey: <anon>` headers (no `@supabase/supabase-js` SDK)
+- Endpoints:
+  - `/auth/v1/user` — validate JWT, get user ID
+  - `/rest/v1/subscriptions` — query user's subscription plan/status (RLS enforced, user reads own row only)
+  - `/functions/v1/create-payment-paddle` — initiate USD payment (site calls from `PayPage.tsx`)
+  - `/functions/v1/create-payment-yookassa` — initiate RUB payment (site calls from `PayPage.tsx`)
+  - `/functions/v1/get-subscription` — fetch full subscription record with card details (AccountPage calls)
+  - `/functions/v1/cancel-subscription-*` — cancel subscription (triggered by extension or site AccountPage)
+- Hardcoded constants (must be kept in sync across all usage sites):
+  - `SUPABASE_URL = "https://vuywydhwkqmihfztpkgl.supabase.co"` — appears in `src/app/pages/PayPage.tsx:11`, `src/app/pages/AccountPage.tsx:7`, `api/download-skill.ts:14`
+  - `SUPABASE_ANON_KEY = "eyJhbGc..."` — same three files, used for read-only authenticated access + JWT validation
+  - Also appears in extension repo's `config/api.js` — must be kept in sync
 
-**Extension IDs (hardcoded, duplicated in 3 files):**
-- `iphkppgbobpilmphloffcalicmejacfl` — Chrome Web Store
-- `kcmcaeenfmfnpiaihicecnfnagejpcog` — Local dev (unpacked)
+**Paddle.js v2 (Payment Processing — USD):**
+- SDK: `https://cdn.paddle.com/paddle/v2/paddle.js` (CDN, synchronously loaded on `/pay` prerendered HTML only; lazy-loaded for SPA navigation)
+- Initialization: `src/lib/paddle.ts` via `ensurePaddle()` helper function
+- Environment: `VITE_PADDLE_ENV` (sandbox or production) set in Vercel project settings
+- Public token: `VITE_PADDLE_CLIENT_TOKEN` set in Vercel project settings
+- Usage: `PayPage.tsx` calls `window.Paddle.Checkout.open(...)` to open payment modal
+- CORS: allowed only from `https://opten.space`
+- Flow: site creates payment via Supabase Edge Function `/create-payment-paddle` (returns `checkout_id`), then opens Paddle checkout modal. Paddle calls YooKassa backend (for RUB) or Paddle backend (for USD) based on `currency`.
 
-First responder wins; site iterates the list in `PayPage.tsx`, `AccountPage.tsx`, `DownloadSkillPage.tsx`.
+**YooKassa (Payment Processing — RUB):**
+- Accessed indirectly via Supabase Edge Function `/create-payment-yookassa` (extension repo owns the webhook secrets)
+- Webhook URL: hardcoded in extension repo's Edge Function environment, points back to Supabase
+- Return URL: `https://opten.space/success` (locked route, not prefixed with `/en/*`; site handles currency redirect via `success_url` param)
+- Payment flow: site calls Edge Function with plan/currency/lang, Edge Function creates YooKassa payment ID, returns checkout URL, site redirects user to YooKassa
+- Webhook: YooKassa pings Supabase Edge Function on payment success; Edge Function updates `subscriptions` table + generates JWT for new user/subscriber
 
-**Call sites:**
-- `src/app/pages/PayPage.tsx:189` — `sendMessage(id, { type: "GET_AUTH_TOKEN" }, cb)`
-- `src/app/pages/AccountPage.tsx:103` — `sendMessage(id, { type: "GET_AUTH_TOKEN" }, cb)`
-- `src/app/pages/AccountPage.tsx:156` — `sendMessage(id, { type: "CANCEL_SUBSCRIPTION" }, cb)`
-- `src/app/pages/DownloadSkillPage.tsx:43` — `sendMessage(id, { type: "GET_AUTH_TOKEN" }, cb)`
+## Data Storage
 
-**Message types (from extension repo `background/background.js:1002-1084`):**
+**Databases:**
+- Supabase PostgreSQL (production, owned by extension repo)
+  - Tables: `users`, `subscriptions` (RLS row-level security enforced)
+  - Connection: via public REST API (`/rest/v1/`) + JWT auth headers
+  - Client: plain `fetch()` (no ORM)
+  - Analytics replica: `opten-seo` project (read-only from this repo)
 
-| Type | Direction | Request | Response | Purpose |
-|------|-----------|---------|----------|---------|
-| `GET_AUTH_TOKEN` | Site → Extension | `{}` | `{ token: string, email: string } \| { token: null, reason: string }` | Detect extension, auth flow, JWT for Edge Functions |
-| `GET_SUBSCRIPTION` | Site → Extension | `{}` | `{ plan: 'pro'\|'free'\|'cancelled', status: 'active'\|'cancelled'\|null, ... }` | Display subscription state, access gating |
-| `CANCEL_SUBSCRIPTION` | Site → Extension | `{}` | `{ success: true, expires_at: ISO8601 } \| { error: string, message: string }` | Cancel subscription (Extension dispatches to Supabase Edge Function) |
-| `WARMUP` | Site → Extension | `{}` | (ignored) | Fire-and-forget, warm Vercel cold start (unused) |
+**File Storage:**
+- Local filesystem only — no cloud storage integration
+- Assets: `public/` directory (static, served by Vercel CDN)
+- Skill bundle: `api/_assets/opten.zip` (bundled into Vercel serverless function via `vercel.json` `includeFiles`)
 
-**Fallback path:** Pages accept `#token=...` URL hash (e.g., `PayPage.tsx:154`) for direct deep-links from extension.
+**Caching:**
+- Browser caching via HTTP headers (cache-control, etag)
+- No server-side caching layer (Vercel handles edge caching via CDN)
 
-**Detection states:** `"detecting" | "not_installed" | "not_logged_in" | "ready"` (PayPage.tsx:23, AccountPage.tsx:14, DownloadSkillPage.tsx:10-18).
+## Authentication & Identity
 
-**CRITICAL:** See `docs/INTEGRATION-CONTRACT.md` for the binding interface. Any change to message shapes, extension IDs, or route names is a breaking change for already-shipped extension binaries.
+**Auth Provider:**
+- Supabase Auth (JWT-based)
+  - Extension owns the user account creation flow (on extension first-run)
+  - Site validates JWTs from extension via `/auth/v1/user` endpoint
+  - JWTs refreshed by extension via `chrome.runtime.sendMessage(...)` (site never refreshes directly)
+  - No email/password auth on site — delegation to extension
 
-## Supabase (Edge Functions)
-
-**Project (production, owned by extension repo):**
-- URL: `https://vuywydhwkqmihfztpkgl.supabase.co`
-- Access: plain `fetch` with `Authorization: Bearer <jwt>` + `apikey: <anon>` headers (no `@supabase/supabase-js` SDK)
-
-**Hardcoded credentials (duplicated in 3 site files + extension repo's `config/api.js`):**
-- `SUPABASE_URL = "https://vuywydhwkqmihfztpkgl.supabase.co"`
-- `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"` (public-by-design, anon role)
-
-**Locations:**
-- `src/app/pages/PayPage.tsx:10-11` — SUPABASE_FUNCTIONS_URL, SUPABASE_ANON_KEY
-- `src/app/pages/AccountPage.tsx:6-7` — same
-- `api/download-skill.ts:14-16` — SUPABASE_URL (includes `/auth/v1`, `/rest/v1` access)
-
-**Edge Functions called from site:**
-
-| Endpoint | Caller | Auth | Method | Body → Response |
-|----------|--------|------|--------|-----------------|
-| `/functions/v1/create-payment` | `PayPage.tsx:239` (RUB path) | Bearer JWT | POST | `{ recurring: bool }` → `{ confirmation_url }` (YooKassa) |
-| `/functions/v1/create-payment-paddle` | `PayPage.tsx:293` (USD path) | Bearer JWT | POST | `{ recurring: bool }` → `{ priceId, customerEmail, userId }` (Paddle) |
-| `/functions/v1/get-subscription` | `PayPage.tsx:214`, `AccountPage.tsx:129` | Bearer JWT | GET | — → `{ plan, status, expires_at, ... }` |
-| `/functions/v1/cancel-subscription` | Extension (via `CANCEL_SUBSCRIPTION` message) | Bearer JWT | POST | Called by extension, not site |
-| `/functions/v1/cancel-subscription-paddle` | Extension | Bearer JWT | POST | Called by extension, not site |
-
-**REST API called from serverless (`api/download-skill.ts`):**
-- `GET ${SUPABASE_URL}/auth/v1/user` (line 59) — JWT validation
-- `GET ${SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.<id>&plan=eq.pro&status=in.(active,cancelled)...` (line 85) — Pro gate (plan='pro' AND status IN ('active','cancelled'))
-
-**Server-side metadata project (`opten-seo`):**
-- URL: `https://hxqhlsjqrxalyteyqhfd.supabase.co` (`.env.example:11`)
-- Access: via `npx supabase` CLI (devDependency `supabase 2.98.2`)
-- Not consumed by client bundle (no `VITE_` prefix)
-
-## Paddle.js v2
-
-**CDN integration:**
-- Not loaded site-wide; `index.html` has preconnect only
-- Synchronously injected by `scripts/prerender.mjs` into `/pay/index.html` AND `/en/pay/index.html` prerendered files (Phase 2.2 + Phase 3 D-03b)
-- Lazily loaded on SPA-navigation via `src/lib/paddle.ts:ensurePaddle()` (other routes)
-
-**Injection detail (Phase 3 D-03b symmetry):**
-- `scripts/prerender.mjs:175-180` — defines `applyPaddleScript()`
-- `scripts/prerender.mjs:192` — gate: `meta.path === "/pay" || meta.path === "/en/pay"`
-- Direct hits on `/pay` or `/en/pay` have `window.Paddle` ready before React mounts (Phase 2.2 perf optimization)
-
-**Loader (`src/lib/paddle.ts`):**
-- CDN: `https://cdn.paddle.com/paddle/v2/paddle.js`
-- Memoized promise `paddleReady` (idempotent)
-- Init: `Paddle.Environment.set("sandbox")` only when `VITE_PADDLE_ENV === "sandbox"` (Phase 67 fix: no `set("production")`)
-- Init: `Paddle.Initialize({ token: VITE_PADDLE_CLIENT_TOKEN })`
-
-**Call site (`PayPage.tsx`):**
-- Mount preload: `ensurePaddle()` (line 172)
-- Pre-checkout: `ensurePaddle()` (line 281)
-- Checkout: `window.Paddle.Checkout.open({ items: [{ priceId, quantity: 1 }], customer: { email }, customData: { user_id }, settings: { theme: "dark", locale: "en", successUrl: window.location.origin + "/success", displayMode: "overlay" }, eventCallback: (event) => { if (event.name === "checkout.closed") {...} } })` (line 314)
-
-**Post-checkout signal (`SuccessPage.tsx:11`):**
-- Reads `?_ptxn=txn_...` query param (Paddle appends on overlay success); logged only
-
-**Environment variables (Vercel):**
-- `VITE_PADDLE_ENV` — `"sandbox"` | `"production"`
-- `VITE_PADDLE_CLIENT_TOKEN` — Paddle public client token
-
-## YooKassa
-
-**RUB checkout flow:**
-- Site calls `POST /functions/v1/create-payment` Edge Function (`PayPage.tsx:239`)
-- Edge Function (in extension repo) returns `{ confirmation_url }`
-- Site redirects via `window.location.href = data.confirmation_url` (`PayPage.tsx:255`)
-- `return_url` hardcoded in Edge Function to `https://opten.space/success` (binding contract)
-
-**SuccessPage behavior:**
-- YooKassa returns user to `/success` without query params
-- Site shows success state (confetti, CTA to install/sign in)
-
-**No YooKassa JavaScript SDK** — payment link is external redirect only.
-
-## Vercel Platform
-
-**Hosting:**
-- Project: `opten-website2` (per recent commits)
-- Auto-deploy on push to `main`
-- Custom domain: `opten.space` (HTTPS)
-
-**vercel.json configuration:**
-- Rewrites: `/((?!api/).*) → /index.html` (SPA fallback for all non-API routes)
-- Redirects: `/guides/*` → `/blog/*` (Phase 5 B-07 content migration)
-- Headers (global):
-  - `X-Content-Type-Options: nosniff`
-  - `Referrer-Policy: strict-origin-when-cross-origin`
-  - `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(self "https://*.paddle.com")`
-  - `X-Frame-Options: SAMEORIGIN`
-- Headers (path-specific `X-Robots-Tag: noindex, nofollow`):
-  - `/account` → no prerender, SPA-only
-  - `/success` → post-payment, no crawl
-  - `/dashboard/*` → auth-gated, no crawl
-  - `/api/*` → no crawl
-- Functions: `api/download-skill.ts` with `includeFiles: "api/_assets/**"`
-
-**Serverless function (`api/download-skill.ts`):**
-- Auth: Bearer JWT validated against `${SUPABASE_URL}/auth/v1/user`
-- Authorization: Supabase REST query for Pro subscription (plan='pro' AND status IN ('active','cancelled'))
-- Output: ZIP file stream from `api/_assets/opten.zip` (~6.5 KB)
-- CORS: locked to `https://opten.space`
-- Error responses: `401` (invalid/missing JWT), `403` (not Pro), `405` (wrong method), `502` (backend error)
-
-## Authentication & State
-
-**Site-owned `localStorage` (prefix `opten_`):**
-- `opten_lang_v3` — `"ru" | "en"` (set/read by LangSwitcher only)
-- `opten_lang` (legacy, read-only) — one-shot EN migration; `LangContext.tsx:30-31` reads only if value is exactly `"en"`
-- `opten_pay_currency` — `"RUB" | "USD"` (set/read in PayPage.tsx)
-
-**Extension-owned `chrome.storage.local` (`ps_*` prefix):**
-- Site does NOT read directly; all access via `chrome.runtime.sendMessage` (see Chrome Extension section)
-- Keys documented in `docs/INTEGRATION-CONTRACT.md` §5: `ps_auth_token`, `ps_user_email`, `ps_plan`, `ps_sub_status`, `ps_sub_expires`, `ps_sub_provider`, etc.
-
-**No cookies, no service worker, no IndexedDB.**
-
-## Content & SEO Generation
-
-**Per-route metadata source:**
-- `scripts/seo-routes.ts` — single source of truth for title, description, canonical, ogImage, hreflangAlternates, schema (JSON-LD)
-- Typed schema helpers: `faqPageBlock`, `howToBlock`, `productBlock`, `articleBlock`, `webPageBlock`, `breadcrumbBlock`, `collectionPageBlock`, `itemListBlock`, `blogPostingBlock`
-- Reusable schema consts: `ORG_BLOCK`, `WEBSITE_BLOCK`, `SOFTWARE_APP_BLOCK`, `PERSON_FOUNDER_BLOCK` (cross-linked via `@id`)
-
-**Blog content:**
-- `src/content/blog/` — one file per post implementing `BlogPost = { ru, en }`
-- Cover images: `public/blog/<slug>/`
-- Routes: `/blog/:slug` (RU) + `/en/blog/:slug` (EN), dynamically prerendered
-
-**OG cards:**
-- `public/og-card-ru.png`, `public/og-card-en.png` (1200×630)
-- Per-post covers override the defaults
-
-**Build-time outputs:**
-- `dist/sitemap.xml` — 18 `<url>` entries with `xhtml:link` hreflang triplets (ru/en/x-default); per-route `<lastmod>` from git mtime
-- `dist/llms.txt`, `dist/llms-full.txt` — AI-crawler opt-in; generated by `scripts/llms.mjs`
-- `dist/robots.txt` — explicit blocks for 16 user-agents; `Content-Signal: search=yes, ai-train=yes, ai-input=yes`
-
-**Prerendered routes (18 total: 9 RU + 9 EN):**
-- Full prerender: `/`, `/welcome`, `/about`, `/blog`, `/privacy`, `/terms`, `/refund` (RU) + EN siblings
-- Head-only: `/pay`, `/en/pay` (Paddle SDK injected, body loaded by React)
-- Blog posts: `/blog/:slug`, `/en/blog/:slug` (dynamically prerendered per `src/content/blog/`)
-- SPA-only (no prerender, `X-Robots-Tag: noindex`): `/account`, `/success`, `/dashboard/download-skill`
-- Fallback 404: `<Route path="*" element={<NotFound />}>` (injects `<meta robots=noindex>` at runtime)
-
-**Hreflang configuration:**
-- Every prerendered file includes triplet: `<link rel="alternate" hreflang="ru" href="..." />`, `hreflang="en"`, `hreflang="x-default"`
-- Sitemap also includes `xhtml:link` annotations per URL
-
-## External CDNs & Services
-
-| Service | Purpose | Where |
-|---------|---------|-------|
-| `cdn.paddle.com` | Paddle.js v2 SDK | `/pay`, `/en/pay` prerendered HTML; lazy fallback via `src/lib/paddle.ts` |
-| `chromewebstore.google.com` | Extension install link | `PayPage.tsx:12`, `AccountPage.tsx:8`, `DownloadSkillPage.tsx:117`, `index.html:65,78` |
-| `t.me/v_voronezhtsev` | Telegram contact link | `PayPage.tsx:618`, `AccountPage.tsx:400`, `index.html:79` |
-
-## Hardcoded Duplicated Constants
-
-**`EXTENSION_IDS` — 3 files, must stay in sync:**
-- `src/app/pages/PayPage.tsx:13-16`
-- `src/app/pages/AccountPage.tsx:9-12`
-- `src/app/pages/DownloadSkillPage.tsx:5-8`
-
-```ts
-const EXTENSION_IDS = [
-  "iphkppgbobpilmphloffcalicmejacfl",  // Chrome Web Store
-  "kcmcaeenfmfnpiaihicecnfnagejpcog",  // Local dev
-];
-```
-
-**`SUPABASE_URL` — 4 files (3 site + 1 extension), must rotate together:**
-- `src/app/pages/PayPage.tsx:10` — as `SUPABASE_FUNCTIONS_URL = "https://vuywydhwkqmihfztpkgl.supabase.co/functions/v1"`
-- `src/app/pages/AccountPage.tsx:6` — same
-- `api/download-skill.ts:14` — as `SUPABASE_URL = "https://vuywydhwkqmihfztpkgl.supabase.co"` (no suffix; also hits `/auth/v1`, `/rest/v1`)
-- Extension repo's `config/api.js` (out-of-tree)
-
-**`SUPABASE_ANON_KEY` — 4 files (3 site + 1 extension), mirrors SUPABASE_URL:**
-- `src/app/pages/PayPage.tsx:11`
-- `src/app/pages/AccountPage.tsx:7`
-- `api/download-skill.ts:15-16`
-- Extension repo's `config/api.js`
-
-**`EN_SIBLINGS` — runtime + build-time manifest:**
-- `src/i18n/paths.ts:9-16` — runtime `Set<string>` consumed by LocalizedLink / LangSwitcher (6 routes: `/`, `/welcome`, `/pay`, `/privacy`, `/terms`, `/refund`)
-- `scripts/seo-routes.ts` — must contain matching entry for each EN sibling (Phase 3 D-01/D-03b). Build floor check at `sitemap.mjs:29-31` requires >= 18 routes (9 RU + 9 EN post-blog migration).
-
-## Webhooks & Callbacks
-
-**Incoming to site:**
-- `/success` — YooKassa `return_url` + Paddle `successUrl` (not a webhook, user-facing redirect)
-- No webhook receiver endpoints on this site
-
-**Outgoing from site:**
-- All YooKassa/Paddle webhooks land on extension-owned Supabase Edge Functions (`/webhook`, `/webhook-paddle`), not here
-- Site initiates payment via Edge Functions, which in turn invoke payment providers
+**Implementation:**
+- Site reads auth state from extension via `chrome.runtime.sendMessage(id, { type: "GET_AUTH_TOKEN" }, callback)`
+- Response: `{ token: string, email: string }` | `{ token: null, reason: "not_logged_in" | "error" }`
+- Pages: `PayPage.tsx`, `AccountPage.tsx`, `DownloadSkillPage.tsx` all iterate `EXTENSION_IDS` and accept first responder
 
 ## Monitoring & Observability
 
-**Error tracking:** None (no Sentry, Rollbar, Datadog SDK)
+**Error Tracking:**
+- None detected — no Sentry, Rollbar, or similar
 
-**Logging:** Browser console only (`console.log`, `console.warn`). Example: `SuccessPage.tsx:13` logs Paddle txn ID; `paddle.ts:20` warns on missing token.
+**Logs:**
+- Browser console (default `console.log`, `console.warn`, `console.error`)
+- Vercel serverless function logs (visible in Vercel dashboard)
+- Supabase Edge Function logs (visible in Supabase dashboard)
 
-**Analytics:** None detected in client bundle (no GA, GTM, Plausible, Yandex.Metrica).
+## CI/CD & Deployment
+
+**Hosting:**
+- Vercel — static hosting for `dist/` + one serverless function `api/download-skill.ts`
+- Auto-deploy on push to `main` branch (GitHub integration via Vercel)
+- Preview URLs: `https://<branch>-<project>.vercel.app` or custom domain preview (e.g., `https://preview.opten.space`)
+
+**CI Pipeline:**
+- GitHub Actions (if configured) — not found in repo; Vercel handles build/deploy automatically
+- Local build gate: `npm run build` must pass (validates routes, fonts, FAQ schema, URLs)
+
+**Build Artifacts:**
+- `dist/` — static HTML (144 prerendered routes) + CSS + JS + assets
+- `.ssr-cache/` — temporary SSR build output (deleted after prerender)
+- `.ssr-meta/` — temporary metadata build output (deleted after prerender)
+- All committed post-build outputs are removed before commit
+
+## Environment Configuration
+
+**Required env vars (set in Vercel project settings, not in repo):**
+- `VITE_PADDLE_ENV` — `'sandbox'` or `'production'` (affects Paddle SDK initialization)
+- `VITE_PADDLE_CLIENT_TOKEN` — Paddle public client token (for USD payments)
+
+**Secrets (NOT in this repo):**
+- Supabase service role key — in extension repo's Supabase Edge Function secrets
+- Paddle private API key — in extension repo's Supabase Edge Function secrets
+- YooKasha shop ID, secret key — in extension repo's Supabase Edge Function secrets
+
+**Secrets location:**
+- Extension repo (`C:\Projects\promptscore`) owns all API secrets via Supabase Edge Function environment
+- Site has no `SUPABASE_SERVICE_ROLE_KEY` or any sensitive keys
+- Only public constants (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `EXTENSION_IDS`) are in source code (must stay in sync across repos)
+
+## Webhooks & Callbacks
+
+**Incoming (Vercel serverless handles):**
+- `GET /api/download-skill` — extension calls with JWT in `Authorization` header. Verifies JWT + Pro subscription, streams `opten.zip` or returns 403/401 error.
+
+**Outgoing:**
+- None directly from this site
+- Extension calls Supabase Edge Functions for payment creation, subscription cancellation, etc.
+- Supabase Edge Functions receive webhooks from YooKassa on payment success
+- Paddle webhooks sent to Paddle backend (payment processing handled server-side by Paddle, not by this site)
+
+**URL callbacks (hardcoded, locked):**
+- YooKassa `return_url`: `https://opten.space/success` (site-side success page, shows confirmation)
+- Extension navigates to:
+  - `https://opten.space/welcome` on first install
+  - `https://opten.space/pay` on upgrade CTA click
+  - `https://opten.space/account` for account management (extension-gated SPA-only route)
+  - `https://opten.space/dashboard/download-skill` for skill bundle download (extension-gated SPA-only route)
+
+## Chrome Extension Integration (Opten / promptscore)
+
+**Binding Contract:** See `docs/INTEGRATION-CONTRACT.md` (authoritative, locked). Any change is a breaking change for shipped extension binaries.
+
+**Mechanism:** Chrome `externally_connectable` message API — extension manifest whitelists `https://opten.space/*`; site calls `chrome.runtime.sendMessage(extensionId, message, callback)`.
+
+**Extension IDs (hardcoded, must be kept in sync across all three pages):**
+- `iphkppgbobpilmphloffcalicmejacfl` — Chrome Web Store
+- `kcmcaeenfmfnpiaihicecnfnagejpcog` — Local dev (unpacked)
+
+**Call sites:**
+- `src/app/pages/PayPage.tsx:189+` — `sendMessage(id, { type: "GET_AUTH_TOKEN" }, cb)` for extension detection + JWT
+- `src/app/pages/AccountPage.tsx:103+` — `sendMessage(id, { type: "GET_AUTH_TOKEN" }, cb)` + `sendMessage(id, { type: "GET_SUBSCRIPTION" }, cb)`
+- `src/app/pages/AccountPage.tsx:156+` — `sendMessage(id, { type: "CANCEL_SUBSCRIPTION" }, cb)` to cancel Pro subscription
+- `src/app/pages/DownloadSkillPage.tsx:43+` — `sendMessage(id, { type: "GET_AUTH_TOKEN" }, cb)` for skill bundle access gating
+
+**Message Types (from extension repo `background/background.js:1002-1084`):**
+
+| Type | Direction | Request | Response | Purpose |
+|------|-----------|---------|----------|---------|
+| `GET_AUTH_TOKEN` | Site ← → Extension | `{}` | `{ token: string, email: string }` or `{ token: null, reason: "not_logged_in" \| "error" }` | Detect extension, retrieve JWT for API calls, auth flow |
+| `GET_SUBSCRIPTION` | Site ← → Extension | `{}` | `{ plan: "pro" \| "free" \| "cancelled", status: "active" \| "cancelled" \| null, expires_at: ISO8601 \| null, auto_renew: boolean, card_last4: string \| null, card_type: string \| null, has_card: boolean }` | Display subscription state, access gating for Pro features |
+| `CANCEL_SUBSCRIPTION` | Site ← → Extension | `{ force?: boolean }` | `{ success: true, expires_at: ISO8601 }` or `{ error: string, message: string }` | Cancel Pro subscription (extension dispatches to Supabase Edge Function) |
+| `WARMUP` | Site → Extension | `{}` | (ignored) | Fire-and-forget heartbeat (unused; listed in contract) |
+
+**Detection flow:**
+- Pages iterate `EXTENSION_IDS`, send `GET_AUTH_TOKEN` to each, accept first valid response
+- States: `"detecting"` → `"not_installed"` (timeout) or `"not_logged_in"` (token null) or `"ready"` (token present)
+- Fallback: accept `#token=...` URL hash for deep-links from extension (e.g., PayPage.tsx:154)
 
 ---
 
-*Integration audit: 2026-05-18*
+*Integration audit: 2026-05-21*
