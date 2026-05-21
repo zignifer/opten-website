@@ -80,7 +80,10 @@ export default function SiteHeader({ variant = "page", rightSlot }: SiteHeaderPr
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50 px-4 pt-5">
-      <nav className="mx-auto flex max-w-[1100px] items-center justify-between rounded-full bg-[rgba(0,0,0,0.34)] py-2 pl-2 pr-2 text-white backdrop-blur-md sm:pl-3">
+      {/* FIX-03: backdrop-filter on a fixed element is re-sampled every frame during scroll —
+          expensive on iOS Safari and a suspect for sluggish post-scroll tap response. Mobile gets
+          an opaque dark bar (no blur); desktop keeps the frosted-glass look (md+). */}
+      <nav className="mx-auto flex max-w-[1100px] items-center justify-between rounded-full bg-[rgba(1,20,23,0.92)] py-2 pl-2 pr-2 text-white sm:pl-3 md:bg-[rgba(0,0,0,0.34)] md:backdrop-blur-md">
         {/* Left cluster: hamburger + LangSwitcher */}
         <div className="flex items-center gap-2">
           <button
