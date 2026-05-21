@@ -19,6 +19,7 @@
   import "./styles/index.css";
   import { LangProvider } from "./i18n/LangContext";
   import { RouteLoading } from "./app/components/RouteLoading";
+  import ScrollToTop from "./app/components/ScrollToTop";
 
   // Phase 4 D-12: PayPage is now eager (SSR-prerendered body) — the lazy block below covers only
   // SuccessPage / AccountPage / DownloadSkillPage which remain SPA-only.
@@ -55,6 +56,7 @@
   const tree = (
     <BrowserRouter>
       <LangProvider>
+        <ScrollToTop />
         <Suspense fallback={<RouteLoading />}>
           <Routes>
             <Route path="/" element={<App />} />

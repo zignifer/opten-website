@@ -23,6 +23,7 @@ import NotFound from "../src/app/pages/NotFound.tsx";
 import "../src/styles/index.css";
 import { LangProvider } from "../src/i18n/LangContext";
 import { RouteLoading } from "../src/app/components/RouteLoading";
+import ScrollToTop from "../src/app/components/ScrollToTop";
 
 // Phase 3 D-06: Suspense wrapper mirrors main.tsx so SSR emits the `<!--$-->...<!--/$-->`
 // boundary markers React 18 hydration walks; without it, client expects markers, finds none,
@@ -33,6 +34,7 @@ export function renderRoute(path: string): string {
   return renderToString(
     <StaticRouter location={path}>
       <LangProvider>
+        <ScrollToTop />
         <Suspense fallback={<RouteLoading />}>
           <Routes>
             <Route path="/" element={<App />} />
