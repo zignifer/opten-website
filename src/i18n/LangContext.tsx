@@ -39,29 +39,18 @@ function detectLangFromPath(pathname: string): Lang | null {
   return null;
 }
 
-// Phase 2.2: EN dictionary lazy-loaded. The bundle analyzer revealed that statically
-// importing both ru.json (16.5 KB gzip) and en.json (12.8 KB gzip) was burning 29 KB
-// of gzipped weight on every visit — about 18 % of the entire main bundle — even
-// though every visitor uses exactly one language. RU stays statically imported
-// because it's the SSR default (LangProvider initial state) so it must be available
-// synchronously during hydration; EN loads on demand via dynamic import() when a
-// visitor's navigator.language indicates EN or they explicitly switch. EN visitors
-// see RU text for one render frame, then the lang state updates and the tree re-
-// renders in EN — barely perceptible, especially since the EN chunk lands in
-// 30-80 ms on any decent connection.
+// Both RU and EN dictionaries are statically imported and eagerly available. RU is the SSR
+// default; EN must ALSO be present synchronously because on /en/* LangProvider initializes
+// lang="en" from the URL prefix (below), so the first client render — before hydrateRoot in
+// main.tsx — must emit EN to match the prerendered EN HTML. If dicts.en were absent there,
+// t() would fall back to RU, diverging from the server HTML → React #418 hydration mismatch →
+// full client re-render → buttons unresponsive for a beat on iOS Safari (the reported symptom).
+// enFallback is already in the client bundle (the static import is not tree-shaken), so this
+// costs zero extra bytes — the earlier "lazy EN" optimization was already moot for that reason.
+// loadEnDict() below is now a fast-return no-op but kept for the SPA language-switch flow.
 type Dict = Record<string, string>;
-const dicts: Partial<Record<Lang, Dict>> = { ru };
+const dicts: Partial<Record<Lang, Dict>> = { ru, en: enFallback as Dict };
 let enLoadPromise: Promise<Dict> | null = null;
-
-// Phase 3 Pitfall 6 / Open Question #4: SSR needs synchronous en.json access so renderToString
-// on /en/* sees EN strings. Top-level await was rejected by esbuild (chrome87 target).
-// Fallback (RESEARCH.md OQ-4 recommendation b): use the statically-imported enFallback
-// and populate dicts.en synchronously on the SERVER path at module-evaluation time.
-// On the CLIENT, typeof window !== "undefined" so the branch is skipped — clients still
-// use the lazy loadEnDict() path (zero behavioral change for browser visitors).
-if (typeof window === "undefined") {
-  (dicts as Record<Lang, Dict | undefined>).en = enFallback as Dict;
-}
 
 function loadEnDict(): Promise<Dict> {
   if (dicts.en) return Promise.resolve(dicts.en);
