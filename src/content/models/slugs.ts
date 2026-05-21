@@ -69,3 +69,23 @@ export const MODEL_SLUGS_WITH_CONTENT: readonly string[] = [
   "wan",
   "z-image",
 ] as const;
+
+// General/umbrella model pages — bare-brand names that have specific versioned
+// siblings (e.g. "FLUX (General)" alongside flux-1/flux-kontext). The pages stay
+// live + in the sitemap for generic-query SEO, but are hidden from the /models
+// hub grid + its ItemList schema. Lives here (the light-import module) so both
+// index.ts (SSR/build) and index.client.ts (browser) share one source of truth
+// without either pulling the eager content glob.
+export const HUB_HIDDEN_SLUGS: ReadonlySet<string> = new Set<string>([
+  "flux",
+  "gpt-image",
+  "imagen",
+  "kling",
+  "luma-ray",
+  "midjourney",
+  "nano-banana",
+  "seedance",
+  "seedream",
+  "sora",
+  "veo",
+]);

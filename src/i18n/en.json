@@ -43,6 +43,7 @@
   "models.notFound.title": "Model not found",
   "models.notFound.body": "This model is not yet in the catalog. Check the full list of supported models.",
   "models.notFound.cta": "Browse models",
+  "models.loading": "Loading…",
   "models.updatedLabel": "Updated",
   "models.quickFacts.heading": "Quick facts",
   "models.quickFacts.type": "Type",

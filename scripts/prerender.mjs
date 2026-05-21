@@ -266,6 +266,27 @@ function applyJsonLd(html, meta) {
   return html;
 }
 
+// Speed/Phase B: inject the per-page model content data-island as a SIBLING of
+// #root (never inside it — main.tsx's hydration discriminator only checks
+// root.hasChildNodes(), and a child here would corrupt the hydrated tree).
+// type="application/json" (NOT application/ld+json) so verify-faq-mainentity.mjs,
+// which only parses ld+json blocks, never sees it. Escaped via escapeJsonLd so
+// prose containing </script>, <, or & can't break the HTML tokenizer. The client
+// store (src/content/models/index.client.ts) reads #opten-model synchronously at
+// module init, which lets the client bundle drop the eager 62-model glob without
+// any hydration mismatch. Carries BOTH locales (LangSwitcher does client-side
+// navigate() on model routes). Injected before </body>: the entry is a deferred
+// type="module" script, so the island is parsed into the DOM before it runs.
+function applyModelIsland(html, meta) {
+  if (!meta.modelIsland) return html;
+  const json = escapeJsonLd(JSON.stringify(meta.modelIsland));
+  const tag = `<script type="application/json" id="opten-model">${json}</script>`;
+  if (!html.includes("</body>")) {
+    throw new Error(`prerender(${meta.path}): </body> not found — cannot inject model island`);
+  }
+  return html.replace("</body>", `    ${tag}\n  </body>`);
+}
+
 // Phase 4 D-13 (per 04-LCP-AUDIT Option 1 — user-selected 2026-05-17):
 // build-time regression guard, NOT mutation. The LCP-blocking fonts are preloaded in
 // index.html since Phase 2.2. If anyone deletes those <link rel=preload> tags, every
@@ -316,6 +337,7 @@ for (const meta of routes) {
     }
     html = applyBody(html, rendered);
   }
+  html = applyModelIsland(html, meta);      // Speed/Phase B: per-page model content island (model routes only; no-op elsewhere)
   // For "head" tier (e.g., /pay): leave body empty, head is already overridden.
   // For "none" tier: skip (don't write a file — SPA fallback handles).
   if (meta.prerender === "none") continue;

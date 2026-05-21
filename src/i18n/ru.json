@@ -43,6 +43,7 @@
   "models.notFound.title": "Модель не найдена",
   "models.notFound.body": "Возможно, эта модель ещё не добавлена в каталог. Посмотри список всех поддерживаемых моделей.",
   "models.notFound.cta": "К каталогу моделей",
+  "models.loading": "Загрузка…",
   "models.updatedLabel": "Обновлено",
   "models.quickFacts.heading": "Кратко о модели",
   "models.quickFacts.type": "Тип",

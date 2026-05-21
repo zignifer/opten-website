@@ -34,25 +34,8 @@ for (const slug of MODEL_SLUGS_WITH_CONTENT) {
 
 export const ALL_MODEL_SLUGS: readonly string[] = MODELS_REGISTRY.map((m) => m.slug);
 
-// General/umbrella model pages — bare-brand names that have specific versioned
-// siblings (e.g. "FLUX (General)" alongside flux-1/flux-kontext). The pages stay
-// live + in the sitemap for generic-query SEO ("flux prompts"), but they are
-// hidden from the /models hub grid and its ItemList schema: the umbrella cards
-// read oddly next to their concrete versions. NOT removed from related-models,
-// so the pages keep internal links and aren't orphaned.
-export const HUB_HIDDEN_SLUGS: ReadonlySet<string> = new Set<string>([
-  "flux",
-  "gpt-image",
-  "imagen",
-  "kling",
-  "luma-ray",
-  "midjourney",
-  "nano-banana",
-  "seedance",
-  "seedream",
-  "sora",
-  "veo",
-]);
+// HUB_HIDDEN_SLUGS now lives in ./slugs (single source shared with index.client.ts).
+export { HUB_HIDDEN_SLUGS } from "./slugs";
 
 export const allModels: ModelEntry[] = MODELS_REGISTRY.map((meta) => ({
   slug: meta.slug,
@@ -69,6 +52,12 @@ export const modelsBySlug: Record<string, ModelEntry> = allModels.reduce(
 );
 
 export function getModelBySlug(slug: string): ModelEntry | undefined {
+  return modelsBySlug[slug];
+}
+
+// Symmetry with index.client.ts (the browser store, where content loads lazily).
+// On the server/build all content is already in memory, so this resolves sync.
+export async function loadModelBySlug(slug: string): Promise<ModelEntry | undefined> {
   return modelsBySlug[slug];
 }
 

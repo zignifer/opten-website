@@ -5,7 +5,7 @@
 
 import { useT, useLang } from "../../i18n/LangContext";
 import LocalizedLink from "./LocalizedLink";
-import { getRelatedModels } from "../../content/models";
+import { getRelatedModels } from "@/content/models";
 import { metaField } from "../../content/models/metaEn";
 import type { ModelMeta } from "../../content/models/types";
 

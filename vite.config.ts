@@ -17,10 +17,24 @@ export default defineConfig(({ isSsrBuild }) => ({
     imagetools({ exclude: '' }),
   ],
   resolve: {
-    alias: {
+    alias: [
+      // Speed/Phase B: the BROWSER build swaps the model barrel for a lazy,
+      // data-island-backed store (src/content/models/index.client.ts) so the
+      // eager 62-file content glob in index.ts never ships in the entry chunk.
+      // Exact-match regex ONLY — must not capture @/content/models/{metaEn,types,slugs}.
+      // SSR + meta builds (isSsrBuild) and dev keep the full index.ts barrel...
+      // except dev (isSsrBuild=false) also uses the client store, which lazy-loads
+      // model content fine (there's no island in dev — getModelBySlug falls through
+      // to loadModelBySlug).
+      ...(isSsrBuild
+        ? []
+        : [{
+            find: /^@\/content\/models$/,
+            replacement: path.resolve(__dirname, './src/content/models/index.client.ts'),
+          }]),
       // Alias @ to the src directory
-      '@': path.resolve(__dirname, './src'),
-    },
+      { find: '@', replacement: path.resolve(__dirname, './src') },
+    ],
   },
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.

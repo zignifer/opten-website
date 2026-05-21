@@ -13,7 +13,7 @@ import { landingFaq } from "../src/content/landingFaq";
 // Phase 2 fills the rest.
 import { allModels, HUB_HIDDEN_SLUGS } from "../src/content/models";
 import { metaField } from "../src/content/models/metaEn";
-import type { ModelEntry, ModelMeta } from "../src/content/models/types";
+import type { ModelContent, ModelEntry, ModelMeta } from "../src/content/models/types";
 
 // Phase 3 D-01/D-02: cluster pairs (reciprocal hreflang per RESEARCH.md Pitfall 5):
 //   "/"        ↔ "/en/"          "/pay"     ↔ "/en/pay"
@@ -51,6 +51,16 @@ export interface RouteMeta {
   changefreq: "weekly" | "monthly" | "yearly";
   priority: number;                     // 0..1 — matches Phase 1 sitemap priorities
   schema?: SchemaBlock[];               // Phase 4 D-09: optional schema.org JSON-LD blocks; consumed by prerender.mjs applyJsonLd
+  modelIsland?: ModelIslandData;        // Speed/Phase B: per-page model content data-island. prerender.mjs injects it as <script type="application/json" id="opten-model"> so the client bundle can drop the eager 62-model glob. Both langs (LangSwitcher does client-side navigate). Only set on /models/:slug routes.
+}
+
+// Speed/Phase B: payload of the model data-island. Carries BOTH locales so a
+// client-side RU↔EN language switch on a model page resolves content[otherLang]
+// synchronously (no async hop, no hydration mismatch).
+export interface ModelIslandData {
+  slug: string;
+  meta: ModelMeta;
+  content: ModelContent;
 }
 
 // Post-2026-05-17 GEO audit ME-10: shared author string for routes with a human byline.
@@ -525,6 +535,8 @@ function buildModelRoute(entry: ModelEntry, lang: "ru" | "en"): RouteMeta {
     prerender: "full",
     changefreq: "monthly",
     priority: 0.7,
+    // Speed/Phase B: both-langs island (identical on the RU and EN siblings).
+    modelIsland: { slug: meta.slug, meta, content: entry.content },
     schema: [
       lang === "en" ? ORG_BLOCK_EN : ORG_BLOCK,
       WEBSITE_BLOCK,

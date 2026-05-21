@@ -14,7 +14,7 @@ import { useLang, useT } from "../../i18n/LangContext";
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 import LocalizedLink from "../components/LocalizedLink";
-import { allModels, HUB_HIDDEN_SLUGS } from "../../content/models";
+import { allModels, HUB_HIDDEN_SLUGS } from "@/content/models";
 import { metaField } from "../../content/models/metaEn";
 
 type FilterValue = "" | "image" | "video";

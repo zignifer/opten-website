@@ -8,6 +8,7 @@
 // Phase 2 agents), shows only QuickFacts + InstallCta — page is still useful
 // while content is incoming.
 
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useT, useLang } from "../../i18n/LangContext";
 import LocalizedLink from "../components/LocalizedLink";
@@ -18,7 +19,8 @@ import ModelQuickFacts from "../components/ModelQuickFacts";
 import InlineOptenCallout from "../components/InlineOptenCallout";
 import ModelInstallCta from "../components/ModelInstallCta";
 import RelatedModels from "../components/RelatedModels";
-import { getModelBySlug } from "../../content/models";
+import { getModelBySlug, loadModelBySlug } from "@/content/models";
+import type { ModelEntry } from "../../content/models/types";
 import { metaField } from "../../content/models/metaEn";
 
 function formatDate(iso: string, lang: "ru" | "en"): string {
@@ -26,6 +28,43 @@ function formatDate(iso: string, lang: "ru" | "en"): string {
   if (Number.isNaN(d.getTime())) return iso;
   const locale = lang === "ru" ? "ru-RU" : "en-US";
   return d.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
+}
+
+// Speed/Phase B: resolve the model entry across two worlds.
+//   - SSR + first client hydration: getModelBySlug() is synchronous (full barrel
+//     on the server, #opten-model data-island cache on the client) → entry is
+//     present on the very first render → hydrated tree matches the prerendered
+//     HTML, no React #418/#423.
+//   - Client SPA navigation to a model that isn't in the island/cache: fall back
+//     to the lazy per-model chunk via loadModelBySlug() with a brief loading
+//     state. This branch never runs during SSR/hydration.
+function useModelEntry(slug: string | undefined): { entry: ModelEntry | undefined; loading: boolean } {
+  const [resolved, setResolved] = useState<{ slug: string; entry: ModelEntry | undefined } | null>(null);
+
+  useEffect(() => {
+    if (!slug || getModelBySlug(slug)) return; // already available synchronously
+    let cancelled = false;
+    loadModelBySlug(slug).then((e) => {
+      if (!cancelled) setResolved({ slug, entry: e });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [slug]);
+
+  const sync = slug ? getModelBySlug(slug) : undefined;
+  const entry = sync ?? (resolved && resolved.slug === slug ? resolved.entry : undefined);
+  const loading = !!slug && !sync && (!resolved || resolved.slug !== slug);
+  return { entry, loading };
+}
+
+function LoadingFallback() {
+  const t = useT();
+  return (
+    <div className="min-h-screen bg-[#011417] font-['PT_Root_UI',sans-serif] flex items-center justify-center px-[20px]">
+      <p className="text-[rgba(255,255,255,0.6)] text-[16px]">{t("models.loading")}</p>
+    </div>
+  );
 }
 
 function NotFoundFallback() {
@@ -53,7 +92,10 @@ export default function ModelPage() {
   const { lang } = useLang();
   const t = useT();
 
-  const entry = slug ? getModelBySlug(slug) : undefined;
+  const { entry, loading } = useModelEntry(slug);
+  if (loading) {
+    return <LoadingFallback />;
+  }
   if (!entry) {
     return <NotFoundFallback />;
   }

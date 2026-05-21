@@ -11,8 +11,13 @@
  * tried in e9b24c6 and produced exactly that bug. Generic-sans-serif from the
  * CSS font stack (sans-serif keyword) is the safe fallback during the swap window.
  *
- *   PT-Root-UI_VF.woff2  91 KB, covers weights 100-900 (we use 400 / 500 / 700)
- *   Unbounded-VF.woff2  253 KB, covers weights 200-900 (we use 400 / 700)
+ * Subset locally via scripts/subset-fonts.py (corpus = real RU+EN site text +
+ * full Latin/Cyrillic safety ranges) and committed. The weight axis is narrowed
+ * to 400-700 — the only weights used (400 normal, 500 font-medium incl. the
+ * model-page H1 LCP element, 700 bold). scripts/verify-fonts.mjs gates the result.
+ *
+ *   PT-Root-UI_VF.woff2  ~64 KB, weight axis 400-700 (we use 400 / 500 / 700)
+ *   Unbounded-VF.woff2   ~79 KB, weight axis 400-700 (we use 500 / 700)
  */
 
 /* Post-2026-05-17 GEO audit CR-4: font-display: optional kills the swap-shift that produced
@@ -24,7 +29,7 @@
   font-family: 'PT Root UI';
   src: url('/fonts/PT-Root-UI_VF.woff2') format('woff2-variations'),
        url('/fonts/PT-Root-UI_VF.woff2') format('woff2');
-  font-weight: 100 900;
+  font-weight: 400 700;
   font-style: normal;
   font-display: optional;
 }
@@ -33,7 +38,7 @@
   font-family: 'Unbounded';
   src: url('/fonts/Unbounded-VF.woff2') format('woff2-variations'),
        url('/fonts/Unbounded-VF.woff2') format('woff2');
-  font-weight: 200 900;
+  font-weight: 400 700;
   font-style: normal;
   font-display: swap;
 }
