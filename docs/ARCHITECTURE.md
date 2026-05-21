@@ -129,7 +129,7 @@ src/
 │   ├── LangContext.tsx            — React context, useT, useLang; URL-prefix-aware
 │   ├── paths.ts                   — EN_SIBLINGS allow-list; toEnTarget/toRuTarget/localizeHref
 │   ├── ru.json                    — ~68KB dict (RU canonical)
-│   └── en.json                    — ~41KB dict (lazy-loaded)
+│   └── en.json                    — ~41KB dict (eager on client since 2026-05-21)
 ├── imports/                       — Figma-Make-generated SVG paths (auto-generated; brittle)
 ├── lib/
 │   └── paddle.ts                  — ensurePaddle() lazy loader (Phase 2.2)
@@ -148,7 +148,7 @@ dicts) and the GEO/SEO patterns locked-in during v1.0.
    2. **`localStorage.opten_lang_v3`** — explicit user choice (written only by LangSwitcher).
    3. **Legacy `localStorage.opten_lang`** — read only when value is `"en"` (one-shot migration; RU values intentionally ignored, see post-release fix `c789dee`).
    4. **`navigator.language`** — `startsWith('ru') ? 'ru' : 'en'` fallback.
-2. `setLang(l)` writes `opten_lang_v3` synchronously and re-renders. EN dict is lazy-loaded (Phase 2.2) — `loadEnDict()` runs before flipping state to avoid a flash of RU keys.
+2. `setLang(l)` writes `opten_lang_v3` synchronously and re-renders. Both dicts are now eagerly available on the client (2026-05-21 fix `3f4cc80`): `dicts.en` is initialized at module load, so on `/en/*` the first client render emits EN and matches the prerendered EN HTML — without this, `t()` fell back to RU and triggered a React #418 hydration mismatch (the cause of unresponsive buttons for a beat on iOS Safari). `loadEnDict()` survives as a no-op fast-return for the SPA language-switch path.
 3. `t(key)` looks up the dict for current lang, then falls back to `ru`, then to the key string itself.
 4. `document.documentElement.lang` is **NOT** mutated at runtime (Phase 3 D-06 — runtime DOM mutation caused hydration mismatch). It is baked per page at prerender time.
 

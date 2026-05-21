@@ -1,6 +1,7 @@
 # Tech Stack — opten.space
 
-> Snapshot taken 2026-05-14, refreshed 2026-05-20 (post-v2.0 — programmatic model pages).
+> Snapshot taken 2026-05-14, refreshed 2026-05-21 (perf pass: subset fonts, model-content
+> data-island split, eager-EN dict, iOS-Safari blur fix).
 > Re-run discovery when `package.json` or build tooling changes meaningfully.
 
 ## Build & runtime
@@ -27,6 +28,8 @@
 - **Tailwind CSS 4.1.12** via the official Vite plugin (no `postcss.config.mjs` magic; the `postcss.config.mjs` file exists but the Vite plugin is what runs)
 - **`tw-animate-css` 1.3.8** — animation utility classes
 - Style entry point: [`src/styles/`](../../src/styles/) — `index.css`, `tailwind.css`, `theme.css`, `fonts.css`
+- **Self-hosted SUBSET fonts** (`public/fonts/*.woff2`, 2026-05-21): Unbounded (~81 KB) + PT Root UI (~65 KB), weight axis pinned 400–700, subset to the real RU+EN corpus via [`scripts/subset-fonts.py`](../../scripts/subset-fonts.py) and gated by [`scripts/verify-fonts.mjs`](../../scripts/verify-fonts.mjs). Unbounded is preloaded (`<link rel=preload>` in `index.html` — it's the H1 LCP element, `font-display: swap`); PT Root UI uses `font-display: optional` (zero CLS).
+- **iOS-Safari paint budget:** heavy `filter: blur` (hero gradient) and `backdrop-filter` (fixed header on mobile) were trimmed 2026-05-21 — cheap on Chrome but they saturate WebKit's main thread, delaying interactivity + scroll response on iPhone. See [`.planning/research/SAFARI-MOBILE-INTERACTIVITY.md`](../.planning/research/SAFARI-MOBILE-INTERACTIVITY.md).
 
 ## UI libraries
 
@@ -55,7 +58,7 @@
 ## i18n (post-Phase-3)
 
 - Custom context: [`src/i18n/LangContext.tsx`](../../src/i18n/LangContext.tsx)
-- Two dicts: [`ru.json`](../../src/i18n/ru.json) (~68 KB), [`en.json`](../../src/i18n/en.json) (~41 KB) — EN dict is **lazy-loaded** on demand (Phase 2.2 perf fix, ~13 KB gzip saved on RU visits)
+- Two dicts: [`ru.json`](../../src/i18n/ru.json) (~68 KB), [`en.json`](../../src/i18n/en.json) (~41 KB) — both statically imported and **eagerly available on the client** (2026-05-21 fix `3f4cc80`). The earlier Phase 2.2 "lazy EN" optimization was already moot — the SSR-fallback static import pulled `en.json` into the entry chunk regardless — and on `/en/*` the EN dict MUST be present synchronously at the first client render or hydration mismatches (React #418 → buttons unresponsive for a beat on iOS Safari). `loadEnDict()` survives as a no-op fast-return for the SPA language-switch path
 - Detection precedence: URL `/en/*` prefix → `localStorage.opten_lang_v3` (explicit choice) → legacy `localStorage.opten_lang === "en"` (one-shot migration) → `navigator.language`
 - `LangSwitcher` is the only writer to `opten_lang_v3`; legacy `opten_lang="ru"` is intentionally ignored (was the cause of post-Phase-3 fix `c789dee`)
 - `<html lang>` is **baked at prerender time** per output file (`scripts/prerender.mjs`) — not mutated at runtime (Phase 3 D-06 — runtime DOM mutation caused hydration mismatch)
@@ -86,20 +89,22 @@ public-by-design (it's the `anon` role).
 
 ```json
 {
-  "build": "vite build && vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache --emptyOutDir && vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta && node scripts/prerender.mjs && node scripts/sitemap.mjs && node scripts/llms.mjs && node scripts/verify-faq-mainentity.mjs && node scripts/indexnow.mjs",
+  "build": "node scripts/generate-summaries.mjs && vite build && vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache --emptyOutDir && vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta && node scripts/prerender.mjs && node scripts/sitemap.mjs && node scripts/llms.mjs && node scripts/verify-faq-mainentity.mjs && node scripts/verify-fonts.mjs && node scripts/indexnow.mjs",
   "dev": "vite"
 }
 ```
 
 - The build chain is the SEO surface. In order:
-  1. `vite build` → SPA bundle in `dist/`
-  2. `vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache` → SSR React bundle for prerender
-  3. `vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta` → per-route metadata manifest
-  4. `node scripts/prerender.mjs` → 144 `dist/<route>/index.html` files with per-route `<head>`, JSON-LD, `<html lang>`, hreflang (also localizes the static `keywords`/`og:image:alt`/author head tags on EN routes)
-  5. `node scripts/sitemap.mjs` → `dist/sitemap.xml` with per-route `<lastmod>` (git mtime). **Has a floor check that fails the build if route count drops.**
-  6. `node scripts/llms.mjs` → `dist/llms.txt` + `dist/llms-full.txt`. Same floor check.
-  7. `node scripts/verify-faq-mainentity.mjs` → asserts visible FAQ DOM ≡ JSON-LD `FAQPage.mainEntity`. Build-time gate.
-  8. `node scripts/indexnow.mjs` → pings Bing IndexNow with the updated URL set. Non-fatal on network failure.
+  1. `node scripts/generate-summaries.mjs` → regenerates `src/content/models/_summaries.ts` (lightweight name+intro barrel the hub uses, so full model prose stays out of the entry chunk).
+  2. `vite build` → SPA bundle in `dist/`. The **browser** build aliases the model barrel to `src/content/models/index.client.ts` — a data-island-backed lazy store — so the eager 62-file model-content glob never ships in the entry chunk (entry dropped ~2.1 MB → ~449 KB raw on 2026-05-21).
+  3. `vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache` → SSR React bundle for prerender (SSR keeps the full eager barrel).
+  4. `vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta` → per-route metadata manifest
+  5. `node scripts/prerender.mjs` → 144 `dist/<route>/index.html` files with per-route `<head>`, JSON-LD, `<html lang>`, hreflang (also localizes the static `keywords`/`og:image:alt`/author head tags on EN routes, and injects each model page's content as a `<script type="application/json" id="opten-model">` data-island the client store reads synchronously at hydration)
+  6. `node scripts/sitemap.mjs` → `dist/sitemap.xml` with per-route `<lastmod>` (git mtime). **Has a floor check that fails the build if route count drops.**
+  7. `node scripts/llms.mjs` → `dist/llms.txt` + `dist/llms-full.txt`. Same floor check.
+  8. `node scripts/verify-faq-mainentity.mjs` → asserts visible FAQ DOM ≡ JSON-LD `FAQPage.mainEntity`. Build-time gate.
+  9. `node scripts/verify-fonts.mjs` → asserts the subset `*.woff2` are present, within size bounds, weight axis intact, and the Unbounded preload survived. Build-time gate.
+  10. `node scripts/indexnow.mjs` → pings Bing IndexNow with the updated URL set. Non-fatal on network failure.
 - **Out-of-build model tooling** (run manually, NOT in the `build` chain): `node scripts/sync-skills.mjs` (copies promptscore-proxy `skills/*.md` → `src/content/models/_skills/`), `node scripts/build-models-registry.mjs` (parses `_skills/*.md` → AUTO-GEN `_registry.ts`, 62 `ModelMeta`), `node scripts/verify-models-content.mjs` (model content + EN-meta-cyrillic gate — a follow-up wants this wired into the build once Vercel Node ≥22.18 is confirmed).
 - Ad-hoc: `node scripts/smoke-blog.mjs` (requires `npx playwright install chromium` once) — Playwright smoke for the blog flows.
 - No `test` script — no Vitest/Jest.
