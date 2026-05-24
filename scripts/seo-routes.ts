@@ -98,7 +98,7 @@ export const ORG_BLOCK: SchemaBlock = {
   logo: `${SITE_ORIGIN}/favicon-192x192.png`,
   // Post-audit: description + foundingDate + contactPoint give AI systems a complete entity card
   // (was barebones name/url/logo only). foundingDate = official Opten launch 2026-04-22.
-  description: "Opten — Chrome-расширение для AI-оценки и улучшения промптов под 60+ моделей генерации изображений и видео (Midjourney, GPT Image 2, Kling, Sora и др.).",
+  description: "Opten — Chrome-расширение для генерации, AI-оценки и улучшения промптов под 60+ моделей генерации изображений и видео (Midjourney, GPT Image 2, Kling, Sora и др.).",
   foundingDate: "2026-04-22",
   founder: PERSON_FOUNDER_REF,
   contactPoint: {
@@ -121,7 +121,7 @@ export const ORG_BLOCK: SchemaBlock = {
 export const ORG_BLOCK_EN: SchemaBlock = {
   ...ORG_BLOCK,
   description:
-    "Opten is a Chrome extension for AI-powered scoring and one-click improvement of prompts across 60+ image and video generation models (Midjourney, GPT Image 2, Kling, Sora, etc.).",
+    "Opten is a Chrome extension that generates, scores and improves prompts in one click across 60+ image and video generation models (Midjourney, GPT Image 2, Kling, Sora, etc.).",
 };
 
 export const WEBSITE_BLOCK: SchemaBlock = {
@@ -141,7 +141,7 @@ export const SOFTWARE_APP_BLOCK: SchemaBlock = {
   name: "Opten",
   // Post-audit: description, screenshot, softwareVersion — required by Google for SoftwareApp rich result.
   // softwareVersion synced from C:\Projects\promptscore\manifest.json (extension repo, single source of truth).
-  description: "Chrome extension that scores AI prompts against 60+ image and video generation models (Midjourney, GPT Image 2, Kling, Sora, Nano Banana, Flux, Imagen) and rewrites them in one click directly inside the generator's UI.",
+  description: "Chrome extension that generates, scores and rewrites AI prompts for 60+ image and video generation models (Midjourney, GPT Image 2, Kling, Sora, Nano Banana, Flux, Imagen) in one click directly inside the generator's UI.",
   applicationCategory: "BrowserApplication",
   operatingSystem: "Chrome",
   softwareVersion: "1.3.6",
@@ -672,11 +672,11 @@ export const routes: RouteMeta[] = [
       en: `${SITE_ORIGIN}/en/`,
       xDefault: `${SITE_ORIGIN}/`,
     },
-    title: "Opten — AI-оценка и улучшение промптов для генерации изображений",
-    description: "Opten оценивает промпт под конкретную нейросеть, показывает ошибки и исправляет их в один клик. Работает с 60+ моделями прямо в интерфейсе генератора.",
+    title: "Opten — генератор и улучшение промптов для нейросетей",
+    description: "Opten генерирует, оценивает и улучшает промпт под конкретную нейросеть, находит ошибки и исправляет в один клик. 60+ моделей в интерфейсе генератора.",
     canonical: `${SITE_ORIGIN}/`,
     ogTitle: "Opten — не сливай кредиты на плохие промпты",
-    ogDescription: "AI-оценка и улучшение промптов для 60+ моделей генерации изображений. Прямо в интерфейсе генератора.",
+    ogDescription: "Генератор, оценка и улучшение промптов для 60+ моделей генерации. Прямо в интерфейсе генератора.",
     prerender: "full",
     changefreq: "weekly",
     priority: 1.0,
@@ -689,7 +689,7 @@ export const routes: RouteMeta[] = [
       webPageBlock({
         pageId: `${SITE_ORIGIN}/`,
         url: `${SITE_ORIGIN}/`,
-        name: "Opten — AI prompt scorer",
+        name: "Opten — генератор и улучшение промптов",
         inLanguage: "ru-RU",
         cssSelector: ["h1", ".faq-question", ".faq-answer"],
         about: SOFTWARE_APP_REF,
@@ -1019,11 +1019,11 @@ export const routes: RouteMeta[] = [
       en: `${SITE_ORIGIN}/en/`,
       xDefault: `${SITE_ORIGIN}/`,
     },
-    title: "Opten — AI prompt scoring and improvement for image generation",
-    description: "Opten evaluates your prompt for the specific AI model, shows what's wrong, and fixes it in one click. Works with 60+ models right inside the generator interface.",
+    title: "Opten — AI Prompt Generator, Optimizer & Scorer (60+ models)",
+    description: "Opten generates, scores and optimizes your prompt for the specific AI model — shows what's wrong and fixes it in one click. 60+ models, right inside the generator.",
     canonical: `${SITE_ORIGIN}/en/`,
     ogTitle: "Opten — stop wasting credits on bad prompts",
-    ogDescription: "AI prompt scoring and improvement for 60+ image generation models. Right inside the generator interface.",
+    ogDescription: "AI prompt generator, optimizer and scorer for 60+ image & video models. Right inside the generator interface.",
     ogImage: DEFAULT_OG_IMAGE_EN,
     prerender: "full",
     changefreq: "weekly",
@@ -1037,7 +1037,7 @@ export const routes: RouteMeta[] = [
       webPageBlock({
         pageId: `${SITE_ORIGIN}/en/`,
         url: `${SITE_ORIGIN}/en/`,
-        name: "Opten — AI prompt scorer",
+        name: "Opten — AI prompt generator & optimizer",
         inLanguage: "en-US",
         cssSelector: ["h1", ".faq-question", ".faq-answer"],
         about: SOFTWARE_APP_REF,

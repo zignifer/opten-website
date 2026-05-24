@@ -16,7 +16,11 @@ export interface FaqItem {
 const ru: FaqItem[] = [
   {
     q: "Что такое Opten и как он работает?",
-    a: "Opten — расширение для Chrome, которое оценивает твой промпт прямо в интерфейсе генератора (Syntx, Higgsfield, Freepik (включая Magnific)) и одним кликом улучшает его под конкретную модель: Midjourney, Sora, Kling, Nano Banana, GPT Image 2 и ещё 50+. Расширение само определяет модель по странице и применяет правила из её документации — оценка 0–100, до пяти конкретных замечаний и кнопка auto-enhance.",
+    a: "Opten — расширение для Chrome, которое генерирует, оценивает и оптимизирует твой промпт прямо в интерфейсе генератора (Syntx, Higgsfield, Freepik (включая Magnific)) и одним кликом улучшает его под конкретную модель: Midjourney, Sora, Kling, Nano Banana, GPT Image 2 и ещё 50+. Расширение само определяет модель по странице и применяет правила из её документации — оценка 0–100, до пяти конкретных замечаний и кнопка auto-enhance.",
+  },
+  {
+    q: "Opten — это генератор или оптимизатор промптов?",
+    a: "И то, и другое. Opten превращает короткую идею в готовый промпт под модель (генератор) и переписывает слабый промпт в сильный (оптимизатор) — с оценкой 0–100 под конкретную модель, прямо в интерфейсе генератора.",
   },
   {
     q: "Сколько стоит Opten?",
@@ -39,7 +43,11 @@ const ru: FaqItem[] = [
 const en: FaqItem[] = [
   {
     q: "What is Opten and how does it work?",
-    a: "Opten is a Chrome extension that scores your prompt right inside the AI generator's interface (Syntx, Higgsfield, Freepik (including Magnific)) and one-click improves it for the specific model: Midjourney, Sora, Kling, Nano Banana, GPT Image 2, and 50+ others. The extension auto-detects the model from the page URL and applies rules from that model's documentation — a 0–100 score, up to five specific issues, and an auto-enhance button.",
+    a: "Opten is a Chrome extension that generates, scores and optimizes your prompt right inside the AI generator's interface (Syntx, Higgsfield, Freepik (including Magnific)) and one-click improves it for the specific model: Midjourney, Sora, Kling, Nano Banana, GPT Image 2, and 50+ others. The extension auto-detects the model from the page URL and applies rules from that model's documentation — a 0–100 score, up to five specific issues, and an auto-enhance button.",
+  },
+  {
+    q: "Is Opten a prompt generator or optimizer?",
+    a: "Both. Opten turns a short idea into a full, model-ready prompt (generator) and rewrites a weak prompt into a stronger one (optimizer) — scored 0–100 for the specific model, right inside the generator UI.",
   },
   {
     q: "How much does Opten cost?",
