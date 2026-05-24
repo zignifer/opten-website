@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-05-17 against extension `manifest.json` version **1.3.6**.
+> **Last sync:** 2026-05-24 against extension `manifest.json` version **1.3.6** (Phase 87 cutover prep — `SUPABASE_URL` → self-hosted, dual-issuer local JWT verification; manifest version unchanged).
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -196,8 +196,10 @@ The site only **calls** them; it does not own them.
 | `POST /expire-subscriptions` | Cron job | Service role | Provider-only. |
 
 **Hardcoded constants on the site** (must match Supabase project):
-- `SUPABASE_URL = "https://vuywydhwkqmihfztpkgl.supabase.co"`
-- `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"` (see [`PayPage.tsx`](../src/app/pages/PayPage.tsx), [`AccountPage.tsx`](../src/app/pages/AccountPage.tsx), [`api/download-skill.ts`](../api/download-skill.ts))
+- `SUPABASE_URL = "https://supabase.opten.space"` — self-hosted (Phase 87 cutover prep). `PayPage.tsx` / `AccountPage.tsx` use the derived `SUPABASE_FUNCTIONS_URL = "https://supabase.opten.space/functions/v1"`.
+- `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"` — **UNCHANGED** (JWT secret reused; self-hosted Kong accepts the same anon key). (see [`PayPage.tsx`](../src/app/pages/PayPage.tsx), [`AccountPage.tsx`](../src/app/pages/AccountPage.tsx), [`api/download-skill.ts`](../api/download-skill.ts))
+
+**Token verification (Phase 87 / D-03):** the site (`api/download-skill.ts`) and the Edge Functions now verify the user JWT **locally** (jose, HS256, dual-issuer allowlist: cloud + self-hosted). `supabase.auth.getUser()` / `/auth/v1/user` is no longer called — it performs a session lookup that rejects cloud-issued tokens on self-hosted (sessions not migrated, Phase 86). The auth column above stays "Bearer JWT"; both issuers are accepted during the transition so old-extension tokens keep working (CLIENT-06).
 
 If the Supabase project is ever rotated/migrated, **all three site files** plus the extension's
 [`config/api.js`](../../promptscore/config/api.js) must be updated in one coordinated commit.

@@ -10,8 +10,15 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { jwtVerify } from "jose";
 
-const SUPABASE_URL = "https://vuywydhwkqmihfztpkgl.supabase.co";
+// D-03: verify tokens locally (dual-issuer). Same allowlist as proxy + Edge Functions.
+const JWT_ISSUERS = [
+  "https://vuywydhwkqmihfztpkgl.supabase.co/auth/v1", // cloud — old extension
+  "https://supabase.opten.space/auth/v1",             // self-hosted — new extension
+];
+
+const SUPABASE_URL = "https://supabase.opten.space";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1eXd5ZGh3a3FtaWhmenRwa2dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NjAyODUsImV4cCI6MjA5MTAzNjI4NX0.A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg";
 
@@ -53,25 +60,22 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return jsonError(res, 401, { error: "missing_token" });
   }
 
-  // 2. Validate JWT against Supabase auth
+  // 2. Validate JWT locally — dual-issuer jose, no GoTrue session lookup (D-03).
+  // A cloud-issued token carries session_id; self-hosted GoTrue rejects it on a session
+  // lookup (sessions not migrated). Local verify accepts both issuers (CLIENT-06).
   let userId: string;
   try {
-    const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        apikey: SUPABASE_ANON_KEY,
-      },
+    const secret = new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET);
+    const { payload } = await jwtVerify(token, secret, {
+      algorithms: ["HS256"],
+      audience: "authenticated",
+      issuer: JWT_ISSUERS,
+      clockTolerance: "5s",
+      requiredClaims: ["sub", "exp"],
     });
-    if (!userRes.ok) {
-      return jsonError(res, 401, { error: "invalid_token" });
-    }
-    const user = (await userRes.json()) as { id?: string };
-    if (!user.id) {
-      return jsonError(res, 401, { error: "no_user" });
-    }
-    userId = user.id;
+    userId = payload.sub as string;
   } catch {
-    return jsonError(res, 502, { error: "auth_failed" });
+    return jsonError(res, 401, { error: "invalid_token" });
   }
 
   // 3. Query subscriptions table — RLS allows user to read their own row.
