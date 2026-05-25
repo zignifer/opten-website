@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-05-24 against extension `manifest.json` version **1.3.6** (Phase 87 cutover prep — `SUPABASE_URL` → self-hosted, dual-issuer local JWT verification; manifest version unchanged).
+> **Last sync:** 2026-05-25 against extension `manifest.json` version **1.3.7** (Phase 88 cutover COMPLETE — backend fully on self-hosted `supabase.opten.space`; manifest adds `https://supabase.opten.space/*` to `host_permissions`; dual-issuer local JWT verification now handles cloud **ES256/JWKS** + self **HS256**).
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -123,7 +123,7 @@ chrome.runtime.sendMessage(id, { type: "GET_SUBSCRIPTION" }, (response) => {
 
 **Field-level notes:**
 - `plan === 'cancelled'` means the user cancelled but is still inside the paid period. **Treat it as Pro for access purposes** (download skill, no upgrade nag). The `expires_at` is when access actually ends. This mirrors `api/download-skill.ts:78-85`.
-- `limit: 300` for Free is the L3C-01 product positioning (free-аккаунт даёт 0 операций; popup shows `0/300` так как 300 — это Pro-лимит, на который нацелен апгрейд). Server-side proxy ещё enforces legacy `FREE_LIMIT=10`; нужно flip через `vercel env add FREE_LIMIT=0 production` после публикации v1.3.6 в CWS, чтобы серверный лимит совпал с popup-отображением.
+- `limit: 300` for Free is the L3C-01 product positioning (free-аккаунт даёт 0 операций; popup shows `0/300` так как 300 — это Pro-лимит, на который нацелен апгрейд). Server-side proxy enforces `FREE_LIMIT=0` (Phase 88 go-live — flipped on Vercel production to match the popup `0/300` display; free = 0 операций, Pro required).
 - Forward-compatibility rule: **the site MUST NOT assume the response is exhaustive.** Future fields may be added.
 
 #### `CANCEL_SUBSCRIPTION`
@@ -196,10 +196,10 @@ The site only **calls** them; it does not own them.
 | `POST /expire-subscriptions` | Cron job | Service role | Provider-only. |
 
 **Hardcoded constants on the site** (must match Supabase project):
-- `SUPABASE_URL = "https://supabase.opten.space"` — self-hosted (Phase 87 cutover prep). `PayPage.tsx` / `AccountPage.tsx` use the derived `SUPABASE_FUNCTIONS_URL = "https://supabase.opten.space/functions/v1"`.
+- `SUPABASE_URL = "https://supabase.opten.space"` — self-hosted (Phase 88 cutover COMPLETE — this is the live primary backend; cloud `vuywydhwkqmihfztpkgl.supabase.co` is a frozen cold backup). `PayPage.tsx` / `AccountPage.tsx` use the derived `SUPABASE_FUNCTIONS_URL = "https://supabase.opten.space/functions/v1"`.
 - `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"` — **UNCHANGED** (JWT secret reused; self-hosted Kong accepts the same anon key). (see [`PayPage.tsx`](../src/app/pages/PayPage.tsx), [`AccountPage.tsx`](../src/app/pages/AccountPage.tsx), [`api/download-skill.ts`](../api/download-skill.ts))
 
-**Token verification (Phase 87 / D-03):** the site (`api/download-skill.ts`) and the Edge Functions now verify the user JWT **locally** (jose, HS256, dual-issuer allowlist: cloud + self-hosted). `supabase.auth.getUser()` / `/auth/v1/user` is no longer called — it performs a session lookup that rejects cloud-issued tokens on self-hosted (sessions not migrated, Phase 86). The auth column above stays "Bearer JWT"; both issuers are accepted during the transition so old-extension tokens keep working (CLIENT-06).
+**Token verification (Phase 87 / D-03, updated Phase 88):** the site (`api/download-skill.ts`) and the Edge Functions verify the user JWT **locally** (jose, dual-issuer allowlist: cloud + self-hosted). `supabase.auth.getUser()` / `/auth/v1/user` is no longer called — it performs a session lookup that rejects cloud-issued tokens on self-hosted (sessions not migrated, Phase 86). **Cloud migrated to ASYMMETRIC signing keys, so cloud-issued tokens are now ES256 — verified via the cloud JWKS (`/auth/v1/.well-known/jwks.json`); self-hosted GoTrue still signs HS256 with the shared secret.** The verifier branches by the token's `alg`: HS256 → shared secret, ES256 → cloud JWKS. Both issuers are accepted during the transition so old-extension tokens keep working (CLIENT-06). Edge `create-payment*` additionally run a server-side preflight (user-exists + not-already-Pro) before charging.
 
 If the Supabase project is ever rotated/migrated, **all three site files** plus the extension's
 [`config/api.js`](../../promptscore/config/api.js) must be updated in one coordinated commit.
