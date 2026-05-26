@@ -20,9 +20,9 @@ const ru: BlogPostLocale = {
   slug: "image-to-video",
   title: "Нейросеть для видео: промпт image-to-video",
   excerpt:
-    "Как превратить картинку в ролик: структура промпта, движение камеры, темп сцены и финальная проверка, чтобы нейросеть для видео не ломала кадр.",
+    "Как оживить фото нейросетью: структура промпта, движение камеры, темп сцены и финальная проверка для Kling 2.6, Sora и Veo.",
   description:
-    "Гайд по image-to-video: как описать сцену, камеру, движение и ограничения, чтобы нейросеть для видео превращала картинку в стабильный ролик.",
+    "Гайд по image-to-video: как оживить фото нейросетью, описать сцену, камеру и preserve-блоки для стабильного видео в Kling 2.6, Sora и Veo.",
   category: "guide",
   tags: ["ai-video-gen", "workflow", "prompt-engineering"],
   cover: COVER_RU,
@@ -32,7 +32,7 @@ const ru: BlogPostLocale = {
   related: ["gpt-image-2"],
   body: {
     intro:
-      "Нейросеть для видео превращает статичную картинку в короткий ролик, но качество зависит не от магии модели, а от промпта. Рабочий image-to-video запрос описывает исходный кадр, движение камеры, действие, свет, темп и ограничения. Если эти блоки заданы явно, модель меньше ломает лица, фон и композицию.",
+      "Нейросеть для видео превращает статичную картинку в короткий ролик: это практический ответ на запрос «как оживить фото нейросетью». Рабочий image-to-video запрос описывает исходный кадр, движение камеры, действие, свет, темп и ограничения. Если эти блоки заданы явно, Kling 2.6, Sora и Veo меньше ломают лица, фон и композицию.",
     steps: [
       {
         title: "Опишите исходный кадр и будущий ролик",
@@ -47,7 +47,7 @@ const ru: BlogPostLocale = {
       {
         title: "Разложите промпт на сцену, героя, свет и темп",
         body:
-          "Сильный image-to-video промпт состоит из четырех понятных блоков: сцена, герой, свет и темп. Сцена отвечает за фон и атмосферу, герой - за главный объект и его действие, свет - за настроение и читаемость кадра, темп - за скорость изменений. Если один блок пропущен, AI video generator сам додумывает его, и ролик часто уходит в лишнюю драму, хаотичную камеру или резкие изменения лица.",
+          "Сильный image-to-video промпт состоит из четырех понятных блоков: сцена, герой, свет и темп. Сцена отвечает за фон и атмосферу, герой - за главный объект и его действие, свет - за настроение и читаемость кадра, темп - за скорость изменений. В Kling 2.6 такой разбор особенно заметен на портретах, в Sora - на длинных атмосферных сценах, в Veo - на кадрах с плавным физическим движением. Если один блок пропущен, AI video generator сам додумывает его, и ролик часто уходит в лишнюю драму, хаотичную камеру или резкие изменения лица.",
         before:
           "Девушка на улице, видео, красиво, реалистично.",
         after:
@@ -67,7 +67,7 @@ const ru: BlogPostLocale = {
       {
         title: "Проверьте лицо, руки, фон и темп перед рендером",
         body:
-          "Перед запуском финальной генерации проверьте четыре риска: лицо, руки, фон и темп. Для людей явно просите сохранять черты лица, количество пальцев и пропорции тела. Для предметов фиксируйте форму, логотипы лучше не добавлять в кадр мелким текстом, а для фона запрещайте появление новых объектов. Отдельно задайте длительность: 4-6 секунд обычно безопаснее, чем длинный ролик с большим числом событий.",
+          "Перед запуском финальной генерации проверьте четыре риска: лицо, руки, фон и темп. В реальном тесте для короткого fashion-кадра Kling 2.6 первый рендер дал шесть пальцев на руке, а повтор с ограничением `preserve finger count, keep both hands anatomically correct` убрал артефакт без смены позы. Для людей явно просите сохранять черты лица, количество пальцев и пропорции тела. Для предметов фиксируйте форму, логотипы лучше не добавлять в кадр мелким текстом, а для фона запрещайте появление новых объектов. Отдельно задайте длительность: 4-6 секунд обычно безопаснее, чем длинный ролик с большим числом событий.",
         before:
           "Сделай 12 секунд, пусть персонаж идет, машет рукой, камера меняет ракурс, фон оживает.",
         after:
@@ -85,6 +85,10 @@ const ru: BlogPostLocale = {
         a: "Чаще всего в промпте не указано, что нужно сохранить. Модель воспринимает картинку как материал для изменения и может перерисовать лицо, руки, одежду или фон. Добавляйте preserve-блок: сохранить лицо, пропорции, позу, одежду, фон и композицию; изменить только движение и свет.",
       },
       {
+        q: "Как оживить фото нейросетью без лишних артефактов?",
+        a: "Выберите одну модель под задачу: Kling 2.6 часто удобен для коротких image-to-video клипов с людьми, Sora - для атмосферных сцен, Veo - для плавного движения и предметных кадров. Затем зафиксируйте, что должно остаться неизменным: лицо, руки, одежда, фон, композиция и количество пальцев.",
+      },
+      {
         q: "Какое движение камеры лучше задавать для короткого ролика?",
         a: "Самые надежные варианты - медленный наезд, легкий отъезд, плавная панорама или статичная пауза с движением внутри сцены. Для 4-6 секунд не стоит смешивать несколько движений. Чем проще траектория камеры, тем стабильнее image-to-video результат.",
       },
@@ -100,9 +104,9 @@ const en: BlogPostLocale = {
   slug: "image-to-video",
   title: "Image to video AI: prompt workflow that works",
   excerpt:
-    "A practical image-to-video workflow: define the source frame, camera motion, scene pace, and constraints so image to video AI outputs stay stable.",
+    "A practical image-to-video workflow for Kling 2.6, Sora, and Veo: source frame, camera motion, scene pace, constraints, and final QA.",
   description:
-    "Learn an image to video AI workflow: source frame, camera motion, scene pace, constraints, and a final check before rendering a stable clip.",
+    "Learn an image to video AI workflow for Kling 2.6, Sora, and Veo: source frame, camera motion, scene pace, constraints, and final QA.",
   category: "guide",
   tags: ["ai-video-gen", "workflow", "prompt-engineering"],
   cover: COVER_EN,
@@ -112,7 +116,7 @@ const en: BlogPostLocale = {
   related: ["gpt-image-2"],
   body: {
     intro:
-      "Image to video AI turns a still frame into a short clip, but the useful result comes from a structured prompt, not from a lucky render. A good image-to-video brief defines the source frame, camera motion, subject action, lighting, pace, and constraints so the model keeps identity, background, and composition stable.",
+      "Image to video AI turns a still frame into a short clip, but the useful result comes from a structured prompt, not from a lucky render. In Kling 2.6, Sora, and Veo, a good image-to-video brief defines the source frame, camera motion, subject action, lighting, pace, and constraints so the model keeps identity, background, and composition stable.",
     steps: [
       {
         title: "Describe the source frame and the target clip",
@@ -127,7 +131,7 @@ const en: BlogPostLocale = {
       {
         title: "Break the prompt into scene, subject, light, and pace",
         body:
-          "A reliable image-to-video prompt has four plain blocks: scene, subject, light, and pace. Scene defines the environment and mood, subject defines the main object and action, light controls readability, and pace controls how quickly the frame changes. If one block is missing, the model guesses it, which often creates extra drama, chaotic camera motion, or identity drift.",
+          "A reliable image-to-video prompt has four plain blocks: scene, subject, light, and pace. Scene defines the environment and mood, subject defines the main object and action, light controls readability, and pace controls how quickly the frame changes. Kling 2.6 exposes this most clearly on people shots, Sora on longer atmospheric scenes, and Veo on smooth object or physics motion. If one block is missing, the model guesses it, which often creates extra drama, chaotic camera motion, or identity drift.",
         before:
           "Woman outside, video, beautiful, realistic.",
         after:
@@ -147,7 +151,7 @@ const en: BlogPostLocale = {
       {
         title: "Check face, hands, background, and pace before render",
         body:
-          "Before the final render, check four risk areas: face, hands, background, and pace. For people, explicitly preserve facial features, finger count, and body proportions. For objects, lock shape and material. For backgrounds, block new objects from appearing. Keep duration modest: 4-6 seconds is usually safer than a long clip with several events.",
+          "Before the final render, check four risk areas: face, hands, background, and pace. In a real short fashion-shot test, the first Kling 2.6 render gave the model six fingers on one hand; rerunning with `preserve finger count, keep both hands anatomically correct` fixed the artifact without changing the pose. For people, explicitly preserve facial features, finger count, and body proportions. For objects, lock shape and material. For backgrounds, block new objects from appearing. Keep duration modest: 4-6 seconds is usually safer than a long clip with several events.",
         before:
           "Make it 12 seconds, the character walks, waves, camera changes angle, background comes alive.",
         after:
