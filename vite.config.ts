@@ -60,6 +60,13 @@ export default defineConfig(({ isSsrBuild }) => ({
 
   // SPA fallback: all routes serve index.html in dev
   server: {
+    // Bind on all interfaces (dual-stack IPv4 + IPv6). Without this Vite defaults to
+    // "localhost", which on Windows resolves to IPv6 [::1] only — so a browser hitting
+    // IPv4 127.0.0.1 gets ERR_CONNECTION_REFUSED. host:true makes localhost,
+    // 127.0.0.1, and [::1] all reachable.
+    host: true,
+    port: 5173,
+    strictPort: true,
     historyApiFallback: true,
   },
 }))

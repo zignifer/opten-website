@@ -242,6 +242,8 @@ input[type="submit"] {
     width: 100%;
     max-width: 100vw;
     overflow-x: clip;
+    /* The AnnouncementBar's own flow spacer (when enabled) clears the fixed strip —
+       see announcementConfig.ts. No padding here so hiding the bar leaves no gap. */
   }
 
   h1 {
@@ -285,4 +287,56 @@ input[type="submit"] {
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
   }
+}
+
+/* Global maintenance ticker (AnnouncementBar.tsx). Brand green (#9cfb51) bar, brand
+   black (#011417) text in the secondary/body font (PT Root UI), 40px tall, full bleed,
+   pinned to the very top of every page above any header. */
+.announce-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background-color: #9cfb51;
+  color: #011417;
+  font-family: "PT Root UI", sans-serif;
+}
+
+.announce-track {
+  display: flex;
+  flex-shrink: 0;
+  width: max-content;
+  animation: announce-marquee 36s linear infinite;
+  will-change: transform;
+}
+
+.announce-group {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.announce-item {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.announce-dot {
+  margin: 0 28px;
+  opacity: 0.55;
+}
+
+/* Two identical groups → translating the track by half its width lands group #2 exactly
+   where group #1 started, giving a seamless loop. */
+@keyframes announce-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
