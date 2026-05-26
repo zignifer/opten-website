@@ -18,6 +18,7 @@
   "download.errorPrefix": "Download failed",
   "download.errorSuffix": "Please try again or contact support.",
   "meta.title": "Opten — AI Prompt Generator, Optimizer & Scorer (60+ models)",
+  "announcement.maintenance": "The extension is undergoing maintenance — it may not work correctly. We apologize for the inconvenience.",
   "nav.features": "Features",
   "nav.pricing": "Pricing",
   "nav.faq": "FAQ",

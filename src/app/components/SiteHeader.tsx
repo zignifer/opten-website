@@ -18,6 +18,7 @@ import { Menu, User, X } from "lucide-react";
 import LangSwitcher from "./LangSwitcher";
 import LocalizedLink from "./LocalizedLink";
 import { useT, useLang } from "../../i18n/LangContext";
+import { ANNOUNCEMENT_ENABLED } from "../announcementConfig";
 
 interface SiteHeaderProps {
   variant?: "landing" | "page";
@@ -79,7 +80,7 @@ export default function SiteHeader({ variant = "page", rightSlot }: SiteHeaderPr
   const closeMenu = () => setOpen(false);
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-50 px-4 pt-5">
+    <header className={`fixed left-0 right-0 ${ANNOUNCEMENT_ENABLED ? "top-[40px]" : "top-0"} z-50 px-4 pt-5`}>
       {/* FIX-03: backdrop-filter on a fixed element is re-sampled every frame during scroll —
           expensive on iOS Safari and a suspect for sluggish post-scroll tap response. Mobile gets
           an opaque dark bar (no blur); desktop keeps the frosted-glass look (md+). */}

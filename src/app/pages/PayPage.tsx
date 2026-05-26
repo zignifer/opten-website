@@ -3,6 +3,7 @@ import { useT, useLang } from "../../i18n/LangContext";
 import LangSwitcher from "../components/LangSwitcher";
 import LocalizedLink from "../components/LocalizedLink";
 import { ensurePaddle } from "../../lib/paddle";
+import { ANNOUNCEMENT_ENABLED } from "../announcementConfig";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
 import imgFrame37 from "../../imports/LandingPage/da31c95f5bc0f013c26804882654e49618ec43c7.webp";
 import imgChromeSm from "../../imports/LandingPage/chrome-icon-sm.svg";
@@ -386,7 +387,7 @@ export default function PayPage() {
       `}</style>
 
       {/* ─── Navbar ─── */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-[8px]" : "py-[21px]"}`}>
+      <nav className={`fixed ${ANNOUNCEMENT_ENABLED ? "top-[40px]" : "top-0"} left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-[8px]" : "py-[21px]"}`}>
         <div className={`relative max-w-[1100px] mx-[8px] lg:mx-auto flex items-center justify-between rounded-[1000px] py-[8px] pl-[24px] pr-[8px] transition-all duration-300 ${scrolled ? "bg-[rgba(0,0,0,0.6)] backdrop-blur-[12px]" : "bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px]"}`}>
           <div className="hidden md:flex flex-1 gap-[24px] items-center font-['PT_Root_UI',sans-serif] text-[14px] text-white">
             <LocalizedLink to="/" className="hover:opacity-80 transition-opacity">{t("nav.home")}</LocalizedLink>
