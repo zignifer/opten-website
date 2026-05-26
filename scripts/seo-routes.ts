@@ -6,6 +6,7 @@
 // intro/steps/faq under `body: { ... }`. URL still /guides/gpt-image-2 until B-07.
 // This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
+import { post as imageToVideoGuide } from "../src/content/blog/image-to-video";
 import { landingFaq } from "../src/content/landingFaq";
 // Phase v2.0 MODELS-A-6: programmatic model pages. allModels is the registry +
 // content barrel. Only models with `content !== undefined` produce a route in
@@ -922,6 +923,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/image-to-video`, name: imageToVideoGuide.ru.title, datePublished: imageToVideoGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/gpt-image-2`, name: gptImage2Guide.ru.title, datePublished: gptImage2Guide.ru.publishedAt },
         ],
         `${SITE_ORIGIN}/blog`,
@@ -939,6 +941,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // Blog automation trial: /blog/image-to-video — first SEO bilingual post from BLOG-AUTOMATION.md.
+  {
+    path: "/blog/image-to-video",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/image-to-video`,
+      en: `${SITE_ORIGIN}/en/blog/image-to-video`,
+      xDefault: `${SITE_ORIGIN}/blog/image-to-video`,
+    },
+    title: imageToVideoGuide.ru.title,
+    description: imageToVideoGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/image-to-video`,
+    ogTitle: imageToVideoGuide.ru.title,
+    ogDescription: imageToVideoGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${imageToVideoGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/image-to-video`,
+        headline: imageToVideoGuide.ru.title,
+        description: imageToVideoGuide.ru.description,
+        datePublished: imageToVideoGuide.ru.publishedAt,
+        dateModified: imageToVideoGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: imageToVideoGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${imageToVideoGuide.ru.cover.src}`,
+          width: imageToVideoGuide.ru.cover.width,
+          height: imageToVideoGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/image-to-video`,
+        url: `${SITE_ORIGIN}/blog/image-to-video`,
+        name: imageToVideoGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (imageToVideoGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/image-to-video`,
+        imageToVideoGuide.ru.title,
+      ),
+      faqPageBlock(imageToVideoGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/image-to-video`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: imageToVideoGuide.ru.title, url: `${SITE_ORIGIN}/blog/image-to-video` },
+        ],
+        `${SITE_ORIGIN}/blog/image-to-video`,
       ),
     ],
   },
@@ -1271,6 +1333,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/image-to-video`, name: imageToVideoGuide.en.title, datePublished: imageToVideoGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/gpt-image-2`, name: gptImage2Guide.en.title, datePublished: gptImage2Guide.en.publishedAt },
         ],
         `${SITE_ORIGIN}/en/blog`,
@@ -1288,6 +1351,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // Blog automation trial: /en/blog/image-to-video EN sibling. Mirrors /blog/image-to-video.
+  {
+    path: "/en/blog/image-to-video",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/image-to-video`,
+      en: `${SITE_ORIGIN}/en/blog/image-to-video`,
+      xDefault: `${SITE_ORIGIN}/blog/image-to-video`,
+    },
+    title: imageToVideoGuide.en.title,
+    description: imageToVideoGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/image-to-video`,
+    ogTitle: imageToVideoGuide.en.title,
+    ogDescription: imageToVideoGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${imageToVideoGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/image-to-video`,
+        headline: imageToVideoGuide.en.title,
+        description: imageToVideoGuide.en.description,
+        datePublished: imageToVideoGuide.en.publishedAt,
+        dateModified: imageToVideoGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: imageToVideoGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${imageToVideoGuide.en.cover.src}`,
+          width: imageToVideoGuide.en.cover.width,
+          height: imageToVideoGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/image-to-video`,
+        url: `${SITE_ORIGIN}/en/blog/image-to-video`,
+        name: imageToVideoGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (imageToVideoGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/image-to-video`,
+        imageToVideoGuide.en.title,
+      ),
+      faqPageBlock(imageToVideoGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/image-to-video`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: imageToVideoGuide.en.title, url: `${SITE_ORIGIN}/en/blog/image-to-video` },
+        ],
+        `${SITE_ORIGIN}/en/blog/image-to-video`,
       ),
     ],
   },
