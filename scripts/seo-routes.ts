@@ -99,7 +99,7 @@ export const ORG_BLOCK: SchemaBlock = {
   logo: `${SITE_ORIGIN}/favicon-192x192.png`,
   // Post-audit: description + foundingDate + contactPoint give AI systems a complete entity card
   // (was barebones name/url/logo only). foundingDate = official Opten launch 2026-04-22.
-  description: "Opten — Chrome-расширение для генерации, AI-оценки и улучшения промптов под 60+ моделей генерации изображений и видео (Midjourney, GPT Image 2, Kling, Sora и др.).",
+  description: "Opten — Chrome-расширение для генерации, AI-оценки и улучшения промптов под 60+ моделей генерации изображений и видео (Midjourney, GPT Image 2, Kling 3.0, Veo 3.1, Seedance и др.).",
   foundingDate: "2026-04-22",
   founder: PERSON_FOUNDER_REF,
   contactPoint: {
@@ -122,7 +122,7 @@ export const ORG_BLOCK: SchemaBlock = {
 export const ORG_BLOCK_EN: SchemaBlock = {
   ...ORG_BLOCK,
   description:
-    "Opten is a Chrome extension that generates, scores and improves prompts in one click across 60+ image and video generation models (Midjourney, GPT Image 2, Kling, Sora, etc.).",
+    "Opten is a Chrome extension that generates, scores and improves prompts in one click across 60+ image and video generation models (Midjourney, GPT Image 2, Kling 3.0, Veo 3.1, Seedance, etc.).",
 };
 
 export const WEBSITE_BLOCK: SchemaBlock = {
@@ -142,7 +142,7 @@ export const SOFTWARE_APP_BLOCK: SchemaBlock = {
   name: "Opten",
   // Post-audit: description, screenshot, softwareVersion — required by Google for SoftwareApp rich result.
   // softwareVersion synced from C:\Projects\promptscore\manifest.json (extension repo, single source of truth).
-  description: "Chrome extension that generates, scores and rewrites AI prompts for 60+ image and video generation models (Midjourney, GPT Image 2, Kling, Sora, Nano Banana, Flux, Imagen) in one click directly inside the generator's UI.",
+  description: "Chrome extension that generates, scores and rewrites AI prompts for 60+ image and video generation models (Midjourney, GPT Image 2, Kling 3.0, Veo 3.1, Seedance, Nano Banana, Flux, Imagen) in one click directly inside the generator's UI.",
   applicationCategory: "BrowserApplication",
   operatingSystem: "Chrome",
   softwareVersion: "1.3.6",
@@ -179,8 +179,9 @@ export const PERSON_FOUNDER_BLOCK: SchemaBlock = {
     "Prompt engineering",
     "Midjourney",
     "GPT Image 2",
-    "Kling",
-    "Sora",
+    "Kling 3.0",
+    "Veo 3.1",
+    "Seedance",
     "Flux",
   ],
   worksFor: ORG_REF,
@@ -592,8 +593,8 @@ function buildModelsHubRoute(lang: "ru" | "en", modelsWithContent: ModelEntry[])
     ? "Поддерживаемые AI-модели — каталог Opten"
     : "Supported AI models — Opten catalog";
   const description = lang === "ru"
-    ? "Каталог из 60+ AI-моделей генерации изображений и видео, в которых работает Opten: Midjourney, Sora, Kling, Flux, Veo, Imagen и др."
-    : "Catalog of 60+ AI image and video models supported by Opten: Midjourney, Sora, Kling, Flux, Veo, Imagen, and more.";
+    ? "Каталог из 60+ AI-моделей генерации изображений и видео, в которых работает Opten: Midjourney, Kling 3.0, Veo 3.1, Seedance, Flux, Imagen и др."
+    : "Catalog of 60+ AI image and video models supported by Opten: Midjourney, Kling 3.0, Veo 3.1, Seedance, Flux, Imagen, and more.";
   const hubName = lang === "ru" ? "Модели" : "Models";
 
   return {
