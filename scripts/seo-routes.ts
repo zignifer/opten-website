@@ -7,6 +7,7 @@
 // This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
 import { post as imageToVideoGuide } from "../src/content/blog/image-to-video";
+import { post as negativePromptGuide } from "../src/content/blog/negative-prompt";
 import { landingFaq } from "../src/content/landingFaq";
 // Phase v2.0 MODELS-A-6: programmatic model pages. allModels is the registry +
 // content barrel. Only models with `content !== undefined` produce a route in
@@ -924,6 +925,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/negative-prompt`, name: negativePromptGuide.ru.title, datePublished: negativePromptGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/image-to-video`, name: imageToVideoGuide.ru.title, datePublished: imageToVideoGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/gpt-image-2`, name: gptImage2Guide.ru.title, datePublished: gptImage2Guide.ru.publishedAt },
         ],
@@ -942,6 +944,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /blog/negative-prompt — prompt-engineering guide.
+  {
+    path: "/blog/negative-prompt",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/negative-prompt`,
+      en: `${SITE_ORIGIN}/en/blog/negative-prompt`,
+      xDefault: `${SITE_ORIGIN}/blog/negative-prompt`,
+    },
+    title: negativePromptGuide.ru.title,
+    description: negativePromptGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/negative-prompt`,
+    ogTitle: negativePromptGuide.ru.title,
+    ogDescription: negativePromptGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${negativePromptGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/negative-prompt`,
+        headline: negativePromptGuide.ru.title,
+        description: negativePromptGuide.ru.description,
+        datePublished: negativePromptGuide.ru.publishedAt,
+        dateModified: negativePromptGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Разбор",
+        keywords: negativePromptGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${negativePromptGuide.ru.cover.src}`,
+          width: negativePromptGuide.ru.cover.width,
+          height: negativePromptGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/negative-prompt`,
+        url: `${SITE_ORIGIN}/blog/negative-prompt`,
+        name: negativePromptGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (negativePromptGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/negative-prompt`,
+        negativePromptGuide.ru.title,
+      ),
+      faqPageBlock(negativePromptGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/negative-prompt`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: negativePromptGuide.ru.title, url: `${SITE_ORIGIN}/blog/negative-prompt` },
+        ],
+        `${SITE_ORIGIN}/blog/negative-prompt`,
       ),
     ],
   },
@@ -1334,6 +1396,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/negative-prompt`, name: negativePromptGuide.en.title, datePublished: negativePromptGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/image-to-video`, name: imageToVideoGuide.en.title, datePublished: imageToVideoGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/gpt-image-2`, name: gptImage2Guide.en.title, datePublished: gptImage2Guide.en.publishedAt },
         ],
@@ -1352,6 +1415,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /en/blog/negative-prompt EN sibling.
+  {
+    path: "/en/blog/negative-prompt",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/negative-prompt`,
+      en: `${SITE_ORIGIN}/en/blog/negative-prompt`,
+      xDefault: `${SITE_ORIGIN}/blog/negative-prompt`,
+    },
+    title: negativePromptGuide.en.title,
+    description: negativePromptGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/negative-prompt`,
+    ogTitle: negativePromptGuide.en.title,
+    ogDescription: negativePromptGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${negativePromptGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/negative-prompt`,
+        headline: negativePromptGuide.en.title,
+        description: negativePromptGuide.en.description,
+        datePublished: negativePromptGuide.en.publishedAt,
+        dateModified: negativePromptGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Deep dive",
+        keywords: negativePromptGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${negativePromptGuide.en.cover.src}`,
+          width: negativePromptGuide.en.cover.width,
+          height: negativePromptGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/negative-prompt`,
+        url: `${SITE_ORIGIN}/en/blog/negative-prompt`,
+        name: negativePromptGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (negativePromptGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/negative-prompt`,
+        negativePromptGuide.en.title,
+      ),
+      faqPageBlock(negativePromptGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/negative-prompt`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: negativePromptGuide.en.title, url: `${SITE_ORIGIN}/en/blog/negative-prompt` },
+        ],
+        `${SITE_ORIGIN}/en/blog/negative-prompt`,
       ),
     ],
   },
