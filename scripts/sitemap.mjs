@@ -29,11 +29,11 @@ const { routes, SITE_ORIGIN } = await import(pathToFileURL(MANIFEST_BUNDLE).href
 const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 
 // Phase v2.0 MODELS-B-3b: floor bumped 22 → 144 now that all 62 model content
-// files landed. 146 = 20 baseline/blog routes + 2 hubs (/models + /en/models) + 124 model
+// files landed. 148 = 22 baseline/blog routes + 2 hubs (/models + /en/models) + 124 model
 // pages (62 RU + 62 EN). The 3 SPA-only routes (/success, /account,
 // /dashboard/*) carry prerender:"none" and are excluded from sitemapRoutes.
-if (sitemapRoutes.length < 146) {
-  throw new Error(`sitemap.mjs: expected at least 146 routes (20 baseline/blog routes + 2 model hubs + 124 model pages after the image-to-video blog post), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+if (sitemapRoutes.length < 148) {
+  throw new Error(`sitemap.mjs: expected at least 148 routes (22 baseline/blog routes + 2 model hubs + 124 model pages after the negative-prompt blog post), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 // Post-2026-05-17 GEO audit ME-12: per-route lastmod via git mtime of the source file driving
@@ -53,6 +53,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/negative-prompt":    "src/content/blog/negative-prompt.ts",
+  "/en/blog/negative-prompt": "src/content/blog/negative-prompt.ts",
   "/blog/image-to-video":    "src/content/blog/image-to-video.ts",
   "/en/blog/image-to-video": "src/content/blog/image-to-video.ts",
   "/blog/gpt-image-2":       "src/content/blog/gpt-image-2.ts",
