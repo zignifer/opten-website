@@ -5,9 +5,11 @@
 import { post as gptImage2 } from "./gpt-image-2";
 import { post as imageToVideo } from "./image-to-video";
 import { post as negativePrompt } from "./negative-prompt";
+import { post as promptStructure } from "./prompt-structure";
 import type { BlogPost } from "./types";
 
 export const blogPostsBySlug = {
+  "prompt-structure": promptStructure,
   "negative-prompt": negativePrompt,
   "image-to-video": imageToVideo,
   "gpt-image-2": gptImage2,
