@@ -8,7 +8,7 @@
 //
 // Creds (SUPABASE_URL + SUPABASE_PUBLISHABLE_KEY) are read from .env.local — the
 // publishable key only (read). Never put the secret key / access token here.
-// Lookup order: env → C:\Projects\opten-website\.env.local → C:\Projects\opten-seo\.env.local.
+// Lookup order: env → C:\Projects\opten-website\.env.local.
 
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -18,7 +18,6 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ENV_FILES = [
   join(HERE, "..", ".env.local"),
   "C:\\Projects\\opten-website\\.env.local",
-  "C:\\Projects\\opten-seo\\.env.local",
 ];
 
 function fromEnvFiles(key) {
