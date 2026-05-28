@@ -41,10 +41,12 @@ date: 2026-05-26
 топ-фразы по темам с объёмами и идеями статей. Это главный источник ключей и для
 писателя, и для автоматизации (доступен прямо в рабочей копии).
 
-Снимок обновляется человеком из внешней SEO-инфраструктуры (Supabase, таблица
-`seo_keywords`; объём: EN — Bing BroadImpressions, RU — Yandex Wordstat регион
-225 /мес; хвост без цифры — спрос из Google Suggest). **Автоматизации Supabase не
-нужен** — она работает только с `seo/blog-clusters.md` и бэклогом §7.
+Снимок обновляется из Supabase-проекта opten-seo (таблица `seo_keywords`; объём:
+EN — Bing BroadImpressions, RU — Yandex Wordstat рег. 225 /мес; хвост без цифры —
+спрос из Google Suggest). Свежие фразы при необходимости можно тянуть **прямо
+отсюда, не заходя в opten-seo**: `node seo/supabase-keywords.mjs` (read-only
+publishable key в `.env.local`; детали — `seo/supabase.md`). По умолчанию хватает
+снимка `seo/blog-clusters.md`.
 
 **4 кластера (метка `cluster_id`):**
 
@@ -60,9 +62,9 @@ date: 2026-05-26
 Стартовый бэклог с предложенными slug'ами — §7. Не повторяй уже написанное
 (сверься со slug'ами в `src/content/blog/index.ts`).
 
-**Runtime автоматизации.** Источник тем — `seo/blog-clusters.md` + бэклог §7
-(оба в репозитории, в рабочей копии). Дедуп — по `src/content/blog/index.ts`.
-Внешняя SEO-инфраструктура (Supabase) автоматизации не нужна.
+**Runtime автоматизации.** Дефолтный источник тем — `seo/blog-clusters.md` +
+бэклог §7 (в репо). Дедуп — по `src/content/blog/index.ts`. Опционально свежие
+ключи из Supabase — `seo/supabase-keywords.mjs` (без захода в opten-seo).
 
 ---
 
@@ -349,7 +351,9 @@ export const post: BlogPost = { ru, en };
 
 | Файл | Роль |
 |------|------|
-| `seo/blog-clusters.md` | фраза-банк ключей (источник тем) |
+| `seo/blog-clusters.md` | фраза-банк ключей (снимок, источник тем) |
+| `seo/supabase-keywords.mjs` | читалка свежих ключей из Supabase (read-only) |
+| `seo/supabase.md` | как ходить в Supabase из этого репо |
 | `seo/Reference/` | эталон стиля картинок (step-1..4) |
 | `src/content/blog/types.ts` | тип `BlogPost`, enum'ы `BlogTag`/`BlogCategory` |
 | `src/content/blog/index.ts` | баррель `blogPostsBySlug` |
