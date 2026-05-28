@@ -51,7 +51,7 @@ See [docs/TECH.md](docs/TECH.md) for full picture.
 | Repo | Path | Role |
 |------|------|------|
 | opten-website (this) | `C:\Projects\opten-website` | Public site |
-| promptscore (private) | `C:\Projects\promptscore` | Chrome extension (Opten v1.3.6, MV3) + Supabase Edge Functions + migrations + Paddle/YooKassa webhooks. Extension works on 4 platforms: syntx.ai, higgsfield.ai, freepik.com, magnific.com |
+| promptscore (private) | `C:\Projects\promptscore` | Chrome extension (Opten v1.3.8, MV3, post-v2.8 milestone shipped 2026-05-28) + Supabase Edge Functions + migrations + Paddle/YooKassa webhooks. Extension works on 4 platforms: syntx.ai, higgsfield.ai, freepik.com, magnific.com. Extension's Supabase moved cloud → self-hosted (`https://supabase.opten.space`) on 2026-05-25 (Phase 88 cutover); the cloud URL was removed from `host_permissions` in v1.3.7. Popup has **4 tabs** (ИИ-агрегаторы / Скилл / ChatGPT / Улучшить); the ChatGPT tab is a Pro-only «Открыть» CTA that opens a public OpenAI GPT — Pro-gating is UX-only by design. |
 | opten-proxy (private) | `C:\Projects\promptscore-proxy` | Vercel proxy for the extension's AI requests + 63 model-specific skill files in `skills/*.md`. Not used by the site directly, but the same skill files are bundled into the Pro-only `opten.zip` Claude Skill served via this repo's `/api/download-skill` |
 
 The extension repo owns the Supabase project — all Edge Functions and
@@ -79,7 +79,9 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           + sitemap.xml (144 URL) + llms.txt + IndexNow ping
                           + FaqBlock ↔ FAQPage parity assertion
   Site ↔ Extension:       chrome.runtime.sendMessage (externally_connectable, opten.space only)
-  Site → Supabase:        fetch to /functions/v1/* and /rest/v1/*
+  Site → Supabase:        fetch to /functions/v1/* and /rest/v1/* — base URL is
+                          https://supabase.opten.space (self-hosted, Phase 88 cutover 2026-05-25;
+                          cloud vuywydhwkqmihfztpkgl.supabase.co is a frozen cold backup)
   Site → Paddle:          window.Paddle.Checkout.open(...)
   Site own API:           GET /api/download-skill (Vercel serverless, JWT + Pro-gated)
 

@@ -4,12 +4,24 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-05-25 against extension `manifest.json` version **1.3.7** (Phase 88 cutover COMPLETE — backend fully on self-hosted `supabase.opten.space`; manifest adds `https://supabase.opten.space/*` to `host_permissions`; dual-issuer local JWT verification now handles cloud **ES256/JWKS** + self **HS256**).
+> **Last sync:** 2026-05-28 against extension `manifest.json` version **1.3.8** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
-> - [`background/background.js`](../../promptscore/background/background.js) — `onMessageExternal` handler (lines ~1002-1084)
+> - [`background/background.js`](../../promptscore/background/background.js) — `onMessageExternal` handler (lines ~1002-1084), cross-issuer token guard at `clearAuthState()` (~L263) + token-refresh path (~L405-414) — invalidates stale cloud tokens carried over from pre-Phase-88 sessions
 > - [`supabase/functions/`](../../promptscore/supabase/functions/) — Edge Functions
+
+---
+
+## 0. Post-v2.8 cutover note (2026-05-25 → 2026-05-28)
+
+Extension milestone **v2.8 — Self-Hosted Supabase Migration** completed 2026-05-28. Impact on this contract:
+
+1. **Supabase base URL changed** from `https://vuywydhwkqmihfztpkgl.supabase.co` to `https://supabase.opten.space` (see §4). Site-side source files were updated in lockstep with the extension cutover — verified in [`api/download-skill.ts`](../api/download-skill.ts), [`src/app/pages/PayPage.tsx`](../src/app/pages/PayPage.tsx), and [`src/app/pages/AccountPage.tsx`](../src/app/pages/AccountPage.tsx). The cloud project is now a frozen cold backup, not an active backend.
+2. **Anon key is unchanged.** The self-hosted GoTrue reuses the same `JWT_SECRET` as the cloud project, so the existing `SUPABASE_ANON_KEY` (issuer `ref: vuywydhwkqmihfztpkgl` baked into the JWT payload) is still accepted by self-hosted Kong. No site-side key rotation required.
+3. **Dual-issuer JWT reality.** Cloud-issued user tokens (legacy, ES256, verified via cloud JWKS) and self-hosted-issued tokens (HS256, verified via the shared `JWT_SECRET`) are both accepted by the site's local verifier (`api/download-skill.ts`) AND by self-hosted Edge Functions during the transition window. The extension's service worker additionally drops stale cloud tokens that no longer round-trip through `/auth/v1/user` — site code MUST NOT assume that a token received from `GET_AUTH_TOKEN` was just issued (it may be cloud-legacy and very close to extension-side invalidation).
+4. **Edge Function request/response shapes are unchanged.** All 10 functions (see §4) behave the same to the caller — only the deploy target moved. No site-side code changes required beyond the base-URL constant.
+5. **Extension `host_permissions` no longer includes the cloud URL.** Any future contract change that re-introduces a cloud-Supabase code path must also re-add the host to the extension's `manifest.json` and ship a new extension release.
 
 ---
 
