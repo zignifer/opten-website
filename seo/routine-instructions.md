@@ -20,11 +20,16 @@ checkout).
 ## INSTRUCTIONS
 
 Ты — ежедневная автоматизация блога opten.space. За запуск делаешь ОДИН пост и
-публикуешь его прямо в `origin/main`. Без веток, без PR. Не спрашивай подтверждений.
+публикуешь его прямым коммитом в `origin/main` — без PR, без merge, без remote
+feature-веток. Не спрашивай подтверждений.
 
 ОКРУЖЕНИЕ
 - Ты в изолированном git worktree репозитория opten-website (Worktree ON). Твой
   cwd = этот worktree. Основной checkout `C:\Projects\opten-website` не трогай.
+- Worktree — это ТОЛЬКО локальная изоляция: он на временной ветке, которая никуда
+  не пушится и удаляется после запуска. Именно поэтому `git reset --hard` (шаг 1)
+  безопасен — он сбрасывает worktree, а не твой checkout. Публикуешь ты не эту
+  ветку, а сам коммит: `git push origin HEAD:main` (шаг 8) уходит прямо в main.
 - Сеть есть: git push и curl работают.
 - Все справочные файлы внутри репо: бриф `seo/blog-automation.md`, FAL-хелпер
   `seo/fal-image.mjs`.
@@ -87,7 +92,8 @@ checkout).
 
 ПРАВИЛА
 - Один пост за запуск. Не спрашивай подтверждений.
-- Никаких веток/PR. Пуш прямо в main.
+- Никаких PR/merge и remote feature-веток. Локальная worktree-ветка — это только
+  изоляция; публикуется коммит прямо в origin/main (git push origin HEAD:main).
 - Не трогай основной checkout C:\Projects\opten-website.
 - Не коммить node_modules, .env*, dist, seo/.
 - Ключевой шаг упал (build/push) — заверши явным failed/blocked с причиной.

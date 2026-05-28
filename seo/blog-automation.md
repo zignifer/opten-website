@@ -32,8 +32,9 @@ date: 2026-05-26
 в `seo/routine-instructions.md`. Коротко: routine стартует в worktree
 opten-website → выбирает тему → пишет двуязычный пост → генерит картинки через
 `seo/fal-image.mjs` (FAL GPT Image 2, 1600×900) → `npm run build` → commit +
-push прямо в `origin/main`. Без веток и PR. Успех = `opten.space/blog/<slug>` и
-`/en/blog/<slug>` отдают 200.
+push прямо в `origin/main` (`git push origin HEAD:main`). PR/merge и remote
+feature-веток нет; worktree — только локальная изоляция checkout'а. Успех =
+`opten.space/blog/<slug>` и `/en/blog/<slug>` отдают 200.
 
 Ниже §1–§7 — только контент/SEO-substance: **что** писать и **как** оптимизировать.
 
