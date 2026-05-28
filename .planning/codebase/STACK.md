@@ -111,12 +111,12 @@
 - All secrets (Supabase service role, Paddle private key, YooKasha webhooks) live in the **extension repo's** Supabase Edge Function secrets, not this project
 
 **Hardcoded Constants (must be kept in sync across files):**
-- `SUPABASE_URL = "https://vuywydhwkqmihfztpkgl.supabase.co"` — appears in:
-  - `src/app/pages/PayPage.tsx` (line 11)
-  - `src/app/pages/AccountPage.tsx` (line 7)
+- `SUPABASE_URL = "https://supabase.opten.space"` — **self-hosted** on Beget RU VPS (PG17, Caddy v2.11.3 front) since the Phase 88 cutover (2026-05-25, extension v2.8 milestone). The cloud project `https://vuywydhwkqmihfztpkgl.supabase.co` is now a frozen cold backup, not an active backend. Appears in:
+  - `src/app/pages/PayPage.tsx`
+  - `src/app/pages/AccountPage.tsx`
   - `src/app/pages/DownloadSkillPage.tsx` (implicit via parent context)
-  - `api/download-skill.ts` (line 14)
-- `SUPABASE_ANON_KEY` — same four files (JWT authentication, read-only access to auth + subscriptions tables)
+  - `api/download-skill.ts`
+- `SUPABASE_ANON_KEY` — same four files (JWT authentication, read-only access to auth + subscriptions tables). **Unchanged across the cutover** — self-hosted GoTrue reuses the same `JWT_SECRET` as the cloud project, so the existing anon key (issuer `ref: vuywydhwkqmihfztpkgl` baked into the JWT payload) is still accepted by self-hosted Kong.
 - `EXTENSION_IDS = ["iphkppgbobpilmphloffcalicmejacfl", "kcmcaeenfmfnpiaihicecnfnagejpcog"]` — in three pages (`PayPage.tsx`, `AccountPage.tsx`, `DownloadSkillPage.tsx`). First is Chrome Web Store ID; second is local dev unpacked ID. Pages iterate the list and use the first that responds.
 
 **Build Configuration:**

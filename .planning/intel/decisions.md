@@ -52,15 +52,15 @@ Synthesized from ADR-type docs. One entry per locked decision. Source paths are 
 ## DEC-integration-contract-supabase-constants
 
 - **source:** C:\Projects\opten-website\docs\INTEGRATION-CONTRACT.md (§4)
-- **status:** LOCKED
+- **status:** LOCKED (post-Phase-88 cutover)
 - **scope:** Supabase project URL and anon key duplication
 - **decision:** `SUPABASE_URL` and `SUPABASE_ANON_KEY` are duplicated across **four** locations and must rotate together:
   - `src/app/pages/PayPage.tsx`
   - `src/app/pages/AccountPage.tsx`
   - `api/download-skill.ts`
   - Extension repo `config/api.js`
-- **values:** `SUPABASE_URL = "https://vuywydhwkqmihfztpkgl.supabase.co"`; anon key (public-by-design `anon` role JWT).
-- **rationale:** Rotating/migrating the Supabase project requires one coordinated commit across all four files.
+- **values:** `SUPABASE_URL = "https://supabase.opten.space"` — self-hosted on Beget RU VPS since Phase 88 cutover (2026-05-25, extension v2.8 milestone). Cloud `https://vuywydhwkqmihfztpkgl.supabase.co` is a frozen cold backup, not active. Anon key (public-by-design `anon` role JWT) is **unchanged** — self-hosted GoTrue reuses the cloud `JWT_SECRET`, so the issuer `ref: vuywydhwkqmihfztpkgl` baked into the payload is still accepted by self-hosted Kong.
+- **rationale:** Rotating/migrating the Supabase project requires one coordinated commit across all four files. The Phase 88 swap moved the base URL only; anon key rotation was deliberately avoided.
 
 ## DEC-integration-contract-edge-functions
 
@@ -99,4 +99,4 @@ Synthesized from ADR-type docs. One entry per locked decision. Source paths are 
 - **status:** LOCKED
 - **scope:** When to update INTEGRATION-CONTRACT.md
 - **decision:** Update the contract BEFORE merging a change to either repo if it touches: `manifest.json externally_connectable`, `background/background.js` `onMessageExternal` handler, any route path in §3, any Edge Function request/response shape (§4), any `ps_*` key (§5), `EXTENSION_IDS` (§2.2), or `SUPABASE_URL`/`SUPABASE_ANON_KEY` (§4). Bump the "Last sync" date and extension version reference at the top.
-- **last sync:** 2026-05-14 against extension `manifest.json` v1.3.5.
+- **last sync:** 2026-05-28 against extension `manifest.json` v1.3.8 (post-v2.8 Self-Hosted Supabase Migration: Phase 88 cutover 2026-05-25, Phase 89 ops 2026-05-28).

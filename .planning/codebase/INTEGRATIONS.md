@@ -5,18 +5,18 @@
 ## APIs & External Services
 
 **Supabase (Auth + Subscriptions):**
-- Project (production): `https://vuywydhwkqmihfztpkgl.supabase.co` (owned by extension repo `C:\Projects\promptscore`)
+- Project (production): `https://supabase.opten.space` — **self-hosted** on Beget RU VPS (PG17, Caddy v2.11.3 front) since the Phase 88 cutover (2026-05-25, extension v2.8 milestone). The cloud project `https://vuywydhwkqmihfztpkgl.supabase.co` is now a frozen cold backup, not an active backend. The same Supabase backend serves both the extension and this site (auth/billing/skill-download).
 - Access: Plain `fetch` with `Authorization: Bearer <jwt>` + `apikey: <anon>` headers (no `@supabase/supabase-js` SDK)
+- JWT verification: local (`jose` library), dual-issuer allowlist — HS256 (self-hosted shared secret) for post-cutover tokens, ES256 (cloud JWKS via `createRemoteJWKSet`) for legacy pre-cutover users. `/auth/v1/user` is no longer called from `api/download-skill.ts` (sessions were not migrated).
 - Endpoints:
-  - `/auth/v1/user` — validate JWT, get user ID
   - `/rest/v1/subscriptions` — query user's subscription plan/status (RLS enforced, user reads own row only)
   - `/functions/v1/create-payment-paddle` — initiate USD payment (site calls from `PayPage.tsx`)
   - `/functions/v1/create-payment-yookassa` — initiate RUB payment (site calls from `PayPage.tsx`)
   - `/functions/v1/get-subscription` — fetch full subscription record with card details (AccountPage calls)
   - `/functions/v1/cancel-subscription-*` — cancel subscription (triggered by extension or site AccountPage)
 - Hardcoded constants (must be kept in sync across all usage sites):
-  - `SUPABASE_URL = "https://vuywydhwkqmihfztpkgl.supabase.co"` — appears in `src/app/pages/PayPage.tsx:11`, `src/app/pages/AccountPage.tsx:7`, `api/download-skill.ts:14`
-  - `SUPABASE_ANON_KEY = "eyJhbGc..."` — same three files, used for read-only authenticated access + JWT validation
+  - `SUPABASE_URL = "https://supabase.opten.space"` — appears in `src/app/pages/PayPage.tsx`, `src/app/pages/AccountPage.tsx`, `api/download-skill.ts`
+  - `SUPABASE_ANON_KEY = "eyJhbGc..."` — **unchanged** across the cutover. Self-hosted GoTrue reuses the same `JWT_SECRET` as the cloud project, so the issuer `ref: vuywydhwkqmihfztpkgl` baked into the JWT payload is still accepted by self-hosted Kong. Used for read-only authenticated access + JWT validation.
   - Also appears in extension repo's `config/api.js` — must be kept in sync
 
 **Paddle.js v2 (Payment Processing — USD):**

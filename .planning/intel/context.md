@@ -30,7 +30,7 @@ Running notes synthesized from DOC-type sources. Material that informs planning 
 - **Styling:** Tailwind CSS 4.1.12 via `@tailwindcss/vite`; `tw-animate-css`; theme tokens in `src/styles/theme.css`; custom fonts in `src/styles/fonts.css`.
 - **UI libs (heavy surface — audit candidate):** Radix UI primitives (~25 packages), MUI 7.3.5 + icons, Lucide React, `motion` (formerly Framer Motion), `embla-carousel-react`, `react-slick`, `sonner`, `canvas-confetti`, `recharts` (unclear where used; possibly dead weight from Figma Make export).
 - **Forms:** `react-hook-form` 7.55.
-- **Backend integration:** plain `fetch` to Supabase REST/Functions; no `@supabase/supabase-js` SDK.
+- **Backend integration:** plain `fetch` to Supabase REST/Functions; no `@supabase/supabase-js` SDK. As of the Phase 88 cutover (2026-05-25, extension v2.8 milestone), `SUPABASE_URL` is `https://supabase.opten.space` — self-hosted on a Beget RU VPS (PG17, Caddy v2.11.3 front). Cloud `vuywydhwkqmihfztpkgl.supabase.co` is a frozen cold backup. Anon key unchanged (same `JWT_SECRET` reused). JWT verification on the site (`api/download-skill.ts`) is now local + dual-issuer (HS256 self-hosted + ES256 cloud JWKS for legacy tokens); the legacy `EXTENSION_SECRET` bearer path is gone.
 - **Paddle:** v2 SDK loaded synchronously from CDN in `index.html`; initialized in `src/main.tsx`.
 - **i18n:** custom React context (`src/i18n/LangContext.tsx`); two dicts (`ru.json` ~68KB, `en.json` ~41KB); detection via `localStorage.opten_lang` → `navigator.language`.
 - **Vercel serverless:** single function `api/download-skill.ts`; ZIP bundled via `vercel.json` `includeFiles: "api/_assets/**"`.
@@ -152,7 +152,7 @@ No decision recorded yet. The constraint that matters: locked routes `/welcome`,
 
 - `plan: 'free' | 'pro' | 'cancelled'`.
 - `plan === 'cancelled'` is a transitional state: user cancelled but is still inside the paid period. **Treat as Pro for access purposes** — download skill, no upgrade nag. `expires_at` is when access actually ends. Mirrors `api/download-skill.ts:78-85`.
-- `limit: 300` for Free is L3C-01 marketing display (popup shows `0/300`); the proxy enforces `FREE_LIMIT=10` server-side. Do not "fix" this on the site unless the env var is also flipped.
+- `limit: 300` for Free is the L3C-01 product positioning (popup shows `0/300` — Pro-лимит, на который нацелен апгрейд); the proxy enforces `FREE_LIMIT=0` server-side since the Phase 88 go-live (2026-05-25, flipped on Vercel production to match the popup display — free = 0 операций, Pro required). Do not "fix" this on the site unless the env var is also flipped back.
 - Legacy users (created pre-Phase 67) with missing `ps_sub_provider` fall back to `'yookassa'` for cancellation dispatch — do not strip the fallback without a migration.
 
 ---
