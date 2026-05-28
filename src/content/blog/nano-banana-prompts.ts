@@ -22,7 +22,7 @@ const ru: BlogPostLocale = {
   excerpt:
     "Практический workflow для Nano Banana Pro: 5 блоков промпта, выбор модели, референсы, точечные правки и финальная проверка текста, рук и композиции.",
   description:
-    "Как писать промпты для Nano Banana Pro: 5 блоков, референсы, выбор модели, кейс с лишними пальцами и точная правка результата.",
+    "Как писать промпты для Nano Banana Pro: 5 блоков, референсы, выбор модели, кейс с лишними пальцами, точная правка результата и QA перед финальным рендером.",
   category: "guide",
   tags: ["ai-image-gen", "prompt-engineering", "model-deep-dive"],
   cover: COVER_RU,
@@ -116,7 +116,7 @@ const en: BlogPostLocale = {
   excerpt:
     "A practical Nano Banana Pro prompts workflow: five prompt blocks, model choice, references, targeted fixes, and final QA for hands, text, crop, and composition.",
   description:
-    "Write better Nano Banana Pro prompts with five prompt blocks, role-based references, a real extra-fingers fix, and a final QA checklist for images.",
+    "Write better Nano Banana Pro prompts with five prompt blocks, role-based references, a real extra-fingers fix, final image QA, and model choice for production.",
   category: ru.category,
   tags: ru.tags,
   cover: COVER_EN,

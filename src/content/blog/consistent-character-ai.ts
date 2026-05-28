@@ -22,7 +22,7 @@ const ru: BlogPostLocale = {
   excerpt:
     "Как сделать одинакового персонажа в нейросети: референс-лист, identity-блок, preserve-ограничения и проверка серии в GPT Image 2, Nano Banana Pro и Kling 3.0.",
   description:
-    "Практический workflow: как сделать одинакового персонажа в нейросети, удержать лицо, одежду и руки в GPT Image 2, Nano Banana Pro и Kling 3.0.",
+    "Практический workflow: как сделать одинакового персонажа в нейросети, удержать лицо, одежду и руки в GPT Image 2, Nano Banana Pro и Kling 3.0 без drift.",
   category: "guide",
   tags: ["ai-image-gen", "workflow", "prompt-engineering"],
   cover: COVER_RU,
@@ -115,7 +115,7 @@ const en: BlogPostLocale = {
   excerpt:
     "A practical consistent character AI workflow: identity card, stable references, preserve constraints, model choice, and storyboard QA for images and video.",
   description:
-    "Learn a consistent character AI workflow for GPT Image 2, Nano Banana Pro, Midjourney 8.1, Kling 3.0, and Runway Gen-4.5 without identity drift.",
+    "Learn a consistent character AI workflow for GPT Image 2, Nano Banana Pro, Midjourney 8.1, Kling 3.0, and Runway Gen-4.5 without identity drift in series.",
   category: "guide",
   tags: ["ai-image-gen", "workflow", "prompt-engineering"],
   cover: COVER_EN,
