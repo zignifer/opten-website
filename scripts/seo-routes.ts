@@ -148,7 +148,7 @@ export const SOFTWARE_APP_BLOCK: SchemaBlock = {
   description: "Chrome extension that generates, scores and rewrites AI prompts for 60+ image and video generation models (Midjourney, GPT Image 2, Kling 3.0, Veo 3.1, Seedance, Nano Banana, Flux, Imagen) in one click directly inside the generator's UI.",
   applicationCategory: "BrowserApplication",
   operatingSystem: "Chrome",
-  softwareVersion: "1.3.6",
+  softwareVersion: "1.3.8",
   screenshot: DEFAULT_OG_IMAGE_EN,
   url: `${SITE_ORIGIN}/`,
   downloadUrl: CHROME_STORE_URL,
