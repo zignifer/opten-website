@@ -8,6 +8,7 @@
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
 import { post as imageToVideoGuide } from "../src/content/blog/image-to-video";
 import { post as negativePromptGuide } from "../src/content/blog/negative-prompt";
+import { post as promptStructureGuide } from "../src/content/blog/prompt-structure";
 import { landingFaq } from "../src/content/landingFaq";
 // Phase v2.0 MODELS-A-6: programmatic model pages. allModels is the registry +
 // content barrel. Only models with `content !== undefined` produce a route in
@@ -925,6 +926,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/prompt-structure`, name: promptStructureGuide.ru.title, datePublished: promptStructureGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/negative-prompt`, name: negativePromptGuide.ru.title, datePublished: negativePromptGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/image-to-video`, name: imageToVideoGuide.ru.title, datePublished: imageToVideoGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/gpt-image-2`, name: gptImage2Guide.ru.title, datePublished: gptImage2Guide.ru.publishedAt },
@@ -944,6 +946,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /blog/prompt-structure — prompt-engineering deep dive.
+  {
+    path: "/blog/prompt-structure",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/prompt-structure`,
+      en: `${SITE_ORIGIN}/en/blog/prompt-structure`,
+      xDefault: `${SITE_ORIGIN}/blog/prompt-structure`,
+    },
+    title: promptStructureGuide.ru.title,
+    description: promptStructureGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/prompt-structure`,
+    ogTitle: promptStructureGuide.ru.title,
+    ogDescription: promptStructureGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${promptStructureGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/prompt-structure`,
+        headline: promptStructureGuide.ru.title,
+        description: promptStructureGuide.ru.description,
+        datePublished: promptStructureGuide.ru.publishedAt,
+        dateModified: promptStructureGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Разбор",
+        keywords: promptStructureGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${promptStructureGuide.ru.cover.src}`,
+          width: promptStructureGuide.ru.cover.width,
+          height: promptStructureGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/prompt-structure`,
+        url: `${SITE_ORIGIN}/blog/prompt-structure`,
+        name: promptStructureGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (promptStructureGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/prompt-structure`,
+        promptStructureGuide.ru.title,
+      ),
+      faqPageBlock(promptStructureGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/prompt-structure`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: promptStructureGuide.ru.title, url: `${SITE_ORIGIN}/blog/prompt-structure` },
+        ],
+        `${SITE_ORIGIN}/blog/prompt-structure`,
       ),
     ],
   },
@@ -1396,6 +1458,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/prompt-structure`, name: promptStructureGuide.en.title, datePublished: promptStructureGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/negative-prompt`, name: negativePromptGuide.en.title, datePublished: negativePromptGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/image-to-video`, name: imageToVideoGuide.en.title, datePublished: imageToVideoGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/gpt-image-2`, name: gptImage2Guide.en.title, datePublished: gptImage2Guide.en.publishedAt },
@@ -1415,6 +1478,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /en/blog/prompt-structure EN sibling.
+  {
+    path: "/en/blog/prompt-structure",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/prompt-structure`,
+      en: `${SITE_ORIGIN}/en/blog/prompt-structure`,
+      xDefault: `${SITE_ORIGIN}/blog/prompt-structure`,
+    },
+    title: promptStructureGuide.en.title,
+    description: promptStructureGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/prompt-structure`,
+    ogTitle: promptStructureGuide.en.title,
+    ogDescription: promptStructureGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${promptStructureGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/prompt-structure`,
+        headline: promptStructureGuide.en.title,
+        description: promptStructureGuide.en.description,
+        datePublished: promptStructureGuide.en.publishedAt,
+        dateModified: promptStructureGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Deep dive",
+        keywords: promptStructureGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${promptStructureGuide.en.cover.src}`,
+          width: promptStructureGuide.en.cover.width,
+          height: promptStructureGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/prompt-structure`,
+        url: `${SITE_ORIGIN}/en/blog/prompt-structure`,
+        name: promptStructureGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (promptStructureGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/prompt-structure`,
+        promptStructureGuide.en.title,
+      ),
+      faqPageBlock(promptStructureGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/prompt-structure`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: promptStructureGuide.en.title, url: `${SITE_ORIGIN}/en/blog/prompt-structure` },
+        ],
+        `${SITE_ORIGIN}/en/blog/prompt-structure`,
       ),
     ],
   },
