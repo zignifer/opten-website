@@ -6,6 +6,7 @@
 // intro/steps/faq under `body: { ... }`. URL still /guides/gpt-image-2 until B-07.
 // This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
+import { post as consistentCharacterAiGuide } from "../src/content/blog/consistent-character-ai";
 import { post as imageToVideoGuide } from "../src/content/blog/image-to-video";
 import { post as negativePromptGuide } from "../src/content/blog/negative-prompt";
 import { post as promptStructureGuide } from "../src/content/blog/prompt-structure";
@@ -926,6 +927,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/consistent-character-ai`, name: consistentCharacterAiGuide.ru.title, datePublished: consistentCharacterAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/prompt-structure`, name: promptStructureGuide.ru.title, datePublished: promptStructureGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/negative-prompt`, name: negativePromptGuide.ru.title, datePublished: negativePromptGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/image-to-video`, name: imageToVideoGuide.ru.title, datePublished: imageToVideoGuide.ru.publishedAt },
@@ -1066,6 +1068,66 @@ export const routes: RouteMeta[] = [
           { name: negativePromptGuide.ru.title, url: `${SITE_ORIGIN}/blog/negative-prompt` },
         ],
         `${SITE_ORIGIN}/blog/negative-prompt`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /blog/consistent-character-ai — evergreen BL-technique guide.
+  {
+    path: "/blog/consistent-character-ai",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/consistent-character-ai`,
+      en: `${SITE_ORIGIN}/en/blog/consistent-character-ai`,
+      xDefault: `${SITE_ORIGIN}/blog/consistent-character-ai`,
+    },
+    title: consistentCharacterAiGuide.ru.title,
+    description: consistentCharacterAiGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/consistent-character-ai`,
+    ogTitle: consistentCharacterAiGuide.ru.title,
+    ogDescription: consistentCharacterAiGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${consistentCharacterAiGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/consistent-character-ai`,
+        headline: consistentCharacterAiGuide.ru.title,
+        description: consistentCharacterAiGuide.ru.description,
+        datePublished: consistentCharacterAiGuide.ru.publishedAt,
+        dateModified: consistentCharacterAiGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: consistentCharacterAiGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${consistentCharacterAiGuide.ru.cover.src}`,
+          width: consistentCharacterAiGuide.ru.cover.width,
+          height: consistentCharacterAiGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/consistent-character-ai`,
+        url: `${SITE_ORIGIN}/blog/consistent-character-ai`,
+        name: consistentCharacterAiGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (consistentCharacterAiGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/consistent-character-ai`,
+        consistentCharacterAiGuide.ru.title,
+      ),
+      faqPageBlock(consistentCharacterAiGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/consistent-character-ai`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: consistentCharacterAiGuide.ru.title, url: `${SITE_ORIGIN}/blog/consistent-character-ai` },
+        ],
+        `${SITE_ORIGIN}/blog/consistent-character-ai`,
       ),
     ],
   },
@@ -1458,6 +1520,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/consistent-character-ai`, name: consistentCharacterAiGuide.en.title, datePublished: consistentCharacterAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/prompt-structure`, name: promptStructureGuide.en.title, datePublished: promptStructureGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/negative-prompt`, name: negativePromptGuide.en.title, datePublished: negativePromptGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/image-to-video`, name: imageToVideoGuide.en.title, datePublished: imageToVideoGuide.en.publishedAt },
@@ -1598,6 +1661,66 @@ export const routes: RouteMeta[] = [
           { name: negativePromptGuide.en.title, url: `${SITE_ORIGIN}/en/blog/negative-prompt` },
         ],
         `${SITE_ORIGIN}/en/blog/negative-prompt`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /en/blog/consistent-character-ai EN sibling. Mirrors /blog/consistent-character-ai.
+  {
+    path: "/en/blog/consistent-character-ai",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/consistent-character-ai`,
+      en: `${SITE_ORIGIN}/en/blog/consistent-character-ai`,
+      xDefault: `${SITE_ORIGIN}/blog/consistent-character-ai`,
+    },
+    title: consistentCharacterAiGuide.en.title,
+    description: consistentCharacterAiGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/consistent-character-ai`,
+    ogTitle: consistentCharacterAiGuide.en.title,
+    ogDescription: consistentCharacterAiGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${consistentCharacterAiGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/consistent-character-ai`,
+        headline: consistentCharacterAiGuide.en.title,
+        description: consistentCharacterAiGuide.en.description,
+        datePublished: consistentCharacterAiGuide.en.publishedAt,
+        dateModified: consistentCharacterAiGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: consistentCharacterAiGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${consistentCharacterAiGuide.en.cover.src}`,
+          width: consistentCharacterAiGuide.en.cover.width,
+          height: consistentCharacterAiGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/consistent-character-ai`,
+        url: `${SITE_ORIGIN}/en/blog/consistent-character-ai`,
+        name: consistentCharacterAiGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (consistentCharacterAiGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/consistent-character-ai`,
+        consistentCharacterAiGuide.en.title,
+      ),
+      faqPageBlock(consistentCharacterAiGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/consistent-character-ai`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: consistentCharacterAiGuide.en.title, url: `${SITE_ORIGIN}/en/blog/consistent-character-ai` },
+        ],
+        `${SITE_ORIGIN}/en/blog/consistent-character-ai`,
       ),
     ],
   },
