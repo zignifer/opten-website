@@ -1,0 +1,371 @@
+---
+tags: [opten-seo, blog, semantics, seo, geo, brief]
+kind: brief
+target_repo: opten-website (C:\Projects\opten-website)
+date: 2026-05-26
+---
+
+# Блог opten.space — семантика и SEO-оформление постов
+
+> **Что это.** Бриф-руководство для генератора блог-постов: **откуда брать ключи,
+> как их проставлять в текст и как оформить пост SEO/GEO-правильно** под
+> opten.space. Это «мозг» по контенту — *что* писать и *как* оптимизировать.
+>
+> **Что НЕ здесь.** Механику автозапусков, генерацию обложек и публикацию
+> настраивает сам Codex своими встроенными средствами — расписания/кроны и CI в
+> этом документе не описываем. Здесь только семантика и требования к посту.
+>
+> **Где применяется.** Пост создаётся в репозитории сайта **`opten-website`**
+> (`C:\Projects\opten-website`). Эталон формы — живой пост
+> `src/content/blog/gpt-image-2.ts`; любой спорный вопрос сверяй с ним.
+
+---
+
+## 0. Ежедневная автоматизация
+
+> Это **операционная копия** брифа внутри opten-website — чтобы автоматизация
+> была самодостаточной (всё в одном репо, без зависимости от путей opten-seo).
+> Стратегический мастер: `opten-seo/docs/BLOG-AUTOMATION.md`. При расхождении
+> правьте мастер и копируйте сюда.
+
+Посты публикует **Claude Code Local routine**. Полная механика и порядок шагов —
+в `seo/routine-instructions.md`. Коротко: routine стартует в worktree
+opten-website → выбирает тему → пишет двуязычный пост → генерит картинки через
+`seo/fal-image.mjs` (FAL GPT Image 2, 1600×900) → `npm run build` → commit +
+push прямо в `origin/main`. Без веток и PR. Успех = `opten.space/blog/<slug>` и
+`/en/blog/<slug>` отдают 200.
+
+Ниже §1–§7 — только контент/SEO-substance: **что** писать и **как** оптимизировать.
+
+---
+
+## 1. Откуда брать ключи
+
+Семантика блога уже собрана и лежит в SEO-воркспейсе `opten-seo`. Источники по
+приоритету:
+
+1. **`opten-seo/keywords/blog-clusters.md`** — курируемый phrase-bank: топ-фразы по
+   темам с объёмами и идеями статей. Главный рабочий источник для писателя.
+2. **Supabase (SEO-проект), таблица `seo_keywords`** — полный свежий список.
+   Запрос на нужный кластер:
+   ```sql
+   select keyword, language, volume, cluster_id
+   from seo_keywords
+   where cluster_id like 'BL-%'
+   order by cluster_id, volume desc nulls last;
+   ```
+   Объём: EN — Bing BroadImpressions; RU — Yandex Wordstat (регион 225, /мес).
+   Хвост без цифры = реальный спрос из Google Suggest (инструменты его не мерят, но
+   в текст брать стоит).
+
+**4 кластера (метка `cluster_id`):**
+
+| Кластер | Тема | Топ-объём (пример) | Роль |
+|---------|------|--------------------|------|
+| `BL-news` | новости/релизы/сравнения | `nano banana` 122k, RU `нейросеть для видео` 55.8k | быстрый трафик на инфоповоде |
+| `BL-technique` | how-to / техники | `image to video ai` 9.9k, `ai face swap` 7.3k | вечнозелёные гайды |
+| `BL-usecase` | применения | `ai logo generator` 5.6k | коммерческий интент, конверсия |
+| `BL-prompting` | промптинг как тема | `what is a prompt`, RU `негативный промпт` 468 | ядро продукта, ближе всего к Opten |
+
+**Как выбрать тему:** возьми head-фразу кластера → разверни в угол статьи
+(«Nano Banana: что это и как писать промпты», «Sora 2 vs Veo 3.1: что выбрать»).
+Стартовый бэклог с предложенными slug'ами — §7. Не повторяй уже написанное
+(сверься со slug'ами в `src/content/blog/index.ts`).
+
+**Runtime автоматизации.** Ежедневный cron `daily-opten-blog-post` запускается
+без доступа к Supabase и `opten-seo/keywords/blog-clusters.md`. Темы он берёт из
+стартового бэклога §7 + таблицы кластеров выше; дедуп — по
+`src/content/blog/index.ts`. Внешние источники из этого раздела применимы только
+при ручном редактировании брифа человеком.
+
+---
+
+## 2. Как проставлять ключи в посте (ядро брифа)
+
+Принцип: **одна основная фраза на пост** (head кластера или сильный long-tail) +
+2–4 семантических варианта/смежных запроса. Не keyword-stuffing — фразы вплетаются
+естественно, статья сначала полезная.
+
+**Карта размещения (куда какой ключ):**
+
+| Элемент поста | Что туда |
+|---------------|----------|
+| `title` (=H1) | основная фраза ближе к началу, ≤ ~60 симв., естественно |
+| `excerpt` / `description` | основная + 1 смежная, в формулировке «польза/действие» |
+| `body.intro` (первые 40–60 слов) | основная фраза **+ определительный ответ** (answer-block) — это то, что AI-движки цитируют. См. §3 |
+| заголовки `sections[].heading` / `steps[].title` (H2) | смежные фразы и how-/why-формулировки |
+| `body` шагов/секций | long-tail и синонимы в естественном тексте, без повторов в точную форму |
+| `faq[].q` | **реальные вопросы-запросы** из Suggest (как/почему/что/сколько) — кормят FAQPage-схему и голос/AI |
+| `cover.alt` | описательно + основная фраза один раз |
+| `tags` | из закрытого enum (§3); поле schema `keywords` = теги через запятую (выводится автоматически) |
+| `related` | до 3 slug смежных постов (внутренняя перелинковка) |
+
+**RU и EN — раздельно, не переводом.** Спрос на языках разный: RU тянет
+`нейросеть для видео` (55.8k), EN — `image to video ai` (9.9k). Для каждой локали
+бери **свои** фразы из `blog-clusters.md`, а не переводи ключи RU↔EN. Тексты тоже
+самостоятельные на каждом языке.
+
+**GEO-акценты (цитируемость в ChatGPT/Perplexity/AI Overviews):**
+- intro = сжатый прямой ответ в первых 40–60 словах (answer-block).
+- FAQ из вопросов-запросов → прямые Q→A блоки.
+- Конкретика, цифры, примеры «до/после» — их AI охотнее цитирует, чем воду.
+
+**Opten вплетаем органично** (1–2 раза): «промпт решает половину результата →
+Opten сгенерит/оценит/улучшит промпт под конкретную модель прямо в интерфейсе
+генератора», мягкий CTA на расширение.
+
+**Чего избегать:** free-seeker хвост (`free`, `без регистрации`, `unlimited`) —
+плохо конвертит в Pro; off-ICP (`prompt engineering course`, карьера/курсы) — не
+наш юзер; coding-сравнения нейросетей — не наша тема.
+
+---
+
+## 3. SEO-оформление поста — обязательные требования
+
+Тип — `src/content/blog/types.ts`. Пост = `{ ru: BlogPostLocale, en: BlogPostLocale }`.
+
+**Поля и инварианты (на каждую локаль):**
+
+| Поле | Правило |
+|------|---------|
+| `slug` | одинаковый ru/en; уникальный; kebab-case латиницей |
+| `title` | ≤ ~60 симв.; содержит основную фразу |
+| `excerpt` | 140–180 симв. |
+| `description` | 150–160 симв. (`<meta name=description>`) |
+| `category` | ровно 1 из enum (ниже) |
+| `tags` | 2–4 из enum (ниже) |
+| `cover` | `{src,width,height,alt}`; **ширина ≥1200** (идеал 1600×900); alt свой на язык |
+| `readingTimeMin` | целое (≈ слов/180) |
+| `publishedAt`/`updatedAt` | ISO `YYYY-MM-DD`; **ru и en одинаковые**; на создании updatedAt = publishedAt |
+| `body.intro` | **40–60 слов**, answer-block (§2) |
+| `body.sections[]` | `{heading, body, image?}`; в `body` абзацы через `\n\n` |
+| `body.steps[]` | `{title, body, before?, after?, imageSrc?}` → HowTo-схема |
+| `body.faq[]` | `{q, a}` → FAQPage-схема |
+
+**Глубина (для E-E-A-T и ранжирования):** обязательно **FAQ (3–5 Q&A)** плюс
+**`steps` (4–6) либо `sections` (3–6)** плюс **4–5 изображений** (§6, встроенный
+генератор Codex, RU/EN раздельно). Только intro — мало.
+
+**Experience-сигнал (обязательно):** в каждом посте — минимум один named
+практический кейс генерации: конкретная актуальная модель, первая ошибка,
+точное исправление. Пример формы: «в Kling 3.0 первый рендер дал 6 пальцев →
+`preserve finger count` починил». Кейс должен жить в прозе статьи, а не только
+в schema/keywords.
+
+**Структура steps:** не дублируй один шаблон 4–5 раз. Чередуй: шаг-диагностика
+(что пошло не так), шаг-кейс (как починили), шаг-сравнение моделей,
+шаг-чек-лист. `before/after` ставь только там, где это реально помогает.
+
+**Актуальный реестр моделей.** Названия и версии моделей сверяй с
+`C:\Projects\opten-website\src\content\models\slugs.ts` +
+`_registry.ts` + `_summaries.ts`. Старые версии и снятые модели не выдавай как
+живые. Для video/image-to-video сейчас опорные актуалы: Kling 3.0, Veo 3.1,
+Seedance 2.0/Seedance New, Runway Gen-4.5, Luma Ray 3, Wan, Pixverse 6. Для
+image generation: GPT Image 2, Midjourney 8.1, Nano Banana Pro, Imagen 4 Ultra,
+Seedream 5, Flux Kontext.
+
+**Закрытые enum'ы (чужое значение роняет сборку — это защита):**
+- `BlogCategory` (1): `guide` · `deep-dive` · `comparison` · `news`
+- `BlogTag` (2–4): `ai-image-gen` · `ai-video-gen` · `prompt-engineering` ·
+  `model-deep-dive` · `workflow` · `release-notes`
+
+**Маппинг кластер → категория / теги:**
+
+| Кластер | category | типичные tags |
+|---------|----------|---------------|
+| `BL-news` | `news` / `comparison` | `release-notes`, `model-deep-dive`, `ai-image-gen`/`ai-video-gen` |
+| `BL-technique` | `guide` | `workflow`, `ai-image-gen`/`ai-video-gen`, `prompt-engineering` |
+| `BL-usecase` | `guide` | `ai-image-gen`/`ai-video-gen`, `workflow` |
+| `BL-prompting` | `deep-dive` | `prompt-engineering`, `model-deep-dive` |
+
+Схему (BlogPosting + HowTo + FAQPage + WebPage/speakable + BreadcrumbList), мету,
+hreflang, sitemap, llms.txt сайт собирает **сам** из этих полей — нужно лишь
+заполнить пост правильно и подключить его (§5).
+
+---
+
+## 4. Скелет поста (заполнить и сохранить как `<slug>.ts`)
+
+```ts
+import type { BlogPost, BlogPostLocale } from "./types";
+
+const PUBLISHED = "<YYYY-MM-DD>";
+
+// Обложка без текста в картинке → один файл на RU+EN; alt свой на язык.
+const COVER_RU = { src: "/blog/<slug>/cover.jpg", width: 1600, height: 900, alt: "<RU alt>" };
+const COVER_EN = { src: "/blog/<slug>/cover.jpg", width: 1600, height: 900, alt: "<EN alt>" };
+
+const ru: BlogPostLocale = {
+  slug: "<slug>",
+  title: "<RU заголовок ≤60 симв., с основной фразой>",
+  excerpt: "<RU 140–180 симв.>",
+  description: "<RU 150–160 симв.>",
+  category: "<guide|deep-dive|comparison|news>",
+  tags: ["<tag1>", "<tag2>"],
+  cover: COVER_RU,
+  readingTimeMin: 7,
+  publishedAt: PUBLISHED,
+  updatedAt: PUBLISHED,
+  body: {
+    intro: "<RU 40–60 слов: основная фраза + прямой ответ в первых же словах>",
+    steps: [
+      {
+        title: "<RU шаг 1 — описательный (= alt картинки)>",
+        body: "<...>",
+        before: "<опц.>", after: "<опц.>",
+        imageSrc: "/blog/<slug>/ru/step-1.jpg",   // встроенный генератор, текст по-русски
+      },
+      // 4–6 шагов; всего 4–5 картинок на пост (§6)
+    ],
+    // ИЛИ sections: [{ heading: "<RU h2 со смежной фразой>", body: "<абзацы через \\n\\n>",
+    //   image: { src: "/blog/<slug>/ru/sec-1.jpg", width: 1536, height: 864, alt: "<RU alt>" } }],
+    faq: [
+      { q: "<RU вопрос-запрос>", a: "<RU прямой ответ>" },
+      // 3–5 Q&A
+    ],
+  },
+};
+
+const en: BlogPostLocale = {
+  slug: "<slug>",
+  title: "<EN title ≤60 chars, with the primary phrase>",
+  excerpt: "<EN 140–180 chars>",
+  description: "<EN 150–160 chars>",
+  category: ru.category,
+  tags: ru.tags,
+  cover: COVER_EN,
+  readingTimeMin: ru.readingTimeMin,
+  publishedAt: PUBLISHED,
+  updatedAt: PUBLISHED,
+  body: {
+    intro: "<EN 40–60 words: primary phrase + a direct answer up front>",
+    steps: [ { title: "<EN step 1>", body: "<...>", imageSrc: "/blog/<slug>/en/step-1.jpg" } ],
+    faq: [ { q: "<EN question-query>", a: "<EN direct answer>" } ],
+  },
+};
+
+export const post: BlogPost = { ru, en };
+```
+
+---
+
+## 5. Что трогает один пост (справка по интеграции)
+
+Чтобы пост поднялся и попал во всю SEO-машину, кроме самого `<slug>.ts` надо
+дописать его в несколько мест (Codex это автоматизирует — здесь для понимания):
+
+- `src/content/blog/index.ts` — регистрация в `blogPostsBySlug` (импорт + строка).
+- `scripts/seo-routes.ts` — 2 роута (`/blog/<slug>` + `/en/blog/<slug>`) со схемой
+  через готовые билдеры; **и добавить пост в `itemListBlock` обоих хабов** `/blog`
+  и `/en/blog` (частая ловушка — иначе пост не попадёт в schema листинга).
+- `src/i18n/paths.ts` — путь в `STATIC_EN_SIBLINGS` (переключатель RU↔EN).
+- `scripts/sitemap.mjs` — обе локали в `PATH_TO_SOURCE` (lastmod по git-mtime).
+- `scripts/llms.mjs` — добавить пост в обе локали, иначе он не попадёт в
+  `llms.txt` для AI-индексаторов.
+- `public/blog/<slug>/cover.jpg` — обложка (без текста, общая RU/EN).
+- `public/blog/<slug>/ru/*.jpg` + `public/blog/<slug>/en/*.jpg` — внутристатейные
+  изображения с текстом, по локалям (§6); `width`/`height` в посте = реальные размеры.
+
+Листинг и страница поста рендерятся **автоматически** из барреля — компоненты не
+трогать. После правок сборка должна оставаться зелёной (`npm run build` — Codex
+проверит); падение TS-сборки `seo-routes.ts` обычно значит чужой тег/категорию или
+рассинхрон полей.
+
+---
+
+## 6. Изображения статьи (обложка + 4–5 внутристатейных)
+
+**Движок — встроенный генератор изображений Codex.** Отдельный API-ключ не нужен.
+Обложка остаётся без текста. Внутристатейные картинки могут содержать текст, но
+текст не должен превращать кадр в скучный интерфейсный слайд.
+
+Что считаем удачным референс-стилем для будущих постов:
+- **Visual-first:** сначала красивый предметный или кинематографичный кадр
+  результата (персонаж, робот, пейзаж, видео-превью, layered frames), затем
+  аккуратный UI-оверлей. Не делать голую сетку карточек без сильного визуального
+  объекта.
+- **Крупный короткий текст:** 1–4 слова или одна короткая строка. Примеры
+  допустимого уровня: «РЕФЕРЕНСЫ», «ВЫБОР», «АНИМАЦИЯ», «5 БЛОКОВ», «СЦЕНА»,
+  «ДВИЖЕНИЕ», «кадр», «ролик», «до», «после». Без абзацев, мелких подписей и
+  плотных UI-таблиц.
+- **Текст читаемый, но не главный:** белый или лаймовый, высокий контраст,
+  крупный кегль, простор вокруг букв. Если генератор исказил слово — лучше
+  наложить короткий текст локально поверх готового визуала.
+- **Схема поверх визуала:** лаймовые стрелки, линии времени, обводки, номера,
+  check mark, play bar, пунктир траектории, glass panels. Это должно помогать
+  понять статью, а не продавать продукт.
+- **Композиция RU/EN одинаковая:** для каждого RU-кадра нужен EN-близнец с тем
+  же визуалом, раскладкой, объектами и смыслом; меняется только язык короткого
+  текста. Нельзя делать RU и EN разными по сцене.
+- **Смысл дублируется в статье и alt:** картинка поясняет, но не является
+  единственным местом, где сказана важная мысль.
+- **Анти-паттерн:** изображения последнего failed draft `nano-banana-prompts`
+  получились слишком похожими на тёмные SaaS-экраны с малоинтересными панелями.
+  Для следующих постов требуются более предметные, визуально богатые кадры в духе
+  reference examples выше.
+
+### 6.1 Обложка (1 на пост)
+- 16:9, **без текста в картинке** → один файл на RU+EN: `public/blog/<slug>/cover.jpg`.
+- Ширина ≥1200 (идеал 1600×900). `width/height` в посте = реальные размеры файла.
+
+### 6.2 Внутристатейные изображения (4–5 на пост)
+- **Тип — иллюстративные UI-мокапы по теме статьи:** окно генератора с
+  примерным промптом, превью результата, до/после, диагностика ошибки.
+  Это поясняющие визуалы — не реальные скрины несуществующего UI.
+- **Скрины — про тему, а не про Opten.** На изображениях запрещено показывать
+  Opten/PromptScore, score-индикаторы, панель оценки/улучшения промпта или
+  любой продающий UI расширения. Скрин обязан помогать понять статью; Opten
+  продаём в тексте (§2), а не в картинке.
+- **Смысл не должен жить только в картинке** — ключевые детали дублируй в
+  тексте поста и в `alt`.
+- **С текстом → локализуем RU и EN отдельно** (русский текст на RU-картинке,
+  английский — на EN): `public/blog/<slug>/ru/<name>.jpg` и
+  `public/blog/<slug>/en/<name>.jpg`. Каждая локаль поста ссылается на свои файлы.
+- 16:9 landscape (напр. 1600×900).
+- **Размещение в посте:** `steps[].imageSrc` (alt берётся из `title` шага — делай title
+  описательным) и/или `sections[].image` (`{src,width,height,alt}` — alt свой на язык).
+
+### 6.3 Бренд-стиль (для всех изображений)
+- Шрифты: `Unbounded` (заголовки), `PT Root UI` (тело/подписи).
+- Палитра: фон `#011417` (тёмный тил-чёрный), акцент **`#9cfb51`** (лайм), мид
+  `#205f2d`, карточка `#0e2023`, текст белый/прозрачности.
+- Минимализм, тёмная тема, мягкое лаймовое свечение.
+- Промпт-шаблон обложки: «Minimal dark hero illustration, deep teal-black background
+  (#011417), a single soft lime-green (#9cfb51) radial glow, [объект под тему], clean
+  modern tech aesthetic, no text, 16:9.» Для UI-скринов — declared purpose + та же
+  тёмная фирменная палитра + точный (короткий) текст в кавычках.
+
+Если зальёшь референс-баннеры — их стиль в приоритете над этим описанием.
+
+---
+
+## 7. Стартовый бэклог тем
+
+Из `keywords/blog-clusters.md` (топ по объёму; slug — предложение). News-темы
+проверяй на свежесть перед взятием. Runtime-дедуп — против `src/content/blog/index.ts`.
+
+**Уже опубликовано (НЕ брать снова):** `gpt-image-2`, `image-to-video`,
+`consistent-character-ai`, `negative-prompt`, `prompt-structure`.
+
+**Доступные темы по кластерам:**
+
+**BL-news:** `nano-banana-prompts` (122k) · `sora-2-vs-veo-3-1` ·
+`best-ai-video-2026` (RU 55.8k) · `seedance-2-0` · `kling-3-0`
+**BL-technique:** `ai-face-swap` (7.3k) · `upscale-image-ai`
+**BL-usecase:** `ai-logo-generator` (5.6k) · `ai-headshot` (1.3k) · `ai-influencer` ·
+`ai-ugc-for-brands`
+**BL-prompting:** `what-is-a-prompt` · `prompt-examples`
+
+---
+
+## Приложение — ключевые файлы opten-website
+
+| Файл | Роль |
+|------|------|
+| `src/content/blog/types.ts` | тип `BlogPost`, enum'ы `BlogTag`/`BlogCategory` |
+| `src/content/blog/index.ts` | баррель `blogPostsBySlug` |
+| `src/content/blog/gpt-image-2.ts` | **эталонный пост** |
+| `scripts/seo-routes.ts` | роуты + JSON-LD билдеры; `SITE_ORIGIN`, `FOUNDER_NAME`, `ORG_BLOCK` |
+| `src/i18n/paths.ts` | `STATIC_EN_SIBLINGS` |
+| `scripts/sitemap.mjs` | `PATH_TO_SOURCE` |
+| `src/styles/theme.css`, `src/styles/fonts.css` | бренд-палитра и шрифты |
