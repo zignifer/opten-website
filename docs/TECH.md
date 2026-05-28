@@ -51,8 +51,9 @@
 
 - **Plain `fetch`** to Supabase REST + Functions endpoints — no `@supabase/supabase-js` SDK
 - **Hardcoded constants** in [`PayPage.tsx`](../../src/app/pages/PayPage.tsx), [`AccountPage.tsx`](../../src/app/pages/AccountPage.tsx), [`api/download-skill.ts`](../../api/download-skill.ts):
-  - `SUPABASE_URL = "https://vuywydhwkqmihfztpkgl.supabase.co"`
-  - `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"`
+  - `SUPABASE_URL = "https://supabase.opten.space"` — **self-hosted** on Beget RU VPS (PG17, Caddy v2.11.3 front) since the Phase 88 cutover (2026-05-25, extension v2.8 milestone). The cloud project `https://vuywydhwkqmihfztpkgl.supabase.co` is now a frozen cold backup, not an active backend; it was removed from the extension's `host_permissions` in v1.3.7.
+  - `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"` — **unchanged** across the cutover. Self-hosted GoTrue reuses the same `JWT_SECRET` as the cloud project, so the existing anon key (issuer `ref: vuywydhwkqmihfztpkgl` baked into the JWT payload) is still accepted by self-hosted Kong. No key rotation required.
+- **JWT verification (Phase 88 dual-issuer):** `api/download-skill.ts` verifies user JWTs **locally** with `jose` against a dual-issuer allowlist — HS256 (self-hosted shared secret) for post-cutover tokens, ES256 (cloud JWKS via `createRemoteJWKSet`) for legacy pre-cutover users. The legacy `EXTENSION_SECRET` bearer path has been removed; only JWT auth is accepted now. The same dual-issuer pattern runs in the proxy (`lib/helpers.js:65-82`) and in self-hosted Edge Functions during the transition window.
 - **Paddle.js v2** loaded synchronously from `cdn.paddle.com` in [`index.html`](../../index.html). Initialized in [`main.tsx`](../../src/main.tsx) (Phase 67 fix: do not call `Environment.set('production')` — only sandbox).
 
 ## i18n (post-Phase-3)
@@ -81,9 +82,11 @@
 | `VITE_PADDLE_CLIENT_TOKEN` | Paddle public client token | [`main.tsx:30`](../../src/main.tsx#L30) |
 
 `VITE_*` vars are bundled into the client at build time — they're public. Real
-secrets (Supabase service role, etc.) are NOT in this repo; they live in the
-extension repo's Edge Functions. The Supabase anon key in this repo is also
-public-by-design (it's the `anon` role).
+secrets (Supabase service role, etc.) are NOT in this repo; they live on the
+**self-hosted Supabase VPS** (loaded by Edge Functions from `.env.functions` on
+`supabase.opten.space`, see extension repo `supabase/functions/` for source).
+The Supabase anon key in this repo is also public-by-design (it's the `anon`
+role).
 
 ## Scripts
 
