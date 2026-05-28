@@ -9,6 +9,7 @@ import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
 import { post as consistentCharacterAiGuide } from "../src/content/blog/consistent-character-ai";
 import { post as imageToVideoGuide } from "../src/content/blog/image-to-video";
 import { post as negativePromptGuide } from "../src/content/blog/negative-prompt";
+import { post as nanoBananaPromptsGuide } from "../src/content/blog/nano-banana-prompts";
 import { post as promptStructureGuide } from "../src/content/blog/prompt-structure";
 import { landingFaq } from "../src/content/landingFaq";
 // Phase v2.0 MODELS-A-6: programmatic model pages. allModels is the registry +
@@ -927,6 +928,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/nano-banana-prompts`, name: nanoBananaPromptsGuide.ru.title, datePublished: nanoBananaPromptsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/consistent-character-ai`, name: consistentCharacterAiGuide.ru.title, datePublished: consistentCharacterAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/prompt-structure`, name: promptStructureGuide.ru.title, datePublished: promptStructureGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/negative-prompt`, name: negativePromptGuide.ru.title, datePublished: negativePromptGuide.ru.publishedAt },
@@ -948,6 +950,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /blog/nano-banana-prompts — Nano Banana Pro prompting guide.
+  {
+    path: "/blog/nano-banana-prompts",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/nano-banana-prompts`,
+      en: `${SITE_ORIGIN}/en/blog/nano-banana-prompts`,
+      xDefault: `${SITE_ORIGIN}/blog/nano-banana-prompts`,
+    },
+    title: nanoBananaPromptsGuide.ru.title,
+    description: nanoBananaPromptsGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/nano-banana-prompts`,
+    ogTitle: nanoBananaPromptsGuide.ru.title,
+    ogDescription: nanoBananaPromptsGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${nanoBananaPromptsGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/nano-banana-prompts`,
+        headline: nanoBananaPromptsGuide.ru.title,
+        description: nanoBananaPromptsGuide.ru.description,
+        datePublished: nanoBananaPromptsGuide.ru.publishedAt,
+        dateModified: nanoBananaPromptsGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: nanoBananaPromptsGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${nanoBananaPromptsGuide.ru.cover.src}`,
+          width: nanoBananaPromptsGuide.ru.cover.width,
+          height: nanoBananaPromptsGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/nano-banana-prompts`,
+        url: `${SITE_ORIGIN}/blog/nano-banana-prompts`,
+        name: nanoBananaPromptsGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (nanoBananaPromptsGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/nano-banana-prompts`,
+        nanoBananaPromptsGuide.ru.title,
+      ),
+      faqPageBlock(nanoBananaPromptsGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/nano-banana-prompts`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: nanoBananaPromptsGuide.ru.title, url: `${SITE_ORIGIN}/blog/nano-banana-prompts` },
+        ],
+        `${SITE_ORIGIN}/blog/nano-banana-prompts`,
       ),
     ],
   },
@@ -1520,6 +1582,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/nano-banana-prompts`, name: nanoBananaPromptsGuide.en.title, datePublished: nanoBananaPromptsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/consistent-character-ai`, name: consistentCharacterAiGuide.en.title, datePublished: consistentCharacterAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/prompt-structure`, name: promptStructureGuide.en.title, datePublished: promptStructureGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/negative-prompt`, name: negativePromptGuide.en.title, datePublished: negativePromptGuide.en.publishedAt },
@@ -1541,6 +1604,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /en/blog/nano-banana-prompts EN sibling.
+  {
+    path: "/en/blog/nano-banana-prompts",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/nano-banana-prompts`,
+      en: `${SITE_ORIGIN}/en/blog/nano-banana-prompts`,
+      xDefault: `${SITE_ORIGIN}/blog/nano-banana-prompts`,
+    },
+    title: nanoBananaPromptsGuide.en.title,
+    description: nanoBananaPromptsGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/nano-banana-prompts`,
+    ogTitle: nanoBananaPromptsGuide.en.title,
+    ogDescription: nanoBananaPromptsGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${nanoBananaPromptsGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/nano-banana-prompts`,
+        headline: nanoBananaPromptsGuide.en.title,
+        description: nanoBananaPromptsGuide.en.description,
+        datePublished: nanoBananaPromptsGuide.en.publishedAt,
+        dateModified: nanoBananaPromptsGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: nanoBananaPromptsGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${nanoBananaPromptsGuide.en.cover.src}`,
+          width: nanoBananaPromptsGuide.en.cover.width,
+          height: nanoBananaPromptsGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/nano-banana-prompts`,
+        url: `${SITE_ORIGIN}/en/blog/nano-banana-prompts`,
+        name: nanoBananaPromptsGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (nanoBananaPromptsGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/nano-banana-prompts`,
+        nanoBananaPromptsGuide.en.title,
+      ),
+      faqPageBlock(nanoBananaPromptsGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/nano-banana-prompts`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: nanoBananaPromptsGuide.en.title, url: `${SITE_ORIGIN}/en/blog/nano-banana-prompts` },
+        ],
+        `${SITE_ORIGIN}/en/blog/nano-banana-prompts`,
       ),
     ],
   },

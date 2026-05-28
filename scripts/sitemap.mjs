@@ -30,10 +30,10 @@ const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 
 // Phase v2.0 MODELS-B-3b: floor bumped 22 → 144 now that all 62 model content
 // files landed. 152 = 26 baseline/blog routes + 2 hubs (/models + /en/models) + 124 model
-// pages (62 RU + 62 EN). The 3 SPA-only routes (/success, /account,
+// pages (62 RU + 62 EN). Daily blog posts now bring the floor to 154. The 3 SPA-only routes (/success, /account,
 // /dashboard/*) carry prerender:"none" and are excluded from sitemapRoutes.
-if (sitemapRoutes.length < 152) {
-  throw new Error(`sitemap.mjs: expected at least 152 routes (26 baseline/blog routes + 2 model hubs + 124 model pages after the consistent-character-ai blog post), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+if (sitemapRoutes.length < 154) {
+  throw new Error(`sitemap.mjs: expected at least 154 routes (28 baseline/blog routes + 2 model hubs + 124 model pages after the nano-banana-prompts blog post), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 // Post-2026-05-17 GEO audit ME-12: per-route lastmod via git mtime of the source file driving
@@ -53,6 +53,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/nano-banana-prompts":    "src/content/blog/nano-banana-prompts.ts",
+  "/en/blog/nano-banana-prompts": "src/content/blog/nano-banana-prompts.ts",
   "/blog/consistent-character-ai":    "src/content/blog/consistent-character-ai.ts",
   "/en/blog/consistent-character-ai": "src/content/blog/consistent-character-ai.ts",
   "/blog/prompt-structure":    "src/content/blog/prompt-structure.ts",

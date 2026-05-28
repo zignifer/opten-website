@@ -6,10 +6,12 @@ import { post as gptImage2 } from "./gpt-image-2";
 import { post as consistentCharacterAi } from "./consistent-character-ai";
 import { post as imageToVideo } from "./image-to-video";
 import { post as negativePrompt } from "./negative-prompt";
+import { post as nanoBananaPrompts } from "./nano-banana-prompts";
 import { post as promptStructure } from "./prompt-structure";
 import type { BlogPost } from "./types";
 
 export const blogPostsBySlug = {
+  "nano-banana-prompts": nanoBananaPrompts,
   "consistent-character-ai": consistentCharacterAi,
   "prompt-structure": promptStructure,
   "negative-prompt": negativePrompt,
