@@ -11,6 +11,7 @@ import { post as imageToVideoGuide } from "../src/content/blog/image-to-video";
 import { post as negativePromptGuide } from "../src/content/blog/negative-prompt";
 import { post as nanoBananaPromptsGuide } from "../src/content/blog/nano-banana-prompts";
 import { post as promptStructureGuide } from "../src/content/blog/prompt-structure";
+import { post as sora2VsVeo31Guide } from "../src/content/blog/sora-2-vs-veo-3-1";
 import { landingFaq } from "../src/content/landingFaq";
 // Phase v2.0 MODELS-A-6: programmatic model pages. allModels is the registry +
 // content barrel. Only models with `content !== undefined` produce a route in
@@ -928,6 +929,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`, name: sora2VsVeo31Guide.ru.title, datePublished: sora2VsVeo31Guide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/nano-banana-prompts`, name: nanoBananaPromptsGuide.ru.title, datePublished: nanoBananaPromptsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/consistent-character-ai`, name: consistentCharacterAiGuide.ru.title, datePublished: consistentCharacterAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/prompt-structure`, name: promptStructureGuide.ru.title, datePublished: promptStructureGuide.ru.publishedAt },
@@ -950,6 +952,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /blog/sora-2-vs-veo-3-1 — Sora 2 vs Veo 3.1 comparison.
+  {
+    path: "/blog/sora-2-vs-veo-3-1",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`,
+      en: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`,
+      xDefault: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`,
+    },
+    title: sora2VsVeo31Guide.ru.title,
+    description: sora2VsVeo31Guide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`,
+    ogTitle: sora2VsVeo31Guide.ru.title,
+    ogDescription: sora2VsVeo31Guide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${sora2VsVeo31Guide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`,
+        headline: sora2VsVeo31Guide.ru.title,
+        description: sora2VsVeo31Guide.ru.description,
+        datePublished: sora2VsVeo31Guide.ru.publishedAt,
+        dateModified: sora2VsVeo31Guide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Сравнение",
+        keywords: sora2VsVeo31Guide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${sora2VsVeo31Guide.ru.cover.src}`,
+          width: sora2VsVeo31Guide.ru.cover.width,
+          height: sora2VsVeo31Guide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`,
+        url: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`,
+        name: sora2VsVeo31Guide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (sora2VsVeo31Guide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`,
+        sora2VsVeo31Guide.ru.title,
+      ),
+      faqPageBlock(sora2VsVeo31Guide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: sora2VsVeo31Guide.ru.title, url: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1` },
+        ],
+        `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`,
       ),
     ],
   },
@@ -1582,6 +1644,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`, name: sora2VsVeo31Guide.en.title, datePublished: sora2VsVeo31Guide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/nano-banana-prompts`, name: nanoBananaPromptsGuide.en.title, datePublished: nanoBananaPromptsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/consistent-character-ai`, name: consistentCharacterAiGuide.en.title, datePublished: consistentCharacterAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/prompt-structure`, name: promptStructureGuide.en.title, datePublished: promptStructureGuide.en.publishedAt },
@@ -1604,6 +1667,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /en/blog/sora-2-vs-veo-3-1 EN sibling.
+  {
+    path: "/en/blog/sora-2-vs-veo-3-1",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`,
+      en: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`,
+      xDefault: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`,
+    },
+    title: sora2VsVeo31Guide.en.title,
+    description: sora2VsVeo31Guide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`,
+    ogTitle: sora2VsVeo31Guide.en.title,
+    ogDescription: sora2VsVeo31Guide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${sora2VsVeo31Guide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`,
+        headline: sora2VsVeo31Guide.en.title,
+        description: sora2VsVeo31Guide.en.description,
+        datePublished: sora2VsVeo31Guide.en.publishedAt,
+        dateModified: sora2VsVeo31Guide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Comparison",
+        keywords: sora2VsVeo31Guide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${sora2VsVeo31Guide.en.cover.src}`,
+          width: sora2VsVeo31Guide.en.cover.width,
+          height: sora2VsVeo31Guide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`,
+        url: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`,
+        name: sora2VsVeo31Guide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (sora2VsVeo31Guide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`,
+        sora2VsVeo31Guide.en.title,
+      ),
+      faqPageBlock(sora2VsVeo31Guide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: sora2VsVeo31Guide.en.title, url: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1` },
+        ],
+        `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`,
       ),
     ],
   },
