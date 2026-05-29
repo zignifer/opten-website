@@ -12,6 +12,7 @@ import { post as negativePromptGuide } from "../src/content/blog/negative-prompt
 import { post as nanoBananaPromptsGuide } from "../src/content/blog/nano-banana-prompts";
 import { post as promptStructureGuide } from "../src/content/blog/prompt-structure";
 import { post as sora2VsVeo31Guide } from "../src/content/blog/sora-2-vs-veo-3-1";
+import { post as aiLogoGeneratorPromptGuide } from "../src/content/blog/ai-logo-generator-prompt";
 import { landingFaq } from "../src/content/landingFaq";
 // Phase v2.0 MODELS-A-6: programmatic model pages. allModels is the registry +
 // content barrel. Only models with `content !== undefined` produce a route in
@@ -930,6 +931,7 @@ export const routes: RouteMeta[] = [
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
           { url: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`, name: sora2VsVeo31Guide.ru.title, datePublished: sora2VsVeo31Guide.ru.publishedAt },
+          { url: `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`, name: aiLogoGeneratorPromptGuide.ru.title, datePublished: aiLogoGeneratorPromptGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/nano-banana-prompts`, name: nanoBananaPromptsGuide.ru.title, datePublished: nanoBananaPromptsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/consistent-character-ai`, name: consistentCharacterAiGuide.ru.title, datePublished: consistentCharacterAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/prompt-structure`, name: promptStructureGuide.ru.title, datePublished: promptStructureGuide.ru.publishedAt },
@@ -1012,6 +1014,66 @@ export const routes: RouteMeta[] = [
           { name: sora2VsVeo31Guide.ru.title, url: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1` },
         ],
         `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /blog/ai-logo-generator-prompt — AI logo generator prompting guide.
+  {
+    path: "/blog/ai-logo-generator-prompt",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`,
+      en: `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`,
+    },
+    title: aiLogoGeneratorPromptGuide.ru.title,
+    description: aiLogoGeneratorPromptGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`,
+    ogTitle: aiLogoGeneratorPromptGuide.ru.title,
+    ogDescription: aiLogoGeneratorPromptGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiLogoGeneratorPromptGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`,
+        headline: aiLogoGeneratorPromptGuide.ru.title,
+        description: aiLogoGeneratorPromptGuide.ru.description,
+        datePublished: aiLogoGeneratorPromptGuide.ru.publishedAt,
+        dateModified: aiLogoGeneratorPromptGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: aiLogoGeneratorPromptGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiLogoGeneratorPromptGuide.ru.cover.src}`,
+          width: aiLogoGeneratorPromptGuide.ru.cover.width,
+          height: aiLogoGeneratorPromptGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`,
+        url: `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`,
+        name: aiLogoGeneratorPromptGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiLogoGeneratorPromptGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`,
+        aiLogoGeneratorPromptGuide.ru.title,
+      ),
+      faqPageBlock(aiLogoGeneratorPromptGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: aiLogoGeneratorPromptGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-logo-generator-prompt` },
+        ],
+        `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`,
       ),
     ],
   },
@@ -1645,6 +1707,7 @@ export const routes: RouteMeta[] = [
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
           { url: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`, name: sora2VsVeo31Guide.en.title, datePublished: sora2VsVeo31Guide.en.publishedAt },
+          { url: `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt`, name: aiLogoGeneratorPromptGuide.en.title, datePublished: aiLogoGeneratorPromptGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/nano-banana-prompts`, name: nanoBananaPromptsGuide.en.title, datePublished: nanoBananaPromptsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/consistent-character-ai`, name: consistentCharacterAiGuide.en.title, datePublished: consistentCharacterAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/prompt-structure`, name: promptStructureGuide.en.title, datePublished: promptStructureGuide.en.publishedAt },
@@ -1727,6 +1790,66 @@ export const routes: RouteMeta[] = [
           { name: sora2VsVeo31Guide.en.title, url: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1` },
         ],
         `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /en/blog/ai-logo-generator-prompt EN sibling.
+  {
+    path: "/en/blog/ai-logo-generator-prompt",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`,
+      en: `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`,
+    },
+    title: aiLogoGeneratorPromptGuide.en.title,
+    description: aiLogoGeneratorPromptGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt`,
+    ogTitle: aiLogoGeneratorPromptGuide.en.title,
+    ogDescription: aiLogoGeneratorPromptGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiLogoGeneratorPromptGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt`,
+        headline: aiLogoGeneratorPromptGuide.en.title,
+        description: aiLogoGeneratorPromptGuide.en.description,
+        datePublished: aiLogoGeneratorPromptGuide.en.publishedAt,
+        dateModified: aiLogoGeneratorPromptGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: aiLogoGeneratorPromptGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiLogoGeneratorPromptGuide.en.cover.src}`,
+          width: aiLogoGeneratorPromptGuide.en.cover.width,
+          height: aiLogoGeneratorPromptGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt`,
+        url: `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt`,
+        name: aiLogoGeneratorPromptGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiLogoGeneratorPromptGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt`,
+        aiLogoGeneratorPromptGuide.en.title,
+      ),
+      faqPageBlock(aiLogoGeneratorPromptGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: aiLogoGeneratorPromptGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt` },
+        ],
+        `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt`,
       ),
     ],
   },

@@ -9,9 +9,11 @@ import { post as negativePrompt } from "./negative-prompt";
 import { post as nanoBananaPrompts } from "./nano-banana-prompts";
 import { post as promptStructure } from "./prompt-structure";
 import { post as sora2VsVeo31 } from "./sora-2-vs-veo-3-1";
+import { post as aiLogoGeneratorPrompt } from "./ai-logo-generator-prompt";
 import type { BlogPost } from "./types";
 
 export const blogPostsBySlug = {
+  "ai-logo-generator-prompt": aiLogoGeneratorPrompt,
   "sora-2-vs-veo-3-1": sora2VsVeo31,
   "nano-banana-prompts": nanoBananaPrompts,
   "consistent-character-ai": consistentCharacterAi,

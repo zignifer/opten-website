@@ -30,10 +30,10 @@ const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 
 // Phase v2.0 MODELS-B-3b: floor bumped 22 → 144 now that all 62 model content
 // files landed. 152 = 26 baseline/blog routes + 2 hubs (/models + /en/models) + 124 model
-// pages (62 RU + 62 EN). Daily blog posts now bring the floor to 156. The 3 SPA-only routes (/success, /account,
+// pages (62 RU + 62 EN). Daily blog posts now bring the floor to 158. The 3 SPA-only routes (/success, /account,
 // /dashboard/*) carry prerender:"none" and are excluded from sitemapRoutes.
-if (sitemapRoutes.length < 156) {
-  throw new Error(`sitemap.mjs: expected at least 156 routes (30 baseline/blog routes + 2 model hubs + 124 model pages after the sora-2-vs-veo-3-1 blog post), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+if (sitemapRoutes.length < 158) {
+  throw new Error(`sitemap.mjs: expected at least 158 routes (32 baseline/blog routes + 2 model hubs + 124 model pages after daily blog posts), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 // Post-2026-05-17 GEO audit ME-12: per-route lastmod via git mtime of the source file driving
@@ -55,6 +55,8 @@ const PATH_TO_SOURCE = {
   "/en/blog":                "src/content/blog/index.ts",
   "/blog/sora-2-vs-veo-3-1":    "src/content/blog/sora-2-vs-veo-3-1.ts",
   "/en/blog/sora-2-vs-veo-3-1": "src/content/blog/sora-2-vs-veo-3-1.ts",
+  "/blog/ai-logo-generator-prompt":    "src/content/blog/ai-logo-generator-prompt.ts",
+  "/en/blog/ai-logo-generator-prompt": "src/content/blog/ai-logo-generator-prompt.ts",
   "/blog/nano-banana-prompts":    "src/content/blog/nano-banana-prompts.ts",
   "/en/blog/nano-banana-prompts": "src/content/blog/nano-banana-prompts.ts",
   "/blog/consistent-character-ai":    "src/content/blog/consistent-character-ai.ts",
