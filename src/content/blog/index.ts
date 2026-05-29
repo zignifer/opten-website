@@ -3,6 +3,7 @@
 // + src/i18n/paths.ts + scripts/sitemap.mjs PATH_TO_SOURCE must stay in sync.
 
 import { post as gptImage2 } from "./gpt-image-2";
+import { post as bestAiVideo2026 } from "./best-ai-video-2026";
 import { post as consistentCharacterAi } from "./consistent-character-ai";
 import { post as imageToVideo } from "./image-to-video";
 import { post as negativePrompt } from "./negative-prompt";
@@ -13,6 +14,7 @@ import { post as aiLogoGeneratorPrompt } from "./ai-logo-generator-prompt";
 import type { BlogPost } from "./types";
 
 export const blogPostsBySlug = {
+  "best-ai-video-2026": bestAiVideo2026,
   "ai-logo-generator-prompt": aiLogoGeneratorPrompt,
   "sora-2-vs-veo-3-1": sora2VsVeo31,
   "nano-banana-prompts": nanoBananaPrompts,

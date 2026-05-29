@@ -20,6 +20,7 @@ const STATIC_EN_SIBLINGS: readonly string[] = [
   "/refund",
   "/about", // Phase 4.1 B-03
   "/blog", // Phase 5 B-04
+  "/blog/best-ai-video-2026", // Daily blog automation
   "/blog/sora-2-vs-veo-3-1", // Daily blog automation
   "/blog/ai-logo-generator-prompt", // Daily blog automation
   "/blog/nano-banana-prompts", // Daily blog automation

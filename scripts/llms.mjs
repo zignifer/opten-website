@@ -18,11 +18,11 @@ const { routes } = await import(pathToFileURL(MANIFEST_BUNDLE).href);
 const prerenderedRoutes = routes.filter((r) => r.prerender !== "none");
 
 // Floor check: Phase v2.0 MODELS-B-3b bumped 22 → 144 when all 62 model
-// content files landed. Blog posts now bring the floor to 158. SPA-only routes
+// content files landed. Blog posts now bring the floor to 160. SPA-only routes
 // carry prerender:"none" and are excluded.
-if (prerenderedRoutes.length < 158) {
+if (prerenderedRoutes.length < 160) {
   throw new Error(
-    `llms.mjs: expected at least 158 prerendered routes (32 baseline/blog routes + 2 model hubs + 124 model pages after daily blog posts), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
+    `llms.mjs: expected at least 160 prerendered routes (34 baseline/blog routes + 2 model hubs + 124 model pages after daily blog posts), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
   );
 }
 

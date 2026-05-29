@@ -6,6 +6,7 @@
 // intro/steps/faq under `body: { ... }`. URL still /guides/gpt-image-2 until B-07.
 // This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
+import { post as bestAiVideo2026Guide } from "../src/content/blog/best-ai-video-2026";
 import { post as consistentCharacterAiGuide } from "../src/content/blog/consistent-character-ai";
 import { post as imageToVideoGuide } from "../src/content/blog/image-to-video";
 import { post as negativePromptGuide } from "../src/content/blog/negative-prompt";
@@ -930,6 +931,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/best-ai-video-2026`, name: bestAiVideo2026Guide.ru.title, datePublished: bestAiVideo2026Guide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`, name: sora2VsVeo31Guide.ru.title, datePublished: sora2VsVeo31Guide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`, name: aiLogoGeneratorPromptGuide.ru.title, datePublished: aiLogoGeneratorPromptGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/nano-banana-prompts`, name: nanoBananaPromptsGuide.ru.title, datePublished: nanoBananaPromptsGuide.ru.publishedAt },
@@ -954,6 +956,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /blog/best-ai-video-2026 — best AI video generator comparison.
+  {
+    path: "/blog/best-ai-video-2026",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/best-ai-video-2026`,
+      en: `${SITE_ORIGIN}/en/blog/best-ai-video-2026`,
+      xDefault: `${SITE_ORIGIN}/blog/best-ai-video-2026`,
+    },
+    title: bestAiVideo2026Guide.ru.title,
+    description: bestAiVideo2026Guide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/best-ai-video-2026`,
+    ogTitle: bestAiVideo2026Guide.ru.title,
+    ogDescription: bestAiVideo2026Guide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${bestAiVideo2026Guide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/best-ai-video-2026`,
+        headline: bestAiVideo2026Guide.ru.title,
+        description: bestAiVideo2026Guide.ru.description,
+        datePublished: bestAiVideo2026Guide.ru.publishedAt,
+        dateModified: bestAiVideo2026Guide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Сравнение",
+        keywords: bestAiVideo2026Guide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${bestAiVideo2026Guide.ru.cover.src}`,
+          width: bestAiVideo2026Guide.ru.cover.width,
+          height: bestAiVideo2026Guide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/best-ai-video-2026`,
+        url: `${SITE_ORIGIN}/blog/best-ai-video-2026`,
+        name: bestAiVideo2026Guide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (bestAiVideo2026Guide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/best-ai-video-2026`,
+        bestAiVideo2026Guide.ru.title,
+      ),
+      faqPageBlock(bestAiVideo2026Guide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/best-ai-video-2026`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: bestAiVideo2026Guide.ru.title, url: `${SITE_ORIGIN}/blog/best-ai-video-2026` },
+        ],
+        `${SITE_ORIGIN}/blog/best-ai-video-2026`,
       ),
     ],
   },
@@ -1706,6 +1768,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/best-ai-video-2026`, name: bestAiVideo2026Guide.en.title, datePublished: bestAiVideo2026Guide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`, name: sora2VsVeo31Guide.en.title, datePublished: sora2VsVeo31Guide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt`, name: aiLogoGeneratorPromptGuide.en.title, datePublished: aiLogoGeneratorPromptGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/nano-banana-prompts`, name: nanoBananaPromptsGuide.en.title, datePublished: nanoBananaPromptsGuide.en.publishedAt },
@@ -1730,6 +1793,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /en/blog/best-ai-video-2026 EN sibling.
+  {
+    path: "/en/blog/best-ai-video-2026",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/best-ai-video-2026`,
+      en: `${SITE_ORIGIN}/en/blog/best-ai-video-2026`,
+      xDefault: `${SITE_ORIGIN}/blog/best-ai-video-2026`,
+    },
+    title: bestAiVideo2026Guide.en.title,
+    description: bestAiVideo2026Guide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/best-ai-video-2026`,
+    ogTitle: bestAiVideo2026Guide.en.title,
+    ogDescription: bestAiVideo2026Guide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${bestAiVideo2026Guide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/best-ai-video-2026`,
+        headline: bestAiVideo2026Guide.en.title,
+        description: bestAiVideo2026Guide.en.description,
+        datePublished: bestAiVideo2026Guide.en.publishedAt,
+        dateModified: bestAiVideo2026Guide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Comparison",
+        keywords: bestAiVideo2026Guide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${bestAiVideo2026Guide.en.cover.src}`,
+          width: bestAiVideo2026Guide.en.cover.width,
+          height: bestAiVideo2026Guide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/best-ai-video-2026`,
+        url: `${SITE_ORIGIN}/en/blog/best-ai-video-2026`,
+        name: bestAiVideo2026Guide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (bestAiVideo2026Guide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/best-ai-video-2026`,
+        bestAiVideo2026Guide.en.title,
+      ),
+      faqPageBlock(bestAiVideo2026Guide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/best-ai-video-2026`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: bestAiVideo2026Guide.en.title, url: `${SITE_ORIGIN}/en/blog/best-ai-video-2026` },
+        ],
+        `${SITE_ORIGIN}/en/blog/best-ai-video-2026`,
       ),
     ],
   },
