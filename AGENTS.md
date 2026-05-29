@@ -1,3 +1,16 @@
+## Agent Context Ownership
+
+`AGENTS.md` is the source of truth for all AI agent project context in this
+repo. Update this file first.
+
+`CLAUDE.md` is a compatibility mirror for Claude Code. After changing
+`AGENTS.md`, run `npm run sync:agents` so Claude gets the same project
+instructions and does not drift.
+
+Do not recreate the old Codex adapter layout (`.codex/config.toml`,
+`.codex/agents/`, `.agents/skills/`) unless explicitly requested. Project
+knowledge belongs here, with detailed specs in `docs/` and `.planning/`.
+
 ## Project
 
 **opten.space** — public website for the **Opten** Chrome extension. Vite +
@@ -39,7 +52,7 @@ Hardcoded constants that are duplicated and must be kept in sync:
 - **Payments:** Paddle.js v2 (synchronous CDN script in `index.html`)
 - **Backend:** plain `fetch` to Supabase REST + Functions (no `@supabase/supabase-js`)
 - **Deploy:** Vercel, one serverless function at `api/download-skill.ts`
-- **i18n:** Custom React context, RU/EN; URL prefix wins (`/en/*`), then `localStorage.opten_lang_v3` (explicit user choice, written by LangSwitcher), then `navigator.language`. Legacy key `opten_lang` is read **only** when its value is `"en"` for one-shot migration; RU values from the old key are intentionally ignored. Internal navigation uses `<LocalizedLink>` (drop-in `<Link>` replacement) — on `/en/*` URLs it rewrites internal hrefs to `/en/<sibling>` for the EN-prefixed routes — 9 static + 62 model slugs (see `EN_SIBLINGS` in `src/i18n/paths.ts`, built from `src/content/models/slugs.ts`).
+- **i18n:** Custom React context, RU/EN; URL prefix wins (`/en/*`), then `localStorage.opten_lang_v3` (explicit user choice, written by LangSwitcher), then `navigator.language`. Legacy key `opten_lang` is read **only** when its value is `"en"` for one-shot migration; RU values from the old key are intentionally ignored (they often came from auto-write, not explicit choice). Internal navigation uses `<LocalizedLink>` (drop-in `<Link>` replacement) — on `/en/*` URLs it rewrites internal hrefs to `/en/<sibling>` for the EN-prefixed routes — 9 static + 62 model slugs (see `EN_SIBLINGS` in `src/i18n/paths.ts`, built from `src/content/models/slugs.ts`).
 
 No tests, no ESLint config, no `typecheck` script. TS errors surface during
 `vite build` (`npm run build`).
@@ -52,7 +65,7 @@ See [docs/TECH.md](docs/TECH.md) for full picture.
 |------|------|------|
 | opten-website (this) | `C:\Projects\opten-website` | Public site |
 | promptscore (private) | `C:\Projects\promptscore` | Chrome extension (Opten v1.3.8, MV3, post-v2.8 milestone shipped 2026-05-28) + Supabase Edge Functions + migrations + Paddle/YooKassa webhooks. Extension works on 4 platforms: syntx.ai, higgsfield.ai, freepik.com, magnific.com. Extension's Supabase moved cloud → self-hosted (`https://supabase.opten.space`) on 2026-05-25 (Phase 88 cutover); the cloud URL was removed from `host_permissions` in v1.3.7. Popup has **4 tabs** (ИИ-агрегаторы / Скилл / ChatGPT / Улучшить); the ChatGPT tab is a Pro-only «Открыть» CTA that opens a public OpenAI GPT — Pro-gating is UX-only by design. |
-| opten-proxy (private) | `C:\Projects\promptscore-proxy` | Vercel proxy for the extension's AI requests + 63 model-specific skill files in `skills/*.md`. Not used by the site directly, but the same skill files are bundled into the Pro-only `opten.zip` Claude Skill served via this repo's `/api/download-skill` |
+| opten-proxy (private) | `C:\Projects\promptscore-proxy` | Vercel proxy for the extension's AI requests + 63 model-specific skill files in `skills/*.md` (61 model + 2 fallback). Not used by the site directly, but the same skill files are bundled into the Pro-only `opten.zip` Claude Skill served via this repo's `/api/download-skill` |
 
 The extension repo owns the Supabase project — all Edge Functions and
 migrations are deployed from there, not from this repo.

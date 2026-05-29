@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/generate-summaries.mjs && vite build && vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache --emptyOutDir && vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta && node scripts/prerender.mjs && node scripts/sitemap.mjs && node scripts/llms.mjs && node scripts/verify-faq-mainentity.mjs && node scripts/verify-fonts.mjs && node scripts/indexnow.mjs",
-    "dev": "vite"
+    "dev": "vite",
+    "sync:agents": "node scripts/sync-agent-docs.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

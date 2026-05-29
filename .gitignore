@@ -21,3 +21,4 @@ dist
 
 .claude
 .codex
+.codex-devserver/

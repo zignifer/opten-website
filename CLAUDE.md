@@ -1,3 +1,16 @@
+## Agent Context Ownership
+
+`AGENTS.md` is the source of truth for all AI agent project context in this
+repo. Update this file first.
+
+`CLAUDE.md` is a compatibility mirror for Claude Code. After changing
+`AGENTS.md`, run `npm run sync:agents` so Claude gets the same project
+instructions and does not drift.
+
+Do not recreate the old Codex adapter layout (`.codex/config.toml`,
+`.codex/agents/`, `.agents/skills/`) unless explicitly requested. Project
+knowledge belongs here, with detailed specs in `docs/` and `.planning/`.
+
 ## Project
 
 **opten.space** — public website for the **Opten** Chrome extension. Vite +
