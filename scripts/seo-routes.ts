@@ -14,6 +14,7 @@ import { post as nanoBananaPromptsGuide } from "../src/content/blog/nano-banana-
 import { post as promptStructureGuide } from "../src/content/blog/prompt-structure";
 import { post as sora2VsVeo31Guide } from "../src/content/blog/sora-2-vs-veo-3-1";
 import { post as aiLogoGeneratorPromptGuide } from "../src/content/blog/ai-logo-generator-prompt";
+import { post as seedance20Guide } from "../src/content/blog/seedance-2-0";
 import { landingFaq } from "../src/content/landingFaq";
 // Phase v2.0 MODELS-A-6: programmatic model pages. allModels is the registry +
 // content barrel. Only models with `content !== undefined` produce a route in
@@ -931,6 +932,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/seedance-2-0`, name: seedance20Guide.ru.title, datePublished: seedance20Guide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/best-ai-video-2026`, name: bestAiVideo2026Guide.ru.title, datePublished: bestAiVideo2026Guide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`, name: sora2VsVeo31Guide.ru.title, datePublished: sora2VsVeo31Guide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`, name: aiLogoGeneratorPromptGuide.ru.title, datePublished: aiLogoGeneratorPromptGuide.ru.publishedAt },
@@ -956,6 +958,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /blog/seedance-2-0 — Seedance 2.0 overview and prompt guide.
+  {
+    path: "/blog/seedance-2-0",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/seedance-2-0`,
+      en: `${SITE_ORIGIN}/en/blog/seedance-2-0`,
+      xDefault: `${SITE_ORIGIN}/blog/seedance-2-0`,
+    },
+    title: seedance20Guide.ru.title,
+    description: seedance20Guide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/seedance-2-0`,
+    ogTitle: seedance20Guide.ru.title,
+    ogDescription: seedance20Guide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${seedance20Guide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/seedance-2-0`,
+        headline: seedance20Guide.ru.title,
+        description: seedance20Guide.ru.description,
+        datePublished: seedance20Guide.ru.publishedAt,
+        dateModified: seedance20Guide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Новости",
+        keywords: seedance20Guide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${seedance20Guide.ru.cover.src}`,
+          width: seedance20Guide.ru.cover.width,
+          height: seedance20Guide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/seedance-2-0`,
+        url: `${SITE_ORIGIN}/blog/seedance-2-0`,
+        name: seedance20Guide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (seedance20Guide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/seedance-2-0`,
+        seedance20Guide.ru.title,
+      ),
+      faqPageBlock(seedance20Guide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/seedance-2-0`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: seedance20Guide.ru.title, url: `${SITE_ORIGIN}/blog/seedance-2-0` },
+        ],
+        `${SITE_ORIGIN}/blog/seedance-2-0`,
       ),
     ],
   },
@@ -1768,6 +1830,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/seedance-2-0`, name: seedance20Guide.en.title, datePublished: seedance20Guide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/best-ai-video-2026`, name: bestAiVideo2026Guide.en.title, datePublished: bestAiVideo2026Guide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`, name: sora2VsVeo31Guide.en.title, datePublished: sora2VsVeo31Guide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt`, name: aiLogoGeneratorPromptGuide.en.title, datePublished: aiLogoGeneratorPromptGuide.en.publishedAt },
@@ -1793,6 +1856,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /en/blog/seedance-2-0 EN sibling.
+  {
+    path: "/en/blog/seedance-2-0",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/seedance-2-0`,
+      en: `${SITE_ORIGIN}/en/blog/seedance-2-0`,
+      xDefault: `${SITE_ORIGIN}/blog/seedance-2-0`,
+    },
+    title: seedance20Guide.en.title,
+    description: seedance20Guide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/seedance-2-0`,
+    ogTitle: seedance20Guide.en.title,
+    ogDescription: seedance20Guide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${seedance20Guide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/seedance-2-0`,
+        headline: seedance20Guide.en.title,
+        description: seedance20Guide.en.description,
+        datePublished: seedance20Guide.en.publishedAt,
+        dateModified: seedance20Guide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "News",
+        keywords: seedance20Guide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${seedance20Guide.en.cover.src}`,
+          width: seedance20Guide.en.cover.width,
+          height: seedance20Guide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/seedance-2-0`,
+        url: `${SITE_ORIGIN}/en/blog/seedance-2-0`,
+        name: seedance20Guide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (seedance20Guide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/seedance-2-0`,
+        seedance20Guide.en.title,
+      ),
+      faqPageBlock(seedance20Guide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/seedance-2-0`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: seedance20Guide.en.title, url: `${SITE_ORIGIN}/en/blog/seedance-2-0` },
+        ],
+        `${SITE_ORIGIN}/en/blog/seedance-2-0`,
       ),
     ],
   },
