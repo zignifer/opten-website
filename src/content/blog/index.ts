@@ -11,11 +11,9 @@ import { post as nanoBananaPrompts } from "./nano-banana-prompts";
 import { post as promptStructure } from "./prompt-structure";
 import { post as sora2VsVeo31 } from "./sora-2-vs-veo-3-1";
 import { post as aiLogoGeneratorPrompt } from "./ai-logo-generator-prompt";
-import { post as seedance20 } from "./seedance-2-0";
 import type { BlogPost } from "./types";
 
 export const blogPostsBySlug = {
-  "seedance-2-0": seedance20,
   "best-ai-video-2026": bestAiVideo2026,
   "ai-logo-generator-prompt": aiLogoGeneratorPrompt,
   "sora-2-vs-veo-3-1": sora2VsVeo31,
