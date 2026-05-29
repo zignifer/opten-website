@@ -7,7 +7,7 @@
 //
 // Build-time flag: changing it needs a redeploy (commit + push to main) to affect
 // the LIVE site. Locally `npm run dev` hot-reloads it instantly.
-export const ANNOUNCEMENT_ENABLED = true;
+export const ANNOUNCEMENT_ENABLED = false;
 
 // Strip height in px. Kept in sync with `.announce-bar { height }` in
 // src/styles/theme.css and the `top-[40px]` header offsets in SiteHeader / PayPage.
