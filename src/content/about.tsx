@@ -19,21 +19,32 @@ export interface AboutSection {
 }
 
 export interface AboutContent {
+  highlights: {
+    value: string;
+    label: string;
+  }[];
   sections: AboutSection[];
 }
 
 const ru: AboutContent = {
+  highlights: [
+    { value: "30 тыс.+", label: "подписчиков в Instagram, Telegram, YouTube, TikTok и VK" },
+    { value: "40 млн+", label: "просмотров на контенте про нейросети и AI-креатив" },
+    { value: "5 площадок", label: "где я тестирую AI-инструменты и показываю рабочие промпты" },
+  ],
   sections: [
     {
       heading: "Откуда взялся Opten",
       body: (
         <>
           <p className="mb-[14px]">
-            Я Влад Воронежцев — снимаю YouTube Shorts про нейросети для генерации картинок и видео
-            (канал <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>,
-            4 500+ подписчиков, 54 ролика, около 7 млн просмотров за год). По профессии я веб-дизайнер,
-            а с 2024-го года ушёл в AI-креатив с головой: Midjourney, Kling, Veo, Sora, Nano Banana,
-            Seedance — пробовал почти всё, что вышло.
+            Я Влад Воронежцев — веб-дизайнер и AI-блогер про нейросети для генерации картинок,
+            видео и интерфейсов. Веду контент не только в YouTube Shorts: делаю короткие ролики,
+            длинные разборы, посты, промпты и закулисье в Instagram, Telegram, YouTube, TikTok и VK.
+            На YouTube меня можно найти как{" "}
+            <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>, а в Telegram я веду канал «Влад Воронежцев | Про нейросети». С 2024-го года я ушёл
+            в AI-креатив с головой: Midjourney, Kling, Veo, Sora, Nano Banana, Seedance — пробовал
+            почти всё, что вышло.
           </p>
           <p className="mb-[14px]">
             Чем больше я делал контент, тем чаще видел один и тот же паттерн: люди заходят в Syntx,
@@ -117,7 +128,8 @@ const ru: AboutContent = {
           </p>
           <p className="mb-[14px]">
             YouTube — <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>.
-            Там короткие туториалы и тренды.
+            Там короткие туториалы, тренды и часть длинных разборов. Instagram/Reels я использую как
+            параллельный охват для тех же AI- и дизайн-тем.
           </p>
           <p className="mb-[14px]">
             <strong className="text-white font-semibold">Юридически</strong> Opten работает в России от ИП Воронежцев Владислав Павлович,
@@ -136,20 +148,27 @@ const ru: AboutContent = {
 // Phase 4.1 W12b (B-03): EN body populated. Translation reviewed and approved by founder.
 // Mirrors the RU structure: 4 sections (origin / why prompts / what you get / contact).
 // First-person, founder voice; same register as RU; all factual claims preserved
-// (subscriber counts, supported sites incl. Magnific via Freepik, pricing in both currencies,
+// (audience stats, supported sites incl. Magnific via Freepik, pricing in both currencies,
 // IP / Paddle Merchant of Record details, /terms + /refund LocalizedLinks).
 const en: AboutContent = {
+  highlights: [
+    { value: "30K+", label: "followers across Instagram, Telegram, YouTube, TikTok and VK" },
+    { value: "40M+", label: "views on content about neural networks and AI creative work" },
+    { value: "5 channels", label: "where I test AI tools and share practical prompts" },
+  ],
   sections: [
     {
       heading: "How Opten came to be",
       body: (
         <>
           <p className="mb-[14px]">
-            I'm Vlad Voronezhtsev — I make YouTube Shorts about AI image and video generation
-            (channel <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>,
-            4,500+ subscribers, 54 videos, around 7 million views in a year). I'm a web designer
-            by trade, but in 2024 I went all in on AI creative work: Midjourney, Kling, Veo, Sora,
-            Nano Banana, Seedance — I tried just about everything that shipped.
+            I'm Vlad Voronezhtsev — a web designer and AI blogger covering neural networks for image,
+            video and interface generation. I don't only make YouTube Shorts: I publish short videos,
+            long-form breakdowns, posts, prompts and behind-the-scenes notes across Instagram,
+            Telegram, YouTube, TikTok and VK. On YouTube, you can find me as{" "}
+            <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>, and on Telegram I run the "Vlad Voronezhtsev | About AI" channel. In 2024 I went all
+            in on AI creative work: Midjourney, Kling, Veo, Sora, Nano Banana, Seedance — I tried
+            just about everything that shipped.
           </p>
           <p className="mb-[14px]">
             The more content I made, the more I kept seeing the same pattern: people open Syntx,
@@ -233,7 +252,8 @@ const en: AboutContent = {
           </p>
           <p className="mb-[14px]">
             YouTube — <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>.
-            Short tutorials and trends.
+            Short tutorials, trends, and some long-form breakdowns. Instagram/Reels is the parallel
+            reach channel for the same AI and design topics.
           </p>
           <p className="mb-[14px]">
             <strong className="text-white font-semibold">Legally</strong>, Opten operates in Russia as IE Voronezhtsev Vladislav Pavlovich,

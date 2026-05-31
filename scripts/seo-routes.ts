@@ -83,7 +83,8 @@ export const DEFAULT_OG_IMAGE_EN = `${SITE_ORIGIN}/og-card-en.png`; // Phase 3 D
 const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/opten-%E2%80%94-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 const FOUNDER_TELEGRAM_URL = "https://t.me/v_voronezhtsev";
 // Post-2026-05-17 GEO audit: founder's AI-blogger YouTube — primary external authority signal,
-// previously not linked in sameAs (audit CR-2). 4500+ subs, 54 videos, ~7M views over the past year.
+// previously not linked in sameAs (audit CR-2). Public about copy now positions Vlad as a
+// multi-platform AI creator across Instagram, Telegram, YouTube, TikTok and VK.
 const FOUNDER_YOUTUBE_URL = "https://www.youtube.com/@v.voronezhtsev";
 
 // Phase 4 D-10: @id reference pointers — used inside schema blocks to cross-link the entity graph
@@ -180,7 +181,7 @@ export const PERSON_FOUNDER_BLOCK: SchemaBlock = {
   familyName: "Воронежцев",
   url: `${SITE_ORIGIN}/about`,
   jobTitle: "Founder, Opten",
-  description: "AI-блогер, автор Chrome-расширения Opten для оценки промптов под конкретные AI-модели.",
+  description: "AI-блогер и веб-дизайнер, автор Chrome-расширения Opten для оценки промптов под конкретные AI-модели.",
   knowsAbout: [
     "AI image generation",
     "Prompt engineering",
@@ -865,7 +866,7 @@ export const routes: RouteMeta[] = [
       xDefault: `${SITE_ORIGIN}/about`,
     },
     title: "О проекте Opten — кто стоит за расширением",
-    description: "Opten — личный проект Влада Воронежцева, AI-блогера и автора Chrome-расширения для оценки промптов. История создания, контакты, реквизиты.",
+    description: "Opten — личный проект Влада Воронежцева, AI-блогера, веб-дизайнера и автора Chrome-расширения для оценки промптов. История, контакты, реквизиты.",
     canonical: `${SITE_ORIGIN}/about`,
     ogTitle: "О проекте Opten",
     ogDescription: "История создания Opten — расширения для оценки промптов под конкретную AI-модель.",
@@ -883,9 +884,9 @@ export const routes: RouteMeta[] = [
         pageId: `${SITE_ORIGIN}/about`,
         type: "Article",
         headline: "О проекте Opten — кто стоит за расширением",
-        description: "Opten — личный проект Влада Воронежцева, AI-блогера и автора Chrome-расширения для оценки промптов.",
+        description: "Opten — личный проект Влада Воронежцева, AI-блогера, веб-дизайнера и автора Chrome-расширения для оценки промптов.",
         datePublished: "2026-05-17",
-        dateModified: "2026-05-17",
+        dateModified: "2026-05-31",
         inLanguage: "ru-RU",
         articleSection: "About",
       }),
@@ -1704,7 +1705,7 @@ export const routes: RouteMeta[] = [
       xDefault: `${SITE_ORIGIN}/about`,
     },
     title: "About Opten — who's behind the extension",
-    description: "Opten is a personal project by Vlad Voronezhtsev, AI blogger and creator of the Chrome extension for prompt scoring. Origin story, contacts, legal details.",
+    description: "Opten is a personal project by Vlad Voronezhtsev, AI blogger, web designer and creator of the Chrome extension for prompt scoring. Origin story, contacts, legal details.",
     canonical: `${SITE_ORIGIN}/en/about`,
     ogTitle: "About Opten",
     ogDescription: "Origin story of Opten — the extension for scoring prompts against specific AI models.",
@@ -1720,9 +1721,9 @@ export const routes: RouteMeta[] = [
         pageId: `${SITE_ORIGIN}/en/about`,
         type: "Article",
         headline: "About Opten — who's behind the extension",
-        description: "Opten is a personal project by Vlad Voronezhtsev, AI blogger and creator of the Chrome extension for prompt scoring.",
+        description: "Opten is a personal project by Vlad Voronezhtsev, AI blogger, web designer and creator of the Chrome extension for prompt scoring.",
         datePublished: "2026-05-17",
-        dateModified: "2026-05-17",
+        dateModified: "2026-05-31",
         inLanguage: "en-US",
         articleSection: "About",
       }),

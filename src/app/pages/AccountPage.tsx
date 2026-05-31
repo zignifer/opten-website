@@ -37,10 +37,18 @@ function Logo() {
 function CardIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <rect x="2" y="5" width="20" height="14" rx="2" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
-      <path d="M2 10H22" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
-      <rect x="5" y="14" width="4" height="2" rx="0.5" fill="rgba(255,255,255,0.3)" />
+      <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M2 10H22" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="5" y="14" width="4" height="2" rx="0.5" fill="currentColor" opacity="0.45" />
     </svg>
+  );
+}
+
+function StatusPanel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-[12px] border border-white/10 bg-[#0e2023]/90 p-[24px] text-center shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      {children}
+    </div>
   );
 }
 
@@ -191,7 +199,7 @@ export default function AccountPage() {
 
 
   return (
-    <div className="account-page w-full min-h-screen bg-black flex flex-col font-['PT_Root_UI',sans-serif]">
+    <div className="account-page flex min-h-screen w-full flex-col bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
       <style>{`
         /* Phase 5 follow-up: scoped to .account-page so the bare 'a { color: inherit }' rule
            below doesn't bleed into <SiteHeader>'s Account button (whose Tailwind text-[#011417]
@@ -213,9 +221,9 @@ export default function AccountPage() {
       <SiteHeader
         variant="page"
         rightSlot={email ? (
-          <div className="inline-flex h-[40px] items-center gap-[8px] rounded-full bg-[rgba(255,255,255,0.1)] px-[16px] font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.7)]">
+          <div className="inline-flex h-[40px] items-center gap-[8px] rounded-full border border-white/10 bg-white/10 px-[16px] font-['PT_Root_UI',sans-serif] text-[14px] text-white/70">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <path d="M7 7a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM7 8.17c-2.53 0-4.17 1.11-4.17 2.5V12h8.34v-1.33c0-1.39-1.64-2.5-4.17-2.5z" fill="rgba(255,255,255,0.7)" />
+              <path d="M7 7a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM7 8.17c-2.53 0-4.17 1.11-4.17 2.5V12h8.34v-1.33c0-1.39-1.64-2.5-4.17-2.5z" fill="currentColor" />
             </svg>
             <span className="hidden sm:inline">{email}</span>
           </div>
@@ -223,95 +231,105 @@ export default function AccountPage() {
       />
 
       {/* ─── Content ─── */}
-      <section className="flex-1 pt-[140px] pb-[80px] px-[20px]">
-        <div className="max-w-[560px] mx-auto flex flex-col gap-[32px]">
+      <section className="relative flex-1 overflow-hidden bg-[#011417] px-[20px] pb-[80px] pt-[131px] md:pt-[170px]">
+        <div
+          aria-hidden="true"
+          className="opten-figma-gradient"
+          style={{
+            WebkitMaskImage:
+              "linear-gradient(to bottom, black 0%, black 68%, transparent 100%)",
+            maskImage:
+              "linear-gradient(to bottom, black 0%, black 68%, transparent 100%)",
+          }}
+        />
+        <div className="relative z-10 mx-auto flex max-w-[620px] flex-col gap-[28px]">
 
-          <h1 className="text-white text-[32px] md:text-[40px] font-medium leading-[1.1] tracking-[-0.8px] text-center">
+          <h1 className="text-center font-['Unbounded',sans-serif] text-[34px] font-bold leading-[1.1] tracking-[-0.4px] text-white md:text-[46px]">
             {t("account.title")}
           </h1>
 
           {/* Extension status */}
           {extStatus === "detecting" && (
-            <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] p-[24px] text-center">
-              <p className="text-[rgba(255,255,255,0.5)] text-[15px]">{t("account.ext.detecting")}</p>
-            </div>
+            <StatusPanel>
+              <p className="text-[15px] text-white/55">{t("account.ext.detecting")}</p>
+            </StatusPanel>
           )}
 
           {extStatus === "not_installed" && (
-            <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] p-[24px] text-center">
-              <p className="text-white text-[15px] font-medium mb-[8px]">{t("account.ext.notInstalled.title")}</p>
-              <p className="text-[rgba(255,255,255,0.5)] text-[14px] leading-[1.6]">
-                <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-[#2777C3] underline">{t("account.ext.notInstalled.desc1")}</a>,{" "}
+            <StatusPanel>
+              <p className="mb-[8px] text-[15px] font-medium text-white">{t("account.ext.notInstalled.title")}</p>
+              <p className="text-[14px] leading-[1.6] text-white/55">
+                <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline">{t("account.ext.notInstalled.desc1")}</a>,{" "}
                 {t("account.ext.notInstalled.desc2")}
               </p>
-            </div>
+            </StatusPanel>
           )}
 
           {extStatus === "not_logged_in" && (
-            <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] p-[24px] text-center">
-              <p className="text-white text-[15px] font-medium mb-[8px]">{t("account.ext.notLoggedIn.title")}</p>
-              <p className="text-[rgba(255,255,255,0.5)] text-[14px] leading-[1.6]">
+            <StatusPanel>
+              <p className="mb-[8px] text-[15px] font-medium text-white">{t("account.ext.notLoggedIn.title")}</p>
+              <p className="text-[14px] leading-[1.6] text-white/55">
                 {t("account.ext.notLoggedIn.desc")}
               </p>
-            </div>
+            </StatusPanel>
           )}
 
           {/* Subscription info */}
           {extStatus === "ready" && loadingSub && (
-            <div className="bg-[rgba(255,255,255,0.05)] rounded-[12px] p-[24px] text-center">
-              <p className="text-[rgba(255,255,255,0.5)] text-[15px]">{t("account.sub.loading")}</p>
-            </div>
+            <StatusPanel>
+              <p className="text-[15px] text-white/55">{t("account.sub.loading")}</p>
+            </StatusPanel>
           )}
 
           {extStatus === "ready" && !loadingSub && (
             <>
               {/* ── Plan card ── */}
-              <div className="bg-[#0d0d0d] rounded-[16px] p-[32px] relative">
-                <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[16px]" />
+              <div className="relative overflow-hidden rounded-[16px] border border-white/10 bg-[#0e2023] p-[28px] shadow-[0_24px_80px_rgba(0,0,0,0.24)] md:p-[32px]">
+                <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#9cfb51]/40 to-transparent" />
                 <div className="relative z-10 flex flex-col gap-[24px]">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-[rgba(255,255,255,0.5)] text-[13px] uppercase tracking-[1px] mb-[4px]">{t("account.plan.label")}</p>
-                      <p className="text-white text-[28px] font-medium leading-[1.1]">
+                      <p className="mb-[4px] text-[13px] uppercase tracking-[1px] text-white/45">{t("account.plan.label")}</p>
+                      <p className="text-[28px] font-medium leading-[1.1] text-white">
                         {isFree ? t("account.plan.free") : t("account.plan.pro")}
                       </p>
                     </div>
                     {isActive && (
-                      <div className="bg-[rgba(30,142,62,0.15)] px-[12px] py-[6px] rounded-[100px]">
-                        <span className="text-[#34A853] text-[13px] font-medium">{t("account.plan.statusActive")}</span>
+                      <div className="rounded-[100px] bg-[#9cfb51]/12 px-[12px] py-[6px]">
+                        <span className="text-[13px] font-medium text-[#9cfb51]">{t("account.plan.statusActive")}</span>
                       </div>
                     )}
                     {isCancelled && (
-                      <div className="bg-[rgba(255,180,0,0.15)] px-[12px] py-[6px] rounded-[100px]">
-                        <span className="text-[#FBBC04] text-[13px] font-medium">{t("account.plan.statusCancelled")}</span>
+                      <div className="rounded-[100px] bg-[#FBBC04]/15 px-[12px] py-[6px]">
+                        <span className="text-[13px] font-medium text-[#FBBC04]">{t("account.plan.statusCancelled")}</span>
                       </div>
                     )}
                   </div>
 
                   {(isActive || isCancelled) && sub.expires_at && (
                     <div className="flex flex-col gap-[4px]">
-                      <p className="text-[rgba(255,255,255,0.5)] text-[13px]">
+                      <p className="text-[13px] text-white/50">
                         {isSubscription && isActive ? t("account.plan.nextCharge") : t("account.plan.accessUntil")}
                       </p>
-                      <p className="text-white text-[16px]">{formatDate(sub.expires_at, lang)}</p>
+                      <p className="text-[16px] text-white">{formatDate(sub.expires_at, lang)}</p>
                     </div>
                   )}
 
                   {isSubscription && isActive && (
                     <div className="flex flex-col gap-[4px]">
-                      <p className="text-[rgba(255,255,255,0.5)] text-[13px]">{t("account.plan.priceLabel")}</p>
-                      <p className="text-white text-[16px]">{t("account.plan.priceValue")}</p>
+                      <p className="text-[13px] text-white/50">{t("account.plan.priceLabel")}</p>
+                      <p className="text-[16px] text-white">{t("account.plan.priceValue")}</p>
                     </div>
                   )}
 
                   {isFree && (
                     <div className="flex flex-col gap-[4px]">
-                      <p className="text-[rgba(255,255,255,0.5)] text-[14px] leading-[1.6]">
+                      <p className="text-[14px] leading-[1.6] text-white/55">
                         {t("account.plan.freeDesc")}
                       </p>
                       <LocalizedLink
                         to="/pay"
-                        className="mt-[8px] bg-white text-black text-[16px] font-bold py-[14px] px-[32px] rounded-[100px] text-center no-underline inline-block hover:opacity-90 transition-opacity"
+                        className="mt-[8px] inline-block rounded-[100px] bg-[#9cfb51] px-[32px] py-[14px] text-center text-[16px] font-bold text-[#011417] no-underline transition hover:-translate-y-0.5"
                       >
                         {t("account.plan.upgradeBtn")}
                       </LocalizedLink>
@@ -322,50 +340,49 @@ export default function AccountPage() {
 
               {/* ── Card info ── */}
               {isSubscription && (
-                <div className="bg-[#0d0d0d] rounded-[16px] p-[32px] relative">
-                  <div aria-hidden="true" className="absolute border border-[rgba(255,255,255,0.1)] inset-0 pointer-events-none rounded-[16px]" />
+                <div className="relative rounded-[16px] border border-white/10 bg-[#0e2023] p-[28px] shadow-[0_24px_80px_rgba(0,0,0,0.2)] md:p-[32px]">
                   <div className="relative z-10 flex flex-col gap-[24px]">
-                    <p className="text-[rgba(255,255,255,0.5)] text-[13px] uppercase tracking-[1px]">{t("account.payment.label")}</p>
+                    <p className="text-[13px] uppercase tracking-[1px] text-white/45">{t("account.payment.label")}</p>
 
                     {sub.has_card && sub.card_last4 ? (
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-[12px]">
-                          <CardIcon />
+                          <span className="text-white/55"><CardIcon /></span>
                           <div>
-                            <p className="text-white text-[16px]">{cardBrandName(sub.card_type, t)} •••• {sub.card_last4}</p>
-                            <p className="text-[rgba(255,255,255,0.4)] text-[13px]">{t("account.payment.autoLabel")}</p>
+                            <p className="text-[16px] text-white">{cardBrandName(sub.card_type, t)} •••• {sub.card_last4}</p>
+                            <p className="text-[13px] text-white/40">{t("account.payment.autoLabel")}</p>
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-[rgba(255,255,255,0.4)] text-[14px]">{t("account.payment.noCard")}</p>
+                      <p className="text-[14px] text-white/45">{t("account.payment.noCard")}</p>
                     )}
 
                     {/* Cancel / unlink button */}
                     {isActive && (
-                      <div className="flex flex-col gap-[12px] pt-[8px] border-t border-[rgba(255,255,255,0.1)]">
+                      <div className="flex flex-col gap-[12px] border-t border-white/10 pt-[8px]">
                         {cancelDone ? (
-                          <p className="text-[#FBBC04] text-[14px]">
+                          <p className="text-[14px] text-[#FBBC04]">
                             {t("account.cancel.done").replace("{date}", sub.expires_at ? formatDate(sub.expires_at, lang) : "")}
                           </p>
                         ) : (
                           <button
                             onClick={handleCancel}
                             disabled={cancelling}
-                            className="text-[#d4183d] text-[14px] font-medium bg-transparent border-none cursor-pointer text-left p-0 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="cursor-pointer border-none bg-transparent p-0 text-left text-[14px] font-medium text-[#ff5d76] hover:underline disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             {cancelling ? t("account.cancel.inProgress") : t("account.cancel.btn")}
                           </button>
                         )}
-                        <p className="text-[rgba(255,255,255,0.3)] text-[12px] leading-[1.5]">
+                        <p className="text-[12px] leading-[1.5] text-white/35">
                           {t("account.cancel.disclaimer")}
                         </p>
                       </div>
                     )}
 
                     {isCancelled && (
-                      <div className="pt-[8px] border-t border-[rgba(255,255,255,0.1)]">
-                        <p className="text-[rgba(255,255,255,0.4)] text-[14px]">
+                      <div className="border-t border-white/10 pt-[8px]">
+                        <p className="text-[14px] text-white/45">
                           {t("account.cancelled.info")}
                         </p>
                       </div>
@@ -377,15 +394,15 @@ export default function AccountPage() {
           )}
 
           {error && (
-            <p className="text-[#d4183d] text-[14px] text-center">{error}</p>
+            <p className="text-center text-[14px] text-[#ff5d76]">{error}</p>
           )}
         </div>
       </section>
 
       {/* ─── Footer ─── */}
-      <footer className="bg-black w-full border-t border-[rgba(255,255,255,0.05)]">
+      <footer className="w-full border-t border-white/5 bg-[#011417]">
         <div className="flex flex-col items-center gap-[16px] py-[32px] px-[20px]">
-          <div className="flex flex-wrap justify-center gap-[20px] sm:gap-[32px] text-[14px] text-[rgba(255,255,255,0.4)]">
+          <div className="flex flex-wrap justify-center gap-[20px] text-[14px] text-white/40 sm:gap-[32px]">
             <LocalizedLink to="/" className="hover:text-white transition-colors no-underline text-inherit">{t("nav.home")}</LocalizedLink>
             <LocalizedLink to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.privacy")}</LocalizedLink>
             <LocalizedLink to="/terms" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.terms")}</LocalizedLink>
