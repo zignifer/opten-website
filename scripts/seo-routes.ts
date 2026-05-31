@@ -6,6 +6,7 @@
 // intro/steps/faq under `body: { ... }`. URL still /guides/gpt-image-2 until B-07.
 // This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
+import { post as aiFaceSwapGuide } from "../src/content/blog/ai-face-swap";
 import { post as bestAiVideo2026Guide } from "../src/content/blog/best-ai-video-2026";
 import { post as consistentCharacterAiGuide } from "../src/content/blog/consistent-character-ai";
 import { post as imageToVideoGuide } from "../src/content/blog/image-to-video";
@@ -932,6 +933,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/ai-face-swap`, name: aiFaceSwapGuide.ru.title, datePublished: aiFaceSwapGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/best-ai-video-2026`, name: bestAiVideo2026Guide.ru.title, datePublished: bestAiVideo2026Guide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`, name: sora2VsVeo31Guide.ru.title, datePublished: sora2VsVeo31Guide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-logo-generator-prompt`, name: aiLogoGeneratorPromptGuide.ru.title, datePublished: aiLogoGeneratorPromptGuide.ru.publishedAt },
@@ -957,6 +959,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /blog/ai-face-swap — AI face swap quality-control guide.
+  {
+    path: "/blog/ai-face-swap",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-face-swap`,
+      en: `${SITE_ORIGIN}/en/blog/ai-face-swap`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-face-swap`,
+    },
+    title: aiFaceSwapGuide.ru.title,
+    description: aiFaceSwapGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-face-swap`,
+    ogTitle: aiFaceSwapGuide.ru.title,
+    ogDescription: aiFaceSwapGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiFaceSwapGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-face-swap`,
+        headline: aiFaceSwapGuide.ru.title,
+        description: aiFaceSwapGuide.ru.description,
+        datePublished: aiFaceSwapGuide.ru.publishedAt,
+        dateModified: aiFaceSwapGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: aiFaceSwapGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiFaceSwapGuide.ru.cover.src}`,
+          width: aiFaceSwapGuide.ru.cover.width,
+          height: aiFaceSwapGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-face-swap`,
+        url: `${SITE_ORIGIN}/blog/ai-face-swap`,
+        name: aiFaceSwapGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiFaceSwapGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/ai-face-swap`,
+        aiFaceSwapGuide.ru.title,
+      ),
+      faqPageBlock(aiFaceSwapGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-face-swap`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: aiFaceSwapGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-face-swap` },
+        ],
+        `${SITE_ORIGIN}/blog/ai-face-swap`,
       ),
     ],
   },
@@ -1769,6 +1831,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/ai-face-swap`, name: aiFaceSwapGuide.en.title, datePublished: aiFaceSwapGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/best-ai-video-2026`, name: bestAiVideo2026Guide.en.title, datePublished: bestAiVideo2026Guide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`, name: sora2VsVeo31Guide.en.title, datePublished: sora2VsVeo31Guide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-logo-generator-prompt`, name: aiLogoGeneratorPromptGuide.en.title, datePublished: aiLogoGeneratorPromptGuide.en.publishedAt },
@@ -1794,6 +1857,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /en/blog/ai-face-swap EN sibling.
+  {
+    path: "/en/blog/ai-face-swap",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-face-swap`,
+      en: `${SITE_ORIGIN}/en/blog/ai-face-swap`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-face-swap`,
+    },
+    title: aiFaceSwapGuide.en.title,
+    description: aiFaceSwapGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-face-swap`,
+    ogTitle: aiFaceSwapGuide.en.title,
+    ogDescription: aiFaceSwapGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiFaceSwapGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-face-swap`,
+        headline: aiFaceSwapGuide.en.title,
+        description: aiFaceSwapGuide.en.description,
+        datePublished: aiFaceSwapGuide.en.publishedAt,
+        dateModified: aiFaceSwapGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: aiFaceSwapGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiFaceSwapGuide.en.cover.src}`,
+          width: aiFaceSwapGuide.en.cover.width,
+          height: aiFaceSwapGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-face-swap`,
+        url: `${SITE_ORIGIN}/en/blog/ai-face-swap`,
+        name: aiFaceSwapGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiFaceSwapGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/ai-face-swap`,
+        aiFaceSwapGuide.en.title,
+      ),
+      faqPageBlock(aiFaceSwapGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-face-swap`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: aiFaceSwapGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-face-swap` },
+        ],
+        `${SITE_ORIGIN}/en/blog/ai-face-swap`,
       ),
     ],
   },

@@ -30,10 +30,10 @@ const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 
 // Phase v2.0 MODELS-B-3b: floor bumped 22 → 144 now that all 62 model content
 // files landed. 152 = 26 baseline/blog routes + 2 hubs (/models + /en/models) + 124 model
-// pages (62 RU + 62 EN). Daily blog posts now bring the floor to 160. The 3 SPA-only routes (/success, /account,
+// pages (62 RU + 62 EN). Daily blog posts now bring the floor to 162. The 3 SPA-only routes (/success, /account,
 // /dashboard/*) carry prerender:"none" and are excluded from sitemapRoutes.
-if (sitemapRoutes.length < 160) {
-  throw new Error(`sitemap.mjs: expected at least 160 routes (34 baseline/blog routes + 2 model hubs + 124 model pages after daily blog posts), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+if (sitemapRoutes.length < 162) {
+  throw new Error(`sitemap.mjs: expected at least 162 routes (36 baseline/blog routes + 2 model hubs + 124 model pages after daily blog posts), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 // Post-2026-05-17 GEO audit ME-12: per-route lastmod via git mtime of the source file driving
@@ -53,6 +53,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/ai-face-swap":    "src/content/blog/ai-face-swap.ts",
+  "/en/blog/ai-face-swap": "src/content/blog/ai-face-swap.ts",
   "/blog/best-ai-video-2026":    "src/content/blog/best-ai-video-2026.ts",
   "/en/blog/best-ai-video-2026": "src/content/blog/best-ai-video-2026.ts",
   "/blog/sora-2-vs-veo-3-1":    "src/content/blog/sora-2-vs-veo-3-1.ts",
