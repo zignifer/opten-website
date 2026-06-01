@@ -216,6 +216,17 @@ For non-trivial work use the GSD slash commands (`/gsd-plan-phase`,
 For ad-hoc edits this section is non-binding — just keep changes scoped and
 respect the integration contract above.
 
+### Browser verification
+
+For local UI verification, use the Codex in-app Browser first (`iab`) for
+opening, inspecting, clicking, typing, screenshotting, and checking localhost
+routes. Do not default to the standalone Playwright CLI for site checks.
+
+Use Playwright CLI only as a fallback when the in-app Browser tool is not
+available in the current session, and say that explicitly in the final note.
+Project scripts that already use Playwright, such as `scripts/smoke-blog.mjs`,
+can remain Playwright-based unless they are being rewritten.
+
 The Obsidian vault root is the repo root, so every `.md` here also appears
 in the vault graph. Prefer `[[wikilinks]]` over relative markdown links
 inside `.planning/` so backlinks/graph view stay populated. See `_index.md`

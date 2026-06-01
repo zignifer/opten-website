@@ -155,6 +155,31 @@ input[type="submit"] {
     radial-gradient(ellipse 130% 92% at 50% 100%, rgba(156, 251, 81, 0.18) 0%, rgba(32, 95, 45, 0.16) 48%, rgba(1, 20, 23, 0) 84%);
 }
 
+.opten-demo-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 251, 81, 0.38) rgba(255, 255, 255, 0.04);
+}
+
+.opten-demo-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.opten-demo-scrollbar::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.opten-demo-scrollbar::-webkit-scrollbar-thumb {
+  border: 2px solid rgba(7, 28, 31, 0.95);
+  border-radius: 999px;
+  background: rgba(156, 251, 81, 0.38);
+}
+
+.opten-demo-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 251, 81, 0.58);
+}
+
 .opten-figma-gradient::before {
   content: "";
   position: absolute;
