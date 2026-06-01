@@ -243,6 +243,53 @@ Set in Vercel (project settings, not in repo):
 (Supabase service role, Paddle private API key, YooKassa secrets) live in
 the **extension repo's** Supabase Edge Function secrets.
 
+### Google Search Console local access
+
+Agents can access the Opten Search Console property through the existing
+OAuth installed-app flow. Service Account access was tried and rejected by the
+GSC UI (`email not found` when adding the service account as a user), so use
+OAuth with the owner Google account instead.
+
+Local credentials live only in `.secrets/gsc-oauth.env` (gitignored) with:
+
+- `GSC_CLIENT_ID`
+- `GSC_CLIENT_SECRET`
+- `GSC_REFRESH_TOKEN`
+- `GSC_SITE_URL=sc-domain:opten.space`
+
+The same credentials are mirrored from `C:\Projects\opten-seo\.env.local`.
+Use `node scripts/gsc.mjs sites`, `node scripts/gsc.mjs sitemaps`,
+`node scripts/gsc.mjs submit-sitemap`, and
+`node scripts/gsc.mjs inspect https://opten.space/models` for direct GSC API
+checks. If Google returns `invalid_grant`, refresh the OAuth token in the same
+installed-app flow and update `.secrets/gsc-oauth.env`.
+
+### Yandex Webmaster local access
+
+Yandex Webmaster API access uses a direct OAuth token, not the Yandex Cloud
+Wordstat API key. The legacy Wordstat OAuth token in `C:\Projects\opten-seo`
+does not work for Webmaster (`ACCESS_FORBIDDEN`, missing scopes).
+
+Local credentials belong in `.secrets/yandex-webmaster.env` (gitignored):
+
+- `YANDEX_WEBMASTER_OAUTH_TOKEN`
+- `YANDEX_WEBMASTER_HOST_URL=https://opten.space/`
+
+Create the token from a Yandex OAuth app with Yandex Webmaster permissions
+(`webmaster:hostinfo` and `webmaster:verify` in the official setup flow).
+Tokens are short-lived operational secrets; if Yandex returns `401` or
+`ACCESS_FORBIDDEN`, issue a fresh token and update the local `.secrets` file.
+Use `node scripts/yandex-webmaster.mjs user`, `hosts`, `summary`, `sitemaps`,
+`queries`, and `recrawl <url>` for checks.
+
+Current local status (2026-06-01): access is configured and verified. The API
+sees `https://opten.space/` as `verified: true`; summary returned `sqi: 10`,
+`searchable_pages_count: 146`, `excluded_pages_count: 4`; sitemap
+`https://opten.space/sitemap.xml` had `errors_count: 0`, `urls_count: 160`;
+popular search queries returned 41 rows for 2026-05-24..2026-05-30. Use this
+API directly for Yandex indexing/search visibility checks before guessing from
+public search results.
+
 ## Content & SEO — read before adding pages, posts, or images
 
 The site shipped v1.0 (GEO Optimization, 12 → ~72.6 score, 7 phases) and v2.0
@@ -271,6 +318,8 @@ Reference documentation lives in `docs/`:
 
 - [docs/INTEGRATION-CONTRACT.md](docs/INTEGRATION-CONTRACT.md) — **binding interface with the extension**
 - [docs/CONTENT-AUTHORING.md](docs/CONTENT-AUTHORING.md) — **GEO+SEO playbook for new pages, blog posts, images** (read before any content change)
+- [docs/SEARCH-CONSOLE.md](docs/SEARCH-CONSOLE.md) — local Google Search Console OAuth access and CLI commands
+- [docs/YANDEX-WEBMASTER.md](docs/YANDEX-WEBMASTER.md) — local Yandex Webmaster OAuth access and CLI commands
 - [docs/TECH.md](docs/TECH.md) — stack snapshot
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — routes, flows, state
 - [docs/SEO-AUDIT.md](docs/SEO-AUDIT.md) — SEO baseline + gap analysis (v1.0 input artifact)

@@ -6,7 +6,18 @@
   "scripts": {
     "build": "node scripts/generate-summaries.mjs && vite build && vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache --emptyOutDir && vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta && node scripts/prerender.mjs && node scripts/sitemap.mjs && node scripts/llms.mjs && node scripts/verify-faq-mainentity.mjs && node scripts/verify-fonts.mjs && node scripts/indexnow.mjs",
     "dev": "vite",
-    "sync:agents": "node scripts/sync-agent-docs.mjs"
+    "gsc:inspect": "node scripts/gsc.mjs inspect",
+    "gsc:performance": "node scripts/gsc.mjs performance",
+    "gsc:sitemaps": "node scripts/gsc.mjs sitemaps",
+    "gsc:sites": "node scripts/gsc.mjs sites",
+    "gsc:submit-sitemap": "node scripts/gsc.mjs submit-sitemap",
+    "sync:agents": "node scripts/sync-agent-docs.mjs",
+    "yandex:webmaster:hosts": "node scripts/yandex-webmaster.mjs hosts",
+    "yandex:webmaster:queries": "node scripts/yandex-webmaster.mjs queries",
+    "yandex:webmaster:recrawl": "node scripts/yandex-webmaster.mjs recrawl",
+    "yandex:webmaster:sitemaps": "node scripts/yandex-webmaster.mjs sitemaps",
+    "yandex:webmaster:summary": "node scripts/yandex-webmaster.mjs summary",
+    "yandex:webmaster:user": "node scripts/yandex-webmaster.mjs user"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

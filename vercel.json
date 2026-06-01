@@ -1,5 +1,11 @@
 {
   "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.opten.space" }],
+      "destination": "https://opten.space/:path*",
+      "permanent": true
+    },
     { "source": "/guides/gpt-image-2",    "destination": "/blog/gpt-image-2",    "permanent": true },
     { "source": "/en/guides/gpt-image-2", "destination": "/en/blog/gpt-image-2", "permanent": true },
     { "source": "/guides",                "destination": "/blog",                "permanent": true },
