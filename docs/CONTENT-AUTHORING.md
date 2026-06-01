@@ -21,7 +21,7 @@ When adding ANY new page or post:
 2. **First 40-60 words = definitional answer block.** GEO citability lives or dies here. Lead with what/why, not marketing fluff. AI Overviews extract this verbatim.
 3. **Locale parity.** RU and EN MUST exist together. If you don't have the EN translation, don't ship the RU yet. Half-translated content tanks hreflang quality and gets demoted by Google.
 4. **JSON-LD must mirror the visible DOM.** If schema says `datePublished: 2026-05-18`, the page MUST display that date in a `<time>` element. Schema-vs-body conflicts are an audit auto-fail (root-cause class CR-1).
-5. **Images: `/blog/<slug>/cover.jpg` ≥ 1600×900, no in-image text.** No-text means one asset works for RU + EN + OG + visible `<img>` — keeps everything in sync.
+5. **Images: `/blog/<slug>/cover.jpg` ≥ 1600×900, no in-image text.** No-text means one asset works for RU + EN + OG + visible `<img>` — keeps everything in sync. Locale-specific inline images may include short text, but the text must be generated into the final image, not added afterward as an overlay.
 6. **Mobile perf is part of SEO.** Every image gets explicit `width`/`height` (no CLS), every `<img>` after the hero gets `loading="lazy"`, every font is `font-display: optional` (see Phase 2.2 / commit `6141a0d`).
 7. **Run `npm run build` before commit.** It runs prerender + sitemap + llms.txt + FaqBlock parity check + IndexNow ping. A failing build means a broken contract — fix, don't bypass.
 
@@ -166,7 +166,7 @@ Every blog post is a single TS file in [src/content/blog/](../src/content/blog/)
 ## 6. Images
 
 **Where to put them:**
-- Per-post asset: `public/blog/<slug>/cover.jpg` + any inline images at `public/blog/<slug>/<name>.<ext>`.
+- Per-post asset: `public/blog/<slug>/cover.jpg` + any inline images at `public/blog/<slug>/<name>.<ext>` or locale-specific inline images at `public/blog/<slug>/ru/*.jpg` and `public/blog/<slug>/en/*.jpg`.
 - Site-wide assets: `public/assets/` (existing — Welcome carousel, partner logos, etc.).
 - Open Graph default cards: `public/og-card-ru.png` + `public/og-card-en.png` (1200×630). Don't replace these without coordinating with [scripts/seo-routes.ts](../scripts/seo-routes.ts) `DEFAULT_OG_IMAGE` constants.
 
@@ -174,6 +174,7 @@ Every blog post is a single TS file in [src/content/blog/](../src/content/blog/)
 - **Cover images** = JPEG (`/blog/<slug>/cover.jpg`), ≥ 1600×900 (16:9), ≤ 300 KB. JPEG over WebP for covers because Google's Rich Results validator prefers raster for `BlogPosting.image` and `Person.image`.
 - **In-body images** that benefit from compression = WebP (`<Picture>` component handles `srcset` + JPEG fallback automatically — see [src/app/components/Picture.tsx](../src/app/components/Picture.tsx)).
 - **No in-image text on covers.** One asset must work for RU + EN + OG + visible `<img>`. In-image text forces two assets and breaks locale parity.
+- **Inline text is generated, not overlaid.** If a post uses RU/EN in-body images with short labels, generate separate final rasters for each language with the text already rendered into the scene. Do not create a textless base and add typography later with an editor, Canvas, HTML/CSS, or Sharp. If the text is malformed, regenerate with a shorter phrase.
 - **Founder/Person images** use the 400×400 raster + WebP @1x/@2x pattern. The schema `image` field points at the JPEG; the visible `<picture>` serves WebP variants. See [src/content/about.tsx](../src/content/about.tsx) and the `PERSON_FOUNDER_BLOCK.image` line in [scripts/seo-routes.ts](../scripts/seo-routes.ts).
 
 **Alt text:**

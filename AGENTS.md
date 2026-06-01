@@ -257,10 +257,11 @@ Non-negotiables (the full set lives in `docs/CONTENT-AUTHORING.md`):
 2. First 40-60 words = definitional answer block (`<h1>` + `.blog-intro`). AI Overviews extract this verbatim.
 3. JSON-LD must mirror the visible DOM — FAQs, dates, prices, person names. `verify-faq-mainentity.mjs` enforces FAQ parity at build time; the others are auditor-detectable.
 4. Cover images: `public/blog/<slug>/cover.jpg`, ≥1600×900, no in-image text (one asset works for RU + EN + OG + visible `<img>`).
-5. Every `<img>` gets explicit `width`/`height` (CLS guard).
-6. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
-7. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
-8. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
+5. SEO2 inline blog images are locale-specific final rasters: generate RU and EN images with the short text already rendered inside the image. Do not generate textless bases and add text afterward with editor/Canvas/HTML/CSS/Sharp overlays.
+6. Every `<img>` gets explicit `width`/`height` (CLS guard).
+7. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
+8. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
+9. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
 
 **The full playbook with route-registration checklist, schema graph rules, image conventions, and a list of optimizations that have already been tried and rejected: [docs/CONTENT-AUTHORING.md](docs/CONTENT-AUTHORING.md).** Open this file alongside `seo-routes.ts` whenever adding a new page.
 
