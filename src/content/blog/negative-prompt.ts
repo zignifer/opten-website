@@ -23,7 +23,7 @@ const ru: BlogPostLocale = {
     "Что такое негативный промпт, когда он помогает в Imagen 4 Ultra, Midjourney 8.1 и Seedream 5, а когда лучше писать позитивные ограничения сцены.",
   description:
     "Гайд по negative prompt: что такое негативный промпт, как убрать артефакты и не сломать кадр в Imagen 4 Ultra, Midjourney 8.1 и Seedream 5 на практике.",
-  category: "deep-dive",
+  category: "guide",
   tags: ["prompt-engineering", "ai-image-gen", "workflow"],
   cover: COVER_RU,
   readingTimeMin: 7,
@@ -107,7 +107,7 @@ const en: BlogPostLocale = {
     "What a negative prompt is, when it helps in Imagen 4 Ultra, Midjourney 8.1, and Seedream 5, and when positive scene constraints work better.",
   description:
     "Learn how to write a negative prompt, remove AI image artifacts, and avoid overloading models like Imagen 4 Ultra, Midjourney 8.1, and Seedream 5 in practice.",
-  category: "deep-dive",
+  category: "guide",
   tags: ["prompt-engineering", "ai-image-gen", "workflow"],
   cover: COVER_EN,
   readingTimeMin: 6,

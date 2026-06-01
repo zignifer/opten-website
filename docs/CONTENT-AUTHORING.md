@@ -141,8 +141,8 @@ Every blog post is a single TS file in [src/content/blog/](../src/content/blog/)
 | `title` | ≤ 60 chars ideal, ≤ 70 hard cap | SERP truncation |
 | `excerpt` | 140-180 chars | Card UI + meta description |
 | `description` | 150-160 chars | `<meta name="description">` |
-| `category` | `"guide" \| "deep-dive" \| "comparison" \| "news"` | Filtering + `articleSection` schema field |
-| `tags` | 2-4 from the `BlogTag` union | Filter chips + `keywords` schema field |
+| `category` | exactly one of `"guide" \| "news"` | Visible blog label/filter + `articleSection` schema field |
+| `tags` | 2-4 from the `BlogTag` union | Technical SEO keywords only; not visible filter chips |
 | `cover` | `{ src, width, height, alt }` — width ≥1200, ideally 1600×900 | Rich Results carousel + OG |
 | `readingTimeMin` | int, calibrated to ~250 RU words/min or ~270 EN | Byline accuracy |
 | `publishedAt` + `updatedAt` | ISO `yyyy-mm-dd` | Schema dates — RU/EN MUST be the same date per locale-parity policy |
@@ -159,7 +159,7 @@ Every blog post is a single TS file in [src/content/blog/](../src/content/blog/)
 **Locale-parity in practice:**
 - RU dates and EN dates are the same (`PUBLISHED` constant shared, see [gpt-image-2.ts:9](../src/content/blog/gpt-image-2.ts)).
 - RU `readingTimeMin` and EN `readingTimeMin` are independent — Russian prose runs ~5-10% longer than English for the same content.
-- Tags are shared (the `BlogTag` union is locale-agnostic). Categories are shared.
+- Categories are shared and limited to `guide` / `news`. Tags are shared too, but they are internal SEO keywords, not the public blog taxonomy.
 
 ---
 

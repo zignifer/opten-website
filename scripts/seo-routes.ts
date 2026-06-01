@@ -993,7 +993,7 @@ export const routes: RouteMeta[] = [
         datePublished: seedance20PromptsGuide.ru.publishedAt,
         dateModified: seedance20PromptsGuide.ru.updatedAt,
         inLanguage: "ru-RU",
-        articleSection: "Новости",
+        articleSection: "Гайд",
         keywords: seedance20PromptsGuide.ru.tags,
         image: {
           url: `${SITE_ORIGIN}${seedance20PromptsGuide.ru.cover.src}`,
@@ -1113,7 +1113,7 @@ export const routes: RouteMeta[] = [
         datePublished: bestAiVideo2026Guide.ru.publishedAt,
         dateModified: bestAiVideo2026Guide.ru.updatedAt,
         inLanguage: "ru-RU",
-        articleSection: "Сравнение",
+        articleSection: "Гайд",
         keywords: bestAiVideo2026Guide.ru.tags,
         image: {
           url: `${SITE_ORIGIN}${bestAiVideo2026Guide.ru.cover.src}`,
@@ -1173,7 +1173,7 @@ export const routes: RouteMeta[] = [
         datePublished: sora2VsVeo31Guide.ru.publishedAt,
         dateModified: sora2VsVeo31Guide.ru.updatedAt,
         inLanguage: "ru-RU",
-        articleSection: "Сравнение",
+        articleSection: "Гайд",
         keywords: sora2VsVeo31Guide.ru.tags,
         image: {
           url: `${SITE_ORIGIN}${sora2VsVeo31Guide.ru.cover.src}`,
@@ -1353,7 +1353,7 @@ export const routes: RouteMeta[] = [
         datePublished: promptStructureGuide.ru.publishedAt,
         dateModified: promptStructureGuide.ru.updatedAt,
         inLanguage: "ru-RU",
-        articleSection: "Разбор",
+        articleSection: "Гайд",
         keywords: promptStructureGuide.ru.tags,
         image: {
           url: `${SITE_ORIGIN}${promptStructureGuide.ru.cover.src}`,
@@ -1413,7 +1413,7 @@ export const routes: RouteMeta[] = [
         datePublished: negativePromptGuide.ru.publishedAt,
         dateModified: negativePromptGuide.ru.updatedAt,
         inLanguage: "ru-RU",
-        articleSection: "Разбор",
+        articleSection: "Гайд",
         keywords: negativePromptGuide.ru.tags,
         image: {
           url: `${SITE_ORIGIN}${negativePromptGuide.ru.cover.src}`,
@@ -1952,7 +1952,7 @@ export const routes: RouteMeta[] = [
         datePublished: seedance20PromptsGuide.en.publishedAt,
         dateModified: seedance20PromptsGuide.en.updatedAt,
         inLanguage: "en-US",
-        articleSection: "News",
+        articleSection: "Guide",
         keywords: seedance20PromptsGuide.en.tags,
         image: {
           url: `${SITE_ORIGIN}${seedance20PromptsGuide.en.cover.src}`,
@@ -2072,7 +2072,7 @@ export const routes: RouteMeta[] = [
         datePublished: bestAiVideo2026Guide.en.publishedAt,
         dateModified: bestAiVideo2026Guide.en.updatedAt,
         inLanguage: "en-US",
-        articleSection: "Comparison",
+        articleSection: "Guide",
         keywords: bestAiVideo2026Guide.en.tags,
         image: {
           url: `${SITE_ORIGIN}${bestAiVideo2026Guide.en.cover.src}`,
@@ -2132,7 +2132,7 @@ export const routes: RouteMeta[] = [
         datePublished: sora2VsVeo31Guide.en.publishedAt,
         dateModified: sora2VsVeo31Guide.en.updatedAt,
         inLanguage: "en-US",
-        articleSection: "Comparison",
+        articleSection: "Guide",
         keywords: sora2VsVeo31Guide.en.tags,
         image: {
           url: `${SITE_ORIGIN}${sora2VsVeo31Guide.en.cover.src}`,
@@ -2312,7 +2312,7 @@ export const routes: RouteMeta[] = [
         datePublished: promptStructureGuide.en.publishedAt,
         dateModified: promptStructureGuide.en.updatedAt,
         inLanguage: "en-US",
-        articleSection: "Deep dive",
+        articleSection: "Guide",
         keywords: promptStructureGuide.en.tags,
         image: {
           url: `${SITE_ORIGIN}${promptStructureGuide.en.cover.src}`,
@@ -2372,7 +2372,7 @@ export const routes: RouteMeta[] = [
         datePublished: negativePromptGuide.en.publishedAt,
         dateModified: negativePromptGuide.en.updatedAt,
         inLanguage: "en-US",
-        articleSection: "Deep dive",
+        articleSection: "Guide",
         keywords: negativePromptGuide.en.tags,
         image: {
           url: `${SITE_ORIGIN}${negativePromptGuide.en.cover.src}`,

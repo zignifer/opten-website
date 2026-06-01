@@ -23,7 +23,7 @@ const ru: BlogPostLocale = {
     "Практичная структура промпта для изображений и видео: цель, сцена, модель, ограничения, проверка первого рендера и точная правка без переписывания всего запроса.",
   description:
     "Структура промпта для нейросети: 5 блоков запроса, примеры для GPT Image 2, Midjourney 8.1, Kling 3.0 и правка первого рендера для изображений и видео.",
-  category: "deep-dive",
+  category: "guide",
   tags: ["prompt-engineering", "workflow", "ai-image-gen", "ai-video-gen"],
   cover: COVER_RU,
   readingTimeMin: 7,

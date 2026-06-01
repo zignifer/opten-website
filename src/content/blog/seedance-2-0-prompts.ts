@@ -22,7 +22,7 @@ const ru: BlogPostLocale = {
     "Seedance 2.0 промпты работают лучше, когда сцена разбита на блоки. Разбираем промпты для Seedance 2.0, тайминг и ограничения.",
   description:
     "Seedance 2.0 промпты: как описывать сцену, движение, объект и ограничения, чтобы видео не теряло бренд и камеру.",
-  category: "news",
+  category: "guide",
   tags: ["release-notes", "model-deep-dive", "ai-video-gen"],
   cover: COVER_RU,
   readingTimeMin: 7,

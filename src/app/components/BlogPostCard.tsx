@@ -1,27 +1,22 @@
 // Phase 5 B-04: blog post card for /blog and /en/blog listing.
 // Dark card on bg-[#0e2023] per the opten-design system, 16:9 cover, category badge,
-// title, excerpt, and meta row (date + reading time + first 2 tags).
+// title, excerpt, and meta row (date + reading time).
 // Picture/srcset is intentionally NOT used here: blog covers live in public/blog/<slug>/
 // (generated via Codex CLI in C8) and are referenced by absolute URL — vite-imagetools
 // only optimizes assets imported through Vite, not arbitrary public/ paths.
 
 import LocalizedLink from "./LocalizedLink";
 import { useLang, useT } from "../../i18n/LangContext";
-import type { BlogPostLocale, BlogTag } from "../../content/blog/types";
+import type { BlogPostLocale } from "../../content/blog/types";
 
 interface BlogPostCardProps {
   post: BlogPostLocale & { slug: string };
-  tagLabel: (tag: BlogTag) => string;
 }
 
 function categoryLabelKey(category: BlogPostLocale["category"]): string {
   switch (category) {
     case "guide":
       return "blog.category.guide";
-    case "deep-dive":
-      return "blog.category.deepDive";
-    case "comparison":
-      return "blog.category.comparison";
     case "news":
       return "blog.category.news";
   }
@@ -34,7 +29,7 @@ function formatDate(iso: string, lang: "ru" | "en"): string {
   return d.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
 }
 
-export default function BlogPostCard({ post, tagLabel }: BlogPostCardProps) {
+export default function BlogPostCard({ post }: BlogPostCardProps) {
   const t = useT();
   const { lang } = useLang();
   const href = `/blog/${post.slug}`;
@@ -55,7 +50,7 @@ export default function BlogPostCard({ post, tagLabel }: BlogPostCardProps) {
       </div>
       <div className="flex flex-col gap-[12px] p-[20px]">
         <span className="inline-flex w-fit items-center rounded-full bg-[rgba(156,251,81,0.15)] px-[10px] py-[3px] text-[11px] font-bold uppercase tracking-[1px] text-[#9cfb51]">
-          {t(categoryLabelKey(post.category))}
+          <span className="inline-block translate-y-[2px]">{t(categoryLabelKey(post.category))}</span>
         </span>
         <h3 className="font-['Unbounded',sans-serif] text-[18px] font-medium leading-[1.25] tracking-[-0.3px] text-white line-clamp-2">
           {post.title}
@@ -67,11 +62,6 @@ export default function BlogPostCard({ post, tagLabel }: BlogPostCardProps) {
           <span>
             {post.readingTimeMin} {t("blog.readingTime")}
           </span>
-          {post.tags.slice(0, 2).map((tag) => (
-            <span key={tag} className="rounded-full bg-white/5 px-[8px] py-[2px] text-white/55">
-              {tagLabel(tag)}
-            </span>
-          ))}
         </div>
       </div>
     </LocalizedLink>

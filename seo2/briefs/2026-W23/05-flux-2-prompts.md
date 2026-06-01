@@ -21,7 +21,7 @@ keyword_source: "local scripts/.cache/04-volume-blog.json fallback"
 
 - Slug: `flux-2-prompts`
 - Cluster: `BL-news`
-- Category: `news`
+- Category: `guide`
 - Tags: `release-notes`, `model-deep-dive`, `ai-image-gen`
 - Search intent: comparison / consideration
 - Opten angle: Поймать release/search интерес и перевести его в image prompt structure.

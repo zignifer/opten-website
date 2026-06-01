@@ -21,7 +21,7 @@ keyword_source: "local scripts/.cache/04-volume-blog.json fallback"
 
 - Slug: `seedance-2-0-prompts`
 - Cluster: `BL-news`
-- Category: `news`
+- Category: `guide`
 - Tags: `release-notes`, `model-deep-dive`, `ai-video-gen`
 - Search intent: comparison / consideration
 - Opten angle: Использовать новостной спрос на Seedance как вход в тему video-prompt структуры.

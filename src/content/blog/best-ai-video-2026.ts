@@ -22,7 +22,7 @@ const ru: BlogPostLocale = {
     "Разбираем лучшие нейросети для видео 2026 по задачам: Veo 3.1, Kling 3.0, Runway Gen-4.5 и Seedance 2.0. Плюс тест из трёх дублей.",
   description:
     "Лучшие нейросети для видео 2026: как выбрать Veo 3.1, Kling 3.0, Runway Gen-4.5 или Seedance 2.0 под задачу, звук и контроль.",
-  category: "comparison",
+  category: "guide",
   tags: ["ai-video-gen", "model-deep-dive", "prompt-engineering", "workflow"],
   cover: COVER_RU,
   readingTimeMin: 7,

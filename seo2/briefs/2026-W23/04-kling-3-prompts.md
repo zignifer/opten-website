@@ -21,7 +21,7 @@ keyword_source: "local scripts/.cache/04-volume-blog.json fallback"
 
 - Slug: `kling-3-prompts`
 - Cluster: `BL-news`
-- Category: `news`
+- Category: `guide`
 - Tags: `release-notes`, `model-deep-dive`, `ai-video-gen`
 - Search intent: comparison / consideration
 - Opten angle: Показать, что свежая версия видео-модели требует более точного motion prompt; Opten помогает превратить идею в модельно-готовый промпт.

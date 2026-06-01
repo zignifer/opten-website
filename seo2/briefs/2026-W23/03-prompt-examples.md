@@ -21,7 +21,7 @@ keyword_source: "local scripts/.cache/04-volume-blog.json fallback"
 
 - Slug: `prompt-examples`
 - Cluster: `BL-prompting`
-- Category: `deep-dive`
+- Category: `guide`
 - Tags: `prompt-engineering`, `workflow`
 - Search intent: guide / consideration
 - Opten angle: Статья должна не просто дать список, а научить разбирать примеры и улучшать их под модель.

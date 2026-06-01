@@ -22,7 +22,7 @@ const ru: BlogPostLocale = {
     "Сравниваем Sora 2 и Veo 3.1 по доступу, звуку, управлению кадром и production-сценариям. Плюс практический кейс с исправлением промпта.",
   description:
     "Sora 2 vs Veo 3.1: сравнение нейросетей для видео по доступу, звуку, контролю кадра и промптам. Что выбрать для production в 2026.",
-  category: "comparison",
+  category: "guide",
   tags: ["ai-video-gen", "model-deep-dive", "prompt-engineering", "release-notes"],
   cover: COVER_RU,
   readingTimeMin: 7,

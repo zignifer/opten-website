@@ -14,10 +14,11 @@ import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 import BlogPostCard from "../components/BlogPostCard";
 import { allBlogPosts } from "../../content/blog";
-import type { BlogTag } from "../../content/blog/types";
+import type { BlogCategory } from "../../content/blog/types";
 
 const PAGE_SIZE = 12;
 const SEARCH_DEBOUNCE_MS = 250;
+const BLOG_CATEGORIES: BlogCategory[] = ["news", "guide"];
 
 export default function BlogListPage() {
   const { lang } = useLang();
@@ -26,10 +27,10 @@ export default function BlogListPage() {
 
   // Until hydrated, mirror the SSR render (prerendered with no query params →
   // unfiltered, page 1, empty search) so a direct-load / refresh of a filtered
-  // URL (?tag, ?q, ?page) doesn't throw a hydration mismatch — the prerender
+  // URL (?category, ?q, ?page) doesn't throw a hydration mismatch — the prerender
   // always emits page 1 of the full inventory. After mount we flip to the URL.
   const [hydrated, setHydrated] = useState(false);
-  const activeTag = (hydrated ? searchParams.get("tag") ?? "" : "") as BlogTag | "";
+  const activeCategory = (hydrated ? searchParams.get("category") ?? "" : "") as BlogCategory | "";
   const pageParam = Number.parseInt((hydrated ? searchParams.get("page") : null) ?? "1", 10);
   const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
   const queryParam = hydrated ? searchParams.get("q") ?? "" : "";
@@ -74,33 +75,27 @@ export default function BlogListPage() {
     [lang],
   );
 
-  // Tag chip vocabulary: only show chips for tags that actually appear in posts.
-  const tagSet = useMemo(() => {
-    const set = new Set<BlogTag>();
-    localizedPosts.forEach((p) => p.tags.forEach((tag) => set.add(tag)));
-    return Array.from(set);
-  }, [localizedPosts]);
-
   // Filter + search → final list.
   const filteredPosts = useMemo(() => {
     const q = queryParam.toLowerCase().trim();
     return localizedPosts.filter((p) => {
-      if (activeTag && !p.tags.includes(activeTag)) return false;
+      if (activeCategory && p.category !== activeCategory) return false;
       if (!q) return true;
       const haystack = `${p.title} ${p.excerpt} ${p.tags.join(" ")}`.toLowerCase();
       return haystack.includes(q);
     });
-  }, [localizedPosts, activeTag, queryParam]);
+  }, [localizedPosts, activeCategory, queryParam]);
 
   const totalPages = Math.max(1, Math.ceil(filteredPosts.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const pageStart = (safePage - 1) * PAGE_SIZE;
   const pagePosts = filteredPosts.slice(pageStart, pageStart + PAGE_SIZE);
 
-  function selectTag(nextTag: BlogTag | "") {
+  function selectCategory(nextCategory: BlogCategory | "") {
     const next = new URLSearchParams(searchParams);
-    if (nextTag) next.set("tag", nextTag);
-    else next.delete("tag");
+    if (nextCategory) next.set("category", nextCategory);
+    else next.delete("category");
+    next.delete("tag");
     next.delete("page");
     setSearchParams(next, { replace: true });
   }
@@ -117,27 +112,8 @@ export default function BlogListPage() {
     setQueryInput("");
   }
 
-  function tagLabel(tag: BlogTag): string {
-    const key = `blog.tag.${tagToKey(tag)}`;
-    return t(key);
-  }
-
-  // Tag → i18n key shape (kebab-case → camelCase).
-  function tagToKey(tag: BlogTag): string {
-    switch (tag) {
-      case "ai-image-gen":
-        return "aiImageGen";
-      case "ai-video-gen":
-        return "aiVideoGen";
-      case "prompt-engineering":
-        return "promptEngineering";
-      case "model-deep-dive":
-        return "modelDeepDive";
-      case "workflow":
-        return "workflow";
-      case "release-notes":
-        return "releaseNotes";
-    }
+  function categoryLabel(category: BlogCategory): string {
+    return t(`blog.filter.${category}`);
   }
 
   return (
@@ -180,16 +156,16 @@ export default function BlogListPage() {
           <label className="relative block w-full sm:hidden">
             <span className="sr-only">{t("blog.filter.label")}</span>
             <select
-              value={activeTag}
-              onChange={(e) => selectTag((e.target.value || "") as BlogTag | "")}
+              value={activeCategory}
+              onChange={(e) => selectCategory((e.target.value || "") as BlogCategory | "")}
               className="h-[40px] w-full appearance-none rounded-full border border-white/10 bg-white/5 px-[18px] pr-[40px] text-[14px] text-white transition focus:border-white/30 focus:bg-white/8 focus:outline-none"
             >
               <option value="" className="bg-[#0e2023] text-white">
                 {t("blog.filter.all")}
               </option>
-              {tagSet.map((tag) => (
-                <option key={tag} value={tag} className="bg-[#0e2023] text-white">
-                  {tagLabel(tag)}
+              {BLOG_CATEGORIES.map((category) => (
+                <option key={category} value={category} className="bg-[#0e2023] text-white">
+                  {categoryLabel(category)}
                 </option>
               ))}
             </select>
@@ -212,23 +188,23 @@ export default function BlogListPage() {
           >
             <button
               type="button"
-              onClick={() => selectTag("")}
+              onClick={() => selectCategory("")}
               className={`rounded-full border px-[14px] py-[7px] text-[13px] font-medium transition ${
-                activeTag === ""
+                activeCategory === ""
                   ? "border-transparent bg-[#9cfb51] text-[#011417]"
                   : "border-white/10 bg-white/5 text-white/75 hover:bg-white/10 hover:text-white"
               }`}
-              aria-pressed={activeTag === ""}
+              aria-pressed={activeCategory === ""}
             >
-              {t("blog.filter.all")}
+              <span>{t("blog.filter.all")}</span>
             </button>
-            {tagSet.map((tag) => {
-              const active = activeTag === tag;
+            {BLOG_CATEGORIES.map((category) => {
+              const active = activeCategory === category;
               return (
                 <button
-                  key={tag}
+                  key={category}
                   type="button"
-                  onClick={() => selectTag(tag)}
+                  onClick={() => selectCategory(category)}
                   aria-pressed={active}
                   className={`rounded-full border px-[14px] py-[7px] text-[13px] font-medium transition ${
                     active
@@ -236,7 +212,7 @@ export default function BlogListPage() {
                       : "border-white/10 bg-white/5 text-white/75 hover:bg-white/10 hover:text-white"
                   }`}
                 >
-                  {tagLabel(tag)}
+                  <span>{categoryLabel(category)}</span>
                 </button>
               );
             })}
@@ -270,7 +246,7 @@ export default function BlogListPage() {
         ) : (
           <div className="mt-[40px] grid gap-[24px] sm:grid-cols-2 lg:grid-cols-3">
             {pagePosts.map((p) => (
-              <BlogPostCard key={p.slug} post={p} tagLabel={tagLabel} />
+              <BlogPostCard key={p.slug} post={p} />
             ))}
           </div>
         )}

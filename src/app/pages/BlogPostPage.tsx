@@ -18,30 +18,12 @@ import SiteFooter from "../components/SiteFooter";
 import BlogPostCard from "../components/BlogPostCard";
 import FaqBlock from "../components/FaqBlock";
 import { blogPostsBySlug, allBlogPosts, type BlogSlug } from "../../content/blog";
-import type { BlogTag } from "../../content/blog/types";
 
 function formatPostDate(iso: string, lang: "ru" | "en"): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
   const locale = lang === "ru" ? "ru-RU" : "en-US";
   return d.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
-}
-
-function tagToKey(tag: BlogTag): string {
-  switch (tag) {
-    case "ai-image-gen":
-      return "aiImageGen";
-    case "ai-video-gen":
-      return "aiVideoGen";
-    case "prompt-engineering":
-      return "promptEngineering";
-    case "model-deep-dive":
-      return "modelDeepDive";
-    case "workflow":
-      return "workflow";
-    case "release-notes":
-      return "releaseNotes";
-  }
 }
 
 function NotFoundFallback() {
@@ -78,14 +60,12 @@ export default function BlogPostPage() {
   const sections = data.body.sections ?? [];
   const faq = data.body.faq ?? [];
 
-  const tagLabel = (tag: BlogTag): string => t(`blog.tag.${tagToKey(tag)}`);
-
   // Related posts: explicit `related[]` if defined, else other recent posts.
   const explicitRelated = (data.related ?? [])
     .map((s) => allBlogPosts.find((b) => b.slug === s))
     .filter((b): b is NonNullable<typeof b> => Boolean(b));
-  const fallbackRelated = allBlogPosts.filter((b) => b.slug !== data.slug).slice(0, 3);
-  const related = (explicitRelated.length ? explicitRelated : fallbackRelated).slice(0, 3);
+  const fallbackRelated = allBlogPosts.filter((b) => b.slug !== data.slug).slice(0, 2);
+  const related = (explicitRelated.length ? explicitRelated : fallbackRelated).slice(0, 2);
 
   return (
     <div className="min-h-screen bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
@@ -108,7 +88,7 @@ export default function BlogPostPage() {
 
         {/* Category badge */}
         <span className="inline-flex w-fit items-center rounded-full bg-[rgba(156,251,81,0.15)] px-[10px] py-[3px] text-[11px] font-bold uppercase tracking-[1px] text-[#9cfb51]">
-          {t(`blog.category.${data.category === "deep-dive" ? "deepDive" : data.category}`)}
+          <span className="inline-block translate-y-[2px]">{t(`blog.category.${data.category}`)}</span>
         </span>
 
         <h1 className="mt-[16px] font-['Unbounded',sans-serif] text-[28px] font-medium leading-[1.15] tracking-[-0.6px] text-white md:text-[40px]">
@@ -237,7 +217,7 @@ export default function BlogPostPage() {
         {related.length > 0 ? (
           <div className="grid gap-[20px] sm:grid-cols-2">
             {related.map(({ slug: s, post }) => (
-              <BlogPostCard key={s} post={{ slug: s, ...post[lang] }} tagLabel={tagLabel} />
+              <BlogPostCard key={s} post={{ slug: s, ...post[lang] }} />
             ))}
           </div>
         ) : (
