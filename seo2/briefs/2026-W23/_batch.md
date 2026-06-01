@@ -23,7 +23,7 @@ brief_count: 10
 | # | status | slug | cluster | primary keyword | max volume | brief |
 |---:|--------|------|---------|-----------------|-----------:|-------|
 | 1 | published | `ai-face-swap` | `BL-technique` | `замена лица нейросеть` | 7974 | [01-ai-face-swap.md](01-ai-face-swap.md) |
-| 2 | pending | `seedance-2-0-prompts` | `BL-news` | `seedance 2.0` | 10742 | [02-seedance-2-0-prompts.md](02-seedance-2-0-prompts.md) |
+| 2 | published | `seedance-2-0-prompts` | `BL-news` | `seedance 2.0` | 10742 | [02-seedance-2-0-prompts.md](02-seedance-2-0-prompts.md) |
 | 3 | pending | `prompt-examples` | `BL-prompting` | `примеры промптов` | 2736 | [03-prompt-examples.md](03-prompt-examples.md) |
 | 4 | pending | `kling-3-prompts` | `BL-news` | `kling 3.0` | 2388 | [04-kling-3-prompts.md](04-kling-3-prompts.md) |
 | 5 | pending | `flux-2-prompts` | `BL-news` | `flux 2` | 541 | [05-flux-2-prompts.md](05-flux-2-prompts.md) |

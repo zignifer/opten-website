@@ -7,6 +7,7 @@
 // This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
 import { post as aiFaceSwapGuide } from "../src/content/blog/ai-face-swap";
+import { post as seedance20PromptsGuide } from "../src/content/blog/seedance-2-0-prompts";
 import { post as bestAiVideo2026Guide } from "../src/content/blog/best-ai-video-2026";
 import { post as consistentCharacterAiGuide } from "../src/content/blog/consistent-character-ai";
 import { post as imageToVideoGuide } from "../src/content/blog/image-to-video";
@@ -933,6 +934,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/seedance-2-0-prompts`, name: seedance20PromptsGuide.ru.title, datePublished: seedance20PromptsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-face-swap`, name: aiFaceSwapGuide.ru.title, datePublished: aiFaceSwapGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/best-ai-video-2026`, name: bestAiVideo2026Guide.ru.title, datePublished: bestAiVideo2026Guide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/sora-2-vs-veo-3-1`, name: sora2VsVeo31Guide.ru.title, datePublished: sora2VsVeo31Guide.ru.publishedAt },
@@ -959,6 +961,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /blog/seedance-2-0-prompts — Seedance 2.0 prompt structure guide.
+  {
+    path: "/blog/seedance-2-0-prompts",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/seedance-2-0-prompts`,
+      en: `${SITE_ORIGIN}/en/blog/seedance-2-0-prompts`,
+      xDefault: `${SITE_ORIGIN}/blog/seedance-2-0-prompts`,
+    },
+    title: seedance20PromptsGuide.ru.title,
+    description: seedance20PromptsGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/seedance-2-0-prompts`,
+    ogTitle: seedance20PromptsGuide.ru.title,
+    ogDescription: seedance20PromptsGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${seedance20PromptsGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/seedance-2-0-prompts`,
+        headline: seedance20PromptsGuide.ru.title,
+        description: seedance20PromptsGuide.ru.description,
+        datePublished: seedance20PromptsGuide.ru.publishedAt,
+        dateModified: seedance20PromptsGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Новости",
+        keywords: seedance20PromptsGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${seedance20PromptsGuide.ru.cover.src}`,
+          width: seedance20PromptsGuide.ru.cover.width,
+          height: seedance20PromptsGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/seedance-2-0-prompts`,
+        url: `${SITE_ORIGIN}/blog/seedance-2-0-prompts`,
+        name: seedance20PromptsGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (seedance20PromptsGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/seedance-2-0-prompts`,
+        seedance20PromptsGuide.ru.title,
+      ),
+      faqPageBlock(seedance20PromptsGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/seedance-2-0-prompts`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: seedance20PromptsGuide.ru.title, url: `${SITE_ORIGIN}/blog/seedance-2-0-prompts` },
+        ],
+        `${SITE_ORIGIN}/blog/seedance-2-0-prompts`,
       ),
     ],
   },
@@ -1831,6 +1893,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/seedance-2-0-prompts`, name: seedance20PromptsGuide.en.title, datePublished: seedance20PromptsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-face-swap`, name: aiFaceSwapGuide.en.title, datePublished: aiFaceSwapGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/best-ai-video-2026`, name: bestAiVideo2026Guide.en.title, datePublished: bestAiVideo2026Guide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/sora-2-vs-veo-3-1`, name: sora2VsVeo31Guide.en.title, datePublished: sora2VsVeo31Guide.en.publishedAt },
@@ -1857,6 +1920,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /en/blog/seedance-2-0-prompts EN sibling.
+  {
+    path: "/en/blog/seedance-2-0-prompts",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/seedance-2-0-prompts`,
+      en: `${SITE_ORIGIN}/en/blog/seedance-2-0-prompts`,
+      xDefault: `${SITE_ORIGIN}/blog/seedance-2-0-prompts`,
+    },
+    title: seedance20PromptsGuide.en.title,
+    description: seedance20PromptsGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/seedance-2-0-prompts`,
+    ogTitle: seedance20PromptsGuide.en.title,
+    ogDescription: seedance20PromptsGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${seedance20PromptsGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/seedance-2-0-prompts`,
+        headline: seedance20PromptsGuide.en.title,
+        description: seedance20PromptsGuide.en.description,
+        datePublished: seedance20PromptsGuide.en.publishedAt,
+        dateModified: seedance20PromptsGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "News",
+        keywords: seedance20PromptsGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${seedance20PromptsGuide.en.cover.src}`,
+          width: seedance20PromptsGuide.en.cover.width,
+          height: seedance20PromptsGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/seedance-2-0-prompts`,
+        url: `${SITE_ORIGIN}/en/blog/seedance-2-0-prompts`,
+        name: seedance20PromptsGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (seedance20PromptsGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/seedance-2-0-prompts`,
+        seedance20PromptsGuide.en.title,
+      ),
+      faqPageBlock(seedance20PromptsGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/seedance-2-0-prompts`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: seedance20PromptsGuide.en.title, url: `${SITE_ORIGIN}/en/blog/seedance-2-0-prompts` },
+        ],
+        `${SITE_ORIGIN}/en/blog/seedance-2-0-prompts`,
       ),
     ],
   },
