@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-06-02 against extension `manifest.json` version **1.3.8** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added but not launched in visible navigation; Phase 92 extension context-menu save contract added). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
+> **Last sync:** 2026-06-02 against extension `manifest.json` version **1.3.8** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added but not launched in visible navigation; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -174,16 +174,15 @@ live with these exact paths and the documented behavior.
 | `/success` | YooKassa redirect after successful payment | Show success state, optionally autoclose tab. Used as `return_url` in [`create-payment/index.ts:65`](../../promptscore/supabase/functions/create-payment/index.ts#L65). | YooKassa `return_url` |
 | `/account` | Optional — sometimes linked from popup | Subscription management UI, calls `CANCEL_SUBSCRIPTION`. | n/a (user-driven) |
 | `/dashboard/download-skill` | Pro-only feature in popup → opens new tab | Auth-gated page that calls `/api/download-skill` to fetch `opten.zip`. | [popup Phase 73](../../promptscore/popup/popup.html) |
-| `/prompt-library` | User/site navigation once launched; currently manually accessible only | Pro-only prompt library UI. Calls `GET_AUTH_TOKEN`, checks subscription, then uses Supabase PostgREST for `prompt_library` CRUD/search. Free/expired users see locked upsell state without prompt data reads. SPA-only, `noindex,nofollow`, no `/en/*` sibling. | Phase 91 |
+| `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Pro-only prompt library UI. Calls `GET_AUTH_TOKEN`, checks subscription, then uses Supabase PostgREST for `prompt_library` CRUD/search. Free/expired users see locked upsell state without prompt data reads. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 93 |
 
 **Locked route names** (renames are breaking):
 - `/welcome`, `/pay`, `/success` — referenced by the extension binary that's
   already shipped to users. If you rename them, **users on old extension
   versions will hit 404** until they update. Don't.
-- `/prompt-library` — not referenced by shipped extension binaries yet, but
-  it is the fixed Phase 91 route for Prompt Library launch and future context
-  menu "open library" actions. Do not rename once Phase 92/93 extension code
-  starts opening it.
+- `/prompt-library` — fixed Phase 91 route for Prompt Library launch and
+  Phase 93 extension context-menu "open library" / failed-insert fallback
+  actions. Do not rename it; in-tree extension code now opens this route.
 
 > **Note (Phase 3 D-03b):** the site additionally emits `/en/pay` as an EN sibling of `/pay`.
 > The extension does NOT navigate to `/en/pay` in current shipped versions; this is a site-side
@@ -221,7 +220,7 @@ The site only **calls** them; it does not own them.
 If the Supabase project is ever rotated/migrated, **all three site files** plus the extension's
 [`config/api.js`](../../promptscore/config/api.js) must be updated in one coordinated commit.
 
-### 4.1 Prompt Library PostgREST surface (Phase 91, extension save added Phase 92)
+### 4.1 Prompt Library PostgREST surface (Phase 91, extension save/insert added Phase 92/93)
 
 Prompt Library data lives in the extension-owned Supabase database. The site
 does not call an Edge Function for normal prompt CRUD/search. It calls
@@ -310,6 +309,25 @@ when a Pro user selects text on an HTTP(S) page and clicks
 - Prompt bodies must not be logged by either repo. Metadata-only logging
   (status code, result code, source host, prompt id) is acceptable.
 
+**Extension context-menu insert (Phase 93):**
+
+The extension service worker renders bounded native context-menu insert actions
+from `ps_prompt_library_cache` and direct PostgREST refreshes:
+
+- `Вставить последний`, bounded `Избранные`, bounded `Недавние`, and
+  `Открыть библиотеку`.
+- Generic HTTP(S) page insertion uses `activeTab` + `chrome.scripting`
+  after the explicit native context-menu gesture. The extension must not add
+  `<all_urls>`, `clipboardRead`, or `clipboardWrite` for this feature.
+- Successful insert calls `POST /rest/v1/rpc/prompt_library_mark_used` with
+  `{ p_prompt_id }`, then refreshes the bounded local cache from the returned
+  row/cache surface.
+- Failed direct insertion opens `https://opten.space/prompt-library` as the
+  manual path. Prompt body text is never placed in a URL, mirrored through the
+  external message API, or copied through a broad clipboard permission.
+- Prompt-library insert does not call the Vercel proxy, Anthropic, Edge
+  Functions, or `usage_logs`.
+
 ---
 
 ## 5. Storage keys (`ps_*`) — extension-owned, site-readable
@@ -335,7 +353,7 @@ Renaming a key on the extension side requires updating the response field too.
 | `ps_sub_auto_renew` | Extension | `GET_SUBSCRIPTION.auto_renew` | |
 | `ps_sub_provider` | Extension (set by webhook) | — (used internally for cancellation dispatch) | `'yookassa' \| 'paddle'`. Missing → fallback to `'yookassa'`. |
 | `ps_pkce_verifier` | Extension | — | Internal OAuth state. |
-| `ps_prompt_library_cache` | Extension | — | Phase 92 local-only bounded cache for Prompt Library context menus. Shape: `{ version, updated_at, last_saved_id, last_saved_at, recent, favorites }`; `recent` is capped at 20 rows, `favorites` at 10 rows. Rows may include prompt `body` for Phase 93 insertion, so the key is cleared on logout/auth reset and is never mirrored through the site message API. |
+| `ps_prompt_library_cache` | Extension | — | Phase 92 local-only bounded cache for Prompt Library context menus; Phase 93 uses it for insert menu rows and may refresh it through PostgREST. Shape: `{ version, updated_at, last_saved_id, last_saved_at, recent, favorites }`; `recent` is capped at 20 rows, `favorites` at 10 rows, and native menus show smaller bounded subsets. Rows may include prompt `body` for insertion, so the key is cleared on logout/auth reset and is never mirrored through the site message API. |
 
 **Breaking-change protocol:**
 1. Add a new key in the extension first (parallel to the old one).
