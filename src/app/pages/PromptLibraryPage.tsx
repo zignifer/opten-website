@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Archive,
   ArchiveRestore,
+  CirclePlay,
   Copy,
   Library,
   MoreHorizontal,
@@ -13,6 +14,7 @@ import {
   Sparkles,
   Star,
   Trash2,
+  X,
 } from "lucide-react";
 import { useLang } from "../../i18n/LangContext";
 import LocalizedLink from "../components/LocalizedLink";
@@ -32,6 +34,8 @@ const MAX_BODY_CHARS = 12000;
 const MAX_TAGS = 8;
 const PROMPT_SELECT = "id,user_id,title,body,tags,favorite,source_host,source_url,source_title,body_hash,use_count,last_used_at,created_at,updated_at,archived_at";
 const PROMPT_LIBRARY_REFRESH_MESSAGE = "REFRESH_PROMPT_LIBRARY_CACHE";
+const PROMPT_LIBRARY_DEMO_VIDEO_SRC = "/assets/prompt-library/demo.mp4";
+const PROMPT_LIBRARY_DEMO_SEEN_KEY = "opten_prompt_library_demo_seen_v1";
 
 type FilterMode = "all" | "favorite" | "recent" | "archive";
 type EditorMode = "view" | "edit";
@@ -65,6 +69,11 @@ const TEXT = {
   ru: {
     title: "Библиотека промптов",
     add: "Добавить промпт",
+    demoButton: "Как работает",
+    demoTitle: "Посмотри демо",
+    demoBody: "В демо показываем живой сценарий: сохраняем промпт из генератора, даем ему понятное имя, добавляем в избранное и вставляем в поле для ввода промптов.",
+    demoClose: "Закрыть",
+    demoVideoLabel: "Демо работы библиотеки промптов Opten",
     search: "Найти промпт, тег или источник...",
     searchLabel: "Поиск промптов",
     filters: {
@@ -131,6 +140,11 @@ const TEXT = {
   en: {
     title: "Prompt Library",
     add: "Add prompt",
+    demoButton: "How it works",
+    demoTitle: "Watch the demo",
+    demoBody: "The demo shows the real flow: save a prompt from the generator, give it a clear name, mark it as a favorite, and insert it into the prompt input field.",
+    demoClose: "Close",
+    demoVideoLabel: "Opten Prompt Library demo",
     search: "Find a prompt, tag, or source...",
     searchLabel: "Search prompts",
     filters: {
@@ -198,6 +212,15 @@ const TEXT = {
 
 function cx(...classes: Array<string | false | null | undefined>): string {
   return classes.filter(Boolean).join(" ");
+}
+
+function markPromptLibraryDemoSeen() {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(PROMPT_LIBRARY_DEMO_SEEN_KEY, "1");
+  } catch {
+    // Private browsing or storage policy failures should not block the modal.
+  }
 }
 
 function normalize(value: string): string {
@@ -366,6 +389,91 @@ function EmptyState({ title, body }: { title: string; body?: string }) {
   );
 }
 
+function PromptLibraryDemoModal({ open, text, onClose }: { open: boolean; text: typeof TEXT.ru; onClose: () => void }) {
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const focusTimer = window.setTimeout(() => closeButtonRef.current?.focus({ preventScroll: true }), 0);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.clearTimeout(focusTimer);
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[120] flex items-center justify-center bg-black/72 px-3 py-5 backdrop-blur-sm sm:px-5"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="prompt-library-demo-title"
+        aria-describedby="prompt-library-demo-description"
+        className="max-h-[calc(100dvh-40px)] w-full max-w-[920px] overflow-y-auto rounded-[14px] border border-white/12 bg-[#071c1f] p-4 shadow-[0_28px_90px_rgba(0,0,0,0.58)] sm:p-5"
+      >
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h2 id="prompt-library-demo-title" className="font-['Unbounded',sans-serif] text-[22px] font-bold leading-tight text-white sm:text-[28px]">
+              {text.demoTitle}
+            </h2>
+            <p id="prompt-library-demo-description" className="mt-2 max-w-[680px] text-[14px] leading-[1.58] text-white/58 sm:text-[15px]">
+              {text.demoBody}
+            </p>
+          </div>
+          <button
+            ref={closeButtonRef}
+            type="button"
+            onClick={onClose}
+            aria-label={text.demoClose}
+            className="grid size-10 shrink-0 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-white/60 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
+          >
+            <X size={18} aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="overflow-hidden rounded-[10px] border border-white/10 bg-[#021113]">
+          <video
+            aria-label={text.demoVideoLabel}
+            className="block aspect-video w-full bg-[#021113] object-contain"
+            controls
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            src={PROMPT_LIBRARY_DEMO_VIDEO_SRC}
+          />
+        </div>
+
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-11 min-w-[128px] cursor-pointer items-center justify-center rounded-full bg-[#9cfb51] px-5 text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
+          >
+            {text.demoClose}
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export default function PromptLibraryPage() {
   const { lang } = useLang();
   const text = lang === "en" ? TEXT.en : TEXT.ru;
@@ -384,6 +492,7 @@ export default function PromptLibraryPage() {
   const [quickTitlesOpen, setQuickTitlesOpen] = useState(false);
   const [cardMenuId, setCardMenuId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [demoOpen, setDemoOpen] = useState(false);
   const [error, setError] = useState("");
   const [loadingPrompts, setLoadingPrompts] = useState(false);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
@@ -418,6 +527,17 @@ export default function PromptLibraryPage() {
 
   useEffect(() => {
     void detectExtension();
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(PROMPT_LIBRARY_DEMO_SEEN_KEY) === "1") return;
+    } catch {
+      // If storage cannot be read, still show the first-run demo for this session.
+    }
+
+    markPromptLibraryDemoSeen();
+    setDemoOpen(true);
   }, []);
 
   useEffect(() => {
@@ -473,6 +593,16 @@ export default function PromptLibraryPage() {
 
   function showToast(message: string) {
     setToast(message);
+  }
+
+  function handleOpenDemo() {
+    markPromptLibraryDemoSeen();
+    setDemoOpen(true);
+  }
+
+  function handleCloseDemo() {
+    markPromptLibraryDemoSeen();
+    setDemoOpen(false);
   }
 
   function notifyPromptLibraryCacheRefresh() {
@@ -828,6 +958,7 @@ export default function PromptLibraryPage() {
       : { title: text.emptyTitle, body: text.emptyBody };
   const filterTitle = filter === "all" ? text.allPrompts : text.filters[filter];
   const filterCountLabel = filter === "all" ? `${promptCount}/${MAX_PROMPTS}` : `${sortedPrompts.length}`;
+  const demoModal = <PromptLibraryDemoModal open={demoOpen} text={text} onClose={handleCloseDemo} />;
 
   const pageShell = (children: JSX.Element) => (
     <div className="min-h-dvh bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
@@ -843,6 +974,7 @@ export default function PromptLibraryPage() {
         />
         <div className="relative z-10 mx-auto max-w-[1100px]">{children}</div>
       </main>
+      {demoModal}
     </div>
   );
 
@@ -917,15 +1049,25 @@ export default function PromptLibraryPage() {
               </h1>
               <span className="sr-only" aria-live="polite">{loadingPrompts ? text.loading : ""}</span>
             </div>
-            <button
-              type="button"
-              onClick={handleCreate}
-              disabled={promptCount >= MAX_PROMPTS}
-              className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#9cfb51] px-5 text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto"
-            >
-              <Plus size={16} aria-hidden="true" />
-              {text.add}
-            </button>
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+              <button
+                type="button"
+                onClick={handleOpenDemo}
+                className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-[#9cfb51]/35 bg-transparent px-5 text-[14px] font-bold text-white/78 transition hover:-translate-y-0.5 hover:border-[#9cfb51]/60 hover:bg-[#9cfb51]/8 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 sm:w-auto"
+              >
+                <CirclePlay size={16} aria-hidden="true" />
+                {text.demoButton}
+              </button>
+              <button
+                type="button"
+                onClick={handleCreate}
+                disabled={promptCount >= MAX_PROMPTS}
+                className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#9cfb51] px-5 text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto"
+              >
+                <Plus size={16} aria-hidden="true" />
+                {text.add}
+              </button>
+            </div>
           </section>
 
           <section>
@@ -1222,6 +1364,7 @@ export default function PromptLibraryPage() {
       >
         {toast}
       </div>
+      {demoModal}
     </div>
   );
 }
