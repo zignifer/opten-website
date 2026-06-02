@@ -27,6 +27,8 @@ interface SiteHeaderProps {
   rightSlot?: React.ReactNode;
 }
 
+const PROMPT_LIBRARY_MENU_LAUNCHED = false;
+
 function Logo() {
   return (
     <img
@@ -165,6 +167,15 @@ export default function SiteHeader({ variant = "page", rightSlot }: SiteHeaderPr
           >
             {t("nav.models")}
           </LocalizedLink>
+          {PROMPT_LIBRARY_MENU_LAUNCHED && (
+            <LocalizedLink
+              to="/prompt-library"
+              onClick={closeMenu}
+              className="block rounded-[12px] px-4 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white no-underline"
+            >
+              {t("nav.promptLibrary")}
+            </LocalizedLink>
+          )}
           <a
             href={anchor("faq")}
             onClick={closeMenu}

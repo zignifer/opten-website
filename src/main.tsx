@@ -30,6 +30,7 @@
   const SuccessPage = lazy(() => import("./app/pages/SuccessPage.tsx"));
   const AccountPage = lazy(() => import("./app/pages/AccountPage.tsx"));
   const DownloadSkillPage = lazy(() => import("./app/pages/DownloadSkillPage.tsx"));
+  const PromptLibraryPage = lazy(() => import("./app/pages/PromptLibraryPage.tsx"));
   const PromptLibraryDemoPage = lazy(() => import("./app/pages/PromptLibraryDemoPage.tsx"));
 
   // Phase 2.2: Paddle bootstrap moved to src/lib/paddle.ts.
@@ -78,6 +79,7 @@
             <Route path="/models" element={<ModelsHubPage />} />
             <Route path="/models/:slug" element={<ModelPage />} />
             <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
+            <Route path="/prompt-library" element={<PromptLibraryPage />} />
             <Route path="/internal/prompt-library-demo" element={<PromptLibraryDemoPage />} />
             {/* Phase 3 D-01/D-03b: /en/* siblings. Mirror of entry-server.tsx EN routes + /en/pay (head-only, client-mount-only). __PRERENDER_PATH discriminator (lines 65-66) handles these unchanged — meta.path strings written by applyMarker include "/en/welcome" etc. Phase 4 D-06: /en/guides/:slug bilingual anchor. */}
             <Route path="/en/"        element={<App />} />
