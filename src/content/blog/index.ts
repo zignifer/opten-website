@@ -5,6 +5,7 @@
 import { post as gptImage2 } from "./gpt-image-2";
 import { post as aiFaceSwap } from "./ai-face-swap";
 import { post as seedance20Prompts } from "./seedance-2-0-prompts";
+import { post as promptExamples } from "./prompt-examples";
 import { post as bestAiVideo2026 } from "./best-ai-video-2026";
 import { post as consistentCharacterAi } from "./consistent-character-ai";
 import { post as imageToVideo } from "./image-to-video";
@@ -16,6 +17,7 @@ import { post as aiLogoGeneratorPrompt } from "./ai-logo-generator-prompt";
 import type { BlogPost } from "./types";
 
 export const blogPostsBySlug = {
+  "prompt-examples": promptExamples,
   "seedance-2-0-prompts": seedance20Prompts,
   "ai-face-swap": aiFaceSwap,
   "best-ai-video-2026": bestAiVideo2026,
