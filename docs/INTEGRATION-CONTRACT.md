@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-06-02 against extension `manifest.json` version **1.3.8** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added but not launched in visible navigation; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
+> **Last sync:** 2026-06-02 against extension `manifest.json` version **1.3.8** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added but not launched in visible navigation; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -72,6 +72,7 @@ Both repos hardcode the IDs. Defined in:
 - [`src/app/pages/PayPage.tsx`](../src/app/pages/PayPage.tsx) (`EXTENSION_IDS`)
 - [`src/app/pages/AccountPage.tsx`](../src/app/pages/AccountPage.tsx) (`EXTENSION_IDS`)
 - [`src/app/pages/DownloadSkillPage.tsx`](../src/app/pages/DownloadSkillPage.tsx) (`EXTENSION_IDS`)
+- [`src/app/pages/PromptLibraryPage.tsx`](../src/app/pages/PromptLibraryPage.tsx) (`EXTENSION_IDS`)
 
 ```ts
 const EXTENSION_IDS = [
@@ -80,12 +81,12 @@ const EXTENSION_IDS = [
 ];
 ```
 
-Site pages iterate the list and pick whichever responds first. If the CWS ID ever changes (re-upload as a new listing) — update **all three pages**.
+Site pages iterate the list and pick whichever responds first. If the CWS ID ever changes (re-upload as a new listing) — update **all four pages**.
 
 ### 2.3 Message types
 
 The site is the **initiator** of every message; the extension only replies.
-All four handlers are defined in [`background.js:1002-1084`](../../promptscore/background/background.js#L1002-L1084).
+All five handlers are defined in the external message handler in [`background.js`](../../promptscore/background/background.js).
 
 #### `GET_AUTH_TOKEN`
 
@@ -150,6 +151,24 @@ chrome.runtime.sendMessage(id, { type: "CANCEL_SUBSCRIPTION" }, (response) => {
 - Legacy users (created pre-Phase 67) with missing `ps_sub_provider` fall back to `'yookassa'`. Do not strip this fallback without a migration.
 - Used only by [`AccountPage.tsx`](../src/app/pages/AccountPage.tsx).
 
+#### `REFRESH_PROMPT_LIBRARY_CACHE`
+
+```ts
+chrome.runtime.sendMessage(id, { type: "REFRESH_PROMPT_LIBRARY_CACHE" }, (response) => {
+  // response: { ok: boolean, error?: 'refresh_failed' }
+});
+```
+
+- Used by [`PromptLibraryPage.tsx`](../src/app/pages/PromptLibraryPage.tsx)
+  after successful Prompt Library `POST`/`PATCH`/`DELETE`/mark-used mutations.
+- The site sends no prompt body, title, tags, row ID, snippet, or selected text.
+  The response also returns no prompt data.
+- The extension performs a forced refresh of its own bounded
+  `ps_prompt_library_cache` from PostgREST with its stored Bearer JWT, rebuilds
+  native context menus, and bypasses the normal context-menu `onShown` throttle.
+- Failure is non-blocking for the site UI; the next context-menu/cloud refresh
+  can still self-heal.
+
 #### `WARMUP`
 
 ```ts
@@ -174,7 +193,7 @@ live with these exact paths and the documented behavior.
 | `/success` | YooKassa redirect after successful payment | Show success state, optionally autoclose tab. Used as `return_url` in [`create-payment/index.ts:65`](../../promptscore/supabase/functions/create-payment/index.ts#L65). | YooKassa `return_url` |
 | `/account` | Optional — sometimes linked from popup | Subscription management UI, calls `CANCEL_SUBSCRIPTION`. | n/a (user-driven) |
 | `/dashboard/download-skill` | Pro-only feature in popup → opens new tab | Auth-gated page that calls `/api/download-skill` to fetch `opten.zip`. | [popup Phase 73](../../promptscore/popup/popup.html) |
-| `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Pro-only prompt library UI. Calls `GET_AUTH_TOKEN`, checks subscription, then uses Supabase PostgREST for `prompt_library` CRUD/search. Free/expired users see locked upsell state without prompt data reads. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 93 |
+| `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Pro-only prompt library UI. Calls `GET_AUTH_TOKEN`, checks subscription, then uses Supabase PostgREST for `prompt_library` CRUD/search. After successful mutations it calls `REFRESH_PROMPT_LIBRARY_CACHE` so native extension menus do not keep stale titles/favorite state. Free/expired users see locked upsell state without prompt data reads. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 94 |
 
 **Locked route names** (renames are breaking):
 - `/welcome`, `/pay`, `/success` — referenced by the extension binary that's
@@ -273,7 +292,7 @@ Access rules:
 - Quotas are server-side: 150 rows per user, 12,000 body chars, 8 tags, 50 chars
   per tag.
 - Duplicate bodies are rejected per user by generated `body_hash`.
-- Search uses PostgREST full-text filtering on generated `search_vector` with
+- Search uses PostgREST full-text filtering on trigger-maintained `search_vector` with
   the `wfts` operator. No embeddings, no Anthropic, no Vercel proxy, and no
   `usage_logs` writes are part of this surface.
 
@@ -312,7 +331,8 @@ when a Pro user selects text on an HTTP(S) page and clicks
 **Extension context-menu insert (Phase 93):**
 
 The extension service worker renders bounded native context-menu insert actions
-from `ps_prompt_library_cache` and direct PostgREST refreshes:
+from `ps_prompt_library_cache`, direct PostgREST refreshes, and site-triggered
+`REFRESH_PROMPT_LIBRARY_CACHE` refreshes:
 
 - `Вставить последний`, bounded `Избранные`, bounded `Недавние`, and
   `Открыть библиотеку`.
@@ -353,7 +373,7 @@ Renaming a key on the extension side requires updating the response field too.
 | `ps_sub_auto_renew` | Extension | `GET_SUBSCRIPTION.auto_renew` | |
 | `ps_sub_provider` | Extension (set by webhook) | — (used internally for cancellation dispatch) | `'yookassa' \| 'paddle'`. Missing → fallback to `'yookassa'`. |
 | `ps_pkce_verifier` | Extension | — | Internal OAuth state. |
-| `ps_prompt_library_cache` | Extension | — | Phase 92 local-only bounded cache for Prompt Library context menus; Phase 93 uses it for insert menu rows and may refresh it through PostgREST. Shape: `{ version, updated_at, last_saved_id, last_saved_at, recent, favorites }`; `recent` is capped at 20 rows, `favorites` at 10 rows, and native menus show smaller bounded subsets. Rows may include prompt `body` for insertion, so the key is cleared on logout/auth reset and is never mirrored through the site message API. |
+| `ps_prompt_library_cache` | Extension | — | Phase 92 local-only bounded cache for Prompt Library context menus; Phase 93 uses it for insert menu rows and may refresh it through PostgREST; Phase 94 lets the site trigger a refresh via `REFRESH_PROMPT_LIBRARY_CACHE` after successful library mutations. Shape: `{ version, updated_at, last_saved_id, last_saved_at, recent, favorites }`; `recent` is capped at 20 rows, `favorites` at 10 rows, and native menus show smaller bounded subsets. Rows may include prompt `body` for insertion, so the key is cleared on logout/auth reset and is never mirrored through the site message API. |
 
 **Breaking-change protocol:**
 1. Add a new key in the extension first (parallel to the old one).

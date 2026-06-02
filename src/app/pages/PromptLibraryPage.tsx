@@ -31,6 +31,7 @@ const MAX_PROMPTS = 150;
 const MAX_BODY_CHARS = 12000;
 const MAX_TAGS = 8;
 const PROMPT_SELECT = "id,user_id,title,body,tags,favorite,source_host,source_url,source_title,body_hash,use_count,last_used_at,created_at,updated_at,archived_at";
+const PROMPT_LIBRARY_REFRESH_MESSAGE = "REFRESH_PROMPT_LIBRARY_CACHE";
 
 type FilterMode = "all" | "favorite" | "recent" | "archive";
 type EditorMode = "view" | "edit";
@@ -474,6 +475,21 @@ export default function PromptLibraryPage() {
     setToast(message);
   }
 
+  function notifyPromptLibraryCacheRefresh() {
+    const chrome = (window as any).chrome;
+    if (!chrome?.runtime?.sendMessage) return;
+
+    for (const id of EXTENSION_IDS) {
+      try {
+        chrome.runtime.sendMessage(id, { type: PROMPT_LIBRARY_REFRESH_MESSAGE }, () => {
+          void chrome.runtime.lastError;
+        });
+      } catch {
+        // The page tries both CWS and unpacked extension IDs; missing IDs are expected.
+      }
+    }
+  }
+
   function authHeaders(authToken = token): HeadersInit {
     return {
       Authorization: `Bearer ${authToken ?? ""}`,
@@ -693,6 +709,7 @@ export default function PromptLibraryPage() {
 
     if (!saved) return;
     upsertLocal(saved);
+    notifyPromptLibraryCacheRefresh();
     setEditorMode("view");
     setQuickTitlesOpen(false);
     showToast(text.saved);
@@ -706,7 +723,10 @@ export default function PromptLibraryPage() {
       method: "PATCH",
       body: JSON.stringify({ favorite: !prompt.favorite }),
     });
-    if (saved) upsertLocal(saved);
+    if (saved) {
+      upsertLocal(saved);
+      notifyPromptLibraryCacheRefresh();
+    }
     showToast(prompt.favorite ? text.favRemoved : text.favAdded);
   }
 
@@ -730,6 +750,7 @@ export default function PromptLibraryPage() {
       return current.filter((item) => item.id !== saved.id);
     });
     setSelectedId(saved.id);
+    notifyPromptLibraryCacheRefresh();
     showToast(saved.archived_at ? text.archivedToast : text.restoredToast);
   }
 
@@ -749,6 +770,7 @@ export default function PromptLibraryPage() {
     setPrompts((current) => current.filter((item) => item.id !== prompt.id));
     setSelectedId((current) => (current === prompt.id ? "" : current));
     setPromptCount((current) => Math.max(0, current - 1));
+    notifyPromptLibraryCacheRefresh();
     showToast(text.deletedToast);
   }
 
@@ -772,6 +794,7 @@ export default function PromptLibraryPage() {
     const data = await res.json().catch(() => null);
     if (res.ok && data) {
       upsertLocal(Array.isArray(data) ? data[0] : data);
+      notifyPromptLibraryCacheRefresh();
     }
   }
 
