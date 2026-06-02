@@ -85,7 +85,7 @@
     "sharp": "^0.34.5",
     "supabase": "^2.98.2",
     "tailwindcss": "4.1.12",
-    "vite": "6.3.5",
+    "vite": "6.4.3",
     "vite-imagetools": "^6.2.9"
   },
   "peerDependencies": {
@@ -102,7 +102,7 @@
   },
   "pnpm": {
     "overrides": {
-      "vite": "6.3.5"
+      "vite": "6.4.3"
     }
   }
 }
