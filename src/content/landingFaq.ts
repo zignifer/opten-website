@@ -32,7 +32,7 @@ const ru: FaqItem[] = [
   },
   {
     q: "Сохраняет ли Opten мои промпты на серверах?",
-    a: "Нет. Промпты и референсные изображения проходят транзитом через Vercel-прокси к Claude Haiku 4.5 для анализа и не сохраняются ни у Opten, ни у Anthropic (политика API). Никакой телеметрии содержимого промпта. В аккаунте хранится только счётчик использованных проверок за месяц.",
+    a: "Для оценки и улучшения — нет: промпты и референсные изображения проходят транзитом через Vercel-прокси к Claude Haiku 4.5 и не сохраняются ни у Opten, ни у Anthropic (политика API). Если Pro-пользователь явно сохраняет текст в Библиотеке промптов, Opten хранит эту запись в Opten Cloud, чтобы её можно было найти и вставить снова — без телеметрии содержимого, рекламы и обучения моделей.",
   },
   {
     q: "Где работает расширение?",
@@ -59,7 +59,7 @@ const en: FaqItem[] = [
   },
   {
     q: "Does Opten store my prompts on its servers?",
-    a: "No. Prompts and reference images flow through a Vercel proxy to Claude Haiku 4.5 for analysis and are NOT stored — neither by Opten nor by Anthropic (per API policy). No prompt-content telemetry. Your account only tracks the monthly count of checks used.",
+    a: "For scoring and improvement, no: prompts and reference images pass through a Vercel proxy to Claude Haiku 4.5 and are not stored by Opten or Anthropic (per API policy). If a Pro user explicitly saves text in the Prompt Library, Opten stores that record in Opten Cloud so it can be found and inserted again — without prompt-content telemetry, advertising, or model training.",
   },
   {
     q: "Where does the extension work?",
