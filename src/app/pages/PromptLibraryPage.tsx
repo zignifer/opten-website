@@ -915,7 +915,7 @@ export default function PromptLibraryPage() {
               <h1 className="font-['Unbounded',sans-serif] text-[30px] font-bold leading-tight text-white sm:text-[38px]">
                 {text.title}
               </h1>
-              {loadingPrompts && <p className="mt-2 text-[13px] text-white/45">{text.loading}</p>}
+              <span className="sr-only" aria-live="polite">{loadingPrompts ? text.loading : ""}</span>
             </div>
             <button
               type="button"
@@ -949,7 +949,17 @@ export default function PromptLibraryPage() {
             <div className="flex min-w-0 flex-col rounded-[10px] border border-white/10 bg-[#071c1f]/90 lg:h-[calc(100dvh-298px)] lg:min-h-[520px]">
               <div className="flex flex-col gap-3 border-b border-white/10 px-4 py-3 md:flex-row md:items-center md:justify-between">
                 <h2 className="text-[15px] font-semibold leading-tight text-white">
-                  {filterTitle} <span className="text-white/50">({filterCountLabel})</span>
+                  <span className="inline-flex items-center gap-2">
+                    <span>{filterTitle} <span className="text-white/50">({filterCountLabel})</span></span>
+                    <RefreshCw
+                      size={13}
+                      aria-hidden="true"
+                      className={cx(
+                        "shrink-0 text-[#9cfb51]/75 transition-opacity",
+                        loadingPrompts ? "animate-spin opacity-100" : "opacity-0",
+                      )}
+                    />
+                  </span>
                 </h2>
                 <div className="flex flex-wrap gap-1 rounded-[9px] border border-white/10 bg-[#0d2528] p-1" role="group" aria-label="Filter">
                   {(["all", "favorite", "recent", "archive"] as FilterMode[]).map((item) => (
