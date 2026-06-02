@@ -54,11 +54,15 @@ Defined in [`manifest.json:59-61`](../../promptscore/manifest.json#L59-L61):
 }
 ```
 
-The handler additionally validates `sender.url` at runtime
-([`background.js:1004-1008`](../../promptscore/background/background.js#L1004-L1008), tag `SEC-02`):
+The handler additionally validates the exact `sender.url` origin at runtime
+([`background.js:2220-2230`](../../promptscore/background/background.js#L2220-L2230), tag `SEC-02`):
 
 ```js
-if (!sender.url || !sender.url.startsWith('https://opten.space')) {
+function isTrustedExternalSender(sender) {
+  return !!(sender && sender.url && new URL(sender.url).origin === 'https://opten.space');
+}
+
+if (!isTrustedExternalSender(sender)) {
   sendResponse({ error: true, message: 'Unauthorized origin' });
   return;
 }
