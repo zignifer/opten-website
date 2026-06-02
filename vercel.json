@@ -14,7 +14,8 @@
   "rewrites": [
     { "source": "/account", "destination": "/index.html" },
     { "source": "/success", "destination": "/index.html" },
-    { "source": "/dashboard/download-skill", "destination": "/index.html" }
+    { "source": "/dashboard/download-skill", "destination": "/index.html" },
+    { "source": "/internal/:path*", "destination": "/index.html" }
   ],
   "headers": [
     {
@@ -46,6 +47,12 @@
     },
     {
       "source": "/dashboard/:path*",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/internal/:path*",
       "headers": [
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
       ]
