@@ -832,7 +832,7 @@ export default function PromptLibraryPage() {
   const pageShell = (children: JSX.Element) => (
     <div className="min-h-dvh bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
       <SiteHeader variant="page" />
-      <main className="relative overflow-hidden px-4 pb-10 pt-[98px] sm:px-6 lg:px-8 lg:pt-[112px]">
+      <main className="relative overflow-hidden px-4 pb-[70px] pt-[128px] sm:px-6 lg:px-8 lg:pt-[142px]">
         <div
           aria-hidden="true"
           className="opten-figma-gradient"
@@ -899,7 +899,7 @@ export default function PromptLibraryPage() {
     <div className="min-h-dvh bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
       <SiteHeader variant="page" />
 
-      <main className="relative overflow-hidden px-4 pb-10 pt-[98px] sm:px-6 lg:px-8 lg:pt-[112px]">
+      <main className="relative overflow-hidden px-4 pb-[70px] pt-[128px] sm:px-6 lg:px-8 lg:pt-[142px]">
         <div
           aria-hidden="true"
           className="opten-figma-gradient"
@@ -910,7 +910,7 @@ export default function PromptLibraryPage() {
         />
 
         <div className="relative z-10 mx-auto flex max-w-[1100px] flex-col gap-4">
-          <section className="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <section className="flex flex-col gap-4 pb-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="font-['Unbounded',sans-serif] text-[30px] font-bold leading-tight text-white sm:text-[38px]">
                 {text.title}
@@ -946,7 +946,7 @@ export default function PromptLibraryPage() {
           </section>
 
           <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_420px]">
-            <div className="flex min-w-0 flex-col rounded-[10px] border border-white/10 bg-[#071c1f]/90 lg:h-[calc(100dvh-298px)] lg:min-h-[520px]">
+            <div className="flex min-w-0 flex-col rounded-[10px] border border-white/10 bg-[#071c1f]/90 lg:h-[calc(100dvh-358px)] lg:min-h-[520px]">
               <div className="flex flex-col gap-3 border-b border-white/10 px-4 py-3 md:flex-row md:items-center md:justify-between">
                 <h2 className="text-[15px] font-semibold leading-tight text-white">
                   <span className="inline-flex items-center gap-2">
@@ -1088,7 +1088,7 @@ export default function PromptLibraryPage() {
               </div>
             </div>
 
-            <aside className="flex min-w-0 flex-col rounded-[10px] border border-white/10 bg-[#071c1f]/95 lg:sticky lg:top-[96px] lg:h-[calc(100dvh-298px)] lg:min-h-[520px] lg:overflow-hidden">
+            <aside className="flex min-w-0 flex-col rounded-[10px] border border-white/10 bg-[#071c1f]/95 lg:sticky lg:top-[126px] lg:h-[calc(100dvh-358px)] lg:min-h-[520px] lg:overflow-hidden">
               {selectedPrompt ? (
                 <>
                   <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
