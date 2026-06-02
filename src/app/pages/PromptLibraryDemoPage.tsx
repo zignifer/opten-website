@@ -1,21 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Archive,
   ArchiveRestore,
-  ChevronDown,
   Copy,
-  Download,
   Library,
+  MoreHorizontal,
   Pencil,
   Plus,
   Save,
   Search,
-  ShieldCheck,
   Sparkles,
   Star,
-  Trash2,
-  Upload,
-  X,
 } from "lucide-react";
 import SiteHeader from "../components/SiteHeader";
 
@@ -35,7 +30,7 @@ interface PromptRecord {
 }
 
 type FilterMode = "all" | "favorite" | "recent" | "archive";
-type ModalKind = "import" | "export" | null;
+type EditorMode = "view" | "edit";
 
 const MAX_PROMPTS = 150;
 const MAX_BODY_CHARS = 12000;
@@ -407,74 +402,19 @@ function EmptyState({ title, body }: { title: string; body?: string }) {
   );
 }
 
-function MockModal({ kind, onClose }: { kind: Exclude<ModalKind, null>; onClose: () => void }) {
-  const copy =
-    kind === "import"
-      ? {
-          icon: Upload,
-          title: "Импорт промптов",
-          body: "Демо-состояние. Позже здесь будет загрузка JSON/CSV и проверка лимитов перед записью в библиотеку.",
-          action: "Импорт пока выключен",
-        }
-      : {
-          icon: Download,
-          title: "Экспорт библиотеки",
-          body: "Демо-состояние. Позже экспорт отдаст локальный файл с выбранными промптами, тегами и датами.",
-          action: "Экспорт пока выключен",
-        };
-  const Icon = copy.icon;
-
-  return (
-    <div
-      className="fixed inset-0 z-[80] grid place-items-center bg-black/60 px-4 py-8"
-      role="presentation"
-      onMouseDown={onClose}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="prompt-library-demo-modal-title"
-        className="w-full max-w-[420px] rounded-[14px] border border-white/12 bg-[#0b2023] p-5 text-white shadow-[0_32px_90px_rgba(0,0,0,0.55)]"
-        onMouseDown={(event) => event.stopPropagation()}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <span className="grid size-10 place-items-center rounded-full bg-[#9cfb51]/12 text-[#9cfb51]">
-            <Icon size={18} aria-hidden="true" />
-          </span>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Закрыть окно"
-            className="grid size-10 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-white/60 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
-          >
-            <X size={18} aria-hidden="true" />
-          </button>
-        </div>
-        <h2 id="prompt-library-demo-modal-title" className="mt-4 text-[20px] font-semibold leading-tight text-white">
-          {copy.title}
-        </h2>
-        <p className="mt-2 text-[14px] leading-[1.6] text-white/55">{copy.body}</p>
-        <button
-          type="button"
-          disabled
-          className="mt-5 h-11 w-full rounded-full border border-white/10 bg-white/[0.04] text-[14px] font-medium text-white/35"
-        >
-          {copy.action}
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export default function PromptLibraryDemoPage() {
   const [prompts, setPrompts] = useState<PromptRecord[]>(MOCK_PROMPTS);
   const [selectedId, setSelectedId] = useState(MOCK_PROMPTS[0].id);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterMode>("all");
-  const [tagFilter, setTagFilter] = useState("all");
-  const [tagDraft, setTagDraft] = useState(MOCK_PROMPTS[0].tags.join(", "));
+  const [editorMode, setEditorMode] = useState<EditorMode>("view");
+  const [draftTitle, setDraftTitle] = useState(MOCK_PROMPTS[0].title);
+  const [draftBody, setDraftBody] = useState(MOCK_PROMPTS[0].body);
+  const [draftTags, setDraftTags] = useState(MOCK_PROMPTS[0].tags.join(", "));
+  const [quickTitlesOpen, setQuickTitlesOpen] = useState(false);
+  const [cardMenuId, setCardMenuId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [modal, setModal] = useState<ModalKind>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const previousTitle = document.title;
@@ -515,19 +455,26 @@ export default function PromptLibraryDemoPage() {
 
   useEffect(() => {
     const prompt = prompts.find((item) => item.id === selectedId);
-    setTagDraft(prompt?.tags.join(", ") ?? "");
-  }, [selectedId]);
+    setDraftTitle(prompt?.title ?? "");
+    setDraftBody(prompt?.body ?? "");
+    setDraftTags(prompt?.tags.join(", ") ?? "");
+    setQuickTitlesOpen(false);
+  }, [prompts, selectedId]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const isSearchShortcut = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k";
+      if (!isSearchShortcut) return;
+      event.preventDefault();
+      searchInputRef.current?.focus();
+      searchInputRef.current?.select();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const selectedPrompt = prompts.find((prompt) => prompt.id === selectedId) ?? null;
-  const activeCount = prompts.filter((prompt) => !prompt.archivedAt).length;
-  const archivedCount = prompts.length - activeCount;
-  const favoriteCount = prompts.filter((prompt) => prompt.favorite && !prompt.archivedAt).length;
-
-  const allTags = useMemo(() => {
-    const tags = new Set<string>();
-    prompts.forEach((prompt) => prompt.tags.forEach((tag) => tags.add(tag)));
-    return Array.from(tags).sort((a, b) => a.localeCompare(b, "ru"));
-  }, [prompts]);
 
   const filteredPrompts = useMemo(() => {
     const query = normalize(search);
@@ -538,7 +485,6 @@ export default function PromptLibraryDemoPage() {
         if (filter !== "archive" && archived) return false;
         if (filter === "favorite" && !prompt.favorite) return false;
         if (filter === "recent" && !prompt.lastUsedAt) return false;
-        if (tagFilter !== "all" && !prompt.tags.some((tag) => normalize(tag) === normalize(tagFilter))) return false;
         if (!query) return true;
         const haystack = normalize(`${prompt.title} ${prompt.body} ${prompt.tags.join(" ")} ${prompt.sourceHost}`);
         return haystack.includes(query);
@@ -546,9 +492,17 @@ export default function PromptLibraryDemoPage() {
       .sort((a, b) => {
         return dateValue(b.lastUsedAt ?? b.updatedAt) - dateValue(a.lastUsedAt ?? a.updatedAt);
       });
-  }, [filter, prompts, search, tagFilter]);
+  }, [filter, prompts, search]);
 
-  const titleSuggestions = useMemo(() => (selectedPrompt ? buildTitleSuggestions(selectedPrompt) : []), [selectedPrompt]);
+  const titleSuggestions = useMemo(() => {
+    if (!selectedPrompt) return [];
+    return buildTitleSuggestions({
+      ...selectedPrompt,
+      title: draftTitle,
+      body: draftBody,
+      tags: parseTags(draftTags),
+    });
+  }, [draftBody, draftTags, draftTitle, selectedPrompt]);
 
   const showToast = (message: string) => setToast(message);
 
@@ -579,6 +533,7 @@ export default function PromptLibraryDemoPage() {
     setPrompts((current) => [prompt, ...current]);
     setFilter("all");
     setSelectedId(prompt.id);
+    setEditorMode("edit");
     showToast("Новый промпт создан");
   };
 
@@ -595,6 +550,7 @@ export default function PromptLibraryDemoPage() {
   };
 
   const handleArchiveToggle = (prompt: PromptRecord) => {
+    setCardMenuId(null);
     if (prompt.archivedAt) {
       touchPrompt(prompt.id, { archivedAt: null }, "Промпт восстановлен");
     } else {
@@ -605,27 +561,57 @@ export default function PromptLibraryDemoPage() {
 
   const handleSave = () => {
     if (!selectedPrompt) return;
-    touchPrompt(selectedPrompt.id, {}, "Изменения сохранены");
+    const nextTags = parseTags(draftTags);
+    touchPrompt(
+      selectedPrompt.id,
+      {
+        title: draftTitle.trim() || "Без названия",
+        body: draftBody.slice(0, MAX_BODY_CHARS),
+        tags: nextTags.length ? nextTags : ["draft"],
+      },
+      "Изменения сохранены",
+    );
+    setEditorMode("view");
+    setQuickTitlesOpen(false);
   };
 
-  const empty =
-    search.trim() || tagFilter !== "all"
-      ? {
-          title: "Ничего не найдено",
-          body: "Попробуй другое название, тег или фрагмент промпта.",
-        }
-      : filter === "archive"
-        ? { title: "Архив пуст" }
-        : {
-            title: "Пока нет сохраненных промптов",
-            body: "В расширении: выдели текст - ПКМ - Сохранить в Opten.",
-          };
+  const handleStartEdit = () => {
+    if (!selectedPrompt) return;
+    setDraftTitle(selectedPrompt.title);
+    setDraftBody(selectedPrompt.body);
+    setDraftTags(selectedPrompt.tags.join(", "));
+    setEditorMode("edit");
+    setQuickTitlesOpen(false);
+  };
+
+  const handleCancelEdit = () => {
+    if (!selectedPrompt) return;
+    setDraftTitle(selectedPrompt.title);
+    setDraftBody(selectedPrompt.body);
+    setDraftTags(selectedPrompt.tags.join(", "));
+    setEditorMode("view");
+    setQuickTitlesOpen(false);
+  };
+
+  const empty = search.trim()
+    ? {
+        title: "Ничего не найдено",
+        body: "Попробуй другое название, тег или фрагмент промпта.",
+      }
+    : filter === "archive"
+      ? { title: "Архив пуст" }
+      : {
+          title: "Пока нет сохраненных промптов",
+          body: "В расширении: выдели текст - ПКМ - Сохранить в Opten.",
+        };
+  const filterTitle = filter === "all" ? "Все промпты" : FILTERS.find((item) => item.value === filter)?.label ?? "Промпты";
+  const filterCountLabel = filter === "all" ? `${filteredPrompts.length}/${MAX_PROMPTS}` : `${filteredPrompts.length}`;
 
   return (
     <div className="min-h-dvh bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
       <SiteHeader variant="page" />
 
-      <main className="relative overflow-hidden px-4 pb-10 pt-[118px] sm:px-6 lg:px-8 lg:pt-[136px]">
+      <main className="relative overflow-hidden px-4 pb-10 pt-[98px] sm:px-6 lg:px-8 lg:pt-[112px]">
         <div
           aria-hidden="true"
           className="opten-figma-gradient"
@@ -635,142 +621,74 @@ export default function PromptLibraryDemoPage() {
           }}
         />
 
-        <div className="relative z-10 mx-auto flex max-w-[1100px] flex-col gap-5">
-          <section className="flex flex-col gap-4 border-b border-white/10 pb-5">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-              <div className="min-w-0">
-                <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-[#9cfb51]/30 bg-[#9cfb51]/10 px-3 py-1 text-[12px] font-medium text-[#9cfb51]">
-                    <ShieldCheck size={14} aria-hidden="true" />
-                    Pro demo
-                  </span>
-                  <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[12px] text-white/55">
-                    Демо - локальные данные
-                  </span>
-                </div>
-                <h1 className="font-['Unbounded',sans-serif] text-[30px] font-bold leading-tight text-white sm:text-[38px]">
-                  Библиотека промптов
-                </h1>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 sm:flex sm:items-center">
-                <div className="rounded-[8px] border border-white/10 bg-white/[0.04] px-3 py-2">
-                  <p className="text-[12px] text-white/40">Промпты</p>
-                  <p className="text-[15px] font-semibold text-white">{activeCount} / {MAX_PROMPTS}</p>
-                </div>
-                <div className="rounded-[8px] border border-white/10 bg-white/[0.04] px-3 py-2">
-                  <p className="text-[12px] text-white/40">Избранные</p>
-                  <p className="text-[15px] font-semibold text-white">{favoriteCount}</p>
-                </div>
-                <div className="rounded-[8px] border border-white/10 bg-white/[0.04] px-3 py-2">
-                  <p className="text-[12px] text-white/40">Архив</p>
-                  <p className="text-[15px] font-semibold text-white">{archivedCount}</p>
-                </div>
-              </div>
-            </div>
+        <div className="relative z-10 mx-auto flex max-w-[1100px] flex-col gap-4">
+          <section className="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+            <h1 className="font-['Unbounded',sans-serif] text-[30px] font-bold leading-tight text-white sm:text-[38px]">
+              Библиотека промптов
+            </h1>
+            <button
+              type="button"
+              onClick={handleCreate}
+              className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#9cfb51] px-5 text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 sm:w-auto"
+            >
+              <Plus size={16} aria-hidden="true" />
+              Добавить промпт
+            </button>
           </section>
 
-          <section className="flex flex-col gap-3 rounded-[10px] border border-white/10 bg-[#071c1f]/90 p-3 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
-            <div className="grid gap-3 lg:grid-cols-[minmax(220px,1fr)_auto_auto] lg:items-center">
-              <label className="relative block">
-                <span className="sr-only">Поиск промптов</span>
-                <Search
-                  size={17}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/35"
-                  aria-hidden="true"
-                />
-                <input
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Поиск по названию, тегу или тексту"
-                  className="h-11 w-full rounded-[9px] border border-white/10 bg-[#0d2528] pl-10 pr-3 text-[14px] text-white outline-none transition placeholder:text-white/35 focus:border-[#9cfb51]/60 focus:ring-2 focus:ring-[#9cfb51]/15"
-                />
-              </label>
-
-              <div className="flex flex-wrap gap-1 rounded-[9px] border border-white/10 bg-[#0d2528] p-1" role="group" aria-label="Фильтр">
-                {FILTERS.map((item) => (
-                  <button
-                    key={item.value}
-                    type="button"
-                    onClick={() => setFilter(item.value)}
-                    aria-pressed={filter === item.value}
-                    className={cx(
-                      "h-9 cursor-pointer rounded-[7px] px-3 text-[13px] transition focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60",
-                      filter === item.value
-                        ? "bg-[#9cfb51] text-[#011417]"
-                        : "text-white/58 hover:bg-white/[0.06] hover:text-white",
-                    )}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-
-              <label className="relative">
-                <span className="sr-only">Тег</span>
-                <select
-                  value={tagFilter}
-                  onChange={(event) => setTagFilter(event.target.value)}
-                  className="h-11 w-full appearance-none rounded-[9px] border border-white/10 bg-[#0d2528] pl-3 pr-11 text-[14px] text-white outline-none transition focus:border-[#9cfb51]/60 focus:ring-2 focus:ring-[#9cfb51]/15 lg:w-[180px]"
-                >
-                  <option value="all" className="bg-[#0d2528] text-white">Все теги</option>
-                  {allTags.map((tag) => (
-                    <option key={tag} value={tag} className="bg-[#0d2528] text-white">
-                      {tag}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  size={16}
-                  className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-white/75"
-                  aria-hidden="true"
-                />
-              </label>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={handleCreate}
-                className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-full bg-[#9cfb51] px-4 text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
-              >
-                <Plus size={16} aria-hidden="true" />
-                Создать
-              </button>
-              <button
-                type="button"
-                onClick={() => setModal("import")}
-                className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 text-[14px] text-white/70 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
-              >
-                <Upload size={16} aria-hidden="true" />
-                Импорт
-              </button>
-              <button
-                type="button"
-                onClick={() => setModal("export")}
-                className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 text-[14px] text-white/70 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
-              >
-                <Download size={16} aria-hidden="true" />
-                Экспорт
-              </button>
-            </div>
+          <section>
+            <label className="relative block">
+              <span className="sr-only">Поиск промптов</span>
+              <Search
+                size={17}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/35"
+                aria-hidden="true"
+              />
+              <input
+                ref={searchInputRef}
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Найти промпт, тег или источник..."
+                className="h-[54px] w-full rounded-[9px] border border-white/10 bg-[#081d1f] pl-10 pr-16 text-[15px] text-white outline-none transition placeholder:text-white/35 focus:border-[#9cfb51]/60 focus:ring-2 focus:ring-[#9cfb51]/15"
+              />
+              <span className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-[6px] border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] font-medium text-white/42 sm:inline-flex">
+                Ctrl K
+              </span>
+            </label>
           </section>
 
           <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_420px]">
-            <div className="min-w-0 rounded-[10px] border border-white/10 bg-[#071c1f]/90">
-              <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
+            <div className="flex min-w-0 flex-col rounded-[10px] border border-white/10 bg-[#071c1f]/90 lg:h-[calc(100dvh-298px)] lg:min-h-[520px]">
+              <div className="flex flex-col gap-3 border-b border-white/10 px-4 py-3 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <h2 className="text-[15px] font-semibold leading-tight text-white">Сохраненные промпты</h2>
-                  <p className="mt-1 text-[12px] text-white/40">{filteredPrompts.length} в текущем виде</p>
+                  <h2 className="text-[15px] font-semibold leading-tight text-white">
+                    {filterTitle} <span className="text-white/50">({filterCountLabel})</span>
+                  </h2>
                 </div>
-                <span className="hidden rounded-full bg-white/[0.05] px-3 py-1 text-[12px] text-white/45 sm:inline-flex">
-                  12 000 символов / промпт
-                </span>
+                <div className="flex flex-wrap gap-1 rounded-[9px] border border-white/10 bg-[#0d2528] p-1" role="group" aria-label="Фильтр">
+                  {FILTERS.map((item) => (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => setFilter(item.value)}
+                      aria-pressed={filter === item.value}
+                      className={cx(
+                        "inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-[7px] px-3 text-[12px] outline-none ring-0 transition focus:ring-0 focus-visible:ring-1 focus-visible:ring-[#9cfb51]/45",
+                        filter === item.value
+                          ? "bg-[#9cfb51] text-[#011417]"
+                          : "text-white/58 hover:bg-white/[0.06] hover:text-white",
+                      )}
+                    >
+                      {item.value === "favorite" && <Star size={12} fill={filter === "favorite" ? "currentColor" : "none"} aria-hidden="true" />}
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div
                 data-prompt-list
-                className="opten-demo-scrollbar flex flex-col gap-2 p-2 md:max-h-[calc(100dvh-114px)] md:overflow-y-auto md:pr-1"
+                className="opten-demo-scrollbar flex min-h-0 flex-1 flex-col gap-2 p-2 md:overflow-y-auto md:pr-1"
               >
                 {filteredPrompts.length === 0 ? (
                   <EmptyState title={empty.title} body={empty.body} />
@@ -782,16 +700,47 @@ export default function PromptLibraryDemoPage() {
                       <article
                         key={prompt.id}
                         data-prompt-id={prompt.id}
-                        onClick={() => setSelectedId(prompt.id)}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => {
+                          setSelectedId(prompt.id);
+                          setEditorMode("view");
+                          setCardMenuId(null);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key !== "Enter" && event.key !== " ") return;
+                          event.preventDefault();
+                          setSelectedId(prompt.id);
+                          setEditorMode("view");
+                          setCardMenuId(null);
+                        }}
                         aria-current={selected ? "true" : undefined}
                         className={cx(
-                          "shrink-0 cursor-pointer rounded-[9px] border p-3 transition",
+                          "group relative shrink-0 cursor-pointer rounded-[9px] border p-2.5 outline-none ring-0 transition focus:ring-0 focus-visible:ring-1 focus-visible:ring-[#9cfb51]/35",
                           selected
-                            ? "border-[#9cfb51]/45 bg-[#9cfb51]/8 shadow-[0_0_0_1px_rgba(156,251,81,0.08)]"
+                            ? "border-[#9cfb51]/42 bg-[#9cfb51]/7"
                             : "border-white/8 bg-white/[0.035] hover:border-white/16 hover:bg-white/[0.055]",
                         )}
                       >
-                        <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+                        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-2.5 sm:gap-3">
+                          <button
+                            type="button"
+                            data-action="favorite"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              touchPrompt(prompt.id, { favorite: !prompt.favorite }, prompt.favorite ? "Убрано из избранного" : "Добавлено в избранное");
+                            }}
+                            aria-label={prompt.favorite ? "Убрать из избранного" : "Добавить в избранное"}
+                            className={cx(
+                              "grid size-9 shrink-0 cursor-pointer place-items-center rounded-full border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/60",
+                              prompt.favorite
+                                ? "border-[#9cfb51]/35 bg-[#9cfb51]/12 text-[#9cfb51]"
+                                : "border-white/10 bg-white/[0.04] text-white/45 hover:bg-white/10 hover:text-white",
+                            )}
+                          >
+                            <Star size={16} fill={prompt.favorite ? "currentColor" : "none"} aria-hidden="true" />
+                          </button>
+
                           <div className="min-w-0">
                             <div className="flex min-w-0 items-center gap-2">
                               <h3 className="truncate text-[15px] font-semibold leading-tight text-white">{prompt.title}</h3>
@@ -801,29 +750,30 @@ export default function PromptLibraryDemoPage() {
                                 </span>
                               )}
                             </div>
-                            <p className="mt-2 line-clamp-2 text-[13px] leading-[1.5] text-white/52 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+                            <p
+                              className="mt-1.5 text-[13px] leading-[1.45] text-white/50 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:1] [overflow:hidden]"
+                            >
                               {prompt.body || "Пустой промпт"}
                             </p>
+
+                            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-medium text-white/45">
+                              <span>
+                                Добавлен: <span className="text-white/65">{formatDate(prompt.createdAt)}</span>
+                              </span>
+                              <span>
+                                Использований: <span className="text-white/65">{prompt.useCount}</span>
+                              </span>
+                            </div>
                           </div>
 
-                          <div className="flex items-start gap-1 sm:justify-end">
-                            <button
-                              type="button"
-                              data-action="favorite"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                touchPrompt(prompt.id, { favorite: !prompt.favorite }, prompt.favorite ? "Убрано из избранного" : "Добавлено в избранное");
-                              }}
-                              aria-label={prompt.favorite ? "Убрать из избранного" : "Добавить в избранное"}
-                              className={cx(
-                                "grid size-9 cursor-pointer place-items-center rounded-full border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/60",
-                                prompt.favorite
-                                  ? "border-[#9cfb51]/40 bg-[#9cfb51]/12 text-[#9cfb51]"
-                                  : "border-white/10 bg-white/[0.04] text-white/45 hover:text-white",
-                              )}
-                            >
-                              <Star size={16} fill={prompt.favorite ? "currentColor" : "none"} aria-hidden="true" />
-                            </button>
+                          <div
+                            className={cx(
+                              "relative flex shrink-0 items-start gap-1 opacity-100 transition",
+                              cardMenuId === prompt.id
+                                ? "sm:opacity-100"
+                                : "sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100",
+                            )}
+                          >
                             <button
                               type="button"
                               data-action="copy"
@@ -832,49 +782,39 @@ export default function PromptLibraryDemoPage() {
                                 void handleCopy(prompt);
                               }}
                               aria-label="Копировать"
-                              className="grid size-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-white/45 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/60"
+                              className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-white/45 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/60"
                             >
                               <Copy size={16} aria-hidden="true" />
                             </button>
                             <button
                               type="button"
-                              data-action="edit"
+                              data-action="menu"
                               onClick={(event) => {
                                 event.stopPropagation();
-                                setSelectedId(prompt.id);
+                                setCardMenuId((current) => (current === prompt.id ? null : prompt.id));
                               }}
-                              aria-label="Редактировать"
-                              className="grid size-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-white/45 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/60"
+                              aria-expanded={cardMenuId === prompt.id}
+                              aria-label="Открыть действия"
+                              className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-white/45 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/60"
                             >
-                              <Pencil size={16} aria-hidden="true" />
+                              <MoreHorizontal size={16} aria-hidden="true" />
                             </button>
-                            <button
-                              type="button"
-                              data-action={archived ? "restore" : "archive"}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                handleArchiveToggle(prompt);
-                              }}
-                              aria-label={archived ? "Восстановить" : "Архивировать"}
-                              className="grid size-9 cursor-pointer place-items-center rounded-full border border-white/10 bg-white/[0.04] text-white/45 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/60"
-                            >
-                              {archived ? <ArchiveRestore size={16} aria-hidden="true" /> : <Archive size={16} aria-hidden="true" />}
-                            </button>
+                            {cardMenuId === prompt.id && (
+                              <div
+                                className="absolute right-0 top-10 z-30 w-[176px] rounded-[10px] border border-white/10 bg-[#0b2023] p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.45)]"
+                                onClick={(event) => event.stopPropagation()}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => handleArchiveToggle(prompt)}
+                                  className="flex h-10 w-full cursor-pointer items-center gap-2 rounded-[8px] px-3 text-left text-[13px] text-white/70 transition hover:bg-white/[0.06] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/50"
+                                >
+                                  {archived ? <ArchiveRestore size={15} aria-hidden="true" /> : <Archive size={15} aria-hidden="true" />}
+                                  {archived ? "Восстановить" : "Архивировать"}
+                                </button>
+                              </div>
+                            )}
                           </div>
-                        </div>
-
-                        <div className="mt-3 flex flex-wrap items-center gap-2">
-                          {prompt.tags.slice(0, 4).map((tag) => (
-                            <PromptTag key={tag} active={tagFilter !== "all" && normalize(tagFilter) === normalize(tag)}>
-                              {tag}
-                            </PromptTag>
-                          ))}
-                        </div>
-
-                        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-white/38">
-                          <span>{prompt.sourceHost}</span>
-                          <span>{prompt.useCount} использ.</span>
-                          <span>{formatDate(prompt.lastUsedAt ?? prompt.updatedAt)}</span>
                         </div>
                       </article>
                     );
@@ -883,151 +823,185 @@ export default function PromptLibraryDemoPage() {
               </div>
             </div>
 
-            <aside className="opten-demo-scrollbar min-w-0 rounded-[10px] border border-white/10 bg-[#071c1f]/95 lg:sticky lg:top-[104px] lg:max-h-[calc(100dvh-128px)] lg:overflow-y-auto">
+            <aside className="flex min-w-0 flex-col rounded-[10px] border border-white/10 bg-[#071c1f]/95 lg:sticky lg:top-[96px] lg:h-[calc(100dvh-298px)] lg:min-h-[520px] lg:overflow-hidden">
               {selectedPrompt ? (
-                <div className="flex flex-col">
+                <>
                   <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
-                    <div>
-                      <h2 className="text-[15px] font-semibold leading-tight text-white">Редактор</h2>
-                      <p className="mt-1 text-[12px] text-white/40">
-                        {selectedPrompt.archivedAt ? "Архивный промпт" : "Активный промпт"}
-                      </p>
+                    <div className="min-w-0 flex-1">
+                      <h2 className="truncate text-[15px] font-semibold leading-tight text-white">
+                        {selectedPrompt.title}
+                      </h2>
                     </div>
                     <button
                       type="button"
                       onClick={() => touchPrompt(selectedPrompt.id, { favorite: !selectedPrompt.favorite }, selectedPrompt.favorite ? "Убрано из избранного" : "Добавлено в избранное")}
+                      aria-label={selectedPrompt.favorite ? "Убрать из избранного" : "Добавить в избранное"}
                       className={cx(
-                        "inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border px-3 text-[13px] transition focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60",
+                        "grid size-10 shrink-0 cursor-pointer place-items-center rounded-full border transition focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60",
                         selectedPrompt.favorite
                           ? "border-[#9cfb51]/40 bg-[#9cfb51]/12 text-[#9cfb51]"
                           : "border-white/10 bg-white/[0.04] text-white/55 hover:text-white",
                       )}
                     >
                       <Star size={15} fill={selectedPrompt.favorite ? "currentColor" : "none"} aria-hidden="true" />
-                      Избранное
                     </button>
                   </div>
 
-                  <div className="flex flex-col gap-4 p-4">
-                    <label className="flex flex-col gap-2">
-                      <span className="text-[13px] font-medium text-white/70">Название</span>
-                      <input
-                        value={selectedPrompt.title}
-                        onChange={(event) => updatePrompt(selectedPrompt.id, { title: event.target.value })}
-                        className="h-11 rounded-[9px] border border-white/10 bg-[#0d2528] px-3 text-[15px] text-white outline-none transition placeholder:text-white/35 focus:border-[#9cfb51]/60 focus:ring-2 focus:ring-[#9cfb51]/15"
-                        placeholder="Название промпта"
-                      />
-                    </label>
-
-                    <div>
-                      <div className="mb-2 flex items-center gap-2 text-[13px] font-medium text-white/70">
-                        <Sparkles size={15} className="text-[#9cfb51]" aria-hidden="true" />
-                        Быстрые названия
+                  {editorMode === "view" ? (
+                    <div className="opten-demo-scrollbar flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
+                      <div className="opten-demo-scrollbar min-h-[190px] flex-1 overflow-y-auto rounded-[10px] border border-white/10 bg-[#0d2528] p-4">
+                        <p className="whitespace-pre-wrap text-[15px] font-medium leading-[1.62] text-white">
+                          {selectedPrompt.body || "Промпт пока пуст. Перейди в редактирование, чтобы добавить текст."}
+                        </p>
                       </div>
+
                       <div className="flex flex-wrap gap-2">
-                        {titleSuggestions.map((suggestion) => (
-                          <button
-                            key={suggestion}
-                            type="button"
-                            onClick={() => updatePrompt(selectedPrompt.id, { title: suggestion })}
-                            className="max-w-full cursor-pointer rounded-full border border-[#9cfb51]/20 bg-[#9cfb51]/8 px-3 py-1.5 text-[12px] text-[#bafa85] transition hover:border-[#9cfb51]/45 hover:bg-[#9cfb51]/14 focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
-                          >
-                            <span className="block truncate">{suggestion}</span>
-                          </button>
+                        {selectedPrompt.tags.map((tag) => (
+                          <PromptTag key={tag}>{tag}</PromptTag>
                         ))}
                       </div>
-                    </div>
 
-                    <label className="flex flex-col gap-2">
-                      <span className="text-[13px] font-medium text-white/70">Промпт</span>
-                      <textarea
-                        value={selectedPrompt.body}
-                        onChange={(event) => updatePrompt(selectedPrompt.id, { body: event.target.value.slice(0, MAX_BODY_CHARS) })}
-                        className="opten-demo-scrollbar min-h-[240px] resize-y rounded-[9px] border border-white/10 bg-[#0d2528] px-3 py-3 text-[14px] leading-[1.55] text-white outline-none transition placeholder:text-white/35 focus:border-[#9cfb51]/60 focus:ring-2 focus:ring-[#9cfb51]/15"
-                        placeholder="Текст промпта"
-                      />
-                      <span className="text-right text-[12px] text-white/35">
-                        {selectedPrompt.body.length} / {MAX_BODY_CHARS}
-                      </span>
-                    </label>
-
-                    <label className="flex flex-col gap-2">
-                      <span className="text-[13px] font-medium text-white/70">Теги</span>
-                      <input
-                        value={tagDraft}
-                        onChange={(event) => {
-                          setTagDraft(event.target.value);
-                          updatePrompt(selectedPrompt.id, { tags: parseTags(event.target.value) });
-                        }}
-                        className="h-11 rounded-[9px] border border-white/10 bg-[#0d2528] px-3 text-[14px] text-white outline-none transition placeholder:text-white/35 focus:border-[#9cfb51]/60 focus:ring-2 focus:ring-[#9cfb51]/15"
-                        placeholder="video, product, freepik"
-                      />
-                      <span className="text-right text-[12px] text-white/35">
-                        {selectedPrompt.tags.length} / {MAX_TAGS}
-                      </span>
-                    </label>
-
-                    <div className="grid gap-2 rounded-[9px] border border-white/10 bg-white/[0.03] p-3 text-[13px] text-white/55">
-                      <div className="flex items-start justify-between gap-3">
-                        <span className="text-white/35">Источник</span>
-                        <span className="max-w-[240px] text-right text-white/75">{selectedPrompt.sourceHost}</span>
-                      </div>
-                      {selectedPrompt.sourceTitle && (
-                        <div className="flex items-start justify-between gap-3">
-                          <span className="text-white/35">Контекст</span>
-                          <span className="max-w-[240px] text-right text-white/75">{selectedPrompt.sourceTitle}</span>
+                      <details className="rounded-[9px] border border-white/10 bg-white/[0.025] p-3 text-[13px] text-white/55">
+                        <summary className="cursor-pointer select-none text-white/70 outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/60">
+                          Детали промпта
+                        </summary>
+                        <div className="mt-3 grid gap-2">
+                          {selectedPrompt.sourceTitle && (
+                            <div className="flex items-start justify-between gap-3">
+                              <span className="text-white/35">Контекст</span>
+                              <span className="max-w-[230px] text-right text-white/72">{selectedPrompt.sourceTitle}</span>
+                            </div>
+                          )}
+                          <div className="flex items-start justify-between gap-3">
+                            <span className="text-white/35">Создан</span>
+                            <span className="text-right text-white/72">{formatFullDate(selectedPrompt.createdAt)}</span>
+                          </div>
+                          <div className="flex items-start justify-between gap-3">
+                            <span className="text-white/35">Обновлен</span>
+                            <span className="text-right text-white/72">{formatFullDate(selectedPrompt.updatedAt)}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleArchiveToggle(selectedPrompt)}
+                            className="mt-2 inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3 text-[13px] text-white/68 transition hover:bg-white/[0.08] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
+                          >
+                            {selectedPrompt.archivedAt ? <ArchiveRestore size={15} aria-hidden="true" /> : <Archive size={15} aria-hidden="true" />}
+                            {selectedPrompt.archivedAt ? "Восстановить" : "Архивировать"}
+                          </button>
                         </div>
-                      )}
-                      <div className="flex items-start justify-between gap-3">
-                        <span className="text-white/35">Использований</span>
-                        <span className="text-white/75">{selectedPrompt.useCount}</span>
-                      </div>
-                      <div className="flex items-start justify-between gap-3">
-                        <span className="text-white/35">Создан</span>
-                        <span className="text-right text-white/75">{formatFullDate(selectedPrompt.createdAt)}</span>
-                      </div>
-                      <div className="flex items-start justify-between gap-3">
-                        <span className="text-white/35">Последнее использование</span>
-                        <span className="text-right text-white/75">{formatFullDate(selectedPrompt.lastUsedAt)}</span>
-                      </div>
+                      </details>
                     </div>
+                  ) : (
+                    <div className="flex min-h-0 flex-1 flex-col gap-4 p-4">
+                      <div className="relative">
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                          <label htmlFor="prompt-demo-title" className="text-[13px] font-medium text-white/70">
+                            Название
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setQuickTitlesOpen((open) => !open)}
+                            className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.035] px-3 text-[12px] text-white/62 transition hover:bg-white/[0.08] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
+                          >
+                            <Sparkles size={13} className="text-[#9cfb51]/80" aria-hidden="true" />
+                            AI
+                          </button>
+                        </div>
+                        <input
+                          id="prompt-demo-title"
+                          value={draftTitle}
+                          onChange={(event) => setDraftTitle(event.target.value)}
+                          className="h-11 w-full rounded-[9px] border border-white/10 bg-[#0d2528] px-3 text-[15px] text-white outline-none transition placeholder:text-white/35 focus:border-[#9cfb51]/60 focus:ring-2 focus:ring-[#9cfb51]/15"
+                          placeholder="Название промпта"
+                        />
+                        {quickTitlesOpen && (
+                          <div className="absolute right-0 top-[74px] z-20 grid w-full gap-1.5 rounded-[10px] border border-white/10 bg-[#0b2023] p-2 shadow-[0_22px_60px_rgba(0,0,0,0.45)]">
+                            {titleSuggestions.map((suggestion) => (
+                              <button
+                                key={suggestion}
+                                type="button"
+                                onClick={() => {
+                                  setDraftTitle(suggestion);
+                                  setQuickTitlesOpen(false);
+                                }}
+                                className="cursor-pointer rounded-[8px] px-3 py-2 text-left text-[13px] text-white/70 transition hover:bg-white/[0.06] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/50"
+                              >
+                                <span className="line-clamp-1 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:1]">{suggestion}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
 
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      <button
-                        type="button"
-                        onClick={handleSave}
-                        className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#9cfb51] px-4 text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
-                      >
-                        <Save size={16} aria-hidden="true" />
-                        Сохранить
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(selectedPrompt)}
-                        className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 text-[14px] text-white/75 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
-                      >
-                        <Copy size={16} aria-hidden="true" />
-                        Копировать
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleArchiveToggle(selectedPrompt)}
-                        className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 text-[14px] text-white/75 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
-                      >
-                        {selectedPrompt.archivedAt ? <ArchiveRestore size={16} aria-hidden="true" /> : <Archive size={16} aria-hidden="true" />}
-                        {selectedPrompt.archivedAt ? "Восстановить" : "Архивировать"}
-                      </button>
-                      <button
-                        type="button"
-                        disabled
-                        className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.025] px-4 text-[14px] text-white/28"
-                      >
-                        <Trash2 size={16} aria-hidden="true" />
-                        Удалить навсегда
-                      </button>
+                      <label className="flex min-h-0 flex-1 flex-col gap-2">
+                        <span className="text-[13px] font-medium text-white/70">Промпт</span>
+                        <textarea
+                          value={draftBody}
+                          onChange={(event) => setDraftBody(event.target.value.slice(0, MAX_BODY_CHARS))}
+                          className="opten-demo-scrollbar min-h-[220px] flex-1 resize-none overflow-y-auto rounded-[9px] border border-white/10 bg-[#0d2528] px-3 py-3 text-[14px] leading-[1.55] text-white outline-none transition placeholder:text-white/35 focus:border-[#9cfb51]/60 focus:ring-2 focus:ring-[#9cfb51]/15"
+                          placeholder="Текст промпта"
+                        />
+                        <span className="text-right text-[12px] text-white/35">
+                          {draftBody.length} / {MAX_BODY_CHARS}
+                        </span>
+                      </label>
+
+                      <label className="flex flex-col gap-2">
+                        <span className="text-[13px] font-medium text-white/70">Теги</span>
+                        <input
+                          value={draftTags}
+                          onChange={(event) => setDraftTags(event.target.value)}
+                          className="h-11 rounded-[9px] border border-white/10 bg-[#0d2528] px-3 text-[14px] text-white outline-none transition placeholder:text-white/35 focus:border-[#9cfb51]/60 focus:ring-2 focus:ring-[#9cfb51]/15"
+                          placeholder="video, product, freepik"
+                        />
+                        <span className="text-right text-[12px] text-white/35">
+                          {parseTags(draftTags).length} / {MAX_TAGS}
+                        </span>
+                      </label>
                     </div>
+                  )}
+
+                  <div className="shrink-0 border-t border-white/10 bg-[#071c1f]/98 p-3">
+                    {editorMode === "view" ? (
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(selectedPrompt)}
+                          className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#9cfb51] px-4 text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
+                        >
+                          <Copy size={16} aria-hidden="true" />
+                          Копировать
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleStartEdit}
+                          className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 text-[14px] text-white/75 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
+                        >
+                          <Pencil size={16} aria-hidden="true" />
+                          Редактировать
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        <button
+                          type="button"
+                          onClick={handleSave}
+                          className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#9cfb51] px-4 text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
+                        >
+                          <Save size={16} aria-hidden="true" />
+                          Сохранить
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleCancelEdit}
+                          className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 text-[14px] text-white/75 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
+                        >
+                          Отменить
+                        </button>
+                      </div>
+                    )}
                   </div>
-                </div>
+                </>
               ) : (
                 <EmptyState title="Промпт не выбран" />
               )}
@@ -1047,7 +1021,6 @@ export default function PromptLibraryDemoPage() {
         {toast}
       </div>
 
-      {modal && <MockModal kind={modal} onClose={() => setModal(null)} />}
     </div>
   );
 }
