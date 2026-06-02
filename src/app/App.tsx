@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLang, useT } from "../i18n/LangContext";
 import {
   Check,
+  CirclePlay,
   Rocket,
 } from "lucide-react";
 import LocalizedLink from "./components/LocalizedLink";
@@ -35,6 +36,27 @@ import syntxSrc from '../../public/assets/partners/syntx.png?w=268&format=webp;p
 
 const STORE_URL = "https://chromewebstore.google.com/detail/opten-%E2%80%94-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 const ASSET_ROOT = "/assets/landing-design";
+const SUPADEMO_SCRIPT_SRC = "https://script.supademo.com/supademo.js";
+const SUPADEMO_DEMO_SEEN_KEY = "opten_landing_supademo_seen_v1";
+const SUPADEMO_DEMO_IDS = {
+  ru: "cmpfrrpv03q91qm8qgfunpkzz",
+  en: "cmpwpev5d004iw70jlnbh6psr",
+} as const;
+const SUPADEMO_DEMO_URLS = {
+  ru: "https://app.supademo.com/demo/cmpfrrpv03q91qm8qgfunpkzz?utm_source=link",
+  en: "https://app.supademo.com/demo/cmpwpev5d004iw70jlnbh6psr?utm_source=link",
+} as const;
+
+declare global {
+  interface Window {
+    Supademo?: {
+      open: (id: string, options?: Record<string, unknown>) => void;
+    };
+  }
+}
+
+let supademoScriptPromise: Promise<void> | null = null;
+let supademoDemoSeenInSession = false;
 
 const partnerSrcMap = {
   canva: canvaSrc,
@@ -45,6 +67,70 @@ const partnerSrcMap = {
 
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
+}
+
+function hasSeenSupademoDemo(): boolean {
+  if (typeof window === "undefined") return true;
+  if (supademoDemoSeenInSession) return true;
+  try {
+    return window.localStorage.getItem(SUPADEMO_DEMO_SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markSupademoDemoSeen() {
+  if (typeof window === "undefined") return;
+  supademoDemoSeenInSession = true;
+  try {
+    window.localStorage.setItem(SUPADEMO_DEMO_SEEN_KEY, "1");
+  } catch {
+    // Storage can fail in private browsing; the demo should still open.
+  }
+}
+
+function loadSupademoSdk(): Promise<void> {
+  if (typeof window === "undefined") return Promise.reject(new Error("Supademo SDK is client-only"));
+  if (window.Supademo?.open) return Promise.resolve();
+  if (supademoScriptPromise) return supademoScriptPromise;
+
+  supademoScriptPromise = new Promise((resolve, reject) => {
+    const handleLoad = () => {
+      if (window.Supademo?.open) resolve();
+      else reject(new Error("Supademo SDK loaded without open()"));
+    };
+    const handleError = () => reject(new Error("Failed to load Supademo SDK"));
+    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${SUPADEMO_SCRIPT_SRC}"]`);
+
+    if (existingScript) {
+      existingScript.addEventListener("load", handleLoad, { once: true });
+      existingScript.addEventListener("error", handleError, { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = SUPADEMO_SCRIPT_SRC;
+    script.async = true;
+    script.addEventListener("load", handleLoad, { once: true });
+    script.addEventListener("error", handleError, { once: true });
+    document.body.appendChild(script);
+  });
+
+  return supademoScriptPromise;
+}
+
+async function openSupademoDemo(lang: "ru" | "en", fallbackToLink = true) {
+  if (typeof window === "undefined") return;
+  markSupademoDemoSeen();
+
+  try {
+    await loadSupademoSdk();
+    window.Supademo?.open(SUPADEMO_DEMO_IDS[lang]);
+  } catch {
+    if (fallbackToLink) {
+      window.open(SUPADEMO_DEMO_URLS[lang], "_blank", "noopener,noreferrer");
+    }
+  }
 }
 
 function titleCaseEn(text: string, lang: string) {
@@ -123,6 +209,7 @@ function Hero() {
 
 function Partners() {
   const t = useT();
+  const { lang } = useLang();
   return (
     <section className="w-full bg-[#011417]">
       <div className="flex flex-col items-center justify-center pb-[70px] px-[20px] md:pb-[56px] md:px-[120px]">
@@ -156,12 +243,24 @@ function Partners() {
               platform-partners bar. The partner logos are PLATFORMS (where Opten works);
               the "All 62+ models" CTA is the MODELS catalog (what Opten knows). Two
               orthogonal axes — keep them visually separated. */}
-          <LocalizedLink
-            to="/models"
-            className="mt-6 inline-flex items-center gap-[8px] rounded-full border border-white/15 bg-white/5 px-[20px] py-[10px] font-['PT_Root_UI',sans-serif] text-[14px] text-white/85 no-underline transition hover:border-white/30 hover:bg-white/10 hover:text-white"
-          >
-            {t("models.landing.allButton")} →
-          </LocalizedLink>
+          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => {
+                void openSupademoDemo(lang);
+              }}
+              className="inline-flex h-11 min-w-[168px] cursor-pointer items-center justify-center gap-2 rounded-full bg-[#9cfb51] px-5 font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 hover:bg-[#b5ff76] focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 focus:ring-offset-2 focus:ring-offset-[#011417]"
+            >
+              <CirclePlay size={16} aria-hidden="true" />
+              {t("demo.watchButton")}
+            </button>
+            <LocalizedLink
+              to="/models"
+              className="inline-flex h-11 min-w-[168px] items-center justify-center gap-[8px] rounded-full border border-white/15 bg-white/5 px-[20px] font-['PT_Root_UI',sans-serif] text-[14px] text-white/85 no-underline transition hover:border-white/30 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 focus:ring-offset-2 focus:ring-offset-[#011417]"
+            >
+              {t("models.landing.allButton")} →
+            </LocalizedLink>
+          </div>
         </div>
       </div>
     </section>
@@ -443,6 +542,20 @@ export default function App() {
   useEffect(() => {
     document.title = t("meta.title");
   }, [t]);
+
+  useEffect(() => {
+    if (hasSeenSupademoDemo()) return;
+
+    const timer = window.setTimeout(() => {
+      if (!hasSeenSupademoDemo()) {
+        void openSupademoDemo(lang, false);
+      }
+    }, 10000);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [lang]);
 
   return (
     <div className="w-full max-w-[100vw] overflow-x-hidden bg-[#011417] text-white">

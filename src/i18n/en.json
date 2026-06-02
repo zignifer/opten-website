@@ -120,6 +120,7 @@
   "hero.installBtn": "Install extension",
   "hero.installBtnSub": "Chrome / Yandex Browser",
   "hero.definitional": "Opten is a Chrome extension and AI prompt generator and optimizer that scores prompts for the specific model. Supports 60+ image and video models — Midjourney, GPT Image 2, Kling 3.0, Veo 3.1, Seedance, Nano Banana, Flux — and rewrites them in one click inside the Syntx, Higgsfield, and Freepik interfaces. From $2.99/month.",
+  "demo.watchButton": "Watch demo",
   "partners.label": "After installing, use it on these sites:",
   "partners.disclaimer": "Opten is an independent product. The brands shown are not affiliated with Opten.",
   "partners.soon": "Soon",
