@@ -4,14 +4,14 @@
 //
 // Layout (mobile + desktop identical):
 //   [☰ hamburger]   [LOGO]   [LangSwitcher] [Account ▸]
-// Dropdown panel below the bar contains: Home / Features / Pricing / Blog / FAQ / About.
+// Dropdown panel below the bar contains: Home / Prompt Library / Pricing / Blog / Models / FAQ / About.
 //
 // Variant prop drives anchor behavior:
-//   - "landing" → anchors render as #features (smooth-scroll inside the current page)
-//   - "page"    → anchors render as /#features (full-page nav back to landing, then scroll)
+//   - "landing" → anchors render as #pricing/#faq (smooth-scroll inside the current page)
+//   - "page"    → anchors render as /#pricing/#faq (full-page nav back to landing, then scroll)
 //
 // LocalizedLink preserves /en/* prefix on both variants — anchor href is built from base
-// path returned by useOnEnPath() so SiteHeader on /en/blog correctly links to /en/#features.
+// path returned by the current language so SiteHeader on locked routes correctly links home.
 
 import { useEffect, useRef, useState } from "react";
 import { Menu, User, X } from "lucide-react";
@@ -26,8 +26,6 @@ interface SiteHeaderProps {
    *  Use to surface page-specific identity affordances (e.g. signed-in email pill on /account). */
   rightSlot?: React.ReactNode;
 }
-
-const PROMPT_LIBRARY_MENU_LAUNCHED = false;
 
 function Logo() {
   return (
@@ -138,13 +136,21 @@ export default function SiteHeader({ variant = "page", rightSlot }: SiteHeaderPr
           >
             {t("nav.home")}
           </LocalizedLink>
-          <a
-            href={anchor("features")}
+          <LocalizedLink
+            to="/prompt-library"
             onClick={closeMenu}
-            className="block rounded-[12px] px-4 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white no-underline"
+            className="flex min-h-[48px] items-center gap-2 rounded-[12px] px-4 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white no-underline"
           >
-            {t("nav.features")}
-          </a>
+            <span>{t("nav.promptLibrary")}</span>
+            <img
+              src="/assets/prompt-library/new.svg"
+              alt=""
+              width="36"
+              height="18"
+              aria-hidden="true"
+              className="h-[18px] w-9 shrink-0"
+            />
+          </LocalizedLink>
           <a
             href={anchor("pricing")}
             onClick={closeMenu}
@@ -167,15 +173,6 @@ export default function SiteHeader({ variant = "page", rightSlot }: SiteHeaderPr
           >
             {t("nav.models")}
           </LocalizedLink>
-          {PROMPT_LIBRARY_MENU_LAUNCHED && (
-            <LocalizedLink
-              to="/prompt-library"
-              onClick={closeMenu}
-              className="block rounded-[12px] px-4 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white no-underline"
-            >
-              {t("nav.promptLibrary")}
-            </LocalizedLink>
-          )}
           <a
             href={anchor("faq")}
             onClick={closeMenu}
