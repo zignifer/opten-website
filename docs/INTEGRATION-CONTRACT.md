@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-06-02 against extension `manifest.json` version **1.3.8** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added but not launched in visible navigation). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
+> **Last sync:** 2026-06-02 against extension `manifest.json` version **1.3.8** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added but not launched in visible navigation; Phase 92 extension context-menu save contract added). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -221,7 +221,7 @@ The site only **calls** them; it does not own them.
 If the Supabase project is ever rotated/migrated, **all three site files** plus the extension's
 [`config/api.js`](../../promptscore/config/api.js) must be updated in one coordinated commit.
 
-### 4.1 Prompt Library PostgREST surface (Phase 91)
+### 4.1 Prompt Library PostgREST surface (Phase 91, extension save added Phase 92)
 
 Prompt Library data lives in the extension-owned Supabase database. The site
 does not call an Edge Function for normal prompt CRUD/search. It calls
@@ -289,6 +289,27 @@ Response: PromptLibraryRow
 This increments `use_count`, sets `last_used_at`, and returns the updated row.
 It is granted to `authenticated` only.
 
+**Extension context-menu save (Phase 92):**
+
+The extension service worker also calls this same PostgREST surface directly
+when a Pro user selects text on an HTTP(S) page and clicks
+`Сохранить выделенное` in the native context menu:
+
+- `POST /rest/v1/prompt_library?select=...` with `user_id`, deterministic
+  `title`, selected `body`, empty `tags`, `favorite=false`, and source metadata
+  from the active tab (`source_host`, `source_url`, `source_title`).
+- Duplicate bodies are handled through the generated `body_hash` contract:
+  after a unique-constraint response, the extension computes the same normalized
+  SHA-256 hash locally, fetches the owner row by `body_hash`, restores it when
+  archived, and refreshes its bounded local cache instead of creating another
+  row.
+- Entitlement is checked locally for UX and then enforced by PostgREST/RLS.
+  The extension refreshes only `users`/`subscriptions` state for this feature;
+  prompt-library save does not call the Vercel proxy, Anthropic, Edge Functions,
+  or `usage_logs`.
+- Prompt bodies must not be logged by either repo. Metadata-only logging
+  (status code, result code, source host, prompt id) is acceptable.
+
 ---
 
 ## 5. Storage keys (`ps_*`) — extension-owned, site-readable
@@ -314,6 +335,7 @@ Renaming a key on the extension side requires updating the response field too.
 | `ps_sub_auto_renew` | Extension | `GET_SUBSCRIPTION.auto_renew` | |
 | `ps_sub_provider` | Extension (set by webhook) | — (used internally for cancellation dispatch) | `'yookassa' \| 'paddle'`. Missing → fallback to `'yookassa'`. |
 | `ps_pkce_verifier` | Extension | — | Internal OAuth state. |
+| `ps_prompt_library_cache` | Extension | — | Phase 92 local-only bounded cache for Prompt Library context menus. Shape: `{ version, updated_at, last_saved_id, last_saved_at, recent, favorites }`; `recent` is capped at 20 rows, `favorites` at 10 rows. Rows may include prompt `body` for Phase 93 insertion, so the key is cleared on logout/auth reset and is never mirrored through the site message API. |
 
 **Breaking-change protocol:**
 1. Add a new key in the extension first (parallel to the old one).
