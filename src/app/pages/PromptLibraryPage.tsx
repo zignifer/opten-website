@@ -381,7 +381,7 @@ function PromptTag({ children }: { children: string }) {
 
 function EmptyState({ title, body }: { title: string; body?: string }) {
   return (
-    <div className="flex min-h-[260px] flex-col items-center justify-center rounded-[10px] border border-dashed border-white/12 bg-white/[0.025] px-6 py-10 text-center">
+    <div className="flex min-h-[260px] flex-1 flex-col items-center justify-center px-6 py-10 text-center">
       <Library size={28} className="mb-4 text-white/35" aria-hidden="true" />
       <p className="text-[16px] font-medium text-white">{title}</p>
       {body && <p className="mt-2 max-w-[340px] text-[14px] leading-[1.55] text-white/45">{body}</p>}
