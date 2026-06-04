@@ -1,17 +1,19 @@
 import { useState, type FormEvent } from "react";
-import { ArrowRight, CheckCircle2, Loader2, Mail } from "lucide-react";
-import { Navigate } from "react-router";
+import { ArrowRight, CheckCircle2, KeyRound, Loader2, Mail } from "lucide-react";
+import { Navigate, useNavigate } from "react-router";
 import SpaceHeader from "../../components/space/SpaceHeader";
 import { useSpaceAuth } from "../../components/space/SpaceAuthProvider";
-import { sendMagicLink, startGoogleLogin } from "../../../lib/optenAuth";
+import { sendMagicLink, startGoogleLogin, verifyEmailOtp } from "../../../lib/optenAuth";
 import { useLang } from "../../../i18n/LangContext";
 
 export default function AppLoginPage() {
   const { lang } = useLang();
-  const { status } = useSpaceAuth();
+  const navigate = useNavigate();
+  const { status, refresh } = useSpaceAuth();
   const copy = loginCopy[lang];
   const [email, setEmail] = useState("");
-  const [formState, setFormState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [code, setCode] = useState("");
+  const [formState, setFormState] = useState<"idle" | "sending" | "sent" | "verifying" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
 
   if (status === "signed_in") return <Navigate to="/app/learn" replace />;
@@ -29,6 +31,25 @@ export default function AppLoginPage() {
     } catch (err) {
       setFormState("error");
       setError(err instanceof Error ? err.message : "magic_link_failed");
+    }
+  }
+
+  async function handleCodeSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const normalizedEmail = email.trim();
+    const normalizedCode = code.trim();
+    if (!normalizedEmail || normalizedCode.length < 6 || formState === "verifying") return;
+
+    setFormState("verifying");
+    setError(null);
+    try {
+      await verifyEmailOtp(normalizedEmail, normalizedCode);
+      await refresh();
+      navigate("/app/learn", { replace: true });
+    } catch (err) {
+      setFormState("sent");
+      const message = err instanceof Error ? err.message : "otp_verify_failed";
+      setError(isInvalidOtpError(message) ? copy.invalidCode : message);
     }
   }
 
@@ -75,7 +96,14 @@ export default function AppLoginPage() {
                     type="email"
                     required
                     value={email}
-                    onChange={(event) => setEmail(event.target.value)}
+                    onChange={(event) => {
+                      setEmail(event.target.value);
+                      if (formState === "sent" || formState === "verifying") {
+                        setCode("");
+                        setFormState("idle");
+                        setError(null);
+                      }
+                    }}
                     placeholder={copy.emailPlaceholder}
                     className="h-[46px] w-full rounded-[8px] border border-white/10 bg-[#06191c] pl-[42px] pr-[14px] text-[15px] text-white outline-none transition placeholder:text-white/34 focus:border-[#9cfb51]/60"
                   />
@@ -84,7 +112,7 @@ export default function AppLoginPage() {
 
               <button
                 type="submit"
-                disabled={formState === "sending" || formState === "sent"}
+                disabled={formState === "sending" || formState === "sent" || formState === "verifying"}
                 className="mt-[14px] flex h-[48px] w-full items-center justify-center gap-[10px] rounded-[8px] bg-[#9cfb51] px-[16px] text-[16px] font-bold text-[#011417] transition hover:bg-[#8be942] disabled:cursor-default disabled:opacity-70"
               >
                 {formState === "sending" ? <Loader2 size={18} className="animate-spin" /> : null}
@@ -92,6 +120,38 @@ export default function AppLoginPage() {
                 {formState === "sent" ? copy.sent : copy.emailButton}
               </button>
             </form>
+
+            {(formState === "sent" || formState === "verifying") && (
+              <form onSubmit={handleCodeSubmit} className="mt-[16px] rounded-[8px] border border-white/10 bg-[#06191c]/70 p-[14px]">
+                <label className="block">
+                  <span className="mb-[8px] block text-[14px] font-medium text-white/74">{copy.codeLabel}</span>
+                  <span className="relative block">
+                    <KeyRound
+                      aria-hidden="true"
+                      size={17}
+                      className="pointer-events-none absolute left-[14px] top-1/2 -translate-y-1/2 text-white/42"
+                    />
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      value={code}
+                      onChange={(event) => setCode(event.target.value.replace(/\s/g, "").slice(0, 12))}
+                      placeholder={copy.codePlaceholder}
+                      className="h-[46px] w-full rounded-[8px] border border-white/10 bg-[#011012] pl-[42px] pr-[14px] text-[18px] font-bold tracking-[0.18em] text-white outline-none transition placeholder:text-[15px] placeholder:font-normal placeholder:tracking-normal placeholder:text-white/34 focus:border-[#9cfb51]/60"
+                    />
+                  </span>
+                </label>
+                <button
+                  type="submit"
+                  disabled={formState === "verifying" || code.trim().length < 6}
+                  className="mt-[12px] flex h-[46px] w-full items-center justify-center gap-[10px] rounded-[8px] border border-[#9cfb51]/50 bg-[#9cfb51]/12 px-[16px] text-[15px] font-bold text-[#9cfb51] transition hover:bg-[#9cfb51]/18 disabled:cursor-default disabled:opacity-60"
+                >
+                  {formState === "verifying" ? <Loader2 size={18} className="animate-spin" /> : null}
+                  {copy.codeButton}
+                </button>
+              </form>
+            )}
 
             {error && <p className="mt-[12px] text-[13px] leading-[1.45] text-red-300">{copy.error}: {error}</p>}
             <p className="mt-[16px] text-[13px] leading-[1.5] text-white/52">{copy.note}</p>
@@ -110,10 +170,14 @@ const loginCopy = {
     or: "или",
     emailLabel: "Email",
     emailPlaceholder: "you@example.com",
-    emailButton: "Получить ссылку для входа",
-    sent: "Ссылка отправлена",
-    error: "Не удалось отправить ссылку",
-    note: "Email-вход работает через безопасную magic link ссылку. Пароль для MVP не требуется.",
+    emailButton: "Получить ссылку и код",
+    sent: "Письмо отправлено",
+    codeLabel: "Код из письма",
+    codePlaceholder: "6 цифр",
+    codeButton: "Войти по коду",
+    invalidCode: "Код неверный или устарел. Проверьте цифры из последнего письма.",
+    error: "Не удалось выполнить вход",
+    note: "Email-вход работает через ссылку или одноразовый код из письма. Пароль для MVP не требуется.",
   },
   en: {
     title: "Sign in to Opten Space",
@@ -122,9 +186,17 @@ const loginCopy = {
     or: "or",
     emailLabel: "Email",
     emailPlaceholder: "you@example.com",
-    emailButton: "Send sign-in link",
-    sent: "Link sent",
-    error: "Could not send the link",
-    note: "Email sign-in uses a secure magic link. Passwords are not required for the MVP.",
+    emailButton: "Send link and code",
+    sent: "Email sent",
+    codeLabel: "Code from email",
+    codePlaceholder: "6 digits",
+    codeButton: "Sign in with code",
+    invalidCode: "The code is invalid or expired. Check the digits from the latest email.",
+    error: "Could not sign in",
+    note: "Email sign-in works with the link or one-time code from the email. Passwords are not required for the MVP.",
   },
 } as const;
+
+function isInvalidOtpError(message: string): boolean {
+  return /otp_expired|invalid|expired/i.test(message);
+}

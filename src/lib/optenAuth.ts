@@ -46,6 +46,14 @@ type SupabaseTokenResponse = {
   error_description?: string;
 };
 
+type SupabaseVerifyResponse = SupabaseTokenResponse & {
+  session?: SupabaseTokenResponse | null;
+  user?: {
+    id?: string;
+    email?: string | null;
+  } | null;
+};
+
 export function getAppAuthCallbackUrl(): string {
   if (typeof window === "undefined") return "https://opten.space/app/auth/callback";
   return `${window.location.origin}/app/auth/callback`;
@@ -79,6 +87,37 @@ export async function sendMagicLink(email: string, redirectTo = getAppAuthCallba
     const body = await res.json().catch(() => ({}));
     throw new Error(body?.msg || body?.error_description || body?.error || "magic_link_failed");
   }
+}
+
+export async function verifyEmailOtp(email: string, token: string): Promise<OptenSession> {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/verify`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email.trim(),
+      token: token.trim(),
+      type: "magiclink",
+    }),
+  });
+
+  const body = (await res.json().catch(() => ({}))) as SupabaseVerifyResponse;
+  if (!res.ok) {
+    throw new Error(body?.msg || body?.error_description || body?.error || "otp_verify_failed");
+  }
+
+  const tokenBody = body.access_token ? body : body.session;
+  const session = sessionFromTokenResponse(tokenBody || {});
+  if (body.user?.id || body.user?.email) {
+    session.user = {
+      id: body.user.id || session.user.id,
+      email: body.user.email ?? session.user.email,
+    };
+  }
+  writeSession(session);
+  return session;
 }
 
 export function readSession(): OptenSession | null {
