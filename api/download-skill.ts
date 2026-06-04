@@ -28,6 +28,12 @@ const ZIP_PATH = join(process.cwd(), "api", "_assets", "opten.zip");
 
 const CORS_ORIGIN = "https://opten.space";
 
+function isSubscriptionPeriodLive(expiresAt: string | null): boolean {
+  if (!expiresAt) return true;
+  const expiresMs = Date.parse(expiresAt);
+  return Number.isNaN(expiresMs) || expiresMs > Date.now();
+}
+
 function setCors(res: ServerResponse) {
   res.setHeader("Access-Control-Allow-Origin", CORS_ORIGIN);
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -86,7 +92,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   let isPro = false;
   try {
     const subRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${userId}&plan=eq.pro&status=in.(active,cancelled)&select=plan,status&limit=1`,
+      `${SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${userId}&plan=eq.pro&status=in.(active,cancelled)&select=plan,status,expires_at&order=created_at.desc&limit=10`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -98,8 +104,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     if (!subRes.ok) {
       return jsonError(res, 502, { error: "sub_query_failed", code: subRes.status });
     }
-    const rows = (await subRes.json()) as Array<{ plan: string; status: string }>;
-    isPro = Array.isArray(rows) && rows.length > 0;
+    const rows = (await subRes.json()) as Array<{ plan: string; status: string; expires_at: string | null }>;
+    isPro = Array.isArray(rows) && rows.some((row) => isSubscriptionPeriodLive(row.expires_at));
   } catch {
     return jsonError(res, 502, { error: "sub_query_error" });
   }

@@ -57,6 +57,19 @@ function formatDate(iso: string, lang: string) {
   return new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" });
 }
 
+function isSubscriptionPeriodLive(expiresAt: string | null): boolean {
+  if (!expiresAt) return true;
+  const expiresMs = Date.parse(expiresAt);
+  return Number.isNaN(expiresMs) || expiresMs > Date.now();
+}
+
+function hasCurrentPaidAccess(sub: Subscription | null): boolean {
+  return !!sub
+    && sub.plan !== "free"
+    && (sub.status === "active" || sub.status === "cancelled")
+    && isSubscriptionPeriodLive(sub.expires_at);
+}
+
 function cardBrandName(type: string | null, t: (key: string) => string): string {
   if (!type) return t("account.payment.cardDefault");
   const map: Record<string, string> = {
@@ -191,9 +204,10 @@ export default function AccountPage() {
     }
   };
 
-  const isActive = sub?.status === "active";
-  const isCancelled = sub?.status === "cancelled";
-  const isFree = !sub || sub.plan === "free" || sub.status === "expired";
+  const hasPaidAccess = hasCurrentPaidAccess(sub);
+  const isActive = hasPaidAccess && sub?.status === "active";
+  const isCancelled = hasPaidAccess && sub?.status === "cancelled";
+  const isFree = !hasPaidAccess;
   const isOneTime = (isActive || isCancelled) && !sub?.auto_renew;
   const isSubscription = (isActive || isCancelled) && !!sub?.auto_renew;
 

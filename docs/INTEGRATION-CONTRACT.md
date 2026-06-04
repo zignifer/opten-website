@@ -139,7 +139,7 @@ chrome.runtime.sendMessage(id, { type: "GET_SUBSCRIPTION" }, (response) => {
 ```
 
 **Field-level notes:**
-- `plan === 'cancelled'` means the user cancelled but is still inside the paid period. **Treat it as Pro for access purposes** (download skill, no upgrade nag). The `expires_at` is when access actually ends. This mirrors `api/download-skill.ts:78-85`.
+- `plan === 'cancelled'` means the user cancelled but is still inside the paid period. **Treat it as Pro for access purposes only while `expires_at` is absent or in the future** (download skill, no upgrade nag). Once `expires_at` is in the past, clients must treat the user as Free even if the daily `expire-subscriptions` cleanup has not relabeled the row yet. This mirrors the Pro gate in [`api/download-skill.ts`](../api/download-skill.ts).
 - `limit: 300` for Free is the L3C-01 product positioning (free-аккаунт даёт 0 операций; popup shows `0/300` так как 300 — это Pro-лимит, на который нацелен апгрейд). Server-side proxy enforces `FREE_LIMIT=0` (Phase 88 go-live — flipped on Vercel production to match the popup `0/300` display; free = 0 операций, Pro required).
 - Forward-compatibility rule: **the site MUST NOT assume the response is exhaustive.** Future fields may be added.
 
@@ -438,7 +438,7 @@ If you switch envs, you must also flip the corresponding Paddle priceIds in the 
 | Removing a field from `GET_SUBSCRIPTION` response | Site PayPage/AccountPage crashes | Forward-compatible additions only. Removals need extension-side deprecation window. |
 | Rotating `SUPABASE_ANON_KEY` | Both repos break | Coordinate; the key is hardcoded in 3 site files + extension `config/api.js`. |
 | Marking `/dashboard/download-skill` as public | Anyone gets the skill ZIP | Auth + Pro check in [`api/download-skill.ts`](../api/download-skill.ts) is defense-in-depth — keep it. |
-| Treating `plan === 'cancelled'` as Free in site UI | Cancelled-but-not-expired users lose access prematurely | Mirror [`api/download-skill.ts:78-85`](../api/download-skill.ts#L78-L85): `'cancelled'` with an active period is still Pro. |
+| Treating `plan === 'cancelled'` as always Free or always Pro in site UI | Cancelled-but-not-expired users lose access prematurely, or expired users cannot pay again before cron cleanup | Mirror [`api/download-skill.ts`](../api/download-skill.ts): `'cancelled'` with a future `expires_at` is still Pro; past `expires_at` is Free for payment/UI purposes. |
 | Paddle env-var flip without priceId sync | Real users get sandbox prices (or vice versa) | Treat Paddle env switch as a coordinated deploy across site + Edge Function. |
 | Adding a new site route the extension navigates to | Site must exist before extension ships referring code | Site first, then extension. |
 

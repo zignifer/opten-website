@@ -34,6 +34,19 @@ interface Subscription {
   has_card: boolean;
 }
 
+function isSubscriptionPeriodLive(expiresAt: string | null): boolean {
+  if (!expiresAt) return true;
+  const expiresMs = Date.parse(expiresAt);
+  return Number.isNaN(expiresMs) || expiresMs > Date.now();
+}
+
+function hasCurrentPaidAccess(sub: Subscription | null): boolean {
+  return !!sub
+    && sub.plan !== "free"
+    && (sub.status === "active" || sub.status === "cancelled")
+    && isSubscriptionPeriodLive(sub.expires_at);
+}
+
 /* ─── Reusable Icons (same as landing) ─── */
 
 function ChromeIconSmall() {
@@ -363,8 +376,8 @@ export default function PayPage() {
   const handlePay = (recurring: boolean) =>
     currency === "USD" ? handlePayUsd(recurring) : handlePayRub(recurring);
 
-  // D-10: active or cancelled (not yet expired) Pro blocks payment
-  const hasActivePro = sub !== null && (sub.status === "active" || sub.status === "cancelled") && sub.plan !== "free";
+  // D-10: active or cancelled Pro blocks payment only while the paid period is still live.
+  const hasActivePro = hasCurrentPaidAccess(sub);
 
   return (
     <div className="flex min-h-screen w-full flex-col overflow-x-hidden bg-[#011417] text-white">
