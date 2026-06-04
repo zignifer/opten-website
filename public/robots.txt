@@ -6,6 +6,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -23,6 +25,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -35,6 +39,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -47,6 +53,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -59,6 +67,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -71,6 +81,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -83,6 +95,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -95,6 +109,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -107,6 +123,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -119,6 +137,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -131,6 +151,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -143,6 +165,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -155,6 +179,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -167,6 +193,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -179,6 +207,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 
@@ -191,6 +221,8 @@ Disallow: /success
 Disallow: /en/success
 Disallow: /dashboard/
 Disallow: /en/dashboard/
+Disallow: /app/
+Disallow: /space/
 Disallow: /api/
 Disallow: /en/api/
 

@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-06-02 against extension `manifest.json` version **1.3.8** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
+> **Last sync:** 2026-06-04 against extension `manifest.json` version **1.3.8** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -33,6 +33,7 @@ The site and the extension are tightly coupled at four boundaries:
 2. **Fixed URL paths** — the extension navigates the user to specific site routes on install (`/welcome`), upgrade (`/pay`), and after payment (`/success`). Renaming any of these silently breaks user flows.
 3. **Supabase Edge Functions** — billing endpoints (`/create-payment*`, `/cancel-subscription*`, `/get-subscription`) are shared between the site (initiates payment) and the extension (initiates cancellation). Schema changes require coordinated deploys.
 4. **Storage keys (`ps_*`)** — `chrome.storage.local` is the extension's source of truth for plan/subscription state. The site reads (and in some flows updates) these keys indirectly via the message API. Renaming or removing a key is a breaking change.
+5. **Opten Space website auth** — `/app/*` can authenticate directly against the same self-hosted Supabase Auth using public GoTrue endpoints. Credits and plan state still come from extension-owned Supabase Edge Functions and remain keyed by `auth.users.id`, not by email.
 
 **Working rule:** if you change anything that touches a section below, open
 the extension repo first, propose the change there, and only then ship the
@@ -198,6 +199,7 @@ live with these exact paths and the documented behavior.
 | `/account` | Optional — sometimes linked from popup | Subscription management UI, calls `CANCEL_SUBSCRIPTION`. | n/a (user-driven) |
 | `/dashboard/download-skill` | Pro-only feature in popup → opens new tab | Auth-gated page that calls `/api/download-skill` to fetch `opten.zip`. | [popup Phase 73](../../promptscore/popup/popup.html) |
 | `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Pro-only prompt library UI. Calls `GET_AUTH_TOKEN`, checks subscription, then uses Supabase PostgREST for `prompt_library` CRUD/search. After successful mutations it calls `REFRESH_PROMPT_LIBRARY_CACHE` so native extension menus do not keep stale titles/favorite state. Free/expired users see locked upsell state without prompt data reads. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 94 |
+| `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta; `/app` redirects to `/app/learn`, and Learn is the first tab. Website auth may use Google OAuth or email magic link through self-hosted Supabase Auth. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95 |
 
 **Locked route names** (renames are breaking):
 - `/welcome`, `/pay`, `/success` — referenced by the extension binary that's
@@ -206,6 +208,9 @@ live with these exact paths and the documented behavior.
 - `/prompt-library` — fixed Phase 91 route for Prompt Library launch and
   Phase 93 extension context-menu "open library" / failed-insert fallback
   actions. Do not rename it; in-tree extension code now opens this route.
+- `/app/*` is not yet opened by shipped extension binaries, but it is the
+  canonical Opten Space Beta web-app namespace. Do not move the app back to
+  `/space/*`; keep `/space/*` only as temporary redirect/backward compatibility.
 
 > **Note (Phase 3 D-03b):** the site additionally emits `/en/pay` as an EN sibling of `/pay`.
 > The extension does NOT navigate to `/en/pay` in current shipped versions; this is a site-side
@@ -228,6 +233,7 @@ The site only **calls** them; it does not own them.
 | `POST /cancel-subscription` | Extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | YooKassa cancellation. Site never calls directly. |
 | `POST /cancel-subscription-paddle` | Extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | Paddle cancellation. Site never calls directly. |
 | `POST /get-subscription` | Site (optional) | Bearer JWT | Reads `subscriptions` table. Used as a fallback if the extension is not installed (rare path). |
+| `POST /account-summary` | Site `/app/*` | Bearer JWT | Reads the verified user's account, latest subscription, and `usage_logs` count using service role, then returns a single account/credit summary. No payment mutation. Response is the canonical web-app source for `email`, `plan`, `status`, `limit`, `used`, `remaining`, `expires_at`, `provider`, `currency`, and card metadata. |
 | `POST /webhook` | YooKassa | IP-whitelist | Provider-only. Updates `subscriptions` table with `provider='yookassa'`. |
 | `POST /webhook-paddle` | Paddle | HMAC-SHA256 | Provider-only. Updates `subscriptions` table with `provider='paddle'`. |
 | `POST /webhook-paddle-sandbox` | Paddle sandbox | HMAC-SHA256 | Provider-only. For E2E testing. |
@@ -242,6 +248,34 @@ The site only **calls** them; it does not own them.
 
 If the Supabase project is ever rotated/migrated, **all three site files** plus the extension's
 [`config/api.js`](../../promptscore/config/api.js) must be updated in one coordinated commit.
+
+### 4.2 Opten Space website auth (Phase 95)
+
+`/app/*` is allowed to authenticate without the extension installed. It uses
+only public Supabase Auth endpoints on the live self-hosted backend:
+
+- Google OAuth starts at `/auth/v1/authorize?provider=google&redirect_to=...`.
+- Email login starts at `/auth/v1/otp` and sends a magic link/OTP email.
+- Session refresh uses `/auth/v1/token?grant_type=refresh_token`.
+- Session inspection uses the locally stored access token and the
+  `account-summary` function; the website does not call service-role APIs.
+
+Product rule:
+
+```text
+The subscription and credits belong to the auth.users.id that bought them.
+Google account A and Email account B are different accounts unless Supabase
+links them into the same auth user. Another account seeing Free is expected.
+```
+
+Security rule:
+
+- Do not put `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, payment secrets,
+  proxy API keys, or provider OAuth secrets in the website or extension bundle.
+- Website local storage may hold the web-app access/refresh session for `/app/*`
+  MVP auth, but plan/credit authority remains server-side in `account-summary`.
+- Any future "sign in on website then activate extension" handoff must use a
+  short-lived server-issued code, not direct service-role secrets in the browser.
 
 ### 4.1 Prompt Library PostgREST surface (Phase 91, extension save/insert added Phase 92/93)
 

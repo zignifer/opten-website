@@ -35,6 +35,14 @@ The route inventory is hand-listed across 6 files. Phase 6 (scale-ready architec
 will collapse this into one data model — until then, **every new route updates
 all 6 or the build silently drifts**:
 
+**Exception:** authenticated/noindex app routes such as `/app/*`, `/account`,
+`/success`, `/dashboard/*`, `/prompt-library`, and `/internal/*` are SPA-only
+surfaces. They must be added to `src/main.tsx` and Vercel rewrite/noindex
+headers, but they must **not** be added to `scripts/seo-routes.ts`,
+`EN_SIBLINGS`, sitemap, llms.txt, or JSON-LD. Language switches in-place through
+`opten_lang_v3`. If Learn/course content later needs search traffic, create a
+separate public RU+EN content route instead of indexing the app shell.
+
 | # | File | What you add |
 |---|------|--------------|
 | 1 | [src/main.tsx](../src/main.tsx) | `<Route path="..." element={<Page />} />` for both RU + EN siblings. EN siblings live after the RU block. Catch-all `<Route path="*" element={<NotFound />} />` MUST stay last. |

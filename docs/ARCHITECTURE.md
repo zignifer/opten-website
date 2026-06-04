@@ -13,7 +13,7 @@
 │       │                                                                      │
 │       └─> main.tsx → <BrowserRouter> → <LangProvider> → <Routes>             │
 │                                                                              │
-│   Routes (~22 patterns + catch-all 404; 144 prerendered HTML files):         │
+│   Routes (~28 patterns + catch-all 404; 144 prerendered HTML files):         │
 │     RU (9 prerendered, 3 SPA-only):                                          │
 │       /                   App.tsx              landing                       │
 │       /pay                PayPage.tsx          RU YooKassa | EN Paddle       │
@@ -26,6 +26,7 @@
 │       /account            AccountPage.tsx      SPA-only (extension-coupled)  │
 │       /dashboard/         DownloadSkillPage    SPA-only (Pro-gated)          │
 │         download-skill                                                       │
+│       /app/*              Opten Space Beta     SPA-only (website auth)       │
 │     Models (Phase v2.0): /models hub + /models/:slug (62) + /en/* mirrors    │
 │     EN siblings (9 marketing + 63 models prerendered):                       │
 │       /en/, /en/pay, /en/welcome, /en/about, /en/blog, /en/blog/:slug,       │
@@ -47,6 +48,7 @@
    │  Extension   │         │ Supabase Functions  │      │  Paddle Checkout  │
    │  (Chrome)    │         │ create-payment*     │      │  (overlay SDK)    │
    │              │         │ get-subscription    │      │                   │
+   │              │         │ account-summary     │      │                   │
    └──────────────┘         │ cancel-*  webhook*  │      └───────────────────┘
                             └─────────────────────┘
 ```
@@ -74,10 +76,21 @@ hits get a populated `<head>` + body before React mounts.
 | `/success` | [`SuccessPage.tsx`](../../src/app/pages/SuccessPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Post-YooKassa-redirect confirmation | No | No |
 | `/account` | [`AccountPage.tsx`](../../src/app/pages/AccountPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | View plan, cancel subscription | `GET_AUTH_TOKEN`, `GET_SUBSCRIPTION`, `CANCEL_SUBSCRIPTION` | Indirectly via extension |
 | `/dashboard/download-skill` | [`DownloadSkillPage.tsx`](../../src/app/pages/DownloadSkillPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Pro-only skill ZIP download | `GET_AUTH_TOKEN` (Bearer for `/api/download-skill`) | `/api/download-skill` (this site's own serverless) |
+| `/app` | `AppIndexPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Opten Space Beta entry; redirects to `/app/learn`. | No | No |
+| `/app/login` | `AppLoginPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Website-side Google/email auth for Opten Space. | No | Supabase Auth public endpoints |
+| `/app/auth/callback` | `AppAuthCallbackPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Receives Supabase Auth hash tokens and stores the website app session. | No | No |
+| `/app/learn` | `LearnOverviewPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Learn tab inside Opten Space Beta. Header reads account/credits via website session when present. | No | `account-summary` |
+| `/app/learn/:lessonSlug` | `LessonDetailPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Lesson detail inside Opten Space Beta. | No | `account-summary` |
 | `*` (catch-all) | [`NotFound.tsx`](../../src/app/pages/NotFound.tsx) | n/a — runtime `<meta robots=noindex>` injection | Locale-aware 404 fallback for typo'd URLs | No | No |
 
 **EN siblings** (identical components — language flips via `LangProvider`): the 9 marketing routes above plus `/en/models` and every `/en/models/<slug>` (Phase v2.0).
 Source of truth: [`EN_SIBLINGS`](../../src/i18n/paths.ts) in `src/i18n/paths.ts` — 9 static entries + the model slugs from `src/content/models/slugs.ts`; must mirror the EN entries in [`scripts/seo-routes.ts`](../../scripts/seo-routes.ts).
+
+**Opten Space `/app/*` language policy:** app routes are authenticated/noindex
+and deliberately do not get `/en/app/*` siblings, sitemap entries, JSON-LD, or
+hreflang annotations. The app language switch writes `opten_lang_v3` and flips
+the React content in-place. If Learn/course content later needs SEO, create a
+separate public content route with RU + EN siblings instead of indexing the app.
 
 **Legacy redirects** (Vercel `redirects[]`, permanent 301):
 `/guides`, `/en/guides`, `/guides/gpt-image-2`, `/en/guides/gpt-image-2` → `/blog`, `/en/blog`, `/blog/gpt-image-2`, `/en/blog/gpt-image-2` (Phase 5 B-07 — the `/guides/*` URL space was retired in favor of `/blog/*`).
@@ -133,6 +146,7 @@ src/
 ├── imports/                       — Figma-Make-generated SVG paths (auto-generated; brittle)
 ├── lib/
 │   └── paddle.ts                  — ensurePaddle() lazy loader (Phase 2.2)
+│   └── optenAuth.ts               — `/app/*` Supabase Auth REST helpers + account-summary fetch
 ├── styles/                        — index.css, tailwind.css, theme.css, fonts.css
 └── types/                         — TS type defs (e.g. for window.Paddle)
 ```
@@ -167,6 +181,7 @@ See [SEO-AUDIT.md](SEO-AUDIT.md) for the audit baseline and the v1.0 archive in 
 Every content surface uses two shared shells:
 
 - **[`<SiteHeader>`](../../src/app/components/SiteHeader.tsx)** — unified hamburger nav on every viewport. `variant="landing"` (anchors render as `#features` for in-page scroll) is reserved for `App.tsx`; `variant="page"` (anchors render as `/#features` for full-page nav back to landing) is the default for everything else. A `rightSlot` prop swaps the Account button for page-specific affordances (e.g. signed-in email pill on `/account`).
+- **[`<SpaceHeader>`](../../src/app/components/space/SpaceHeader.tsx)** — Opten Space Beta app shell header for `/app/*`. It reads account/credit state from `SpaceAuthProvider` and must not depend on the extension being installed.
 - **[`<SiteFooter>`](../../src/app/components/SiteFooter.tsx)** — shared CTA + nav (`/about`, `/blog`, `/privacy`, `/terms`, `/refund`, Telegram). The CTA gradient and `<InstallButton>` are consistent across landing, blog, and content pages.
 
 New content pages MUST wrap with `<SiteHeader variant="page">` + `<SiteFooter>`. There is no legacy `<Navbar>` to fork — it was retired in Phase 5 B-03.
@@ -310,10 +325,14 @@ The auth check is defense-in-depth — the extension popup also gates the link.
 | Auth token | Extension's `chrome.storage.local.ps_auth_token` | Extension OAuth | Extension (mirrored to site via `GET_AUTH_TOKEN`) |
 | Subscription | Supabase `subscriptions` table | Webhooks (YooKassa, Paddle) | Edge Functions, extension, site (via extension) |
 | Plan / quota | Extension `chrome.storage.local.ps_*` | Extension (synced from Supabase) | Site via `GET_SUBSCRIPTION` |
+| Opten Space web session | `localStorage.opten_space_session_v1` | `/app/login` and `/app/auth/callback` | `/app/*` only |
+| Opten Space account summary | Supabase `users`, `subscriptions`, `usage_logs` via `account-summary` | Supabase Auth/webhooks/proxy usage logging | `/app/*` via Bearer JWT |
 
 **The site has no persistent server-side state of its own.** All persistence
 is either in the user's browser (localStorage, extension storage) or in
-Supabase (owned by the extension repo).
+Supabase (owned by the extension repo). Website auth for `/app/*` stores a
+client session locally, but subscription and credit authority remains in
+Supabase and extension-owned Edge Functions.
 
 ## Build/asset notes
 

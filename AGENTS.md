@@ -16,14 +16,19 @@ knowledge belongs here, with detailed specs in `docs/` and `.planning/`.
 **opten.space** — public website for the **Opten** Chrome extension. Vite +
 React 18 + TypeScript + Tailwind 4, SPA, deployed on Vercel.
 
-Three jobs: (1) marketing surface (landing in RU/EN), (2) billing surface
+Four jobs: (1) marketing surface (landing in RU/EN), (2) billing surface
 (`/pay`, `/account`, `/success` for YooKassa RUB + Paddle USD — Pro is the
 only purchasable tier; free-аккаунт даёт 0 операций, нужен для логина), (3)
 Pro-only utilities (`/dashboard/download-skill` — streams `opten.zip` Claude
-Skill bundle sourced from the extension repo's `opten/` dir, Phase 73).
+Skill bundle sourced from the extension repo's `opten/` dir, Phase 73), (4)
+Opten Space Beta app shell at `/app/*` (SPA-only, noindex) whose first tab is
+Learn and whose account/credits state is read from the same self-hosted
+Supabase backend as the extension.
 
-The site is **not the product** — the extension is. The site exists to sell,
-service, and onboard extension users.
+The extension is still the primary shipped product. Opten Space Beta is an
+account-based web app surface, but it must share identity, subscription, and
+credits with the extension through `auth.users.id` and extension-owned
+Supabase Edge Functions.
 
 ## CRITICAL: Read this before any change to billing/auth/routes/integration
 
@@ -39,6 +44,11 @@ Locked routes (referenced by already-shipped extension binaries — do not renam
 - `/welcome` — extension navigates here on first install
 - `/pay` — extension opens this from popup upgrade CTA
 - `/success` — YooKassa `return_url`
+
+Opten Space Beta app routes are **not extension-locked** yet, but `/app/*` is
+the canonical app namespace going forward. `/space/*` was an early local Learn
+prototype namespace and should only remain as temporary redirect/backward
+compatibility while the beta moves to `/app`.
 
 Hardcoded constants that are duplicated and must be kept in sync:
 - `EXTENSION_IDS` — appears in [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [src/app/pages/DownloadSkillPage.tsx](src/app/pages/DownloadSkillPage.tsx)
@@ -77,12 +87,14 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
      │
      └→ main.tsx → <BrowserRouter> → <LangProvider> → <Routes>
             ↓
-        ~22 client route patterns + catch-all 404 → 144 prerendered routes:
+        ~28 client route patterns + catch-all 404 → 144 prerendered routes:
           Marketing/billing RU (9): /, /pay, /welcome, /about, /blog, /blog/:slug,
                   /privacy, /terms, /refund
           Models RU (Phase v2.0): /models hub + /models/:slug (62 model pages)
           RU SPA-only (3, X-Robots-Tag noindex): /success, /account,
                                                   /dashboard/download-skill
+          App SPA-only (X-Robots-Tag noindex): /app, /app/login,
+                  /app/auth/callback, /app/learn, /app/learn/:lessonSlug
           EN: /en/ sibling for each prerendered RU route + /en/models(/:slug)
           Catch-all: <Route path="*"> → NotFound (runtime noindex injection)
 
@@ -95,6 +107,10 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
   Site → Supabase:        fetch to /functions/v1/* and /rest/v1/* — base URL is
                           https://supabase.opten.space (self-hosted, Phase 88 cutover 2026-05-25;
                           cloud vuywydhwkqmihfztpkgl.supabase.co is a frozen cold backup)
+                          `/app/*` uses public Supabase Auth endpoints directly
+                          for website login and `/functions/v1/account-summary`
+                          for account/credit state; service-role secrets stay
+                          in extension-owned Edge Functions only.
   Site → Paddle:          window.Paddle.Checkout.open(...)
   Site own API:           GET /api/download-skill (Vercel serverless, JWT + Pro-gated)
 
@@ -102,7 +118,7 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           (Phase 5 B-07; the /guides/* URL space is retired)
 ```
 
-**Locked routes never get `/en/*` siblings by design** (Phase 3 D-03): `/success` is YooKassa-RUB only, `/account` and `/dashboard/*` are extension-coupled SPA-only routes (Disallow'd in robots.txt). On those routes the LangSwitcher flips language *in place* (storage + state) instead of navigating.
+**Locked routes never get `/en/*` siblings by design** (Phase 3 D-03): `/success` is YooKassa-RUB only, `/account` and `/dashboard/*` are extension-coupled SPA-only routes (Disallow'd in robots.txt). `/app/*` follows the same noindex/no-EN-sibling policy because it is an authenticated app surface, not a content/SEO surface. On those routes the LangSwitcher or app-local language switch flips language *in place* (storage + state) instead of navigating.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routes, billing flows, and i18n details.
 
@@ -175,7 +191,8 @@ src/
 
 - React Context for i18n only
 - `localStorage` for: `opten_lang_v3` (i18n, written by LangSwitcher only), `opten_pay_currency`. Legacy `opten_lang` is read-only for one-shot EN migration — do not write to it.
-- All auth and subscription state lives in the **extension's** `chrome.storage.local` (`ps_*` keys) — site reads via `chrome.runtime.sendMessage(...)` only
+- Extension-coupled auth and subscription state lives in the **extension's** `chrome.storage.local` (`ps_*` keys) — legacy site surfaces read via `chrome.runtime.sendMessage(...)`.
+- Opten Space `/app/*` stores its own website Supabase session in `localStorage.opten_space_session_v1` and refreshes it through public GoTrue endpoints. Credits/subscription state still comes from the shared backend by calling `/functions/v1/account-summary` with the user's Bearer JWT. Do not put service-role keys, JWT secrets, payment secrets, or proxy API keys in the website bundle.
 
 ### Naming
 

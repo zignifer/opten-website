@@ -1,7 +1,7 @@
 
   import { createRoot, hydrateRoot } from "react-dom/client";
   import { lazy, Suspense } from "react";
-  import { BrowserRouter, Routes, Route } from "react-router";
+  import { BrowserRouter, Routes, Route, Navigate } from "react-router";
   import App from "./app/App.tsx";
   import PrivacyPage from "./app/pages/PrivacyPage.tsx";
   import TermsPage from "./app/pages/TermsPage.tsx";
@@ -32,6 +32,14 @@
   const DownloadSkillPage = lazy(() => import("./app/pages/DownloadSkillPage.tsx"));
   const PromptLibraryPage = lazy(() => import("./app/pages/PromptLibraryPage.tsx"));
   const PromptLibraryDemoPage = lazy(() => import("./app/pages/PromptLibraryDemoPage.tsx"));
+  const AppIndexPage = lazy(() => import("./app/pages/space/AppIndexPage.tsx"));
+  const AppLoginPage = lazy(() => import("./app/pages/space/AppLoginPage.tsx"));
+  const AppAuthCallbackPage = lazy(() => import("./app/pages/space/AppAuthCallbackPage.tsx"));
+  const LearnOverviewPage = lazy(() => import("./app/pages/space/LearnOverviewPage.tsx"));
+  const LessonDetailPage = lazy(() => import("./app/pages/space/LessonDetailPage.tsx"));
+  const SpaceAuthProvider = lazy(() =>
+    import("./app/components/space/SpaceAuthProvider.tsx").then((module) => ({ default: module.SpaceAuthProvider })),
+  );
 
   // Phase 2.2: Paddle bootstrap moved to src/lib/paddle.ts.
   // /pay/index.html still gets the sync <script> tag via prerender.mjs — direct hits
@@ -81,6 +89,13 @@
             <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
             <Route path="/prompt-library" element={<PromptLibraryPage />} />
             <Route path="/internal/prompt-library-demo" element={<PromptLibraryDemoPage />} />
+            <Route path="/app" element={<SpaceAuthProvider><AppIndexPage /></SpaceAuthProvider>} />
+            <Route path="/app/login" element={<SpaceAuthProvider><AppLoginPage /></SpaceAuthProvider>} />
+            <Route path="/app/auth/callback" element={<SpaceAuthProvider><AppAuthCallbackPage /></SpaceAuthProvider>} />
+            <Route path="/app/learn" element={<SpaceAuthProvider><LearnOverviewPage /></SpaceAuthProvider>} />
+            <Route path="/app/learn/:lessonSlug" element={<SpaceAuthProvider><LessonDetailPage /></SpaceAuthProvider>} />
+            <Route path="/space/learn" element={<Navigate to="/app/learn" replace />} />
+            <Route path="/space/learn/:lessonSlug" element={<Navigate to="/app/learn" replace />} />
             {/* Phase 3 D-01/D-03b: /en/* siblings. Mirror of entry-server.tsx EN routes + /en/pay (head-only, client-mount-only). __PRERENDER_PATH discriminator (lines 65-66) handles these unchanged — meta.path strings written by applyMarker include "/en/welcome" etc. Phase 4 D-06: /en/guides/:slug bilingual anchor. */}
             <Route path="/en/"        element={<App />} />
             <Route path="/en/pay"     element={<PayPage />} />

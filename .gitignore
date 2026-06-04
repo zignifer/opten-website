@@ -23,3 +23,5 @@ dist
 .claude
 .codex
 .codex-devserver/
+.vite-dev-*.log
+learn/

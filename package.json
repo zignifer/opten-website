@@ -12,6 +12,7 @@
     "gsc:sites": "node scripts/gsc.mjs sites",
     "gsc:submit-sitemap": "node scripts/gsc.mjs submit-sitemap",
     "sync:agents": "node scripts/sync-agent-docs.mjs",
+    "verify:space-learn": "node scripts/verify-space-learn.mjs",
     "yandex:webmaster:hosts": "node scripts/yandex-webmaster.mjs hosts",
     "yandex:webmaster:queries": "node scripts/yandex-webmaster.mjs queries",
     "yandex:webmaster:recrawl": "node scripts/yandex-webmaster.mjs recrawl",
