@@ -255,7 +255,15 @@ If the Supabase project is ever rotated/migrated, **all three site files** plus 
 only public Supabase Auth endpoints on the live self-hosted backend:
 
 - Google OAuth starts at `/auth/v1/authorize?provider=google&redirect_to=...`.
-- Email login starts at `/auth/v1/otp` and sends a magic link/OTP email.
+- Email login starts at `/auth/v1/otp` and sends a magic link/OTP email. The
+  same email intentionally contains both `{{ .Token }}` and
+  `{{ .ConfirmationURL }}`: the OTP code is the reliable path for the website
+  and a future extension email-login UI, while the link is a website login
+  convenience. A normal email magic link does not automatically sign the Chrome
+  extension in unless a separate short-lived extension handoff/bridge is built.
+  The live self-hosted Auth template is served by this repo at
+  `/auth-templates/magic-link.html` and referenced by
+  `GOTRUE_MAILER_TEMPLATES_MAGIC_LINK` on the VPS.
 - Session refresh uses `/auth/v1/token?grant_type=refresh_token`.
 - Session inspection uses the locally stored access token and the
   `account-summary` function; the website does not call service-role APIs.
