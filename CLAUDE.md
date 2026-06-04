@@ -281,8 +281,9 @@ the **extension repo's** Supabase Edge Function secrets.
 Self-hosted Supabase Auth SMTP is configured on the VPS, not in Vercel. The
 live magic-link/OTP email template is a public static file in this repo:
 `public/auth-templates/magic-link.html`. GoTrue references it with
-`GOTRUE_MAILER_TEMPLATES_MAGIC_LINK`; do not put Resend API keys or SMTP
-passwords in this repo.
+the `GOTRUE_MAILER_TEMPLATES_*` auth-template env vars for magic link,
+confirmation, and recovery email branches; do not put Resend API keys or
+SMTP passwords in this repo.
 
 ### Google Search Console local access
 

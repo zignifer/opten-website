@@ -262,8 +262,8 @@ only public Supabase Auth endpoints on the live self-hosted backend:
   convenience. A normal email magic link does not automatically sign the Chrome
   extension in unless a separate short-lived extension handoff/bridge is built.
   The live self-hosted Auth template is served by this repo at
-  `/auth-templates/magic-link.html` and referenced by
-  `GOTRUE_MAILER_TEMPLATES_MAGIC_LINK` on the VPS.
+  `/auth-templates/magic-link.html` and referenced by the relevant
+  `GOTRUE_MAILER_TEMPLATES_*` auth-template env vars on the VPS.
 - Session refresh uses `/auth/v1/token?grant_type=refresh_token`.
 - Session inspection uses the locally stored access token and the
   `account-summary` function; the website does not call service-role APIs.

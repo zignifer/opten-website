@@ -99,7 +99,7 @@ export async function verifyEmailOtp(email: string, token: string): Promise<Opte
     body: JSON.stringify({
       email: email.trim(),
       token: token.trim(),
-      type: "magiclink",
+      type: "email",
     }),
   });
 
