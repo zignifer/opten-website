@@ -24,4 +24,4 @@ dist
 .codex
 .codex-devserver/
 .vite-dev-*.log
-learn/
+/learn/
