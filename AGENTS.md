@@ -111,12 +111,12 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           for website login and `/functions/v1/account-summary`
                           for account/credit state; service-role secrets stay
                           in extension-owned Edge Functions only.
-                          Auth email for magic-link/OTP login is sent by
+                          Auth email for OTP login is sent by
                           self-hosted Supabase Auth through Resend SMTP and
                           uses the public GoTrue template at
                           /auth-templates/magic-link.html. The code is the
-                          primary extension-compatible path; the magic link
-                          is a website-login convenience.
+                          only rendered email sign-in path; no magic-link CTA
+                          is shown in the email.
   Site → Paddle:          window.Paddle.Checkout.open(...)
   Site own API:           GET /api/download-skill (Vercel serverless, JWT + Pro-gated)
 
@@ -199,7 +199,7 @@ src/
 - `localStorage` for: `opten_lang_v3` (i18n, written by LangSwitcher only), `opten_pay_currency`. Legacy `opten_lang` is read-only for one-shot EN migration — do not write to it.
 - Extension-coupled auth and subscription state lives in the **extension's** `chrome.storage.local` (`ps_*` keys) — legacy site surfaces read via `chrome.runtime.sendMessage(...)`.
 - Opten Space `/app/*` stores its own website Supabase session in `localStorage.opten_space_session_v1` and refreshes it through public GoTrue endpoints. Credits/subscription state still comes from the shared backend by calling `/functions/v1/account-summary` with the user's Bearer JWT. Do not put service-role keys, JWT secrets, payment secrets, or proxy API keys in the website bundle.
-- Opten Space email auth sends one email that includes both an OTP code and a magic link. The OTP code is the portable flow for the website and future extension UI. A normal email magic link opens the website callback and does not automatically log the Chrome extension in unless a separate extension handoff/bridge is built.
+- Opten Space email auth renders only an OTP code in the email. The code is the portable flow for the website and future extension UI. GoTrue may still generate an internal confirmation URL, but the public template does not show it; a normal email magic link would open the website callback and would not automatically log the Chrome extension in unless a separate extension handoff/bridge is built.
 
 ### Naming
 
@@ -279,11 +279,12 @@ Set in Vercel (project settings, not in repo):
 the **extension repo's** Supabase Edge Function secrets.
 
 Self-hosted Supabase Auth SMTP is configured on the VPS, not in Vercel. The
-live magic-link/OTP email template is a public static file in this repo:
+live OTP email template is a public static file in this repo:
 `public/auth-templates/magic-link.html`. GoTrue references it with
 the `GOTRUE_MAILER_TEMPLATES_*` auth-template env vars for magic link,
-confirmation, and recovery email branches; do not put Resend API keys or
-SMTP passwords in this repo.
+confirmation, and recovery email branches, but the template renders only
+`{{ .Token }}` and does not render `{{ .ConfirmationURL }}`. Do not put
+Resend API keys or SMTP passwords in this repo.
 
 ### Google Search Console local access
 

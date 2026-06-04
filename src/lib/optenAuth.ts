@@ -66,7 +66,7 @@ export function startGoogleLogin(redirectTo = getAppAuthCallbackUrl()): void {
   window.location.href = url.toString();
 }
 
-export async function sendMagicLink(email: string, redirectTo = getAppAuthCallbackUrl()): Promise<void> {
+export async function sendEmailOtp(email: string, redirectTo = getAppAuthCallbackUrl()): Promise<void> {
   const url = new URL(`${SUPABASE_URL}/auth/v1/otp`);
   url.searchParams.set("redirect_to", redirectTo);
 
@@ -85,7 +85,7 @@ export async function sendMagicLink(email: string, redirectTo = getAppAuthCallba
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body?.msg || body?.error_description || body?.error || "magic_link_failed");
+    throw new Error(body?.msg || body?.error_description || body?.error || "email_otp_failed");
   }
 }
 

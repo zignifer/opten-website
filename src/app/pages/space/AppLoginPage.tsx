@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2, KeyRound, Loader2, Mail } from "lucide-react"
 import { Navigate, useNavigate } from "react-router";
 import SpaceHeader from "../../components/space/SpaceHeader";
 import { useSpaceAuth } from "../../components/space/SpaceAuthProvider";
-import { sendMagicLink, startGoogleLogin, verifyEmailOtp } from "../../../lib/optenAuth";
+import { sendEmailOtp, startGoogleLogin, verifyEmailOtp } from "../../../lib/optenAuth";
 import { useLang } from "../../../i18n/LangContext";
 
 export default function AppLoginPage() {
@@ -26,11 +26,11 @@ export default function AppLoginPage() {
     setFormState("sending");
     setError(null);
     try {
-      await sendMagicLink(normalized);
+      await sendEmailOtp(normalized);
       setFormState("sent");
     } catch (err) {
       setFormState("error");
-      setError(err instanceof Error ? err.message : "magic_link_failed");
+      setError(err instanceof Error ? err.message : "email_otp_failed");
     }
   }
 
@@ -170,14 +170,14 @@ const loginCopy = {
     or: "или",
     emailLabel: "Email",
     emailPlaceholder: "you@example.com",
-    emailButton: "Получить ссылку и код",
-    sent: "Письмо отправлено",
+    emailButton: "Получить код",
+    sent: "Код отправлен",
     codeLabel: "Код из письма",
     codePlaceholder: "6 цифр",
     codeButton: "Войти по коду",
     invalidCode: "Код неверный или устарел. Проверьте цифры из последнего письма.",
     error: "Не удалось выполнить вход",
-    note: "Email-вход работает через ссылку или одноразовый код из письма. Пароль для MVP не требуется.",
+    note: "Email-вход работает через одноразовый код из письма. Пароль для MVP не требуется.",
   },
   en: {
     title: "Sign in to Opten Space",
@@ -186,14 +186,14 @@ const loginCopy = {
     or: "or",
     emailLabel: "Email",
     emailPlaceholder: "you@example.com",
-    emailButton: "Send link and code",
-    sent: "Email sent",
+    emailButton: "Get code",
+    sent: "Code sent",
     codeLabel: "Code from email",
     codePlaceholder: "6 digits",
     codeButton: "Sign in with code",
     invalidCode: "The code is invalid or expired. Check the digits from the latest email.",
     error: "Could not sign in",
-    note: "Email sign-in works with the link or one-time code from the email. Passwords are not required for the MVP.",
+    note: "Email sign-in works with a one-time code from the email. Passwords are not required for the MVP.",
   },
 } as const;
 

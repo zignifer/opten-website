@@ -199,7 +199,7 @@ live with these exact paths and the documented behavior.
 | `/account` | Optional — sometimes linked from popup | Subscription management UI, calls `CANCEL_SUBSCRIPTION`. | n/a (user-driven) |
 | `/dashboard/download-skill` | Pro-only feature in popup → opens new tab | Auth-gated page that calls `/api/download-skill` to fetch `opten.zip`. | [popup Phase 73](../../promptscore/popup/popup.html) |
 | `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Pro-only prompt library UI. Calls `GET_AUTH_TOKEN`, checks subscription, then uses Supabase PostgREST for `prompt_library` CRUD/search. After successful mutations it calls `REFRESH_PROMPT_LIBRARY_CACHE` so native extension menus do not keep stale titles/favorite state. Free/expired users see locked upsell state without prompt data reads. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 94 |
-| `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta; `/app` redirects to `/app/learn`, and Learn is the first tab. Website auth may use Google OAuth or email magic link through self-hosted Supabase Auth. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95 |
+| `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta; `/app` redirects to `/app/learn`, and Learn is the first tab. Website auth may use Google OAuth or email OTP through self-hosted Supabase Auth. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95 |
 
 **Locked route names** (renames are breaking):
 - `/welcome`, `/pay`, `/success` — referenced by the extension binary that's
@@ -255,15 +255,14 @@ If the Supabase project is ever rotated/migrated, **all three site files** plus 
 only public Supabase Auth endpoints on the live self-hosted backend:
 
 - Google OAuth starts at `/auth/v1/authorize?provider=google&redirect_to=...`.
-- Email login starts at `/auth/v1/otp` and sends a magic link/OTP email. The
-  same email intentionally contains both `{{ .Token }}` and
-  `{{ .ConfirmationURL }}`: the OTP code is the reliable path for the website
-  and a future extension email-login UI, while the link is a website login
-  convenience. A normal email magic link does not automatically sign the Chrome
-  extension in unless a separate short-lived extension handoff/bridge is built.
-  The live self-hosted Auth template is served by this repo at
-  `/auth-templates/magic-link.html` and referenced by the relevant
-  `GOTRUE_MAILER_TEMPLATES_*` auth-template env vars on the VPS.
+- Email login starts at `/auth/v1/otp` and renders only an OTP code in the
+  email. The GoTrue template intentionally shows `{{ .Token }}` and does not
+  show `{{ .ConfirmationURL }}`: the code is the reliable path for the website
+  and a future extension email-login UI. A normal email magic link would not
+  automatically sign the Chrome extension in unless a separate short-lived
+  extension handoff/bridge is built. The live self-hosted Auth template is
+  served by this repo at `/auth-templates/magic-link.html` and referenced by
+  the relevant `GOTRUE_MAILER_TEMPLATES_*` auth-template env vars on the VPS.
 - Session refresh uses `/auth/v1/token?grant_type=refresh_token`.
 - Session inspection uses the locally stored access token and the
   `account-summary` function; the website does not call service-role APIs.
