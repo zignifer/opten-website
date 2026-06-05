@@ -283,7 +283,9 @@ live OTP email template is a public static file in this repo:
 `public/auth-templates/magic-link.html`. GoTrue references it with
 the `GOTRUE_MAILER_TEMPLATES_*` auth-template env vars for magic link,
 confirmation, and recovery email branches, but the template renders only
-`{{ .Token }}` and does not render `{{ .ConfirmationURL }}`. Do not put
+`{{ .Token }}` and does not render `{{ .ConfirmationURL }}`. The auth email is
+English-only by product decision; keep both the HTML copy and the
+`GOTRUE_MAILER_SUBJECTS_*` subject env vars on the VPS in English. Do not put
 Resend API keys or SMTP passwords in this repo.
 
 ### Google Search Console local access

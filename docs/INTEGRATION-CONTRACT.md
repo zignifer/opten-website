@@ -263,6 +263,8 @@ only public Supabase Auth endpoints on the live self-hosted backend:
   extension handoff/bridge is built. The live self-hosted Auth template is
   served by this repo at `/auth-templates/magic-link.html` and referenced by
   the relevant `GOTRUE_MAILER_TEMPLATES_*` auth-template env vars on the VPS.
+  The email is English-only by product decision; keep the template copy and
+  the VPS `GOTRUE_MAILER_SUBJECTS_*` subject env vars in English.
 - Session refresh uses `/auth/v1/token?grant_type=refresh_token`.
 - Session inspection uses the locally stored access token and the
   `account-summary` function; the website does not call service-role APIs.
@@ -418,6 +420,7 @@ Renaming a key on the extension side requires updating the response field too.
 | `ps_sub_auto_renew` | Extension | `GET_SUBSCRIPTION.auto_renew` | |
 | `ps_sub_provider` | Extension (set by webhook) | — (used internally for cancellation dispatch) | `'yookassa' \| 'paddle'`. Missing → fallback to `'yookassa'`. |
 | `ps_pkce_verifier` | Extension | — | Internal OAuth state. |
+| `ps_email_auth_pending` | Extension | — | Internal/local-only Email OTP popup state. Shape: `{ email, sentAt }`. Used only to restore the code-entry screen after Chrome closes the popup while the user checks email; cleared on successful sign-in, logout, and auth reset; never mirrored through the site message API. |
 | `ps_prompt_library_cache` | Extension | — | Phase 92 local-only bounded cache for Prompt Library context menus; Phase 93 uses it for insert menu rows and may refresh it through PostgREST; Phase 94 lets the site trigger a refresh via `REFRESH_PROMPT_LIBRARY_CACHE` after successful library mutations. Shape: `{ version, updated_at, last_saved_id, last_saved_at, recent, favorites }`; `recent` is capped at 20 rows, `favorites` at 10 rows, and native menus show smaller bounded subsets. Rows may include prompt `body` for insertion, so the key is cleared on logout/auth reset and is never mirrored through the site message API. |
 
 **Breaking-change protocol:**
