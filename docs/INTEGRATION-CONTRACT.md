@@ -258,9 +258,9 @@ only public Supabase Auth endpoints on the live self-hosted backend:
 - Email login starts at `/auth/v1/otp` and renders only an OTP code in the
   email. The GoTrue template intentionally shows `{{ .Token }}` and does not
   show `{{ .ConfirmationURL }}`: the code is the reliable path for the website
-  and a future extension email-login UI. A normal email magic link would not
-  automatically sign the Chrome extension in unless a separate short-lived
-  extension handoff/bridge is built. The live self-hosted Auth template is
+  and the extension popup. A normal email magic link would not automatically
+  sign the Chrome extension in unless a separate short-lived extension
+  handoff/bridge is built. The live self-hosted Auth template is
   served by this repo at `/auth-templates/magic-link.html` and referenced by
   the relevant `GOTRUE_MAILER_TEMPLATES_*` auth-template env vars on the VPS.
   The email is English-only by product decision; keep the template copy and

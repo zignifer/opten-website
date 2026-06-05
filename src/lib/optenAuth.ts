@@ -90,6 +90,9 @@ export async function sendEmailOtp(email: string, redirectTo = getAppAuthCallbac
 }
 
 export async function verifyEmailOtp(email: string, token: string): Promise<OptenSession> {
+  const normalizedToken = token.replace(/\D/g, "").slice(0, 6);
+  if (normalizedToken.length !== 6) throw new Error("otp_verify_failed");
+
   const res = await fetch(`${SUPABASE_URL}/auth/v1/verify`, {
     method: "POST",
     headers: {
@@ -98,7 +101,7 @@ export async function verifyEmailOtp(email: string, token: string): Promise<Opte
     },
     body: JSON.stringify({
       email: email.trim(),
-      token: token.trim(),
+      token: normalizedToken,
       type: "email",
     }),
   });

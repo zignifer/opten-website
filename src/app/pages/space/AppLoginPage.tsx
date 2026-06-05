@@ -30,15 +30,16 @@ export default function AppLoginPage() {
       setFormState("sent");
     } catch (err) {
       setFormState("error");
-      setError(err instanceof Error ? err.message : "email_otp_failed");
+      const message = err instanceof Error ? err.message : "email_otp_failed";
+      setError(resolveLoginError(message, copy));
     }
   }
 
   async function handleCodeSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const normalizedEmail = email.trim();
-    const normalizedCode = code.trim();
-    if (!normalizedEmail || normalizedCode.length < 6 || formState === "verifying") return;
+    const normalizedCode = normalizeOtpCode(code);
+    if (!normalizedEmail || normalizedCode.length !== 6 || formState === "verifying") return;
 
     setFormState("verifying");
     setError(null);
@@ -49,7 +50,7 @@ export default function AppLoginPage() {
     } catch (err) {
       setFormState("sent");
       const message = err instanceof Error ? err.message : "otp_verify_failed";
-      setError(isInvalidOtpError(message) ? copy.invalidCode : message);
+      setError(resolveLoginError(message, copy));
     }
   }
 
@@ -136,7 +137,7 @@ export default function AppLoginPage() {
                       inputMode="numeric"
                       autoComplete="one-time-code"
                       value={code}
-                      onChange={(event) => setCode(event.target.value.replace(/\s/g, "").slice(0, 12))}
+                      onChange={(event) => setCode(normalizeOtpCode(event.target.value))}
                       placeholder={copy.codePlaceholder}
                       className="h-[46px] w-full rounded-[8px] border border-white/10 bg-[#011012] pl-[42px] pr-[14px] text-[18px] font-bold tracking-[0.18em] text-white outline-none transition placeholder:text-[15px] placeholder:font-normal placeholder:tracking-normal placeholder:text-white/34 focus:border-[#9cfb51]/60"
                     />
@@ -144,7 +145,7 @@ export default function AppLoginPage() {
                 </label>
                 <button
                   type="submit"
-                  disabled={formState === "verifying" || code.trim().length < 6}
+                  disabled={formState === "verifying" || normalizeOtpCode(code).length !== 6}
                   className="mt-[12px] flex h-[46px] w-full items-center justify-center gap-[10px] rounded-[8px] border border-[#9cfb51]/50 bg-[#9cfb51]/12 px-[16px] text-[15px] font-bold text-[#9cfb51] transition hover:bg-[#9cfb51]/18 disabled:cursor-default disabled:opacity-60"
                 >
                   {formState === "verifying" ? <Loader2 size={18} className="animate-spin" /> : null}
@@ -176,6 +177,8 @@ const loginCopy = {
     codePlaceholder: "6 цифр",
     codeButton: "Войти по коду",
     invalidCode: "Код неверный или устарел. Проверьте цифры из последнего письма.",
+    rateLimited: "Слишком много попыток. Подождите минуту и попробуйте снова.",
+    genericError: "Попробуйте ещё раз или войдите через Google.",
     error: "Не удалось выполнить вход",
     note: "Email-вход работает через одноразовый код из письма. Пароль для MVP не требуется.",
   },
@@ -192,11 +195,27 @@ const loginCopy = {
     codePlaceholder: "6 digits",
     codeButton: "Sign in with code",
     invalidCode: "The code is invalid or expired. Check the digits from the latest email.",
+    rateLimited: "Too many attempts. Wait a minute and try again.",
+    genericError: "Try again or continue with Google.",
     error: "Could not sign in",
     note: "Email sign-in works with a one-time code from the email. Passwords are not required for the MVP.",
   },
 } as const;
 
 function isInvalidOtpError(message: string): boolean {
-  return /otp_expired|invalid|expired/i.test(message);
+  return /otp_expired|invalid|expired|token/i.test(message);
+}
+
+function isRateLimitError(message: string): boolean {
+  return /rate|security|after \d+\s*seconds?/i.test(message);
+}
+
+function normalizeOtpCode(value: string): string {
+  return value.replace(/\D/g, "").slice(0, 6);
+}
+
+function resolveLoginError(message: string, copy: (typeof loginCopy)["ru"] | (typeof loginCopy)["en"]): string {
+  if (isInvalidOtpError(message)) return copy.invalidCode;
+  if (isRateLimitError(message)) return copy.rateLimited;
+  return copy.genericError;
 }

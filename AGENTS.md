@@ -199,7 +199,7 @@ src/
 - `localStorage` for: `opten_lang_v3` (i18n, written by LangSwitcher only), `opten_pay_currency`. Legacy `opten_lang` is read-only for one-shot EN migration — do not write to it.
 - Extension-coupled auth and subscription state lives in the **extension's** `chrome.storage.local` (`ps_*` keys) — legacy site surfaces read via `chrome.runtime.sendMessage(...)`.
 - Opten Space `/app/*` stores its own website Supabase session in `localStorage.opten_space_session_v1` and refreshes it through public GoTrue endpoints. Credits/subscription state still comes from the shared backend by calling `/functions/v1/account-summary` with the user's Bearer JWT. Do not put service-role keys, JWT secrets, payment secrets, or proxy API keys in the website bundle.
-- Opten Space email auth renders only an OTP code in the email. The code is the portable flow for the website and future extension UI. GoTrue may still generate an internal confirmation URL, but the public template does not show it; a normal email magic link would open the website callback and would not automatically log the Chrome extension in unless a separate extension handoff/bridge is built.
+- Opten Space email auth renders only an OTP code in the email. The same OTP flow is used by the website and the extension popup: send through `/auth/v1/otp`, verify through `/auth/v1/verify`, then persist a normal Supabase session for the same `auth.users.id`. GoTrue may still generate an internal confirmation URL, but the public template does not show it; a normal email magic link would open the website callback and would not automatically log the Chrome extension in unless a separate extension handoff/bridge is built.
 
 ### Naming
 
