@@ -93,6 +93,7 @@
             <Route path="/app/login" element={<SpaceAuthProvider><AppLoginPage /></SpaceAuthProvider>} />
             <Route path="/app/auth/callback" element={<SpaceAuthProvider><AppAuthCallbackPage /></SpaceAuthProvider>} />
             <Route path="/app/learn" element={<SpaceAuthProvider><LearnOverviewPage /></SpaceAuthProvider>} />
+            <Route path="/app/learn-v2" element={<Navigate to="/app/learn" replace />} />
             <Route path="/app/learn/:lessonSlug" element={<SpaceAuthProvider><LessonDetailPage /></SpaceAuthProvider>} />
             <Route path="/space/learn" element={<Navigate to="/app/learn" replace />} />
             <Route path="/space/learn/:lessonSlug" element={<Navigate to="/app/learn" replace />} />

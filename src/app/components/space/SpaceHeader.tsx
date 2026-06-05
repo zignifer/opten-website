@@ -151,7 +151,7 @@ const headerCopy = {
     signIn: "Войти",
     signOut: "Выйти",
     switchLanguage: "Переключить язык",
-    nav: { Learn: "Learn", Extension: "Extension", Library: "Library" },
+    nav: { Learn: "Курсы", Extension: "Расширение", Library: "Библиотека" },
     usage: (value: string) => `Использовано кредитов: ${value}`,
   },
   en: {

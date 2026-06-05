@@ -33,6 +33,7 @@ assert.match(main, /\/app\/learn"/, "Main router must register /app/learn");
 assert.match(main, /\/app\/learn\/:lessonSlug"/, "Main router must register /app/learn/:lessonSlug");
 assert.match(main, /\/space\/learn"[\s\S]*Navigate[\s\S]*\/app\/learn/, "Legacy /space/learn must redirect to /app/learn");
 assert.match(main, /LearnOverviewPage/, "Main router must import/render LearnOverviewPage");
+assert.match(main, /\/app\/learn-v2"[\s\S]*Navigate[\s\S]*\/app\/learn/, "Legacy /app/learn-v2 must redirect to /app/learn");
 assert.match(main, /LessonDetailPage/, "Main router must import/render LessonDetailPage");
 assert.match(main, /SpaceAuthProvider/, "Main router must wrap app routes in SpaceAuthProvider");
 
