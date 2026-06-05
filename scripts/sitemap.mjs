@@ -30,10 +30,10 @@ const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 
 // Phase v2.0 MODELS-B-3b: floor bumped 22 → 144 now that all 62 model content
 // files landed. 152 = 26 baseline/blog routes + 2 hubs (/models + /en/models) + 124 model
-// pages (62 RU + 62 EN). Daily blog posts now bring the floor to 166. The 3 SPA-only routes (/success, /account,
+// pages (62 RU + 62 EN). Daily blog posts now bring the floor to 168. The 3 SPA-only routes (/success, /account,
 // /dashboard/*) carry prerender:"none" and are excluded from sitemapRoutes.
-if (sitemapRoutes.length < 166) {
-  throw new Error(`sitemap.mjs: expected at least 166 routes (40 baseline/blog routes + 2 model hubs + 124 model pages after daily blog posts), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+if (sitemapRoutes.length < 168) {
+  throw new Error(`sitemap.mjs: expected at least 168 routes (42 baseline/blog routes + 2 model hubs + 124 model pages after daily blog posts), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 // Post-2026-05-17 GEO audit ME-12: per-route lastmod via git mtime of the source file driving
@@ -53,6 +53,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/kling-3-prompts":    "src/content/blog/kling-3-prompts.ts",
+  "/en/blog/kling-3-prompts": "src/content/blog/kling-3-prompts.ts",
   "/blog/prompt-examples":    "src/content/blog/prompt-examples.ts",
   "/en/blog/prompt-examples": "src/content/blog/prompt-examples.ts",
   "/blog/seedance-2-0-prompts":    "src/content/blog/seedance-2-0-prompts.ts",
