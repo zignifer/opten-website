@@ -1,0 +1,28 @@
+**Findings**
+- No actionable P0/P1/P2 findings remain.
+
+**Open Questions**
+- None. The implementation intentionally uses Opten fonts/colors and generated card imagery instead of the exact raster assets from the reference.
+
+**Implementation Checklist**
+- Built a second Learn page at `/app/learn-v2` without replacing `/app/learn`.
+- Reused the existing Opten Space header and 1200px content width.
+- Matched the reference structure: hero lesson, compact author card, topic pills, sort/search row, progress cards, collections, and all-lessons grid.
+- Updated the top-section grid to the revised reference: `Unbounded` hero title constrained to the video column, lesson title/description typography matched to the author card, and a 261px by 412px author card aligned to the content field.
+- Updated the Learn v2 surface to match landing-page color tokens: page background `#011417`, card/control surfaces `#0e2023`, top-right landing gradient, and a compact `SiteFooter` over a page-level bottom blob gradient.
+- Updated collection/filter copy: collection cards use the requested five titles, and topic filters use `Вайб-кодинг` / `Вайб-дизайн`.
+- Added the provided `line.png` as a title overlay asset on the Learn v2 H1.
+- Generated and placed bitmap assets for thumbnails/cards and author portrait under `public/assets/space/learn-v2/`.
+- Verified browser interactions: search, topic filtering, sorting, and section expansion actions.
+
+**Follow-up Polish**
+- P3: Generated imagery is intentionally not pixel-identical to the source reference, but matches the same dark cinematic AI-learning direction with Opten lime accents.
+
+source visual truth path: `C:\Users\КОМП\Desktop\final.png` + latest in-thread top-section reference screenshot
+implementation screenshot path: `C:\Projects\opten-website\tmp\design-qa\learn-v2-background-footer-top.png`
+viewport: `1458x720`
+state: default desktop `/app/learn-v2`
+full-view comparison evidence: `C:\Projects\opten-website\tmp\design-qa\learn-v2-background-footer-top.png`
+focused region comparison evidence: top section metrics were checked in the in-app browser: title cell `552px`, hero video `552px`, title overflow `false`, title font `Unbounded 55px`, H1 line overlay loaded from `/assets/space/learn-v2/title-line.png` at natural `531x59` and rendered as `460x30` with vertical scale, author card `261x412`, author/video bottom delta `0px`, author box-shadow `none`, lesson title matches author title at `21px`/`700`/`26.25px`, lesson description matches author description at `14px`/`400`/`21.7px`, root/background color `rgb(1,20,23)`, card/control color `rgb(14,32,35)`, top gradient positioned to the right, compact footer present with links `О проекте`, `Блог`, `Модели`, `Конфиденциальность`, `Оферта`, `Возврат`, `Связаться`, footer has no `.opten-footer-gradient`, page has a bottom `gradient-blob-shape.svg` layer using the same `1720x982`/`blur(140px)` scale as the landing hero and anchored below the page bottom, card-to-footer gap is `80px`, and no marketing CTA/install block.
+patches made since previous QA pass: constrained the H1 to the video column, tuned its desktop size to fill the video width without clipping, added the provided title line overlay, shifted the featured lesson text block left by `18px`, matched the featured lesson typography to the author card typography, bottom-aligned the author card with the hero video, removed the author-card shadow, switched Learn v2 to landing background/card tokens, added a top-right landing gradient, added a compact footer with header-like bottom blob gradient, updated collection/filter labels, narrowed the author card, removed its detail button, and rebuilt the desktop grid to remove the extra right-side slack inside the content area.
+final result: passed
