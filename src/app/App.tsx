@@ -37,7 +37,6 @@ import syntxSrc from '../../public/assets/partners/syntx.png?w=268&format=webp;p
 const STORE_URL = "https://chromewebstore.google.com/detail/opten-%E2%80%94-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 const ASSET_ROOT = "/assets/landing-design";
 const SUPADEMO_SCRIPT_SRC = "https://script.supademo.com/supademo.js";
-const SUPADEMO_DEMO_SEEN_KEY = "opten_landing_supademo_seen_v1";
 const SUPADEMO_DEMO_IDS = {
   ru: "cmpfrrpv03q91qm8qgfunpkzz",
   en: "cmpwpev5d004iw70jlnbh6psr",
@@ -56,7 +55,6 @@ declare global {
 }
 
 let supademoScriptPromise: Promise<void> | null = null;
-let supademoDemoSeenInSession = false;
 
 const partnerSrcMap = {
   canva: canvaSrc,
@@ -67,26 +65,6 @@ const partnerSrcMap = {
 
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
-}
-
-function hasSeenSupademoDemo(): boolean {
-  if (typeof window === "undefined") return true;
-  if (supademoDemoSeenInSession) return true;
-  try {
-    return window.localStorage.getItem(SUPADEMO_DEMO_SEEN_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function markSupademoDemoSeen() {
-  if (typeof window === "undefined") return;
-  supademoDemoSeenInSession = true;
-  try {
-    window.localStorage.setItem(SUPADEMO_DEMO_SEEN_KEY, "1");
-  } catch {
-    // Storage can fail in private browsing; the demo should still open.
-  }
 }
 
 function loadSupademoSdk(): Promise<void> {
@@ -119,17 +97,14 @@ function loadSupademoSdk(): Promise<void> {
   return supademoScriptPromise;
 }
 
-async function openSupademoDemo(lang: "ru" | "en", fallbackToLink = true) {
+async function openSupademoDemo(lang: "ru" | "en") {
   if (typeof window === "undefined") return;
-  markSupademoDemoSeen();
 
   try {
     await loadSupademoSdk();
     window.Supademo?.open(SUPADEMO_DEMO_IDS[lang]);
   } catch {
-    if (fallbackToLink) {
-      window.open(SUPADEMO_DEMO_URLS[lang], "_blank", "noopener,noreferrer");
-    }
+    window.open(SUPADEMO_DEMO_URLS[lang], "_blank", "noopener,noreferrer");
   }
 }
 
@@ -542,20 +517,6 @@ export default function App() {
   useEffect(() => {
     document.title = t("meta.title");
   }, [t]);
-
-  useEffect(() => {
-    if (hasSeenSupademoDemo()) return;
-
-    const timer = window.setTimeout(() => {
-      if (!hasSeenSupademoDemo()) {
-        void openSupademoDemo(lang, false);
-      }
-    }, 10000);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [lang]);
 
   return (
     <div className="w-full max-w-[100vw] overflow-x-hidden bg-[#011417] text-white">
