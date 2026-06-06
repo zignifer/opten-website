@@ -36,11 +36,13 @@ assert.match(siteHeader, /label: "Extension"[\s\S]*to: "\/"[\s\S]*label: "Librar
 assert.doesNotMatch(siteHeader, /label: "Learn"|BookOpenCheck/, "SiteHeader must hide Learn/Courses while the product is not ready");
 assert.doesNotMatch(siteHeader, /\bMenu\b|\bX\b|site-header-menu|role="menu"/, "SiteHeader must not render hamburger marketing navigation");
 assert.doesNotMatch(siteHeader, /nav\.pricing|nav\.blog|nav\.models|nav\.faq|nav\.about/, "SiteHeader must not include marketing nav labels");
+assert.match(siteHeader, /<LocalizedLink[\s\S]*to="\/pay"[\s\S]*aria-label=\{copy\.usage\(creditLabel\)\}/, "SiteHeader credits pill must link to /pay");
 
 const spaceHeader = read("src/app/components/space/SpaceHeader.tsx");
 assert.doesNotMatch(spaceHeader, /label: "Learn"|BookOpenCheck/, "SpaceHeader must hide Learn/Courses while the product is not ready");
 assert.match(spaceHeader, /to="\/account"|to=\{["'`]\/account["'`]\}/, "SpaceHeader signed-in profile must navigate to /account");
 assert.doesNotMatch(spaceHeader, /onClick=\{\(\) => signOut\(\)\}/, "SpaceHeader profile click must not sign out");
+assert.match(spaceHeader, /<LocalizedLink[\s\S]*to="\/pay"[\s\S]*aria-label=\{copy\.usage\(creditLabel\)\}/, "SpaceHeader credits pill must link to /pay");
 
 const auth = read("src/lib/optenAuth.ts");
 assert.match(auth, /normalizeSafeNext/, "Auth helpers must expose normalizeSafeNext");
@@ -64,6 +66,7 @@ assert.match(pay, /useSpaceAuth/, "PayPage must prefer website auth");
 assert.match(pay, /refreshSessionIfNeeded|readSession/, "PayPage must be able to refresh/read website session");
 assert.match(pay, /fetchAccountSummary|account/, "PayPage must use account summary for website subscription state");
 assert.match(pay, /\/login\?next=\/pay/, "PayPage must route signed-out users to /login?next=/pay");
+assert.match(pay, /font-\['Unbounded',sans-serif\][\s\S]*text-\[34px\][\s\S]*md:text-\[46px\]/, "PayPage title must match AccountPage heading scale");
 
 const account = read("src/app/pages/AccountPage.tsx");
 assert.match(account, /useSpaceAuth/, "AccountPage must prefer website auth");

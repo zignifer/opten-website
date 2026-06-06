@@ -87,8 +87,9 @@ export default function SiteHeader({ rightSlot }: SiteHeaderProps): JSX.Element 
         </div>
 
         <div className="flex min-w-0 items-center justify-end gap-[8px] max-lg:hidden">
-          <div
-            className="flex h-[31px] items-center gap-[8px] rounded-full px-[12px] py-[8px]"
+          <LocalizedLink
+            to="/pay"
+            className="flex h-[31px] items-center gap-[8px] rounded-full px-[12px] py-[8px] no-underline outline-none transition hover:bg-white/[0.04] focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417]"
             aria-label={copy.usage(creditLabel)}
           >
             <img
@@ -100,7 +101,7 @@ export default function SiteHeader({ rightSlot }: SiteHeaderProps): JSX.Element 
               className="h-[14px] w-[14px] shrink-0"
             />
             <span className="text-[14px] font-medium leading-[1.1] text-white">{creditLabel}</span>
-          </div>
+          </LocalizedLink>
 
           <LangSwitcher className="flex h-[32px] min-w-[42px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-transparent px-[10px] font-['PT_Root_UI',sans-serif] text-[13px] font-bold text-white/70 transition hover:border-white/25 hover:text-white" />
 

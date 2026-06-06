@@ -80,8 +80,9 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
         </div>
 
         <div className="flex min-w-0 items-center justify-end gap-[8px] max-lg:hidden">
-          <div
-            className="flex h-[31px] items-center gap-[8px] rounded-full px-[12px] py-[8px]"
+          <LocalizedLink
+            to="/pay"
+            className="flex h-[31px] items-center gap-[8px] rounded-full px-[12px] py-[8px] no-underline outline-none transition hover:bg-white/[0.04] focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011012]"
             aria-label={copy.usage(creditLabel)}
           >
             <img
@@ -93,7 +94,7 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
               className="h-[14px] w-[14px] shrink-0"
             />
             <span className="text-[14px] font-medium leading-[1.1] text-white">{creditLabel}</span>
-          </div>
+          </LocalizedLink>
 
           <button
             type="button"
