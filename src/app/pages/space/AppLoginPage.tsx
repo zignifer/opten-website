@@ -166,7 +166,7 @@ export default function AppLoginPage() {
                   <button
                     type="button"
                     onClick={handleChangeEmail}
-                    className="text-[12px] font-normal leading-[1.3] text-[#9cfb51]/75 outline-none transition hover:text-[#9cfb51] focus-visible:rounded-[4px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9cfb51]/50"
+                    className="cursor-pointer text-[12px] font-normal leading-[1.3] text-[#9cfb51]/75 outline-none transition hover:text-[#9cfb51] focus-visible:rounded-[4px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9cfb51]/50"
                   >
                     {copy.changeEmail}
                   </button>
@@ -195,7 +195,7 @@ export default function AppLoginPage() {
               <button
                 type="submit"
                 disabled={formState === "verifying" || normalizeOtpCode(code).length !== 6}
-                className="flex h-[44px] w-full items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[24px] py-[12px] text-[13px] font-medium leading-[1.3] text-[#011417] outline-none transition hover:bg-[#8ff144] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex h-[44px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[24px] py-[12px] text-[13px] font-medium leading-[1.3] text-[#011417] outline-none transition hover:bg-[#8ff144] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {formState === "verifying" ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : null}
                 {copy.codeButton}
@@ -222,7 +222,7 @@ export default function AppLoginPage() {
               <button
                 type="submit"
                 disabled={formState === "sending"}
-                className="flex h-[44px] w-full items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[24px] py-[12px] text-[13px] font-medium leading-[1.3] text-[#011417] outline-none transition hover:bg-[#8ff144] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex h-[44px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[24px] py-[12px] text-[13px] font-medium leading-[1.3] text-[#011417] outline-none transition hover:bg-[#8ff144] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {formState === "sending" ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : null}
                 {formState === "sending" ? copy.sending : copy.emailButton}
@@ -233,7 +233,7 @@ export default function AppLoginPage() {
           <button
             type="button"
             onClick={() => startGoogleLogin(getWebsiteAuthCallbackUrl(safeNext))}
-            className="relative mt-[12px] flex h-[44px] w-full items-center justify-center gap-[12px] rounded-[8px] border-0 bg-white px-[24px] py-[11px] text-[13px] font-medium leading-[1.3] text-black outline-none transition hover:shadow-[0_2px_8px_rgba(0,0,0,0.15)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50"
+            className="relative mt-[12px] flex h-[44px] w-full cursor-pointer items-center justify-center gap-[12px] rounded-[8px] border-0 bg-white px-[24px] py-[11px] text-[13px] font-medium leading-[1.3] text-black outline-none transition hover:shadow-[0_2px_8px_rgba(0,0,0,0.15)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50"
           >
             <span className="pointer-events-none absolute inset-0 rounded-[8px] border border-black/10" aria-hidden="true" />
             <GoogleIcon />

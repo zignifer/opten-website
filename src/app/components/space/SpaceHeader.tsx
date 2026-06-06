@@ -99,7 +99,7 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
             type="button"
             onClick={() => setLang(lang === "ru" ? "en" : "ru")}
             aria-label={copy.switchLanguage}
-            className="flex h-[32px] min-w-[42px] items-center justify-center rounded-full border border-white/10 bg-transparent px-[10px] text-[13px] font-bold text-white/70 transition hover:border-white/25 hover:text-white"
+            className="flex h-[32px] min-w-[42px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-transparent px-[10px] text-[13px] font-bold text-white/70 transition hover:border-white/25 hover:text-white"
           >
             {lang === "ru" ? "EN" : "RU"}
           </button>

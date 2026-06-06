@@ -565,7 +565,7 @@ export default function AccountPage() {
                 <button
                   type="button"
                   onClick={handleWebsiteSignOut}
-                  className="mx-auto inline-flex cursor-pointer justify-center rounded-[100px] border border-white/15 bg-transparent px-[28px] py-[14px] text-[14px] font-bold text-white/80 transition hover:border-white/30 hover:text-white"
+                  className="flex h-[52px] w-full cursor-pointer items-center justify-center rounded-[8px] border border-white/15 bg-transparent px-[24px] font-['PT_Root_UI',sans-serif] text-[14px] font-medium leading-[1.3] text-white transition hover:border-white/30 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50"
                 >
                   {t("account.signOut.btn")}
                 </button>

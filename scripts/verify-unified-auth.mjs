@@ -47,6 +47,8 @@ const login = read("src/app/pages/space/AppLoginPage.tsx");
 assert.match(login, /useLocation/, "Login page must read next from URL search params");
 assert.match(login, /normalizeSafeNext/, "Login page must normalize next redirects");
 assert.match(login, /getWebsiteAuthCallbackUrl/, "Login page must use canonical website callback");
+assert.match(login, /cursor-pointer[\s\S]*copy\.emailButton/, "Email OTP button must show a pointer cursor when active");
+assert.match(login, /cursor-pointer[\s\S]*copy\.google/, "Google auth button must show a pointer cursor when active");
 assert.doesNotMatch(login, /Navigate to="\/app\/learn"|navigate\("\/app\/learn"/, "Login page must not hardcode /app/learn as the only post-login destination");
 
 const callback = read("src/app/pages/space/AppAuthCallbackPage.tsx");
@@ -63,6 +65,7 @@ const account = read("src/app/pages/AccountPage.tsx");
 assert.match(account, /useSpaceAuth/, "AccountPage must prefer website auth");
 assert.match(account, /fetchAccountSummary/, "AccountPage must read account-summary for website sessions");
 assert.match(account, /signOut/, "AccountPage must expose website sign-out");
+assert.match(account, /h-\[52px\][\s\S]*font-\['PT_Root_UI',sans-serif\][\s\S]*text-\[14px\][\s\S]*font-medium/, "Account sign-out button must keep the requested 52px PT Root UI medium 14 styling");
 assert.doesNotMatch(account, /account\.auth\.websiteSource|account\.auth\.extensionSource|account\.signOut\.label|account\.signOut\.desc/, "AccountPage must not render explanatory auth-source text around the sign-out button");
 assert.match(account, /cancel-subscription-paddle/, "AccountPage must call Paddle cancellation directly for website sessions");
 assert.match(account, /cancel-subscription/, "AccountPage must call cancellation directly for website sessions");
