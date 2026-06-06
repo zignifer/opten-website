@@ -1,14 +1,33 @@
-import { ArrowLeft, ArrowRight, CheckCircle2, Circle, Clock3, Lock, Play, Volume2 } from "lucide-react";
-import type { ReactNode } from "react";
-import LocalizedLink from "../../LocalizedLink";
-import SpaceHeader from "../SpaceHeader";
-import type { LearnCollection, LearnLesson, LearnOverviewSection } from "../../../../content/space/learn";
 import {
+  Check,
+  Crown,
+  FileText,
+  Link as LinkIcon,
+  Lock,
+  Play,
+  Video,
+} from "lucide-react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useLocation } from "react-router";
+import { useLang } from "../../../../i18n/LangContext";
+import type { AccountSummary } from "../../../../lib/optenAuth";
+import LocalizedLink from "../../LocalizedLink";
+import SiteFooter from "../../SiteFooter";
+import SpaceHeader from "../SpaceHeader";
+import { useSpaceAuth } from "../SpaceAuthProvider";
+import type { LearnCollection, LearnLesson, LearnMaterial, LearnOverviewSection, LearnTimestamp } from "../../../../content/space/learn";
+import {
+  getLearnLessonAuthor,
   getLearnLessonVideoProvider,
   getLessonPosition,
 } from "../../../../content/space/learn";
 
-const accent = "#9cfb51";
+const LEARN_PROGRESS_STORAGE_KEY = "opten_space_learn_progress_v1";
+
+type StoredLearnProgress = {
+  completed: string[];
+  incomplete: string[];
+};
 
 type LearnSectionWrapperProps = {
   children: ReactNode;
@@ -16,9 +35,16 @@ type LearnSectionWrapperProps = {
 
 export function LearnSectionWrapper({ children }: LearnSectionWrapperProps) {
   return (
-    <div className="min-h-screen bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
       <SpaceHeader variant="learnOnly" />
-      <main className="mx-auto max-w-[1200px] px-[32px] pb-[42px] pt-[24px] max-md:px-4">{children}</main>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute right-[-760px] top-[-620px] h-[982px] w-[1720px] bg-[url('/assets/landing-design/gradient-blob-shape.svg')] bg-[length:100%_100%] bg-center bg-no-repeat opacity-[0.15] blur-[140px]"
+      />
+      <main className="relative z-10 mx-auto max-w-[1200px] px-[32px] pb-[76px] pt-[30px] max-md:px-4 max-md:pb-[58px] max-md:pt-[22px]">
+        {children}
+      </main>
+      <SiteFooter variant="linksOnly" />
     </div>
   );
 }
@@ -94,7 +120,7 @@ export function VideoCard({ lesson }: VideoCardProps) {
           className="h-full w-full object-cover opacity-85 transition duration-500 group-hover:scale-[1.035]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.08),rgba(1,16,18,0.58))]" />
-        <span className="absolute left-1/2 top-1/2 grid size-[46px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white/25 bg-black/42 text-white backdrop-blur-sm transition group-hover:border-[#9cfb51]/70 group-hover:text-[#9cfb51]">
+        <span className="absolute left-1/2 top-1/2 grid size-[46px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#9cfb51] text-[#011417] shadow-[0_12px_34px_rgba(156,251,81,0.24)] transition group-hover:scale-[1.04] group-hover:bg-[#8ff144]">
           <Play size={20} fill="currentColor" />
         </span>
       </div>
@@ -118,270 +144,794 @@ type LessonDetailLayoutProps = {
   nextLesson?: LearnLesson;
 };
 
-export function LessonDetailLayout({ lesson, collection, previousLesson, nextLesson }: LessonDetailLayoutProps) {
+type SidebarTab = "lessons" | "timestamps";
+
+export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutProps) {
+  const { lang } = useLang();
+  const copy = detailCopy[lang];
+  const { account } = useSpaceAuth();
+  const hasPro = hasProAccess(account);
+  const locked = isLessonLocked(lesson, hasPro);
+  const isCourse = collection.kind === "course";
+  const [activeTab, setActiveTab] = useState<SidebarTab>(isCourse ? "lessons" : "timestamps");
+  const [startSeconds, setStartSeconds] = useState(0);
+  const [playRequestId, setPlayRequestId] = useState(0);
+  const [manualProgress, setManualProgress] = useState<StoredLearnProgress>(() => readStoredLearnProgress());
+
+  useEffect(() => {
+    setStartSeconds(0);
+    setPlayRequestId(0);
+  }, [lesson.slug]);
+
+  const completedSlugs = useMemo(() => getCompletedLessonSlugs(collection, manualProgress), [collection, manualProgress]);
+  const displayedCollection = useMemo(
+    () => applyLessonProgress(collection, completedSlugs, lesson.slug),
+    [collection, completedSlugs, lesson.slug],
+  );
+  const displayedLesson = displayedCollection.lessons.find((item) => item.slug === lesson.slug) ?? lesson;
+  const lessonCompleted = completedSlugs.has(lesson.slug);
+
+  const handleTimestampSelect = (seconds: number) => {
+    setStartSeconds(seconds);
+    setPlayRequestId((current) => current + 1);
+  };
+
+  const handleLessonCompletionChange = (completed: boolean) => {
+    setManualProgress((currentProgress) => {
+      const nextProgress = updateStoredLessonProgress(currentProgress, lesson, completed);
+      writeStoredLearnProgress(nextProgress);
+      return nextProgress;
+    });
+  };
+
   return (
     <LearnSectionWrapper>
-      <nav className="mb-[24px] flex flex-wrap items-center gap-[9px] text-[14px] text-white/68" aria-label="Breadcrumb">
+      <nav className="mb-[24px] flex flex-wrap items-center gap-[9px] text-[14px] text-white/68" aria-label={copy.breadcrumb}>
         <LocalizedLink to="/app/learn" className="text-white/68 no-underline hover:text-white">
-          Learn
+          {copy.courses}
         </LocalizedLink>
-        <span>/</span>
-        <span>{collection.title}</span>
-        <span>/</span>
-        <span>{lesson.title}</span>
+        <span className="text-white/28">/</span>
+        <span>{collection.categoryLabel}</span>
+        {isCourse && (
+          <>
+            <span className="text-white/28">/</span>
+            <span className="font-medium text-white">{getLessonPosition(lesson.slug)}</span>
+          </>
+        )}
       </nav>
 
-      <section className="grid grid-cols-[minmax(0,1fr)_360px] items-start gap-[16px] max-lg:grid-cols-1">
-        <div>
-          <LessonPlayerMock lesson={lesson} />
-          <DetailNavigation previousLesson={previousLesson} nextLesson={nextLesson} className="mt-[20px] hidden lg:flex" />
+      <section className="grid grid-cols-[minmax(0,1fr)_360px] items-start gap-[24px] max-lg:grid-cols-1">
+        <div className="min-w-0">
+          <LessonPlayer lesson={displayedLesson} locked={locked} startSeconds={startSeconds} playRequestId={playRequestId} />
+          <LessonIntro
+            lesson={displayedLesson}
+            collection={displayedCollection}
+            locked={locked}
+            completed={lessonCompleted}
+            onCompletionChange={handleLessonCompletionChange}
+          />
+          <LessonMaterials materials={displayedLesson.materials} locked={locked} />
+          <RelatedLessons collection={displayedCollection} currentSlug={lesson.slug} hasPro={hasPro} />
         </div>
 
-        <aside className="flex min-w-0 flex-col gap-[16px]">
-          <LessonInfoPanel lesson={lesson} collection={collection} />
-          <CourseOutline collection={collection} currentSlug={lesson.slug} />
+        <aside className="flex min-w-0 flex-col gap-[16px] lg:sticky lg:top-[88px]">
+          <CollectionSummaryCard lesson={displayedLesson} collection={displayedCollection} />
+          <LessonSidebar
+            lesson={displayedLesson}
+            collection={displayedCollection}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            onTimestampSelect={handleTimestampSelect}
+            hasPro={hasPro}
+          />
+          <UnlockProCard hasPro={hasPro} />
         </aside>
       </section>
-
-      <DetailNavigation previousLesson={previousLesson} nextLesson={nextLesson} className="mt-[16px] lg:hidden" />
     </LearnSectionWrapper>
+  );
+}
+
+type LessonPlayerProps = {
+  lesson: LearnLesson;
+  locked: boolean;
+  startSeconds: number;
+  playRequestId: number;
+};
+
+function LessonPlayer({ lesson, locked, startSeconds, playRequestId }: LessonPlayerProps) {
+  const { pathname } = useLocation();
+  const { lang } = useLang();
+  const provider = getLearnLessonVideoProvider(lesson);
+  const [activated, setActivated] = useState(false);
+  const localizedVideo = lesson.localizedVideo?.[lang];
+  const youtubeId = localizedVideo?.youtubeId ?? lesson.youtubeId;
+  const captionLanguage = localizedVideo?.captionLanguage ?? lang;
+  const audioLanguage = localizedVideo?.audioLanguage ?? (localizedVideo?.youtubeId && localizedVideo.youtubeId !== lesson.youtubeId ? lang : "ru");
+  const embedUrl = youtubeId ? getYoutubeEmbedUrl(youtubeId, lang, captionLanguage, startSeconds, activated) : "";
+
+  useEffect(() => {
+    setActivated(false);
+  }, [lesson.slug]);
+
+  useEffect(() => {
+    if (playRequestId > 0) setActivated(true);
+  }, [playRequestId]);
+
+  return (
+    <section
+      className="overflow-hidden rounded-[8px] border border-white/12 bg-[#0e2023] shadow-[0_18px_56px_rgba(0,0,0,0.24)]"
+      data-video-provider={provider.provider}
+      data-provider-asset-id={provider.providerAssetId}
+      data-playback-policy={provider.playbackPolicy}
+    >
+      <div className="relative aspect-video overflow-hidden bg-[#06191c]">
+        {locked || !embedUrl || !activated ? (
+          <>
+            <img
+              src={provider.posterPath}
+              alt=""
+              width="1200"
+              height="676"
+              className={`h-full w-full object-cover ${locked ? "opacity-62" : "opacity-90"}`}
+            />
+            <div className={`absolute inset-0 ${locked ? "bg-[#011417]/70 backdrop-blur-[2px]" : "bg-[linear-gradient(180deg,rgba(1,20,23,0.06),rgba(1,20,23,0.46))]"}`} />
+            {locked ? (
+              <div className="absolute inset-0 grid place-items-center px-[20px] text-center">
+                <div className="w-full max-w-[360px] rounded-[14px] border border-white/18 bg-[#102126]/92 px-[24px] py-[24px] shadow-[0_22px_70px_rgba(0,0,0,0.44)] backdrop-blur-md max-sm:px-[18px] max-sm:py-[18px]">
+                  <span className="mx-auto grid size-[48px] place-items-center rounded-full border border-[#9cfb51]/45 bg-[#9cfb51]/10 text-[#9cfb51]">
+                    <Lock size={22} />
+                  </span>
+                  <h2 className="mt-[16px] text-[18px] font-bold leading-tight text-white">Урок заблокирован</h2>
+                  <p className="mt-[8px] text-[13px] leading-[1.45] text-white/68">
+                    Разблокируйте тариф Pro, чтобы смотреть видео и получить доступ к материалам.
+                  </p>
+                  <div className="mt-[18px] flex gap-[8px] max-sm:flex-col">
+                    <LocalizedLink
+                      to="/pay"
+                      className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] bg-[#9cfb51] px-[14px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943]"
+                    >
+                      Открыть Pro
+                    </LocalizedLink>
+                    <LocalizedLink
+                      to={`/login?next=${encodeURIComponent(pathname)}`}
+                      className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] border border-[#9cfb51]/65 px-[14px] text-[14px] font-bold text-[#9cfb51] no-underline transition hover:bg-[#9cfb51]/10"
+                    >
+                      Войти
+                    </LocalizedLink>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setActivated(true)}
+                className="absolute inset-0 grid cursor-pointer place-items-center border-0 bg-transparent p-0 text-white outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#9cfb51]/80"
+                aria-label={lang === "en" ? "Play lesson" : "Смотреть урок"}
+                data-audio-language={audioLanguage}
+              >
+                <span className="grid size-[76px] place-items-center rounded-full bg-[#9cfb51] text-[#011417] shadow-[0_16px_48px_rgba(156,251,81,0.26)] transition duration-200 hover:scale-[1.04] hover:bg-[#8ff144]">
+                  <Play size={30} fill="currentColor" strokeWidth={2.4} className="ml-[3px]" />
+                </span>
+              </button>
+            )}
+          </>
+        ) : (
+          <iframe
+            key={`${youtubeId}-${startSeconds}-${playRequestId}`}
+            src={embedUrl}
+            title={lesson.title}
+            className="absolute inset-0 h-full w-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        )}
+      </div>
+    </section>
+  );
+}
+
+function getYoutubeEmbedUrl(
+  youtubeId: string,
+  uiLanguage: "ru" | "en",
+  captionLanguage: "ru" | "en",
+  startSeconds: number,
+  autoplay: boolean,
+) {
+  const params = new URLSearchParams({
+    rel: "0",
+    modestbranding: "1",
+    playsinline: "1",
+    iv_load_policy: "3",
+    hl: uiLanguage,
+    cc_lang_pref: captionLanguage,
+  });
+
+  if (autoplay) params.set("autoplay", "1");
+  if (startSeconds > 0) params.set("start", String(startSeconds));
+  if (captionLanguage === "en") params.set("cc_load_policy", "1");
+  if (typeof window !== "undefined") params.set("origin", window.location.origin);
+
+  return `https://www.youtube-nocookie.com/embed/${youtubeId}?${params.toString()}`;
+}
+
+type LessonIntroProps = {
+  lesson: LearnLesson;
+  collection: LearnCollection;
+  locked: boolean;
+  completed: boolean;
+  onCompletionChange: (completed: boolean) => void;
+};
+
+function LessonIntro({ lesson, collection, locked, completed, onCompletionChange }: LessonIntroProps) {
+  const { lang } = useLang();
+  const copy = detailCopy[lang];
+  const position = getLessonPosition(lesson.slug);
+
+  return (
+    <section className="mt-[26px]">
+      <div className="flex flex-wrap items-center justify-between gap-[12px]">
+        <div className="flex flex-wrap items-center gap-[10px]">
+          {position && (
+            <span className="rounded-[6px] bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
+              {position}
+            </span>
+          )}
+          <span className="rounded-[6px] bg-white/[0.05] px-[9px] py-[5px] text-[12px] font-medium leading-none text-white/56">
+            {collection.categoryLabel}
+          </span>
+          {locked && (
+            <span className="inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
+              <Lock size={13} />
+              Pro
+            </span>
+          )}
+        </div>
+        {!locked && (
+          <LessonCompletionAction
+            completed={completed}
+            copy={copy}
+            onToggle={() => onCompletionChange(!completed)}
+          />
+        )}
+      </div>
+      <h1 className="mt-[18px] max-w-[820px] text-[30px] font-bold leading-[1.14] text-white max-md:text-[25px]">
+        {lesson.title}
+      </h1>
+      <p className="mt-[18px] max-w-[820px] pb-[20px] text-[14px] leading-[1.55] text-white/70">{lesson.description}</p>
+    </section>
+  );
+}
+
+type LessonCompletionActionProps = {
+  completed: boolean;
+  copy: (typeof detailCopy)["ru"];
+  onToggle: () => void;
+};
+
+function LessonCompletionAction({ completed, copy, onToggle }: LessonCompletionActionProps) {
+  return (
+    <button
+      type="button"
+      aria-pressed={completed}
+      onClick={onToggle}
+      className={`inline-flex h-[30px] cursor-pointer items-center gap-[7px] rounded-[7px] border px-[10px] text-[12px] font-bold leading-none outline-none transition focus-visible:ring-2 focus-visible:ring-[#9cfb51]/65 ${
+        completed
+          ? "border-[#9cfb51]/35 bg-[#9cfb51]/12 text-[#9cfb51] hover:bg-[#9cfb51]/16"
+          : "border-white/10 bg-white/[0.035] text-white/64 hover:border-[#9cfb51]/35 hover:text-[#9cfb51]"
+      }`}
+    >
+      <span className={`grid size-[14px] place-items-center rounded-full ${completed ? "bg-[#9cfb51] text-[#011417]" : "border border-white/38 text-transparent"}`}>
+        <Check size={9} strokeWidth={3} />
+      </span>
+      <span>{completed ? copy.lessonCompleted : copy.markLessonCompleted}</span>
+      {completed && <span className="border-l border-[#9cfb51]/24 pl-[7px] text-white/56">{copy.undoCompleted}</span>}
+    </button>
+  );
+}
+
+type LessonMaterialsProps = {
+  materials: LearnMaterial[];
+  locked: boolean;
+};
+
+function LessonMaterials({ materials, locked }: LessonMaterialsProps) {
+  if (materials.length === 0) return null;
+
+  return (
+    <section className="mt-[34px] max-w-[820px]">
+      <h2 className="text-[22px] font-bold leading-tight text-white">Материалы урока</h2>
+      <div className="mt-[14px] overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]">
+        {materials.map((material) => {
+          const Icon = materialIcon(material.kind);
+          const external = material.href.startsWith("http");
+          const disabled = locked;
+          const rowClass =
+            "grid grid-cols-[34px_minmax(0,1fr)_104px] items-center gap-[12px] border-b border-white/8 px-[16px] py-[10px] last:border-b-0 max-sm:grid-cols-[32px_minmax(0,1fr)]";
+
+          return (
+            <div key={material.title} className={rowClass}>
+              <span className="grid size-[30px] place-items-center rounded-full bg-white/[0.065] text-white/76">
+                <Icon size={17} />
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate text-[14px] font-medium leading-tight text-white">{material.title}</span>
+                <span className="mt-[4px] block text-[12px] leading-tight text-white/42">{material.meta}</span>
+              </span>
+              {disabled ? (
+                <span className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.04] text-[13px] font-medium text-white/32 max-sm:col-span-2">
+                  Pro
+                </span>
+              ) : external ? (
+                <a
+                  href={material.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-sm:col-span-2"
+                >
+                  {material.actionLabel}
+                </a>
+              ) : (
+                <LocalizedLink
+                  to={material.href}
+                  className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-sm:col-span-2"
+                >
+                  {material.actionLabel}
+                </LocalizedLink>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function materialIcon(kind: LearnMaterial["kind"]) {
+  if (kind === "pdf") return FileText;
+  if (kind === "video") return Video;
+  return LinkIcon;
+}
+
+type CollectionSummaryCardProps = {
+  lesson: LearnLesson;
+  collection: LearnCollection;
+};
+
+function CollectionSummaryCard({ lesson, collection }: CollectionSummaryCardProps) {
+  const { lang } = useLang();
+  const copy = detailCopy[lang];
+  const author = getLearnLessonAuthor(lesson);
+  const progress = collection.progress;
+  const percent = progress ? Math.round((progress.completed / progress.total) * 100) : 0;
+  const isStandalone = collection.kind === "standalone";
+
+  return (
+    <section className="rounded-[8px] border border-white/10 bg-[#0e2023]/92 px-[20px] py-[20px] shadow-[0_16px_50px_rgba(0,0,0,0.18)]">
+      <p className="text-[13px] font-medium leading-tight text-white/42">{isStandalone ? copy.singleLesson : collection.categoryLabel}</p>
+      <h2 className="mt-[14px] text-[20px] font-bold leading-[1.2] text-white">{isStandalone ? copy.lessonAuthor : collection.title}</h2>
+      {isStandalone && <p className="mt-[10px] text-[13px] leading-[1.45] text-white/58">{author.intro}</p>}
+      <div className="mt-[20px] flex items-center gap-[11px]">
+        <img
+          src={author.avatarPath}
+          alt=""
+          width="400"
+          height="400"
+          className="size-[40px] shrink-0 rounded-full border border-white/14 object-cover"
+        />
+        <div className="min-w-0">
+          <p className="truncate text-[14px] font-bold leading-tight text-white">{author.name}</p>
+          <p className="mt-[4px] truncate text-[12px] leading-tight text-white/50">{author.role}</p>
+        </div>
+      </div>
+      <AuthorSocialLinks copy={copy} />
+      {progress && (
+        <div className="mt-[22px] border-t border-white/8 pt-[18px]">
+          <div className="flex items-center justify-between gap-[12px]">
+            <span className="text-[13px] font-medium text-white/72">Прогресс курса</span>
+            <span className="text-[13px] font-bold text-[#9cfb51]">{percent}%</span>
+          </div>
+          <div className="mt-[12px] h-[5px] overflow-hidden rounded-full bg-white/12">
+            <div className="h-full rounded-full bg-[#9cfb51]" style={{ width: `${percent}%` }} />
+          </div>
+          <p className="mt-[8px] text-right text-[12px] leading-tight text-white/44">
+            {progress.completed} из {progress.total} уроков
+          </p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+type AuthorSocialLinksProps = {
+  copy: (typeof detailCopy)["ru"];
+};
+
+function AuthorSocialLinks({ copy }: AuthorSocialLinksProps) {
+  return (
+    <div className="mt-[18px] border-t border-white/8 pt-[16px]">
+      <p className="text-[12px] font-medium leading-none text-white/38">{copy.authorSocials}</p>
+      <div className="mt-[10px] flex flex-wrap gap-[8px]">
+        {authorSocialLinks.map((item) => (
+          <a
+            key={item.label}
+            href={item.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={item.label}
+            className="grid size-[43px] place-items-center rounded-full opacity-80 transition hover:opacity-100 hover:drop-shadow-[0_0_14px_rgba(156,251,81,0.24)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9cfb51]/60"
+          >
+            <img src={item.iconPath} alt="" width="43" height="43" className="size-[43px]" loading="lazy" />
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const authorSocialLinks = [
+  { label: "YouTube", href: "https://www.youtube.com/channel/UC797Sd_fYNILYZFuXsjjFDA", iconPath: "/assets/space/social/youtube.svg" },
+  { label: "Instagram", href: "https://www.instagram.com/v.voronezhtsev/", iconPath: "/assets/space/social/instagram.svg" },
+  { label: "Telegram", href: "https://t.me/v_voronezhtsev", iconPath: "/assets/space/social/telegram.svg" },
+  { label: "TikTok", href: "https://www.tiktok.com/@v_voronezhtsev", iconPath: "/assets/space/social/tiktok.svg" },
+] as const;
+
+type LessonSidebarProps = {
+  lesson: LearnLesson;
+  collection: LearnCollection;
+  activeTab: SidebarTab;
+  onTabChange: (tab: SidebarTab) => void;
+  onTimestampSelect: (seconds: number) => void;
+  hasPro: boolean;
+};
+
+function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestampSelect, hasPro }: LessonSidebarProps) {
+  const isCourse = collection.kind === "course";
+
+  return (
+    <section className="overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]/92">
+      <div className="flex h-[52px] items-end border-b border-white/8 px-[16px]">
+        {isCourse && (
+          <button
+            type="button"
+            onClick={() => onTabChange("lessons")}
+            className={`relative h-[52px] min-w-[92px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition ${
+              activeTab === "lessons" ? "text-white" : "text-white/58 hover:text-white"
+            }`}
+          >
+            Уроки
+            {activeTab === "lessons" && <span className="absolute inset-x-[10px] bottom-0 h-[2px] rounded-full bg-[#9cfb51]" />}
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => onTabChange("timestamps")}
+          className={`relative h-[52px] min-w-[116px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition ${
+            activeTab === "timestamps" ? "text-white" : "text-white/58 hover:text-white"
+          }`}
+        >
+          Тайм-коды
+          {activeTab === "timestamps" && <span className="absolute inset-x-[10px] bottom-0 h-[2px] rounded-full bg-[#9cfb51]" />}
+        </button>
+      </div>
+
+      {activeTab === "lessons" && isCourse ? (
+        <CourseOutline collection={collection} currentSlug={lesson.slug} hasPro={hasPro} />
+      ) : (
+        <TimestampList timestamps={lesson.timestamps} onSelect={onTimestampSelect} />
+      )}
+    </section>
   );
 }
 
 type CourseOutlineProps = {
   collection: LearnCollection;
   currentSlug: string;
+  hasPro: boolean;
   className?: string;
 };
 
-export function CourseOutline({ collection, currentSlug, className = "" }: CourseOutlineProps) {
+export function CourseOutline({ collection, currentSlug, hasPro, className = "" }: CourseOutlineProps) {
   return (
-    <aside className={`rounded-[8px] border border-white/10 bg-white/[0.035] p-[16px] ${className}`}>
-      <div className="border-b border-white/10 pb-[14px]">
-        <h2 className="text-[20px] font-bold leading-tight text-white">{collection.title}</h2>
-        <p className="mt-[6px] text-[14px] text-white/70">
-          {collection.lessons.length} {collection.lessons.length === 1 ? "lesson" : "lessons"}
-        </p>
-      </div>
-
-      <div className="mt-[12px] flex flex-col gap-[8px]">
-        {collection.lessons.map((outlineLesson, index) => {
-          const current = outlineLesson.slug === currentSlug;
-          return (
-            <LocalizedLink
-              key={outlineLesson.slug}
-              to={`/app/learn/${outlineLesson.slug}`}
-              aria-current={current ? "page" : undefined}
-              className={`group flex gap-[10px] rounded-[8px] border p-[11px] no-underline transition ${
-                current
-                  ? "border-[#9cfb51]/85 bg-[#9cfb51]/[0.07] text-white"
-                  : "border-transparent bg-transparent text-white/78 hover:border-white/10 hover:bg-white/[0.035] hover:text-white"
-              }`}
-            >
-              <span
-                className={`mt-[1px] grid size-[24px] shrink-0 place-items-center rounded-full border text-[12px] ${
-                  current ? "border-[#9cfb51] text-[#9cfb51]" : "border-white/32 text-white/78"
-                }`}
-              >
-                {index + 1}
+    <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] ${className}`}>
+      {collection.lessons.map((outlineLesson, index) => {
+        const current = outlineLesson.slug === currentSlug;
+        const locked = isLessonLocked(outlineLesson, hasPro);
+        return (
+          <LocalizedLink
+            key={outlineLesson.slug}
+            to={`/app/learn/${outlineLesson.slug}`}
+            aria-current={current ? "page" : undefined}
+            className={`group grid grid-cols-[26px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition ${
+              current
+                ? "bg-[#9cfb51]/10 text-white"
+                : locked
+                  ? "bg-white/[0.035] text-white/68 hover:bg-white/[0.055] hover:text-white"
+                  : "text-white/76 hover:bg-white/[0.045] hover:text-white"
+            }`}
+          >
+            <span className={`text-center text-[14px] font-bold leading-none ${current ? "text-[#9cfb51]" : "text-white/48"}`}>
+              {index + 1}
+            </span>
+            <span className="min-w-0">
+              <span className={`block text-[14px] font-bold leading-[1.35] ${current ? "text-white" : ""}`}>{outlineLesson.title}</span>
+              <span className="mt-[4px] block text-[12px] leading-tight text-white/44">
+                {locked ? <span className="text-[#9cfb51]">Разблокируется на Pro</span> : outlineLesson.duration}
               </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[14px] font-medium leading-[1.4]">{outlineLesson.title}</span>
-                <span className="mt-[4px] flex flex-wrap items-center gap-[8px] text-[12px] leading-[1.35] text-white/58">
-                  <span>{outlineLesson.duration}</span>
-                  <span className="flex items-center gap-[4px] text-[#9cfb51]">
-                    {statusIcon(outlineLesson)}
-                    {outlineLesson.status}
-                  </span>
-                </span>
-              </span>
-              {outlineLesson.access === "full-platform" && (
-                <Lock size={16} className="mt-[3px] shrink-0 text-white/60" aria-label="Full platform access" />
-              )}
-            </LocalizedLink>
-          );
-        })}
-      </div>
-
-      <LocalizedLink
-        to="/app/learn"
-        className="mt-[14px] flex h-[44px] items-center justify-center gap-[10px] rounded-[8px] border border-white/12 bg-white/[0.025] text-[15px] font-medium text-white no-underline transition hover:border-white/25 hover:bg-white/[0.045]"
-      >
-        <ArrowLeft size={18} />
-        Back to lessons
-      </LocalizedLink>
-    </aside>
+            </span>
+            <LessonStatusDot lesson={outlineLesson} current={current} />
+          </LocalizedLink>
+        );
+      })}
+    </div>
   );
 }
 
-type LessonPlayerMockProps = {
-  lesson: LearnLesson;
+type TimestampListProps = {
+  timestamps: LearnTimestamp[];
+  onSelect: (seconds: number) => void;
 };
 
-export function LessonPlayerMock({ lesson }: LessonPlayerMockProps) {
-  const gated = lesson.access === "full-platform";
-  const videoProvider = getLearnLessonVideoProvider(lesson);
+function TimestampList({ timestamps, onSelect }: TimestampListProps) {
   return (
-    <section
-      className="overflow-hidden rounded-[8px] border border-white/10 bg-white/[0.035] p-[16px]"
-      data-video-provider={videoProvider.provider}
-      data-provider-asset-id={videoProvider.providerAssetId}
-      data-playback-policy={videoProvider.playbackPolicy}
-    >
-      <div className="relative aspect-video overflow-hidden rounded-[8px] border border-white/10 bg-[#06191c] max-sm:aspect-[4/3]">
-        <img src={lesson.thumbnailPath} alt="" className="h-full w-full object-cover opacity-68" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(156,251,81,0.13),rgba(1,16,18,0.76)_54%,rgba(1,16,18,0.9))]" />
-        <div className="absolute left-[16px] top-[16px] inline-flex items-center gap-[8px] rounded-full border border-white/14 bg-black/35 px-[12px] py-[8px] text-[14px] text-white backdrop-blur-sm max-sm:hidden">
-          <Play size={16} className="text-[#9cfb51]" />
-          Mock lesson player
-        </div>
-        {gated ? (
-          <div className="absolute inset-0 grid place-items-center px-[22px] text-center">
-            <div>
-              <span className="mx-auto grid size-[72px] place-items-center rounded-full border border-[#9cfb51]/75 bg-[#011012]/68 text-white max-sm:size-[52px]">
-                <Lock size={34} className="max-sm:size-[25px]" />
-              </span>
-              <h2 className="mt-[18px] text-[26px] font-bold leading-tight text-white max-sm:text-[21px]">
-                Full access placeholder
-              </h2>
-              <p className="mt-[8px] text-[17px] leading-[1.45] text-white/72 max-sm:text-[13px]">
-                Frontend mock for a future subscription-gated lesson.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="absolute inset-0 grid place-items-center">
-            <span className="grid size-[66px] place-items-center rounded-full border border-white/25 bg-black/42 text-white backdrop-blur-sm">
-              <Play size={28} fill="currentColor" />
+    <div className="max-h-[720px] overflow-y-auto p-[8px]">
+      {timestamps.map((timestamp) => (
+        <button
+          key={`${timestamp.time}-${timestamp.title}`}
+          type="button"
+          onClick={() => onSelect(timestamp.seconds)}
+          className="group grid w-full cursor-pointer grid-cols-[52px_minmax(0,1fr)] gap-[10px] rounded-[8px] border-0 bg-transparent px-[10px] py-[11px] text-left transition hover:bg-white/[0.045] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/70"
+        >
+          <span className="mt-[1px] font-mono text-[13px] font-bold leading-tight text-[#9cfb51]">{timestamp.time}</span>
+          <span className="min-w-0">
+            <span className="block text-[14px] font-bold leading-[1.35] text-white group-hover:text-[#9cfb51]">
+              {timestamp.title}
             </span>
-          </div>
-        )}
-      </div>
+            <span className="mt-[4px] block text-[12px] leading-[1.35] text-white/48">{timestamp.description}</span>
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
 
-      <div className="mt-[16px]">
-        <div className="h-[5px] overflow-hidden rounded-full bg-white/25">
-          <div className="h-full w-[22%] rounded-full bg-[#9cfb51]" />
+type UnlockProCardProps = {
+  hasPro: boolean;
+};
+
+function UnlockProCard({ hasPro }: UnlockProCardProps) {
+  if (hasPro) {
+    return (
+      <section className="rounded-[8px] border border-[#9cfb51]/45 bg-[#10261b] p-[18px]">
+        <div className="flex items-start gap-[12px]">
+          <span className="grid size-[42px] shrink-0 place-items-center rounded-full bg-[#9cfb51]/12 text-[#9cfb51]">
+            <Check size={20} />
+          </span>
+          <div>
+            <h2 className="text-[16px] font-bold leading-tight text-white">Pro активен</h2>
+            <p className="mt-[8px] text-[13px] leading-[1.45] text-white/62">Все Pro-уроки и материалы доступны без дополнительных оплат.</p>
+          </div>
         </div>
-        <div className="mt-[13px] flex items-center gap-[16px] text-white">
-          <Play size={21} fill="currentColor" />
-          <Volume2 size={21} />
-          <span className="text-[16px] text-[#9cfb51]">01:00</span>
-          <span className="text-[16px] text-white/55">/ {lesson.duration.replace(" min", ":00")}</span>
-          <span className="ml-auto rounded-[4px] border border-white/22 px-[5px] py-[2px] text-[12px] text-white/82">CC</span>
-          <span className="text-[14px] text-white/82">1x</span>
+      </section>
+    );
+  }
+
+  return (
+    <section className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/55 bg-[linear-gradient(135deg,rgba(11,48,31,0.95),rgba(14,32,35,0.96))] p-[18px] shadow-[0_18px_60px_rgba(54,134,28,0.16)]">
+      <div className="pointer-events-none absolute right-[-42px] top-[-28px] size-[120px] rounded-full bg-[#9cfb51]/12 blur-[4px]" />
+      <div className="relative flex items-start gap-[12px]">
+        <span className="grid size-[42px] shrink-0 place-items-center rounded-full bg-[#9cfb51]/14 text-[#9cfb51]">
+          <Crown size={20} />
+        </span>
+        <div>
+          <h2 className="text-[17px] font-bold leading-[1.25] text-white">Разблокируйте все уроки</h2>
+          <p className="mt-[8px] text-[13px] leading-[1.45] text-white/68">
+            Получите доступ ко всем материалам курса и Pro-урокам без ограничений.
+          </p>
         </div>
+      </div>
+      <LocalizedLink
+        to="/pay"
+        className="relative mt-[18px] flex h-[43px] items-center justify-center rounded-[8px] bg-[#9cfb51] px-[16px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943]"
+      >
+        Разблокировать на Pro
+      </LocalizedLink>
+    </section>
+  );
+}
+
+type RelatedLessonsProps = {
+  collection: LearnCollection;
+  currentSlug: string;
+  hasPro: boolean;
+};
+
+function RelatedLessons({ collection, currentSlug, hasPro }: RelatedLessonsProps) {
+  const lessons = useMemo(
+    () => collection.lessons.filter((item) => item.slug !== currentSlug).slice(0, 2),
+    [collection.lessons, currentSlug],
+  );
+
+  if (lessons.length === 0) return null;
+
+  return (
+    <section className="mt-[36px]">
+      <h2 className="text-[24px] font-bold leading-tight text-white">Все уроки</h2>
+      <div className="mt-[16px] grid grid-cols-2 gap-[16px] max-sm:grid-cols-1">
+        {lessons.map((item) => {
+          const locked = isLessonLocked(item, hasPro);
+          return (
+            <LocalizedLink
+              key={item.slug}
+              to={`/app/learn/${item.slug}`}
+              className="group overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023] text-white no-underline transition hover:border-[#9cfb51]/45 hover:bg-[#10282c]"
+            >
+              <div className="relative aspect-video overflow-hidden bg-[#06191c]">
+                <img
+                  src={item.thumbnailPath}
+                  alt=""
+                  width="1200"
+                  height="676"
+                  loading="lazy"
+                  className="h-full w-full object-cover opacity-82 transition duration-500 group-hover:scale-[1.035]"
+                />
+                <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.04),rgba(1,16,18,0.36))]" />
+                <span
+                  className={`absolute left-1/2 top-1/2 grid size-[52px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full ${
+                    locked ? "bg-white/10 text-white/72" : "bg-[#9cfb51] text-[#011417] shadow-[0_14px_38px_rgba(156,251,81,0.22)]"
+                  }`}
+                >
+                  {locked ? <Lock size={21} /> : <Play size={22} fill="currentColor" className="ml-[2px]" />}
+                </span>
+                <span className="absolute bottom-[8px] right-[8px] rounded-[4px] bg-black/72 px-[6px] py-[4px] text-[13px] font-medium leading-none text-white">
+                  {item.duration}
+                </span>
+              </div>
+              <div className="px-[14px] pb-[18px] pt-[13px]">
+                <p className="text-[12px] leading-none text-white/38">{item.category}</p>
+                <h3 className="mt-[9px] min-h-[48px] text-[18px] font-bold leading-[1.3] text-white">{item.title}</h3>
+                <p className="mt-[14px] text-[13px] font-medium text-[#9cfb51]">
+                  {locked ? "Разблокируется на Pro" : "Смотреть урок"}
+                </p>
+              </div>
+            </LocalizedLink>
+          );
+        })}
       </div>
     </section>
   );
 }
 
-type LessonInfoPanelProps = {
+type LessonStatusDotProps = {
   lesson: LearnLesson;
-  collection: LearnCollection;
-  className?: string;
+  current: boolean;
 };
 
-export function LessonInfoPanel({ lesson, collection, className = "" }: LessonInfoPanelProps) {
-  const position = getLessonPosition(lesson.slug);
-  const gated = lesson.access === "full-platform";
+function LessonStatusDot({ lesson, current }: LessonStatusDotProps) {
+  if (lesson.status === "Completed") {
+    return (
+      <span className="grid size-[22px] place-items-center">
+        <span className="grid size-[14px] place-items-center rounded-full bg-[#9cfb51] text-[#011417]">
+          <Check size={10} strokeWidth={3} />
+        </span>
+      </span>
+    );
+  }
+
   return (
-    <aside className={`rounded-[8px] border border-white/10 bg-white/[0.035] p-[20px] ${className}`}>
-      <div className="flex flex-wrap items-center justify-between gap-[10px]">
-        <p className="text-[15px] font-bold leading-tight text-[#9cfb51]">{collection.title}</p>
-        {position && <p className="text-[13px] leading-tight text-white/58">{position}</p>}
-      </div>
-      <h1 className="mt-[18px] text-[28px] font-bold leading-[1.12] text-white max-sm:text-[24px]">{lesson.title}</h1>
-      <div className="mt-[12px] flex flex-wrap items-center gap-[10px] text-[13px] text-white/64">
-        <span className="inline-flex items-center gap-[5px]">
-          <Clock3 size={14} />
-          {lesson.duration}
-        </span>
-        <span className="text-white/25">•</span>
-        <span className="inline-flex items-center gap-[5px] text-[#9cfb51]">
-          {statusIcon(lesson)}
-          {lesson.status}
-        </span>
-      </div>
-      <p className="mt-[20px] border-b border-white/10 pb-[20px] text-[14px] leading-[1.55] text-white/82">{lesson.description}</p>
-
-      <section className="mt-[20px]">
-        <h2 className="text-[18px] font-bold leading-tight text-white">What you'll learn</h2>
-        <ul className="mt-[14px] space-y-[11px]">
-          {lesson.whatYouWillLearn.map((item) => (
-            <li key={item} className="flex gap-[9px] text-[14px] leading-[1.45] text-white/78">
-              <CheckCircle2 size={18} className="mt-[1px] shrink-0 text-[#9cfb51]" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {gated && (
-        <section className="mt-[20px]">
-          <button
-            type="button"
-            disabled
-            aria-label="Full platform access is not available in this MVP"
-            className="flex h-[48px] w-full cursor-default items-center justify-center gap-[10px] rounded-[8px] bg-[#9cfb51] px-[18px] text-[18px] font-bold text-[#011417] opacity-100"
-          >
-            <Lock size={19} />
-            Full access placeholder
-          </button>
-          <p className="mt-[10px] text-center text-[13px] leading-[1.4] text-white/62">
-            Frontend-only gated state. Access checks are not connected.
-          </p>
-        </section>
-      )}
-    </aside>
+    <span className="grid size-[22px] place-items-center">
+      <span
+        className={`block size-[12px] rounded-full border ${
+          current ? "border-[#9cfb51]" : "border-white/42"
+        }`}
+      />
+    </span>
   );
 }
 
-type DetailNavigationProps = {
-  previousLesson?: LearnLesson;
-  nextLesson?: LearnLesson;
-  className?: string;
-};
+function readStoredLearnProgress(): StoredLearnProgress {
+  if (typeof window === "undefined") return { completed: [], incomplete: [] };
 
-function DetailNavigation({ previousLesson, nextLesson, className = "" }: DetailNavigationProps) {
-  return (
-    <nav
-      className={`items-center justify-between gap-[12px] rounded-[8px] border border-white/10 bg-white/[0.025] p-[12px] ${className}`}
-      aria-label="Lesson navigation"
-    >
-      {previousLesson ? (
-        <LocalizedLink
-          to={`/app/learn/${previousLesson.slug}`}
-          className="inline-flex h-[42px] min-w-[160px] items-center gap-[10px] rounded-[8px] px-[12px] text-[15px] font-medium text-white no-underline transition hover:bg-white/[0.045]"
-        >
-          <ArrowLeft size={18} />
-          Previous lesson
-        </LocalizedLink>
-      ) : (
-        <span className="inline-flex h-[42px] min-w-[160px] items-center gap-[10px] rounded-[8px] px-[12px] text-[15px] text-white/32">
-          <ArrowLeft size={18} />
-          Previous lesson
-        </span>
-      )}
-      {nextLesson ? (
-        <LocalizedLink
-          to={`/app/learn/${nextLesson.slug}`}
-          className="ml-auto inline-flex h-[42px] min-w-[132px] items-center justify-end gap-[10px] rounded-[8px] px-[12px] text-[15px] font-medium text-white no-underline transition hover:bg-white/[0.045]"
-        >
-          Next lesson
-          <ArrowRight size={18} />
-        </LocalizedLink>
-      ) : (
-        <span className="ml-auto inline-flex h-[42px] min-w-[132px] items-center justify-end gap-[10px] rounded-[8px] px-[12px] text-[15px] text-white/32">
-          Next lesson
-          <ArrowRight size={18} />
-        </span>
-      )}
-    </nav>
-  );
+  try {
+    const raw = window.localStorage.getItem(LEARN_PROGRESS_STORAGE_KEY);
+    if (!raw) return { completed: [], incomplete: [] };
+    const parsed = JSON.parse(raw) as Partial<StoredLearnProgress>;
+    return {
+      completed: Array.isArray(parsed.completed) ? parsed.completed.filter((item): item is string => typeof item === "string") : [],
+      incomplete: Array.isArray(parsed.incomplete) ? parsed.incomplete.filter((item): item is string => typeof item === "string") : [],
+    };
+  } catch {
+    return { completed: [], incomplete: [] };
+  }
 }
 
-function statusIcon(lesson: LearnLesson) {
-  if (lesson.status === "Completed") return <CheckCircle2 size={14} />;
-  if (lesson.status === "In progress") return <Circle size={14} />;
-  return <Play size={14} color={accent} />;
+function writeStoredLearnProgress(progress: StoredLearnProgress) {
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.setItem(LEARN_PROGRESS_STORAGE_KEY, JSON.stringify(progress));
+  } catch {
+    // Local progress is a convenience; failing to persist should not break the lesson page.
+  }
 }
+
+function updateStoredLessonProgress(progress: StoredLearnProgress, lesson: LearnLesson, completed: boolean): StoredLearnProgress {
+  const completedSet = new Set(progress.completed);
+  const incompleteSet = new Set(progress.incomplete);
+
+  if (completed) {
+    completedSet.add(lesson.slug);
+    incompleteSet.delete(lesson.slug);
+  } else {
+    completedSet.delete(lesson.slug);
+    if (lesson.status === "Completed") {
+      incompleteSet.add(lesson.slug);
+    } else {
+      incompleteSet.delete(lesson.slug);
+    }
+  }
+
+  return {
+    completed: [...completedSet],
+    incomplete: [...incompleteSet],
+  };
+}
+
+function getCompletedLessonSlugs(collection: LearnCollection, progress: StoredLearnProgress) {
+  const completed = new Set(collection.lessons.filter((item) => item.status === "Completed").map((item) => item.slug));
+
+  for (const slug of progress.completed) completed.add(slug);
+  for (const slug of progress.incomplete) completed.delete(slug);
+
+  return completed;
+}
+
+function applyLessonProgress(collection: LearnCollection, completedSlugs: Set<string>, currentSlug: string): LearnCollection {
+  const completedCount = collection.lessons.filter((item) => completedSlugs.has(item.slug)).length;
+
+  return {
+    ...collection,
+    progress: collection.progress
+      ? {
+          ...collection.progress,
+          completed: completedCount,
+          total: collection.progress.total || collection.lessons.length,
+        }
+      : collection.progress,
+    lessons: collection.lessons.map((item) => {
+      if (completedSlugs.has(item.slug)) return { ...item, status: "Completed" };
+      if (item.status === "Completed") return { ...item, status: item.slug === currentSlug ? "In progress" : "Available" };
+      return item;
+    }),
+  };
+}
+
+function isLessonLocked(lesson: LearnLesson, hasPro: boolean) {
+  return lesson.access === "full-platform" && !hasPro;
+}
+
+function hasProAccess(account: AccountSummary | null) {
+  return Boolean(account && account.plan !== "free" && (account.status === "active" || account.status === "cancelled"));
+}
+
+const detailCopy = {
+  ru: {
+    breadcrumb: "Навигация по курсу",
+    courses: "Курсы",
+    singleLesson: "Одиночный урок",
+    lessonAuthor: "Автор урока",
+    authorSocials: "Соцсети автора",
+    markLessonCompleted: "Отметить как изучено",
+    lessonCompleted: "Урок изучен",
+    undoCompleted: "Отменить",
+  },
+  en: {
+    breadcrumb: "Course navigation",
+    courses: "Courses",
+    singleLesson: "Single lesson",
+    lessonAuthor: "Lesson author",
+    authorSocials: "Author socials",
+    markLessonCompleted: "Mark as learned",
+    lessonCompleted: "Lesson learned",
+    undoCompleted: "Undo",
+  },
+} as const;

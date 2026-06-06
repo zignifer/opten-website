@@ -11,6 +11,7 @@
     "gsc:sitemaps": "node scripts/gsc.mjs sitemaps",
     "gsc:sites": "node scripts/gsc.mjs sites",
     "gsc:submit-sitemap": "node scripts/gsc.mjs submit-sitemap",
+    "learn:video-notes": "node scripts/learn-video-notes.mjs",
     "sync:agents": "node scripts/sync-agent-docs.mjs",
     "verify:unified-auth": "node scripts/verify-unified-auth.mjs",
     "verify:space-learn": "node scripts/verify-space-learn.mjs",

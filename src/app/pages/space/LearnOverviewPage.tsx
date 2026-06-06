@@ -9,6 +9,7 @@ import {
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { useLang } from "../../../i18n/LangContext";
+import LocalizedLink from "../../components/LocalizedLink";
 import SiteFooter from "../../components/SiteFooter";
 import SpaceHeader from "../../components/space/SpaceHeader";
 
@@ -420,6 +421,23 @@ const allLessons: LessonCard[] = [
   },
 ];
 
+const lessonDetailSlugById: Record<string, string> = {
+  "cursor-web-app": "bolt-saas-evening",
+  "figma-ai-repeat": "figma-ai-interface",
+  "business-cases": "ai-design-assistants",
+  "cursor-advanced": "bolt-saas-evening",
+  "runway-editing": "runway-prompt-to-video",
+  "midjourney-advanced": "midjourney-style-light",
+};
+
+const collectionDetailSlugById: Record<string, string> = {
+  "quick-start": "prompt-engineering-basics",
+  "ai-video-zero-to-pro": "runway-prompt-to-video",
+  "vibe-coding-projects": "bolt-saas-evening",
+  "business-ai": "ai-design-assistants",
+  "tools-reviews": "pika-new-features",
+};
+
 export default function LearnOverviewPage() {
   const { lang } = useLang();
   const copy = pageCopy[lang];
@@ -489,18 +507,18 @@ export default function LearnOverviewPage() {
 
           <AuthorCard lang={lang} />
 
-          <HeroVideoCard lang={lang} className="mt-[51px] min-[1120px]:col-start-1 min-[1120px]:row-start-2" />
-          <article className="mt-[51px] flex min-h-[310px] flex-col justify-center max-[1119px]:max-w-[552px] min-[1120px]:col-start-2 min-[1120px]:row-start-2 min-[1120px]:-ml-[18px]">
+          <HeroVideoCard lang={lang} className="mt-[51px] max-md:hidden min-[1120px]:col-start-1 min-[1120px]:row-start-2" />
+          <article className="mt-[51px] flex min-h-[310px] flex-col justify-center max-[1119px]:max-w-[552px] max-md:hidden min-[1120px]:col-start-2 min-[1120px]:row-start-2 min-[1120px]:-ml-[18px]">
             <h2 className="text-[21px] font-bold leading-tight text-white">{copy.featuredTitle}</h2>
             <p className="mt-[15px] text-[14px] leading-[1.55] text-white/55">
               {copy.featuredDescription}
             </p>
-            <button
-              type="button"
-              className="mt-[24px] h-[43px] w-[197px] rounded-[8px] bg-[#9cfb51] px-[20px] text-[14px] font-bold text-[#062013] transition hover:bg-[#8ee943] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417]"
+            <LocalizedLink
+              to="/app/learn/runway-prompt-to-video"
+              className="mt-[24px] flex h-[43px] w-[197px] items-center justify-center rounded-[8px] bg-[#9cfb51] px-[20px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417]"
             >
               {copy.watchLesson}
-            </button>
+            </LocalizedLink>
           </article>
         </section>
 
@@ -623,8 +641,8 @@ export default function LearnOverviewPage() {
 
 function HeroVideoCard({ lang, className = "" }: { lang: LearnLang; className?: string }) {
   return (
-    <button
-      type="button"
+    <LocalizedLink
+      to="/app/learn/runway-prompt-to-video"
       className={`group relative block aspect-video overflow-hidden rounded-[12px] border border-white/12 bg-[#0e2023] text-left shadow-[0_20px_60px_rgba(0,0,0,0.22)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417] ${className}`}
       aria-label={`${pageCopy[lang].watchLesson}: ${pageCopy[lang].featuredTitle}`}
     >
@@ -642,13 +660,13 @@ function HeroVideoCard({ lang, className = "" }: { lang: LearnLang; className?: 
       <span className="absolute bottom-[10px] right-[11px] rounded-[4px] bg-black/70 px-[6px] py-[4px] text-[13px] font-medium leading-none text-white">
         {featuredLesson.duration}
       </span>
-    </button>
+    </LocalizedLink>
   );
 }
 
 function AuthorCard({ lang }: { lang: LearnLang }) {
   return (
-    <aside className="row-span-2 flex flex-col rounded-[15px] border border-white/10 bg-[#0e2023] px-[20px] py-[20px] shadow-none max-[1119px]:mt-[24px] max-[1119px]:max-w-[552px] min-[1120px]:col-start-3 min-[1120px]:row-start-1 min-[1120px]:h-[412px] min-[1120px]:self-end">
+    <aside className="row-span-2 flex flex-col rounded-[15px] border border-white/10 bg-[#0e2023] px-[20px] py-[20px] shadow-none max-[1119px]:mt-[24px] max-[1119px]:max-w-[552px] max-md:hidden min-[1120px]:col-start-3 min-[1120px]:row-start-1 min-[1120px]:h-[412px] min-[1120px]:self-end">
       <p className="text-[11px] font-bold uppercase leading-none text-white/38">{courseAuthor.label[lang]}</p>
       <img
         src={courseAuthor.avatar}
@@ -712,9 +730,9 @@ function LessonSection({
 
 function ProgressLessonCard({ lesson, lang }: { lesson: LessonCard; lang: LearnLang }) {
   return (
-    <button
-      type="button"
-      className="group overflow-hidden rounded-[9px] border border-white/10 bg-[#0e2023] text-left transition hover:border-[#9cfb51]/45 hover:bg-[#10282c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]"
+    <LocalizedLink
+      to={lessonHref(lesson)}
+      className="group block overflow-hidden rounded-[9px] border border-white/10 bg-[#0e2023] text-left no-underline transition hover:border-[#9cfb51]/45 hover:bg-[#10282c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]"
     >
       <MediaThumb lesson={lesson} compact />
       <div className="px-[12px] pb-[12px] pt-[12px]">
@@ -725,7 +743,7 @@ function ProgressLessonCard({ lesson, lang }: { lesson: LessonCard; lang: LearnL
           <div className="h-full rounded-full bg-[#9cfb51]" style={{ width: `${lesson.progress}%` }} />
         </div>
       </div>
-    </button>
+    </LocalizedLink>
   );
 }
 
@@ -733,9 +751,9 @@ function CollectionTile({ collection, lang }: { collection: CollectionCard; lang
   const copy = pageCopy[lang];
 
   return (
-    <button
-      type="button"
-      className="group relative min-h-[237px] overflow-hidden rounded-[9px] border border-white/10 bg-[#0e2023] text-left transition hover:border-[#9cfb51]/45 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]"
+    <LocalizedLink
+      to={collectionHref(collection)}
+      className="group relative block min-h-[237px] overflow-hidden rounded-[9px] border border-white/10 bg-[#0e2023] text-left no-underline transition hover:border-[#9cfb51]/45 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]"
     >
       <img
         src={collection.image}
@@ -757,15 +775,15 @@ function CollectionTile({ collection, lang }: { collection: CollectionCard; lang
         <span className="block text-[17px] font-bold leading-[1.24] text-white">{collectionTitle(collection, lang)}</span>
         <span className="mt-[7px] block text-[13px] leading-tight text-white/55">{collectionSubtitle(collection, lang)}</span>
       </span>
-    </button>
+    </LocalizedLink>
   );
 }
 
 function LargeLessonCard({ lesson, lang }: { lesson: LessonCard; lang: LearnLang }) {
   return (
-    <button
-      type="button"
-      className="group overflow-hidden rounded-[9px] border border-white/10 bg-[#0e2023] text-left transition hover:border-[#9cfb51]/45 hover:bg-[#10282c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]"
+    <LocalizedLink
+      to={lessonHref(lesson)}
+      className="group block overflow-hidden rounded-[9px] border border-white/10 bg-[#0e2023] text-left no-underline transition hover:border-[#9cfb51]/45 hover:bg-[#10282c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]"
     >
       <MediaThumb lesson={lesson} />
       <div className="px-[14px] pb-[20px] pt-[13px]">
@@ -785,7 +803,7 @@ function LargeLessonCard({ lesson, lang }: { lesson: LessonCard; lang: LearnLang
           <span className="ml-[6px] text-white/35">{lessonUpdated(lesson, lang)}</span>
         </div>
       </div>
-    </button>
+    </LocalizedLink>
   );
 }
 
@@ -837,6 +855,14 @@ function lessonTitle(lesson: LessonCard, lang: LearnLang) {
 
 function lessonUpdated(lesson: LessonCard, lang: LearnLang) {
   return lessonTranslations[lesson.id]?.updated[lang] ?? lesson.updated;
+}
+
+function lessonHref(lesson: LessonCard) {
+  return `/app/learn/${lessonDetailSlugById[lesson.id] ?? lesson.id}`;
+}
+
+function collectionHref(collection: CollectionCard) {
+  return `/app/learn/${collectionDetailSlugById[collection.id] ?? "runway-prompt-to-video"}`;
 }
 
 function collectionTitle(collection: CollectionCard, lang: LearnLang) {

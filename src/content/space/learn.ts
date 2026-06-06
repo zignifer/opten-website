@@ -4,26 +4,53 @@ export type LearnLessonStatus = "Available" | "In progress" | "Completed";
 
 export type LearnAccess = "free" | "full-platform";
 
+export type LearnCollectionKind = "course" | "standalone";
+
 export type LearnAuthor = {
   name: string;
   initials: string;
+  role: string;
   intro: string;
   note: string;
+  avatarPath: string;
+};
+
+export type LearnTimestamp = {
+  time: string;
+  seconds: number;
+  title: string;
+  description: string;
+};
+
+export type LearnMaterial = {
+  title: string;
+  meta: string;
+  kind: "pdf" | "video" | "link";
+  actionLabel: string;
+  href: string;
 };
 
 export type LearnVideoProviderMetadata = {
-  provider: "future-provider-placeholder";
+  provider: "youtube";
   providerAssetId: string;
   posterPath: string;
-  playbackPolicy: "mock-preview" | "mock-preview-plus-gated-full";
+  playbackPolicy: "public-embed" | "subscription-gated-public-preview";
   signedPlaybackUrl: null;
   notes: string;
+};
+
+export type LearnLocalizedVideo = {
+  youtubeId?: string;
+  youtubeUrl?: string;
+  audioLanguage?: "ru" | "en";
+  captionLanguage?: "ru" | "en";
 };
 
 export type LearnLesson = {
   slug: string;
   title: string;
   description: string;
+  category: string;
   duration: string;
   status: LearnLessonStatus;
   access: LearnAccess;
@@ -37,14 +64,26 @@ export type LearnLesson = {
   topics: string[];
   whatYouWillLearn: string[];
   updatedNote: string;
+  youtubeId?: string;
+  youtubeUrl?: string;
+  localizedVideo?: Partial<Record<"ru" | "en", LearnLocalizedVideo>>;
+  timestamps: LearnTimestamp[];
+  materials: LearnMaterial[];
   videoProvider?: LearnVideoProviderMetadata;
+};
+
+export type LearnCourseProgress = {
+  completed: number;
+  total: number;
 };
 
 export type LearnCourse = {
   id: string;
   title: string;
   category: LearnFilter;
+  label: string;
   description: string;
+  progress: LearnCourseProgress;
   lessons: LearnLesson[];
 };
 
@@ -61,276 +100,336 @@ export type LearnCollection = {
   id: string;
   title: string;
   description: string;
+  kind: LearnCollectionKind;
+  categoryLabel: string;
+  progress?: LearnCourseProgress;
   lessons: LearnLesson[];
 };
 
 export const learnFilters: LearnFilter[] = ["All", "Standalone", "Prompt packs", "Builder", "Brand", "Models"];
 
 export const futureProtectedVideoDeliveryNote =
-  "Future protected video delivery should use backend-issued signed short-lived playback URLs and a proper streaming/video provider, potentially HLS/DRM-capable if required. Do not claim frontend can make videos impossible to steal. Do not implement now.";
+  "Current Learn MVP embeds public YouTube lessons. Future protected video delivery should use backend-issued signed short-lived playback URLs and a proper streaming/video provider if private Pro-only video files become required.";
+
+const learnAssetBase = "/assets/space/learn-v2";
 
 export const learnDefaultAuthor: LearnAuthor = {
-  name: "Vladislav Voronezhtsev",
-  initials: "VV",
-  intro: "I build Opten workflows and turn real production patterns into short practical lessons.",
-  note: "Expect prompt-pack walkthroughs, model notes, and compact updates when tools change.",
+  name: "Влад Воронежцев",
+  initials: "ВВ",
+  role: "Веб-дизайнер, AI-креатор",
+  intro: "Показываю рабочие AI-процессы на реальных уроках: от идеи и промпта до готового видео.",
+  note: "Уроки обновляются, когда меняются модели, интерфейсы или production-процесс.",
+  avatarPath: `${learnAssetBase}/author-vlad-frame43.jpg`,
 };
 
 export const learnIntegrationTodos = {
-  auth: "TODO: connect Opten auth/user database later to decide viewer identity and entitlement state.",
-  subscription:
-    "TODO: connect subscription/payment access later. Keep this frontend-only mock disconnected from checkout, billing, or payment APIs.",
+  auth: "Use SpaceAuthProvider/account-summary for viewer identity and entitlement state.",
+  subscription: "Pro lessons unlock when account-summary returns plan=pro with active or cancelled paid access.",
   video:
-    "TODO: connect a real streaming/video provider later using backend-issued signed short-lived playback URLs. Use HLS/DRM-capable delivery if product requirements need it.",
+    "Public YouTube embed is the first delivery path. Keep provider access and timestamp generation in local scripts/server context, not in browser code.",
   contentManagement:
-    "TODO: replace this local mock catalog with an owner upload/content management workflow when the product owner is ready.",
+    "Replace this local catalog with an owner upload/content management workflow when course authoring is ready.",
 };
 
-const templateAssetBase = "/assets/space/templates";
-
-const standaloneLessons: LearnLesson[] = [
+const aiAvatarTimestamps: LearnTimestamp[] = [
   {
-    slug: "new-model-workflow-update",
-    title: "New model workflow update",
-    description: "Map a model release into the prompt-pack workflow without changing the product scope.",
-    duration: "5 min",
-    status: "Available",
-    access: "free",
-    thumbnailPath: `${templateAssetBase}/skincare-texture.jpg`,
-    filters: ["Standalone", "Models"],
-    topics: ["Model updates", "Prompt packs", "External AI tools"],
-    whatYouWillLearn: [
-      "Spot when a model change affects prompt wording",
-      "Keep prompt packs model-specific",
-      "Separate Opten prompts from external media creation",
-    ],
-    updatedNote: "Standalone updates are added when model behavior changes the workflow.",
+    time: "00:00",
+    seconds: 0,
+    title: "Введение в AI-аватары",
+    description: "Как перенос движения и мимики превращает исходное видео в управляемого ИИ-персонажа.",
   },
   {
-    slug: "external-ai-tool-handoff",
-    title: "External AI tool handoff",
-    description: "Prepare prompt pack output for external image and video tools.",
-    duration: "7 min",
-    status: "Completed",
-    access: "free",
-    thumbnailPath: `${templateAssetBase}/cinematic-destination-reel.jpg`,
-    filters: ["Standalone", "Models", "Prompt packs"],
-    topics: ["External AI tools", "Model-specific prompts", "Copy workflow"],
-    whatYouWillLearn: [
-      "Copy only the prompt section needed for the next step",
-      "Use selected model labels as handoff context",
-      "Avoid implying Opten generates the final media",
-    ],
-    updatedNote: "Short standalone videos cover important handoff changes between full courses.",
+    time: "00:38",
+    seconds: 38,
+    title: "Подготовка видеореференса",
+    description: "Записываем исходный ролик и вытаскиваем первый кадр для дальнейшей генерации.",
   },
   {
-    slug: "prompt-pack-teardown",
-    title: "Prompt pack teardown",
-    description: "Read a complete prompt pack and understand why each section exists.",
-    duration: "9 min",
-    status: "In progress",
-    access: "free",
-    thumbnailPath: `${templateAssetBase}/on-model-fashion-reel.jpg`,
-    filters: ["Standalone", "Prompt packs"],
-    topics: ["Prompt packs", "Model notes", "Consistency rules"],
-    whatYouWillLearn: [
-      "Identify source-image, video-motion, rules, and model-note sections",
-      "Use brief fields to explain prompt wording",
-      "Keep prompt packs compact enough to copy",
-    ],
-    updatedNote: "Teardowns are refreshed as the prompt-pack format changes.",
+    time: "01:25",
+    seconds: 85,
+    title: "Создание образа персонажа",
+    description: "Генерируем изображение персонажа в Syntax с сохранением позы и освещения.",
+  },
+  {
+    time: "02:30",
+    seconds: 150,
+    title: "Изменение голоса в 11 Labs",
+    description: "Используем Voice Changer, чтобы подготовить озвучку для будущего аватара.",
+  },
+  {
+    time: "03:55",
+    seconds: 235,
+    title: "Анимация в Kling Motion Control",
+    description: "Загружаем материалы и оживляем персонажа по движениям из видеореференса.",
+  },
+  {
+    time: "04:45",
+    seconds: 285,
+    title: "Сборка проекта и липсинк",
+    description: "Меняем оригинальный звук на сгенерированный и проверяем синхронизацию губ.",
+  },
+  {
+    time: "05:50",
+    seconds: 350,
+    title: "Методы придания реализма",
+    description: "Используем перезапись экрана телефона, чтобы получить более живое ощущение съемки.",
+  },
+  {
+    time: "07:20",
+    seconds: 440,
+    title: "Апскейл видео и мемы",
+    description: "Улучшаем исходники через апскейлер, чтобы избежать артефактов при анимации.",
+  },
+  {
+    time: "08:35",
+    seconds: 515,
+    title: "Настройки фона и ориентации",
+    description: "Разбираем параметры фона и направления взгляда персонажа в Kling Motion Control.",
   },
 ];
 
+const defaultTimestamps: LearnTimestamp[] = [
+  { time: "00:00", seconds: 0, title: "Контекст урока", description: "Что делаем и какой результат должен получиться." },
+  { time: "01:40", seconds: 100, title: "Подготовка материалов", description: "Собираем входные данные и фиксируем ограничения." },
+  { time: "04:10", seconds: 250, title: "Основной workflow", description: "Проходим ключевые действия в инструменте." },
+  { time: "07:30", seconds: 450, title: "Проверка результата", description: "Смотрим на ошибки, артефакты и способы исправления." },
+];
+
+const aiVideoMaterials: LearnMaterial[] = [
+  {
+    title: "Шаблон промпта для AI-аватара",
+    meta: "PDF · 245 КБ",
+    kind: "pdf",
+    actionLabel: "Скачать",
+    href: "/dashboard/download-skill",
+  },
+  {
+    title: "Примеры референсов и результатов",
+    meta: "MP4 · 128 МБ",
+    kind: "video",
+    actionLabel: "Смотреть",
+    href: "https://youtu.be/slxq1d8u-Hg",
+  },
+  {
+    title: "Документация Kling Motion Control",
+    meta: "Ссылка",
+    kind: "link",
+    actionLabel: "Перейти",
+    href: "https://klingai.com/",
+  },
+];
+
+function lesson(input: Omit<LearnLesson, "author" | "updatedNote" | "timestamps" | "materials"> & Partial<Pick<LearnLesson, "timestamps" | "materials" | "updatedNote">>): LearnLesson {
+  return {
+    ...input,
+    author: learnDefaultAuthor,
+    timestamps: input.timestamps ?? defaultTimestamps,
+    materials: input.materials ?? [],
+    updatedNote: input.updatedNote ?? "Материалы урока обновляются вместе с курсом.",
+  };
+}
+
 export const learnCourses: LearnCourse[] = [
   {
-    id: "prompt-pack-foundations",
-    title: "Prompt Pack Foundations",
-    category: "Prompt packs",
-    description: "Image prompts, video prompts, rules, and model notes.",
+    id: "ai-video-zero-to-pro",
+    title: "Создание видео с помощью ИИ: от идеи до результата",
+    category: "Models",
+    label: "ИИ-генерация видео",
+    description: "Практический курс по AI-видео: сценарий, промпт, персонажи, движение, звук и финальная сборка.",
+    progress: { completed: 4, total: 12 },
     lessons: [
-      {
-        slug: "understand-prompt-packs",
-        title: "Understand prompt packs",
-        description: "Learn the structure of a model-ready prompt pack before using the Builder.",
-        duration: "8 min",
-        status: "Available",
+      lesson({
+        slug: "ai-video-intro",
+        title: "Введение в ИИ-видеогенерацию",
+        description: "Разбираем, какие задачи решают современные видео-модели и где в workflow нужен Opten.",
+        category: "ИИ-генерация видео",
+        duration: "10:12",
+        status: "Completed",
         access: "free",
-        thumbnailPath: `${templateAssetBase}/supplement-hero-shot.jpg`,
-        filters: ["Prompt packs"],
-        topics: ["Prompt packs", "Source image prompts", "Video motion prompts"],
-        whatYouWillLearn: [
-          "Read the core prompt-pack sections",
-          "Know when a source-image prompt is included",
-          "Use rules and model notes without adding extra workflows",
-        ],
-        updatedNote: "Foundation lessons are revised when the prompt-pack structure changes.",
-      },
-      {
-        slug: "source-image-prompts",
-        title: "Source image prompts",
-        description: "Write source image prompts that prepare a clean first frame for external tools.",
-        duration: "9 min",
+        thumbnailPath: `${learnAssetBase}/ai-video-smoke.jpg`,
+        filters: ["Models"],
+        topics: ["AI video", "Workflow", "Prompting"],
+        whatYouWillLearn: ["Понимать место видео-моделей в production-процессе", "Разделять идею, референс и промпт", "Оценивать качество первого результата"],
+      }),
+      lesson({
+        slug: "video-tools-basics",
+        title: "Основы работы с инструментами",
+        description: "Настраиваем рабочую связку для генерации, проверки и доработки роликов.",
+        category: "ИИ-генерация видео",
+        duration: "13:45",
+        status: "Completed",
+        access: "free",
+        thumbnailPath: `${learnAssetBase}/tools-server-corridor.jpg`,
+        filters: ["Models"],
+        topics: ["Tools", "Setup", "Production"],
+        whatYouWillLearn: ["Собрать базовый набор инструментов", "Подготовить ассеты для генерации", "Не терять версии результата"],
+      }),
+      lesson({
+        slug: "midjourney-style-light",
+        title: "Midjourney: стиль, свет и композиция",
+        description: "Создаём сильный первый кадр, который потом можно использовать в видео-моделях.",
+        category: "ИИ-генерация изображений",
+        duration: "12:18",
+        status: "Completed",
+        access: "free",
+        thumbnailPath: `${learnAssetBase}/midjourney-landscape.jpg`,
+        filters: ["Models"],
+        topics: ["Midjourney", "Composition", "First frame"],
+        whatYouWillLearn: ["Собирать визуальный стиль сцены", "Контролировать свет и композицию", "Готовить кадр под дальнейшую анимацию"],
+      }),
+      lesson({
+        slug: "runway-prompt-to-video",
+        title: "Kling Motion Control: AI-аватар под нужные движения",
+        description:
+          "В этом уроке вы сделаете AI-аватара, перенесёте на него движение из видеореференса, подготовите голос и соберёте результат с липсинком.",
+        category: "ИИ-генерация видео",
+        duration: "09:38",
         status: "In progress",
         access: "free",
-        thumbnailPath: `${templateAssetBase}/premium-beauty-visuals.jpg`,
-        filters: ["Prompt packs", "Models"],
-        topics: ["Source image prompts", "Model-specific prompts", "External AI tools"],
+        thumbnailPath: `${learnAssetBase}/runway-neon-city.jpg`,
+        youtubeId: "slxq1d8u-Hg",
+        youtubeUrl: "https://youtu.be/slxq1d8u-Hg?si=vszm1zByQhlrOc7u",
+        localizedVideo: {
+          ru: {
+            youtubeId: "slxq1d8u-Hg",
+            youtubeUrl: "https://youtu.be/slxq1d8u-Hg?si=vszm1zByQhlrOc7u",
+            audioLanguage: "ru",
+            captionLanguage: "ru",
+          },
+          en: {
+            youtubeId: "slxq1d8u-Hg",
+            youtubeUrl: "https://youtu.be/slxq1d8u-Hg?si=vszm1zByQhlrOc7u",
+            captionLanguage: "en",
+          },
+        },
+        filters: ["Models"],
+        topics: ["Kling", "Motion Control", "AI avatar", "Lip sync"],
         whatYouWillLearn: [
-          "Write source-image wording for selected image models",
-          "Keep visual details aligned with the brief",
-          "Avoid text, logos, and extra overlays in prompt language",
+          "Подготовить видеореференс и первый кадр",
+          "Собрать образ персонажа в Syntax",
+          "Сделать озвучку через 11 Labs",
+          "Анимировать аватара в Kling Motion Control",
         ],
-        updatedNote: "Source-image guidance follows the current image-model defaults.",
-      },
-      {
-        slug: "video-motion-prompts",
-        title: "Video motion prompts",
-        description: "Turn brief fields into motion instructions for selected video models.",
-        duration: "10 min",
-        status: "Completed",
-        access: "full-platform",
-        thumbnailPath: `${templateAssetBase}/athlete-action-shot.jpg`,
-        filters: ["Prompt packs", "Models"],
-        topics: ["Video motion prompts", "Model-specific prompts", "Motion language"],
-        whatYouWillLearn: [
-          "Describe motion instead of static styling only",
-          "Reference uploaded images only when the flow uses an image",
-          "Keep model notes attached to the prompt pack",
-        ],
-        updatedNote: "Motion lessons update when video model behavior changes.",
-      },
-      {
-        slug: "consistency-rules-and-model-notes",
-        title: "Consistency rules and model notes",
-        description: "Use consistency rules and notes to reduce surprises in external tools.",
-        duration: "6 min",
-        status: "Completed",
-        access: "full-platform",
-        thumbnailPath: `${templateAssetBase}/outfit-transition-video.jpg`,
-        filters: ["Prompt packs", "Brand", "Models"],
-        topics: ["Consistency rules", "Brand context", "Model notes"],
-        whatYouWillLearn: [
-          "Prioritize product, outfit, color, and style consistency",
-          "Add brand context without adding new account workflows",
-          "Read model notes before copying prompts externally",
-        ],
-        updatedNote: "Notes are refreshed as Opten workflows and model defaults change.",
-      },
-    ],
-  },
-  {
-    id: "builder-workflow",
-    title: "Builder Workflow",
-    category: "Builder",
-    description: "Create model-ready prompt packs from a compact brief.",
-    lessons: [
-      {
-        slug: "builder-overview",
-        title: "Builder overview",
-        description: "Walk through the Builder sections and the one-way prompt-pack flow.",
-        duration: "6 min",
-        status: "Completed",
-        access: "free",
-        thumbnailPath: `${templateAssetBase}/on-model-fashion-reel.jpg`,
-        filters: ["Builder", "Prompt packs"],
-        topics: ["Builder workflow", "Prompt packs", "Brief fields"],
-        whatYouWillLearn: [
-          "Move from Prompt Library to Builder to Ready",
-          "Understand how default brief fields seed a prompt pack",
-          "Keep Ready read-only after creating the pack",
-        ],
-        updatedNote: "Builder overview reflects the current MVP one-way flow.",
-      },
-      {
-        slug: "create-your-first-prompt-pack",
-        title: "Create your first prompt pack",
-        description: "Fill a compact Builder brief and create model-ready prompts for selected external AI tools.",
-        duration: "12 min",
-        status: "In progress",
-        access: "full-platform",
-        thumbnailPath: `${templateAssetBase}/outfit-transition-video.jpg`,
-        filters: ["Builder", "Prompt packs", "Models"],
-        topics: ["Builder workflow", "Prompt packs", "External AI tools", "Model-specific prompts"],
-        whatYouWillLearn: [
-          "Fill the minimum Builder brief",
-          "Select source image and video models",
-          "Create model-ready prompts",
-          "Copy prompts into external AI tools",
-        ],
-        updatedNote: "Lessons are refreshed as models and AI tools change.",
-      },
-      {
-        slug: "choose-starting-points",
-        title: "Choose starting points",
-        description: "Pick the right source-first, image-to-video, product-photo, or text-to-video flow.",
-        duration: "7 min",
+        timestamps: aiAvatarTimestamps,
+        materials: aiVideoMaterials,
+        updatedNote: "Тайм-коды сгенерированы через локальный NotebookLM pipeline 2026-06-06.",
+      }),
+      lesson({
+        slug: "figma-ai-interface",
+        title: "Создаём интерфейсы в Figma с ИИ",
+        description: "Проектируем экран продукта и быстро собираем визуальный прототип под видео.",
+        category: "Вайб-дизайн",
+        duration: "14:05",
         status: "Available",
         access: "free",
-        thumbnailPath: `${templateAssetBase}/meme-skit-prompt-pack.jpg`,
-        filters: ["Builder", "Prompt packs"],
-        topics: ["Starting points", "Builder workflow", "Prompt sections"],
-        whatYouWillLearn: [
-          "Choose the correct Builder starting point",
-          "Know when the source-image prompt is omitted",
-          "Keep no-source flows free of image-upload wording",
-        ],
-        updatedNote: "Starting point guidance follows the approved conditional-flow matrix.",
-      },
-      {
-        slug: "copy-prompts-into-external-tools",
-        title: "Copy prompts into external tools",
-        description: "Use image and video prompt sections outside Opten Space without adding extra steps.",
-        duration: "7 min",
-        status: "Completed",
-        access: "full-platform",
-        thumbnailPath: `${templateAssetBase}/hotel-campaign.jpg`,
-        filters: ["Builder", "Prompt packs", "Models"],
-        topics: ["Copy workflow", "External AI tools", "Model-specific prompts"],
-        whatYouWillLearn: [
-          "Copy image prompts only when the flow includes them",
-          "Copy video prompts for the selected video model",
-          "Stay within the MVP copy workflow",
-        ],
-        updatedNote: "Copy workflow lessons update when Ready screen behavior changes.",
-      },
-      {
-        slug: "review-model-notes",
-        title: "Review model notes",
-        description: "Read model notes before using prompts in selected external tools.",
-        duration: "8 min",
-        status: "Completed",
-        access: "full-platform",
-        thumbnailPath: `${templateAssetBase}/performance-product-ad.jpg`,
-        filters: ["Builder", "Brand", "Models"],
-        topics: ["Model notes", "Brand context", "External AI tools"],
-        whatYouWillLearn: [
-          "Use model notes to set expectations",
-          "Carry brand context into prompt wording",
-          "Keep the prompt pack model-specific",
-        ],
-        updatedNote: "Model notes are revised when selected-model guidance changes.",
-      },
+        thumbnailPath: `${learnAssetBase}/figma-interior.jpg`,
+        filters: ["Builder"],
+        topics: ["Figma", "AI design", "Interface"],
+        whatYouWillLearn: ["Собрать быстрый экран", "Подготовить интерфейс как ассет", "Использовать прототип как часть ролика"],
+      }),
+      ...[
+        ["video-camera-motion", "Анимация и движения в видео", "14:05"],
+        ["character-stability", "Стабильность персонажей и сцен", "16:20"],
+        ["voice-and-sound", "Работа со звуком и озвучкой", "12:34"],
+        ["color-grading-style", "Цветокоррекция и стилизация", "11:48"],
+        ["export-codecs", "Экспорт, кодеки и оптимизация", "10:40"],
+        ["real-project-cases", "Кейсы: разбор реальных проектов", "18:12"],
+        ["final-project", "Финальный проект и выводы", "15:30"],
+      ].map(([slug, title, duration], index) =>
+        lesson({
+          slug,
+          title,
+          description: "Продвинутый урок курса. Доступ открывается на тарифе Pro.",
+          category: "ИИ-генерация видео",
+          duration,
+          status: "Available",
+          access: "full-platform",
+          fullAccessOnly: true,
+          thumbnailPath: index % 2 === 0 ? `${learnAssetBase}/pika-neon-car.jpg` : `${learnAssetBase}/hero-portal.jpg`,
+          filters: ["Models"],
+          topics: ["Advanced AI video", "Production", "Pro"],
+          whatYouWillLearn: ["Разбирать продвинутые production-приёмы", "Исправлять типичные ошибки генерации", "Готовить материал к публикации"],
+        }),
+      ),
     ],
   },
+];
+
+const standaloneLessons: LearnLesson[] = [
+  lesson({
+    slug: "prompt-engineering-basics",
+    title: "Промпт-инжиниринг: базовые принципы и примеры",
+    description: "Одиночный урок о структуре хорошего промпта: роль, сцена, ограничения, стиль и проверка результата.",
+    category: "ИИ-генерация изображений",
+    duration: "08:21",
+    status: "Available",
+    access: "free",
+    thumbnailPath: `${learnAssetBase}/prompt-coast.jpg`,
+    filters: ["Standalone", "Prompt packs"],
+    topics: ["Prompting", "Images", "Basics"],
+    whatYouWillLearn: ["Писать компактный промпт без лишних деталей", "Отделять стиль от результата", "Проверять промпт перед генерацией"],
+  }),
+  lesson({
+    slug: "pika-new-features",
+    title: "Pika 2.0: новые возможности и практические кейсы",
+    description: "Одиночный обзор новых возможностей Pika и практических сценариев для коротких видео.",
+    category: "ИИ-генерация видео",
+    duration: "11:27",
+    status: "Available",
+    access: "full-platform",
+    thumbnailPath: `${learnAssetBase}/pika-neon-car.jpg`,
+    filters: ["Standalone", "Models"],
+    topics: ["Pika", "AI video", "Overview"],
+    whatYouWillLearn: ["Оценить новые режимы Pika", "Подобрать сценарии для коротких роликов", "Понять ограничения результата"],
+  }),
+  lesson({
+    slug: "bolt-saas-evening",
+    title: "Строим SaaS за вечер с помощью Bolt.new",
+    description: "Одиночный урок по быстрому прототипированию SaaS-интерфейса без полноценной команды разработки.",
+    category: "Вайб-кодинг",
+    duration: "18:42",
+    status: "Available",
+    access: "free",
+    thumbnailPath: `${learnAssetBase}/bolt-saas-screen.jpg`,
+    filters: ["Standalone", "Builder"],
+    topics: ["Bolt", "SaaS", "Vibe coding"],
+    whatYouWillLearn: ["Собрать MVP-экран", "Сформулировать техническое задание", "Проверить результат без лишней архитектуры"],
+  }),
+  lesson({
+    slug: "ai-design-assistants",
+    title: "AI-помощники в дизайне: Figma, Uizard, Galileo",
+    description: "Разбираем, где AI-дизайн помогает ускорить работу, а где всё ещё нужен ручной контроль.",
+    category: "Вайб-дизайн",
+    duration: "15:30",
+    status: "Available",
+    access: "free",
+    thumbnailPath: `${learnAssetBase}/ai-design-dashboard.jpg`,
+    filters: ["Standalone", "Builder"],
+    topics: ["Design", "Figma", "AI assistants"],
+    whatYouWillLearn: ["Выбирать AI-инструмент под задачу", "Сохранять дизайн-систему", "Быстро проверять варианты интерфейса"],
+  }),
 ];
 
 const standaloneCollection: LearnCollection = {
   id: "standalone-videos",
-  title: "Standalone videos",
-  description: "Short updates and experiments outside any course.",
+  title: "Все уроки",
+  description: "Одиночные видео без продолжения. Часть будет бесплатной, часть будет открываться на тарифе Pro.",
+  kind: "standalone",
+  categoryLabel: "Одиночные уроки",
   lessons: standaloneLessons,
 };
 
-const collections: LearnCollection[] = [
-  standaloneCollection,
-  ...learnCourses.map((course) => ({
-    id: course.id,
-    title: course.title,
-    description: course.description,
-    lessons: course.lessons,
-  })),
-];
+const courseCollections: LearnCollection[] = learnCourses.map((course) => ({
+  id: course.id,
+  title: course.title,
+  description: course.description,
+  kind: "course",
+  categoryLabel: course.label,
+  progress: course.progress,
+  lessons: course.lessons,
+}));
+
+const collections: LearnCollection[] = [standaloneCollection, ...courseCollections];
 
 export const learnOverviewBaseSections: LearnOverviewSection[] = [
   {
@@ -343,13 +442,10 @@ export const learnOverviewBaseSections: LearnOverviewSection[] = [
   ...learnCourses.map((course) => ({
     id: course.id,
     title: course.title,
-    metadata: `${course.lessons.length} lessons`,
+    metadata: `${course.lessons.length} уроков`,
     description: course.description,
-    iconPath:
-      course.id === "prompt-pack-foundations"
-        ? "/assets/space/figma/prompt-stack.svg"
-        : "/assets/space/figma/header-atoms/icon-create.svg",
-    lessons: course.lessons.slice(0, course.id === "prompt-pack-foundations" ? 3 : 4),
+    iconPath: "/assets/space/figma/prompt-stack.svg",
+    lessons: course.lessons.slice(0, 4),
   })),
 ];
 
@@ -358,24 +454,24 @@ export function getLearnOverviewSections(query: string, activeFilter: LearnFilte
   return learnOverviewBaseSections
     .map((section) => ({
       ...section,
-      lessons: section.lessons.filter((lesson) => lessonMatches(lesson, normalizedQuery, activeFilter)),
+      lessons: section.lessons.filter((item) => lessonMatches(item, normalizedQuery, activeFilter)),
     }))
     .filter((section) => section.lessons.length > 0);
 }
 
 export function findLearnLesson(slug: string | undefined): LearnLesson | undefined {
   if (!slug) return undefined;
-  return collections.flatMap((collection) => collection.lessons).find((lesson) => lesson.slug === slug);
+  return collections.flatMap((collection) => collection.lessons).find((item) => item.slug === slug);
 }
 
 export function getLearnCollectionForLesson(slug: string): LearnCollection | undefined {
-  return collections.find((collection) => collection.lessons.some((lesson) => lesson.slug === slug));
+  return collections.find((collection) => collection.lessons.some((item) => item.slug === slug));
 }
 
 export function getAdjacentLearnLessons(slug: string) {
   const collection = getLearnCollectionForLesson(slug);
   if (!collection) return { previousLesson: undefined, nextLesson: undefined };
-  const index = collection.lessons.findIndex((lesson) => lesson.slug === slug);
+  const index = collection.lessons.findIndex((item) => item.slug === slug);
   return {
     previousLesson: index > 0 ? collection.lessons[index - 1] : undefined,
     nextLesson: index >= 0 && index < collection.lessons.length - 1 ? collection.lessons[index + 1] : undefined,
@@ -384,41 +480,41 @@ export function getAdjacentLearnLessons(slug: string) {
 
 export function getLessonPosition(slug: string) {
   const collection = getLearnCollectionForLesson(slug);
-  if (!collection) return "";
-  const index = collection.lessons.findIndex((lesson) => lesson.slug === slug);
+  if (!collection || collection.kind !== "course") return "";
+  const index = collection.lessons.findIndex((item) => item.slug === slug);
   if (index < 0) return "";
-  return `Lesson ${index + 1} of ${collection.lessons.length}`;
+  return `Урок ${index + 1} из ${collection.lessons.length}`;
 }
 
-export function getLearnLessonAuthor(lesson: LearnLesson) {
-  return lesson.author ?? learnDefaultAuthor;
+export function getLearnLessonAuthor(item: LearnLesson) {
+  return item.author ?? learnDefaultAuthor;
 }
 
-export function getLearnLessonReleaseNote(lesson: LearnLesson) {
-  return lesson.releaseNote ?? lesson.updatedNote;
+export function getLearnLessonReleaseNote(item: LearnLesson) {
+  return item.releaseNote ?? item.updatedNote;
 }
 
-export function getLearnLessonUpdatedAt(lesson: LearnLesson) {
-  return lesson.updatedAt ?? "2026-06-04";
+export function getLearnLessonUpdatedAt(item: LearnLesson) {
+  return item.updatedAt ?? "2026-06-06";
 }
 
-export function getLearnLessonVideoProvider(lesson: LearnLesson): LearnVideoProviderMetadata {
+export function getLearnLessonVideoProvider(item: LearnLesson): LearnVideoProviderMetadata {
   return (
-    lesson.videoProvider ?? {
-      provider: "future-provider-placeholder",
-      providerAssetId: `todo-${lesson.slug}`,
-      posterPath: lesson.thumbnailPath,
-      playbackPolicy: lesson.access === "full-platform" ? "mock-preview-plus-gated-full" : "mock-preview",
+    item.videoProvider ?? {
+      provider: "youtube",
+      providerAssetId: item.youtubeId ?? `todo-${item.slug}`,
+      posterPath: item.thumbnailPath,
+      playbackPolicy: item.access === "full-platform" ? "subscription-gated-public-preview" : "public-embed",
       signedPlaybackUrl: null,
       notes: futureProtectedVideoDeliveryNote,
     }
   );
 }
 
-function lessonMatches(lesson: LearnLesson, normalizedQuery: string, activeFilter: LearnFilter) {
-  const filterMatch = activeFilter === "All" || lesson.filters.includes(activeFilter);
+function lessonMatches(item: LearnLesson, normalizedQuery: string, activeFilter: LearnFilter) {
+  const filterMatch = activeFilter === "All" || item.filters.includes(activeFilter);
   const queryMatch =
     !normalizedQuery ||
-    `${lesson.title} ${lesson.description} ${lesson.topics.join(" ")} ${lesson.status}`.toLowerCase().includes(normalizedQuery);
+    `${item.title} ${item.description} ${item.category} ${item.topics.join(" ")} ${item.status}`.toLowerCase().includes(normalizedQuery);
   return filterMatch && queryMatch;
 }

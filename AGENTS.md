@@ -358,6 +358,28 @@ popular search queries returned 41 rows for 2026-05-24..2026-05-30. Use this
 API directly for Yandex indexing/search visibility checks before guessing from
 public search results.
 
+### Opten Space Learn video timestamp tooling
+
+Learn course/lesson pages embed public YouTube videos in the SPA and store
+ready-to-render timestamps in `src/content/space/learn.ts`. Do not call
+NotebookLM, YouTube Data API, or any provider key from browser code.
+
+Local-only credentials for generating lesson timestamps live in
+`.secrets/learn-video.env` (gitignored):
+
+- `NOTEBOOKLM_NOTEBOOK_ID` — NotebookLM notebook used for Opten Learn video notes
+- `YOUTUBE_API_KEY` — optional YouTube Data API v3 key copied from
+  `C:\Projects\Obsidian\Vlad\.env` for future metadata/comment enrichment
+- `YOUTUBE_CHANNEL_ID` — optional owner channel id from the same vault
+
+Use `node scripts/learn-video-notes.mjs <youtube-url>` to add a YouTube source
+to NotebookLM, wait for indexing, and print a JSON timestamp array. The script
+sets `PYTHONIOENCODING=utf-8`, `NO_COLOR=1`, and `TERM=dumb` before calling the
+`notebooklm` CLI because the Windows/Rich default console path can fail on
+Unicode. Paste reviewed output into the relevant lesson's `timestamps` array;
+keep generated source IDs and provider notes out of the public bundle unless
+they are intentionally non-secret.
+
 ## Content & SEO — read before adding pages, posts, or images
 
 The site shipped v1.0 (GEO Optimization, 12 → ~72.6 score, 7 phases) and v2.0

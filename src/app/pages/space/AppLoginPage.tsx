@@ -148,9 +148,8 @@ export default function AppLoginPage() {
 
           <div className="mt-[26px] flex w-full flex-col items-center gap-[10px]">
             <h1 id="opten-space-login-title" className="m-0 font-['Unbounded',sans-serif] text-[21px] font-medium leading-[1.12] tracking-[0] text-white">
-              <span>{copy.titleLine1}</span>
-              <br />
-              <span>
+              <span className="block whitespace-nowrap">{copy.titleLine1}</span>
+              <span className="block whitespace-nowrap">
                 {copy.titleLine2Prefix}
                 <span className="text-[#9cfb51]">{copy.titleHighlight}</span>
               </span>
@@ -342,8 +341,8 @@ function LoginCardFrame() {
 const loginCopy = {
   ru: {
     titleLine1: "Добро пожаловать",
-    titleLine2Prefix: "в аккаунт ",
-    titleHighlight: "Opten",
+    titleLine2Prefix: "в ",
+    titleHighlight: "Opten Space",
     description: "Единый вход для подписки, кредитов, расширения и будущих курсов.",
     google: "Войти через Google",
     emailLabel: "Email",
@@ -364,9 +363,9 @@ const loginCopy = {
     loginBadge3: "Opten никогда не хранит ваши промпты",
   },
   en: {
-    titleLine1: "Welcome",
-    titleLine2Prefix: "to your ",
-    titleHighlight: "Opten account",
+    titleLine1: "Welcome to",
+    titleLine2Prefix: " ",
+    titleHighlight: "Opten Space",
     description: "One account for subscription, credits, the extension, and future courses.",
     google: "Continue with Google",
     emailLabel: "Email",
