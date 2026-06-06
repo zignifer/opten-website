@@ -117,7 +117,7 @@ export default function AppLoginPage() {
       <SpaceHeader variant="learnOnly" />
       <main
         className="relative h-[calc(100svh-65px)] min-h-[560px] overflow-hidden bg-[#020607] text-white"
-        style={{ fontFamily: "Inter, 'PT Root UI', sans-serif" }}
+        style={{ fontFamily: "'PT Root UI', sans-serif" }}
       >
         <LoginBackground />
 
