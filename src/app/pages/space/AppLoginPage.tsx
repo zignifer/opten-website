@@ -141,9 +141,9 @@ export default function AppLoginPage() {
           <img
             src={SPACE_LOGO_SRC}
             alt="Opten Space Beta"
-            width="158"
+            width="124"
             height="23"
-            className="block h-[23px] w-[158px] shrink-0"
+            className="block h-[23px] w-[124px] shrink-0"
           />
 
           <div className="mt-[26px] flex w-full flex-col items-center gap-[10px]">

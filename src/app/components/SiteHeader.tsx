@@ -47,15 +47,15 @@ export default function SiteHeader({ rightSlot }: SiteHeaderProps): JSX.Element 
         <LocalizedLink
           to="/"
           aria-label="Opten home"
-          className="-ml-[4px] inline-flex h-[32px] w-[166px] items-center rounded-sm px-[4px] no-underline outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417]"
+          className="-ml-[4px] inline-flex h-[32px] w-[132px] items-center rounded-sm px-[4px] no-underline outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417]"
         >
           <img
             src={`${figmaHeaderAssetBase}/logo-lockup.svg`}
             alt=""
             aria-hidden="true"
-            width="158"
+            width="124"
             height="23"
-            className="block h-[23px] w-[158px] shrink-0"
+            className="block h-[23px] w-[124px] shrink-0"
           />
         </LocalizedLink>
 
