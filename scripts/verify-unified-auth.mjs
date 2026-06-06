@@ -12,6 +12,9 @@ const main = read("src/main.tsx");
 assert.match(main, /path="\/login"/, "Main router must register canonical /login");
 assert.match(main, /path="\/auth\/callback"/, "Main router must register canonical /auth/callback");
 assert.match(main, /<SpaceAuthProvider>[\s\S]*<ScrollToTop \/>[\s\S]*<Routes>[\s\S]*<\/Routes>[\s\S]*<\/SpaceAuthProvider>/, "Main app tree must be globally wrapped in SpaceAuthProvider");
+assert.match(main, /vite:preloadError[\s\S]*reloadOnceAfterChunkError/, "Main app must recover from stale lazy chunks after deploy");
+assert.match(main, /ChunkReloadBoundary[\s\S]*<Suspense fallback=\{<RouteLoading \/>}/, "Lazy routes must be wrapped in the chunk reload error boundary");
+assert.match(main, /sessionStorage[\s\S]*CHUNK_RELOAD_COOLDOWN_MS[\s\S]*window\.location\.reload\(\)/, "Chunk reload recovery must guard against reload loops");
 assert.doesNotMatch(main, /<SpaceAuthProvider><AppIndexPage \/><\/SpaceAuthProvider>/, "App routes must not keep route-local SpaceAuthProvider wrappers");
 assert.match(main, /path="\/app\/login"[\s\S]*Navigate[\s\S]*to="\/login\?next=\/app\/learn"/, "/app/login must redirect to the canonical /login surface");
 

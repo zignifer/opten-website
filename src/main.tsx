@@ -1,6 +1,6 @@
 
   import { createRoot, hydrateRoot } from "react-dom/client";
-  import { lazy, Suspense } from "react";
+  import { Component, lazy, Suspense, type ErrorInfo, type ReactNode } from "react";
   import { BrowserRouter, Routes, Route, Navigate } from "react-router";
   import App from "./app/App.tsx";
   import PrivacyPage from "./app/pages/PrivacyPage.tsx";
@@ -61,58 +61,157 @@
 
   // Phase 3 D-05: LangProvider uses useLocation() to derive initial lang from URL prefix.
   // useLocation() requires a Router context — LangProvider must be INSIDE BrowserRouter, not outside.
+  const CHUNK_RELOAD_STORAGE_KEY = "opten_chunk_reload_v1";
+  const CHUNK_RELOAD_COOLDOWN_MS = 30_000;
+  const CHUNK_ERROR_PATTERN =
+    /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|ChunkLoadError|Loading chunk \d+ failed|Unable to preload CSS/i;
+
+  function isChunkLoadError(error: unknown): boolean {
+    const message = error instanceof Error ? `${error.name} ${error.message}` : String(error || "");
+    return CHUNK_ERROR_PATTERN.test(message);
+  }
+
+  function reloadOnceAfterChunkError(): boolean {
+    const reloadKey = `${window.location.pathname}${window.location.search}`;
+    try {
+      const previous = JSON.parse(window.sessionStorage.getItem(CHUNK_RELOAD_STORAGE_KEY) || "null") as {
+        key?: string;
+        at?: number;
+      } | null;
+      if (previous?.key === reloadKey && previous.at && Date.now() - previous.at < CHUNK_RELOAD_COOLDOWN_MS) {
+        return false;
+      }
+      window.sessionStorage.setItem(CHUNK_RELOAD_STORAGE_KEY, JSON.stringify({ key: reloadKey, at: Date.now() }));
+    } catch {
+      // If sessionStorage is blocked, a single reload is still the safest recovery path.
+    }
+    window.location.reload();
+    return true;
+  }
+
+  function registerChunkReloadHandler() {
+    const chunkWindow = window as typeof window & { __optenChunkReloadHandlerInstalled?: boolean };
+    if (chunkWindow.__optenChunkReloadHandlerInstalled) return;
+    chunkWindow.__optenChunkReloadHandlerInstalled = true;
+
+    window.addEventListener("vite:preloadError", (event) => {
+      const preloadEvent = event as Event & { payload?: unknown };
+      if (!isChunkLoadError(preloadEvent.payload)) return;
+      event.preventDefault();
+      reloadOnceAfterChunkError();
+    });
+
+    window.addEventListener("unhandledrejection", (event) => {
+      if (!isChunkLoadError(event.reason)) return;
+      if (reloadOnceAfterChunkError()) event.preventDefault();
+    });
+  }
+
+  type ChunkReloadBoundaryState = {
+    error: "chunk" | "app" | null;
+  };
+
+  class ChunkReloadBoundary extends Component<{ children: ReactNode }, ChunkReloadBoundaryState> {
+    state: ChunkReloadBoundaryState = { error: null };
+
+    static getDerivedStateFromError(error: unknown): ChunkReloadBoundaryState {
+      return { error: isChunkLoadError(error) ? "chunk" : "app" };
+    }
+
+    componentDidCatch(error: unknown, info: ErrorInfo) {
+      if (isChunkLoadError(error)) {
+        if (!reloadOnceAfterChunkError()) {
+          console.error("[Opten] lazy chunk failed after a reload attempt", error, info);
+        }
+        return;
+      }
+      console.error("[Opten] uncaught route error", error, info);
+    }
+
+    render() {
+      if (!this.state.error) return this.props.children;
+
+      const isChunk = this.state.error === "chunk";
+      return (
+        <div className="grid min-h-screen place-items-center bg-[#011417] px-4 font-['PT_Root_UI',sans-serif] text-white">
+          <section className="w-full max-w-[420px] rounded-[8px] border border-white/10 bg-white/[0.045] p-[24px] text-center">
+            <h1 className="text-[24px] font-bold leading-tight">
+              {isChunk ? "Нужно обновить страницу" : "Что-то пошло не так"}
+            </h1>
+            <p className="mt-[10px] text-[14px] leading-[1.5] text-white/68">
+              {isChunk
+                ? "Загружается новая версия Opten. Обновите страницу, если она не обновилась автоматически."
+                : "Обновите страницу и попробуйте снова."}
+            </p>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="mt-[18px] h-[42px] cursor-pointer rounded-[8px] border-0 bg-[#9cfb51] px-[18px] text-[15px] font-bold text-[#011417]"
+            >
+              Обновить
+            </button>
+          </section>
+        </div>
+      );
+    }
+  }
+
+  registerChunkReloadHandler();
+
   const tree = (
     <BrowserRouter>
       <LangProvider>
         <SpaceAuthProvider>
           <ScrollToTop />
           <AnnouncementBar />
-          <Suspense fallback={<RouteLoading />}>
-            <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="/pay" element={<PayPage />} />
-            <Route path="/success" element={<SuccessPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/refund" element={<RefundPage />} />
-            <Route path="/account" element={<AccountPage />} />
-            <Route path="/welcome" element={<WelcomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            {/* Phase 5 B-04 + B-05: /blog hub and bilingual post page. /guides/* retired in B-07. */}
-            <Route path="/blog" element={<BlogListPage />} />
-            <Route path="/blog/:slug" element={<BlogPostPage />} />
-            {/* Phase v2.0 MODELS-A-8: programmatic model pages. Hub + per-model RU/EN. */}
-            <Route path="/models" element={<ModelsHubPage />} />
-            <Route path="/models/:slug" element={<ModelPage />} />
-            <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
-            <Route path="/prompt-library" element={<PromptLibraryPage />} />
-            <Route path="/internal/prompt-library-demo" element={<PromptLibraryDemoPage />} />
-            <Route path="/login" element={<AppLoginPage />} />
-            <Route path="/auth/callback" element={<AppAuthCallbackPage />} />
-            <Route path="/app" element={<AppIndexPage />} />
-            <Route path="/app/login" element={<Navigate to="/login?next=/app/learn" replace />} />
-            <Route path="/app/auth/callback" element={<AppAuthCallbackPage />} />
-            <Route path="/app/learn" element={<LearnOverviewPage />} />
-            <Route path="/app/learn-v2" element={<Navigate to="/app/learn" replace />} />
-            <Route path="/app/learn/:lessonSlug" element={<LessonDetailPage />} />
-            <Route path="/space/learn" element={<Navigate to="/app/learn" replace />} />
-            <Route path="/space/learn/:lessonSlug" element={<Navigate to="/app/learn" replace />} />
-            {/* Phase 3 D-01/D-03b: /en/* siblings. Mirror of entry-server.tsx EN routes + /en/pay (head-only, client-mount-only). __PRERENDER_PATH discriminator (lines 65-66) handles these unchanged — meta.path strings written by applyMarker include "/en/welcome" etc. Phase 4 D-06: /en/guides/:slug bilingual anchor. */}
-            <Route path="/en/"        element={<App />} />
-            <Route path="/en/pay"     element={<PayPage />} />
-            <Route path="/en/welcome" element={<WelcomePage />} />
-            <Route path="/en/privacy" element={<PrivacyPage />} />
-            <Route path="/en/terms"   element={<TermsPage />} />
-            <Route path="/en/refund"  element={<RefundPage />} />
-            <Route path="/en/about"   element={<AboutPage />} /> {/* Phase 4.1 B-03: EN sibling for /about */}
-            <Route path="/en/blog" element={<BlogListPage />} />
-            <Route path="/en/blog/:slug" element={<BlogPostPage />} />
-            <Route path="/en/models" element={<ModelsHubPage />} />
-            <Route path="/en/models/:slug" element={<ModelPage />} />
-            {/* Phase 4.2 / Wave 3 (P1-1): catch-all 404. MUST be LAST — React Router 7 matches in declaration order, so any earlier `*` would shadow specific routes. NotFound injects <meta name="robots" content="noindex,nofollow"> at runtime to stop search engines from indexing typo'd URLs as duplicates of the landing. Status code stays 200 (Vercel SPA rewrite is unchanged; HTTP 404 is deferred to Phase 6 per CONTEXT D-3). */}
-            <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
+          <ChunkReloadBoundary>
+            <Suspense fallback={<RouteLoading />}>
+              <Routes>
+              <Route path="/" element={<App />} />
+              <Route path="/pay" element={<PayPage />} />
+              <Route path="/success" element={<SuccessPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/refund" element={<RefundPage />} />
+              <Route path="/account" element={<AccountPage />} />
+              <Route path="/welcome" element={<WelcomePage />} />
+              <Route path="/about" element={<AboutPage />} />
+              {/* Phase 5 B-04 + B-05: /blog hub and bilingual post page. /guides/* retired in B-07. */}
+              <Route path="/blog" element={<BlogListPage />} />
+              <Route path="/blog/:slug" element={<BlogPostPage />} />
+              {/* Phase v2.0 MODELS-A-8: programmatic model pages. Hub + per-model RU/EN. */}
+              <Route path="/models" element={<ModelsHubPage />} />
+              <Route path="/models/:slug" element={<ModelPage />} />
+              <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
+              <Route path="/prompt-library" element={<PromptLibraryPage />} />
+              <Route path="/internal/prompt-library-demo" element={<PromptLibraryDemoPage />} />
+              <Route path="/login" element={<AppLoginPage />} />
+              <Route path="/auth/callback" element={<AppAuthCallbackPage />} />
+              <Route path="/app" element={<AppIndexPage />} />
+              <Route path="/app/login" element={<Navigate to="/login?next=/app/learn" replace />} />
+              <Route path="/app/auth/callback" element={<AppAuthCallbackPage />} />
+              <Route path="/app/learn" element={<LearnOverviewPage />} />
+              <Route path="/app/learn-v2" element={<Navigate to="/app/learn" replace />} />
+              <Route path="/app/learn/:lessonSlug" element={<LessonDetailPage />} />
+              <Route path="/space/learn" element={<Navigate to="/app/learn" replace />} />
+              <Route path="/space/learn/:lessonSlug" element={<Navigate to="/app/learn" replace />} />
+              {/* Phase 3 D-01/D-03b: /en/* siblings. Mirror of entry-server.tsx EN routes + /en/pay (head-only, client-mount-only). __PRERENDER_PATH discriminator (lines 65-66) handles these unchanged — meta.path strings written by applyMarker include "/en/welcome" etc. Phase 4 D-06: /en/guides/:slug bilingual anchor. */}
+              <Route path="/en/"        element={<App />} />
+              <Route path="/en/pay"     element={<PayPage />} />
+              <Route path="/en/welcome" element={<WelcomePage />} />
+              <Route path="/en/privacy" element={<PrivacyPage />} />
+              <Route path="/en/terms"   element={<TermsPage />} />
+              <Route path="/en/refund"  element={<RefundPage />} />
+              <Route path="/en/about"   element={<AboutPage />} /> {/* Phase 4.1 B-03: EN sibling for /about */}
+              <Route path="/en/blog" element={<BlogListPage />} />
+              <Route path="/en/blog/:slug" element={<BlogPostPage />} />
+              <Route path="/en/models" element={<ModelsHubPage />} />
+              <Route path="/en/models/:slug" element={<ModelPage />} />
+              {/* Phase 4.2 / Wave 3 (P1-1): catch-all 404. MUST be LAST — React Router 7 matches in declaration order, so any earlier `*` would shadow specific routes. NotFound injects <meta name="robots" content="noindex,nofollow"> at runtime to stop search engines from indexing typo'd URLs as duplicates of the landing. Status code stays 200 (Vercel SPA rewrite is unchanged; HTTP 404 is deferred to Phase 6 per CONTEXT D-3). */}
+              <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </ChunkReloadBoundary>
         </SpaceAuthProvider>
       </LangProvider>
     </BrowserRouter>
