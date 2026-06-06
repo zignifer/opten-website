@@ -29,6 +29,8 @@ const siteHeader = read("src/app/components/SiteHeader.tsx");
 assert.match(siteHeader, /useSpaceAuth/, "SiteHeader must read website auth state");
 assert.match(siteHeader, /to="\/account"|to=\{["'`]\/account["'`]\}/, "Signed-in SiteHeader profile must link to /account");
 assert.match(siteHeader, /\/login\?next=/, "Signed-out SiteHeader action must link to /login with next");
+assert.match(siteHeader, /label: "Extension"[\s\S]*to: "\/"[\s\S]*label: "Library"[\s\S]*to: "\/prompt-library"/, "SiteHeader must keep the shared Extension and Library app-style nav");
+assert.doesNotMatch(siteHeader, /label: "Learn"|BookOpenCheck/, "SiteHeader must hide Learn/Courses while the product is not ready");
 assert.doesNotMatch(siteHeader, /\bMenu\b|\bX\b|site-header-menu|role="menu"/, "SiteHeader must not render hamburger marketing navigation");
 assert.doesNotMatch(siteHeader, /nav\.pricing|nav\.blog|nav\.models|nav\.faq|nav\.about/, "SiteHeader must not include marketing nav labels");
 

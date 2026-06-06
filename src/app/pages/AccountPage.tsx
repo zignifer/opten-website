@@ -361,12 +361,22 @@ export default function AccountPage() {
       <SiteHeader
         variant="page"
         rightSlot={email ? (
-          <div className="inline-flex h-[40px] items-center gap-[8px] rounded-full border border-white/10 bg-white/10 px-[16px] font-['PT_Root_UI',sans-serif] text-[14px] text-white/70">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <path d="M7 7a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM7 8.17c-2.53 0-4.17 1.11-4.17 2.5V12h8.34v-1.33c0-1.39-1.64-2.5-4.17-2.5z" fill="currentColor" />
-            </svg>
-            <span className="hidden sm:inline">{email}</span>
-          </div>
+          <LocalizedLink
+            to="/account"
+            aria-label={email}
+            title={email}
+            className="inline-flex h-[32px] max-w-[220px] items-center gap-[8px] rounded-full bg-transparent px-[12px] py-[8px] font-['PT_Root_UI',sans-serif] text-[14px] font-medium text-white/78 no-underline transition hover:bg-white/[0.04] hover:text-white"
+          >
+            <img
+              src="/assets/space/figma/header-atoms/icon-account.svg"
+              alt=""
+              aria-hidden="true"
+              width="16"
+              height="16"
+              className="h-[16px] w-[16px] shrink-0"
+            />
+            <span className="truncate">{email}</span>
+          </LocalizedLink>
         ) : undefined}
       />
 
