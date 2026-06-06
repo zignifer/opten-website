@@ -108,7 +108,7 @@ type VideoCardProps = {
 export function VideoCard({ lesson }: VideoCardProps) {
   return (
     <LocalizedLink
-      to={`/app/learn/${lesson.slug}`}
+      to={`/learn/${lesson.slug}`}
       data-testid={`learn-video-card-${lesson.slug}`}
       className="group flex min-h-0 flex-col overflow-hidden rounded-[8px] border border-white/10 bg-white/[0.05] no-underline transition hover:border-[#9cfb51]/45 hover:bg-white/[0.065]"
     >
@@ -187,7 +187,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
   return (
     <LearnSectionWrapper>
       <nav className="mb-[24px] flex flex-wrap items-center gap-[9px] text-[14px] text-white/68" aria-label={copy.breadcrumb}>
-        <LocalizedLink to="/app/learn" className="text-white/68 no-underline hover:text-white">
+        <LocalizedLink to="/learn" className="text-white/68 no-underline hover:text-white">
           {copy.courses}
         </LocalizedLink>
         <span className="text-white/28">/</span>
@@ -639,7 +639,7 @@ export function CourseOutline({ collection, currentSlug, hasPro, className = "" 
         return (
           <LocalizedLink
             key={outlineLesson.slug}
-            to={`/app/learn/${outlineLesson.slug}`}
+            to={`/learn/${outlineLesson.slug}`}
             aria-current={current ? "page" : undefined}
             className={`group grid grid-cols-[26px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition ${
               current
@@ -762,7 +762,7 @@ function RelatedLessons({ collection, currentSlug, hasPro }: RelatedLessonsProps
           return (
             <LocalizedLink
               key={item.slug}
-              to={`/app/learn/${item.slug}`}
+              to={`/learn/${item.slug}`}
               className="group overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023] text-white no-underline transition hover:border-[#9cfb51]/45 hover:bg-[#10282c]"
             >
               <div className="relative aspect-video overflow-hidden bg-[#06191c]">

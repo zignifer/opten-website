@@ -514,7 +514,7 @@ export default function LearnOverviewPage() {
               {copy.featuredDescription}
             </p>
             <LocalizedLink
-              to="/app/learn/runway-prompt-to-video"
+              to="/learn/runway-prompt-to-video"
               className="mt-[24px] flex h-[43px] w-[197px] items-center justify-center rounded-[8px] bg-[#9cfb51] px-[20px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417]"
             >
               {copy.watchLesson}
@@ -642,7 +642,7 @@ export default function LearnOverviewPage() {
 function HeroVideoCard({ lang, className = "" }: { lang: LearnLang; className?: string }) {
   return (
     <LocalizedLink
-      to="/app/learn/runway-prompt-to-video"
+      to="/learn/runway-prompt-to-video"
       className={`group relative block aspect-video overflow-hidden rounded-[12px] border border-white/12 bg-[#0e2023] text-left shadow-[0_20px_60px_rgba(0,0,0,0.22)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417] ${className}`}
       aria-label={`${pageCopy[lang].watchLesson}: ${pageCopy[lang].featuredTitle}`}
     >
@@ -858,11 +858,11 @@ function lessonUpdated(lesson: LessonCard, lang: LearnLang) {
 }
 
 function lessonHref(lesson: LessonCard) {
-  return `/app/learn/${lessonDetailSlugById[lesson.id] ?? lesson.id}`;
+  return `/learn/${lessonDetailSlugById[lesson.id] ?? lesson.id}`;
 }
 
 function collectionHref(collection: CollectionCard) {
-  return `/app/learn/${collectionDetailSlugById[collection.id] ?? "runway-prompt-to-video"}`;
+  return `/learn/${collectionDetailSlugById[collection.id] ?? "runway-prompt-to-video"}`;
 }
 
 function collectionTitle(collection: CollectionCard, lang: LearnLang) {

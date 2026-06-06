@@ -19,6 +19,8 @@ import BlogPostPage from "../src/app/pages/BlogPostPage.tsx";
 // Phase v2.0 MODELS-A-8: programmatic model pages.
 import ModelsHubPage from "../src/app/pages/ModelsHubPage.tsx";
 import ModelPage from "../src/app/pages/ModelPage.tsx";
+import LearnOverviewPage from "../src/app/pages/space/LearnOverviewPage.tsx";
+import LessonDetailPage from "../src/app/pages/space/LessonDetailPage.tsx";
 import NotFound from "../src/app/pages/NotFound.tsx";
 import "../src/styles/index.css";
 import { LangProvider } from "../src/i18n/LangContext";
@@ -54,6 +56,8 @@ export function renderRoute(path: string): string {
             {/* Phase v2.0 MODELS-A-8: programmatic model pages. SSR-mounted for prerender. */}
             <Route path="/models" element={<ModelsHubPage />} />
             <Route path="/models/:slug" element={<ModelPage />} />
+            <Route path="/learn" element={<LearnOverviewPage />} />
+            <Route path="/learn/:lessonSlug" element={<LessonDetailPage />} />
             {/* Phase 4 D-12: /pay AND /en/pay are SSR-mounted. Phase 4 D-06: /guides/:slug bilingual. Phase 4.1 B-03: /en/about now mounted (RU-only restriction lifted). /success /account /dashboard/* remain SPA-only — intentionally NOT mounted here. */}
             <Route path="/en/"        element={<App />} />
             <Route path="/en/welcome" element={<WelcomePage />} />
@@ -66,6 +70,8 @@ export function renderRoute(path: string): string {
             <Route path="/en/blog/:slug" element={<BlogPostPage />} />
             <Route path="/en/models" element={<ModelsHubPage />} />
             <Route path="/en/models/:slug" element={<ModelPage />} />
+            <Route path="/en/learn" element={<LearnOverviewPage />} />
+            <Route path="/en/learn/:lessonSlug" element={<LessonDetailPage />} />
             {/* Phase 4.2 / Wave 3 (P1-1): catch-all 404 mirrored for SSR parity (defense in depth — prerender.mjs only iterates seo-routes.ts entries, so NotFound is never SSR-rendered today; mirror prevents a future typo'd manifest entry from silently rendering empty). */}
             <Route path="*" element={<NotFound />} />
             </Routes>

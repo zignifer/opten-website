@@ -1,5 +1,5 @@
 import LocalizedLink from "../LocalizedLink";
-import { Chrome, Library, LogIn, type LucideIcon } from "lucide-react";
+import { BookOpen, Chrome, Library, LogIn, type LucideIcon } from "lucide-react";
 import { useLocation } from "react-router";
 import { useLang } from "../../../i18n/LangContext";
 import { useSpaceAuth } from "./SpaceAuthProvider";
@@ -7,12 +7,13 @@ import { useSpaceAuth } from "./SpaceAuthProvider";
 const figmaHeaderAssetBase = "/assets/space/figma/header-atoms";
 
 type SpaceNavItem = {
-  label: "Extension" | "Library";
+  label: "Learn" | "Extension" | "Library";
   icon: LucideIcon;
   to: string;
 };
 
 const navItems: SpaceNavItem[] = [
+  { label: "Learn", icon: BookOpen, to: "/learn" },
   { label: "Extension", icon: Chrome, to: "/" },
   { label: "Library", icon: Library, to: "/prompt-library" },
 ];
@@ -139,6 +140,7 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
 }
 
 function isActiveNavItem(label: string, pathname: string) {
+  if (label === "Learn") return pathname.startsWith("/learn") || pathname.startsWith("/en/learn");
   if (label === "Extension") return pathname === "/";
   if (label === "Library") return pathname === "/prompt-library";
   return false;
@@ -150,7 +152,7 @@ const headerCopy = {
     signIn: "Войти",
     signOut: "Выйти",
     switchLanguage: "Переключить язык",
-    nav: { Extension: "Расширение", Library: "Библиотека" },
+    nav: { Learn: "Курсы", Extension: "Расширение", Library: "Библиотека" },
     usage: (value: string) => `Использовано кредитов: ${value}`,
   },
   en: {
@@ -158,7 +160,7 @@ const headerCopy = {
     signIn: "Sign in",
     signOut: "Sign out",
     switchLanguage: "Switch language",
-    nav: { Extension: "Extension", Library: "Library" },
+    nav: { Learn: "Courses", Extension: "Extension", Library: "Library" },
     usage: (value: string) => `Credit usage: ${value}`,
   },
 } as const;

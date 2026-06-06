@@ -29,11 +29,15 @@ const main = readFileSync(join(root, "src/main.tsx"), "utf8");
 assert.match(main, /\/app"/, "Main router must register /app");
 assert.match(main, /\/app\/login"/, "Main router must register /app/login");
 assert.match(main, /\/app\/auth\/callback"/, "Main router must register /app/auth/callback");
-assert.match(main, /\/app\/learn"/, "Main router must register /app/learn");
-assert.match(main, /\/app\/learn\/:lessonSlug"/, "Main router must register /app/learn/:lessonSlug");
-assert.match(main, /\/space\/learn"[\s\S]*Navigate[\s\S]*\/app\/learn/, "Legacy /space/learn must redirect to /app/learn");
+assert.match(main, /\/learn"/, "Main router must register public /learn");
+assert.match(main, /\/learn\/:lessonSlug"/, "Main router must register public /learn/:lessonSlug");
+assert.match(main, /\/en\/learn"/, "Main router must register public /en/learn");
+assert.match(main, /\/en\/learn\/:lessonSlug"/, "Main router must register public /en/learn/:lessonSlug");
+assert.match(main, /\/app\/learn"[\s\S]*Navigate[\s\S]*\/learn/, "Legacy /app/learn must redirect to /learn");
+assert.match(main, /\/app\/learn\/:lessonSlug"[\s\S]*Navigate[\s\S]*\/learn/, "Legacy /app/learn/:lessonSlug must redirect to /learn");
+assert.match(main, /\/space\/learn"[\s\S]*Navigate[\s\S]*\/learn/, "Legacy /space/learn must redirect to /learn");
 assert.match(main, /LearnOverviewPage/, "Main router must import/render LearnOverviewPage");
-assert.match(main, /\/app\/learn-v2"[\s\S]*Navigate[\s\S]*\/app\/learn/, "Legacy /app/learn-v2 must redirect to /app/learn");
+assert.match(main, /\/app\/learn-v2"[\s\S]*Navigate[\s\S]*\/learn/, "Legacy /app/learn-v2 must redirect to /learn");
 assert.match(main, /LessonDetailPage/, "Main router must import/render LessonDetailPage");
 assert.match(main, /SpaceAuthProvider/, "Main router must wrap app routes in SpaceAuthProvider");
 
@@ -53,8 +57,7 @@ assert.match(header, /useSpaceAuth/, "Learn header must read account state from 
 assert.match(header, /opten_space_session_v1|account\.remaining|remaining/, "Learn header must render real account credits instead of a hardcoded placeholder");
 assert.doesNotMatch(header, /!\s*learnOnly\s*&&\s*\(/, "Learn header must not hide credits/account in learnOnly mode");
 assert.match(header, /max-w-\[1200px\]/, "Space header content must use the shared 1200px content width");
-assert.doesNotMatch(header, /label: "Learn"/, "Space header must hide Learn/Courses until the product is ready");
-assert.match(header, /label: "Extension"[\s\S]*to: "\/"[\s\S]*label: "Library"[\s\S]*to: "\/prompt-library"/, "Space header nav must keep Extension and Library links");
+assert.match(header, /label: "Learn"[\s\S]*to: "\/learn"[\s\S]*label: "Extension"[\s\S]*to: "\/"[\s\S]*label: "Library"[\s\S]*to: "\/prompt-library"/, "Space header nav must advertise Learn plus Extension and Library links");
 assert.doesNotMatch(header, /label: "Create"|label: "Explore"|label: "Your Prompt"/, "Space header nav must not show placeholder Create, Explore, or Your Prompt tabs in the first Learn pass");
 assert.doesNotMatch(header, /256\/300/, "Space header must not hardcode the credits placeholder");
 
@@ -66,7 +69,8 @@ assert.doesNotMatch(auth, /SERVICE_ROLE|JWT_SECRET|YOOKASSA|PADDLE_API|ANTHROPIC
 
 const learnComponents = readFileSync(join(root, "src/app/components/space/learn/LearnComponents.tsx"), "utf8");
 assert.match(learnComponents, /max-w-\[1200px\]/, "Learn pages must use the shared 1200px content width");
-assert.match(learnComponents, /\/app\/learn/, "Learn links must use canonical /app/learn routes");
+assert.match(learnComponents, /\/learn/, "Learn links must use canonical /learn routes");
+assert.doesNotMatch(learnComponents, /\/app\/learn/, "Learn components must not link to legacy /app/learn routes");
 assert.match(learnComponents, /line-clamp-1 text-\[13px\]/, "Lesson card descriptions must clamp to one line");
 assert.doesNotMatch(learnComponents, /section\.description/, "Learn overview section descriptions must not render");
 assert.match(learnComponents, /text-\[14px\] text-white\/68/, "Lesson breadcrumbs must be 2px smaller than the original 16px");

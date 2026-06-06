@@ -34,6 +34,7 @@ const STATIC_EN_SIBLINGS: readonly string[] = [
   "/blog/image-to-video", // Blog automation trial
   "/blog/gpt-image-2", // Phase 5 B-05/B-07
   "/models", // Phase v2.0 MODELS-A-7
+  "/learn", // Public Learn launch
 ];
 
 const MODEL_PATHS = MODEL_SLUGS_WITH_CONTENT.map((slug) => `/models/${slug}`);

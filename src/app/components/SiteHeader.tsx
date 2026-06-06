@@ -2,7 +2,7 @@
 // navigation lives in the footer, while the header matches the app shell
 // navigation across marketing, billing, account, and Learn routes.
 
-import { Chrome, Library, LogIn, type LucideIcon } from "lucide-react";
+import { BookOpen, Chrome, Library, LogIn, type LucideIcon } from "lucide-react";
 import { useLocation } from "react-router";
 import LangSwitcher from "./LangSwitcher";
 import LocalizedLink from "./LocalizedLink";
@@ -18,12 +18,13 @@ interface SiteHeaderProps {
 }
 
 type SiteNavItem = {
-  label: "Extension" | "Library";
+  label: "Learn" | "Extension" | "Library";
   icon: LucideIcon;
   to: string;
 };
 
 const navItems: SiteNavItem[] = [
+  { label: "Learn", icon: BookOpen, to: "/learn" },
   { label: "Extension", icon: Chrome, to: "/" },
   { label: "Library", icon: Library, to: "/prompt-library" },
 ];
@@ -141,6 +142,7 @@ export default function SiteHeader({ rightSlot }: SiteHeaderProps): JSX.Element 
 }
 
 function isActiveNavItem(label: string, pathname: string) {
+  if (label === "Learn") return pathname.startsWith("/learn") || pathname.startsWith("/en/learn");
   if (label === "Extension") return pathname === "/";
   if (label === "Library") return pathname === "/prompt-library";
   return false;
@@ -150,13 +152,13 @@ const headerCopy = {
   ru: {
     account: "Аккаунт",
     signIn: "Войти",
-    nav: { Extension: "Расширение", Library: "Библиотека" },
+    nav: { Learn: "Курсы", Extension: "Расширение", Library: "Библиотека" },
     usage: (value: string) => `Использовано кредитов: ${value}`,
   },
   en: {
     account: "Account",
     signIn: "Sign in",
-    nav: { Extension: "Extension", Library: "Library" },
+    nav: { Learn: "Courses", Extension: "Extension", Library: "Library" },
     usage: (value: string) => `Credit usage: ${value}`,
   },
 } as const;

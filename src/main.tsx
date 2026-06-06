@@ -1,7 +1,7 @@
 
   import { createRoot, hydrateRoot } from "react-dom/client";
   import { Component, lazy, Suspense, type ErrorInfo, type ReactNode } from "react";
-  import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+  import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router";
   import App from "./app/App.tsx";
   import PrivacyPage from "./app/pages/PrivacyPage.tsx";
   import TermsPage from "./app/pages/TermsPage.tsx";
@@ -107,6 +107,11 @@
     });
   }
 
+  function LegacyLearnLessonRedirect() {
+    const { lessonSlug } = useParams();
+    return <Navigate to={lessonSlug ? `/learn/${lessonSlug}` : "/learn"} replace />;
+  }
+
   type ChunkReloadBoundaryState = {
     error: "chunk" | "app" | null;
   };
@@ -187,14 +192,16 @@
               <Route path="/internal/prompt-library-demo" element={<PromptLibraryDemoPage />} />
               <Route path="/login" element={<AppLoginPage />} />
               <Route path="/auth/callback" element={<AppAuthCallbackPage />} />
+              <Route path="/learn" element={<LearnOverviewPage />} />
+              <Route path="/learn/:lessonSlug" element={<LessonDetailPage />} />
               <Route path="/app" element={<AppIndexPage />} />
-              <Route path="/app/login" element={<Navigate to="/login?next=/app/learn" replace />} />
+              <Route path="/app/login" element={<Navigate to="/login?next=/learn" replace />} />
               <Route path="/app/auth/callback" element={<AppAuthCallbackPage />} />
-              <Route path="/app/learn" element={<LearnOverviewPage />} />
-              <Route path="/app/learn-v2" element={<Navigate to="/app/learn" replace />} />
-              <Route path="/app/learn/:lessonSlug" element={<LessonDetailPage />} />
-              <Route path="/space/learn" element={<Navigate to="/app/learn" replace />} />
-              <Route path="/space/learn/:lessonSlug" element={<Navigate to="/app/learn" replace />} />
+              <Route path="/app/learn" element={<Navigate to="/learn" replace />} />
+              <Route path="/app/learn-v2" element={<Navigate to="/learn" replace />} />
+              <Route path="/app/learn/:lessonSlug" element={<LegacyLearnLessonRedirect />} />
+              <Route path="/space/learn" element={<Navigate to="/learn" replace />} />
+              <Route path="/space/learn/:lessonSlug" element={<LegacyLearnLessonRedirect />} />
               {/* Phase 3 D-01/D-03b: /en/* siblings. Mirror of entry-server.tsx EN routes + /en/pay (head-only, client-mount-only). __PRERENDER_PATH discriminator (lines 65-66) handles these unchanged — meta.path strings written by applyMarker include "/en/welcome" etc. Phase 4 D-06: /en/guides/:slug bilingual anchor. */}
               <Route path="/en/"        element={<App />} />
               <Route path="/en/pay"     element={<PayPage />} />
@@ -207,6 +214,8 @@
               <Route path="/en/blog/:slug" element={<BlogPostPage />} />
               <Route path="/en/models" element={<ModelsHubPage />} />
               <Route path="/en/models/:slug" element={<ModelPage />} />
+              <Route path="/en/learn" element={<LearnOverviewPage />} />
+              <Route path="/en/learn/:lessonSlug" element={<LessonDetailPage />} />
               {/* Phase 4.2 / Wave 3 (P1-1): catch-all 404. MUST be LAST — React Router 7 matches in declaration order, so any earlier `*` would shadow specific routes. NotFound injects <meta name="robots" content="noindex,nofollow"> at runtime to stop search engines from indexing typo'd URLs as duplicates of the landing. Status code stays 200 (Vercel SPA rewrite is unchanged; HTTP 404 is deferred to Phase 6 per CONTEXT D-3). */}
               <Route path="*" element={<NotFound />} />
               </Routes>
