@@ -6,6 +6,7 @@ const root = process.cwd();
 
 const requiredFiles = [
   "src/content/space/learn.ts",
+  "src/content/space/learnSlugs.ts",
   "src/app/components/space/SpaceHeader.tsx",
   "src/app/components/space/SpaceAuthProvider.tsx",
   "src/app/components/space/learn/LearnComponents.tsx",
@@ -19,6 +20,9 @@ const requiredFiles = [
   "public/assets/space/figma/prompt-stack.svg",
   "public/assets/space/figma/header-atoms/logo-lockup.svg",
   "public/assets/space/templates/supplement-hero-shot.jpg",
+  "public/assets/learn/video/actual-ai-tools-2026.mp4",
+  "public/assets/learn/video/actual-ai-tools-2026-poster.jpg",
+  "public/assets/learn/og/actual-ai-tools-2026.jpg",
 ];
 
 for (const file of requiredFiles) {
@@ -45,12 +49,28 @@ const vercel = readFileSync(join(root, "vercel.json"), "utf8");
 assert.match(vercel, /"source": "\/app\/:path\*"/, "Vercel must SPA-rewrite /app/:path* to /index.html");
 assert.match(vercel, /"source": "\/app\/:path\*"[\s\S]*"X-Robots-Tag"[\s\S]*"noindex, nofollow"/, "Opten Space app routes must ship noindex headers");
 assert.match(vercel, /"source": "\/space\/:path\*"/, "Vercel must keep SPA rewrite for legacy /space/:path* redirects");
+assert.doesNotMatch(vercel, /"source": "\/learn(?::|\/)/, "Public /learn routes must not receive the app noindex header");
 
 const content = readFileSync(join(root, "src/content/space/learn.ts"), "utf8");
 assert.match(content, /export const learnFilters/, "Learn filters must be exported");
 assert.match(content, /export const learnCourses/, "Learn courses must be exported");
+assert.match(content, /actual-ai-tools-2026/, "Learn catalog must include the featured local video");
+assert.match(content, /ai-avatar-motion-control/, "Learn catalog must include the AI avatar lesson");
+assert.match(content, /junior-designer-1100-order/, "Learn catalog must include the junior designer order lesson");
+assert.match(content, /client-website-navigation-hero/, "Learn catalog must include the client website lesson");
+assert.match(content, /ai-marketplace-product-cards/, "Learn catalog must include the AI marketplace cards lesson");
+assert.match(content, /web-design-references/, "Learn catalog must include the web design references lesson");
 assert.match(content, /findLearnLesson/, "Learn detail lookup helper must be exported");
 assert.match(content, /getAdjacentLearnLessons/, "Adjacent lesson navigation helper must be exported");
+
+const paths = readFileSync(join(root, "src/i18n/paths.ts"), "utf8");
+assert.match(paths, /LEARN_LESSON_SLUGS/, "LocalizedLink must know public Learn lesson siblings");
+
+const seoRoutes = readFileSync(join(root, "scripts/seo-routes.ts"), "utf8");
+assert.match(seoRoutes, /learnHubRoute/, "SEO manifest must register the public Learn hub");
+assert.match(seoRoutes, /buildLearnLessonRoute/, "SEO manifest must register public Learn lesson pages");
+assert.match(seoRoutes, /LearningResource/, "Learn lesson schema must expose LearningResource");
+assert.match(seoRoutes, /VideoObject/, "Learn lesson schema must expose VideoObject");
 
 const header = readFileSync(join(root, "src/app/components/space/SpaceHeader.tsx"), "utf8");
 assert.match(header, /useSpaceAuth/, "Learn header must read account state from SpaceAuthProvider");

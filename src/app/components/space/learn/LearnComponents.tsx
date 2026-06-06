@@ -7,7 +7,7 @@ import {
   Play,
   Video,
 } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocation } from "react-router";
 import { useLang } from "../../../../i18n/LangContext";
 import type { AccountSummary } from "../../../../lib/optenAuth";
@@ -17,7 +17,16 @@ import SpaceHeader from "../SpaceHeader";
 import { useSpaceAuth } from "../SpaceAuthProvider";
 import type { LearnCollection, LearnLesson, LearnMaterial, LearnOverviewSection, LearnTimestamp } from "../../../../content/space/learn";
 import {
+  getLearnCollectionCategoryLabel,
+  getLearnCollectionTitle,
   getLearnLessonAuthor,
+  getLearnLessonAuthorIntro,
+  getLearnLessonAuthorRole,
+  getLearnLessonCategoryLabel,
+  getLearnLessonDescription,
+  getLearnLessonMaterials,
+  getLearnLessonTimestamps,
+  getLearnLessonTitle,
   getLearnLessonVideoProvider,
   getLessonPosition,
 } from "../../../../content/space/learn";
@@ -106,6 +115,8 @@ type VideoCardProps = {
 };
 
 export function VideoCard({ lesson }: VideoCardProps) {
+  const { lang } = useLang();
+
   return (
     <LocalizedLink
       to={`/learn/${lesson.slug}`}
@@ -125,8 +136,8 @@ export function VideoCard({ lesson }: VideoCardProps) {
         </span>
       </div>
       <div className="flex min-h-[92px] flex-col p-[12px]">
-        <h3 className="line-clamp-2 text-[16px] font-bold leading-[1.25] text-white">{lesson.title}</h3>
-        <p className="mt-[6px] line-clamp-1 text-[13px] leading-[1.35] text-white/62">{lesson.description}</p>
+        <h3 className="line-clamp-2 text-[16px] font-bold leading-[1.25] text-white">{getLearnLessonTitle(lesson, lang)}</h3>
+        <p className="mt-[6px] line-clamp-1 text-[13px] leading-[1.35] text-white/62">{getLearnLessonDescription(lesson, lang)}</p>
         <p className="mt-auto flex flex-wrap items-center gap-[7px] pt-[8px] text-[12px] leading-none text-white/58">
           <span>{lesson.duration}</span>
           <span className="h-[3px] w-[3px] rounded-full bg-white/32" />
@@ -191,7 +202,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
           {copy.courses}
         </LocalizedLink>
         <span className="text-white/28">/</span>
-        <span>{collection.categoryLabel}</span>
+        <span>{getLearnCollectionCategoryLabel(collection, lang)}</span>
         {isCourse && (
           <>
             <span className="text-white/28">/</span>
@@ -210,7 +221,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
             completed={lessonCompleted}
             onCompletionChange={handleLessonCompletionChange}
           />
-          <LessonMaterials materials={displayedLesson.materials} locked={locked} />
+          <LessonMaterials materials={getLearnLessonMaterials(displayedLesson, lang)} locked={locked} />
           <RelatedLessons collection={displayedCollection} currentSlug={lesson.slug} hasPro={hasPro} />
         </div>
 
@@ -241,13 +252,15 @@ type LessonPlayerProps = {
 function LessonPlayer({ lesson, locked, startSeconds, playRequestId }: LessonPlayerProps) {
   const { pathname } = useLocation();
   const { lang } = useLang();
+  const copy = detailCopy[lang];
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const provider = getLearnLessonVideoProvider(lesson);
   const [activated, setActivated] = useState(false);
   const localizedVideo = lesson.localizedVideo?.[lang];
   const youtubeId = localizedVideo?.youtubeId ?? lesson.youtubeId;
   const captionLanguage = localizedVideo?.captionLanguage ?? lang;
-  const audioLanguage = localizedVideo?.audioLanguage ?? (localizedVideo?.youtubeId && localizedVideo.youtubeId !== lesson.youtubeId ? lang : "ru");
   const embedUrl = youtubeId ? getYoutubeEmbedUrl(youtubeId, lang, captionLanguage, startSeconds, activated) : "";
+  const isLocalVideo = provider.provider === "local" && Boolean(lesson.localVideo);
 
   useEffect(() => {
     setActivated(false);
@@ -257,6 +270,12 @@ function LessonPlayer({ lesson, locked, startSeconds, playRequestId }: LessonPla
     if (playRequestId > 0) setActivated(true);
   }, [playRequestId]);
 
+  useEffect(() => {
+    if (!isLocalVideo || !activated || !videoRef.current || playRequestId <= 0) return;
+    videoRef.current.currentTime = startSeconds;
+    void videoRef.current.play().catch(() => undefined);
+  }, [activated, isLocalVideo, playRequestId, startSeconds]);
+
   return (
     <section
       className="overflow-hidden rounded-[8px] border border-white/12 bg-[#0e2023] shadow-[0_18px_56px_rgba(0,0,0,0.24)]"
@@ -265,7 +284,7 @@ function LessonPlayer({ lesson, locked, startSeconds, playRequestId }: LessonPla
       data-playback-policy={provider.playbackPolicy}
     >
       <div className="relative aspect-video overflow-hidden bg-[#06191c]">
-        {locked || !embedUrl || !activated ? (
+        {locked || !activated ? (
           <>
             <img
               src={provider.posterPath}
@@ -281,22 +300,22 @@ function LessonPlayer({ lesson, locked, startSeconds, playRequestId }: LessonPla
                   <span className="mx-auto grid size-[48px] place-items-center rounded-full border border-[#9cfb51]/45 bg-[#9cfb51]/10 text-[#9cfb51]">
                     <Lock size={22} />
                   </span>
-                  <h2 className="mt-[16px] text-[18px] font-bold leading-tight text-white">Урок заблокирован</h2>
+                  <h2 className="mt-[16px] text-[18px] font-bold leading-tight text-white">{copy.lockedLesson}</h2>
                   <p className="mt-[8px] text-[13px] leading-[1.45] text-white/68">
-                    Разблокируйте тариф Pro, чтобы смотреть видео и получить доступ к материалам.
+                    {copy.lockedDescription}
                   </p>
                   <div className="mt-[18px] flex gap-[8px] max-sm:flex-col">
                     <LocalizedLink
                       to="/pay"
                       className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] bg-[#9cfb51] px-[14px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943]"
                     >
-                      Открыть Pro
+                      {copy.openPro}
                     </LocalizedLink>
                     <LocalizedLink
                       to={`/login?next=${encodeURIComponent(pathname)}`}
                       className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] border border-[#9cfb51]/65 px-[14px] text-[14px] font-bold text-[#9cfb51] no-underline transition hover:bg-[#9cfb51]/10"
                     >
-                      Войти
+                      {copy.signIn}
                     </LocalizedLink>
                   </div>
                 </div>
@@ -306,8 +325,7 @@ function LessonPlayer({ lesson, locked, startSeconds, playRequestId }: LessonPla
                 type="button"
                 onClick={() => setActivated(true)}
                 className="absolute inset-0 grid cursor-pointer place-items-center border-0 bg-transparent p-0 text-white outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#9cfb51]/80"
-                aria-label={lang === "en" ? "Play lesson" : "Смотреть урок"}
-                data-audio-language={audioLanguage}
+                aria-label={copy.playLesson}
               >
                 <span className="grid size-[76px] place-items-center rounded-full bg-[#9cfb51] text-[#011417] shadow-[0_16px_48px_rgba(156,251,81,0.26)] transition duration-200 hover:scale-[1.04] hover:bg-[#8ff144]">
                   <Play size={30} fill="currentColor" strokeWidth={2.4} className="ml-[3px]" />
@@ -315,14 +333,34 @@ function LessonPlayer({ lesson, locked, startSeconds, playRequestId }: LessonPla
               </button>
             )}
           </>
-        ) : (
+        ) : isLocalVideo && lesson.localVideo ? (
+          <video
+            ref={videoRef}
+            key={lesson.slug}
+            src={lesson.localVideo.src}
+            poster={lesson.localVideo.posterPath}
+            controls
+            autoPlay
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 h-full w-full bg-black object-cover"
+          />
+        ) : embedUrl ? (
           <iframe
             key={`${youtubeId}-${startSeconds}-${playRequestId}`}
             src={embedUrl}
-            title={lesson.title}
+            title={getLearnLessonTitle(lesson, lang)}
             className="absolute inset-0 h-full w-full border-0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
+          />
+        ) : (
+          <img
+            src={provider.posterPath}
+            alt=""
+            width="1200"
+            height="676"
+            className="h-full w-full object-cover opacity-90"
           />
         )}
       </div>
@@ -365,7 +403,7 @@ type LessonIntroProps = {
 function LessonIntro({ lesson, collection, locked, completed, onCompletionChange }: LessonIntroProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
-  const position = getLessonPosition(lesson.slug);
+  const position = getLessonPosition(lesson.slug, lang);
 
   return (
     <section className="mt-[26px]">
@@ -377,7 +415,7 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
             </span>
           )}
           <span className="rounded-[6px] bg-white/[0.05] px-[9px] py-[5px] text-[12px] font-medium leading-none text-white/56">
-            {collection.categoryLabel}
+            {getLearnCollectionCategoryLabel(collection, lang)}
           </span>
           {locked && (
             <span className="inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
@@ -395,9 +433,11 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
         )}
       </div>
       <h1 className="mt-[18px] max-w-[820px] text-[30px] font-bold leading-[1.14] text-white max-md:text-[25px]">
-        {lesson.title}
+        {getLearnLessonTitle(lesson, lang)}
       </h1>
-      <p className="mt-[18px] max-w-[820px] pb-[20px] text-[14px] leading-[1.55] text-white/70">{lesson.description}</p>
+      <p className="mt-[18px] max-w-[820px] pb-[20px] text-[14px] leading-[1.55] text-white/70">
+        {getLearnLessonDescription(lesson, lang)}
+      </p>
     </section>
   );
 }
@@ -435,11 +475,14 @@ type LessonMaterialsProps = {
 };
 
 function LessonMaterials({ materials, locked }: LessonMaterialsProps) {
+  const { lang } = useLang();
+  const copy = detailCopy[lang];
+
   if (materials.length === 0) return null;
 
   return (
     <section className="mt-[34px] max-w-[820px]">
-      <h2 className="text-[22px] font-bold leading-tight text-white">Материалы урока</h2>
+      <h2 className="text-[22px] font-bold leading-tight text-white">{copy.lessonMaterials}</h2>
       <div className="mt-[14px] overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]">
         {materials.map((material) => {
           const Icon = materialIcon(material.kind);
@@ -507,9 +550,9 @@ function CollectionSummaryCard({ lesson, collection }: CollectionSummaryCardProp
 
   return (
     <section className="rounded-[8px] border border-white/10 bg-[#0e2023]/92 px-[20px] py-[20px] shadow-[0_16px_50px_rgba(0,0,0,0.18)]">
-      <p className="text-[13px] font-medium leading-tight text-white/42">{isStandalone ? copy.singleLesson : collection.categoryLabel}</p>
-      <h2 className="mt-[14px] text-[20px] font-bold leading-[1.2] text-white">{isStandalone ? copy.lessonAuthor : collection.title}</h2>
-      {isStandalone && <p className="mt-[10px] text-[13px] leading-[1.45] text-white/58">{author.intro}</p>}
+      <p className="text-[13px] font-medium leading-tight text-white/42">{isStandalone ? copy.singleLesson : getLearnCollectionCategoryLabel(collection, lang)}</p>
+      <h2 className="mt-[14px] text-[20px] font-bold leading-[1.2] text-white">{isStandalone ? copy.lessonAuthor : getLearnCollectionTitle(collection, lang)}</h2>
+      {isStandalone && <p className="mt-[10px] text-[13px] leading-[1.45] text-white/58">{getLearnLessonAuthorIntro(lesson, lang)}</p>}
       <div className="mt-[20px] flex items-center gap-[11px]">
         <img
           src={author.avatarPath}
@@ -520,21 +563,21 @@ function CollectionSummaryCard({ lesson, collection }: CollectionSummaryCardProp
         />
         <div className="min-w-0">
           <p className="truncate text-[14px] font-bold leading-tight text-white">{author.name}</p>
-          <p className="mt-[4px] truncate text-[12px] leading-tight text-white/50">{author.role}</p>
+          <p className="mt-[4px] truncate text-[12px] leading-tight text-white/50">{getLearnLessonAuthorRole(lesson, lang)}</p>
         </div>
       </div>
       <AuthorSocialLinks copy={copy} />
       {progress && (
         <div className="mt-[22px] border-t border-white/8 pt-[18px]">
           <div className="flex items-center justify-between gap-[12px]">
-            <span className="text-[13px] font-medium text-white/72">Прогресс курса</span>
+            <span className="text-[13px] font-medium text-white/72">{copy.courseProgress}</span>
             <span className="text-[13px] font-bold text-[#9cfb51]">{percent}%</span>
           </div>
           <div className="mt-[12px] h-[5px] overflow-hidden rounded-full bg-white/12">
             <div className="h-full rounded-full bg-[#9cfb51]" style={{ width: `${percent}%` }} />
           </div>
           <p className="mt-[8px] text-right text-[12px] leading-tight text-white/44">
-            {progress.completed} из {progress.total} уроков
+            {copy.progressCount(progress.completed, progress.total)}
           </p>
         </div>
       )}
@@ -585,6 +628,8 @@ type LessonSidebarProps = {
 };
 
 function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestampSelect, hasPro }: LessonSidebarProps) {
+  const { lang } = useLang();
+  const copy = detailCopy[lang];
   const isCourse = collection.kind === "course";
 
   return (
@@ -598,7 +643,7 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
               activeTab === "lessons" ? "text-white" : "text-white/58 hover:text-white"
             }`}
           >
-            Уроки
+            {copy.lessonsTab}
             {activeTab === "lessons" && <span className="absolute inset-x-[10px] bottom-0 h-[2px] rounded-full bg-[#9cfb51]" />}
           </button>
         )}
@@ -609,7 +654,7 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
             activeTab === "timestamps" ? "text-white" : "text-white/58 hover:text-white"
           }`}
         >
-          Тайм-коды
+          {copy.timestampsTab}
           {activeTab === "timestamps" && <span className="absolute inset-x-[10px] bottom-0 h-[2px] rounded-full bg-[#9cfb51]" />}
         </button>
       </div>
@@ -617,7 +662,7 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
       {activeTab === "lessons" && isCourse ? (
         <CourseOutline collection={collection} currentSlug={lesson.slug} hasPro={hasPro} />
       ) : (
-        <TimestampList timestamps={lesson.timestamps} onSelect={onTimestampSelect} />
+        <TimestampList timestamps={getLearnLessonTimestamps(lesson, lang)} onSelect={onTimestampSelect} />
       )}
     </section>
   );
@@ -631,6 +676,9 @@ type CourseOutlineProps = {
 };
 
 export function CourseOutline({ collection, currentSlug, hasPro, className = "" }: CourseOutlineProps) {
+  const { lang } = useLang();
+  const copy = detailCopy[lang];
+
   return (
     <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] ${className}`}>
       {collection.lessons.map((outlineLesson, index) => {
@@ -653,9 +701,11 @@ export function CourseOutline({ collection, currentSlug, hasPro, className = "" 
               {index + 1}
             </span>
             <span className="min-w-0">
-              <span className={`block text-[14px] font-bold leading-[1.35] ${current ? "text-white" : ""}`}>{outlineLesson.title}</span>
+              <span className={`block text-[14px] font-bold leading-[1.35] ${current ? "text-white" : ""}`}>
+                {getLearnLessonTitle(outlineLesson, lang)}
+              </span>
               <span className="mt-[4px] block text-[12px] leading-tight text-white/44">
-                {locked ? <span className="text-[#9cfb51]">Разблокируется на Pro</span> : outlineLesson.duration}
+                {locked ? <span className="text-[#9cfb51]">{copy.unlocksOnPro}</span> : outlineLesson.duration}
               </span>
             </span>
             <LessonStatusDot lesson={outlineLesson} current={current} />
@@ -699,6 +749,9 @@ type UnlockProCardProps = {
 };
 
 function UnlockProCard({ hasPro }: UnlockProCardProps) {
+  const { lang } = useLang();
+  const copy = detailCopy[lang];
+
   if (hasPro) {
     return (
       <section className="rounded-[8px] border border-[#9cfb51]/45 bg-[#10261b] p-[18px]">
@@ -707,8 +760,8 @@ function UnlockProCard({ hasPro }: UnlockProCardProps) {
             <Check size={20} />
           </span>
           <div>
-            <h2 className="text-[16px] font-bold leading-tight text-white">Pro активен</h2>
-            <p className="mt-[8px] text-[13px] leading-[1.45] text-white/62">Все Pro-уроки и материалы доступны без дополнительных оплат.</p>
+            <h2 className="text-[16px] font-bold leading-tight text-white">{copy.proActive}</h2>
+            <p className="mt-[8px] text-[13px] leading-[1.45] text-white/62">{copy.proActiveDescription}</p>
           </div>
         </div>
       </section>
@@ -723,9 +776,9 @@ function UnlockProCard({ hasPro }: UnlockProCardProps) {
           <Crown size={20} />
         </span>
         <div>
-          <h2 className="text-[17px] font-bold leading-[1.25] text-white">Разблокируйте все уроки</h2>
+          <h2 className="text-[17px] font-bold leading-[1.25] text-white">{copy.unlockAllLessons}</h2>
           <p className="mt-[8px] text-[13px] leading-[1.45] text-white/68">
-            Получите доступ ко всем материалам курса и Pro-урокам без ограничений.
+            {copy.unlockAllDescription}
           </p>
         </div>
       </div>
@@ -733,7 +786,7 @@ function UnlockProCard({ hasPro }: UnlockProCardProps) {
         to="/pay"
         className="relative mt-[18px] flex h-[43px] items-center justify-center rounded-[8px] bg-[#9cfb51] px-[16px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943]"
       >
-        Разблокировать на Pro
+        {copy.unlockOnPro}
       </LocalizedLink>
     </section>
   );
@@ -746,6 +799,8 @@ type RelatedLessonsProps = {
 };
 
 function RelatedLessons({ collection, currentSlug, hasPro }: RelatedLessonsProps) {
+  const { lang } = useLang();
+  const copy = detailCopy[lang];
   const lessons = useMemo(
     () => collection.lessons.filter((item) => item.slug !== currentSlug).slice(0, 2),
     [collection.lessons, currentSlug],
@@ -755,7 +810,7 @@ function RelatedLessons({ collection, currentSlug, hasPro }: RelatedLessonsProps
 
   return (
     <section className="mt-[36px]">
-      <h2 className="text-[24px] font-bold leading-tight text-white">Все уроки</h2>
+      <h2 className="text-[24px] font-bold leading-tight text-white">{copy.allLessons}</h2>
       <div className="mt-[16px] grid grid-cols-2 gap-[16px] max-sm:grid-cols-1">
         {lessons.map((item) => {
           const locked = isLessonLocked(item, hasPro);
@@ -787,10 +842,12 @@ function RelatedLessons({ collection, currentSlug, hasPro }: RelatedLessonsProps
                 </span>
               </div>
               <div className="px-[14px] pb-[18px] pt-[13px]">
-                <p className="text-[12px] leading-none text-white/38">{item.category}</p>
-                <h3 className="mt-[9px] min-h-[48px] text-[18px] font-bold leading-[1.3] text-white">{item.title}</h3>
+                <p className="text-[12px] leading-none text-white/38">{getLearnLessonCategoryLabel(item, lang)}</p>
+                <h3 className="mt-[9px] min-h-[48px] text-[18px] font-bold leading-[1.3] text-white">
+                  {getLearnLessonTitle(item, lang)}
+                </h3>
                 <p className="mt-[14px] text-[13px] font-medium text-[#9cfb51]">
-                  {locked ? "Разблокируется на Pro" : "Смотреть урок"}
+                  {locked ? copy.unlocksOnPro : copy.watchLesson}
                 </p>
               </div>
             </LocalizedLink>
@@ -920,9 +977,27 @@ const detailCopy = {
     singleLesson: "Одиночный урок",
     lessonAuthor: "Автор урока",
     authorSocials: "Соцсети автора",
+    lessonsTab: "Уроки",
+    timestampsTab: "Тайм-коды",
+    lessonMaterials: "Материалы урока",
     markLessonCompleted: "Отметить как изучено",
     lessonCompleted: "Урок изучен",
     undoCompleted: "Отменить",
+    lockedLesson: "Урок заблокирован",
+    lockedDescription: "Разблокируйте тариф Pro, чтобы смотреть видео и получить доступ к материалам.",
+    openPro: "Открыть Pro",
+    signIn: "Войти",
+    playLesson: "Смотреть урок",
+    courseProgress: "Прогресс курса",
+    progressCount: (completed: number, total: number) => `${completed} из ${total} уроков`,
+    unlocksOnPro: "Разблокируется на Pro",
+    proActive: "Pro активен",
+    proActiveDescription: "Все Pro-уроки и материалы доступны без дополнительных оплат.",
+    unlockAllLessons: "Разблокируйте все уроки",
+    unlockAllDescription: "Получите доступ ко всем материалам курса и Pro-урокам без ограничений.",
+    unlockOnPro: "Разблокировать на Pro",
+    allLessons: "Все уроки",
+    watchLesson: "Смотреть урок",
   },
   en: {
     breadcrumb: "Course navigation",
@@ -930,8 +1005,26 @@ const detailCopy = {
     singleLesson: "Single lesson",
     lessonAuthor: "Lesson author",
     authorSocials: "Author socials",
+    lessonsTab: "Lessons",
+    timestampsTab: "Timestamps",
+    lessonMaterials: "Lesson materials",
     markLessonCompleted: "Mark as learned",
     lessonCompleted: "Lesson learned",
     undoCompleted: "Undo",
+    lockedLesson: "Lesson locked",
+    lockedDescription: "Unlock Pro to watch this video and get access to the lesson materials.",
+    openPro: "Open Pro",
+    signIn: "Sign in",
+    playLesson: "Play lesson",
+    courseProgress: "Course progress",
+    progressCount: (completed: number, total: number) => `${completed} of ${total} lessons`,
+    unlocksOnPro: "Unlocks on Pro",
+    proActive: "Pro active",
+    proActiveDescription: "All Pro lessons and materials are available without extra payments.",
+    unlockAllLessons: "Unlock all lessons",
+    unlockAllDescription: "Get access to every course material and Pro lesson without limits.",
+    unlockOnPro: "Unlock on Pro",
+    allLessons: "All lessons",
+    watchLesson: "Watch lesson",
   },
 } as const;

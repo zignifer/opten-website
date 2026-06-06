@@ -22,10 +22,11 @@ YooKassa RUB + Paddle USD — Pro is the only purchasable tier; free-аккау�
 0 операций, нужен для логина), (3)
 Pro-only utilities (`/dashboard/download-skill` — streams `opten.zip` Claude
 Skill bundle sourced from the extension repo's `opten/` dir, Phase 73), (4)
-Opten Space Beta app shell at `/app/*` (SPA-only, noindex) whose Learn route
-exists but is temporarily hidden from visible navigation until courses are
-ready, and whose account/credits state is read from the same self-hosted
-Supabase backend as the extension.
+public Learn pages at `/learn` + `/en/learn` (indexed RU/EN video lessons with
+schema, sitemap, llms.txt, and legacy redirects from `/app/learn*`), alongside
+the Opten Space Beta app shell at `/app/*` (SPA-only, noindex) whose
+account/credits state is read from the same self-hosted Supabase backend as the
+extension.
 
 The extension is still the primary shipped product. Opten Space Beta is an
 account-based web app surface, but it must share identity, subscription, and
@@ -63,9 +64,9 @@ Canonical website-auth routes:
 - `/app/login` and `/app/auth/callback` remain compatibility routes/redirects.
 
 Opten Space Beta app routes are **not extension-locked** yet, but `/app/*` is
-the canonical app namespace going forward. `/space/*` was an early local Learn
-prototype namespace and should only remain as temporary redirect/backward
-compatibility while the beta moves to `/app`.
+the canonical app namespace for authenticated app surfaces going forward.
+Learn is now a public SEO section at `/learn`; `/app/learn*` and `/space/learn*`
+must remain temporary redirects/backward compatibility, not canonical links.
 
 Hardcoded constants that are duplicated and must be kept in sync:
 - `EXTENSION_IDS` — appears in [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [src/app/pages/DownloadSkillPage.tsx](src/app/pages/DownloadSkillPage.tsx)
@@ -79,7 +80,7 @@ Hardcoded constants that are duplicated and must be kept in sync:
 - **Payments:** Paddle.js v2 (synchronous CDN script in `index.html`)
 - **Backend:** plain `fetch` to Supabase REST + Functions (no `@supabase/supabase-js`)
 - **Deploy:** Vercel, one serverless function at `api/download-skill.ts`
-- **i18n:** Custom React context, RU/EN; URL prefix wins (`/en/*`), then `localStorage.opten_lang_v3` (explicit user choice, written by LangSwitcher), then `navigator.language`. Legacy key `opten_lang` is read **only** when its value is `"en"` for one-shot migration; RU values from the old key are intentionally ignored (they often came from auto-write, not explicit choice). Internal navigation uses `<LocalizedLink>` (drop-in `<Link>` replacement) — on `/en/*` URLs it rewrites internal hrefs to `/en/<sibling>` for the EN-prefixed routes — 9 static + 62 model slugs (see `EN_SIBLINGS` in `src/i18n/paths.ts`, built from `src/content/models/slugs.ts`).
+- **i18n:** Custom React context, RU/EN; URL prefix wins (`/en/*`), then `localStorage.opten_lang_v3` (explicit user choice, written by LangSwitcher), then `navigator.language`. Legacy key `opten_lang` is read **only** when its value is `"en"` for one-shot migration; RU values from the old key are intentionally ignored (they often came from auto-write, not explicit choice). Internal navigation uses `<LocalizedLink>` (drop-in `<Link>` replacement) — on `/en/*` URLs it rewrites internal hrefs to `/en/<sibling>` for EN-prefixed routes, including static/blog routes, 62 model slugs from `src/content/models/slugs.ts`, and Learn lesson slugs from `src/content/space/learnSlugs.ts`.
 
 No tests, no ESLint config, no `typecheck` script. TS errors surface during
 `vite build` (`npm run build`).
@@ -104,22 +105,23 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
      │
      └→ main.tsx → <BrowserRouter> → <LangProvider> → <Routes>
             ↓
-        ~28 client route patterns + catch-all 404 → 144 prerendered routes:
+        ~32 client route patterns + catch-all 404 → 182 prerendered routes:
           Marketing/billing RU (9): /, /pay, /welcome, /about, /blog, /blog/:slug,
                   /privacy, /terms, /refund
           Models RU (Phase v2.0): /models hub + /models/:slug (62 model pages)
+          Learn RU: /learn hub + /learn/:lessonSlug (public video lessons)
           RU SPA-only (5, X-Robots-Tag noindex): /success, /login,
                                                   /auth/callback, /account,
                                                   /dashboard/download-skill
           App SPA-only (X-Robots-Tag noindex): /app, /app/login,
-                  /app/auth/callback, /app/learn, /app/learn/:lessonSlug
-          EN: /en/ sibling for each prerendered RU route + /en/models(/:slug)
+                  /app/auth/callback; /app/learn* redirects to /learn*
+          EN: /en/ sibling for each prerendered RU route + /en/models(/:slug) + /en/learn(/:slug)
           Catch-all: <Route path="*"> → NotFound (runtime noindex injection)
 
-  Prerender (postbuild):  scripts/prerender.mjs → 144 dist/<route>/index.html files
-                          (18 baseline + 2 model hubs + 124 model pages — 62 RU + 62 EN —
+  Prerender (postbuild):  scripts/prerender.mjs → 182 dist/<route>/index.html files
+                          (42 baseline/blog + 14 Learn + 2 model hubs + 124 model pages —
                           with hreflang triplets + baked <html lang>)
-                          + sitemap.xml (144 URL) + llms.txt + IndexNow ping
+                          + sitemap.xml (182 URL) + llms.txt + IndexNow ping
                           + FaqBlock ↔ FAQPage parity assertion
   Site ↔ Extension:       chrome.runtime.sendMessage (externally_connectable, opten.space only)
   Site → Supabase:        fetch to /functions/v1/* and /rest/v1/* — base URL is
@@ -146,7 +148,7 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           (Phase 5 B-07; the /guides/* URL space is retired)
 ```
 
-**Locked/auth routes never get `/en/*` siblings by design** (Phase 3 D-03): `/success` is YooKassa-RUB only; `/login`, `/auth/*`, `/account`, `/dashboard/*`, and `/app/*` are authenticated or app surfaces (Disallow'd/noindex) rather than content/SEO pages. On those routes the LangSwitcher or app-local language switch flips language *in place* (storage + state) instead of navigating.
+**Locked/auth routes never get `/en/*` siblings by design** (Phase 3 D-03): `/success` is YooKassa-RUB only; `/login`, `/auth/*`, `/account`, `/dashboard/*`, and `/app/*` are authenticated or app surfaces (Disallow'd/noindex) rather than content/SEO pages. Public Learn is the exception to the old app Learn prototype: canonical Learn routes are `/learn` and `/en/learn`, while `/app/learn*` redirects. On locked/auth routes the LangSwitcher or app-local language switch flips language *in place* (storage + state) instead of navigating.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routes, billing flows, and i18n details.
 
@@ -408,6 +410,7 @@ Reference documentation lives in `docs/`:
 
 - [docs/INTEGRATION-CONTRACT.md](docs/INTEGRATION-CONTRACT.md) — **binding interface with the extension**
 - [docs/CONTENT-AUTHORING.md](docs/CONTENT-AUTHORING.md) — **GEO+SEO playbook for new pages, blog posts, images** (read before any content change)
+- [docs/LEARN-PUBLISHING.md](docs/LEARN-PUBLISHING.md) — **public Learn video publishing workflow** (RU/EN lesson data, timestamps, thumbnails, OG images, schema, sitemap)
 - [docs/SEARCH-CONSOLE.md](docs/SEARCH-CONSOLE.md) — local Google Search Console OAuth access and CLI commands
 - [docs/YANDEX-WEBMASTER.md](docs/YANDEX-WEBMASTER.md) — local Yandex Webmaster OAuth access and CLI commands
 - [docs/TECH.md](docs/TECH.md) — stack snapshot

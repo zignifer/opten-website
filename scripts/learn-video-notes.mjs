@@ -109,7 +109,7 @@ async function main() {
 
   const sourceIdFlag = args.indexOf("--source-id");
   const sourceIdFromArgs = sourceIdFlag >= 0 ? args[sourceIdFlag + 1] : "";
-  const youtubeUrl = args.find((arg, index) => !arg.startsWith("-") && index !== sourceIdFlag + 1);
+  const youtubeUrl = args.find((arg, index) => !arg.startsWith("-") && (sourceIdFlag < 0 || index !== sourceIdFlag + 1));
 
   if (!youtubeUrl && !sourceIdFromArgs) {
     printUsage();

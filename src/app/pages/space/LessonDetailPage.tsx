@@ -6,10 +6,10 @@ export default function LessonDetailPage() {
   const { lessonSlug } = useParams();
   const lesson = findLearnLesson(lessonSlug);
 
-  if (!lesson) return <Navigate to="/app/learn" replace />;
+  if (!lesson) return <Navigate to="/learn" replace />;
 
   const collection = getLearnCollectionForLesson(lesson.slug);
-  if (!collection) return <Navigate to="/app/learn" replace />;
+  if (!collection) return <Navigate to="/learn" replace />;
 
   const { previousLesson, nextLesson } = getAdjacentLearnLessons(lesson.slug);
 

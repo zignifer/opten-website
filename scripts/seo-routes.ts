@@ -26,6 +26,20 @@ import { landingFaq } from "../src/content/landingFaq";
 import { allModels, HUB_HIDDEN_SLUGS } from "../src/content/models";
 import { metaField } from "../src/content/models/metaEn";
 import type { ModelContent, ModelEntry, ModelMeta } from "../src/content/models/types";
+import {
+  featuredLearnLesson,
+  getLearnLessonCategoryLabel,
+  getLearnLessonDescription,
+  getLearnLessonOutcomes,
+  getLearnLessonSeoDescription,
+  getLearnLessonSeoTitle,
+  getLearnLessonTitle,
+  getLearnLessonTopics,
+  getLearnLessonVideoProvider,
+  publicLearnLessons,
+  type LearnLang,
+  type LearnLesson,
+} from "../src/content/space/learn";
 
 // Phase 3 D-01/D-02: cluster pairs (reciprocal hreflang per RESEARCH.md Pitfall 5):
 //   "/"        ↔ "/en/"          "/pay"     ↔ "/en/pay"
@@ -663,6 +677,207 @@ function buildModelsHubRoute(lang: "ru" | "en", modelsWithContent: ModelEntry[])
     ],
   };
 }
+
+function absoluteAssetUrl(path: string): string {
+  return path.startsWith("http://") || path.startsWith("https://") ? path : `${SITE_ORIGIN}${path}`;
+}
+
+function learnOgImageUrl(lesson: LearnLesson): string {
+  return `${SITE_ORIGIN}/assets/learn/og/${lesson.slug}.jpg`;
+}
+
+function learnHubRoute(lang: LearnLang): RouteMeta {
+  const path = lang === "ru" ? "/learn" : "/en/learn";
+  const ruUrl = `${SITE_ORIGIN}/learn`;
+  const enUrl = `${SITE_ORIGIN}/en/learn`;
+  const pageUrl = lang === "ru" ? ruUrl : enUrl;
+  const inLanguage = lang === "ru" ? "ru-RU" : "en-US";
+  const homeName = lang === "ru" ? "Главная" : "Home";
+  const learnName = lang === "ru" ? "Курсы" : "Courses";
+  const title = lang === "ru"
+    ? "Курсы Opten — практические уроки по нейросетям, AI-видео и дизайну"
+    : "Opten courses — practical lessons on AI tools, AI video, and design";
+  const description = lang === "ru"
+    ? "Бесплатные видеоуроки Opten по нейросетям, AI-видео, дизайну и рабочим процессам. Реальные разборы Влада Воронежцева с тайм-кодами и материалами."
+    : "Free Opten video lessons on AI tools, AI video, design, and creative workflows. Practical lessons by Vlad Voronezhtsev with timestamps and materials.";
+
+  return {
+    path,
+    htmlLang: lang,
+    hreflangAlternates: {
+      ru: ruUrl,
+      en: enUrl,
+      xDefault: ruUrl,
+    },
+    title,
+    description,
+    canonical: pageUrl,
+    ogTitle: title,
+    ogDescription: description,
+    ogImage: learnOgImageUrl(featuredLearnLesson),
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "weekly",
+    priority: 0.85,
+    schema: [
+      lang === "en" ? ORG_BLOCK_EN : ORG_BLOCK,
+      WEBSITE_BLOCK,
+      collectionPageBlock({
+        pageId: pageUrl,
+        url: pageUrl,
+        name: title,
+        description,
+        inLanguage,
+      }),
+      itemListBlock(
+        publicLearnLessons.map((lesson) => ({
+          url: lang === "ru" ? `${SITE_ORIGIN}/learn/${lesson.slug}` : `${SITE_ORIGIN}/en/learn/${lesson.slug}`,
+          name: getLearnLessonTitle(lesson, lang),
+          datePublished: lesson.publishedAt,
+        })),
+        pageUrl,
+      ),
+      webPageBlock({
+        pageId: pageUrl,
+        url: pageUrl,
+        name: title,
+        inLanguage,
+        cssSelector: ["h1", "h2"],
+        about: SOFTWARE_APP_REF,
+      }),
+      breadcrumbBlock(
+        [
+          { name: homeName, url: lang === "ru" ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}/en/` },
+          { name: learnName, url: pageUrl },
+        ],
+        pageUrl,
+      ),
+    ],
+  };
+}
+
+function learningResourceBlock(lesson: LearnLesson, lang: LearnLang, pageUrl: string, inLanguage: "ru-RU" | "en-US"): SchemaBlock {
+  return {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "@id": `${pageUrl}#learning-resource`,
+    name: getLearnLessonTitle(lesson, lang),
+    description: getLearnLessonDescription(lesson, lang),
+    inLanguage,
+    author: PERSON_FOUNDER_REF,
+    provider: ORG_REF,
+    publisher: ORG_REF,
+    learningResourceType: "Video lesson",
+    educationalLevel: lang === "ru" ? "Начальный и средний уровень" : "Beginner to intermediate",
+    teaches: getLearnLessonOutcomes(lesson, lang),
+    keywords: getLearnLessonTopics(lesson, lang).join(", "),
+    timeRequired: lesson.durationIso,
+    datePublished: lesson.publishedAt,
+    dateModified: lesson.updatedAt,
+    isAccessibleForFree: lesson.access === "free",
+    mainEntityOfPage: pageUrl,
+  };
+}
+
+function videoObjectBlock(lesson: LearnLesson, lang: LearnLang, pageUrl: string, inLanguage: "ru-RU" | "en-US"): SchemaBlock {
+  const provider = getLearnLessonVideoProvider(lesson);
+  const block: SchemaBlock = {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "@id": `${pageUrl}#video`,
+    name: getLearnLessonTitle(lesson, lang),
+    description: getLearnLessonDescription(lesson, lang),
+    thumbnailUrl: [absoluteAssetUrl(lesson.thumbnailPath)],
+    uploadDate: lesson.publishedAt,
+    duration: lesson.durationIso,
+    inLanguage,
+    author: PERSON_FOUNDER_REF,
+    publisher: ORG_REF,
+    isPartOf: { "@id": `${pageUrl}#learning-resource` },
+  };
+
+  if (provider.provider === "local") {
+    block.contentUrl = provider.contentUrl ?? absoluteAssetUrl(lesson.localVideo?.src ?? lesson.thumbnailPath);
+  } else {
+    block.embedUrl = `https://www.youtube-nocookie.com/embed/${provider.providerAssetId}`;
+  }
+
+  return block;
+}
+
+function buildLearnLessonRoute(lesson: LearnLesson, lang: LearnLang): RouteMeta {
+  const path = lang === "ru" ? `/learn/${lesson.slug}` : `/en/learn/${lesson.slug}`;
+  const ruUrl = `${SITE_ORIGIN}/learn/${lesson.slug}`;
+  const enUrl = `${SITE_ORIGIN}/en/learn/${lesson.slug}`;
+  const pageUrl = lang === "ru" ? ruUrl : enUrl;
+  const inLanguage = lang === "ru" ? "ru-RU" : "en-US";
+  const homeName = lang === "ru" ? "Главная" : "Home";
+  const learnName = lang === "ru" ? "Курсы" : "Courses";
+  const title = getLearnLessonSeoTitle(lesson, lang);
+  const description = getLearnLessonSeoDescription(lesson, lang);
+
+  return {
+    path,
+    htmlLang: lang,
+    hreflangAlternates: {
+      ru: ruUrl,
+      en: enUrl,
+      xDefault: ruUrl,
+    },
+    title,
+    description,
+    canonical: pageUrl,
+    ogTitle: title,
+    ogDescription: description,
+    ogImage: learnOgImageUrl(lesson),
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.75,
+    schema: [
+      lang === "en" ? ORG_BLOCK_EN : ORG_BLOCK,
+      WEBSITE_BLOCK,
+      learningResourceBlock(lesson, lang, pageUrl, inLanguage),
+      videoObjectBlock(lesson, lang, pageUrl, inLanguage),
+      articleBlock({
+        pageId: pageUrl,
+        type: "TechArticle",
+        headline: getLearnLessonTitle(lesson, lang),
+        description,
+        datePublished: lesson.publishedAt,
+        dateModified: lesson.updatedAt,
+        inLanguage,
+        articleSection: getLearnLessonCategoryLabel(lesson, lang),
+        image: absoluteAssetUrl(lesson.thumbnailPath),
+      }),
+      webPageBlock({
+        pageId: pageUrl,
+        url: pageUrl,
+        name: title,
+        inLanguage,
+        cssSelector: ["h1", "h2"],
+        about: SOFTWARE_APP_REF,
+      }),
+      breadcrumbBlock(
+        [
+          { name: homeName, url: lang === "ru" ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}/en/` },
+          { name: learnName, url: lang === "ru" ? `${SITE_ORIGIN}/learn` : `${SITE_ORIGIN}/en/learn` },
+          { name: getLearnLessonTitle(lesson, lang), url: pageUrl },
+        ],
+        pageUrl,
+      ),
+    ],
+  };
+}
+
+const learnRouteEntries: RouteMeta[] = [
+  learnHubRoute("ru"),
+  learnHubRoute("en"),
+  ...publicLearnLessons.flatMap((lesson) => [
+    buildLearnLessonRoute(lesson, "ru"),
+    buildLearnLessonRoute(lesson, "en"),
+  ]),
+];
 
 const modelsWithContent = allModels.filter((m): m is ModelEntry & { content: NonNullable<typeof m.content> } =>
   m.content !== undefined,
@@ -2837,5 +3052,6 @@ export const routes: RouteMeta[] = [
   // RouteMeta per (model, locale) for every model with content !== undefined.
   // Phase 1 ships only the gpt-image-2 reference = 4 new routes (2 hubs + 2
   // page locales). Phase 2 expands modelsWithContent to all 62 → 126 routes.
+  ...learnRouteEntries,
   ...modelRouteEntries,
 ];
