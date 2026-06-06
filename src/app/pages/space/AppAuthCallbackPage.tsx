@@ -3,25 +3,37 @@ import { Loader2 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router";
 import { normalizeSafeNext, storeSessionFromUrl } from "../../../lib/optenAuth";
 import { useLang } from "../../../i18n/LangContext";
+import { useSpaceAuth } from "../../components/space/SpaceAuthProvider";
 
 export default function AppAuthCallbackPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { lang } = useLang();
+  const { refresh } = useSpaceAuth();
   const [error, setError] = useState<string | null>(null);
   const copy = callbackCopy[lang];
   const rawNext = new URLSearchParams(location.search).get("next");
   const safeNext = normalizeSafeNext(rawNext, location.pathname.startsWith("/app/") ? "/app/learn" : "/account");
 
   useEffect(() => {
-    try {
-      storeSessionFromUrl(window.location.href);
-      window.history.replaceState(null, "", window.location.pathname);
-      navigate(safeNext, { replace: true });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "auth_callback_failed");
+    let cancelled = false;
+
+    async function completeAuth() {
+      try {
+        storeSessionFromUrl(window.location.href);
+        window.history.replaceState(null, "", window.location.pathname);
+        await refresh();
+        if (!cancelled) navigate(safeNext, { replace: true });
+      } catch (err) {
+        if (!cancelled) setError(err instanceof Error ? err.message : "auth_callback_failed");
+      }
     }
-  }, [navigate, safeNext]);
+
+    completeAuth();
+    return () => {
+      cancelled = true;
+    };
+  }, [navigate, refresh, safeNext]);
 
   return (
     <div className="grid min-h-screen place-items-center bg-[#011012] px-4 font-['PT_Root_UI',sans-serif] text-white">

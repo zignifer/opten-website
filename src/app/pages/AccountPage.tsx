@@ -32,9 +32,6 @@ interface Subscription {
   has_card: boolean;
   provider?: string | null;
   currency?: string | null;
-  limit?: number;
-  used?: number;
-  remaining?: number;
 }
 
 /* ─── Icons ─── */
@@ -104,9 +101,6 @@ function subscriptionFromAccount(account: AccountSummary | null): Subscription |
     has_card: account.has_card,
     provider: account.provider,
     currency: account.currency,
-    limit: account.limit,
-    used: account.used,
-    remaining: account.remaining,
   };
 }
 
@@ -444,15 +438,6 @@ export default function AccountPage() {
 
           {extStatus === "ready" && !loadingSub && (
             <>
-              <div className="relative overflow-hidden rounded-[16px] border border-white/10 bg-[#0e2023] p-[24px] shadow-[0_24px_80px_rgba(0,0,0,0.2)] md:p-[28px]">
-                <div>
-                  <p className="mb-[4px] text-[13px] uppercase tracking-[1px] text-white/45">{t("account.credits.label")}</p>
-                  <p className="text-[28px] font-medium leading-[1.1] text-white">
-                    {sub?.remaining ?? 0}/{sub?.limit ?? 300}
-                  </p>
-                </div>
-              </div>
-
               {/* ── Plan card ── */}
               <div className="relative overflow-hidden rounded-[16px] border border-white/10 bg-[#0e2023] p-[28px] shadow-[0_24px_80px_rgba(0,0,0,0.24)] md:p-[32px]">
                 <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#9cfb51]/40 to-transparent" />

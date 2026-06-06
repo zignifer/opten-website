@@ -53,6 +53,7 @@ assert.doesNotMatch(login, /Navigate to="\/app\/learn"|navigate\("\/app\/learn"/
 
 const callback = read("src/app/pages/space/AppAuthCallbackPage.tsx");
 assert.match(callback, /normalizeSafeNext/, "Auth callback must normalize next redirects");
+assert.match(callback, /useSpaceAuth[\s\S]*refresh[\s\S]*await refresh\(\)[\s\S]*navigate\(safeNext/, "Auth callback must refresh website account state before redirecting");
 assert.doesNotMatch(callback, /navigate\("\/app\/learn"/, "Auth callback must not always return to /app/learn");
 
 const pay = read("src/app/pages/PayPage.tsx");
@@ -66,6 +67,7 @@ assert.match(account, /useSpaceAuth/, "AccountPage must prefer website auth");
 assert.match(account, /fetchAccountSummary/, "AccountPage must read account-summary for website sessions");
 assert.match(account, /signOut/, "AccountPage must expose website sign-out");
 assert.match(account, /h-\[52px\][\s\S]*font-\['PT_Root_UI',sans-serif\][\s\S]*text-\[14px\][\s\S]*font-medium/, "Account sign-out button must keep the requested 52px PT Root UI medium 14 styling");
+assert.doesNotMatch(account, /account\.credits\.label|sub\?\.remaining|sub\?\.limit/, "AccountPage body must not render the credits summary card; credits stay in the shared header");
 assert.doesNotMatch(account, /account\.auth\.websiteSource|account\.auth\.extensionSource|account\.signOut\.label|account\.signOut\.desc/, "AccountPage must not render explanatory auth-source text around the sign-out button");
 assert.match(account, /cancel-subscription-paddle/, "AccountPage must call Paddle cancellation directly for website sessions");
 assert.match(account, /cancel-subscription/, "AccountPage must call cancellation directly for website sessions");
