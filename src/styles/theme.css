@@ -251,7 +251,6 @@ input[type="submit"] {
        scroll container, so taps keep working. The white-overscroll guard relies on
        background-color below, not on overflow, so it is unaffected. */
     overflow-x: clip;
-    scrollbar-gutter: stable;
     width: 100%;
     max-width: 100vw;
     background-color: #011417;

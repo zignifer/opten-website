@@ -126,8 +126,9 @@ export default function AppLoginPage() {
             className="absolute left-1/2 top-1/2 h-[940px] w-[1672px] max-w-none"
             style={{ transform: "translate(calc(-50% - 4px), -50%)" }}
           >
-            <LoginCardFrame />
-            <div className="absolute left-[695px] top-[270px] z-10 flex w-[270px] flex-col items-center text-center">
+            <div className="absolute left-[651px] top-[220px] z-[2] h-[500px] w-[358px] origin-center scale-[1.3] max-[520px]:scale-100">
+              <LoginCardFrame />
+              <div className="absolute left-[44px] top-[20px] z-10 flex w-[270px] flex-col items-center text-center">
           <img
             src={SPACE_LOGO_SRC}
             alt="Opten Space Beta"
@@ -185,7 +186,7 @@ export default function AppLoginPage() {
               <button
                 type="submit"
                 disabled={formState === "verifying" || normalizeOtpCode(code).length !== 6}
-                className="flex h-[44px] w-full items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[24px] py-[12px] text-[15px] font-medium leading-[1.3] text-[#011417] outline-none transition hover:bg-[#8ff144] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex h-[44px] w-full items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[24px] py-[12px] text-[13px] font-medium leading-[1.3] text-[#011417] outline-none transition hover:bg-[#8ff144] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {formState === "verifying" ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : null}
                 {copy.codeButton}
@@ -212,7 +213,7 @@ export default function AppLoginPage() {
               <button
                 type="submit"
                 disabled={formState === "sending"}
-                className="flex h-[44px] w-full items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[24px] py-[12px] text-[15px] font-medium leading-[1.3] text-[#011417] outline-none transition hover:bg-[#8ff144] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex h-[44px] w-full items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[24px] py-[12px] text-[13px] font-medium leading-[1.3] text-[#011417] outline-none transition hover:bg-[#8ff144] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {formState === "sending" ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : null}
                 {formState === "sending" ? copy.sending : copy.emailButton}
@@ -223,7 +224,7 @@ export default function AppLoginPage() {
           <button
             type="button"
             onClick={() => startGoogleLogin()}
-            className="relative mt-[12px] flex h-[44px] w-full items-center justify-center gap-[12px] rounded-[8px] border-0 bg-white px-[24px] py-[11px] text-[15px] font-medium leading-[1.3] text-black outline-none transition hover:shadow-[0_2px_8px_rgba(0,0,0,0.15)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50"
+            className="relative mt-[12px] flex h-[44px] w-full items-center justify-center gap-[12px] rounded-[8px] border-0 bg-white px-[24px] py-[11px] text-[13px] font-medium leading-[1.3] text-black outline-none transition hover:shadow-[0_2px_8px_rgba(0,0,0,0.15)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50"
           >
             <span className="pointer-events-none absolute inset-0 rounded-[8px] border border-black/10" aria-hidden="true" />
             <GoogleIcon />
@@ -232,6 +233,7 @@ export default function AppLoginPage() {
 
           {error && <p className="mt-[12px] max-w-full truncate text-[12px] leading-[1.3] text-[#dc2626]">{copy.error}: {error}</p>}
           <LoginTrustBadges copy={copy} />
+              </div>
             </div>
           </div>
         </section>
@@ -312,7 +314,7 @@ function LoginCardFrame() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute left-[651px] top-[250px] z-[2] h-[500px] w-[358px] overflow-hidden rounded-[8px] bg-[linear-gradient(180deg,rgba(7,26,27,0.74)_0%,rgba(2,13,15,0.92)_100%)] shadow-[0_22px_70px_rgba(0,0,0,0.42),0_0_38px_rgba(156,251,81,0.06)]"
+      className="pointer-events-none absolute inset-0 z-[2] h-[500px] w-[358px] overflow-hidden rounded-[8px] bg-[linear-gradient(180deg,rgba(7,26,27,0.74)_0%,rgba(2,13,15,0.92)_100%)] shadow-[0_22px_70px_rgba(0,0,0,0.42),0_0_38px_rgba(156,251,81,0.06)]"
     >
       <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_24%,rgba(255,255,255,0.05),transparent_36%),radial-gradient(circle_at_50%_100%,rgba(156,251,81,0.07),transparent_43%)]" />
       <span className="absolute inset-0 opacity-[0.28] [background-image:radial-gradient(rgba(255,255,255,0.18)_0.45px,transparent_0.68px),radial-gradient(rgba(156,251,81,0.12)_0.42px,transparent_0.7px)] [background-position:0_0,7px_9px] [background-size:12px_12px,18px_18px] [mask-image:linear-gradient(180deg,transparent_0%,black_15%,black_84%,transparent_100%)]" />

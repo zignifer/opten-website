@@ -32,7 +32,7 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
   const accountLabel = account?.email || session?.user.email || copy.account;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#011012]/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 w-screen border-b border-white/10 bg-[#011012]/95 backdrop-blur-sm">
       <nav
         aria-label="Opten Space"
         className="mx-auto grid h-[64px] max-w-[1200px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center px-[32px] py-[16px] font-['PT_Root_UI',sans-serif] text-white max-lg:grid-cols-[auto_1fr_auto] max-md:px-4"
