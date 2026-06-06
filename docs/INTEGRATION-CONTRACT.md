@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-06-04 against extension `manifest.json` version **1.3.8** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
+> **Last sync:** 2026-06-06 against extension `manifest.json` version **1.3.8** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -31,9 +31,9 @@ The site and the extension are tightly coupled at four boundaries:
 
 1. **`externally_connectable` messaging** — the only legal channel for the site to read auth/subscription state from the extension and to trigger subscription cancellation.
 2. **Fixed URL paths** — the extension navigates the user to specific site routes on install (`/welcome`), upgrade (`/pay`), and after payment (`/success`). Renaming any of these silently breaks user flows.
-3. **Supabase Edge Functions** — billing endpoints (`/create-payment*`, `/cancel-subscription*`, `/get-subscription`) are shared between the site (initiates payment) and the extension (initiates cancellation). Schema changes require coordinated deploys.
+3. **Supabase Edge Functions** — billing endpoints (`/create-payment*`, `/cancel-subscription*`, `/get-subscription`, `/account-summary`) are shared between the site and the extension. The site may initiate payment and cancellation with its own website JWT; the extension may still initiate the same operations through its own JWT. Schema changes require coordinated deploys.
 4. **Storage keys (`ps_*`)** — `chrome.storage.local` is the extension's source of truth for plan/subscription state. The site reads (and in some flows updates) these keys indirectly via the message API. Renaming or removing a key is a breaking change.
-5. **Opten Space website auth** — `/app/*` can authenticate directly against the same self-hosted Supabase Auth using public GoTrue endpoints. Credits and plan state still come from extension-owned Supabase Edge Functions and remain keyed by `auth.users.id`, not by email.
+5. **Website auth** — `/login`, `/auth/callback`, `/pay`, `/account`, and `/app/*` can authenticate directly against the same self-hosted Supabase Auth using public GoTrue endpoints. Credits and plan state still come from extension-owned Supabase Edge Functions and remain keyed by `auth.users.id`, not by email.
 
 **Working rule:** if you change anything that touches a section below, open
 the extension repo first, propose the change there, and only then ship the
@@ -194,12 +194,14 @@ live with these exact paths and the documented behavior.
 | Path | Trigger | Behavior expected | Code reference |
 |------|---------|-------------------|----------------|
 | `/welcome` | `chrome.runtime.onInstalled` (fresh install) | First-run greeting; explain how to pin extension + sign in. May upsell Pro. | [`background.js:9`](../../promptscore/background/background.js#L9) |
-| `/pay` | Popup "Upgrade" CTA → opens new tab | Render PayPage with RU/EN price + checkout buttons (YooKassa or Paddle). Calls `GET_AUTH_TOKEN` to know who's paying. | [`background.js:903`](../../promptscore/background/background.js#L903) |
+| `/login` | User/site navigation | Canonical website login for marketing, billing, account, and app surfaces. Uses public Supabase Auth Google OAuth or email OTP and stores `localStorage.opten_space_session_v1`. SPA-only, `noindex,nofollow`, no `/en/*` sibling. | Site-only |
+| `/auth/callback` | Supabase Auth redirect | Canonical website auth callback. Stores the website session and returns to safe `next=...`; never logs the extension in automatically. SPA-only, `noindex,nofollow`, no `/en/*` sibling. | Site-only |
+| `/pay` | Popup "Upgrade" CTA → opens new tab; user/site navigation | Render PayPage with RU/EN price + checkout buttons (YooKassa or Paddle). Prefers website JWT from `/login`; falls back to extension `GET_AUTH_TOKEN` for already-shipped extension flows. | [`background.js:903`](../../promptscore/background/background.js#L903) |
 | `/success` | YooKassa redirect after successful payment | Show success state, optionally autoclose tab. Used as `return_url` in [`create-payment/index.ts:65`](../../promptscore/supabase/functions/create-payment/index.ts#L65). | YooKassa `return_url` |
-| `/account` | Optional — sometimes linked from popup | Subscription management UI, calls `CANCEL_SUBSCRIPTION`. | n/a (user-driven) |
+| `/account` | User/site navigation; optional popup link | Website-first subscription management UI. Prefers website JWT, reads `account-summary`, can call `cancel-subscription` / `cancel-subscription-paddle` directly, and offers website-only logout. Falls back to extension `GET_AUTH_TOKEN` / `CANCEL_SUBSCRIPTION` for compatibility. SPA-only, `noindex,nofollow`, no `/en/*` sibling. | n/a (user-driven) |
 | `/dashboard/download-skill` | Pro-only feature in popup → opens new tab | Auth-gated page that calls `/api/download-skill` to fetch `opten.zip`. | [popup Phase 73](../../promptscore/popup/popup.html) |
 | `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Pro-only prompt library UI. Calls `GET_AUTH_TOKEN`, checks subscription, then uses Supabase PostgREST for `prompt_library` CRUD/search. After successful mutations it calls `REFRESH_PROMPT_LIBRARY_CACHE` so native extension menus do not keep stale titles/favorite state. Free/expired users see locked upsell state without prompt data reads. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 94 |
-| `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta; `/app` redirects to `/app/learn`, and Learn is the first tab. Website auth may use Google OAuth or email OTP through self-hosted Supabase Auth. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95 |
+| `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta; `/app` redirects to `/app/learn`, but Learn/Courses is temporarily hidden from visible navigation until ready. Website auth uses the canonical `/login` and may use Google OAuth or email OTP through self-hosted Supabase Auth. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95/96 |
 
 **Locked route names** (renames are breaking):
 - `/welcome`, `/pay`, `/success` — referenced by the extension binary that's
@@ -228,12 +230,12 @@ The site only **calls** them; it does not own them.
 
 | Endpoint | Caller | Auth | Notes |
 |----------|--------|------|-------|
-| `POST /create-payment` | Site (`PayPage` RU path) | Bearer JWT | YooKassa. Body: `{ recurring: boolean }`. Returns `{ confirmation_url }`. `return_url` is hardcoded to `https://opten.space/success`. |
-| `POST /create-payment-paddle` | Site (`PayPage` EN path) | Bearer JWT | Paddle. Returns `{ priceId, customerEmail, userId }`. Site then calls `Paddle.Checkout.open(...)`. |
-| `POST /cancel-subscription` | Extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | YooKassa cancellation. Site never calls directly. |
-| `POST /cancel-subscription-paddle` | Extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | Paddle cancellation. Site never calls directly. |
+| `POST /create-payment` | Site (`PayPage` RU path) | Bearer JWT | YooKassa. Body: `{ recurring: boolean }`. Returns `{ confirmation_url }`. `return_url` is hardcoded to `https://opten.space/success`. The JWT may come from website auth or extension fallback. |
+| `POST /create-payment-paddle` | Site (`PayPage` EN path) | Bearer JWT | Paddle. Returns `{ priceId, customerEmail, userId }`. Site then calls `Paddle.Checkout.open(...)`. The JWT may come from website auth or extension fallback. |
+| `POST /cancel-subscription` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | YooKassa cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
+| `POST /cancel-subscription-paddle` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | Paddle cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
 | `POST /get-subscription` | Site (optional) | Bearer JWT | Reads `subscriptions` table. Used as a fallback if the extension is not installed (rare path). |
-| `POST /account-summary` | Site `/app/*` | Bearer JWT | Reads the verified user's account, latest subscription, and `usage_logs` count using service role, then returns a single account/credit summary. No payment mutation. Response is the canonical web-app source for `email`, `plan`, `status`, `limit`, `used`, `remaining`, `expires_at`, `provider`, `currency`, and card metadata. |
+| `POST /account-summary` | Site `/login` consumers, `/pay`, `/account`, `/app/*` | Bearer JWT | Reads the verified user's account, latest subscription, and `usage_logs` count using service role, then returns a single account/credit summary. No payment mutation. Response is the canonical website source for `email`, `plan`, `status`, `limit`, `used`, `remaining`, `expires_at`, `provider`, `currency`, and card metadata. |
 | `POST /webhook` | YooKassa | IP-whitelist | Provider-only. Updates `subscriptions` table with `provider='yookassa'`. |
 | `POST /webhook-paddle` | Paddle | HMAC-SHA256 | Provider-only. Updates `subscriptions` table with `provider='paddle'`. |
 | `POST /webhook-paddle-sandbox` | Paddle sandbox | HMAC-SHA256 | Provider-only. For E2E testing. |
@@ -249,10 +251,12 @@ The site only **calls** them; it does not own them.
 If the Supabase project is ever rotated/migrated, **all three site files** plus the extension's
 [`config/api.js`](../../promptscore/config/api.js) must be updated in one coordinated commit.
 
-### 4.2 Opten Space website auth (Phase 95)
+### 4.2 Website auth (Phase 95/96)
 
-`/app/*` is allowed to authenticate without the extension installed. It uses
-only public Supabase Auth endpoints on the live self-hosted backend:
+`/login`, `/auth/callback`, and `/app/*` are allowed to authenticate without
+the extension installed. `/pay` and `/account` prefer that website session and
+fall back to extension messages only for compatibility. Website auth uses only
+public Supabase Auth endpoints on the live self-hosted backend:
 
 - Google OAuth starts at `/auth/v1/authorize?provider=google&redirect_to=...`.
 - Email login starts at `/auth/v1/otp` and renders only an OTP code in the
@@ -275,6 +279,15 @@ Product rule:
 The subscription and credits belong to the auth.users.id that bought them.
 Google account A and Email account B are different accounts unless Supabase
 links them into the same auth user. Another account seeing Free is expected.
+```
+
+Website/extension session rule:
+
+```text
+The website session and extension session are independent local sessions.
+Website logout clears only localStorage.opten_space_session_v1 and public
+Supabase logout for that website JWT. It must not mutate chrome.storage.local
+ps_* keys or send an extension logout message.
 ```
 
 Security rule:

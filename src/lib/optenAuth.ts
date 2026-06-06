@@ -59,6 +59,21 @@ export function getAppAuthCallbackUrl(): string {
   return `${window.location.origin}/app/auth/callback`;
 }
 
+export function normalizeSafeNext(value: string | null | undefined, fallback = "/account"): string {
+  if (!value) return fallback;
+  if (!value.startsWith("/") || value.startsWith("//")) return fallback;
+  if (value.startsWith("/auth/") || value.startsWith("/app/auth/")) return fallback;
+  return value;
+}
+
+export function getWebsiteAuthCallbackUrl(next?: string | null): string {
+  if (typeof window === "undefined") return "https://opten.space/auth/callback";
+  const url = new URL(`${window.location.origin}/auth/callback`);
+  const safeNext = normalizeSafeNext(next, "");
+  if (safeNext) url.searchParams.set("next", safeNext);
+  return url.toString();
+}
+
 export function startGoogleLogin(redirectTo = getAppAuthCallbackUrl()): void {
   const url = new URL(`${SUPABASE_URL}/auth/v1/authorize`);
   url.searchParams.set("provider", "google");

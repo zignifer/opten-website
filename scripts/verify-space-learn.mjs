@@ -53,7 +53,8 @@ assert.match(header, /useSpaceAuth/, "Learn header must read account state from 
 assert.match(header, /opten_space_session_v1|account\.remaining|remaining/, "Learn header must render real account credits instead of a hardcoded placeholder");
 assert.doesNotMatch(header, /!\s*learnOnly\s*&&\s*\(/, "Learn header must not hide credits/account in learnOnly mode");
 assert.match(header, /max-w-\[1200px\]/, "Space header content must use the shared 1200px content width");
-assert.match(header, /label: "Learn"[\s\S]*to: "\/app\/learn"[\s\S]*label: "Extension"[\s\S]*to: "\/"[\s\S]*label: "Library"[\s\S]*to: "\/prompt-library"/, "Space header nav must order Learn first, then Extension and Library");
+assert.doesNotMatch(header, /label: "Learn"/, "Space header must hide Learn/Courses until the product is ready");
+assert.match(header, /label: "Extension"[\s\S]*to: "\/"[\s\S]*label: "Library"[\s\S]*to: "\/prompt-library"/, "Space header nav must keep Extension and Library links");
 assert.doesNotMatch(header, /label: "Create"|label: "Explore"|label: "Your Prompt"/, "Space header nav must not show placeholder Create, Explore, or Your Prompt tabs in the first Learn pass");
 assert.doesNotMatch(header, /256\/300/, "Space header must not hardcode the credits placeholder");
 

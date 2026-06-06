@@ -16,14 +16,16 @@
 │   Routes (~28 patterns + catch-all 404; 144 prerendered HTML files):         │
 │     RU (9 prerendered, 3 SPA-only):                                          │
 │       /                   App.tsx              landing                       │
-│       /pay                PayPage.tsx          RU YooKassa | EN Paddle       │
+│       /login              AppLoginPage.tsx     website auth (SPA-only)       │
+│       /auth/callback      AppAuthCallback      website auth callback         │
+│       /pay                PayPage.tsx          website-first checkout        │
 │       /welcome            WelcomePage.tsx      first install                 │
 │       /about              AboutPage.tsx        E-E-A-T founder page          │
 │       /blog               BlogListPage.tsx     blog hub (filter/search)      │
 │       /blog/:slug         BlogPostPage.tsx     bilingual post page           │
 │       /privacy /terms /refund                  legal                         │
 │       /success            SuccessPage.tsx      SPA-only (no prerender)       │
-│       /account            AccountPage.tsx      SPA-only (extension-coupled)  │
+│       /account            AccountPage.tsx      SPA-only account/subscription │
 │       /dashboard/         DownloadSkillPage    SPA-only (Pro-gated)          │
 │         download-skill                                                       │
 │       /app/*              Opten Space Beta     SPA-only (website auth)       │
@@ -63,7 +65,9 @@ hits get a populated `<head>` + body before React mounts.
 | Path | Component | Prerender | Purpose | Talks to extension? | Talks to Supabase? |
 |------|-----------|-----------|---------|---------------------|--------------------|
 | `/` | [`App.tsx`](../../src/app/App.tsx) | full | Landing page, scroll-reveal | No | No |
-| `/pay` | [`PayPage.tsx`](../../src/app/pages/PayPage.tsx) | full | Checkout — YooKassa for RU/RUB, Paddle for EN/USD | `GET_AUTH_TOKEN` to know who's paying | `create-payment` or `create-payment-paddle` |
+| `/login` | `AppLoginPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Canonical website login for billing, account, and app surfaces. | No | Supabase Auth public endpoints |
+| `/auth/callback` | `AppAuthCallbackPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Receives Supabase Auth hash tokens, stores website session, returns to safe `next`. | No | No |
+| `/pay` | [`PayPage.tsx`](../../src/app/pages/PayPage.tsx) | full | Website-first checkout — YooKassa for RU/RUB, Paddle for EN/USD | Fallback `GET_AUTH_TOKEN` only when no website session exists | `account-summary`, `create-payment` or `create-payment-paddle` |
 | `/welcome` | [`WelcomePage.tsx`](../../src/app/pages/WelcomePage.tsx) | full | First-install onboarding (opened by extension on install) | No (extension navigates *to* this) | No |
 | `/about` | [`AboutPage.tsx`](../../src/app/pages/AboutPage.tsx) | full | E-E-A-T founder page (Person schema + Article) | No | No |
 | `/blog` | [`BlogListPage.tsx`](../../src/app/pages/BlogListPage.tsx) | full | Blog hub — CollectionPage + ItemList; search + tag filter (client) | No | No |
@@ -74,12 +78,12 @@ hits get a populated `<head>` + body before React mounts.
 | `/terms` | [`TermsPage.tsx`](../../src/app/pages/TermsPage.tsx) | full | Legal | No | No |
 | `/refund` | [`RefundPage.tsx`](../../src/app/pages/RefundPage.tsx) | full | Legal | No | No |
 | `/success` | [`SuccessPage.tsx`](../../src/app/pages/SuccessPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Post-YooKassa-redirect confirmation | No | No |
-| `/account` | [`AccountPage.tsx`](../../src/app/pages/AccountPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | View plan, cancel subscription | `GET_AUTH_TOKEN`, `GET_SUBSCRIPTION`, `CANCEL_SUBSCRIPTION` | Indirectly via extension |
+| `/account` | [`AccountPage.tsx`](../../src/app/pages/AccountPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | View credits/plan, cancel subscription, sign out of website account | Fallback `GET_AUTH_TOKEN` / `CANCEL_SUBSCRIPTION` only when no website session exists | `account-summary`, `cancel-subscription`, `cancel-subscription-paddle` |
 | `/dashboard/download-skill` | [`DownloadSkillPage.tsx`](../../src/app/pages/DownloadSkillPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Pro-only skill ZIP download | `GET_AUTH_TOKEN` (Bearer for `/api/download-skill`) | `/api/download-skill` (this site's own serverless) |
 | `/app` | `AppIndexPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Opten Space Beta entry; redirects to `/app/learn`. | No | No |
-| `/app/login` | `AppLoginPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Website-side Google/email auth for Opten Space. | No | Supabase Auth public endpoints |
-| `/app/auth/callback` | `AppAuthCallbackPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Receives Supabase Auth hash tokens and stores the website app session. | No | No |
-| `/app/learn` | `LearnOverviewPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Learn tab inside Opten Space Beta. Header reads account/credits via website session when present. | No | `account-summary` |
+| `/app/login` | `Navigate` | none (SPA-only, `X-Robots-Tag: noindex`) | Compatibility redirect to `/login?next=/app/learn`. | No | No |
+| `/app/auth/callback` | `AppAuthCallbackPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Compatibility auth callback; canonical callback is `/auth/callback`. | No | No |
+| `/app/learn` | `LearnOverviewPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Learn route inside Opten Space Beta. Direct route remains live, but Learn/Courses is temporarily hidden from visible navigation until ready. | No | `account-summary` |
 | `/app/learn/:lessonSlug` | `LessonDetailPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Lesson detail inside Opten Space Beta. | No | `account-summary` |
 | `*` (catch-all) | [`NotFound.tsx`](../../src/app/pages/NotFound.tsx) | n/a — runtime `<meta robots=noindex>` injection | Locale-aware 404 fallback for typo'd URLs | No | No |
 
@@ -171,7 +175,7 @@ dicts) and the GEO/SEO patterns locked-in during v1.0.
 - Each prerendered `<head>` carries a `<link rel="alternate" hreflang>` triplet (`ru`, `en`, `x-default → unprefixed RU`) reciprocal between siblings.
 - `<html lang>` baked per route at build time by `scripts/prerender.mjs` (`ru` for unprefixed, `en` for `/en/*`).
 - **Hreflang locale code policy:** hreflang annotations use language-only codes (`ru`, `en`, `x-default`) in both `scripts/prerender.mjs#applyHreflang` and `scripts/sitemap.mjs` xhtml:link entries, while schema-level `inLanguage` stays region-specific (`ru-RU`, `en-US`) in `scripts/seo-routes.ts`. Both are valid per Google's documentation; the mix is intentional — language-only hreflang targets the broadest audience (RU readers globally, not just RU-from-Russia), while schema-level region tags give AI systems a precise origin signal for the content. Do not "unify" these — the asymmetry is the policy.
-- Locked routes without EN siblings (`/success`, `/account`, `/dashboard/download-skill`) stay RU-only by design — they are `Disallow`'d in `robots.txt`, carry `X-Robots-Tag: noindex,nofollow` headers via `vercel.json`, and are extension-coupled (D-03).
+- Locked/auth routes without EN siblings (`/success`, `/login`, `/auth/*`, `/account`, `/dashboard/download-skill`, `/app/*`) stay RU-only by design — they are `Disallow`'d/noindex app or account surfaces, not content/SEO pages (D-03).
 - `<LocalizedLink>` (drop-in replacement for `<Link>`) preserves the `/en/` prefix when navigating internally between EN siblings; on locked no-sibling routes the LangSwitcher flips language in place via storage.
 
 See [SEO-AUDIT.md](SEO-AUDIT.md) for the audit baseline and the v1.0 archive in `.planning/milestones/v1.0-ROADMAP.md` for the trajectory (GEO score 12 → ~72.6, target ~80+ after Phase 4.2 deploy bakes in).
@@ -180,8 +184,8 @@ See [SEO-AUDIT.md](SEO-AUDIT.md) for the audit baseline and the v1.0 archive in 
 
 Every content surface uses two shared shells:
 
-- **[`<SiteHeader>`](../../src/app/components/SiteHeader.tsx)** — unified hamburger nav on every viewport. `variant="landing"` (anchors render as `#features` for in-page scroll) is reserved for `App.tsx`; `variant="page"` (anchors render as `/#features` for full-page nav back to landing) is the default for everything else. A `rightSlot` prop swaps the Account button for page-specific affordances (e.g. signed-in email pill on `/account`).
-- **[`<SpaceHeader>`](../../src/app/components/space/SpaceHeader.tsx)** — Opten Space Beta app shell header for `/app/*`. It reads account/credit state from `SpaceAuthProvider` and must not depend on the extension being installed.
+- **[`<SiteHeader>`](../../src/app/components/SiteHeader.tsx)** — compact website account header. It intentionally omits marketing navigation because those links live in the footer; the header focuses on logo, language, credits, and profile/login. It reads `SpaceAuthProvider`, links signed-in users to `/account`, and links signed-out users to `/login?next=<current path>`.
+- **[`<SpaceHeader>`](../../src/app/components/space/SpaceHeader.tsx)** — Opten Space Beta app shell header for `/app/*`. It reads account/credit state from `SpaceAuthProvider`, must not depend on the extension being installed, and temporarily hides Learn/Courses from visible nav until the product is ready. Signed-in profile navigates to `/account`; sign-out lives only in `/account`.
 - **[`<SiteFooter>`](../../src/app/components/SiteFooter.tsx)** — shared CTA + nav (`/about`, `/blog`, `/privacy`, `/terms`, `/refund`, Telegram). The CTA gradient and `<InstallButton>` are consistent across landing, blog, and content pages.
 
 New content pages MUST wrap with `<SiteHeader variant="page">` + `<SiteFooter>`. There is no legacy `<Navbar>` to fork — it was retired in Phase 5 B-03.
@@ -242,8 +246,9 @@ Key points:
 
 ```
 User on /pay (lang=ru, currency=RUB)
-  └─> Detect extension via sendMessage(EXTENSION_IDS[0..1], GET_AUTH_TOKEN)
-        └─> response.token   → user is signed in
+  └─> Prefer website session from localStorage.opten_space_session_v1
+        └─> account-summary renders current plan/credits
+      Else fallback to extension GET_AUTH_TOKEN for shipped extension flows
   └─> User clicks "Оформить подписку"
         └─> POST  https://<supabase>.co/functions/v1/create-payment
               Authorization: Bearer <token>
@@ -262,7 +267,7 @@ User on /pay (lang=ru, currency=RUB)
 
 ```
 User on /pay (lang=en, currency=USD)
-  └─> Same extension detection.
+  └─> Same website-first auth, extension fallback only when no website session exists.
   └─> User clicks "Subscribe"
         └─> POST  /functions/v1/create-payment-paddle
               Authorization: Bearer <token>
@@ -287,14 +292,20 @@ and surfaces the success state inline; no full-page redirect needed.
 
 ```
 User on /account
-  └─> sendMessage(extId, GET_AUTH_TOKEN) → check logged in
-  └─> sendMessage(extId, GET_SUBSCRIPTION) → render plan + card info
+  └─> Prefer website session from localStorage.opten_space_session_v1
+        └─> POST /functions/v1/account-summary → render credits, plan, card info
   └─> User clicks "Cancel"
-        └─> sendMessage(extId, CANCEL_SUBSCRIPTION)
-              └─> Extension reads ps_sub_provider
-                    └─> 'yookassa' → /functions/v1/cancel-subscription
-                    └─> 'paddle'   → /functions/v1/cancel-subscription-paddle
+        └─> Website session:
+              └─> provider='paddle'   → POST /functions/v1/cancel-subscription-paddle
+              └─> otherwise           → POST /functions/v1/cancel-subscription
               └─> Response: { success, expires_at }   (status flips to 'cancelled', plan stays 'pro' until expires_at)
+      Else fallback:
+        └─> sendMessage(extId, GET_AUTH_TOKEN / CANCEL_SUBSCRIPTION)
+              └─> Extension reads ps_sub_provider and dispatches to the same cancel functions
+
+Website logout on /account clears only localStorage.opten_space_session_v1 and
+calls public Supabase logout for that website JWT. It does not mutate extension
+chrome.storage.local ps_* keys; extension logout remains extension-owned.
 ```
 
 ## Skill ZIP download flow (`/dashboard/download-skill`)
@@ -323,16 +334,18 @@ The auth check is defense-in-depth — the extension popup also gates the link.
 | Current language | `localStorage.opten_lang_v3` (legacy `opten_lang` read for one-shot EN migration) | LangSwitcher (only writer) | LangContext (`<html lang>` is baked at prerender, NOT mutated) |
 | Payment currency | `localStorage.opten_pay_currency` | PayPage | PayPage |
 | Auth token | Extension's `chrome.storage.local.ps_auth_token` | Extension OAuth | Extension (mirrored to site via `GET_AUTH_TOKEN`) |
-| Subscription | Supabase `subscriptions` table | Webhooks (YooKassa, Paddle) | Edge Functions, extension, site (via extension) |
+| Subscription | Supabase `subscriptions` table | Webhooks (YooKassa, Paddle) | Edge Functions, extension, site (`account-summary` / fallback via extension) |
 | Plan / quota | Extension `chrome.storage.local.ps_*` | Extension (synced from Supabase) | Site via `GET_SUBSCRIPTION` |
-| Opten Space web session | `localStorage.opten_space_session_v1` | `/app/login` and `/app/auth/callback` | `/app/*` only |
-| Opten Space account summary | Supabase `users`, `subscriptions`, `usage_logs` via `account-summary` | Supabase Auth/webhooks/proxy usage logging | `/app/*` via Bearer JWT |
+| Website Supabase session | `localStorage.opten_space_session_v1` | `/login` and `/auth/callback` (`/app/*` compatibility callback supported) | `/pay`, `/account`, `/app/*`, `SiteHeader`, `SpaceHeader` |
+| Website account summary | Supabase `users`, `subscriptions`, `usage_logs` via `account-summary` | Supabase Auth/webhooks/proxy usage logging | `/pay`, `/account`, `/app/*`, headers via Bearer JWT |
 
 **The site has no persistent server-side state of its own.** All persistence
 is either in the user's browser (localStorage, extension storage) or in
-Supabase (owned by the extension repo). Website auth for `/app/*` stores a
-client session locally, but subscription and credit authority remains in
-Supabase and extension-owned Edge Functions.
+Supabase (owned by the extension repo). Website auth stores a client session
+locally, but subscription and credit authority remains in Supabase and
+extension-owned Edge Functions. Website and extension sessions may represent
+different `auth.users.id` values; this is expected, and entitlements do not
+cross accounts unless the user signs into both surfaces as the same account.
 
 ## Build/asset notes
 

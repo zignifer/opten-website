@@ -16,7 +16,7 @@ type LearnSectionWrapperProps = {
 
 export function LearnSectionWrapper({ children }: LearnSectionWrapperProps) {
   return (
-    <div className="min-h-screen bg-[#011012] font-['PT_Root_UI',sans-serif] text-white">
+    <div className="min-h-screen bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
       <SpaceHeader variant="learnOnly" />
       <main className="mx-auto max-w-[1200px] px-[32px] pb-[42px] pt-[24px] max-md:px-4">{children}</main>
     </div>

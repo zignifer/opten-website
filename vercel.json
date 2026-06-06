@@ -13,6 +13,8 @@
   ],
   "rewrites": [
     { "source": "/account", "destination": "/index.html" },
+    { "source": "/login", "destination": "/index.html" },
+    { "source": "/auth/callback", "destination": "/index.html" },
     { "source": "/success", "destination": "/index.html" },
     { "source": "/dashboard/download-skill", "destination": "/index.html" },
     { "source": "/prompt-library", "destination": "/index.html" },
@@ -38,6 +40,24 @@
     },
     {
       "source": "/en/account/:path*",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/login",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/login/:path*",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/auth/:path*",
       "headers": [
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
       ]

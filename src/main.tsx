@@ -21,6 +21,7 @@
   import { RouteLoading } from "./app/components/RouteLoading";
   import ScrollToTop from "./app/components/ScrollToTop";
   import AnnouncementBar from "./app/components/AnnouncementBar";
+  import { SpaceAuthProvider } from "./app/components/space/SpaceAuthProvider.tsx";
 
   // Phase 4 D-12: PayPage is now eager (SSR-prerendered body) — the lazy block below covers only
   // SuccessPage / AccountPage / DownloadSkillPage which remain SPA-only.
@@ -37,10 +38,6 @@
   const AppAuthCallbackPage = lazy(() => import("./app/pages/space/AppAuthCallbackPage.tsx"));
   const LearnOverviewPage = lazy(() => import("./app/pages/space/LearnOverviewPage.tsx"));
   const LessonDetailPage = lazy(() => import("./app/pages/space/LessonDetailPage.tsx"));
-  const SpaceAuthProvider = lazy(() =>
-    import("./app/components/space/SpaceAuthProvider.tsx").then((module) => ({ default: module.SpaceAuthProvider })),
-  );
-
   // Phase 2.2: Paddle bootstrap moved to src/lib/paddle.ts.
   // /pay/index.html still gets the sync <script> tag via prerender.mjs — direct hits
   // have window.Paddle ready before PayPage mounts. Non-pay routes skip the SDK
@@ -67,10 +64,11 @@
   const tree = (
     <BrowserRouter>
       <LangProvider>
-        <ScrollToTop />
-        <AnnouncementBar />
-        <Suspense fallback={<RouteLoading />}>
-          <Routes>
+        <SpaceAuthProvider>
+          <ScrollToTop />
+          <AnnouncementBar />
+          <Suspense fallback={<RouteLoading />}>
+            <Routes>
             <Route path="/" element={<App />} />
             <Route path="/pay" element={<PayPage />} />
             <Route path="/success" element={<SuccessPage />} />
@@ -89,12 +87,14 @@
             <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
             <Route path="/prompt-library" element={<PromptLibraryPage />} />
             <Route path="/internal/prompt-library-demo" element={<PromptLibraryDemoPage />} />
-            <Route path="/app" element={<SpaceAuthProvider><AppIndexPage /></SpaceAuthProvider>} />
-            <Route path="/app/login" element={<SpaceAuthProvider><AppLoginPage /></SpaceAuthProvider>} />
-            <Route path="/app/auth/callback" element={<SpaceAuthProvider><AppAuthCallbackPage /></SpaceAuthProvider>} />
-            <Route path="/app/learn" element={<SpaceAuthProvider><LearnOverviewPage /></SpaceAuthProvider>} />
+            <Route path="/login" element={<AppLoginPage />} />
+            <Route path="/auth/callback" element={<AppAuthCallbackPage />} />
+            <Route path="/app" element={<AppIndexPage />} />
+            <Route path="/app/login" element={<Navigate to="/login?next=/app/learn" replace />} />
+            <Route path="/app/auth/callback" element={<AppAuthCallbackPage />} />
+            <Route path="/app/learn" element={<LearnOverviewPage />} />
             <Route path="/app/learn-v2" element={<Navigate to="/app/learn" replace />} />
-            <Route path="/app/learn/:lessonSlug" element={<SpaceAuthProvider><LessonDetailPage /></SpaceAuthProvider>} />
+            <Route path="/app/learn/:lessonSlug" element={<LessonDetailPage />} />
             <Route path="/space/learn" element={<Navigate to="/app/learn" replace />} />
             <Route path="/space/learn/:lessonSlug" element={<Navigate to="/app/learn" replace />} />
             {/* Phase 3 D-01/D-03b: /en/* siblings. Mirror of entry-server.tsx EN routes + /en/pay (head-only, client-mount-only). __PRERENDER_PATH discriminator (lines 65-66) handles these unchanged — meta.path strings written by applyMarker include "/en/welcome" etc. Phase 4 D-06: /en/guides/:slug bilingual anchor. */}
@@ -111,8 +111,9 @@
             <Route path="/en/models/:slug" element={<ModelPage />} />
             {/* Phase 4.2 / Wave 3 (P1-1): catch-all 404. MUST be LAST — React Router 7 matches in declaration order, so any earlier `*` would shadow specific routes. NotFound injects <meta name="robots" content="noindex,nofollow"> at runtime to stop search engines from indexing typo'd URLs as duplicates of the landing. Status code stays 200 (Vercel SPA rewrite is unchanged; HTTP 404 is deferred to Phase 6 per CONTEXT D-3). */}
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+            </Routes>
+          </Suspense>
+        </SpaceAuthProvider>
       </LangProvider>
     </BrowserRouter>
   );

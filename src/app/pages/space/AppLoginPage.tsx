@@ -1,9 +1,15 @@
 import { useRef, useState, type ClipboardEvent, type FormEvent, type KeyboardEvent } from "react";
 import { Loader2 } from "lucide-react";
-import { Navigate, useNavigate } from "react-router";
+import { Navigate, useLocation, useNavigate } from "react-router";
 import SpaceHeader from "../../components/space/SpaceHeader";
 import { useSpaceAuth } from "../../components/space/SpaceAuthProvider";
-import { sendEmailOtp, startGoogleLogin, verifyEmailOtp } from "../../../lib/optenAuth";
+import {
+  getWebsiteAuthCallbackUrl,
+  normalizeSafeNext,
+  sendEmailOtp,
+  startGoogleLogin,
+  verifyEmailOtp,
+} from "../../../lib/optenAuth";
 import { useLang } from "../../../i18n/LangContext";
 
 const SPACE_LOGO_SRC = "/assets/space/figma/header-atoms/logo-lockup.svg";
@@ -11,8 +17,11 @@ const SPACE_LOGO_SRC = "/assets/space/figma/header-atoms/logo-lockup.svg";
 export default function AppLoginPage() {
   const { lang } = useLang();
   const navigate = useNavigate();
+  const location = useLocation();
   const { status, refresh } = useSpaceAuth();
   const copy = loginCopy[lang];
+  const rawNext = new URLSearchParams(location.search).get("next");
+  const safeNext = normalizeSafeNext(rawNext, "/account");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [formState, setFormState] = useState<"idle" | "sending" | "sent" | "verifying" | "error">("idle");
@@ -20,7 +29,7 @@ export default function AppLoginPage() {
   const codeInputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const codeDigits = Array.from({ length: 6 }, (_, index) => code[index] || "");
 
-  if (status === "signed_in") return <Navigate to="/app/learn" replace />;
+  if (status === "signed_in") return <Navigate to={safeNext} replace />;
 
   async function handleEmailSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,7 +39,7 @@ export default function AppLoginPage() {
     setFormState("sending");
     setError(null);
     try {
-      await sendEmailOtp(normalized);
+      await sendEmailOtp(normalized, getWebsiteAuthCallbackUrl(safeNext));
       setFormState("sent");
       window.requestAnimationFrame(() => codeInputRefs.current[0]?.focus());
     } catch (err) {
@@ -104,7 +113,7 @@ export default function AppLoginPage() {
     try {
       await verifyEmailOtp(normalizedEmail, normalizedCode);
       await refresh();
-      navigate("/app/learn", { replace: true });
+      navigate(safeNext, { replace: true });
     } catch (err) {
       setFormState("sent");
       const message = err instanceof Error ? err.message : "otp_verify_failed";
@@ -223,7 +232,7 @@ export default function AppLoginPage() {
 
           <button
             type="button"
-            onClick={() => startGoogleLogin()}
+            onClick={() => startGoogleLogin(getWebsiteAuthCallbackUrl(safeNext))}
             className="relative mt-[12px] flex h-[44px] w-full items-center justify-center gap-[12px] rounded-[8px] border-0 bg-white px-[24px] py-[11px] text-[13px] font-medium leading-[1.3] text-black outline-none transition hover:shadow-[0_2px_8px_rgba(0,0,0,0.15)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50"
           >
             <span className="pointer-events-none absolute inset-0 rounded-[8px] border border-black/10" aria-hidden="true" />
@@ -333,9 +342,9 @@ function LoginCardFrame() {
 const loginCopy = {
   ru: {
     titleLine1: "Добро пожаловать",
-    titleLine2Prefix: "в ",
-    titleHighlight: "Opten Space",
-    description: "Единое пространство для визуала, нейросетей, курсов и AI-инструментов.",
+    titleLine2Prefix: "в аккаунт ",
+    titleHighlight: "Opten",
+    description: "Единый вход для подписки, кредитов, расширения и будущих курсов.",
     google: "Войти через Google",
     emailLabel: "Email",
     emailPlaceholder: "mail@gmail.com",
@@ -356,9 +365,9 @@ const loginCopy = {
   },
   en: {
     titleLine1: "Welcome",
-    titleLine2Prefix: "to ",
-    titleHighlight: "Opten Space",
-    description: "A unified space for visuals, AI models, courses, and AI tools.",
+    titleLine2Prefix: "to your ",
+    titleHighlight: "Opten account",
+    description: "One account for subscription, credits, the extension, and future courses.",
     google: "Continue with Google",
     emailLabel: "Email",
     emailPlaceholder: "mail@gmail.com",

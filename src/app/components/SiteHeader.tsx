@@ -1,29 +1,17 @@
-// Phase 5 B-03: unified site header with hamburger menu on every viewport.
-// Replaces the bespoke Navbar() that lived in App.tsx (landing-only) and harmonizes
-// header UX between landing and content pages.
-//
-// Layout (mobile + desktop identical):
-//   [☰ hamburger]   [LOGO]   [LangSwitcher] [Account ▸]
-// Dropdown panel below the bar contains: Home / Prompt Library / Pricing / Blog / Models / FAQ / About.
-//
-// Variant prop drives anchor behavior:
-//   - "landing" → anchors render as #pricing/#faq (smooth-scroll inside the current page)
-//   - "page"    → anchors render as /#pricing/#faq (full-page nav back to landing, then scroll)
-//
-// LocalizedLink preserves /en/* prefix on both variants — anchor href is built from base
-// path returned by the current language so SiteHeader on locked routes correctly links home.
+// Unified website header. The marketing menu is intentionally omitted: content
+// navigation lives in the footer, while the header focuses on account, credits,
+// language, and brand presence across marketing, billing, and app routes.
 
-import { useEffect, useRef, useState } from "react";
-import { Menu, User, X } from "lucide-react";
+import { LogIn, User } from "lucide-react";
+import { useLocation } from "react-router";
 import LangSwitcher from "./LangSwitcher";
 import LocalizedLink from "./LocalizedLink";
-import { useT, useLang } from "../../i18n/LangContext";
+import { useT } from "../../i18n/LangContext";
 import { ANNOUNCEMENT_ENABLED } from "../announcementConfig";
+import { useSpaceAuth } from "./space/SpaceAuthProvider";
 
 interface SiteHeaderProps {
   variant?: "landing" | "page";
-  /** Optional override for the right cluster. Defaults to the Account button.
-   *  Use to surface page-specific identity affordances (e.g. signed-in email pill on /account). */
   rightSlot?: React.ReactNode;
 }
 
@@ -40,155 +28,73 @@ function Logo() {
   );
 }
 
-export default function SiteHeader({ variant = "page", rightSlot }: SiteHeaderProps): JSX.Element {
+export default function SiteHeader({ rightSlot }: SiteHeaderProps): JSX.Element {
   const t = useT();
-  const { lang } = useLang();
-  const [open, setOpen] = useState(false);
-  const panelRef = useRef<HTMLDivElement | null>(null);
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
-
-  // codex review P2: home href must follow the user's chosen language, not just the URL prefix.
-  // On locked routes without an EN sibling (/account, /success, /dashboard/*) the URL stays
-  // unprefixed but the user may already be in EN via storage; sending them to /#faq would
-  // dump them onto the RU landing. `lang` is the source of truth.
-  const homeHref = lang === "en" ? "/en/" : "/";
-  const anchor = (hash: string): string => {
-    if (variant === "landing") return `#${hash}`;
-    return `${homeHref}#${hash}`;
-  };
-
-  // Outside-click + Escape close. Mousedown phase to beat React-Router Link onClick.
-  useEffect(() => {
-    if (!open) return;
-    function onMouseDown(e: MouseEvent) {
-      const target = e.target as Node;
-      if (panelRef.current?.contains(target)) return;
-      if (buttonRef.current?.contains(target)) return;
-      setOpen(false);
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
-    }
-    document.addEventListener("mousedown", onMouseDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onMouseDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
-
-  const closeMenu = () => setOpen(false);
+  const location = useLocation();
+  const { status, account, session } = useSpaceAuth();
+  const creditLabel = account ? `${account.remaining}/${account.limit}` : status === "loading" ? "..." : "0/300";
+  const accountLabel = account?.email || session?.user.email || t("nav.account");
+  const next = `${location.pathname}${location.search}`;
+  const loginTo = `/login?next=${encodeURIComponent(next)}`;
 
   return (
-    <header className={`fixed left-0 right-0 ${ANNOUNCEMENT_ENABLED ? "top-[40px]" : "top-0"} z-50 px-4 pt-5`}>
-      {/* FIX-03: backdrop-filter on a fixed element is re-sampled every frame during scroll —
-          expensive on iOS Safari and a suspect for sluggish post-scroll tap response. Mobile gets
-          an opaque dark bar (no blur); desktop keeps the frosted-glass look (md+). */}
-      <nav className="mx-auto flex max-w-[1100px] items-center justify-between rounded-full bg-[rgba(1,20,23,0.92)] py-2 pl-2 pr-2 text-white sm:pl-3 md:bg-[rgba(0,0,0,0.34)] md:backdrop-blur-md">
-        {/* Left cluster: hamburger + LangSwitcher */}
-        <div className="flex items-center gap-2">
-          <button
-            ref={buttonRef}
-            type="button"
-            aria-label={t("nav.menuToggle")}
-            aria-expanded={open}
-            aria-controls="site-header-menu"
-            onClick={() => setOpen((v) => !v)}
-            className="grid size-10 place-items-center rounded-full bg-white/5 transition hover:bg-white/10"
-          >
-            {open ? <X size={19} /> : <Menu size={19} />}
-          </button>
-          <LangSwitcher
-            className="font-['PT_Root_UI',sans-serif] text-[14px] text-white/55 transition hover:text-white bg-transparent border-none cursor-pointer px-2"
-            onSwitch={closeMenu}
-          />
-        </div>
-
-        <LocalizedLink to="/" className="absolute left-1/2 -translate-x-1/2" onClick={closeMenu}>
+    <header className={`fixed left-0 right-0 ${ANNOUNCEMENT_ENABLED ? "top-[40px]" : "top-0"} z-50 border-b border-white/10 bg-[#011012]/95 backdrop-blur-sm`}>
+      <nav
+        aria-label="Opten"
+        className="mx-auto grid h-[64px] max-w-[1200px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center px-[32px] py-[16px] font-['PT_Root_UI',sans-serif] text-white max-lg:grid-cols-[auto_1fr_auto] max-md:px-4"
+      >
+        <LocalizedLink
+          to="/"
+          aria-label="Opten home"
+          className="-ml-[4px] inline-flex h-[44px] w-[92px] items-center rounded-sm px-[4px] no-underline outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011012]"
+        >
           <Logo />
         </LocalizedLink>
 
-        {/* Right cluster: Account button by default; pages can override via `rightSlot`
-            (e.g. /account swaps in an email pill when the user is signed in). */}
-        {rightSlot ?? (
-          <LocalizedLink
-            to="/account"
-            className="inline-flex h-[40px] items-center gap-2 rounded-full bg-white px-3 sm:px-4 font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 no-underline"
-            onClick={closeMenu}
+        <div className="hidden items-center justify-center gap-[12px] md:flex" aria-label="Account credits">
+          <div
+            className="flex h-[36px] items-center gap-[8px] rounded-full px-[12px] py-[8px]"
+            aria-label={`Credits: ${creditLabel}`}
           >
-            <User size={16} fill="currentColor" />
-            <span className="hidden sm:inline">{t("nav.account")}</span>
-          </LocalizedLink>
-        )}
-      </nav>
-
-      {open && (
-        <div
-          ref={panelRef}
-          id="site-header-menu"
-          role="menu"
-          className="mx-auto mt-2 flex max-w-[1100px] flex-col gap-1 rounded-[20px] border border-white/10 bg-[#071d1a] p-3 font-['PT_Root_UI',sans-serif] text-white shadow-2xl"
-        >
-          <LocalizedLink
-            to="/"
-            onClick={closeMenu}
-            className="block rounded-[12px] px-4 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white no-underline"
-          >
-            {t("nav.home")}
-          </LocalizedLink>
-          <LocalizedLink
-            to="/prompt-library"
-            onClick={closeMenu}
-            className="flex min-h-[48px] items-center gap-2 rounded-[12px] px-4 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white no-underline"
-          >
-            <span>{t("nav.promptLibrary")}</span>
             <img
-              src="/assets/prompt-library/new.svg"
+              src="/assets/space/figma/header-atoms/icon-usage.svg"
               alt=""
-              width="36"
-              height="18"
               aria-hidden="true"
-              className="h-[18px] w-9 shrink-0"
+              width="14"
+              height="14"
+              className="h-[14px] w-[14px] shrink-0"
             />
-          </LocalizedLink>
-          <a
-            href={anchor("pricing")}
-            onClick={closeMenu}
-            className="block rounded-[12px] px-4 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white no-underline"
-          >
-            {t("nav.pricing")}
-          </a>
-          <LocalizedLink
-            to="/blog"
-            onClick={closeMenu}
-            className="block rounded-[12px] px-4 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white no-underline"
-          >
-            {t("nav.blog")}
-          </LocalizedLink>
-          {/* Phase v2.0 MODELS-A-11: Models hub entry next to Blog */}
-          <LocalizedLink
-            to="/models"
-            onClick={closeMenu}
-            className="block rounded-[12px] px-4 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white no-underline"
-          >
-            {t("nav.models")}
-          </LocalizedLink>
-          <a
-            href={anchor("faq")}
-            onClick={closeMenu}
-            className="block rounded-[12px] px-4 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white no-underline"
-          >
-            {t("nav.faq")}
-          </a>
-          <LocalizedLink
-            to="/about"
-            onClick={closeMenu}
-            className="block rounded-[12px] px-4 py-3 text-[15px] text-white/85 transition hover:bg-white/5 hover:text-white no-underline"
-          >
-            {t("nav.about")}
-          </LocalizedLink>
+            <span className="text-[14px] font-medium leading-[1.1] text-white">{creditLabel}</span>
+          </div>
         </div>
-      )}
+
+        <div className="flex min-w-0 items-center justify-end gap-[8px]">
+          <LangSwitcher className="flex h-[44px] min-w-[44px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-transparent px-[10px] font-['PT_Root_UI',sans-serif] text-[13px] font-bold text-white/70 transition hover:border-white/25 hover:text-white" />
+
+          {rightSlot ?? (
+            status === "signed_in" ? (
+              <LocalizedLink
+                to="/account"
+                aria-label={accountLabel}
+                title={accountLabel}
+                className="flex h-[44px] max-w-[220px] items-center gap-[8px] rounded-full bg-transparent px-[12px] py-[8px] text-[14px] font-medium text-white/78 no-underline transition hover:bg-white/[0.04] hover:text-white"
+              >
+                <User size={16} fill="currentColor" aria-hidden="true" />
+                <span className="hidden truncate sm:inline">{accountLabel}</span>
+              </LocalizedLink>
+            ) : (
+              <LocalizedLink
+                to={loginTo}
+                aria-label={t("nav.login")}
+                className="flex h-[44px] items-center gap-[8px] rounded-full bg-transparent px-[12px] py-[8px] text-[14px] font-medium text-white/78 no-underline transition hover:bg-white/[0.04] hover:text-white"
+              >
+                <LogIn size={16} aria-hidden="true" />
+                <span className="hidden sm:inline">{t("nav.login")}</span>
+              </LocalizedLink>
+            )
+          )}
+        </div>
+      </nav>
     </header>
   );
 }

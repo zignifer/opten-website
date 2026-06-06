@@ -1,9 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { useT, useLang } from "../../i18n/LangContext";
-import LangSwitcher from "../components/LangSwitcher";
 import LocalizedLink from "../components/LocalizedLink";
+import SiteHeader from "../components/SiteHeader";
 import { ensurePaddle } from "../../lib/paddle";
+import {
+  fetchAccountSummary,
+  readSession,
+  refreshSessionIfNeeded,
+  type AccountSummary,
+} from "../../lib/optenAuth";
 import { ANNOUNCEMENT_ENABLED } from "../announcementConfig";
+import { useSpaceAuth } from "../components/space/SpaceAuthProvider";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
 import imgFrame37 from "../../imports/LandingPage/da31c95f5bc0f013c26804882654e49618ec43c7.webp";
 import imgChromeSm from "../../imports/LandingPage/chrome-icon-sm.svg";
@@ -23,6 +30,7 @@ type Currency = "RUB" | "USD";
 const langToCurrency = (lang: string): Currency => (lang === "ru" ? "RUB" : "USD");
 
 type ExtStatus = "detecting" | "not_installed" | "not_logged_in" | "ready";
+type AuthSource = "website" | "extension" | null;
 
 interface Subscription {
   plan: string;
@@ -32,6 +40,19 @@ interface Subscription {
   card_last4: string | null;
   card_type: string | null;
   has_card: boolean;
+}
+
+function subscriptionFromAccount(account: AccountSummary | null): Subscription | null {
+  if (!account) return null;
+  return {
+    plan: account.plan,
+    status: account.status,
+    expires_at: account.expires_at,
+    auto_renew: account.auto_renew,
+    card_last4: account.card_last4,
+    card_type: account.card_type,
+    has_card: account.has_card,
+  };
 }
 
 function isSubscriptionPeriodLive(expiresAt: string | null): boolean {
@@ -129,9 +150,7 @@ function Divider() {
 export default function PayPage() {
   const t = useT();
   const { lang } = useLang();
-  // Phase 4.1 IN-02: lang-aware anchor — prevents EN users on /en/pay being routed to RU landing for FAQ scroll
-  const homeHash = lang === "en" ? "/en/#faq" : "/#faq";
-
+  const { status: authStatus, session, account } = useSpaceAuth();
   // Phase 66 D-04 + FE-02 + Phase 4 D-12 (SSR safety): currency state with lang-driven default
   // and manual override. SSR initializes from lang only — localStorage is browser-only and would
   // crash renderToString. A post-mount useEffect hydrates the stored override (one repaint,
@@ -172,10 +191,11 @@ export default function PayPage() {
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
+  const [authSource, setAuthSource] = useState<AuthSource>(null);
   const [extStatus, setExtStatus] = useState<ExtStatus>("detecting");
-  const [scrolled, setScrolled] = useState(false);
   const [sub, setSub] = useState<Subscription | null>(null);
   const [loadingSub, setLoadingSub] = useState(false);
+  const [hashTokenMode, setHashTokenMode] = useState(false);
 
   useEffect(() => {
     // 1. Check URL hash first (direct link from extension)
@@ -183,17 +203,13 @@ export default function PayPage() {
     const params = new URLSearchParams(hash);
     const hashToken = params.get("token");
     if (hashToken) {
+      setHashTokenMode(true);
+      setAuthSource("extension");
       setToken(hashToken);
       setExtStatus("ready");
       window.history.replaceState(null, "", window.location.pathname);
       fetchSubscription(hashToken);
-    } else {
-      // 2. Try to get token from extension via externally_connectable
-      detectExtension();
     }
-
-    const handler = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handler);
 
     // Phase 2.2: warm up Paddle SDK on mount so it's ready by the time user clicks Pay.
     // On direct /pay hits, prerender.mjs injected the sync <script>, so window.Paddle is
@@ -202,9 +218,32 @@ export default function PayPage() {
     ensurePaddle().catch((err) => {
       console.warn("[Opten] Paddle SDK preload failed:", err);
     });
-
-    return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  useEffect(() => {
+    if (hashTokenMode) return;
+
+    if (authStatus === "loading") {
+      setExtStatus("detecting");
+      return;
+    }
+
+    if (authStatus === "signed_in" && session) {
+      setAuthSource("website");
+      setToken(session.access_token);
+      setEmail(account?.email || session.user.email);
+      setExtStatus("ready");
+      setSub(subscriptionFromAccount(account));
+      setLoadingSub(false);
+      return;
+    }
+
+    setAuthSource(null);
+    setToken(null);
+    setEmail(null);
+    setSub(null);
+    detectExtension();
+  }, [authStatus, session?.access_token, session?.user.email, account, hashTokenMode]);
 
   const detectExtension = () => {
     const chrome = (window as any).chrome;
@@ -228,6 +267,7 @@ export default function PayPage() {
           }
           if (response.token) {
             resolved = true;
+            setAuthSource("extension");
             setToken(response.token);
             if (response.email) setEmail(response.email);
             setExtStatus("ready");
@@ -399,33 +439,7 @@ export default function PayPage() {
         a { text-decoration: none; color: inherit; }
       `}</style>
 
-      {/* ─── Navbar ─── */}
-      <nav className={`fixed ${ANNOUNCEMENT_ENABLED ? "top-[40px]" : "top-0"} left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-[8px]" : "py-[21px]"}`}>
-        <div className={`relative max-w-[1100px] mx-[8px] lg:mx-auto flex items-center justify-between rounded-[1000px] py-[8px] pl-[24px] pr-[8px] transition-all duration-300 ${scrolled ? "bg-[rgba(0,0,0,0.6)] backdrop-blur-[12px]" : "bg-[rgba(0,0,0,0.3)] backdrop-blur-[2px]"}`}>
-          <div className="hidden md:flex flex-1 gap-[24px] items-center font-['PT_Root_UI',sans-serif] text-[14px] text-white">
-            <LocalizedLink to="/" className="hover:opacity-80 transition-opacity">{t("nav.home")}</LocalizedLink>
-            <LocalizedLink to="/pay" className="hover:opacity-80 transition-opacity">{t("nav.pricing")}</LocalizedLink>
-            <a href={homeHash} className="hover:opacity-80 transition-opacity">{t("nav.faq")}</a>
-            <LangSwitcher className="text-sm font-medium text-zinc-400 hover:text-white transition-colors bg-transparent border-none cursor-pointer font-['PT_Root_UI',sans-serif]" />
-          </div>
-          <div className="absolute left-1/2 -translate-x-1/2">
-            <Logo />
-          </div>
-          <div className="flex-1 flex justify-end ml-auto md:ml-0">
-            {email ? (
-              <LocalizedLink to="/account" className="bg-[rgba(255,255,255,0.1)] flex gap-[8px] items-center justify-center p-[10px] px-[16px] rounded-[100px] no-underline">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 7a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM7 8.17c-2.53 0-4.17 1.11-4.17 2.5V12h8.34v-1.33c0-1.39-1.64-2.5-4.17-2.5z" fill="rgba(255,255,255,0.7)"/></svg>
-                <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] text-[14px] text-[rgba(255,255,255,0.7)]">{email}</span>
-              </LocalizedLink>
-            ) : (
-              <LocalizedLink to="/account" className="btn-hover bg-white flex gap-[8px] items-center justify-center p-[12px] px-[20px] rounded-[100px] cursor-pointer border-none no-underline">
-                <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 7.5a3 3 0 100-6 3 3 0 000 6zM7.5 9C4.46 9 2 10.34 2 12v1.5h11V12c0-1.66-2.46-3-5.5-3z" fill="#181818"/></svg>
-                <span className="hidden sm:inline font-['PT_Root_UI',sans-serif] font-medium leading-[1.1] text-[14px] text-[#181818] text-center whitespace-nowrap">{t("nav.account")}</span>
-              </LocalizedLink>
-            )}
-          </div>
-        </div>
-      </nav>
+      <SiteHeader variant="page" />
 
       {/* ─── Pricing Section ─── */}
       <section className="relative w-full flex-1 overflow-hidden border-none bg-[#011417] pt-[96px] md:pt-[130px]">
@@ -472,7 +486,7 @@ export default function PayPage() {
             {/* Phase 4 (post-04-04 revert): runtime-conditional cards back inline. SSR renders with
                 extStatus="detecting" → ChromeStore anchor branch (visible pricing facts in initial HTML
                 → Product schema 'visible content' policy satisfied). After hydration, when extension is
-                detected, the buttons swap to Pay actions in-place. No runtime rail. */}
+                detected or website auth is ready, the buttons swap to Pay actions in-place. No runtime rail. */}
             <div className="grid w-full max-w-[800px] gap-[24px] md:grid-cols-2">
               {/* ── One-time Card ── */}
               <div className="flex-1">
@@ -511,10 +525,10 @@ export default function PayPage() {
                         </button>
                       )
                     ) : (
-                      <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover relative inline-flex cursor-pointer items-center justify-center gap-[12px] rounded-[100px] border-none bg-white px-[32px] py-[18px] no-underline">
+                      <LocalizedLink to="/login?next=/pay" className="btn-hover relative inline-flex cursor-pointer items-center justify-center gap-[12px] rounded-[100px] border-none bg-white px-[32px] py-[18px] no-underline">
                         <div aria-hidden="true" className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                        <span className="font-['PT_Root_UI',sans-serif] text-[18px] font-bold leading-[1.3] text-[#011417]">{t("pay.onetime.tryBtn")}</span>
-                      </a>
+                        <span className="font-['PT_Root_UI',sans-serif] text-[18px] font-bold leading-[1.3] text-[#011417]">{t("pay.status.signIn.cta")}</span>
+                      </LocalizedLink>
                     )}
                   </div>
                 </div>
@@ -560,9 +574,9 @@ export default function PayPage() {
                         </button>
                       )
                     ) : (
-                      <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-hover relative inline-flex cursor-pointer items-center justify-center gap-[12px] rounded-[100px] border-none bg-[#011417] px-[32px] py-[18px] no-underline">
-                        <span className="font-['PT_Root_UI',sans-serif] text-[18px] font-bold leading-[1.3] text-[#9cfb51]">{t("pay.pro.tryBtn")}</span>
-                      </a>
+                      <LocalizedLink to="/login?next=/pay" className="btn-hover relative inline-flex cursor-pointer items-center justify-center gap-[12px] rounded-[100px] border-none bg-[#011417] px-[32px] py-[18px] no-underline">
+                        <span className="font-['PT_Root_UI',sans-serif] text-[18px] font-bold leading-[1.3] text-[#9cfb51]">{t("pay.status.signIn.cta")}</span>
+                      </LocalizedLink>
                     )}
                   </div>
                 </div>
@@ -586,44 +600,40 @@ export default function PayPage() {
               {extStatus === "not_installed" && (
                 <div className="w-full rounded-[12px] border border-white/10 bg-[#0e2023] px-[24px] py-[20px] text-center">
                   <p className="font-['PT_Root_UI',sans-serif] text-white text-[15px] font-medium leading-[1.5] mb-[12px]">
-                    {t("pay.status.notInstalled.title")}
+                    {t("pay.status.signIn.title")}
                   </p>
-                  <div className="flex flex-col gap-[8px] text-left max-w-[360px] mx-auto">
-                    <div className="flex gap-[10px] items-center">
-                      <span className="text-[#9cfb51] text-[14px] font-bold shrink-0 w-[20px] text-center font-['PT_Root_UI',sans-serif]">1</span>
-                      <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.5]">
-                        <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-[#2777C3] underline">{t("pay.status.notInstalled.step1pre")}</a> {t("pay.status.notInstalled.step1post")}
-                      </p>
-                    </div>
-                    <div className="flex gap-[10px] items-center">
-                      <span className="text-[#9cfb51] text-[14px] font-bold shrink-0 w-[20px] text-center font-['PT_Root_UI',sans-serif]">2</span>
-                      <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.5]">
-                        {t("pay.status.notInstalled.step2")}
-                      </p>
-                    </div>
-                    <div className="flex gap-[10px] items-center">
-                      <span className="text-[#9cfb51] text-[14px] font-bold shrink-0 w-[20px] text-center font-['PT_Root_UI',sans-serif]">3</span>
-                      <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.5]">
-                        {t("pay.status.notInstalled.step3")}
-                      </p>
-                    </div>
-                  </div>
+                  <p className="mx-auto mb-[16px] max-w-[420px] font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.6]">
+                    {t("pay.status.signIn.desc")}
+                  </p>
+                  <LocalizedLink
+                    to="/login?next=/pay"
+                    className="inline-flex rounded-[100px] bg-[#9cfb51] px-[22px] py-[12px] font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] no-underline transition hover:-translate-y-0.5"
+                  >
+                    {t("pay.status.signIn.cta")}
+                  </LocalizedLink>
                 </div>
               )}
 
               {extStatus === "not_logged_in" && (
                 <div className="w-full rounded-[12px] border border-white/10 bg-[#0e2023] px-[24px] py-[20px] text-center">
                   <p className="font-['PT_Root_UI',sans-serif] text-white text-[15px] font-medium leading-[1.5] mb-[8px]">
-                    {t("pay.status.notLoggedIn.title")}
+                    {t("pay.status.signIn.title")}
                   </p>
-                  <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.6]">
+                  <p className="mx-auto mb-[16px] max-w-[420px] font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.6]">
                     {t("pay.status.notLoggedIn.desc")}
                   </p>
+                  <LocalizedLink
+                    to="/login?next=/pay"
+                    className="inline-flex rounded-[100px] bg-[#9cfb51] px-[22px] py-[12px] font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] no-underline transition hover:-translate-y-0.5"
+                  >
+                    {t("pay.status.signIn.cta")}
+                  </LocalizedLink>
                 </div>
               )}
 
               {extStatus === "ready" && (
                 <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.3)] text-[12px] text-center leading-[1.5]">
+                  {authSource === "website" && email ? `${email}. ` : ""}
                   {t("pay.status.ready.disclaimer")}{" "}
                   <LocalizedLink to="/terms" className="text-[rgba(255,255,255,0.5)] underline">{t("pay.status.ready.terms")}</LocalizedLink>
                   {" "}{t("pay.status.ready.and")}{" "}

@@ -25,6 +25,7 @@ import { LangProvider } from "../src/i18n/LangContext";
 import { RouteLoading } from "../src/app/components/RouteLoading";
 import ScrollToTop from "../src/app/components/ScrollToTop";
 import AnnouncementBar from "../src/app/components/AnnouncementBar";
+import { SpaceAuthProvider } from "../src/app/components/space/SpaceAuthProvider.tsx";
 
 // Phase 3 D-06: Suspense wrapper mirrors main.tsx so SSR emits the `<!--$-->...<!--/$-->`
 // boundary markers React 18 hydration walks; without it, client expects markers, finds none,
@@ -35,10 +36,11 @@ export function renderRoute(path: string): string {
   return renderToString(
     <StaticRouter location={path}>
       <LangProvider>
-        <ScrollToTop />
-        <AnnouncementBar />
-        <Suspense fallback={<RouteLoading />}>
-          <Routes>
+        <SpaceAuthProvider>
+          <ScrollToTop />
+          <AnnouncementBar />
+          <Suspense fallback={<RouteLoading />}>
+            <Routes>
             <Route path="/" element={<App />} />
             <Route path="/welcome" element={<WelcomePage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
@@ -66,8 +68,9 @@ export function renderRoute(path: string): string {
             <Route path="/en/models/:slug" element={<ModelPage />} />
             {/* Phase 4.2 / Wave 3 (P1-1): catch-all 404 mirrored for SSR parity (defense in depth — prerender.mjs only iterates seo-routes.ts entries, so NotFound is never SSR-rendered today; mirror prevents a future typo'd manifest entry from silently rendering empty). */}
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+            </Routes>
+          </Suspense>
+        </SpaceAuthProvider>
       </LangProvider>
     </StaticRouter>
   );

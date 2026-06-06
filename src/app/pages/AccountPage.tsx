@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import { useT, useLang } from "../../i18n/LangContext";
 import LocalizedLink from "../components/LocalizedLink";
 import SiteHeader from "../components/SiteHeader";
+import {
+  fetchAccountSummary,
+  signOut as signOutWebsite,
+  type AccountSummary,
+} from "../../lib/optenAuth";
+import { useSpaceAuth } from "../components/space/SpaceAuthProvider";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
 
 const SUPABASE_FUNCTIONS_URL = "https://supabase.opten.space/functions/v1";
@@ -13,6 +20,7 @@ const EXTENSION_IDS = [
 ];
 
 type ExtStatus = "detecting" | "not_installed" | "not_logged_in" | "ready";
+type AuthSource = "website" | "extension" | null;
 
 interface Subscription {
   plan: string;
@@ -22,6 +30,11 @@ interface Subscription {
   card_last4: string | null;
   card_type: string | null;
   has_card: boolean;
+  provider?: string | null;
+  currency?: string | null;
+  limit?: number;
+  used?: number;
+  remaining?: number;
 }
 
 /* ─── Icons ─── */
@@ -79,16 +92,42 @@ function cardBrandName(type: string | null, t: (key: string) => string): string 
   return map[type] || type;
 }
 
+function subscriptionFromAccount(account: AccountSummary | null): Subscription | null {
+  if (!account) return null;
+  return {
+    plan: account.plan,
+    status: account.status,
+    expires_at: account.expires_at,
+    auto_renew: account.auto_renew,
+    card_last4: account.card_last4,
+    card_type: account.card_type,
+    has_card: account.has_card,
+    provider: account.provider,
+    currency: account.currency,
+    limit: account.limit,
+    used: account.used,
+    remaining: account.remaining,
+  };
+}
+
 /* ─── Page ─── */
 
 export default function AccountPage() {
   const t = useT();
   const { lang } = useLang();
+  const navigate = useNavigate();
+  const {
+    status: authStatus,
+    session,
+    account,
+    refresh: refreshSpaceAuth,
+  } = useSpaceAuth();
   // Phase 4.1 WR-03 (IN-02 sibling — same pattern as PayPage Wave 9): lang-aware FAQ anchor.
   // /account has no /en/account sibling per Phase 3 D-03 (extension-coupled SPA-only route);
   // EN users who flip language stay on /account but their FAQ click must go to /en/#faq, not /#faq.
   const homeHash = lang === "en" ? "/en/#faq" : "/#faq";
   const [token, setToken] = useState<string | null>(null);
+  const [authSource, setAuthSource] = useState<AuthSource>(null);
   const [extStatus, setExtStatus] = useState<ExtStatus>("detecting");
   const [sub, setSub] = useState<Subscription | null>(null);
   const [loadingSub, setLoadingSub] = useState(false);
@@ -97,6 +136,7 @@ export default function AccountPage() {
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [hashTokenMode, setHashTokenMode] = useState(false);
 
   useEffect(() => {
     // Try hash token first
@@ -104,18 +144,44 @@ export default function AccountPage() {
     const params = new URLSearchParams(hash);
     const hashToken = params.get("token");
     if (hashToken) {
+      setHashTokenMode(true);
+      setAuthSource("extension");
       setToken(hashToken);
       setExtStatus("ready");
       window.history.replaceState(null, "", window.location.pathname);
       fetchSubscription(hashToken);
-    } else {
-      detectExtension();
     }
 
     const handler = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  useEffect(() => {
+    if (hashTokenMode) return;
+
+    if (authStatus === "loading") {
+      setExtStatus("detecting");
+      return;
+    }
+
+    if (authStatus === "signed_in" && session) {
+      setAuthSource("website");
+      setToken(session.access_token);
+      setEmail(account?.email || session.user.email);
+      setExtStatus("ready");
+      setSub(subscriptionFromAccount(account));
+      setLoadingSub(false);
+      setError(null);
+      return;
+    }
+
+    setAuthSource(null);
+    setToken(null);
+    setEmail(null);
+    setSub(null);
+    detectExtension();
+  }, [authStatus, session?.access_token, session?.user.email, account, hashTokenMode]);
 
   const detectExtension = () => {
     const chrome = (window as any).chrome;
@@ -124,27 +190,32 @@ export default function AccountPage() {
       return;
     }
     let tried = 0;
+    let resolved = false;
     for (const id of EXTENSION_IDS) {
       try {
         chrome.runtime.sendMessage(id, { type: "GET_AUTH_TOKEN" }, (response: any) => {
+          if (resolved) return;
           tried++;
           if (chrome.runtime.lastError || !response) {
-            if (tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
+            if (!resolved && tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
             return;
           }
           if (response.token) {
+            resolved = true;
+            setAuthSource("extension");
             setToken(response.token);
             if (response.email) setEmail(response.email);
             setExtStatus("ready");
             // Always fetch fresh data from Edge Function (not stale chrome.storage cache)
             fetchSubscription(response.token);
           } else {
+            resolved = true;
             setExtStatus("not_logged_in");
           }
         });
       } catch {
         tried++;
-        if (tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
+        if (!resolved && tried >= EXTENSION_IDS.length) setExtStatus("not_installed");
       }
     }
   };
@@ -171,16 +242,60 @@ export default function AccountPage() {
     }
   };
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
     setCancelling(true);
     setError(null);
+    if (authSource === "website" && token) {
+      try {
+        const endpoint = sub?.provider === "paddle" ? "/cancel-subscription-paddle" : "/cancel-subscription";
+        const res = await fetch(SUPABASE_FUNCTIONS_URL + endpoint, {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + token,
+            "apikey": SUPABASE_ANON_KEY,
+            "Content-Type": "application/json",
+          },
+          body: "{}",
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.error || !data.success) {
+          setError(t("account.error.cancelFailed"));
+          return;
+        }
+
+        setCancelDone(true);
+        const nextAccount = await fetchAccountSummary(token).catch(() => null);
+        if (nextAccount) {
+          setSub(subscriptionFromAccount(nextAccount));
+        } else {
+          setSub(prev => prev ? {
+            ...prev,
+            status: "cancelled",
+            auto_renew: false,
+            card_last4: null,
+            card_type: null,
+            has_card: false,
+            expires_at: data.expires_at || prev.expires_at,
+          } : null);
+        }
+        await refreshSpaceAuth();
+      } catch {
+        setError(t("account.error.network"));
+      } finally {
+        setCancelling(false);
+      }
+      return;
+    }
+
     try {
       const chrome = (window as any).chrome;
+      let resolved = false;
       // Find working extension ID
       for (const id of EXTENSION_IDS) {
         try {
           chrome.runtime.sendMessage(id, { type: "CANCEL_SUBSCRIPTION" }, (response: any) => {
-            if (chrome.runtime.lastError || !response) return;
+            if (resolved || chrome.runtime.lastError || !response) return;
+            resolved = true;
             if (response.success) {
               setCancelDone(true);
               setSub(prev => prev ? {
@@ -202,6 +317,17 @@ export default function AccountPage() {
       setError(t("account.error.network"));
       setCancelling(false);
     }
+  };
+
+  const handleWebsiteSignOut = async () => {
+    setError(null);
+    await signOutWebsite(session?.access_token);
+    setAuthSource(null);
+    setToken(null);
+    setEmail(null);
+    setSub(null);
+    await refreshSpaceAuth();
+    navigate("/login?next=/account", { replace: true });
   };
 
   const hasPaidAccess = hasCurrentPaidAccess(sub);
@@ -271,20 +397,31 @@ export default function AccountPage() {
 
           {extStatus === "not_installed" && (
             <StatusPanel>
-              <p className="mb-[8px] text-[15px] font-medium text-white">{t("account.ext.notInstalled.title")}</p>
-              <p className="text-[14px] leading-[1.6] text-white/55">
-                <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline">{t("account.ext.notInstalled.desc1")}</a>,{" "}
-                {t("account.ext.notInstalled.desc2")}
+              <p className="mb-[8px] text-[15px] font-medium text-white">{t("account.auth.signInTitle")}</p>
+              <p className="mx-auto mb-[16px] max-w-[420px] text-[14px] leading-[1.6] text-white/55">
+                {t("account.auth.signInDesc")}
               </p>
+              <LocalizedLink
+                to="/login?next=/account"
+                className="inline-flex rounded-[100px] bg-[#9cfb51] px-[22px] py-[12px] text-[14px] font-bold text-[#011417] no-underline transition hover:-translate-y-0.5"
+              >
+                {t("account.auth.signInCta")}
+              </LocalizedLink>
             </StatusPanel>
           )}
 
           {extStatus === "not_logged_in" && (
             <StatusPanel>
-              <p className="mb-[8px] text-[15px] font-medium text-white">{t("account.ext.notLoggedIn.title")}</p>
-              <p className="text-[14px] leading-[1.6] text-white/55">
+              <p className="mb-[8px] text-[15px] font-medium text-white">{t("account.auth.signInTitle")}</p>
+              <p className="mx-auto mb-[16px] max-w-[420px] text-[14px] leading-[1.6] text-white/55">
                 {t("account.ext.notLoggedIn.desc")}
               </p>
+              <LocalizedLink
+                to="/login?next=/account"
+                className="inline-flex rounded-[100px] bg-[#9cfb51] px-[22px] py-[12px] text-[14px] font-bold text-[#011417] no-underline transition hover:-translate-y-0.5"
+              >
+                {t("account.auth.signInCta")}
+              </LocalizedLink>
             </StatusPanel>
           )}
 
@@ -297,6 +434,20 @@ export default function AccountPage() {
 
           {extStatus === "ready" && !loadingSub && (
             <>
+              <div className="relative overflow-hidden rounded-[16px] border border-white/10 bg-[#0e2023] p-[24px] shadow-[0_24px_80px_rgba(0,0,0,0.2)] md:p-[28px]">
+                <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="mb-[4px] text-[13px] uppercase tracking-[1px] text-white/45">{t("account.credits.label")}</p>
+                    <p className="text-[28px] font-medium leading-[1.1] text-white">
+                      {sub?.remaining ?? 0}/{sub?.limit ?? 300}
+                    </p>
+                  </div>
+                  <p className="max-w-[320px] text-[13px] leading-[1.55] text-white/45 sm:text-right">
+                    {authSource === "website" ? t("account.auth.websiteSource") : t("account.auth.extensionSource")}
+                  </p>
+                </div>
+              </div>
+
               {/* ── Plan card ── */}
               <div className="relative overflow-hidden rounded-[16px] border border-white/10 bg-[#0e2023] p-[28px] shadow-[0_24px_80px_rgba(0,0,0,0.24)] md:p-[32px]">
                 <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#9cfb51]/40 to-transparent" />
@@ -401,6 +552,24 @@ export default function AccountPage() {
                         </p>
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {authSource === "website" && (
+                <div className="relative rounded-[16px] border border-white/10 bg-[#0e2023] p-[24px] shadow-[0_24px_80px_rgba(0,0,0,0.16)] md:p-[28px]">
+                  <div className="flex flex-col gap-[14px] sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="mb-[4px] text-[13px] uppercase tracking-[1px] text-white/45">{t("account.signOut.label")}</p>
+                      <p className="text-[14px] leading-[1.6] text-white/55">{t("account.signOut.desc")}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleWebsiteSignOut}
+                      className="inline-flex cursor-pointer justify-center rounded-[100px] border border-white/15 bg-transparent px-[22px] py-[12px] text-[14px] font-bold text-white/80 transition hover:border-white/30 hover:text-white"
+                    >
+                      {t("account.signOut.btn")}
+                    </button>
                   </div>
                 </div>
               )}

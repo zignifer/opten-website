@@ -1,24 +1,27 @@
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useNavigate } from "react-router";
-import { storeSessionFromUrl } from "../../../lib/optenAuth";
+import { useLocation, useNavigate } from "react-router";
+import { normalizeSafeNext, storeSessionFromUrl } from "../../../lib/optenAuth";
 import { useLang } from "../../../i18n/LangContext";
 
 export default function AppAuthCallbackPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { lang } = useLang();
   const [error, setError] = useState<string | null>(null);
   const copy = callbackCopy[lang];
+  const rawNext = new URLSearchParams(location.search).get("next");
+  const safeNext = normalizeSafeNext(rawNext, location.pathname.startsWith("/app/") ? "/app/learn" : "/account");
 
   useEffect(() => {
     try {
       storeSessionFromUrl(window.location.href);
-      window.history.replaceState(null, "", "/app/auth/callback");
-      navigate("/app/learn", { replace: true });
+      window.history.replaceState(null, "", window.location.pathname);
+      navigate(safeNext, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "auth_callback_failed");
     }
-  }, [navigate]);
+  }, [navigate, safeNext]);
 
   return (
     <div className="grid min-h-screen place-items-center bg-[#011012] px-4 font-['PT_Root_UI',sans-serif] text-white">
@@ -29,7 +32,7 @@ export default function AppAuthCallbackPage() {
             <p className="mt-[10px] text-[14px] leading-[1.5] text-white/68">{error}</p>
             <button
               type="button"
-              onClick={() => navigate("/app/login", { replace: true })}
+              onClick={() => navigate(`/login?next=${encodeURIComponent(safeNext)}`, { replace: true })}
               className="mt-[18px] h-[42px] rounded-[8px] bg-[#9cfb51] px-[18px] text-[15px] font-bold text-[#011417]"
             >
               {copy.back}

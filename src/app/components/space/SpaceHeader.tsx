@@ -1,5 +1,5 @@
 import LocalizedLink from "../LocalizedLink";
-import { BookOpenCheck, Chrome, Library, LogIn, type LucideIcon } from "lucide-react";
+import { Chrome, Library, LogIn, type LucideIcon } from "lucide-react";
 import { useLocation } from "react-router";
 import { useLang } from "../../../i18n/LangContext";
 import { useSpaceAuth } from "./SpaceAuthProvider";
@@ -7,13 +7,12 @@ import { useSpaceAuth } from "./SpaceAuthProvider";
 const figmaHeaderAssetBase = "/assets/space/figma/header-atoms";
 
 type SpaceNavItem = {
-  label: "Learn" | "Extension" | "Library";
+  label: "Extension" | "Library";
   icon: LucideIcon;
   to: string;
 };
 
 const navItems: SpaceNavItem[] = [
-  { label: "Learn", icon: BookOpenCheck, to: "/app/learn" },
   { label: "Extension", icon: Chrome, to: "/" },
   { label: "Library", icon: Library, to: "/prompt-library" },
 ];
@@ -25,21 +24,22 @@ type SpaceHeaderProps = {
 export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
   const { pathname } = useLocation();
   const { lang, setLang } = useLang();
-  const { status, account, session, signOut } = useSpaceAuth();
-  const learnOnly = variant === "learnOnly";
+  const { status, account, session } = useSpaceAuth();
+  const headerBackgroundClass = variant === "learnOnly" ? "bg-[#011417]/95" : "bg-[#011012]/95";
   const copy = headerCopy[lang];
+  const loginTo = `/login?next=${encodeURIComponent(pathname)}`;
   const creditLabel = account ? `${account.remaining}/${account.limit}` : status === "loading" ? "..." : "0/300";
   const accountLabel = account?.email || session?.user.email || copy.account;
 
   return (
-    <header className="sticky top-0 z-40 w-screen border-b border-white/10 bg-[#011012]/95 backdrop-blur-sm">
+    <header className={`sticky top-0 z-40 w-screen border-b border-white/10 ${headerBackgroundClass} backdrop-blur-sm`}>
       <nav
         aria-label="Opten Space"
         className="mx-auto grid h-[64px] max-w-[1200px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center px-[32px] py-[16px] font-['PT_Root_UI',sans-serif] text-white max-lg:grid-cols-[auto_1fr_auto] max-md:px-4"
       >
         <LocalizedLink
-          to={learnOnly ? "/app/learn" : "/app"}
-          aria-label={learnOnly ? "Opten Space Learn home" : "Opten Space home"}
+          to="/"
+          aria-label="Opten home"
           className="-ml-[4px] inline-flex h-[32px] w-[166px] items-center rounded-sm px-[4px] no-underline outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011012]"
         >
           <img
@@ -105,12 +105,11 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
           </button>
 
           {status === "signed_in" ? (
-            <button
-              type="button"
-              onClick={() => signOut()}
-              aria-label={copy.signOut}
+            <LocalizedLink
+              to="/account"
+              aria-label={accountLabel}
               title={accountLabel}
-              className="flex h-[32px] max-w-[220px] items-center gap-[8px] rounded-full bg-transparent px-[12px] py-[8px] text-[14px] font-medium text-white/78 transition hover:bg-white/[0.04] hover:text-white"
+              className="flex h-[32px] max-w-[220px] items-center gap-[8px] rounded-full bg-transparent px-[12px] py-[8px] text-[14px] font-medium text-white/78 no-underline transition hover:bg-white/[0.04] hover:text-white"
             >
               <img
                 src={`${figmaHeaderAssetBase}/icon-account.svg`}
@@ -121,10 +120,10 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
                 className="h-[16px] w-[16px] shrink-0"
               />
               <span className="truncate">{accountLabel}</span>
-            </button>
+            </LocalizedLink>
           ) : (
             <LocalizedLink
-              to="/app/login"
+              to={loginTo}
               aria-label={copy.signIn}
               className="flex h-[32px] items-center gap-[8px] rounded-full bg-transparent px-[12px] py-[8px] text-[14px] font-medium text-white/78 no-underline transition hover:bg-white/[0.04] hover:text-white"
             >
@@ -139,7 +138,6 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
 }
 
 function isActiveNavItem(label: string, pathname: string) {
-  if (label === "Learn") return pathname.startsWith("/app/learn") || pathname.startsWith("/space/learn");
   if (label === "Extension") return pathname === "/";
   if (label === "Library") return pathname === "/prompt-library";
   return false;
@@ -151,7 +149,7 @@ const headerCopy = {
     signIn: "Войти",
     signOut: "Выйти",
     switchLanguage: "Переключить язык",
-    nav: { Learn: "Курсы", Extension: "Расширение", Library: "Библиотека" },
+    nav: { Extension: "Расширение", Library: "Библиотека" },
     usage: (value: string) => `Использовано кредитов: ${value}`,
   },
   en: {
@@ -159,7 +157,7 @@ const headerCopy = {
     signIn: "Sign in",
     signOut: "Sign out",
     switchLanguage: "Switch language",
-    nav: { Learn: "Learn", Extension: "Extension", Library: "Library" },
+    nav: { Extension: "Extension", Library: "Library" },
     usage: (value: string) => `Credit usage: ${value}`,
   },
 } as const;
