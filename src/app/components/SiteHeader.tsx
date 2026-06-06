@@ -2,8 +2,10 @@
 // navigation lives in the footer, while the header matches the app shell
 // navigation across marketing, billing, account, and Learn routes.
 
-import { BookOpen, Chrome, Library, LogIn, type LucideIcon } from "lucide-react";
+import { useEffect, useId, useState, type ReactNode } from "react";
+import { BookOpen, Chrome, Library, LogIn, Menu, X, type LucideIcon } from "lucide-react";
 import { useLocation } from "react-router";
+import HeaderMobileMenu, { type HeaderMobileNavItem } from "./HeaderMobileMenu";
 import LangSwitcher from "./LangSwitcher";
 import LocalizedLink from "./LocalizedLink";
 import { useLang } from "../../i18n/LangContext";
@@ -14,7 +16,7 @@ const figmaHeaderAssetBase = "/assets/space/figma/header-atoms";
 
 interface SiteHeaderProps {
   variant?: "landing" | "page";
-  rightSlot?: React.ReactNode;
+  rightSlot?: ReactNode;
 }
 
 type SiteNavItem = {
@@ -33,11 +35,23 @@ export default function SiteHeader({ rightSlot }: SiteHeaderProps): JSX.Element 
   const { lang } = useLang();
   const location = useLocation();
   const { status, account, session } = useSpaceAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuId = useId();
   const copy = headerCopy[lang];
   const creditLabel = account ? `${account.remaining}/${account.limit}` : status === "loading" ? "..." : "0/300";
   const accountLabel = account?.email || session?.user.email || copy.account;
   const next = `${location.pathname}${location.search}`;
   const loginTo = `/login?next=${encodeURIComponent(next)}`;
+  const mobileNavItems: HeaderMobileNavItem[] = navItems.map((item) => ({
+    active: isActiveNavItem(item.label, location.pathname),
+    icon: item.icon,
+    label: copy.nav[item.label],
+    to: item.to,
+  }));
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname, location.search]);
 
   return (
     <header className={`fixed left-0 right-0 ${ANNOUNCEMENT_ENABLED ? "top-[40px]" : "top-0"} z-50 border-b border-white/10 bg-[#011417]/95 backdrop-blur-sm`}>
@@ -60,7 +74,7 @@ export default function SiteHeader({ rightSlot }: SiteHeaderProps): JSX.Element 
           />
         </LocalizedLink>
 
-        <div className="flex items-center justify-center gap-[12px] max-md:hidden" aria-label="Opten navigation">
+        <div className="flex items-center justify-center gap-[12px] max-lg:hidden" aria-label="Opten navigation">
           {navItems.map((item) => {
             const active = isActiveNavItem(item.label, location.pathname);
             const Icon = item.icon;
@@ -136,27 +150,60 @@ export default function SiteHeader({ rightSlot }: SiteHeaderProps): JSX.Element 
             )
           )}
         </div>
+
+        <div className="flex min-w-0 items-center justify-end gap-[8px] lg:hidden">
+          <LangSwitcher className="flex h-[36px] min-w-[42px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/[0.02] px-[10px] text-[13px] font-bold text-white/76 transition hover:border-white/25 hover:text-white" />
+          <button
+            type="button"
+            aria-label={mobileMenuOpen ? copy.closeMenu : copy.openMenu}
+            aria-controls={mobileMenuId}
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className="grid size-[38px] place-items-center rounded-full border border-white/10 bg-white/[0.02] text-white/78 transition hover:border-white/25 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9cfb51]/70"
+          >
+            {mobileMenuOpen ? <X size={19} aria-hidden="true" /> : <Menu size={19} aria-hidden="true" />}
+          </button>
+        </div>
       </nav>
+      <HeaderMobileMenu
+        id={mobileMenuId}
+        isOpen={mobileMenuOpen}
+        navItems={mobileNavItems}
+        creditLabel={creditLabel}
+        usageAriaLabel={copy.usage(creditLabel)}
+        accountLabel={accountLabel}
+        signedIn={status === "signed_in"}
+        loginTo={loginTo}
+        signInLabel={copy.signIn}
+        languageLabel={copy.language}
+        onClose={() => setMobileMenuOpen(false)}
+      />
     </header>
   );
 }
 
 function isActiveNavItem(label: string, pathname: string) {
   if (label === "Learn") return pathname.startsWith("/learn") || pathname.startsWith("/en/learn");
-  if (label === "Extension") return pathname === "/";
-  if (label === "Library") return pathname === "/prompt-library";
+  if (label === "Extension") return pathname === "/" || pathname === "/en";
+  if (label === "Library") return pathname === "/prompt-library" || pathname === "/en/prompt-library";
   return false;
 }
 
 const headerCopy = {
   ru: {
     account: "Аккаунт",
+    closeMenu: "Закрыть меню",
+    language: "Язык",
+    openMenu: "Открыть меню",
     signIn: "Войти",
     nav: { Learn: "Курсы", Extension: "Расширение", Library: "Библиотека" },
     usage: (value: string) => `Использовано кредитов: ${value}`,
   },
   en: {
     account: "Account",
+    closeMenu: "Close menu",
+    language: "Language",
+    openMenu: "Open menu",
     signIn: "Sign in",
     nav: { Learn: "Courses", Extension: "Extension", Library: "Library" },
     usage: (value: string) => `Credit usage: ${value}`,

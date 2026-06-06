@@ -19,10 +19,11 @@ import { toEnTarget, toRuTarget } from "../../i18n/paths";
 
 interface LangSwitcherProps {
   className?: string;
+  label?: string;
   onSwitch?: () => void; // optional side effect, e.g. close mobile menu
 }
 
-export default function LangSwitcher({ className, onSwitch }: LangSwitcherProps): JSX.Element {
+export default function LangSwitcher({ className, label, onSwitch }: LangSwitcherProps): JSX.Element {
   const { lang, setLang } = useLang();
   const location = useLocation();
   const navigate = useNavigate();
@@ -54,7 +55,14 @@ export default function LangSwitcher({ className, onSwitch }: LangSwitcherProps)
       }}
       className={className}
     >
-      {lang === "ru" ? "EN" : "RU"}
+      {label ? (
+        <>
+          <span>{label}</span>
+          <span>{lang === "ru" ? "EN" : "RU"}</span>
+        </>
+      ) : (
+        lang === "ru" ? "EN" : "RU"
+      )}
     </button>
   );
 }

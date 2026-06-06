@@ -1,6 +1,9 @@
-import LocalizedLink from "../LocalizedLink";
-import { BookOpen, Chrome, Library, LogIn, type LucideIcon } from "lucide-react";
+import { useEffect, useId, useState } from "react";
+import { BookOpen, Chrome, Library, LogIn, Menu, X, type LucideIcon } from "lucide-react";
 import { useLocation } from "react-router";
+import HeaderMobileMenu, { type HeaderMobileNavItem } from "../HeaderMobileMenu";
+import LangSwitcher from "../LangSwitcher";
+import LocalizedLink from "../LocalizedLink";
 import { useLang } from "../../../i18n/LangContext";
 import { useSpaceAuth } from "./SpaceAuthProvider";
 
@@ -23,17 +26,31 @@ type SpaceHeaderProps = {
 };
 
 export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
-  const { pathname } = useLocation();
-  const { lang, setLang } = useLang();
+  const location = useLocation();
+  const { pathname } = location;
+  const { lang } = useLang();
   const { status, account, session } = useSpaceAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuId = useId();
   const headerBackgroundClass = variant === "learnOnly" ? "bg-[#011417]/95" : "bg-[#011012]/95";
   const copy = headerCopy[lang];
-  const loginTo = `/login?next=${encodeURIComponent(pathname)}`;
+  const next = `${pathname}${location.search}`;
+  const loginTo = `/login?next=${encodeURIComponent(next)}`;
   const creditLabel = account ? `${account.remaining}/${account.limit}` : status === "loading" ? "..." : "0/300";
   const accountLabel = account?.email || session?.user.email || copy.account;
+  const mobileNavItems: HeaderMobileNavItem[] = navItems.map((item) => ({
+    active: isActiveNavItem(item.label, pathname),
+    icon: item.icon,
+    label: copy.nav[item.label],
+    to: item.to,
+  }));
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname, location.search]);
 
   return (
-    <header className={`sticky top-0 z-40 w-screen border-b border-white/10 ${headerBackgroundClass} backdrop-blur-sm`}>
+    <header className={`sticky top-0 z-40 w-full border-b border-white/10 ${headerBackgroundClass} backdrop-blur-sm`}>
       <nav
         aria-label="Opten Space"
         className="mx-auto grid h-[64px] max-w-[1200px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center px-[32px] py-[16px] font-['PT_Root_UI',sans-serif] text-white max-lg:grid-cols-[auto_1fr_auto] max-md:px-4"
@@ -53,7 +70,7 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
           />
         </LocalizedLink>
 
-        <div className="flex items-center justify-center gap-[12px] max-md:hidden" aria-label="Space navigation">
+        <div className="flex items-center justify-center gap-[12px] max-lg:hidden" aria-label="Space navigation">
           {navItems.map((item) => {
             const active = isActiveNavItem(item.label, pathname);
             const Icon = item.icon;
@@ -97,14 +114,7 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
             <span className="text-[14px] font-medium leading-[1.1] text-white">{creditLabel}</span>
           </LocalizedLink>
 
-          <button
-            type="button"
-            onClick={() => setLang(lang === "ru" ? "en" : "ru")}
-            aria-label={copy.switchLanguage}
-            className="flex h-[32px] min-w-[42px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-transparent px-[10px] text-[13px] font-bold text-white/70 transition hover:border-white/25 hover:text-white"
-          >
-            {lang === "ru" ? "EN" : "RU"}
-          </button>
+          <LangSwitcher className="flex h-[32px] min-w-[42px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-transparent px-[10px] text-[13px] font-bold text-white/70 transition hover:border-white/25 hover:text-white" />
 
           {status === "signed_in" ? (
             <LocalizedLink
@@ -134,32 +144,63 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
             </LocalizedLink>
           )}
         </div>
+
+        <div className="flex min-w-0 items-center justify-end gap-[8px] lg:hidden">
+          <LangSwitcher className="flex h-[36px] min-w-[42px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/[0.02] px-[10px] text-[13px] font-bold text-white/76 transition hover:border-white/25 hover:text-white" />
+          <button
+            type="button"
+            aria-label={mobileMenuOpen ? copy.closeMenu : copy.openMenu}
+            aria-controls={mobileMenuId}
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className="grid size-[38px] place-items-center rounded-full border border-white/10 bg-white/[0.02] text-white/78 transition hover:border-white/25 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9cfb51]/70"
+          >
+            {mobileMenuOpen ? <X size={19} aria-hidden="true" /> : <Menu size={19} aria-hidden="true" />}
+          </button>
+        </div>
       </nav>
+      <HeaderMobileMenu
+        id={mobileMenuId}
+        isOpen={mobileMenuOpen}
+        navItems={mobileNavItems}
+        creditLabel={creditLabel}
+        usageAriaLabel={copy.usage(creditLabel)}
+        accountLabel={accountLabel}
+        signedIn={status === "signed_in"}
+        loginTo={loginTo}
+        signInLabel={copy.signIn}
+        languageLabel={copy.language}
+        onClose={() => setMobileMenuOpen(false)}
+      />
     </header>
   );
 }
 
 function isActiveNavItem(label: string, pathname: string) {
   if (label === "Learn") return pathname.startsWith("/learn") || pathname.startsWith("/en/learn");
-  if (label === "Extension") return pathname === "/";
-  if (label === "Library") return pathname === "/prompt-library";
+  if (label === "Extension") return pathname === "/" || pathname === "/en";
+  if (label === "Library") return pathname === "/prompt-library" || pathname === "/en/prompt-library";
   return false;
 }
 
 const headerCopy = {
   ru: {
     account: "Аккаунт",
+    closeMenu: "Закрыть меню",
+    language: "Язык",
+    openMenu: "Открыть меню",
     signIn: "Войти",
     signOut: "Выйти",
-    switchLanguage: "Переключить язык",
     nav: { Learn: "Курсы", Extension: "Расширение", Library: "Библиотека" },
     usage: (value: string) => `Использовано кредитов: ${value}`,
   },
   en: {
     account: "Account",
+    closeMenu: "Close menu",
+    language: "Language",
+    openMenu: "Open menu",
     signIn: "Sign in",
     signOut: "Sign out",
-    switchLanguage: "Switch language",
     nav: { Learn: "Courses", Extension: "Extension", Library: "Library" },
     usage: (value: string) => `Credit usage: ${value}`,
   },
