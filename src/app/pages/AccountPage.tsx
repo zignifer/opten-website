@@ -445,15 +445,10 @@ export default function AccountPage() {
           {extStatus === "ready" && !loadingSub && (
             <>
               <div className="relative overflow-hidden rounded-[16px] border border-white/10 bg-[#0e2023] p-[24px] shadow-[0_24px_80px_rgba(0,0,0,0.2)] md:p-[28px]">
-                <div className="flex flex-col gap-[16px] sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="mb-[4px] text-[13px] uppercase tracking-[1px] text-white/45">{t("account.credits.label")}</p>
-                    <p className="text-[28px] font-medium leading-[1.1] text-white">
-                      {sub?.remaining ?? 0}/{sub?.limit ?? 300}
-                    </p>
-                  </div>
-                  <p className="max-w-[320px] text-[13px] leading-[1.55] text-white/45 sm:text-right">
-                    {authSource === "website" ? t("account.auth.websiteSource") : t("account.auth.extensionSource")}
+                <div>
+                  <p className="mb-[4px] text-[13px] uppercase tracking-[1px] text-white/45">{t("account.credits.label")}</p>
+                  <p className="text-[28px] font-medium leading-[1.1] text-white">
+                    {sub?.remaining ?? 0}/{sub?.limit ?? 300}
                   </p>
                 </div>
               </div>
@@ -567,21 +562,13 @@ export default function AccountPage() {
               )}
 
               {authSource === "website" && (
-                <div className="relative rounded-[16px] border border-white/10 bg-[#0e2023] p-[24px] shadow-[0_24px_80px_rgba(0,0,0,0.16)] md:p-[28px]">
-                  <div className="flex flex-col gap-[14px] sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="mb-[4px] text-[13px] uppercase tracking-[1px] text-white/45">{t("account.signOut.label")}</p>
-                      <p className="text-[14px] leading-[1.6] text-white/55">{t("account.signOut.desc")}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleWebsiteSignOut}
-                      className="inline-flex cursor-pointer justify-center rounded-[100px] border border-white/15 bg-transparent px-[22px] py-[12px] text-[14px] font-bold text-white/80 transition hover:border-white/30 hover:text-white"
-                    >
-                      {t("account.signOut.btn")}
-                    </button>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  onClick={handleWebsiteSignOut}
+                  className="mx-auto inline-flex cursor-pointer justify-center rounded-[100px] border border-white/15 bg-transparent px-[28px] py-[14px] text-[14px] font-bold text-white/80 transition hover:border-white/30 hover:text-white"
+                >
+                  {t("account.signOut.btn")}
+                </button>
               )}
             </>
           )}

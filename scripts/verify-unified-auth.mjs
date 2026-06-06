@@ -63,6 +63,7 @@ const account = read("src/app/pages/AccountPage.tsx");
 assert.match(account, /useSpaceAuth/, "AccountPage must prefer website auth");
 assert.match(account, /fetchAccountSummary/, "AccountPage must read account-summary for website sessions");
 assert.match(account, /signOut/, "AccountPage must expose website sign-out");
+assert.doesNotMatch(account, /account\.auth\.websiteSource|account\.auth\.extensionSource|account\.signOut\.label|account\.signOut\.desc/, "AccountPage must not render explanatory auth-source text around the sign-out button");
 assert.match(account, /cancel-subscription-paddle/, "AccountPage must call Paddle cancellation directly for website sessions");
 assert.match(account, /cancel-subscription/, "AccountPage must call cancellation directly for website sessions");
 assert.match(account, /\/login\?next=\/account/, "AccountPage must route signed-out users to /login?next=/account");
