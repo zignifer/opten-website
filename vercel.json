@@ -18,6 +18,8 @@
     { "source": "/success", "destination": "/index.html" },
     { "source": "/dashboard/download-skill", "destination": "/index.html" },
     { "source": "/prompt-library", "destination": "/index.html" },
+    { "source": "/learn/templates/:path*", "destination": "/index.html" },
+    { "source": "/en/learn/templates/:path*", "destination": "/index.html" },
     { "source": "/app/:path*", "destination": "/index.html" },
     { "source": "/space/:path*", "destination": "/index.html" },
     { "source": "/internal/:path*", "destination": "/index.html" }
@@ -82,6 +84,18 @@
     },
     {
       "source": "/prompt-library/:path*",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/learn/templates/:path*",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/en/learn/templates/:path*",
       "headers": [
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
       ]

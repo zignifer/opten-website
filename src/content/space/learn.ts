@@ -14,6 +14,7 @@ export type LearnFilter = "All" | "Standalone" | "Prompt packs" | "Builder" | "B
 
 export type LearnAuthor = {
   name: string;
+  localizedName?: LocalizedText;
   initials: string;
   role: LocalizedText;
   intro: LocalizedText;
@@ -130,6 +131,7 @@ export type LearnCollection = {
   description: LocalizedText;
   kind: LearnCollectionKind;
   categoryLabel: LocalizedText;
+  routeBasePath?: LocalizedText;
   progress?: LearnCourseProgress;
   lessons: LearnLesson[];
 };
@@ -165,6 +167,10 @@ const learnAssetBase = "/assets/learn";
 
 export const learnDefaultAuthor: LearnAuthor = {
   name: "Влад Воронежцев",
+  localizedName: {
+    ru: "Влад Воронежцев",
+    en: "Vlad Voronezhtsev",
+  },
   initials: "ВВ",
   role: {
     ru: "Веб-дизайнер, AI-креатор",
@@ -191,6 +197,70 @@ export const learnIntegrationTodos = {
 };
 
 const emptyMaterials: Record<LearnLang, LearnMaterial[]> = { ru: [], en: [] };
+
+const actualAiToolsMaterials: Record<LearnLang, LearnMaterial[]> = {
+  ru: [
+    { title: "Higgsfield", meta: "AI-видео, движение камеры и визуальные эффекты", kind: "link", actionLabel: "Перейти", href: "https://higgsfield.ai/" },
+    { title: "Freepik / Magnific", meta: "Изображения, апскейл и визуальные ассеты", kind: "link", actionLabel: "Перейти", href: "https://freepik.com/" },
+    { title: "Syntx", meta: "AI-аватары и визуальные генерации", kind: "link", actionLabel: "Перейти", href: "https://syntx.ai/welcome/GlUETIt6" },
+  ],
+  en: [
+    { title: "Higgsfield", meta: "AI video, camera motion, and visual effects", kind: "link", actionLabel: "Open", href: "https://higgsfield.ai/" },
+    { title: "Freepik / Magnific", meta: "Images, upscaling, and visual assets", kind: "link", actionLabel: "Open", href: "https://freepik.com/" },
+    { title: "Syntx", meta: "AI avatars and visual generation", kind: "link", actionLabel: "Open", href: "https://syntx.ai/welcome/GlUETIt6" },
+  ],
+};
+
+const aiAvatarMaterials: Record<LearnLang, LearnMaterial[]> = {
+  ru: [
+    { title: "Исходники с медведем", meta: "Материалы для скачивания на Яндекс Диске", kind: "link", actionLabel: "Скачать", href: "https://disk.yandex.ru/d/xzRwLyTMdrptYg" },
+    { title: "Исходники с человеком", meta: "Материалы для скачивания на Яндекс Диске", kind: "link", actionLabel: "Скачать", href: "https://disk.yandex.ru/d/oXQC8gAKd7fLrQ" },
+    { title: "Промпты для урока", meta: "Готовые промпты и текстовые заготовки", kind: "link", actionLabel: "Открыть", href: "https://disk.yandex.ru/i/RW634KjnQBxXOA" },
+  ],
+  en: [
+    { title: "Bear source files", meta: "Downloadable files on Yandex Disk", kind: "link", actionLabel: "Download", href: "https://disk.yandex.ru/d/xzRwLyTMdrptYg" },
+    { title: "Human source files", meta: "Downloadable files on Yandex Disk", kind: "link", actionLabel: "Download", href: "https://disk.yandex.ru/d/oXQC8gAKd7fLrQ" },
+    { title: "Lesson prompts", meta: "Ready prompts and text blocks", kind: "link", actionLabel: "Open", href: "https://disk.yandex.ru/i/RW634KjnQBxXOA" },
+  ],
+};
+
+const juniorOrderMaterials: Record<LearnLang, LearnMaterial[]> = {
+  ru: [
+    { title: "Проект в Figma", meta: "Исходный макет Lesson 2", kind: "link", actionLabel: "Открыть", href: "https://www.figma.com/design/mOcAHEj6CTfJ4I6rX3njbS/Lesson-2?node-id=0-1&t=4jkf8940YqYUa4ty-1" },
+  ],
+  en: [
+    { title: "Figma project", meta: "Lesson 2 source design", kind: "link", actionLabel: "Open", href: "https://www.figma.com/design/mOcAHEj6CTfJ4I6rX3njbS/Lesson-2?node-id=0-1&t=4jkf8940YqYUa4ty-1" },
+  ],
+};
+
+const clientWebsiteMaterials: Record<LearnLang, LearnMaterial[]> = {
+  ru: [
+    { title: "AI инструмент удаления фона", meta: "Magnific Background Remover", kind: "link", actionLabel: "Перейти", href: "https://www.magnific.com/ai/background-remover" },
+    { title: "Проект в Figma", meta: "Исходный макет Lesson Show", kind: "link", actionLabel: "Открыть", href: "https://www.figma.com/design/veGLoNcpik3KFPVt80NrCE/Lesson--Show-?node-id=0-1&t=ntKcUydisb4baiXQ-1" },
+  ],
+  en: [
+    { title: "AI background remover", meta: "Magnific Background Remover", kind: "link", actionLabel: "Open", href: "https://www.magnific.com/ai/background-remover" },
+    { title: "Figma project", meta: "Lesson Show source design", kind: "link", actionLabel: "Open", href: "https://www.figma.com/design/veGLoNcpik3KFPVt80NrCE/Lesson--Show-?node-id=0-1&t=ntKcUydisb4baiXQ-1" },
+  ],
+};
+
+const marketplaceCardsMaterials: Record<LearnLang, LearnMaterial[]> = {
+  ru: [
+    { title: "Проект в Figma", meta: "Исходный макет урока OZON карточка", kind: "link", actionLabel: "Открыть", href: "https://www.figma.com/design/EOlrmBQqBnS3hBJuARSWdu/%D0%A3%D1%80%D0%BE%D0%BA-OZON-%D0%BA%D0%B0%D1%80%D1%82%D0%BE%D1%87%D0%BA%D0%B0?node-id=0-1&t=1oPi9xThdfdNHQSr-1" },
+  ],
+  en: [
+    { title: "Figma project", meta: "OZON product card lesson source design", kind: "link", actionLabel: "Open", href: "https://www.figma.com/design/EOlrmBQqBnS3hBJuARSWdu/%D0%A3%D1%80%D0%BE%D0%BA-OZON-%D0%BA%D0%B0%D1%80%D1%82%D0%BE%D1%87%D0%BA%D0%B0?node-id=0-1&t=1oPi9xThdfdNHQSr-1" },
+  ],
+};
+
+const referencesMaterials: Record<LearnLang, LearnMaterial[]> = {
+  ru: [
+    { title: "Проект в Figma", meta: "Исходный макет Pyros lesson", kind: "link", actionLabel: "Открыть", href: "https://www.figma.com/design/guN3wlvDOU5Noj96hXLoaM/Pyros--lesson-?node-id=0-1&t=QtmYU4jb6IxF2iPS-1" },
+  ],
+  en: [
+    { title: "Figma project", meta: "Pyros lesson source design", kind: "link", actionLabel: "Open", href: "https://www.figma.com/design/guN3wlvDOU5Noj96hXLoaM/Pyros--lesson-?node-id=0-1&t=QtmYU4jb6IxF2iPS-1" },
+  ],
+};
 
 function localize<T>(value: Record<LearnLang, T>, lang: LearnLang): T {
   return value[lang] ?? value.ru;
@@ -398,7 +468,7 @@ export const publicLearnLessons: LearnLesson[] = [
       contentUrl: `https://opten.space${learnAssetBase}/video/actual-ai-tools-2026.mp4`,
     },
     timestamps: { ru: actualAiToolsTimestampsRu, en: actualAiToolsTimestampsEn },
-    materials: emptyMaterials,
+    materials: actualAiToolsMaterials,
   }),
   lesson({
     slug: "ai-avatar-motion-control",
@@ -407,8 +477,8 @@ export const publicLearnLessons: LearnLesson[] = [
       en: "Kling Motion Control: AI avatar with the right movement",
     },
     description: {
-      ru: "Сделайте AI-аватара, перенесите на него движение из видеореференса, подготовьте голос и соберите результат с липсинком.",
-      en: "Create an AI avatar, transfer movement from a video reference, prepare the voice, and assemble the result with lip sync.",
+      ru: "Меняем внешность, голос и получаем персонажа, который говорит и двигается в точности как видео референс. По этой же схеме делаются все танцующие мемы и персонажи из соцсетей. В этом уроке разобрал полный процесс: от съёмки до готового ролика.",
+      en: "We change the appearance and voice and get a character that speaks and moves exactly like the video reference. The same workflow is used for dancing memes and social-media characters. In this lesson I break down the full process, from shooting to the final video.",
     },
     seoTitle: {
       ru: "Как сделать AI-аватара и анимировать его в Kling Motion Control",
@@ -424,7 +494,7 @@ export const publicLearnLessons: LearnLesson[] = [
     status: "Available",
     access: "free",
     thumbnailPath: `${learnAssetBase}/thumbs/ai-avatar-motion-control.jpg`,
-    publishedAt: "2026-02-09",
+    publishedAt: "2026-05-29",
     updatedAt: "2026-06-06",
     releaseNote: {
       ru: "Тайм-коды обновлены через локальный NotebookLM pipeline.",
@@ -450,7 +520,7 @@ export const publicLearnLessons: LearnLesson[] = [
       en: { youtubeId: "slxq1d8u-Hg", youtubeUrl: "https://youtu.be/slxq1d8u-Hg", captionLanguage: "en" },
     },
     timestamps: { ru: aiAvatarTimestampsRu, en: aiAvatarTimestampsEn },
-    materials: emptyMaterials,
+    materials: aiAvatarMaterials,
   }),
   lesson({
     slug: "junior-designer-1100-order",
@@ -459,8 +529,8 @@ export const publicLearnLessons: LearnLesson[] = [
       en: "A junior finishes a $1100 order: website design review",
     },
     description: {
-      ru: "Разбор реального Figma-макета: сетка, отступы, карточки, типографика, FAQ и финальная версия сайта.",
-      en: "A real Figma design review covering grid, spacing, cards, typography, FAQ, and the final website version.",
+      ru: "Второй ролик про то как я делаю дизайн сайта за 1,100 долларов, но в этот раз я решил сменить формат съёмки и дал возможность абсолютному новичку который только смотрел теорию по фигме, доделать дизайн страницы. А я тем временем уже буду делать разбор его работы и исправлять. Таким образом мы разберём все ошибки которые новички допускают при создании дизайна сайта в Figma, приятного просмотра.",
+      en: "The second video about how I design a website for $1,100, but this time I changed the filming format and let an absolute beginner, who had only watched Figma theory, finish the page design. Meanwhile, I review his work and fix it. This way we go through all the mistakes beginners make when designing a website in Figma.",
     },
     category: "vibe-design",
     duration: "29:57",
@@ -468,7 +538,7 @@ export const publicLearnLessons: LearnLesson[] = [
     status: "Available",
     access: "free",
     thumbnailPath: `${learnAssetBase}/thumbs/junior-designer-1100-order.jpg`,
-    publishedAt: "2025-10-22",
+    publishedAt: "2026-06-02",
     updatedAt: "2026-06-06",
     releaseNote: {
       ru: "Практический разбор ошибок начинающего дизайнера на реальном заказе.",
@@ -494,7 +564,7 @@ export const publicLearnLessons: LearnLesson[] = [
       en: { youtubeId: "blrSogS4yXM", youtubeUrl: "https://youtu.be/blrSogS4yXM", captionLanguage: "en" },
     },
     timestamps: { ru: juniorOrderTimestampsRu, en: juniorOrderTimestampsEn },
-    materials: emptyMaterials,
+    materials: juniorOrderMaterials,
   }),
   lesson({
     slug: "client-website-navigation-hero",
@@ -503,8 +573,8 @@ export const publicLearnLessons: LearnLesson[] = [
       en: "$1100 website design: navigation and hero section in Figma",
     },
     description: {
-      ru: "Пошаговая сборка первой секции сайта для реального клиента: мудборд, фон, типографика, кнопки и меню.",
-      en: "A step-by-step build of a client website hero section: moodboard, background, typography, buttons, and menu.",
+      ru: "В этом видео я покажу, как сделать сайт в Figma работая над реальным проектом по веб-дизайну: клиент заплатил мне за создание сайта в Figma, и я делюсь полным процессом. Вы узнаете как правильно выстраивать дизайн-процессы, какие UX/UI решения принимаю и какие материалы для дизайна использую. Это первая серия, впереди ещё больше полезных фишек для дизайнеров и тех, кто хочет зарабатывать на веб-дизайне.",
+      en: "In this video I show how to design a website in Figma while working on a real web-design project: a client paid me to create a website in Figma, and I share the full process. You will learn how I structure design processes, what UX/UI decisions I make, and what design materials I use. This is the first episode, with more useful techniques ahead for designers and anyone who wants to earn from web design.",
     },
     category: "vibe-design",
     duration: "29:34",
@@ -512,7 +582,7 @@ export const publicLearnLessons: LearnLesson[] = [
     status: "Available",
     access: "free",
     thumbnailPath: `${learnAssetBase}/thumbs/client-website-navigation-hero.jpg`,
-    publishedAt: "2025-09-25",
+    publishedAt: "2026-05-24",
     updatedAt: "2026-06-06",
     releaseNote: {
       ru: "Подходит как базовый урок по созданию hero-секции для коммерческого сайта.",
@@ -538,7 +608,7 @@ export const publicLearnLessons: LearnLesson[] = [
       en: { youtubeId: "MEs-DdIjPy0", youtubeUrl: "https://youtu.be/MEs-DdIjPy0", captionLanguage: "en" },
     },
     timestamps: { ru: clientWebsiteTimestampsRu, en: clientWebsiteTimestampsEn },
-    materials: emptyMaterials,
+    materials: clientWebsiteMaterials,
   }),
   lesson({
     slug: "ai-marketplace-product-cards",
@@ -547,8 +617,8 @@ export const publicLearnLessons: LearnLesson[] = [
       en: "AI product-card design for marketplaces",
     },
     description: {
-      ru: "Как сделать премиальную карточку товара без фотосессии: ChatGPT, генерация фона, Figma, типографика и инфографика.",
-      en: "How to create a premium product card without a photoshoot: ChatGPT, background generation, Figma, typography, and infographics.",
+      ru: "В этом видео покажу, как с помощью ChatGPT и нейросетей можно сделать красивые карточки товаров для маркетплейсов без единого фото! Я просто взял изображение товара, сгенерировал фон, совместил их — и получил полноценную карточку, готовую для загрузки на OZON и Wildberries. Идеально для тех, у кого нет студии или бюджета на съёмку. Смотри до конца, чтобы понять, как это может упростить тебе жизнь.",
+      en: "In this video I show how to use ChatGPT and AI tools to create beautiful product cards for marketplaces without a single photo shoot. I take a product image, generate a background, combine them, and get a complete card ready for OZON and Wildberries. Perfect for anyone without a studio or shooting budget. Watch to the end to see how much this can simplify your workflow.",
     },
     category: "ai-image",
     duration: "26:22",
@@ -556,7 +626,7 @@ export const publicLearnLessons: LearnLesson[] = [
     status: "Available",
     access: "free",
     thumbnailPath: `${learnAssetBase}/thumbs/ai-marketplace-product-cards.jpg`,
-    publishedAt: "2025-07-08",
+    publishedAt: "2026-05-20",
     updatedAt: "2026-06-06",
     releaseNote: {
       ru: "Урок для дизайнеров карточек товаров и визуалов для маркетплейсов.",
@@ -582,7 +652,7 @@ export const publicLearnLessons: LearnLesson[] = [
       en: { youtubeId: "-0elJixu1kc", youtubeUrl: "https://youtu.be/-0elJixu1kc", captionLanguage: "en" },
     },
     timestamps: { ru: marketplaceCardsTimestampsRu, en: marketplaceCardsTimestampsEn },
-    materials: emptyMaterials,
+    materials: marketplaceCardsMaterials,
   }),
   lesson({
     slug: "web-design-references",
@@ -591,8 +661,8 @@ export const publicLearnLessons: LearnLesson[] = [
       en: "How web designers use references without copying",
     },
     description: {
-      ru: "Правила работы с референсами: где искать идеи, как анализировать структуру, менять стиль и собирать moodboard.",
-      en: "A practical reference workflow: where to find ideas, how to analyze structure, change style, and build moodboards.",
+      ru: "В этом видео я рассказываю про то, как воровать в веб-дизайне правильно. Почему все дизайнеры собирают референсы, создают мудборды и откуда вообще брать вдохновение для дизайна сайта. Если ты когда-либо сталкивался с проблемой «не знаю с чего начать дизайн», это видео для тебя. Я объясню, зачем дизайнеры анализируют чужие работы, копируют элементы интерфейсов, используют референсы Dribbble и Behance, и почему это не считается воровством, если делать всё с умом. Разберём примеры, как собирать референсы для лендинга, как делать уникальный UI-дизайн, комбинируя идеи с разных источников. Это видео — отличный старт для тех, кто хочет понять, как делать дизайн не с нуля, а эффективно.",
+      en: "In this video I explain how to borrow ideas in web design the right way: why designers collect references, build moodboards, and where inspiration for a website design actually comes from. If you have ever felt stuck and did not know where to start a design, this lesson is for you. I explain why designers analyze other work, reuse interface ideas, study Dribbble and Behance references, and why it is not theft when done thoughtfully. We go through examples of collecting references for a landing page and making a unique UI design by combining ideas from different sources. This is a strong starting point for anyone who wants to design efficiently instead of starting from a blank page.",
     },
     category: "vibe-design",
     duration: "13:52",
@@ -600,7 +670,7 @@ export const publicLearnLessons: LearnLesson[] = [
     status: "Available",
     access: "free",
     thumbnailPath: `${learnAssetBase}/thumbs/web-design-references.jpg`,
-    publishedAt: "2025-06-25",
+    publishedAt: "2026-06-04",
     updatedAt: "2026-06-06",
     releaseNote: {
       ru: "Короткий урок по насмотренности, мудбордам и этичной работе с чужими идеями.",
@@ -626,7 +696,7 @@ export const publicLearnLessons: LearnLesson[] = [
       en: { youtubeId: "MsIkbE1w-fM", youtubeUrl: "https://youtu.be/MsIkbE1w-fM", captionLanguage: "en" },
     },
     timestamps: { ru: referencesTimestampsRu, en: referencesTimestampsEn },
-    materials: emptyMaterials,
+    materials: referencesMaterials,
   }),
 ];
 
@@ -706,6 +776,181 @@ const courseCollections: LearnCollection[] = learnCourses.map((course) => ({
 
 export const learnCollections: LearnCollection[] = [standaloneCollection, ...courseCollections];
 
+const templateCourseLessons: LearnLesson[] = [
+  lesson({
+    ...publicLearnLessons[0],
+    slug: "template-course-01",
+    title: { ru: "Шаблон курса: вводный открытый урок", en: "Course template: open intro lesson" },
+    description: {
+      ru: "Первый бесплатный урок подборки: используется для проверки карточки, сайдбара и прогресса курса.",
+      en: "The first free course lesson used to verify the course card, sidebar, and progress state.",
+    },
+    status: "Completed",
+    access: "free",
+    releaseNote: { ru: "Template-only lesson. Hidden from SEO and sitemap.", en: "Template-only lesson. Hidden from SEO and sitemap." },
+  }),
+  lesson({
+    ...publicLearnLessons[1],
+    slug: "template-course-02",
+    title: { ru: "Шаблон курса: инструменты и подготовка", en: "Course template: tools and preparation" },
+    description: {
+      ru: "Открытый урок подборки для состояния выполненного урока и переходов внутри курса.",
+      en: "An open course lesson for testing completed state and in-course navigation.",
+    },
+    status: "Completed",
+    access: "free",
+    releaseNote: { ru: "Template-only lesson. Hidden from SEO and sitemap.", en: "Template-only lesson. Hidden from SEO and sitemap." },
+  }),
+  lesson({
+    ...publicLearnLessons[2],
+    slug: "template-course-03",
+    title: { ru: "Шаблон курса: референсы и структура", en: "Course template: references and structure" },
+    description: {
+      ru: "Открытый урок подборки для проверки промежуточного состояния списка уроков.",
+      en: "An open course lesson for testing the middle state of the lesson outline.",
+    },
+    status: "Completed",
+    access: "free",
+    releaseNote: { ru: "Template-only lesson. Hidden from SEO and sitemap.", en: "Template-only lesson. Hidden from SEO and sitemap." },
+  }),
+  lesson({
+    ...publicLearnLessons[3],
+    slug: "template-course-04",
+    title: { ru: "Шаблон курса: текущий урок подборки", en: "Course template: current collection lesson" },
+    description: {
+      ru: "Основной шаблонный экран курса: текущий урок, материалы, вкладки Уроки/Тайм-коды и прогресс.",
+      en: "The primary course template screen: current lesson, materials, Lessons/Timestamps tabs, and progress.",
+    },
+    status: "In progress",
+    access: "free",
+    releaseNote: { ru: "Template-only lesson. Hidden from SEO and sitemap.", en: "Template-only lesson. Hidden from SEO and sitemap." },
+  }),
+  lesson({
+    ...publicLearnLessons[4],
+    slug: "template-course-05",
+    title: { ru: "Шаблон курса: следующий открытый урок", en: "Course template: next open lesson" },
+    description: {
+      ru: "Открытый урок после текущего, чтобы видеть поведение будущих доступных уроков.",
+      en: "An open lesson after the current one, used to verify future available lesson behavior.",
+    },
+    status: "Available",
+    access: "free",
+    releaseNote: { ru: "Template-only lesson. Hidden from SEO and sitemap.", en: "Template-only lesson. Hidden from SEO and sitemap." },
+  }),
+  lesson({
+    ...publicLearnLessons[5],
+    slug: "template-course-06",
+    title: { ru: "Шаблон курса: Pro-урок с блокировкой", en: "Course template: locked Pro lesson" },
+    description: {
+      ru: "Шаблон заблокированного урока с Pro-плашкой на видео и подписью в списке уроков.",
+      en: "A locked lesson template with the Pro overlay on video and locked label in the lesson outline.",
+    },
+    status: "Available",
+    access: "full-platform",
+    fullAccessOnly: true,
+    releaseNote: { ru: "Template-only lesson. Hidden from SEO and sitemap.", en: "Template-only lesson. Hidden from SEO and sitemap." },
+  }),
+  lesson({
+    ...publicLearnLessons[1],
+    slug: "template-course-07",
+    title: { ru: "Шаблон курса: второй Pro-урок", en: "Course template: second Pro lesson" },
+    description: {
+      ru: "Дополнительный заблокированный урок для проверки длинного списка и одинаковых Pro-состояний.",
+      en: "An additional locked lesson for checking longer outlines and repeated Pro states.",
+    },
+    status: "Available",
+    access: "full-platform",
+    fullAccessOnly: true,
+    releaseNote: { ru: "Template-only lesson. Hidden from SEO and sitemap.", en: "Template-only lesson. Hidden from SEO and sitemap." },
+  }),
+];
+
+const templateStandaloneLesson = lesson({
+  ...publicLearnLessons[0],
+  slug: "template-standalone-lesson",
+  title: { ru: "Шаблон одиночного урока", en: "Standalone lesson template" },
+  description: {
+    ru: "Шаблон страницы одиночного видео: без вкладки уроков, только тайм-коды, автор и Pro-блок справа.",
+    en: "A standalone video page template: no lesson-list tab, only timestamps, author card, and Pro block on the right.",
+  },
+  releaseNote: { ru: "Template-only lesson. Hidden from SEO and sitemap.", en: "Template-only lesson. Hidden from SEO and sitemap." },
+});
+
+export const learnTemplateCollections: LearnCollection[] = [
+  {
+    id: "course",
+    title: { ru: "Шаблон подборки курса", en: "Course collection template" },
+    description: {
+      ru: "Внутренний шаблон будущей подборки: прогресс, список уроков, бесплатные и Pro-состояния.",
+      en: "An internal future-collection template: progress, lesson outline, free and Pro states.",
+    },
+    kind: "course",
+    categoryLabel: { ru: "Шаблон курса", en: "Course template" },
+    routeBasePath: { ru: "/learn/templates/course", en: "/en/learn/templates/course" },
+    progress: { completed: 3, total: templateCourseLessons.length },
+    lessons: templateCourseLessons,
+  },
+  {
+    id: "standalone",
+    title: { ru: "Шаблон одиночного урока", en: "Standalone lesson template" },
+    description: {
+      ru: "Внутренний шаблон одиночного урока без продолжения.",
+      en: "An internal template for a standalone lesson without a sequence.",
+    },
+    kind: "standalone",
+    categoryLabel: { ru: "Шаблон одиночного урока", en: "Standalone template" },
+    routeBasePath: { ru: "/learn/templates/standalone", en: "/en/learn/templates/standalone" },
+    lessons: [templateStandaloneLesson],
+  },
+];
+
+export const learnTemplateLinks = [
+  {
+    id: "course",
+    title: { ru: "Шаблон подборки курса", en: "Course collection template" },
+    path: "/learn/templates/course",
+    enPath: "/en/learn/templates/course",
+  },
+  {
+    id: "locked-course-lesson",
+    title: { ru: "Шаблон заблокированного Pro-урока", en: "Locked Pro lesson template" },
+    path: "/learn/templates/course/template-course-06",
+    enPath: "/en/learn/templates/course/template-course-06",
+  },
+  {
+    id: "standalone",
+    title: { ru: "Шаблон одиночного урока", en: "Standalone lesson template" },
+    path: "/learn/templates/standalone",
+    enPath: "/en/learn/templates/standalone",
+  },
+] as const;
+
+export function getLearnTemplateCollection(templateKind: string | undefined): LearnCollection | undefined {
+  if (!templateKind) return undefined;
+  return learnTemplateCollections.find((collection) => collection.id === templateKind);
+}
+
+export function getDefaultLearnTemplateLesson(collection: LearnCollection): LearnLesson {
+  return collection.lessons.find((item) => item.status === "In progress") ?? collection.lessons[0];
+}
+
+export function findLearnTemplateLesson(templateKind: string | undefined, lessonSlug: string | undefined): LearnLesson | undefined {
+  const collection = getLearnTemplateCollection(templateKind);
+  if (!collection) return undefined;
+  if (!lessonSlug) return getDefaultLearnTemplateLesson(collection);
+  return collection.lessons.find((item) => item.slug === lessonSlug);
+}
+
+export function getAdjacentLearnTemplateLessons(templateKind: string | undefined, lessonSlug: string) {
+  const collection = getLearnTemplateCollection(templateKind);
+  if (!collection) return { previousLesson: undefined, nextLesson: undefined };
+  const index = collection.lessons.findIndex((item) => item.slug === lessonSlug);
+  return {
+    previousLesson: index > 0 ? collection.lessons[index - 1] : undefined,
+    nextLesson: index >= 0 && index < collection.lessons.length - 1 ? collection.lessons[index + 1] : undefined,
+  };
+}
+
 export const learnOverviewBaseSections: LearnOverviewSection[] = [
   {
     id: standaloneCollection.id,
@@ -755,6 +1000,10 @@ export function getLessonPosition(slug: string, lang: LearnLang = "ru") {
 
 export function getLearnLessonAuthor(item: LearnLesson) {
   return item.author ?? learnDefaultAuthor;
+}
+
+export function getLearnAuthorName(author: LearnAuthor, lang: LearnLang) {
+  return author.localizedName?.[lang] ?? author.name;
 }
 
 export function getLearnLessonTitle(item: LearnLesson, lang: LearnLang) {

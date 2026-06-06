@@ -1,5 +1,4 @@
 import {
-  BadgeCheck,
   BookOpen,
   ChevronDown,
   Play,
@@ -14,6 +13,7 @@ import {
   futureLearnCollections,
   getFutureCollectionSubtitle,
   getFutureCollectionTitle,
+  getLearnAuthorName,
   getLearnLessonAuthor,
   getLearnLessonCategoryLabel,
   getLearnLessonDescription,
@@ -192,7 +192,9 @@ export default function LearnOverviewPage() {
 
           <HeroVideoCard lang={lang} className="mt-[51px] max-md:hidden min-[1120px]:col-start-1 min-[1120px]:row-start-2" />
           <article className="mt-[51px] flex min-h-[310px] flex-col justify-center max-[1119px]:max-w-[552px] max-md:hidden min-[1120px]:col-start-2 min-[1120px]:row-start-2 min-[1120px]:-ml-[18px]">
-            <h2 className="text-[21px] font-bold leading-tight text-white">{getLearnLessonTitle(featuredLearnLesson, lang)}</h2>
+            <h2 className="text-[21px] font-bold leading-tight text-white">
+              {renderFeaturedLessonTitle(featuredLearnLesson, lang)}
+            </h2>
             <p className="mt-[15px] text-[14px] leading-[1.55] text-white/55">
               {getLearnLessonDescription(featuredLearnLesson, lang)}
             </p>
@@ -294,8 +296,8 @@ export default function LearnOverviewPage() {
           </section>
         )}
       </main>
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[360px] overflow-hidden max-md:h-[280px]">
-        <div className="absolute left-1/2 bottom-[-640px] h-[982px] w-[1720px] -translate-x-[56%] bg-[url('/assets/landing-design/gradient-blob-shape.svg')] bg-[length:100%_100%] bg-center bg-no-repeat opacity-[0.18] blur-[140px] max-md:bottom-[-300px] max-md:h-[548px] max-md:w-[960px] max-md:-translate-x-[59%] max-md:opacity-20 max-md:blur-[75px]" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[620px] overflow-hidden max-md:h-[420px]">
+        <div className="absolute left-1/2 bottom-[-500px] h-[982px] w-[1720px] -translate-x-[56%] bg-[url('/assets/landing-design/gradient-blob-shape.svg')] bg-[length:100%_100%] bg-center bg-no-repeat opacity-[0.18] blur-[140px] max-md:bottom-[-260px] max-md:h-[548px] max-md:w-[960px] max-md:-translate-x-[59%] max-md:opacity-20 max-md:blur-[75px]" />
       </div>
       <SiteFooter variant="linksOnly" />
     </div>
@@ -317,7 +319,7 @@ function HeroVideoCard({ lang, className = "" }: { lang: LearnLang; className?: 
         className="absolute inset-0 h-full w-full object-cover opacity-88 transition duration-500 group-hover:scale-[1.025]"
       />
       <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.02),rgba(1,16,18,0.24))]" />
-      <span className="absolute left-1/2 top-1/2 grid size-[63px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#061417]/88 text-[#9cfb51] shadow-[0_10px_32px_rgba(0,0,0,0.36)] transition group-hover:scale-105">
+      <span className="absolute left-1/2 top-1/2 grid size-[63px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#9cfb51] text-[#011417] shadow-[0_14px_38px_rgba(156,251,81,0.24)] transition group-hover:scale-105 group-hover:bg-[#8ff144]">
         <Play size={32} fill="currentColor" className="ml-[3px]" />
       </span>
       <span className="absolute bottom-[10px] right-[11px] rounded-[4px] bg-black/70 px-[6px] py-[4px] text-[13px] font-medium leading-none text-white">
@@ -329,28 +331,39 @@ function HeroVideoCard({ lang, className = "" }: { lang: LearnLang; className?: 
 
 function AuthorCard({ lang }: { lang: LearnLang }) {
   const author = getLearnLessonAuthor(featuredLearnLesson);
+  const authorName = getLearnAuthorName(author, lang);
 
   return (
     <aside className="row-span-2 flex flex-col rounded-[15px] border border-white/10 bg-[#0e2023] px-[20px] py-[20px] shadow-none max-[1119px]:mt-[24px] max-[1119px]:max-w-[552px] max-md:hidden min-[1120px]:col-start-3 min-[1120px]:row-start-1 min-[1120px]:h-[412px] min-[1120px]:self-end">
       <p className="text-[11px] font-bold uppercase leading-none text-white/38">{courseAuthor.label[lang]}</p>
       <img
         src={author.avatarPath}
-        alt={author.name}
+        alt={authorName}
         width="400"
         height="400"
         className="mt-[22px] size-[96px] rounded-full border border-white/16 object-cover"
       />
-      <h2 className="mt-[22px] inline-flex items-center gap-[7px] text-[21px] font-bold leading-tight text-white">
-        {author.name} <BadgeCheck size={15} className="text-[#9cfb51]" fill="currentColor" />
-      </h2>
+      <h2 className="mt-[22px] text-[21px] font-bold leading-tight text-white">{authorName}</h2>
       <p className="mt-[15px] text-[14px] leading-[1.55] text-white/55">{courseAuthor.description[lang]}</p>
-      <dl className="mt-auto grid grid-cols-2 gap-[24px]">
-        {courseAuthor.stats.map((stat) => (
+      <dl className="mt-auto flex w-[226px] items-start">
+        <div aria-hidden="true" className="shrink-0">
+          <img
+            src={`${assetBase}/author-followers-avatars.png`}
+            alt=""
+            width="285"
+            height="180"
+            loading="eager"
+            decoding="async"
+            className="h-[37.24px] w-[58px] -translate-y-[2px] select-none object-fill"
+          />
+        </div>
+        {courseAuthor.stats.map((stat, index) => (
           <Stat
             key={stat.value.ru}
             value={stat.value[lang]}
             label={stat.label[lang]}
             active={"active" in stat ? stat.active : false}
+            className={index === 0 ? "ml-[7px] w-[72px]" : "ml-[17px] w-[72px]"}
           />
         ))}
       </dl>
@@ -358,11 +371,11 @@ function AuthorCard({ lang }: { lang: LearnLang }) {
   );
 }
 
-function Stat({ value, label, active = false }: { value: string; label: string; active?: boolean }) {
+function Stat({ value, label, active = false, className = "" }: { value: string; label: string; active?: boolean; className?: string }) {
   return (
-    <div>
-      <dt className={`text-[16px] font-bold leading-none ${active ? "text-[#9cfb51]" : "text-white/70"}`}>{value}</dt>
-      <dd className="mt-[7px] text-[12px] leading-tight text-white/42">{label}</dd>
+    <div className={className}>
+      <dt className={`text-[16px] font-bold leading-[1.3] ${active ? "text-[#9cfb51]" : "text-white"}`}>{value}</dt>
+      <dd className="text-[12px] leading-[1.3] text-white/55">{label}</dd>
     </div>
   );
 }
@@ -409,6 +422,7 @@ function CollectionTile({ collection, lang }: { collection: LearnFutureCollectio
 
 function LargeLessonCard({ lesson, lang }: { lesson: LearnLesson; lang: LearnLang }) {
   const author = getLearnLessonAuthor(lesson);
+  const authorName = getLearnAuthorName(author, lang);
 
   return (
     <LocalizedLink
@@ -429,7 +443,7 @@ function LargeLessonCard({ lesson, lang }: { lesson: LearnLesson; lang: LearnLan
             decoding="async"
             className="size-[25px] shrink-0 rounded-full border border-white/14 object-cover"
           />
-          <span>{author.name}</span>
+          <span>{authorName}</span>
           <span className="ml-[6px] text-white/35">{lessonUpdated(lesson, lang)}</span>
         </div>
       </div>
@@ -449,13 +463,26 @@ function MediaThumb({ lesson }: { lesson: LearnLesson }) {
         className="h-full w-full object-cover opacity-82 transition duration-500 group-hover:scale-[1.035]"
       />
       <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.04),rgba(1,16,18,0.26))]" />
-      <span className="absolute left-1/2 top-1/2 grid size-[48px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white/22 bg-black/58 text-white backdrop-blur-sm transition group-hover:border-[#9cfb51]/70 group-hover:text-[#9cfb51]">
+      <span className="absolute left-1/2 top-1/2 grid size-[48px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#9cfb51] text-[#011417] shadow-[0_14px_38px_rgba(156,251,81,0.22)] transition group-hover:scale-[1.04] group-hover:bg-[#8ff144]">
         <Play size={21} fill="currentColor" className="ml-[2px]" />
       </span>
       <span className="absolute bottom-[8px] right-[8px] rounded-[4px] bg-black/72 px-[6px] py-[4px] text-[13px] font-medium leading-none text-white">
         {lesson.duration}
       </span>
     </div>
+  );
+}
+
+function renderFeaturedLessonTitle(lesson: LearnLesson, lang: LearnLang) {
+  const title = getLearnLessonTitle(lesson, lang);
+  if (lang !== "ru" || title !== "Актуальные нейросети в 2026 году") return title;
+
+  return (
+    <>
+      Актуальные нейросети{" "}
+      <br />
+      в 2026 году
+    </>
   );
 }
 

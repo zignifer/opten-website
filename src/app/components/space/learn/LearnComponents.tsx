@@ -29,6 +29,7 @@ import {
   getLearnLessonTitle,
   getLearnLessonVideoProvider,
   getLessonPosition,
+  getLearnAuthorName,
 } from "../../../../content/space/learn";
 
 const LEARN_PROGRESS_STORAGE_KEY = "opten_space_learn_progress_v1";
@@ -201,14 +202,14 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
         <LocalizedLink to="/learn" className="text-white/68 no-underline hover:text-white">
           {copy.courses}
         </LocalizedLink>
-        <span className="text-white/28">/</span>
-        <span>{getLearnCollectionCategoryLabel(collection, lang)}</span>
         {isCourse && (
           <>
             <span className="text-white/28">/</span>
-            <span className="font-medium text-white">{getLessonPosition(lesson.slug)}</span>
+            <span>{getLearnCollectionTitle(collection, lang)}</span>
           </>
         )}
+        <span className="text-white/28">/</span>
+        <span className="font-medium text-white">{getLearnLessonTitle(lesson, lang)}</span>
       </nav>
 
       <section className="grid grid-cols-[minmax(0,1fr)_360px] items-start gap-[24px] max-lg:grid-cols-1">
@@ -544,6 +545,7 @@ function CollectionSummaryCard({ lesson, collection }: CollectionSummaryCardProp
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const author = getLearnLessonAuthor(lesson);
+  const authorName = getLearnAuthorName(author, lang);
   const progress = collection.progress;
   const percent = progress ? Math.round((progress.completed / progress.total) * 100) : 0;
   const isStandalone = collection.kind === "standalone";
@@ -562,7 +564,7 @@ function CollectionSummaryCard({ lesson, collection }: CollectionSummaryCardProp
           className="size-[40px] shrink-0 rounded-full border border-white/14 object-cover"
         />
         <div className="min-w-0">
-          <p className="truncate text-[14px] font-bold leading-tight text-white">{author.name}</p>
+          <p className="truncate text-[14px] font-bold leading-tight text-white">{authorName}</p>
           <p className="mt-[4px] truncate text-[12px] leading-tight text-white/50">{getLearnLessonAuthorRole(lesson, lang)}</p>
         </div>
       </div>
@@ -687,7 +689,7 @@ export function CourseOutline({ collection, currentSlug, hasPro, className = "" 
         return (
           <LocalizedLink
             key={outlineLesson.slug}
-            to={`/learn/${outlineLesson.slug}`}
+            to={getLessonHref(collection, outlineLesson.slug, lang)}
             aria-current={current ? "page" : undefined}
             className={`group grid grid-cols-[26px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition ${
               current
@@ -817,7 +819,7 @@ function RelatedLessons({ collection, currentSlug, hasPro }: RelatedLessonsProps
           return (
             <LocalizedLink
               key={item.slug}
-              to={`/learn/${item.slug}`}
+              to={getLessonHref(collection, item.slug, lang)}
               className="group overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023] text-white no-underline transition hover:border-[#9cfb51]/45 hover:bg-[#10282c]"
             >
               <div className="relative aspect-video overflow-hidden bg-[#06191c]">
@@ -856,6 +858,11 @@ function RelatedLessons({ collection, currentSlug, hasPro }: RelatedLessonsProps
       </div>
     </section>
   );
+}
+
+function getLessonHref(collection: LearnCollection, slug: string, lang: "ru" | "en") {
+  const basePath = collection.routeBasePath?.[lang] ?? "/learn";
+  return `${basePath}/${slug}`;
 }
 
 type LessonStatusDotProps = {

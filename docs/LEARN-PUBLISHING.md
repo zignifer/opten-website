@@ -77,6 +77,34 @@ and timestamp seeking.
 - Manual completion is stored in `localStorage.opten_space_learn_progress_v1`
   and must always be reversible.
 
+## Future Course Collections
+
+The course-page template is intentionally preserved in code, even though the
+current public catalog uses standalone lessons only.
+
+Direct noindex template URLs:
+
+- Course page: `/learn/templates/course`
+- Locked Pro lesson state: `/learn/templates/course/template-course-06`
+- Standalone lesson page: `/learn/templates/standalone`
+- English course page: `/en/learn/templates/course`
+- English standalone lesson page: `/en/learn/templates/standalone`
+
+- Add a future course to `learnCourses` in `src/content/space/learn.ts`.
+- Keep `kind: "course"` through the generated `learnCollections` mapping.
+- Put every course lesson in the course's `lessons` array in display order.
+- Use `access: "free"` for open lessons and `access: "full-platform"` for
+  lessons unlocked by Pro.
+- Set `progress.total` to the number of course lessons. The UI recalculates
+  completed count from manual progress and built-in completed lessons.
+- Course lesson pages automatically show the right sidebar with both tabs:
+  lesson list and timestamps.
+- Standalone lesson pages keep only the timestamps tab.
+- The "continue learning" surface should remain hidden while `learnCourses` is
+  empty, and can be enabled when real course progress exists.
+- Future placeholder cards live in `futureLearnCollections`; they are visual
+  teasers only and should not link to fake lesson pages.
+
 ## Player Notes
 
 YouTube lessons use a custom Opten poster and play button before activation.

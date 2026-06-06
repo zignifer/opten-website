@@ -15,6 +15,7 @@ const requiredFiles = [
   "src/app/pages/space/AppAuthCallbackPage.tsx",
   "src/app/pages/space/LearnOverviewPage.tsx",
   "src/app/pages/space/LessonDetailPage.tsx",
+  "src/app/pages/space/LearnTemplatePage.tsx",
   "src/lib/optenAuth.ts",
   "public/assets/space/figma/search.svg",
   "public/assets/space/figma/prompt-stack.svg",
@@ -34,8 +35,11 @@ assert.match(main, /\/app"/, "Main router must register /app");
 assert.match(main, /\/app\/login"/, "Main router must register /app/login");
 assert.match(main, /\/app\/auth\/callback"/, "Main router must register /app/auth/callback");
 assert.match(main, /\/learn"/, "Main router must register public /learn");
+assert.match(main, /\/learn\/templates\/:templateKind"/, "Main router must register noindex Learn template routes");
+assert.match(main, /\/learn\/templates\/:templateKind\/:templateLessonSlug"/, "Main router must register noindex Learn template lesson routes");
 assert.match(main, /\/learn\/:lessonSlug"/, "Main router must register public /learn/:lessonSlug");
 assert.match(main, /\/en\/learn"/, "Main router must register public /en/learn");
+assert.match(main, /\/en\/learn\/templates\/:templateKind"/, "Main router must register EN noindex Learn template routes");
 assert.match(main, /\/en\/learn\/:lessonSlug"/, "Main router must register public /en/learn/:lessonSlug");
 assert.match(main, /\/app\/learn"[\s\S]*Navigate[\s\S]*\/learn/, "Legacy /app/learn must redirect to /learn");
 assert.match(main, /\/app\/learn\/:lessonSlug"[\s\S]*Navigate[\s\S]*\/learn/, "Legacy /app/learn/:lessonSlug must redirect to /learn");
@@ -49,7 +53,10 @@ const vercel = readFileSync(join(root, "vercel.json"), "utf8");
 assert.match(vercel, /"source": "\/app\/:path\*"/, "Vercel must SPA-rewrite /app/:path* to /index.html");
 assert.match(vercel, /"source": "\/app\/:path\*"[\s\S]*"X-Robots-Tag"[\s\S]*"noindex, nofollow"/, "Opten Space app routes must ship noindex headers");
 assert.match(vercel, /"source": "\/space\/:path\*"/, "Vercel must keep SPA rewrite for legacy /space/:path* redirects");
-assert.doesNotMatch(vercel, /"source": "\/learn(?::|\/)/, "Public /learn routes must not receive the app noindex header");
+assert.match(vercel, /"source": "\/learn\/templates\/:path\*"[\s\S]*"destination": "\/index\.html"/, "Learn template routes must SPA-rewrite to /index.html");
+assert.match(vercel, /"source": "\/learn\/templates\/:path\*"[\s\S]*"X-Robots-Tag"[\s\S]*"noindex, nofollow"/, "Learn template routes must ship noindex headers");
+assert.match(vercel, /"source": "\/en\/learn\/templates\/:path\*"[\s\S]*"X-Robots-Tag"[\s\S]*"noindex, nofollow"/, "EN Learn template routes must ship noindex headers");
+assert.doesNotMatch(vercel, /"source": "\/learn"[\s\S]*"X-Robots-Tag"/, "Public /learn hub must not receive a noindex header");
 
 const content = readFileSync(join(root, "src/content/space/learn.ts"), "utf8");
 assert.match(content, /export const learnFilters/, "Learn filters must be exported");
@@ -60,8 +67,20 @@ assert.match(content, /junior-designer-1100-order/, "Learn catalog must include 
 assert.match(content, /client-website-navigation-hero/, "Learn catalog must include the client website lesson");
 assert.match(content, /ai-marketplace-product-cards/, "Learn catalog must include the AI marketplace cards lesson");
 assert.match(content, /web-design-references/, "Learn catalog must include the web design references lesson");
+assert.match(content, /https:\/\/higgsfield\.ai\//, "Actual AI tools lesson must include the Higgsfield material");
+assert.match(content, /https:\/\/freepik\.com\//, "Actual AI tools lesson must include the Freepik / Magnific material");
+assert.match(content, /https:\/\/syntx\.ai\/welcome\/GlUETIt6/, "Actual AI tools lesson must include the Syntx material");
+assert.match(content, /xzRwLyTMdrptYg/, "AI avatar lesson must include the bear source files material");
+assert.match(content, /oXQC8gAKd7fLrQ/, "AI avatar lesson must include the human source files material");
+assert.match(content, /RW634KjnQBxXOA/, "AI avatar lesson must include the prompts material");
+assert.match(content, /mOcAHEj6CTfJ4I6rX3njbS\/Lesson-2/, "Junior designer lesson must include the Figma project material");
+assert.match(content, /magnific\.com\/ai\/background-remover/, "Client website lesson must include the Magnific background remover material");
+assert.match(content, /veGLoNcpik3KFPVt80NrCE\/Lesson--Show-/, "Client website lesson must include the Figma project material");
+assert.match(content, /guN3wlvDOU5Noj96hXLoaM\/Pyros--lesson-/, "References lesson must include the Figma project material");
 assert.match(content, /findLearnLesson/, "Learn detail lookup helper must be exported");
 assert.match(content, /getAdjacentLearnLessons/, "Adjacent lesson navigation helper must be exported");
+assert.match(content, /learnTemplateCollections/, "Noindex Learn template collections must be preserved for future course authoring");
+assert.match(content, /routeBasePath/, "Template collections must keep internal template lesson links on template URLs");
 
 const paths = readFileSync(join(root, "src/i18n/paths.ts"), "utf8");
 assert.match(paths, /LEARN_LESSON_SLUGS/, "LocalizedLink must know public Learn lesson siblings");
