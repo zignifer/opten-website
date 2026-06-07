@@ -1,11 +1,11 @@
 // Phase 5 B-04: blog post card for /blog and /en/blog listing.
 // Dark card on bg-[#0e2023] per the opten-design system, 16:9 cover, category badge,
 // title, excerpt, and meta row (date + reading time).
-// Picture/srcset is intentionally NOT used here: blog covers live in public/blog/<slug>/
-// (generated via Codex CLI in C8) and are referenced by absolute URL — vite-imagetools
-// only optimizes assets imported through Vite, not arbitrary public/ paths.
+// Blog covers live in public/blog/<slug>/, so they use the build-generated
+// responsive public-image pipeline rather than vite-imagetools imports.
 
 import LocalizedLink from "./LocalizedLink";
+import ResponsiveImage from "./ResponsiveImage";
 import { useLang, useT } from "../../i18n/LangContext";
 import type { BlogPostLocale } from "../../content/blog/types";
 
@@ -39,12 +39,14 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
       className="group block overflow-hidden rounded-[12px] border border-white/10 bg-[#0e2023] text-inherit no-underline transition hover:border-white/20 hover:-translate-y-0.5"
     >
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#011417]">
-        <img
+        <ResponsiveImage
           src={post.cover.src}
           alt={post.cover.alt}
           width={post.cover.width}
           height={post.cover.height}
           loading="lazy"
+          widths={[480, 800, 1200]}
+          sizes="(max-width: 640px) calc(100vw - 40px), (max-width: 1024px) calc(50vw - 32px), 380px"
           className="h-full w-full object-cover transition group-hover:scale-[1.02]"
         />
       </div>

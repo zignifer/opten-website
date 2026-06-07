@@ -17,6 +17,7 @@ import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 import BlogPostCard from "../components/BlogPostCard";
 import FaqBlock from "../components/FaqBlock";
+import ResponsiveImage from "../components/ResponsiveImage";
 import { blogPostsBySlug, allBlogPosts, type BlogSlug } from "../../content/blog";
 
 function formatPostDate(iso: string, lang: "ru" | "en"): string {
@@ -112,12 +113,14 @@ export default function BlogPostPage() {
 
         {/* Cover image — 16:9, ≥1200px wide for Rich Results carousel */}
         <figure className="mt-[28px] overflow-hidden rounded-[12px] border border-white/10 bg-[#0e2023]">
-          <img
+          <ResponsiveImage
             src={data.cover.src}
             alt={data.cover.alt}
             width={data.cover.width}
             height={data.cover.height}
             loading="eager"
+            widths={[480, 800, 1200, 1600]}
+            sizes="(max-width: 840px) calc(100vw - 40px), 800px"
             className="block h-auto w-full"
           />
         </figure>
@@ -158,12 +161,14 @@ export default function BlogPostPage() {
                   </div>
                 )}
                 {step.imageSrc && (
-                  <img
+                  <ResponsiveImage
                     src={step.imageSrc}
                     alt={step.title}
                     loading="lazy"
                     width="800"
                     height="450"
+                    widths={[480, 800]}
+                    sizes="(max-width: 840px) calc(100vw - 40px), 800px"
                     className="mt-[16px] w-full rounded-[8px] border border-white/10"
                   />
                 )}
@@ -186,12 +191,14 @@ export default function BlogPostPage() {
                   </p>
                 ))}
                 {sec.image && (
-                  <img
+                  <ResponsiveImage
                     src={sec.image.src}
                     alt={sec.image.alt}
                     width={sec.image.width}
                     height={sec.image.height}
                     loading="lazy"
+                    widths={[480, 800, 1200]}
+                    sizes="(max-width: 840px) calc(100vw - 40px), 800px"
                     className="mt-[12px] w-full rounded-[8px] border border-white/10"
                   />
                 )}

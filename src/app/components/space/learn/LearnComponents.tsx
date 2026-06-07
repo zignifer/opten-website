@@ -12,6 +12,7 @@ import { useLocation } from "react-router";
 import { useLang } from "../../../../i18n/LangContext";
 import type { AccountSummary } from "../../../../lib/optenAuth";
 import LocalizedLink from "../../LocalizedLink";
+import ResponsiveImage from "../../ResponsiveImage";
 import SiteFooter from "../../SiteFooter";
 import SpaceHeader from "../SpaceHeader";
 import { useSpaceAuth } from "../SpaceAuthProvider";
@@ -125,10 +126,14 @@ export function VideoCard({ lesson }: VideoCardProps) {
       className="group flex min-h-0 flex-col overflow-hidden rounded-[8px] border border-white/10 bg-white/[0.05] no-underline transition hover:border-[#9cfb51]/45 hover:bg-white/[0.065]"
     >
       <div className="relative aspect-video overflow-hidden bg-white/5">
-        <img
+        <ResponsiveImage
           src={lesson.thumbnailPath}
           alt=""
           loading="lazy"
+          width="1200"
+          height="676"
+          widths={[360, 480, 720, 960]}
+          sizes="(max-width: 767px) calc(100vw - 64px), (max-width: 1279px) calc(50vw - 48px), 360px"
           className="h-full w-full object-cover opacity-85 transition duration-500 group-hover:scale-[1.035]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.08),rgba(1,16,18,0.58))]" />
@@ -287,11 +292,14 @@ function LessonPlayer({ lesson, locked, startSeconds, playRequestId }: LessonPla
       <div className="relative aspect-video overflow-hidden bg-[#06191c]">
         {locked || !activated ? (
           <>
-            <img
+            <ResponsiveImage
               src={provider.posterPath}
               alt=""
               width="1200"
               height="676"
+              loading="eager"
+              widths={[480, 800, 1200]}
+              sizes="(max-width: 1023px) calc(100vw - 32px), 816px"
               className={`h-full w-full object-cover ${locked ? "opacity-62" : "opacity-90"}`}
             />
             <div className={`absolute inset-0 ${locked ? "bg-[#011417]/70 backdrop-blur-[2px]" : "bg-[linear-gradient(180deg,rgba(1,20,23,0.06),rgba(1,20,23,0.46))]"}`} />
@@ -356,11 +364,14 @@ function LessonPlayer({ lesson, locked, startSeconds, playRequestId }: LessonPla
             allowFullScreen
           />
         ) : (
-          <img
+          <ResponsiveImage
             src={provider.posterPath}
             alt=""
             width="1200"
             height="676"
+            loading="lazy"
+            widths={[480, 800, 1200]}
+            sizes="(max-width: 1023px) calc(100vw - 32px), 816px"
             className="h-full w-full object-cover opacity-90"
           />
         )}
@@ -556,11 +567,14 @@ function CollectionSummaryCard({ lesson, collection }: CollectionSummaryCardProp
       <h2 className="mt-[14px] text-[20px] font-bold leading-[1.2] text-white">{isStandalone ? copy.lessonAuthor : getLearnCollectionTitle(collection, lang)}</h2>
       {isStandalone && <p className="mt-[10px] text-[13px] leading-[1.45] text-white/58">{getLearnLessonAuthorIntro(lesson, lang)}</p>}
       <div className="mt-[20px] flex items-center gap-[11px]">
-        <img
+        <ResponsiveImage
           src={author.avatarPath}
           alt=""
           width="400"
           height="400"
+          loading="lazy"
+          widths={[64, 96]}
+          sizes="40px"
           className="size-[40px] shrink-0 rounded-full border border-white/14 object-cover"
         />
         <div className="min-w-0">
@@ -823,12 +837,14 @@ function RelatedLessons({ collection, currentSlug, hasPro }: RelatedLessonsProps
               className="group overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023] text-white no-underline transition hover:border-[#9cfb51]/45 hover:bg-[#10282c]"
             >
               <div className="relative aspect-video overflow-hidden bg-[#06191c]">
-                <img
+                <ResponsiveImage
                   src={item.thumbnailPath}
                   alt=""
                   width="1200"
                   height="676"
                   loading="lazy"
+                  widths={[360, 480, 720]}
+                  sizes="(max-width: 639px) calc(100vw - 32px), 400px"
                   className="h-full w-full object-cover opacity-82 transition duration-500 group-hover:scale-[1.035]"
                 />
                 <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.04),rgba(1,16,18,0.36))]" />

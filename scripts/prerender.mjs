@@ -312,6 +312,18 @@ function applyHeroPreloadGuard(html, meta) {
   return html; // unchanged
 }
 
+// SPA-only noindex routes must not reuse the prerendered landing document as their fallback.
+// Keep #root empty so main.tsx mounts the real client route with createRoot and the browser
+// does not discover landing-only images before /login, /account, /app/*, etc. render.
+{
+  let htmlSpa = applyHeroPreloadGuard(template, { path: "/spa.html" });
+  htmlSpa = applyModulePreload(htmlSpa);
+  htmlSpa = applySafariPreloadFallback(htmlSpa);
+  htmlSpa = htmlSpa.replace("</head>", `    <meta name="robots" content="noindex,nofollow" />\n  </head>`);
+  await writeFile(resolve(DIST, "spa.html"), htmlSpa, "utf-8");
+  console.log("✓ /spa.html emitted (empty noindex SPA fallback)");
+}
+
 for (const meta of routes) {
   let html = applyMeta(template, meta);
   html = applyHtmlLang(html, meta);         // Phase 3 GEO-C-4: bake <html lang> per file

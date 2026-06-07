@@ -3,6 +3,7 @@ dist
 .vite
 .ssr-cache
 .ssr-meta
+public/generated/
 .playwright-mcp
 *.local
 .env

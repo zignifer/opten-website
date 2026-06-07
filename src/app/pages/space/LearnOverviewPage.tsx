@@ -26,6 +26,7 @@ import {
   type LearnTopic,
 } from "../../../content/space/learn";
 import LocalizedLink from "../../components/LocalizedLink";
+import ResponsiveImage from "../../components/ResponsiveImage";
 import SiteFooter from "../../components/SiteFooter";
 import SpaceHeader from "../../components/space/SpaceHeader";
 
@@ -174,12 +175,14 @@ export default function LearnOverviewPage() {
               <span className="relative z-10">
                 <span className="relative inline-block">
                   <span className="relative z-10">{copy.heroTitleLead}</span>
-                  <img
+                  <ResponsiveImage
                     src={`${assetBase}/title-line.png`}
                     alt=""
                     aria-hidden="true"
                     width="532"
                     height="74"
+                    widths={[192, 320, 480]}
+                    sizes="(max-width: 768px) 218px, 276px"
                     className="pointer-events-none absolute left-[-22px] top-[16%] z-20 h-auto w-[276px] max-w-none origin-center translate-y-[4px] scale-y-[0.72] select-none max-md:left-[-14px] max-md:top-[17%] max-md:w-[218px]"
                   />
                 </span>{" "}
@@ -311,11 +314,14 @@ function HeroVideoCard({ lang, className = "" }: { lang: LearnLang; className?: 
       className={`group relative block aspect-video overflow-hidden rounded-[12px] border border-white/12 bg-[#0e2023] text-left shadow-[0_20px_60px_rgba(0,0,0,0.22)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417] ${className}`}
       aria-label={`${pageCopy[lang].watchLesson}: ${getLearnLessonTitle(featuredLearnLesson, lang)}`}
     >
-      <img
+      <ResponsiveImage
         src={featuredLearnLesson.thumbnailPath}
         alt=""
         width="1200"
         height="676"
+        loading="eager"
+        widths={[480, 800, 1200]}
+        sizes="(max-width: 1119px) 552px, 552px"
         className="absolute inset-0 h-full w-full object-cover opacity-88 transition duration-500 group-hover:scale-[1.025]"
       />
       <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.02),rgba(1,16,18,0.24))]" />
@@ -336,24 +342,29 @@ function AuthorCard({ lang }: { lang: LearnLang }) {
   return (
     <aside className="row-span-2 flex flex-col rounded-[15px] border border-white/10 bg-[#0e2023] px-[20px] py-[20px] shadow-none max-[1119px]:mt-[24px] max-[1119px]:max-w-[552px] max-md:hidden min-[1120px]:col-start-3 min-[1120px]:row-start-1 min-[1120px]:h-[412px] min-[1120px]:self-end">
       <p className="text-[11px] font-bold uppercase leading-none text-white/38">{courseAuthor.label[lang]}</p>
-      <img
+      <ResponsiveImage
         src={author.avatarPath}
         alt={authorName}
         width="400"
         height="400"
+        loading="lazy"
+        widths={[96, 192]}
+        sizes="96px"
         className="mt-[22px] size-[96px] rounded-full border border-white/16 object-cover"
       />
       <h2 className="mt-[22px] text-[21px] font-bold leading-tight text-white">{authorName}</h2>
       <p className="mt-[15px] text-[14px] leading-[1.55] text-white/55">{courseAuthor.description[lang]}</p>
       <dl className="mt-auto flex w-[226px] items-start">
         <div aria-hidden="true" className="shrink-0">
-          <img
+          <ResponsiveImage
             src={`${assetBase}/author-followers-avatars.png`}
             alt=""
             width="285"
             height="180"
             loading="eager"
             decoding="async"
+            widths={[96, 192, 320]}
+            sizes="58px"
             className="h-[37.24px] w-[58px] -translate-y-[2px] select-none object-fill"
           />
         </div>
@@ -396,12 +407,14 @@ function CollectionTile({ collection, lang }: { collection: LearnFutureCollectio
 
   return (
     <article className="group relative block min-h-[237px] overflow-hidden rounded-[9px] border border-white/10 bg-[#0e2023] text-left transition hover:border-[#9cfb51]/45">
-      <img
+      <ResponsiveImage
         src={collection.image}
         alt=""
         width="1200"
         height="676"
         loading="lazy"
+        widths={[360, 480, 720]}
+        sizes="(max-width: 559px) calc(100vw - 32px), (max-width: 899px) calc(50vw - 24px), 220px"
         className="absolute inset-0 h-full w-full object-cover opacity-72 transition duration-500 group-hover:scale-[1.035]"
       />
       <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.12),rgba(1,16,18,0.9)_78%)]" />
@@ -434,13 +447,15 @@ function LargeLessonCard({ lesson, lang }: { lesson: LearnLesson; lang: LearnLan
         <p className="text-[12px] leading-none text-white/38">{getLearnLessonCategoryLabel(lesson, lang)}</p>
         <h3 className="mt-[9px] min-h-[49px] text-[18px] font-bold leading-[1.3] text-white">{getLearnLessonTitle(lesson, lang)}</h3>
         <div className="mt-[22px] flex items-center gap-[10px] text-[13px] text-white/52">
-          <img
+          <ResponsiveImage
             src={author.avatarPath}
             alt=""
             width="400"
             height="400"
             loading="lazy"
             decoding="async"
+            widths={[64, 96]}
+            sizes="25px"
             className="size-[25px] shrink-0 rounded-full border border-white/14 object-cover"
           />
           <span>{authorName}</span>
@@ -454,12 +469,14 @@ function LargeLessonCard({ lesson, lang }: { lesson: LearnLesson; lang: LearnLan
 function MediaThumb({ lesson }: { lesson: LearnLesson }) {
   return (
     <div className="relative aspect-video overflow-hidden bg-[#0e2023]">
-      <img
+      <ResponsiveImage
         src={lesson.thumbnailPath}
         alt=""
         width="1200"
         height="676"
         loading="lazy"
+        widths={[360, 480, 720, 960]}
+        sizes="(max-width: 639px) calc(100vw - 32px), (max-width: 1023px) calc(50vw - 36px), 380px"
         className="h-full w-full object-cover opacity-82 transition duration-500 group-hover:scale-[1.035]"
       />
       <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.04),rgba(1,16,18,0.26))]" />
