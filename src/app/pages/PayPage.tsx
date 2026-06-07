@@ -597,40 +597,6 @@ export default function PayPage() {
                 </div>
               )}
 
-              {extStatus === "not_installed" && (
-                <div className="w-full rounded-[12px] border border-white/10 bg-[#0e2023] px-[24px] py-[20px] text-center">
-                  <p className="font-['PT_Root_UI',sans-serif] text-white text-[15px] font-medium leading-[1.5] mb-[12px]">
-                    {t("pay.status.signIn.title")}
-                  </p>
-                  <p className="mx-auto mb-[16px] max-w-[420px] font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.6]">
-                    {t("pay.status.signIn.desc")}
-                  </p>
-                  <LocalizedLink
-                    to="/login?next=/pay"
-                    className="inline-flex rounded-[100px] bg-[#9cfb51] px-[22px] py-[12px] font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] no-underline transition hover:-translate-y-0.5"
-                  >
-                    {t("pay.status.signIn.cta")}
-                  </LocalizedLink>
-                </div>
-              )}
-
-              {extStatus === "not_logged_in" && (
-                <div className="w-full rounded-[12px] border border-white/10 bg-[#0e2023] px-[24px] py-[20px] text-center">
-                  <p className="font-['PT_Root_UI',sans-serif] text-white text-[15px] font-medium leading-[1.5] mb-[8px]">
-                    {t("pay.status.signIn.title")}
-                  </p>
-                  <p className="mx-auto mb-[16px] max-w-[420px] font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.6)] text-[14px] leading-[1.6]">
-                    {t("pay.status.notLoggedIn.desc")}
-                  </p>
-                  <LocalizedLink
-                    to="/login?next=/pay"
-                    className="inline-flex rounded-[100px] bg-[#9cfb51] px-[22px] py-[12px] font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] no-underline transition hover:-translate-y-0.5"
-                  >
-                    {t("pay.status.signIn.cta")}
-                  </LocalizedLink>
-                </div>
-              )}
-
               {extStatus === "ready" && (
                 <p className="font-['PT_Root_UI',sans-serif] text-[rgba(255,255,255,0.3)] text-[12px] text-center leading-[1.5]">
                   {authSource === "website" && email ? `${email}. ` : ""}
