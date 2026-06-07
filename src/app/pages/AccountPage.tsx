@@ -441,7 +441,7 @@ export default function AccountPage() {
               {/* ── Plan card ── */}
               <div className="relative overflow-hidden rounded-[16px] border border-white/10 bg-[#0e2023] p-[28px] shadow-[0_24px_80px_rgba(0,0,0,0.24)] md:p-[32px]">
                 <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#9cfb51]/40 to-transparent" />
-                <div className="relative z-10 flex flex-col gap-[24px]">
+                <div className={`relative z-10 flex flex-col ${isFree ? "gap-[18px]" : "gap-[24px]"}`}>
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="mb-[4px] text-[13px] uppercase tracking-[1px] text-white/45">{t("account.plan.label")}</p>
@@ -478,13 +478,13 @@ export default function AccountPage() {
                   )}
 
                   {isFree && (
-                    <div className="flex flex-col gap-[4px]">
+                    <div className="flex flex-col">
                       <p className="text-[14px] leading-[1.6] text-white/55">
                         {t("account.plan.freeDesc")}
                       </p>
                       <LocalizedLink
                         to="/pay"
-                        className="mt-[8px] inline-block rounded-[100px] bg-[#9cfb51] px-[32px] py-[14px] text-center text-[16px] font-bold text-[#011417] no-underline transition hover:-translate-y-0.5"
+                        className="mt-[30px] inline-block rounded-[100px] bg-[#9cfb51] px-[32px] py-[14px] text-center text-[16px] font-bold !text-[#011417] no-underline transition hover:-translate-y-0.5"
                       >
                         {t("account.plan.upgradeBtn")}
                       </LocalizedLink>
