@@ -133,9 +133,9 @@ export default function AppLoginPage() {
         <section className="absolute inset-0 z-10 overflow-hidden" aria-labelledby="opten-space-login-title">
           <div
             className="absolute left-1/2 top-1/2 h-[940px] w-[1672px] max-w-none"
-            style={{ transform: "translate(calc(-50% - 4px), -50%)" }}
+            style={{ transform: "translate(-50%, -50%)" }}
           >
-            <div className="absolute left-[651px] top-[220px] z-[2] h-[500px] w-[358px] origin-center scale-[1.3] max-[520px]:scale-100">
+            <div className="absolute left-[657px] top-[220px] z-[2] h-[500px] w-[358px] origin-center scale-[1.3] max-[520px]:scale-100">
               <LoginCardFrame />
               <div className="absolute left-[44px] top-[20px] z-10 flex w-[270px] flex-col items-center text-center">
           <img
@@ -255,7 +255,7 @@ function LoginBackground() {
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden bg-[#020607]">
       <div
         className="absolute left-1/2 top-1/2 h-[940px] w-[1672px] max-w-none"
-        style={{ transform: "translate(calc(-50% - 4px), -50%)" }}
+        style={{ transform: "translate(-50%, -50%)" }}
       >
         <svg
           className="absolute inset-0 h-full w-full"

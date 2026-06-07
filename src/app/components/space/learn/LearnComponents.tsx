@@ -647,9 +647,10 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const isCourse = collection.kind === "course";
+  const timestampsActive = activeTab === "timestamps";
 
   return (
-    <section className="overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]/92">
+    <section className={`overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]/92 ${timestampsActive ? "max-md:hidden" : ""}`}>
       <div className="flex h-[52px] items-end border-b border-white/8 px-[16px]">
         {isCourse && (
           <button
@@ -666,7 +667,7 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
         <button
           type="button"
           onClick={() => onTabChange("timestamps")}
-          className={`relative h-[52px] min-w-[116px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition ${
+          className={`relative h-[52px] min-w-[116px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition max-md:hidden ${
             activeTab === "timestamps" ? "text-white" : "text-white/58 hover:text-white"
           }`}
         >

@@ -1,5 +1,4 @@
 import { LogIn, type LucideIcon } from "lucide-react";
-import LangSwitcher from "./LangSwitcher";
 import LocalizedLink from "./LocalizedLink";
 
 export type HeaderMobileNavItem = {
@@ -14,7 +13,6 @@ type HeaderMobileMenuProps = {
   creditLabel: string;
   id: string;
   isOpen: boolean;
-  languageLabel: string;
   loginTo: string;
   navItems: HeaderMobileNavItem[];
   onClose: () => void;
@@ -30,7 +28,6 @@ export default function HeaderMobileMenu({
   creditLabel,
   id,
   isOpen,
-  languageLabel,
   loginTo,
   navItems,
   onClose,
@@ -113,12 +110,6 @@ export default function HeaderMobileMenu({
             )}
             <span className="truncate">{signedIn ? accountLabel : signInLabel}</span>
           </LocalizedLink>
-
-          <LangSwitcher
-            label={languageLabel}
-            onSwitch={onClose}
-            className="flex h-[44px] w-full cursor-pointer items-center justify-between rounded-[8px] px-[12px] text-left text-[14px] font-bold text-white/78 outline-none transition hover:bg-white/[0.04] hover:text-white focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417]"
-          />
         </div>
       </div>
     </div>

@@ -169,7 +169,6 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
         signedIn={status === "signed_in"}
         loginTo={loginTo}
         signInLabel={copy.signIn}
-        languageLabel={copy.language}
         onClose={() => setMobileMenuOpen(false)}
       />
     </header>

@@ -240,19 +240,19 @@ export default function LearnOverviewPage() {
           })}
         </section>
 
-        <section className="mt-[22px] border-t border-white/10 pt-[13px] max-md:mt-[24px] max-md:pt-[6px]">
+        <section className="mt-[22px] border-t border-white/10 pt-[13px] max-md:mt-[44px] max-md:border-t-0 max-md:pt-0">
           <div className="flex items-center justify-between gap-[18px] max-md:flex-col max-md:items-stretch max-md:gap-[6px]">
             <label className="relative hidden w-full max-md:block">
               <span className="sr-only">{copy.filterLabel}</span>
               <SlidersHorizontal
                 aria-hidden="true"
                 size={15}
-                className="pointer-events-none absolute left-[13px] top-1/2 -translate-y-1/2 text-white/28"
+                className="pointer-events-none absolute left-[13px] top-1/2 -translate-y-1/2 text-white/28 max-md:hidden"
               />
               <select
                 value={activeTopic}
                 onChange={(event) => setActiveTopic(event.target.value as TopicFilter)}
-                className="h-[42px] w-full appearance-none rounded-[7px] border border-transparent bg-[#0e2023] pl-[40px] pr-[38px] text-[13px] font-medium text-white/86 outline-none transition hover:bg-[#10282c] focus:border-[#9cfb51]/55"
+                className="h-[42px] w-full appearance-none rounded-[7px] border border-transparent bg-[#0e2023] pl-[40px] pr-[38px] text-[13px] font-medium text-white/86 outline-none transition hover:bg-[#10282c] focus:border-[#9cfb51]/55 max-md:pl-[14px]"
               >
                 {topics.map((topic) => (
                   <option key={topic} value={topic} className="bg-[#0e2023] text-white">
@@ -272,12 +272,12 @@ export default function LearnOverviewPage() {
               <SlidersHorizontal
                 aria-hidden="true"
                 size={15}
-                className="pointer-events-none absolute left-[13px] top-1/2 -translate-y-1/2 text-white/28"
+                className="pointer-events-none absolute left-[13px] top-1/2 -translate-y-1/2 text-white/28 max-md:hidden"
               />
               <select
                 value={sortKey}
                 onChange={(event) => setSortKey(event.target.value as SortKey)}
-                className="h-[42px] w-full appearance-none rounded-[7px] border border-transparent bg-[#0e2023] pl-[40px] pr-[38px] text-[13px] font-medium text-white/86 outline-none transition hover:bg-[#10282c] focus:border-[#9cfb51]/55"
+                className="h-[42px] w-full appearance-none rounded-[7px] border border-transparent bg-[#0e2023] pl-[40px] pr-[38px] text-[13px] font-medium text-white/86 outline-none transition hover:bg-[#10282c] focus:border-[#9cfb51]/55 max-md:pl-[14px]"
               >
                 {(Object.keys(sortLabels[lang]) as SortKey[]).map((key) => (
                   <option key={key} value={key} className="bg-[#0e2023] text-white">
@@ -297,14 +297,14 @@ export default function LearnOverviewPage() {
               <Search
                 aria-hidden="true"
                 size={17}
-                className="pointer-events-none absolute left-[14px] top-1/2 -translate-y-1/2 text-white/28"
+                className="pointer-events-none absolute left-[14px] top-1/2 -translate-y-1/2 text-white/28 max-md:hidden"
               />
               <input
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={copy.searchPlaceholder}
-                className="h-[42px] w-full rounded-[7px] border border-transparent bg-[#0e2023] pl-[40px] pr-[14px] text-[13px] text-white outline-none transition placeholder:text-white/48 hover:bg-[#10282c] focus:border-[#9cfb51]/55"
+                className="h-[42px] w-full rounded-[7px] border border-transparent bg-[#0e2023] pl-[40px] pr-[14px] text-[13px] text-white outline-none transition placeholder:text-white/48 hover:bg-[#10282c] focus:border-[#9cfb51]/55 max-md:pl-[14px]"
               />
             </label>
           </div>
