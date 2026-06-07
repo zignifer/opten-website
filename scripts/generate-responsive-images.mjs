@@ -32,10 +32,10 @@ function widthsFor(relativePath) {
   }
 
   if (path.includes("/author-") || file === "title-line.png") {
-    return [96, 192, 320, 480];
+    return [64, 96, 192, 320, 480];
   }
 
-  return [360, 480, 720, 960, 1200];
+  return [360, 480, 720, 800, 960, 1200];
 }
 
 async function collectImages(dir) {

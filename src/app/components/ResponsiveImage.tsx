@@ -39,11 +39,12 @@ export default function ResponsiveImage({
   widths = DEFAULT_WIDTHS,
   sizes = "100vw",
   decoding = "async",
+  onError,
   ...imgProps
 }: ResponsiveImageProps) {
   const parsed = parsePublicImage(src);
   if (!parsed) {
-    return <img src={src} decoding={decoding} {...imgProps} />;
+    return <img src={src} decoding={decoding} onError={onError} {...imgProps} />;
   }
 
   const uniqueWidths = [...new Set(widths)].sort((a, b) => a - b);
@@ -52,7 +53,21 @@ export default function ResponsiveImage({
     <picture>
       <source type="image/avif" srcSet={buildSrcSet(src, uniqueWidths, "avif")} sizes={sizes} />
       <source type="image/webp" srcSet={buildSrcSet(src, uniqueWidths, "webp")} sizes={sizes} />
-      <img src={src} decoding={decoding} sizes={sizes} {...imgProps} />
+      <img
+        src={src}
+        decoding={decoding}
+        sizes={sizes}
+        onError={(event) => {
+          const image = event.currentTarget;
+          if (image.dataset.generatedFallback !== "true") {
+            image.dataset.generatedFallback = "true";
+            image.closest("picture")?.querySelectorAll("source").forEach((source) => source.remove());
+            image.src = src;
+          }
+          onError?.(event);
+        }}
+        {...imgProps}
+      />
     </picture>
   );
 }
