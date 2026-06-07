@@ -6,7 +6,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLang } from "../../../i18n/LangContext";
 import {
   featuredLearnLesson,
@@ -70,6 +70,7 @@ const pageCopy = {
     searchLabel: "Поиск уроков",
     searchPlaceholder: "Поиск уроков...",
     collectionsTitle: "Подборки",
+    viewAllCollections: "Смотреть всё",
     allLessonsTitle: "Все уроки",
     noResultsTitle: "Ничего не найдено",
     noResultsText: "Попробуйте изменить тему или поисковый запрос.",
@@ -86,6 +87,7 @@ const pageCopy = {
     searchLabel: "Search lessons",
     searchPlaceholder: "Search lessons...",
     collectionsTitle: "Collections",
+    viewAllCollections: "View all",
     allLessonsTitle: "All lessons",
     noResultsTitle: "Nothing found",
     noResultsText: "Try changing the topic or search query.",
@@ -122,8 +124,13 @@ export default function LearnOverviewPage() {
   const [activeTopic, setActiveTopic] = useState<TopicFilter>("all");
   const [sortKey, setSortKey] = useState<SortKey>("new");
   const [query, setQuery] = useState("");
+  const [showAllCollections, setShowAllCollections] = useState(false);
 
   const normalizedQuery = query.trim().toLowerCase();
+
+  useEffect(() => {
+    setShowAllCollections(false);
+  }, [activeTopic, normalizedQuery]);
 
   const filteredCollections = useMemo(
     () =>
@@ -170,8 +177,8 @@ export default function LearnOverviewPage() {
       />
       <main className="relative z-10 mx-auto max-w-[1200px] px-[32px] pb-[80px] pt-[60px] max-md:px-4 max-md:pb-[64px] max-md:pt-[28px]">
         <section className="grid min-[1120px]:grid-cols-[minmax(0,552px)_minmax(0,224px)_261px] min-[1120px]:justify-between">
-          <div>
-            <h1 className="relative inline-block font-['Unbounded',sans-serif] text-[55px] font-bold leading-[1.05] tracking-normal text-white max-md:text-[42px] min-[1120px]:whitespace-nowrap">
+          <div className="max-md:text-center">
+            <h1 className="relative inline-block font-['Unbounded',sans-serif] text-[55px] font-bold leading-[1.05] tracking-normal text-white max-md:mx-auto max-md:text-center max-md:text-[42px] min-[1120px]:whitespace-nowrap">
               <span className="relative z-10">
                 <span className="relative inline-block">
                   <span className="relative z-10">{copy.heroTitleLead}</span>
@@ -186,7 +193,9 @@ export default function LearnOverviewPage() {
                     className="pointer-events-none absolute left-[-22px] top-[16%] z-20 h-auto w-[276px] max-w-none origin-center translate-y-[4px] scale-y-[0.72] select-none max-md:left-[-14px] max-md:top-[17%] max-md:w-[218px]"
                   />
                 </span>{" "}
-                {copy.heroTitleTail} <span className="text-[#9cfb51]">Opten</span>
+                <span className="max-md:block md:inline">
+                  {copy.heroTitleTail} <span className="text-[#9cfb51]">Opten</span>
+                </span>
               </span>
             </h1>
           </div>
@@ -210,7 +219,7 @@ export default function LearnOverviewPage() {
           </article>
         </section>
 
-        <section className="mt-[34px] flex flex-wrap gap-[8px]" aria-label={copy.filterLabel}>
+        <section className="mt-[34px] flex flex-wrap gap-[8px] max-md:hidden" aria-label={copy.filterLabel}>
           {topics.map((topic) => {
             const active = topic === activeTopic;
             return (
@@ -231,8 +240,33 @@ export default function LearnOverviewPage() {
           })}
         </section>
 
-        <section className="mt-[22px] border-t border-white/10 pt-[13px]">
-          <div className="flex items-center justify-between gap-[18px] max-md:flex-col max-md:items-stretch">
+        <section className="mt-[22px] border-t border-white/10 pt-[13px] max-md:mt-[24px] max-md:pt-[6px]">
+          <div className="flex items-center justify-between gap-[18px] max-md:flex-col max-md:items-stretch max-md:gap-[6px]">
+            <label className="relative hidden w-full max-md:block">
+              <span className="sr-only">{copy.filterLabel}</span>
+              <SlidersHorizontal
+                aria-hidden="true"
+                size={15}
+                className="pointer-events-none absolute left-[13px] top-1/2 -translate-y-1/2 text-white/28"
+              />
+              <select
+                value={activeTopic}
+                onChange={(event) => setActiveTopic(event.target.value as TopicFilter)}
+                className="h-[42px] w-full appearance-none rounded-[7px] border border-transparent bg-[#0e2023] pl-[40px] pr-[38px] text-[13px] font-medium text-white/86 outline-none transition hover:bg-[#10282c] focus:border-[#9cfb51]/55"
+              >
+                {topics.map((topic) => (
+                  <option key={topic} value={topic} className="bg-[#0e2023] text-white">
+                    {topicLabel(topic, lang)}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                aria-hidden="true"
+                size={17}
+                className="pointer-events-none absolute right-[13px] top-1/2 -translate-y-1/2 text-white/78"
+              />
+            </label>
+
             <label className="relative block w-[215px] max-md:w-full">
               <span className="sr-only">{copy.sortLabel}</span>
               <SlidersHorizontal
@@ -276,10 +310,28 @@ export default function LearnOverviewPage() {
           </div>
         </section>
 
-        <LessonSection title={copy.collectionsTitle}>
+        <LessonSection
+          title={copy.collectionsTitle}
+          action={
+            filteredCollections.length > 1 && !showAllCollections ? (
+              <button
+                type="button"
+                onClick={() => setShowAllCollections(true)}
+                className="hidden h-[30px] shrink-0 items-center rounded-full border border-[#9cfb51]/45 px-[12px] text-[12px] font-bold leading-none text-[#9cfb51] transition hover:bg-[#9cfb51]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/70 max-md:inline-flex"
+              >
+                {copy.viewAllCollections}
+              </button>
+            ) : null
+          }
+        >
           <div className="grid grid-cols-1 gap-[14px] min-[560px]:grid-cols-2 min-[900px]:grid-cols-3 min-[1120px]:grid-cols-5">
-            {filteredCollections.map((collection) => (
-              <CollectionTile key={collection.id} collection={collection} lang={lang} />
+            {filteredCollections.map((collection, index) => (
+              <CollectionTile
+                key={collection.id}
+                collection={collection}
+                lang={lang}
+                className={!showAllCollections && index > 0 ? "max-md:hidden" : ""}
+              />
             ))}
           </div>
         </LessonSection>
@@ -391,22 +443,23 @@ function Stat({ value, label, active = false, className = "" }: { value: string;
   );
 }
 
-function LessonSection({ title, children }: { title: string; children: ReactNode }) {
+function LessonSection({ title, action, children }: { title: string; action?: ReactNode; children: ReactNode }) {
   return (
     <section className="mt-[26px]">
       <div className="mb-[14px] flex items-center justify-between gap-[16px]">
         <h2 className="text-[22px] font-bold leading-tight text-white">{title}</h2>
+        {action}
       </div>
       {children}
     </section>
   );
 }
 
-function CollectionTile({ collection, lang }: { collection: LearnFutureCollection; lang: LearnLang }) {
+function CollectionTile({ collection, lang, className = "" }: { collection: LearnFutureCollection; lang: LearnLang; className?: string }) {
   const copy = pageCopy[lang];
 
   return (
-    <article className="group relative block min-h-[237px] overflow-hidden rounded-[9px] border border-white/10 bg-[#0e2023] text-left transition hover:border-[#9cfb51]/45">
+    <article className={`group relative block min-h-[237px] overflow-hidden rounded-[9px] border border-white/10 bg-[#0e2023] text-left transition hover:border-[#9cfb51]/45 ${className}`}>
       <ResponsiveImage
         src={collection.image}
         alt=""
