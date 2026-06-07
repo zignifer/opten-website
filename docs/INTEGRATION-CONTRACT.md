@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-06-06 against extension `manifest.json` version **1.3.8** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
+> **Last sync:** 2026-06-07 against extension `manifest.json` version **1.4.1** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -200,7 +200,7 @@ live with these exact paths and the documented behavior.
 | `/success` | YooKassa redirect after successful payment | Show success state, optionally autoclose tab. Used as `return_url` in [`create-payment/index.ts:65`](../../promptscore/supabase/functions/create-payment/index.ts#L65). | YooKassa `return_url` |
 | `/account` | User/site navigation; optional popup link | Website-first subscription management UI. Prefers website JWT, reads `account-summary`, can call `cancel-subscription` / `cancel-subscription-paddle` directly, and offers website-only logout. Falls back to extension `GET_AUTH_TOKEN` / `CANCEL_SUBSCRIPTION` for compatibility. SPA-only, `noindex,nofollow`, no `/en/*` sibling. | n/a (user-driven) |
 | `/dashboard/download-skill` | Pro-only feature in popup → opens new tab | Auth-gated page that calls `/api/download-skill` to fetch `opten.zip`. | [popup Phase 73](../../promptscore/popup/popup.html) |
-| `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Pro-only prompt library UI. Calls `GET_AUTH_TOKEN`, checks subscription, then uses Supabase PostgREST for `prompt_library` CRUD/search. After successful mutations it calls `REFRESH_PROMPT_LIBRARY_CACHE` so native extension menus do not keep stale titles/favorite state. Free/expired users see locked upsell state without prompt data reads. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 94 |
+| `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Free prompt library UI for any logged-in extension account. Calls `GET_AUTH_TOKEN` through the installed extension, then uses Supabase PostgREST for `prompt_library` CRUD/search without a subscription check. After successful mutations it calls `REFRESH_PROMPT_LIBRARY_CACHE` so native extension menus do not keep stale titles/favorite state. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 94 + Phase 97 |
 | `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta; `/app` redirects to `/app/learn`, but Learn/Courses is temporarily hidden from visible navigation until ready. Website auth uses the canonical `/login` and may use Google OAuth or email OTP through self-hosted Supabase Auth. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95/96 |
 
 **Locked route names** (renames are breaking):
@@ -314,10 +314,11 @@ DELETE /rest/v1/prompt_library?id=eq.<uuid>
 POST   /rest/v1/rpc/prompt_library_mark_used
 ```
 
-Table: `public.prompt_library` (migration `014_prompt_library.sql` in the
+Table: `public.prompt_library` (created by migration `014_prompt_library.sql`;
+Phase 97 access rule updated by `015_prompt_library_free_access.sql` in the
 extension repo).
 
-Columns exposed to entitled owners:
+Columns exposed to authenticated owners:
 
 ```ts
 {
@@ -342,11 +343,17 @@ Columns exposed to entitled owners:
 Access rules:
 
 - RLS is authoritative. Website UX gates are advisory only.
-- Entitled means `users.plan='pro'` plus a `subscriptions` row with
-  `plan='pro'`, `status in ('active','cancelled')`, and `expires_at` absent or
-  in the future.
-- Free/expired users must not fetch `prompt_library` rows. The site renders a
-  locked upsell state before data access.
+- Prompt Library is free for every authenticated owner account. Phase 97
+  migration `015_prompt_library_free_access.sql` keeps owner isolation and
+  quotas, but removes the old `users.plan='pro'` + `subscriptions` entitlement
+  check because this feature does not call the proxy, AI providers, Edge
+  Functions, or `usage_logs`.
+- The public site still requires the installed Chrome extension for normal use:
+  `/prompt-library` gets its Bearer JWT only through `GET_AUTH_TOKEN`, not from
+  the website `localStorage.opten_space_session_v1` session. RLS cannot
+  distinguish extension-issued and website-issued Supabase JWTs because they are
+  the same auth project tokens; the extension requirement is enforced by the
+  route's UX/message contract.
 - `DELETE` is allowed only for owner rows where `archived_at IS NOT NULL`.
   Active prompts must be archived before permanent delete.
 - Quotas are server-side: 150 rows per user, 12,000 body chars, 8 tags, 50 chars
@@ -370,7 +377,7 @@ It is granted to `authenticated` only.
 **Extension context-menu save (Phase 92):**
 
 The extension service worker also calls this same PostgREST surface directly
-when a Pro user selects text on an HTTP(S) page and clicks
+when a logged-in user selects text on an HTTP(S) page and clicks
 `Сохранить выделенное` in the native context menu:
 
 - `POST /rest/v1/prompt_library?select=...` with `user_id`, deterministic
@@ -381,10 +388,9 @@ when a Pro user selects text on an HTTP(S) page and clicks
   SHA-256 hash locally, fetches the owner row by `body_hash`, restores it when
   archived, and refreshes its bounded local cache instead of creating another
   row.
-- Entitlement is checked locally for UX and then enforced by PostgREST/RLS.
-  The extension refreshes only `users`/`subscriptions` state for this feature;
-  prompt-library save does not call the Vercel proxy, Anthropic, Edge Functions,
-  or `usage_logs`.
+- Authentication is checked locally through the extension token and owner
+  isolation is enforced by PostgREST/RLS. Prompt-library save does not call the
+  Vercel proxy, Anthropic, Edge Functions, or `usage_logs`.
 - Prompt bodies must not be logged by either repo. Metadata-only logging
   (status code, result code, source host, prompt id) is acceptable.
 

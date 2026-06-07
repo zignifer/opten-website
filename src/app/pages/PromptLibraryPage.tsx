@@ -17,11 +17,9 @@ import {
   X,
 } from "lucide-react";
 import { useLang } from "../../i18n/LangContext";
-import LocalizedLink from "../components/LocalizedLink";
 import SiteHeader from "../components/SiteHeader";
 
 const SUPABASE_REST_URL = "https://supabase.opten.space/rest/v1";
-const SUPABASE_FUNCTIONS_URL = "https://supabase.opten.space/functions/v1";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1eXd5ZGh3a3FtaWhmenRwa2dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NjAyODUsImV4cCI6MjA5MTAzNjI4NX0.A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg";
 const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/opten-%E2%80%94-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 const EXTENSION_IDS = [
@@ -39,7 +37,7 @@ const PROMPT_LIBRARY_DEMO_SEEN_KEY = "opten_prompt_library_demo_seen_v1";
 
 type FilterMode = "all" | "favorite" | "recent" | "archive";
 type EditorMode = "view" | "edit";
-type AuthState = "detecting" | "no_extension" | "no_auth" | "checking" | "locked" | "ready" | "error";
+type AuthState = "detecting" | "no_extension" | "no_auth" | "ready" | "error";
 
 interface PromptRecord {
   id: string;
@@ -57,12 +55,6 @@ interface PromptRecord {
   created_at: string;
   updated_at: string;
   archived_at: string | null;
-}
-
-interface Subscription {
-  plan?: string;
-  status?: string | null;
-  expires_at?: string | null;
 }
 
 const TEXT = {
@@ -124,16 +116,13 @@ const TEXT = {
     duplicate: "Такой промпт уже есть в библиотеке",
     quota: "Лимит 150 промптов уже заполнен",
     detecting: "Подключаемся к расширению...",
-    checking: "Проверяем подписку...",
+    checking: "Подключаем библиотеку...",
     loading: "Загружаем библиотеку...",
     notInstalledTitle: "Расширение Opten не найдено",
     notInstalledBody: "Открой библиотеку с установленным расширением Opten. Так сайт получает безопасный токен авторизации.",
     install: "Установить расширение",
     notLoggedTitle: "Войди в аккаунт",
     notLoggedBody: "Открой popup расширения Opten, войди через Google и обнови страницу.",
-    lockedTitle: "Библиотека доступна в Pro",
-    lockedBody: "Free-аккаунт не получает доступ к сохраненным промптам. Перейди на Pro, чтобы хранить и использовать свою библиотеку.",
-    upgrade: "Перейти на Pro",
     retry: "Повторить",
     error: "Не удалось загрузить библиотеку.",
   },
@@ -195,16 +184,13 @@ const TEXT = {
     duplicate: "This prompt already exists in your library",
     quota: "The 150-prompt limit is full",
     detecting: "Connecting to extension...",
-    checking: "Checking subscription...",
+    checking: "Connecting library...",
     loading: "Loading library...",
     notInstalledTitle: "Opten extension not found",
     notInstalledBody: "Open the library with the Opten extension installed. The site uses it to receive a safe auth token.",
     install: "Install extension",
     notLoggedTitle: "Sign in",
     notLoggedBody: "Open the Opten extension popup, sign in with Google, and refresh this page.",
-    lockedTitle: "Prompt Library is available in Pro",
-    lockedBody: "Free accounts do not get access to saved prompts. Upgrade to Pro to store and reuse your library.",
-    upgrade: "Upgrade to Pro",
     retry: "Retry",
     error: "Failed to load the library.",
   },
@@ -320,13 +306,6 @@ function parseJwtUserId(token: string): string | null {
 
 function isDraft(prompt: PromptRecord): boolean {
   return prompt.id.startsWith("draft-");
-}
-
-function isEntitled(sub: Subscription | null): boolean {
-  if (!sub || sub.plan !== "pro") return false;
-  if (sub.status !== "active" && sub.status !== "cancelled") return false;
-  if (!sub.expires_at) return true;
-  return new Date(sub.expires_at).getTime() > Date.now();
 }
 
 async function copyText(text: string): Promise<boolean> {
@@ -661,37 +640,13 @@ export default function PromptLibraryPage() {
           resolved = true;
           setToken(response.token);
           setUserId(nextUserId);
-          void checkEntitlement(response.token);
+          setAuthState("ready");
+          void loadPrompts(response.token);
         });
       } catch {
         tried++;
         if (tried >= EXTENSION_IDS.length && !resolved) setAuthState("no_extension");
       }
-    }
-  }
-
-  async function checkEntitlement(authToken: string) {
-    setAuthState("checking");
-    setError("");
-    try {
-      const res = await fetch(`${SUPABASE_FUNCTIONS_URL}/get-subscription`, {
-        headers: authHeaders(authToken),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) {
-        setError(data?.error || String(res.status));
-        setAuthState("error");
-        return;
-      }
-      if (!isEntitled(data)) {
-        setAuthState("locked");
-        return;
-      }
-      setAuthState("ready");
-      await loadPrompts(authToken);
-    } catch (err: any) {
-      setError(err?.message || "network_error");
-      setAuthState("error");
     }
   }
 
@@ -981,9 +936,6 @@ export default function PromptLibraryPage() {
   if (authState === "detecting") {
     return pageShell(<StatusPanel title={text.detecting} icon={<RefreshCw size={22} className="animate-spin" aria-hidden="true" />} />);
   }
-  if (authState === "checking") {
-    return pageShell(<StatusPanel title={text.checking} icon={<RefreshCw size={22} className="animate-spin" aria-hidden="true" />} />);
-  }
   if (authState === "no_extension") {
     return pageShell(
       <StatusPanel
@@ -999,19 +951,6 @@ export default function PromptLibraryPage() {
   }
   if (authState === "no_auth") {
     return pageShell(<StatusPanel title={text.notLoggedTitle} body={text.notLoggedBody} />);
-  }
-  if (authState === "locked") {
-    return pageShell(
-      <StatusPanel
-        title={text.lockedTitle}
-        body={text.lockedBody}
-        action={
-          <LocalizedLink to="/pay" className="inline-flex h-11 items-center justify-center rounded-full bg-[#9cfb51] px-5 text-[14px] font-bold text-[#011417] no-underline">
-            {text.upgrade}
-          </LocalizedLink>
-        }
-      />,
-    );
   }
   if (authState === "error") {
     return pageShell(
