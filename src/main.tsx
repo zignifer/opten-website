@@ -33,6 +33,7 @@
   const DownloadSkillPage = lazy(() => import("./app/pages/DownloadSkillPage.tsx"));
   const PromptLibraryPage = lazy(() => import("./app/pages/PromptLibraryPage.tsx"));
   const PromptLibraryDemoPage = lazy(() => import("./app/pages/PromptLibraryDemoPage.tsx"));
+  const PublicPromptLibraryPage = lazy(() => import("./app/pages/PublicPromptLibraryPage.tsx"));
   const AppIndexPage = lazy(() => import("./app/pages/space/AppIndexPage.tsx"));
   const AppLoginPage = lazy(() => import("./app/pages/space/AppLoginPage.tsx"));
   const AppAuthCallbackPage = lazy(() => import("./app/pages/space/AppAuthCallbackPage.tsx"));
@@ -190,6 +191,7 @@
               <Route path="/models/:slug" element={<ModelPage />} />
               <Route path="/dashboard/download-skill" element={<DownloadSkillPage />} />
               <Route path="/prompt-library" element={<PromptLibraryPage />} />
+              <Route path="/p/:slug" element={<PublicPromptLibraryPage />} />
               <Route path="/internal/prompt-library-demo" element={<PromptLibraryDemoPage />} />
               <Route path="/login" element={<AppLoginPage />} />
               <Route path="/auth/callback" element={<AppAuthCallbackPage />} />

@@ -11,26 +11,34 @@ import {
   RefreshCw,
   Save,
   Search,
+  Share2,
   Sparkles,
   Star,
   Trash2,
   X,
 } from "lucide-react";
 import { useLang } from "../../i18n/LangContext";
+import {
+  MAX_BODY_CHARS,
+  MAX_PROMPTS,
+  MAX_TAGS,
+  PROMPT_SELECT,
+  SUPABASE_REST_URL,
+  fetchPublicationSummary,
+  promptLibraryHeaders,
+  publishPromptLibrarySnapshot,
+  unpublishPromptLibrary,
+  type PromptLibraryPublicationSummary,
+  type PromptRecord,
+} from "../../lib/promptLibraryApi";
 import SiteHeader from "../components/SiteHeader";
 
-const SUPABASE_REST_URL = "https://supabase.opten.space/rest/v1";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1eXd5ZGh3a3FtaWhmenRwa2dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NjAyODUsImV4cCI6MjA5MTAzNjI4NX0.A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg";
 const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/opten-%E2%80%94-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 const EXTENSION_IDS = [
   "iphkppgbobpilmphloffcalicmejacfl",
   "kcmcaeenfmfnpiaihicecnfnagejpcog",
 ];
 
-const MAX_PROMPTS = 150;
-const MAX_BODY_CHARS = 12000;
-const MAX_TAGS = 8;
-const PROMPT_SELECT = "id,user_id,title,body,tags,favorite,source_host,source_url,source_title,body_hash,use_count,last_used_at,created_at,updated_at,archived_at";
 const PROMPT_LIBRARY_REFRESH_MESSAGE = "REFRESH_PROMPT_LIBRARY_CACHE";
 const PROMPT_LIBRARY_DEMO_VIDEO_SRC = "/assets/prompt-library/demo.mp4";
 const PROMPT_LIBRARY_DEMO_SEEN_KEY = "opten_prompt_library_demo_seen_v1";
@@ -38,24 +46,6 @@ const PROMPT_LIBRARY_DEMO_SEEN_KEY = "opten_prompt_library_demo_seen_v1";
 type FilterMode = "all" | "favorite" | "recent" | "archive";
 type EditorMode = "view" | "edit";
 type AuthState = "detecting" | "no_extension" | "no_auth" | "ready" | "error";
-
-interface PromptRecord {
-  id: string;
-  user_id: string;
-  title: string;
-  body: string;
-  tags: string[];
-  favorite: boolean;
-  source_host: string | null;
-  source_url: string | null;
-  source_title: string | null;
-  body_hash?: string;
-  use_count: number;
-  last_used_at: string | null;
-  created_at: string;
-  updated_at: string;
-  archived_at: string | null;
-}
 
 const TEXT = {
   ru: {
@@ -68,6 +58,21 @@ const TEXT = {
     demoVideoLabel: "Демо работы библиотеки промптов Opten",
     search: "Найти промпт, тег или источник...",
     searchLabel: "Поиск промптов",
+    publishTitle: "Публичная ссылка",
+    publishDesc: "Публикуется снимок текущей библиотеки. Новые промпты появятся по ссылке только после обновления публикации.",
+    publishButton: "Опубликовать",
+    publishedLabel: "Опубликовано",
+    publicLink: "Публичная ссылка",
+    libraryId: "ID библиотеки",
+    copyLink: "Скопировать ссылку",
+    refreshPublication: "Обновить публикацию",
+    unpublish: "Снять с публикации",
+    publicItems: "промптов",
+    copiedLink: "Ссылка скопирована",
+    publishedToast: "Библиотека опубликована",
+    refreshedToast: "Публикация обновлена",
+    unpublishedToast: "Публикация снята",
+    publishFailed: "Не удалось обновить публикацию",
     filters: {
       all: "Все",
       favorite: "Избранные",
@@ -136,6 +141,21 @@ const TEXT = {
     demoVideoLabel: "Opten Prompt Library demo",
     search: "Find a prompt, tag, or source...",
     searchLabel: "Search prompts",
+    publishTitle: "Public link",
+    publishDesc: "This publishes a snapshot of your current library. New prompts appear on the link only after you refresh the publication.",
+    publishButton: "Publish",
+    publishedLabel: "Published",
+    publicLink: "Public link",
+    libraryId: "Library ID",
+    copyLink: "Copy link",
+    refreshPublication: "Refresh publication",
+    unpublish: "Unpublish",
+    publicItems: "prompts",
+    copiedLink: "Link copied",
+    publishedToast: "Library published",
+    refreshedToast: "Publication refreshed",
+    unpublishedToast: "Publication unpublished",
+    publishFailed: "Failed to update publication",
     filters: {
       all: "All",
       favorite: "Favorites",
@@ -474,7 +494,11 @@ export default function PromptLibraryPage() {
   const [demoOpen, setDemoOpen] = useState(false);
   const [error, setError] = useState("");
   const [loadingPrompts, setLoadingPrompts] = useState(false);
+  const [publication, setPublication] = useState<PromptLibraryPublicationSummary | null>(null);
+  const [publishing, setPublishing] = useState(false);
+  const [publishMenuOpen, setPublishMenuOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const publishMenuRef = useRef<HTMLDivElement | null>(null);
 
   const selectedPrompt = prompts.find((prompt) => prompt.id === selectedId) ?? null;
 
@@ -542,6 +566,11 @@ export default function PromptLibraryPage() {
   }, [authState, filter, search, token]);
 
   useEffect(() => {
+    if (authState !== "ready" || !token) return;
+    void loadPublication(token);
+  }, [authState, token]);
+
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const isSearchShortcut = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k";
       if (!isSearchShortcut) return;
@@ -553,6 +582,28 @@ export default function PromptLibraryPage() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    if (!publishMenuOpen) return;
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target;
+      if (target instanceof Node && publishMenuRef.current?.contains(target)) return;
+      setPublishMenuOpen(false);
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPublishMenuOpen(false);
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [publishMenuOpen]);
 
   const sortedPrompts = useMemo(() => {
     return [...prompts].sort((a, b) => dateValue(b.last_used_at ?? b.updated_at) - dateValue(a.last_used_at ?? a.updated_at));
@@ -600,11 +651,57 @@ export default function PromptLibraryPage() {
   }
 
   function authHeaders(authToken = token): HeadersInit {
-    return {
-      Authorization: `Bearer ${authToken ?? ""}`,
-      apikey: SUPABASE_ANON_KEY,
-      "Content-Type": "application/json",
-    };
+    return promptLibraryHeaders(authToken);
+  }
+
+  function getPublicLibraryUrl(slug: string): string {
+    if (typeof window === "undefined") return `https://opten.space/p/${slug}`;
+    return `${window.location.origin}/p/${slug}`;
+  }
+
+  async function loadPublication(authToken = token) {
+    if (!authToken) return;
+    try {
+      setPublication(await fetchPublicationSummary(authToken));
+    } catch {
+      setPublication(null);
+    }
+  }
+
+  async function handlePublishSnapshot() {
+    if (!token || publishing) return;
+    setPublishing(true);
+    try {
+      const nextPublication = await publishPromptLibrarySnapshot(token);
+      setPublication(nextPublication);
+      showToast(publication?.is_public ? text.refreshedToast : text.publishedToast);
+    } catch (err: any) {
+      setError(err?.message || err?.code || "publish_failed");
+      showToast(text.publishFailed);
+    } finally {
+      setPublishing(false);
+    }
+  }
+
+  async function handleUnpublishSnapshot() {
+    if (!token || publishing) return;
+    setPublishing(true);
+    try {
+      await unpublishPromptLibrary(token);
+      await loadPublication(token);
+      showToast(text.unpublishedToast);
+    } catch (err: any) {
+      setError(err?.message || err?.code || "unpublish_failed");
+      showToast(text.publishFailed);
+    } finally {
+      setPublishing(false);
+    }
+  }
+
+  async function handleCopyPublicLink() {
+    if (!publication?.slug) return;
+    const ok = await copyText(getPublicLibraryUrl(publication.slug));
+    showToast(ok ? text.copiedLink : text.copyFailed);
   }
 
   async function detectExtension() {
@@ -988,11 +1085,11 @@ export default function PromptLibraryPage() {
               </h1>
               <span className="sr-only" aria-live="polite">{loadingPrompts ? text.loading : ""}</span>
             </div>
-            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:items-center sm:justify-end">
               <button
                 type="button"
                 onClick={handleOpenDemo}
-                className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-[#9cfb51]/35 bg-transparent px-5 text-[14px] font-bold text-white/78 transition hover:-translate-y-0.5 hover:border-[#9cfb51]/60 hover:bg-[#9cfb51]/8 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 sm:w-auto"
+                className="inline-flex h-12 min-w-[148px] flex-1 cursor-pointer items-center justify-center gap-2 rounded-full border border-[#9cfb51]/35 bg-transparent px-5 text-[14px] font-bold text-white/78 transition hover:-translate-y-0.5 hover:border-[#9cfb51]/60 hover:bg-[#9cfb51]/8 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 sm:flex-none"
               >
                 <CirclePlay size={16} aria-hidden="true" />
                 {text.demoButton}
@@ -1001,11 +1098,114 @@ export default function PromptLibraryPage() {
                 type="button"
                 onClick={handleCreate}
                 disabled={promptCount >= MAX_PROMPTS}
-                className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#9cfb51] px-5 text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto"
+                className="inline-flex h-12 min-w-[158px] flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#9cfb51] px-5 text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 disabled:cursor-not-allowed disabled:opacity-45 sm:flex-none"
               >
                 <Plus size={16} aria-hidden="true" />
                 {text.add}
               </button>
+              <div ref={publishMenuRef} className="relative shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setPublishMenuOpen((open) => !open)}
+                  aria-label={text.publishTitle}
+                  aria-expanded={publishMenuOpen}
+                  aria-haspopup="dialog"
+                  title={text.publishTitle}
+                  className={cx(
+                    "grid size-12 cursor-pointer place-items-center rounded-full border transition focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60",
+                    publication?.is_public
+                      ? "border-[#9cfb51]/35 bg-[#9cfb51]/12 text-[#9cfb51] hover:bg-[#9cfb51]/18"
+                      : "border-white/10 bg-white/[0.04] text-white/62 hover:bg-white/10 hover:text-white",
+                  )}
+                >
+                  <Share2 size={18} aria-hidden="true" />
+                </button>
+
+                {publishMenuOpen && (
+                  <section
+                    role="dialog"
+                    aria-label={text.publishTitle}
+                    className="absolute right-0 top-[58px] z-40 w-[min(360px,calc(100vw-32px))] rounded-[12px] border border-white/10 bg-[#071c1f] p-3 text-left shadow-[0_22px_70px_rgba(0,0,0,0.52)]"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="grid size-10 shrink-0 place-items-center rounded-full border border-[#9cfb51]/25 bg-[#9cfb51]/8 text-[#9cfb51]">
+                        <Share2 size={16} aria-hidden="true" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h2 className="text-[15px] font-semibold leading-tight text-white">{text.publishTitle}</h2>
+                          {publication?.is_public && (
+                            <span className="rounded-full border border-[#9cfb51]/25 bg-[#9cfb51]/8 px-2 py-0.5 text-[11px] font-medium text-[#9cfb51]">
+                              {text.publishedLabel} · {publication.item_count} {text.publicItems}
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-1.5 text-[13px] leading-[1.5] text-white/48">{text.publishDesc}</p>
+                      </div>
+                    </div>
+
+                    {publication?.is_public && (
+                      <div className="mt-3 grid gap-2">
+                        <label className="block">
+                          <span className="sr-only">{text.publicLink}</span>
+                          <input
+                            readOnly
+                            value={getPublicLibraryUrl(publication.slug)}
+                            className="h-10 w-full rounded-[8px] border border-white/10 bg-[#0d2528] px-3 text-[13px] text-white/72 outline-none"
+                            onFocus={(event) => event.currentTarget.select()}
+                          />
+                        </label>
+                        <p className="flex min-w-0 items-center gap-2 px-1 text-[12px] text-white/42">
+                          <span>{text.libraryId}:</span>
+                          <span className="truncate font-mono text-white/68">{publication.slug}</span>
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="mt-3 grid gap-2">
+                      {publication?.is_public ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => void handleCopyPublicLink()}
+                            className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 text-[13px] font-medium text-white/72 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60"
+                          >
+                            <Copy size={14} aria-hidden="true" />
+                            {text.copyLink}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void handlePublishSnapshot()}
+                            disabled={publishing}
+                            className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#9cfb51] px-4 text-[13px] font-bold text-[#011417] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <RefreshCw size={14} className={publishing ? "animate-spin" : undefined} aria-hidden="true" />
+                            {text.refreshPublication}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void handleUnpublishSnapshot()}
+                            disabled={publishing}
+                            className="inline-flex h-10 cursor-pointer items-center justify-center rounded-full border border-[#ff5d76]/20 bg-[#ff5d76]/8 px-4 text-[13px] font-medium text-[#ff9aaa] transition hover:bg-[#ff5d76]/14 focus:outline-none focus:ring-2 focus:ring-[#ff5d76]/40 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {text.unpublish}
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => void handlePublishSnapshot()}
+                          disabled={publishing || promptCount === 0}
+                          className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#9cfb51] px-5 text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 disabled:cursor-not-allowed disabled:opacity-45"
+                        >
+                          <Share2 size={16} aria-hidden="true" />
+                          {publishing ? text.checking : text.publishButton}
+                        </button>
+                      )}
+                    </div>
+                  </section>
+                )}
+              </div>
             </div>
           </section>
 
@@ -1027,7 +1227,7 @@ export default function PromptLibraryPage() {
           </section>
 
           <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_420px]">
-            <div className="flex min-w-0 flex-col rounded-[10px] border border-white/10 bg-[#071c1f]/90 lg:h-[calc(100dvh-358px)] lg:min-h-[520px]">
+            <div className="flex min-w-0 flex-col rounded-[10px] border border-white/10 bg-[#071c1f]/90 lg:h-[calc(100dvh-290px)] lg:min-h-[520px]">
               <div className="flex flex-col gap-3 border-b border-white/10 px-4 py-3 md:flex-row md:items-center md:justify-between">
                 <h2 className="text-[15px] font-semibold leading-tight text-white">
                   <span className="inline-flex items-center gap-2">
@@ -1169,7 +1369,7 @@ export default function PromptLibraryPage() {
               </div>
             </div>
 
-            <aside className="flex min-w-0 flex-col rounded-[10px] border border-white/10 bg-[#071c1f]/95 lg:sticky lg:top-[126px] lg:h-[calc(100dvh-358px)] lg:min-h-[520px] lg:overflow-hidden">
+            <aside className="flex min-w-0 flex-col rounded-[10px] border border-white/10 bg-[#071c1f]/95 lg:sticky lg:top-[126px] lg:h-[calc(100dvh-290px)] lg:min-h-[520px] lg:overflow-hidden">
               {selectedPrompt ? (
                 <>
                   <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">

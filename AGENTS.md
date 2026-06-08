@@ -16,7 +16,7 @@ knowledge belongs here, with detailed specs in `docs/` and `.planning/`.
 **opten.space** — public website for the **Opten** Chrome extension. Vite +
 React 18 + TypeScript + Tailwind 4, SPA, deployed on Vercel.
 
-Four jobs: (1) marketing surface (landing in RU/EN), (2) website-first auth and
+Six jobs: (1) marketing surface (landing in RU/EN), (2) website-first auth and
 billing surface (`/login`, `/auth/callback`, `/pay`, `/account`, `/success` for
 YooKassa RUB + Paddle USD — Pro is the only purchasable tier; free-аккаунт даёт
 0 операций, нужен для логина), (3)
@@ -24,7 +24,10 @@ Pro-only utilities (`/dashboard/download-skill` — streams `opten.zip` Claude
 Skill bundle sourced from the extension repo's `opten/` dir, Phase 73), (4)
 free Prompt Library at `/prompt-library` for any logged-in extension account
 (the page still requires the Chrome extension to supply `GET_AUTH_TOKEN`;
-Prompt Library has no AI/proxy/usage cost), (5) public Learn pages at `/learn`
+Prompt Library has no AI/proxy/usage cost), (5) public read-only Prompt Library
+snapshots at `/p/:slug` (random-link, noindex MVP; viewers save individual
+prompts into their own private library through website auth), (6) public Learn
+pages at `/learn`
 and `/en/learn` (indexed RU/EN video lessons with schema, sitemap, llms.txt, and
 legacy redirects from `/app/learn*`), alongside the Opten Space Beta app shell
 at `/app/*` (SPA-only, noindex) whose
@@ -73,7 +76,7 @@ must remain temporary redirects/backward compatibility, not canonical links.
 
 Hardcoded constants that are duplicated and must be kept in sync:
 - `EXTENSION_IDS` — appears in [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [src/app/pages/DownloadSkillPage.tsx](src/app/pages/DownloadSkillPage.tsx), [src/app/pages/PromptLibraryPage.tsx](src/app/pages/PromptLibraryPage.tsx)
-- `SUPABASE_URL` and `SUPABASE_ANON_KEY` — appears in those three files plus [api/download-skill.ts](api/download-skill.ts) plus the extension's `config/api.js`
+- `SUPABASE_URL`, `SUPABASE_REST_URL`, and `SUPABASE_ANON_KEY` — appears in [src/lib/optenAuth.ts](src/lib/optenAuth.ts), [src/lib/promptLibraryApi.ts](src/lib/promptLibraryApi.ts), [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [api/download-skill.ts](api/download-skill.ts), plus the extension's `config/api.js`
 
 ## Tech stack
 
@@ -108,14 +111,15 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
      │
      └→ main.tsx → <BrowserRouter> → <LangProvider> → <Routes>
             ↓
-        ~32 client route patterns + catch-all 404 → 182 prerendered routes:
+        ~33 client route patterns + catch-all 404 → 182 prerendered routes:
           Marketing/billing RU (9): /, /pay, /welcome, /about, /blog, /blog/:slug,
                   /privacy, /terms, /refund
           Models RU (Phase v2.0): /models hub + /models/:slug (62 model pages)
           Learn RU: /learn hub + /learn/:lessonSlug (public video lessons)
-          RU SPA-only (5, X-Robots-Tag noindex): /success, /login,
+          RU SPA-only (7, X-Robots-Tag noindex): /success, /login,
                                                   /auth/callback, /account,
-                                                  /dashboard/download-skill
+                                                  /dashboard/download-skill,
+                                                  /prompt-library, /p/:slug
           App SPA-only (X-Robots-Tag noindex): /app, /app/login,
                   /app/auth/callback; /app/learn* redirects to /learn*
           EN: /en/ sibling for each prerendered RU route + /en/models(/:slug) + /en/learn(/:slug)
@@ -138,6 +142,12 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           `/account` may call `/cancel-subscription*` directly
                           with a website JWT. Service-role secrets stay in
                           extension-owned Edge Functions only.
+                          Prompt Library public snapshots use PostgREST RPCs:
+                          owner publish/refresh/unpublish uses the extension
+                          JWT on `/prompt-library`; public `/p/:slug` reads an
+                          active snapshot without auth; per-prompt save uses
+                          the website JWT and inserts a private copy under
+                          the viewer's `auth.users.id`.
                           Auth email for OTP login is sent by
                           self-hosted Supabase Auth through Resend SMTP and
                           uses the public GoTrue template at
@@ -151,7 +161,7 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           (Phase 5 B-07; the /guides/* URL space is retired)
 ```
 
-**Locked/auth routes never get `/en/*` siblings by design** (Phase 3 D-03): `/success` is YooKassa-RUB only; `/login`, `/auth/*`, `/account`, `/dashboard/*`, and `/app/*` are authenticated or app surfaces (Disallow'd/noindex) rather than content/SEO pages. Public Learn is the exception to the old app Learn prototype: canonical Learn routes are `/learn` and `/en/learn`, while `/app/learn*` redirects. On locked/auth routes the LangSwitcher or app-local language switch flips language *in place* (storage + state) instead of navigating.
+**Locked/auth/noindex routes never get `/en/*` siblings by design** (Phase 3 D-03): `/success` is YooKassa-RUB only; `/login`, `/auth/*`, `/account`, `/dashboard/*`, `/prompt-library`, `/p/*`, and `/app/*` are authenticated, app, or random-link snapshot surfaces (Disallow'd/noindex) rather than content/SEO pages. Public Learn is the exception to the old app Learn prototype: canonical Learn routes are `/learn` and `/en/learn`, while `/app/learn*` redirects. On locked/auth routes the LangSwitcher or app-local language switch flips language *in place* (storage + state) instead of navigating.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routes, billing flows, and i18n details.
 
@@ -176,7 +186,7 @@ scripts/                 — build pipeline:
                              build-models-registry.mjs — parses _skills/*.md → _registry.ts (62 ModelMeta; AUTO-GEN)
                              verify-models-content.mjs — model content + EN-meta-cyrillic gate (run manually, not in build)
 src/
-├── main.tsx             — entry, ~22 route patterns (incl. /models hub + /models/:slug, RU+EN) + catch-all, hydrate-vs-mount discriminator
+├── main.tsx             — entry, route patterns (incl. /models hub + /models/:slug, /learn, /prompt-library, /p/:slug, RU+EN siblings) + catch-all, hydrate-vs-mount discriminator
 ├── app/
 │   ├── App.tsx          — landing
 │   ├── components/      — shared UI:
@@ -186,7 +196,8 @@ src/
 │   │     BlogPostCard, Picture, InstallButton, OptenHeroAnimation, RouteLoading
 │   │     layout/, figma/, ui/ — wrappers, fallbacks, Radix-derived primitives
 │   └── pages/           — one file per route (incl. BlogListPage, BlogPostPage, AboutPage,
-│                          ModelsHubPage, ModelPage, NotFound)
+│                          ModelsHubPage, ModelPage, PromptLibraryPage,
+│                          PublicPromptLibraryPage, NotFound)
 ├── content/             — humans edit here, consumed by pages + SEO manifest:
 │   ├── about.tsx        — AboutPage body data
 │   ├── landingFaq.ts    — landing FAQ; mirrored 1:1 into FAQPage schema
@@ -200,7 +211,9 @@ src/
 │                          (light import for paths.ts) + types.ts
 ├── i18n/                — LangContext + ru.json/en.json + paths.ts (EN_SIBLINGS)
 ├── imports/             — Figma-Make-generated SVG paths (auto-generated; brittle)
-├── lib/                 — paddle.ts (ensurePaddle lazy loader, Phase 2.2)
+├── lib/                 — paddle.ts (ensurePaddle lazy loader, Phase 2.2),
+│                          optenAuth.ts (website Supabase session),
+│                          promptLibraryApi.ts (Prompt Library PostgREST/RPC helpers)
 ├── styles/              — index.css, tailwind.css, theme.css, fonts.css
 └── types/               — TS type defs
 ```
@@ -227,6 +240,7 @@ src/
 - Extension-coupled auth and subscription state lives in the **extension's** `chrome.storage.local` (`ps_*` keys) — legacy site surfaces read via `chrome.runtime.sendMessage(...)`.
 - `/login`, `/pay`, `/account`, and Opten Space `/app/*` share the website Supabase session in `localStorage.opten_space_session_v1` and refresh it through public GoTrue endpoints. Credits/subscription state still comes from the shared backend by calling `/functions/v1/account-summary` with the user's Bearer JWT. `/pay` and `/account` use extension messages only as fallback compatibility. Do not put service-role keys, JWT secrets, payment secrets, or proxy API keys in the website bundle.
 - `/account` website logout clears only `localStorage.opten_space_session_v1` and calls public Supabase logout for that website JWT. It must not send extension logout messages or mutate extension-owned `ps_*` keys.
+- `/prompt-library` private CRUD still uses the extension-provided JWT and owner-scoped `prompt_library` RLS. Public `/p/:slug` snapshot viewing is anonymous read-only through `prompt_library_get_public_snapshot`; saving a public prompt uses the website Supabase session and creates an independent private `prompt_library` copy for the viewer. Never weaken private `prompt_library` RLS to make public links work.
 - Opten Space email auth renders only an OTP code in the email. The same OTP flow is used by the website and the extension popup: send through `/auth/v1/otp`, verify through `/auth/v1/verify`, then persist a normal Supabase session for the same `auth.users.id`. GoTrue may still generate an internal confirmation URL, but the public template does not show it; a normal email magic link would open the website callback and would not automatically log the Chrome extension in unless a separate extension handoff/bridge is built.
 
 ### Naming

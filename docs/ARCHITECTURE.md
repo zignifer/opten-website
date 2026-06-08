@@ -13,8 +13,8 @@
 │       │                                                                      │
 │       └─> main.tsx → <BrowserRouter> → <LangProvider> → <Routes>             │
 │                                                                              │
-│   Routes (~28 patterns + catch-all 404; 144 prerendered HTML files):         │
-│     RU (9 prerendered, 3 SPA-only):                                          │
+│   Routes (~33 patterns + catch-all 404; 182 prerendered HTML files):         │
+│     RU (9 marketing prerendered, plus SEO content; SPA-only app/account):    │
 │       /                   App.tsx              landing                       │
 │       /login              AppLoginPage.tsx     website auth (SPA-only)       │
 │       /auth/callback      AppAuthCallback      website auth callback         │
@@ -28,6 +28,8 @@
 │       /account            AccountPage.tsx      SPA-only account/subscription │
 │       /dashboard/         DownloadSkillPage    SPA-only (Pro-gated)          │
 │         download-skill                                                       │
+│       /prompt-library     PromptLibraryPage    SPA-only private library      │
+│       /p/:slug            PublicPromptLibrary  SPA-only public snapshot      │
 │       /app/*              Opten Space Beta     SPA-only (website auth)       │
 │     Models (Phase v2.0): /models hub + /models/:slug (62) + /en/* mirrors    │
 │     EN siblings (9 marketing + 63 models prerendered):                       │
@@ -35,7 +37,7 @@
 │       /en/privacy, /en/terms, /en/refund, /en/models(/:slug)                 │
 │     Catch-all: <Route path="*" element={<NotFound />}> — runtime noindex     │
 │                                                                              │
-│   Postbuild prerender produces 144 dist/<route>/index.html files with        │
+│   Postbuild prerender produces 182 dist/<route>/index.html files with        │
 │   per-route head, JSON-LD graph, hreflang triplet, baked <html lang>.        │
 │                                                                              │
 │   API (Vercel serverless):                                                   │
@@ -80,6 +82,8 @@ hits get a populated `<head>` + body before React mounts.
 | `/success` | [`SuccessPage.tsx`](../../src/app/pages/SuccessPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Post-YooKassa-redirect confirmation | No | No |
 | `/account` | [`AccountPage.tsx`](../../src/app/pages/AccountPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | View credits/plan, cancel subscription, sign out of website account | Fallback `GET_AUTH_TOKEN` / `CANCEL_SUBSCRIPTION` only when no website session exists | `account-summary`, `cancel-subscription`, `cancel-subscription-paddle` |
 | `/dashboard/download-skill` | [`DownloadSkillPage.tsx`](../../src/app/pages/DownloadSkillPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Pro-only skill ZIP download | `GET_AUTH_TOKEN` (Bearer for `/api/download-skill`) | `/api/download-skill` (this site's own serverless) |
+| `/prompt-library` | [`PromptLibraryPage.tsx`](../../src/app/pages/PromptLibraryPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Private Prompt Library CRUD/search; owner publish/refresh/unpublish controls for public snapshots. | `GET_AUTH_TOKEN` + `REFRESH_PROMPT_LIBRARY_CACHE` | `prompt_library`, `prompt_library_mark_used`, public snapshot RPCs |
+| `/p/:slug` | [`PublicPromptLibraryPage.tsx`](../../src/app/pages/PublicPromptLibraryPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Read-only random-link Prompt Library snapshot; viewers save individual prompts into their own library. | No | `prompt_library_get_public_snapshot`; save uses website JWT + `prompt_library_save_public_prompt` |
 | `/app` | `AppIndexPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Opten Space Beta entry; redirects to `/app/learn`. | No | No |
 | `/app/login` | `Navigate` | none (SPA-only, `X-Robots-Tag: noindex`) | Compatibility redirect to `/login?next=/app/learn`. | No | No |
 | `/app/auth/callback` | `AppAuthCallbackPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Compatibility auth callback; canonical callback is `/auth/callback`. | No | No |
@@ -151,6 +155,7 @@ src/
 ├── lib/
 │   └── paddle.ts                  — ensurePaddle() lazy loader (Phase 2.2)
 │   └── optenAuth.ts               — `/app/*` Supabase Auth REST helpers + account-summary fetch
+│   └── promptLibraryApi.ts         — Prompt Library PostgREST/RPC helpers
 ├── styles/                        — index.css, tailwind.css, theme.css, fonts.css
 └── types/                         — TS type defs (e.g. for window.Paddle)
 ```
@@ -171,11 +176,11 @@ dicts) and the GEO/SEO patterns locked-in during v1.0.
 4. `document.documentElement.lang` is **NOT** mutated at runtime (Phase 3 D-06 — runtime DOM mutation caused hydration mismatch). It is baked per page at prerender time.
 
 **Bilingual URLs (post-v2.0 state):**
-- **144 prerendered HTML files**: 18 baseline (9 RU marketing + 9 EN siblings) + 2 model hubs + 124 model pages (62 RU + 62 EN).
+- **182 prerendered HTML files**: marketing/blog/Learn baseline + 2 model hubs + 124 model pages (62 RU + 62 EN).
 - Each prerendered `<head>` carries a `<link rel="alternate" hreflang>` triplet (`ru`, `en`, `x-default → unprefixed RU`) reciprocal between siblings.
 - `<html lang>` baked per route at build time by `scripts/prerender.mjs` (`ru` for unprefixed, `en` for `/en/*`).
 - **Hreflang locale code policy:** hreflang annotations use language-only codes (`ru`, `en`, `x-default`) in both `scripts/prerender.mjs#applyHreflang` and `scripts/sitemap.mjs` xhtml:link entries, while schema-level `inLanguage` stays region-specific (`ru-RU`, `en-US`) in `scripts/seo-routes.ts`. Both are valid per Google's documentation; the mix is intentional — language-only hreflang targets the broadest audience (RU readers globally, not just RU-from-Russia), while schema-level region tags give AI systems a precise origin signal for the content. Do not "unify" these — the asymmetry is the policy.
-- Locked/auth routes without EN siblings (`/success`, `/login`, `/auth/*`, `/account`, `/dashboard/download-skill`, `/app/*`) stay RU-only by design — they are `Disallow`'d/noindex app or account surfaces, not content/SEO pages (D-03).
+- Locked/auth/noindex routes without EN siblings (`/success`, `/login`, `/auth/*`, `/account`, `/dashboard/download-skill`, `/prompt-library`, `/p/*`, `/app/*`) stay RU-only by design — they are `Disallow`'d/noindex app, account, or random-link snapshot surfaces, not content/SEO pages (D-03).
 - `<LocalizedLink>` (drop-in replacement for `<Link>`) preserves the `/en/` prefix when navigating internally between EN siblings; on locked no-sibling routes the LangSwitcher flips language in place via storage.
 
 See [SEO-AUDIT.md](SEO-AUDIT.md) for the audit baseline and the v1.0 archive in `.planning/milestones/v1.0-ROADMAP.md` for the trajectory (GEO score 12 → ~72.6, target ~80+ after Phase 4.2 deploy bakes in).
@@ -338,6 +343,8 @@ The auth check is defense-in-depth — the extension popup also gates the link.
 | Plan / quota | Extension `chrome.storage.local.ps_*` | Extension (synced from Supabase) | Site via `GET_SUBSCRIPTION` |
 | Website Supabase session | `localStorage.opten_space_session_v1` | `/login` and `/auth/callback` (`/app/*` compatibility callback supported) | `/pay`, `/account`, `/app/*`, `SiteHeader`, `SpaceHeader` |
 | Website account summary | Supabase `users`, `subscriptions`, `usage_logs` via `account-summary` | Supabase Auth/webhooks/proxy usage logging | `/pay`, `/account`, `/app/*`, headers via Bearer JWT |
+| Prompt Library private rows | Supabase `prompt_library` | Extension/site PostgREST with owner JWT | `/prompt-library`, extension context menus |
+| Prompt Library public snapshots | Supabase `prompt_library_publications`, `prompt_library_publication_items` | `/prompt-library` owner publish RPC | `/p/:slug` public read RPC; per-prompt save copies into viewer `prompt_library` |
 
 **The site has no persistent server-side state of its own.** All persistence
 is either in the user's browser (localStorage, extension storage) or in

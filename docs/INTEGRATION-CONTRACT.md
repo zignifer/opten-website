@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-06-07 against extension `manifest.json` version **1.4.1** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
+> **Last sync:** 2026-06-08 against extension `manifest.json` version **1.4.1** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -201,6 +201,7 @@ live with these exact paths and the documented behavior.
 | `/account` | User/site navigation; optional popup link | Website-first subscription management UI. Prefers website JWT, reads `account-summary`, can call `cancel-subscription` / `cancel-subscription-paddle` directly, and offers website-only logout. Falls back to extension `GET_AUTH_TOKEN` / `CANCEL_SUBSCRIPTION` for compatibility. SPA-only, `noindex,nofollow`, no `/en/*` sibling. | n/a (user-driven) |
 | `/dashboard/download-skill` | Pro-only feature in popup → opens new tab | Auth-gated page that calls `/api/download-skill` to fetch `opten.zip`. | [popup Phase 73](../../promptscore/popup/popup.html) |
 | `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Free prompt library UI for any logged-in extension account. Calls `GET_AUTH_TOKEN` through the installed extension, then uses Supabase PostgREST for `prompt_library` CRUD/search without a subscription check. After successful mutations it calls `REFRESH_PROMPT_LIBRARY_CACHE` so native extension menus do not keep stale titles/favorite state. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 94 + Phase 97 |
+| `/p/:slug` | User-shared public Prompt Library link | Read-only random-link snapshot of a user's library at publish/refresh time. Public read uses `prompt_library_get_public_snapshot` without auth; per-prompt save uses website auth (`localStorage.opten_space_session_v1`) and `prompt_library_save_public_prompt`. SPA-only, `noindex,nofollow`, no `/en/*` sibling. No bulk-copy action. | Phase 98 |
 | `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta; `/app` redirects to `/app/learn`, but Learn/Courses is temporarily hidden from visible navigation until ready. Website auth uses the canonical `/login` and may use Google OAuth or email OTP through self-hosted Supabase Auth. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95/96 |
 
 **Locked route names** (renames are breaking):
@@ -244,11 +245,12 @@ The site only **calls** them; it does not own them.
 
 **Hardcoded constants on the site** (must match Supabase project):
 - `SUPABASE_URL = "https://supabase.opten.space"` — self-hosted (Phase 88 cutover COMPLETE — this is the live primary backend; cloud `vuywydhwkqmihfztpkgl.supabase.co` is a frozen cold backup). `PayPage.tsx` / `AccountPage.tsx` use the derived `SUPABASE_FUNCTIONS_URL = "https://supabase.opten.space/functions/v1"`.
-- `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"` — **UNCHANGED** (JWT secret reused; self-hosted Kong accepts the same anon key). (see [`PayPage.tsx`](../src/app/pages/PayPage.tsx), [`AccountPage.tsx`](../src/app/pages/AccountPage.tsx), [`api/download-skill.ts`](../api/download-skill.ts))
+- `SUPABASE_REST_URL = "https://supabase.opten.space/rest/v1"` — used by Prompt Library PostgREST/RPC helpers.
+- `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"` — **UNCHANGED** (JWT secret reused; self-hosted Kong accepts the same anon key). (see [`src/lib/optenAuth.ts`](../src/lib/optenAuth.ts), [`src/lib/promptLibraryApi.ts`](../src/lib/promptLibraryApi.ts), [`PayPage.tsx`](../src/app/pages/PayPage.tsx), [`AccountPage.tsx`](../src/app/pages/AccountPage.tsx), [`api/download-skill.ts`](../api/download-skill.ts))
 
 **Token verification (Phase 87 / D-03, updated Phase 88):** the site (`api/download-skill.ts`) and the Edge Functions verify the user JWT **locally** (jose, dual-issuer allowlist: cloud + self-hosted). `supabase.auth.getUser()` / `/auth/v1/user` is no longer called — it performs a session lookup that rejects cloud-issued tokens on self-hosted (sessions not migrated, Phase 86). **Cloud migrated to ASYMMETRIC signing keys, so cloud-issued tokens are now ES256 — verified via the cloud JWKS (`/auth/v1/.well-known/jwks.json`); self-hosted GoTrue still signs HS256 with the shared secret.** The verifier branches by the token's `alg`: HS256 → shared secret, ES256 → cloud JWKS. Both issuers are accepted during the transition so old-extension tokens keep working (CLIENT-06). Edge `create-payment*` additionally run a server-side preflight (user-exists + not-already-Pro) before charging.
 
-If the Supabase project is ever rotated/migrated, **all three site files** plus the extension's
+If the Supabase project is ever rotated/migrated, **all listed site files** plus the extension's
 [`config/api.js`](../../promptscore/config/api.js) must be updated in one coordinated commit.
 
 ### 4.2 Website auth (Phase 95/96)
@@ -373,6 +375,61 @@ Response: PromptLibraryRow
 
 This increments `use_count`, sets `last_used_at`, and returns the updated row.
 It is granted to `authenticated` only.
+
+**Public snapshot RPCs (Phase 98):**
+
+Public Prompt Library links are snapshots, not live mirrors. The private
+`prompt_library` table stays owner-only. Migration
+`016_prompt_library_public_snapshots.sql` in the extension repo adds copied
+snapshot tables:
+
+- `public.prompt_library_publications` — one random slug per owner, with
+  `is_public`, `published_at`, `updated_at`, and `unpublished_at`.
+- `public.prompt_library_publication_items` — copied prompt fields for public
+  read-only display.
+
+RPC contract:
+
+```ts
+POST /rest/v1/rpc/prompt_library_publication_summary
+Body: {}
+Auth: authenticated owner JWT
+Response: [{ id, slug, is_public, published_at, updated_at, unpublished_at, item_count }] | []
+
+POST /rest/v1/rpc/prompt_library_publish_snapshot
+Body: {}
+Auth: authenticated owner JWT
+Response: [{ id, slug, is_public, published_at, updated_at, unpublished_at, item_count }]
+
+POST /rest/v1/rpc/prompt_library_unpublish
+Body: {}
+Auth: authenticated owner JWT
+Response: boolean
+
+POST /rest/v1/rpc/prompt_library_get_public_snapshot
+Body: { p_slug: string }
+Auth: anon or authenticated
+Response: rows with publication fields + nullable item fields
+
+POST /rest/v1/rpc/prompt_library_save_public_prompt
+Body: { p_item_id: string }
+Auth: authenticated viewer website JWT
+Response: PromptLibraryRow
+```
+
+Rules:
+
+- Publishing copies all current non-archived owner prompts into the snapshot.
+  New private prompts do not become public until the owner refreshes by calling
+  `prompt_library_publish_snapshot` again.
+- Unpublishing sets `is_public=false`; private rows and copied items are not
+  deleted.
+- Public viewing requires no token but returns rows only for active slugs.
+- Saving creates an independent private `prompt_library` copy for the viewer.
+  Existing owner RLS/quota/body-hash rules still apply to the inserted private
+  row.
+- `/p/:slug` is random-link and `noindex,nofollow` for MVP. There is no
+  "copy whole library" action.
 
 **Extension context-menu save (Phase 92):**
 
