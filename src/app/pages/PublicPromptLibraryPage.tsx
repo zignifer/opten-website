@@ -19,7 +19,7 @@ const TEXT = {
     title: "Библиотека промптов",
     publicLabel: "Публичная",
     libraryId: "ID библиотеки",
-    search: "Найти промпт, тег или источник...",
+    search: "Найти промпт или тег...",
     searchLabel: "Поиск промптов",
     sortRecent: "Недавно добавленные",
     sortAz: "A-Z",
@@ -40,8 +40,6 @@ const TEXT = {
     noBody: "Промпт пока пуст.",
     updated: "Обновлено",
     created: "Создан",
-    source: "Контекст",
-    details: "Детали промпта",
     prompts: "промптов",
     error: "Не удалось выполнить действие",
   },
@@ -49,7 +47,7 @@ const TEXT = {
     title: "Prompt Library",
     publicLabel: "Public",
     libraryId: "Library ID",
-    search: "Find a prompt, tag, or source...",
+    search: "Find a prompt or tag...",
     searchLabel: "Search prompts",
     sortRecent: "Recently added",
     sortAz: "A-Z",
@@ -70,8 +68,6 @@ const TEXT = {
     noBody: "This prompt is empty.",
     updated: "Updated",
     created: "Created",
-    source: "Context",
-    details: "Prompt details",
     prompts: "prompts",
     error: "Action failed",
   },
@@ -89,16 +85,6 @@ function formatDate(value: string | null | undefined, lang: string): string {
   if (!value) return lang === "en" ? "never" : "никогда";
   const locale = lang === "en" ? "en-US" : "ru-RU";
   return new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" }).format(new Date(value));
-}
-
-function formatFullDate(value: string | null | undefined, lang: string): string {
-  if (!value) return lang === "en" ? "none" : "нет";
-  const locale = lang === "en" ? "en-US" : "ru-RU";
-  return new Intl.DateTimeFormat(locale, {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(value));
 }
 
 function PromptTag({ children }: { children: string }) {
@@ -228,7 +214,7 @@ export default function PublicPromptLibraryPage() {
     const query = normalize(search);
     const filtered = (snapshot?.items ?? []).filter((item) => {
       if (!query) return true;
-      return normalize(`${item.title} ${item.body} ${item.tags.join(" ")} ${item.source_host ?? ""} ${item.source_title ?? ""}`).includes(query);
+      return normalize(`${item.title} ${item.body} ${item.tags.join(" ")}`).includes(query);
     });
     return filtered.sort((a, b) => {
       if (sort === "az") return a.title.localeCompare(b.title, lang === "en" ? "en" : "ru");
@@ -438,7 +424,6 @@ export default function PublicPromptLibraryPage() {
                         </p>
                         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-medium text-white/45">
                           <span>{text.created}: <span className="text-white/65">{formatDate(item.source_created_at, lang)}</span></span>
-                          {item.source_host && <span className="text-white/45">{item.source_host.replace(/^www\./, "")}</span>}
                         </div>
                       </div>
 
@@ -482,27 +467,6 @@ export default function PublicPromptLibraryPage() {
                 <div className="flex flex-wrap gap-2">
                   {selectedItem.tags.map((tag) => <PromptTag key={tag}>{tag}</PromptTag>)}
                 </div>
-                <details className="rounded-[9px] border border-white/10 bg-white/[0.025] p-3 text-[13px] text-white/55">
-                  <summary className="cursor-pointer select-none text-white/70 outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/60">
-                    {text.details}
-                  </summary>
-                  <div className="mt-3 grid gap-2">
-                    {(selectedItem.source_title || selectedItem.source_host) && (
-                      <div className="flex items-start justify-between gap-3">
-                        <span className="text-white/35">{text.source}</span>
-                        <span className="max-w-[230px] text-right text-white/72">{selectedItem.source_title || selectedItem.source_host}</span>
-                      </div>
-                    )}
-                    <div className="flex items-start justify-between gap-3">
-                      <span className="text-white/35">{text.created}</span>
-                      <span className="text-right text-white/72">{formatFullDate(selectedItem.source_created_at, lang)}</span>
-                    </div>
-                    <div className="flex items-start justify-between gap-3">
-                      <span className="text-white/35">{text.updated}</span>
-                      <span className="text-right text-white/72">{formatFullDate(selectedItem.source_updated_at, lang)}</span>
-                    </div>
-                  </div>
-                </details>
               </div>
 
               <div className="shrink-0 border-t border-white/10 bg-[#071c1f]/98 p-3">
