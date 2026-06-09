@@ -82,7 +82,7 @@ const pageCopy = {
   },
   en: {
     heroTitleLine1Before: "AI",
-    heroTitleLine1Highlight: "learning",
+    heroTitleLine1Highlight: "Courses",
     heroTitleLine1After: "",
     watchLesson: "Watch lesson",
     filterLabel: "Topic filter",
