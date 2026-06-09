@@ -53,7 +53,7 @@ const vercel = readFileSync(join(root, "vercel.json"), "utf8");
 assert.match(vercel, /"source": "\/app\/:path\*"/, "Vercel must SPA-rewrite /app/:path* to /index.html");
 assert.match(vercel, /"source": "\/app\/:path\*"[\s\S]*"X-Robots-Tag"[\s\S]*"noindex, nofollow"/, "Opten Space app routes must ship noindex headers");
 assert.match(vercel, /"source": "\/space\/:path\*"/, "Vercel must keep SPA rewrite for legacy /space/:path* redirects");
-assert.match(vercel, /"source": "\/learn\/templates\/:path\*"[\s\S]*"destination": "\/index\.html"/, "Learn template routes must SPA-rewrite to /index.html");
+assert.match(vercel, /"source": "\/learn\/templates\/:path\*"[\s\S]*"destination": "\/spa\.html"/, "Learn template routes must SPA-rewrite to /spa.html");
 assert.match(vercel, /"source": "\/learn\/templates\/:path\*"[\s\S]*"X-Robots-Tag"[\s\S]*"noindex, nofollow"/, "Learn template routes must ship noindex headers");
 assert.match(vercel, /"source": "\/en\/learn\/templates\/:path\*"[\s\S]*"X-Robots-Tag"[\s\S]*"noindex, nofollow"/, "EN Learn template routes must ship noindex headers");
 assert.doesNotMatch(vercel, /"source": "\/learn"[\s\S]*"X-Robots-Tag"/, "Public /learn hub must not receive a noindex header");

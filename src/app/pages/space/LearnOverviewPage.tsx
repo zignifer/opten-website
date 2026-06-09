@@ -18,6 +18,8 @@ import {
   getLearnLessonCategoryLabel,
   getLearnLessonDescription,
   getLearnLessonTitle,
+  learnHubFaq,
+  learnHubIntro,
   learnTopicLabels,
   publicLearnLessons,
   type LearnFutureCollection,
@@ -61,8 +63,10 @@ const topicLabels: Record<LearnLang, Record<TopicFilter | LearnTopic, string>> =
 
 const pageCopy = {
   ru: {
-    heroTitleLead: "Курсы",
-    heroTitleTail: "от",
+    heroTitleLine1Before: "Курсы",
+    heroTitleLine1Highlight: "Opten",
+    heroTitleLine1After: "",
+    heroTitleLine2: "по нейросетям, дизайну и вайб-кодингу",
     watchLesson: "Смотреть урок",
     filterLabel: "Фильтр тем",
     sortLabel: "Сортировка",
@@ -76,10 +80,13 @@ const pageCopy = {
     noResultsText: "Попробуйте изменить тему или поисковый запрос.",
     soon: "Скоро",
     lessonUnit: "уроков",
+    faqTitle: "Ответы по курсам",
   },
   en: {
-    heroTitleLead: "Courses",
-    heroTitleTail: "by",
+    heroTitleLine1Before: "AI",
+    heroTitleLine1Highlight: "courses,",
+    heroTitleLine1After: "",
+    heroTitleLine2: "tutorials and vibe coding lessons",
     watchLesson: "Watch lesson",
     filterLabel: "Topic filter",
     sortLabel: "Sorting",
@@ -93,6 +100,7 @@ const pageCopy = {
     noResultsText: "Try changing the topic or search query.",
     soon: "Soon",
     lessonUnit: "lessons",
+    faqTitle: "Course answers",
   },
 } as const;
 
@@ -178,10 +186,14 @@ export default function LearnOverviewPage() {
       <main className="relative z-10 mx-auto max-w-[1200px] px-[32px] pb-[80px] pt-[60px] max-md:px-4 max-md:pb-[64px] max-md:pt-[28px]">
         <section className="grid min-[1120px]:grid-cols-[minmax(0,552px)_minmax(0,224px)_261px] min-[1120px]:justify-between">
           <div className="max-md:text-center">
-            <h1 className="relative inline-block font-['Unbounded',sans-serif] text-[55px] font-bold leading-[1.05] tracking-normal text-white max-md:mx-auto max-md:text-center max-md:text-[42px] min-[1120px]:whitespace-nowrap">
+            <h1 className="relative inline-block max-w-[552px] font-['Unbounded',sans-serif] text-[52px] font-bold leading-[1.05] tracking-normal text-white max-md:mx-auto max-md:text-center max-md:text-[39px]">
               <span className="relative z-10">
                 <span className="relative inline-block">
-                  <span className="relative z-10">{copy.heroTitleLead}</span>
+                  <span className="relative z-10">
+                    {copy.heroTitleLine1Before ? `${copy.heroTitleLine1Before} ` : ""}
+                    <span className="text-[#9cfb51]">{copy.heroTitleLine1Highlight}</span>
+                    {copy.heroTitleLine1After ? ` ${copy.heroTitleLine1After}` : ""}
+                  </span>
                   <ResponsiveImage
                     src={`${assetBase}/title-line.png`}
                     alt=""
@@ -189,15 +201,17 @@ export default function LearnOverviewPage() {
                     width="532"
                     height="74"
                     widths={[192, 320, 480]}
-                    sizes="(max-width: 768px) 218px, 276px"
-                    className="pointer-events-none absolute left-[-22px] top-[16%] z-20 h-auto w-[276px] max-w-none origin-center translate-y-[4px] scale-y-[0.72] select-none max-md:left-[-14px] max-md:top-[17%] max-md:w-[218px]"
+                    sizes="(max-width: 768px) 248px, 320px"
+                    className="pointer-events-none absolute left-[-22px] top-[16%] z-20 h-auto w-[320px] max-w-none origin-center translate-y-[4px] scale-y-[0.72] select-none max-md:left-[-14px] max-md:top-[17%] max-md:w-[248px]"
                   />
-                </span>{" "}
-                <span className="max-md:block md:inline">
-                  {copy.heroTitleTail} <span className="text-[#9cfb51]">Opten</span>
                 </span>
+                {" "}
+                <span className="mt-[10px] block text-[31px] leading-[1.18] text-white max-md:text-[25px]">{copy.heroTitleLine2}</span>
               </span>
             </h1>
+            <p className="learn-intro mt-[22px] max-w-[534px] text-[15px] leading-[1.72] text-white/68 max-md:mx-auto max-md:text-[14px]">
+              {learnHubIntro[lang]}
+            </p>
           </div>
 
           <AuthorCard lang={lang} />
@@ -350,6 +364,8 @@ export default function LearnOverviewPage() {
             <p className="mt-[6px] text-[14px] text-white/55">{copy.noResultsText}</p>
           </section>
         )}
+
+        <LearnFaqSection lang={lang} />
       </main>
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[620px] overflow-hidden max-md:h-[420px]">
         <div className="absolute left-1/2 bottom-[-500px] h-[982px] w-[1720px] -translate-x-[56%] bg-[url('/assets/landing-design/gradient-blob-shape.svg')] bg-[length:100%_100%] bg-center bg-no-repeat opacity-[0.18] blur-[140px] max-md:bottom-[-260px] max-md:h-[548px] max-md:w-[960px] max-md:-translate-x-[59%] max-md:opacity-20 max-md:blur-[75px]" />
@@ -451,6 +467,25 @@ function LessonSection({ title, action, children }: { title: string; action?: Re
         {action}
       </div>
       {children}
+    </section>
+  );
+}
+
+function LearnFaqSection({ lang }: { lang: LearnLang }) {
+  const copy = pageCopy[lang];
+  const items = learnHubFaq[lang];
+
+  return (
+    <section id="learn-faq" className="learn-faq mt-[48px] border-t border-white/10 pt-[28px]" aria-labelledby="learn-faq-heading">
+      <h2 id="learn-faq-heading" className="text-[22px] font-bold leading-tight text-white">{copy.faqTitle}</h2>
+      <dl className="mt-[18px] grid grid-cols-2 gap-[14px] max-md:grid-cols-1">
+        {items.map((item) => (
+          <div key={item.q} className="rounded-[8px] border border-white/10 bg-white/[0.025] px-[18px] py-[17px]">
+            <dt className="learn-faq-question text-[16px] font-bold leading-[1.35] text-white">{item.q}</dt>
+            <dd className="learn-faq-answer mt-[9px] text-[14px] leading-[1.65] text-white/62">{item.a}</dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }

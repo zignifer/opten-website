@@ -36,6 +36,7 @@ import {
   getLearnLessonTitle,
   getLearnLessonTopics,
   getLearnLessonVideoProvider,
+  learnHubFaq,
   publicLearnLessons,
   type LearnLang,
   type LearnLesson,
@@ -695,11 +696,11 @@ function learnHubRoute(lang: LearnLang): RouteMeta {
   const homeName = lang === "ru" ? "Главная" : "Home";
   const learnName = lang === "ru" ? "Курсы" : "Courses";
   const title = lang === "ru"
-    ? "Курсы Opten — практические уроки по нейросетям, AI-видео и дизайну"
-    : "Opten courses — practical lessons on AI tools, AI video, and design";
+    ? "Курсы по нейросетям и ИИ: AI-видео, дизайн, вайб-кодинг | Opten"
+    : "AI Courses & Tutorials: Vibe Coding, Web Design and AI Video | Opten";
   const description = lang === "ru"
-    ? "Бесплатные видеоуроки Opten по нейросетям, AI-видео, дизайну и рабочим процессам. Реальные разборы Влада Воронежцева с тайм-кодами и материалами."
-    : "Free Opten video lessons on AI tools, AI video, design, and creative workflows. Practical lessons by Vlad Voronezhtsev with timestamps and materials.";
+    ? "Бесплатное обучение ИИ и нейросетям от Opten: уроки по AI-видео, веб-дизайну в Figma, вайб-кодингу и промптам. Практические разборы Влада Воронежцева."
+    : "Free AI courses and tutorials from Opten: learn AI, vibe coding, Figma web design, AI video, prompt engineering and practical AI workflows with Vlad Voronezhtsev.";
 
   return {
     path,
@@ -742,9 +743,10 @@ function learnHubRoute(lang: LearnLang): RouteMeta {
         url: pageUrl,
         name: title,
         inLanguage,
-        cssSelector: ["h1", "h2"],
+        cssSelector: ["h1", "h2", ".learn-intro", ".learn-faq-question", ".learn-faq-answer"],
         about: SOFTWARE_APP_REF,
       }),
+      faqPageBlock(learnHubFaq[lang], pageUrl),
       breadcrumbBlock(
         [
           { name: homeName, url: lang === "ru" ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}/en/` },

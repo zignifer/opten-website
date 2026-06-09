@@ -116,6 +116,11 @@ export type LearnFutureCollection = {
   image: string;
 };
 
+export type LearnFaqItem = {
+  q: string;
+  a: string;
+};
+
 export type LearnOverviewSection = {
   id: string;
   title: string;
@@ -157,6 +162,60 @@ export const learnTopicLabels: Record<LearnLang, Record<"all" | LearnTopic, stri
     "vibe-design": "Vibe-design",
     business: "AI for business",
   },
+};
+
+export const learnHubIntro: LocalizedText = {
+  ru:
+    "Бесплатные курсы по нейросетям и уроки Opten помогают начать обучение ИИ с практики, если вы изучаете нейросети с нуля: AI-видео, генерация изображений, веб-дизайн в Figma, вайб-кодинг, AI-визуал для брендов и промпты для современных моделей.",
+  en:
+    "Start learning AI with practical Opten lessons: generative AI, vibe coding, Claude Code, Cursor, Lovable, Figma web design, AI video and prompt engineering workflows.",
+};
+
+export const learnHubFaq: Record<LearnLang, LearnFaqItem[]> = {
+  ru: [
+    {
+      q: "Какие курсы по нейросетям есть на Opten?",
+      a: "На Opten собраны бесплатные уроки и будущие курсы по нейросетям: AI-видео, генерация изображений, промпты, вайб-кодинг, веб-дизайн в Figma и AI-визуал для брендов.",
+    },
+    {
+      q: "С чего начать обучение ИИ и нейросетям с нуля?",
+      a: "Начните с вводных уроков и подборки «Нейросети с нуля», затем переходите к практическим темам: AI-видео, дизайну, промптам или вайб-кодингу под вашу рабочую задачу.",
+    },
+    {
+      q: "Есть ли бесплатные уроки по нейросетям?",
+      a: "Да. Раздел /learn содержит бесплатные видеоуроки, тайм-коды и материалы. Новые открытые уроки добавляются по мере выхода разборов и обновления AI-инструментов.",
+    },
+    {
+      q: "Что такое вайб-кодинг простыми словами?",
+      a: "Вайб-кодинг — это создание сайтов, приложений и автоматизаций через постановку задач ИИ-инструментам. Человек задает цель, проверяет результат и доводит проект до рабочего состояния.",
+    },
+    {
+      q: "Подойдут ли курсы веб-дизайна новичку?",
+      a: "Да, если идти от практики: Figma, референсы, структура сайта, визуальные блоки и разборы реальных экранов. В уроках Opten дизайн связан с нейросетями и современным AI-workflow.",
+    },
+  ],
+  en: [
+    {
+      q: "What AI courses and tutorials are available on Opten?",
+      a: "Opten brings together free AI courses, tutorials, and upcoming collections on generative AI, vibe coding, Figma web design, AI video, prompt engineering, and practical AI workflows.",
+    },
+    {
+      q: "How should beginners start learning AI?",
+      a: "Start with beginner AI tutorials, then move into one practical track: AI video, Figma web design, prompt engineering, or vibe coding. The goal is to learn AI by building useful outputs, not by memorizing theory.",
+    },
+    {
+      q: "Are there free AI courses on Opten?",
+      a: "Yes. The /learn section includes free AI lessons, video tutorials, timestamps, and materials. New open lessons are added as AI tools and production workflows change.",
+    },
+    {
+      q: "What is vibe coding?",
+      a: "Vibe coding means building websites, apps, and automations by describing the goal to AI coding tools such as Claude Code, Cursor, Lovable, or similar agents, then reviewing and refining the output into a working project.",
+    },
+    {
+      q: "Does Opten cover prompt engineering courses?",
+      a: "Opten Learn connects prompt engineering with real creative workflows: AI video, image generation, web design, and vibe coding. The lessons focus on writing clearer prompts before you generate, review, or ship the result.",
+    },
+  ],
 };
 
 export const futureProtectedVideoDeliveryNote =
@@ -705,17 +764,17 @@ export const featuredLearnLesson = publicLearnLessons[0];
 export const futureLearnCollections: LearnFutureCollection[] = [
   {
     id: "quick-start",
-    title: { ru: "Быстрый старт в ИИ", en: "AI quick start" },
-    subtitle: { ru: "Для начинающих", en: "For beginners" },
-    description: { ru: "Подборка базовых уроков появится после публикации первого курса.", en: "A beginner collection will appear after the first course is published." },
+    title: { ru: "Нейросети с нуля", en: "Learn AI for beginners" },
+    subtitle: { ru: "Быстрый старт в ИИ", en: "Free AI courses and tutorials" },
+    description: { ru: "Подборка базовых уроков по нейросетям появится после публикации первого курса.", en: "A beginner AI lesson collection will appear after the first course is published." },
     lessons: 12,
     topic: "ai-image",
     image: `${legacyLearnAssetBase}/quick-start-lines.jpg`,
   },
   {
     id: "ai-video-zero-to-pro",
-    title: { ru: "AI-видео с нуля", en: "AI video from zero" },
-    subtitle: { ru: "Кинематография и сторителлинг", en: "Cinematography and storytelling" },
+    title: { ru: "AI-видео с нуля", en: "AI video tutorials" },
+    subtitle: { ru: "Уроки по нейросетям для видео", en: "Generative AI for video" },
     description: { ru: "Будущий курс по AI-видео, персонажам, движению, звуку и финальной сборке.", en: "A future course on AI video, characters, motion, sound, and final assembly." },
     lessons: 14,
     topic: "ai-video",
@@ -723,17 +782,17 @@ export const futureLearnCollections: LearnFutureCollection[] = [
   },
   {
     id: "vibe-coding-projects",
-    title: { ru: "Вайб-кодим проект", en: "Vibe-code a project" },
-    subtitle: { ru: "Практика и готовые шаблоны", en: "Practice and ready-made templates" },
-    description: { ru: "Будущая подборка по быстрым прототипам и AI-разработке.", en: "A future collection on rapid prototypes and AI-assisted development." },
+    title: { ru: "Вайб-кодинг с нейросетями", en: "Vibe coding lessons" },
+    subtitle: { ru: "Создаем сайты и прототипы", en: "Build apps with AI tools" },
+    description: { ru: "Будущая подборка по быстрым прототипам, сайтам и AI-разработке.", en: "A future collection on rapid prototypes, websites, and AI-assisted development." },
     lessons: 10,
     topic: "vibe-coding",
     image: `${legacyLearnAssetBase}/vibe-code-purple.jpg`,
   },
   {
     id: "business-ai",
-    title: { ru: "ИИ для бизнеса", en: "AI for business" },
-    subtitle: { ru: "Автоматизация и рост", en: "Automation and growth" },
+    title: { ru: "Нейросети для бизнеса", en: "AI training for work" },
+    subtitle: { ru: "Рабочие задачи и автоматизация", en: "Business tasks and automation" },
     description: { ru: "Будущая подборка бизнес-кейсов, автоматизаций и контент-процессов.", en: "A future collection of business cases, automation, and content workflows." },
     lessons: 9,
     topic: "business",
@@ -741,8 +800,8 @@ export const futureLearnCollections: LearnFutureCollection[] = [
   },
   {
     id: "tools-reviews",
-    title: { ru: "Полезные инструменты", en: "Useful tools" },
-    subtitle: { ru: "Полные гайды и сравнения", en: "Complete guides and comparisons" },
+    title: { ru: "AI-инструменты для дизайна", en: "Best AI tools" },
+    subtitle: { ru: "Видео, промпты и сравнения", en: "Prompts, design and video" },
     description: { ru: "Будущие обзоры сервисов и сравнительные разборы AI-инструментов.", en: "Future service reviews and AI-tool comparisons." },
     lessons: 9,
     topic: "ai-video",

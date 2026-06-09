@@ -1,6 +1,18 @@
 {
   "redirects": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.opten.space" }],
+      "destination": "https://opten.space/",
+      "permanent": true
+    },
+    {
+      "source": "/:path*/",
+      "has": [{ "type": "host", "value": "www.opten.space" }],
+      "destination": "https://opten.space/:path*/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "www.opten.space" }],
       "destination": "https://opten.space/:path*",
