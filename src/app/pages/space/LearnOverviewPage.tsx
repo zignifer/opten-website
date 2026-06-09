@@ -81,9 +81,9 @@ const pageCopy = {
     faqTitle: "Ответы по курсам",
   },
   en: {
-    heroTitleLine1Before: "AI",
-    heroTitleLine1Highlight: "Courses",
-    heroTitleLine1After: "",
+    heroTitleLine1Before: "",
+    heroTitleLine1Highlight: "AI",
+    heroTitleLine1After: "Courses",
     watchLesson: "Watch lesson",
     filterLabel: "Topic filter",
     sortLabel: "Sorting",
