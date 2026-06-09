@@ -1015,7 +1015,7 @@ export default function PromptLibraryPage() {
   const pageShell = (children: JSX.Element) => (
     <div className="min-h-dvh bg-[#011417] font-['PT_Root_UI',sans-serif] text-white lg:h-dvh lg:overflow-hidden">
       <SiteHeader variant="page" />
-      <main className="relative overflow-hidden px-4 pb-[70px] pt-[128px] sm:px-6 lg:h-[calc(100dvh-64px)] lg:px-8 lg:pt-[142px]">
+      <main className="relative overflow-hidden px-4 pb-[70px] pt-[128px] sm:px-6 lg:mt-[64px] lg:h-[calc(100dvh-64px)] lg:px-8 lg:py-[48px]">
         <div
           aria-hidden="true"
           className="opten-figma-gradient"
@@ -1067,7 +1067,7 @@ export default function PromptLibraryPage() {
     <div className="min-h-dvh bg-[#011417] font-['PT_Root_UI',sans-serif] text-white lg:h-dvh lg:overflow-hidden">
       <SiteHeader variant="page" />
 
-      <main className="relative overflow-hidden px-4 pb-[70px] pt-[128px] sm:px-6 lg:h-[calc(100dvh-64px)] lg:px-8 lg:pb-0 lg:pt-[76px]">
+      <main className="relative overflow-hidden px-4 pb-[70px] pt-[128px] sm:px-6 lg:mt-[64px] lg:h-[calc(100dvh-64px)] lg:px-8 lg:py-[48px]">
         <div
           aria-hidden="true"
           className="opten-figma-gradient"
