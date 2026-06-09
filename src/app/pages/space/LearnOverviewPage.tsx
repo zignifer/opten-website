@@ -347,9 +347,6 @@ export default function LearnOverviewPage() {
 
         <LearnFaqSection lang={lang} />
       </main>
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[620px] overflow-visible max-md:h-[420px]">
-        <div className="absolute left-1/2 bottom-[-500px] h-[982px] w-[1720px] -translate-x-[56%] bg-[url('/assets/landing-design/gradient-blob-shape.svg')] bg-[length:100%_100%] bg-center bg-no-repeat opacity-[0.16] blur-[140px] max-md:bottom-[-260px] max-md:h-[548px] max-md:w-[960px] max-md:-translate-x-[59%] max-md:opacity-[0.18] max-md:blur-[75px]" />
-      </div>
       <SiteFooter variant="linksOnly" />
     </div>
   );
