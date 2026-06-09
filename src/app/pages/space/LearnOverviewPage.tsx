@@ -347,6 +347,10 @@ export default function LearnOverviewPage() {
 
         <LearnFaqSection lang={lang} />
       </main>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[560px] bg-[radial-gradient(ellipse_at_50%_100%,rgba(45,128,56,0.32)_0%,rgba(18,73,45,0.2)_34%,rgba(1,20,23,0)_72%)] max-md:h-[420px]"
+      />
       <SiteFooter variant="linksOnly" />
     </div>
   );
