@@ -349,8 +349,10 @@ export default function LearnOverviewPage() {
       </main>
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[560px] bg-[radial-gradient(ellipse_at_50%_100%,rgba(45,128,56,0.32)_0%,rgba(18,73,45,0.2)_34%,rgba(1,20,23,0)_72%)] max-md:h-[420px]"
-      />
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[620px] overflow-hidden [mask-image:linear-gradient(to_bottom,transparent_0%,black_22%,black_100%)] max-md:h-[420px]"
+      >
+        <div className="absolute left-1/2 bottom-[-500px] h-[982px] w-[1720px] -translate-x-[56%] bg-[url('/assets/landing-design/gradient-blob-shape.svg')] bg-[length:100%_100%] bg-center bg-no-repeat opacity-[0.18] blur-[140px] max-md:bottom-[-260px] max-md:h-[548px] max-md:w-[960px] max-md:-translate-x-[59%] max-md:opacity-20 max-md:blur-[75px]" />
+      </div>
       <SiteFooter variant="linksOnly" />
     </div>
   );
