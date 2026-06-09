@@ -19,7 +19,6 @@ import {
   getLearnLessonDescription,
   getLearnLessonTitle,
   learnHubFaq,
-  learnHubIntro,
   learnTopicLabels,
   publicLearnLessons,
   type LearnFutureCollection,
@@ -63,10 +62,9 @@ const topicLabels: Record<LearnLang, Record<TopicFilter | LearnTopic, string>> =
 
 const pageCopy = {
   ru: {
-    heroTitleLine1Before: "Курсы",
-    heroTitleLine1Highlight: "Opten",
+    heroTitleLine1Before: "Обучение",
+    heroTitleLine1Highlight: "ИИ",
     heroTitleLine1After: "",
-    heroTitleLine2: "по нейросетям, дизайну и вайб-кодингу",
     watchLesson: "Смотреть урок",
     filterLabel: "Фильтр тем",
     sortLabel: "Сортировка",
@@ -84,9 +82,8 @@ const pageCopy = {
   },
   en: {
     heroTitleLine1Before: "AI",
-    heroTitleLine1Highlight: "courses,",
+    heroTitleLine1Highlight: "learning",
     heroTitleLine1After: "",
-    heroTitleLine2: "tutorials and vibe coding lessons",
     watchLesson: "Watch lesson",
     filterLabel: "Topic filter",
     sortLabel: "Sorting",
@@ -189,29 +186,12 @@ export default function LearnOverviewPage() {
             <h1 className="relative inline-block max-w-[552px] font-['Unbounded',sans-serif] text-[52px] font-bold leading-[1.05] tracking-normal text-white max-md:mx-auto max-md:text-center max-md:text-[39px]">
               <span className="relative z-10">
                 <span className="relative inline-block">
-                  <span className="relative z-10">
-                    {copy.heroTitleLine1Before ? `${copy.heroTitleLine1Before} ` : ""}
-                    <span className="text-[#9cfb51]">{copy.heroTitleLine1Highlight}</span>
-                    {copy.heroTitleLine1After ? ` ${copy.heroTitleLine1After}` : ""}
-                  </span>
-                  <ResponsiveImage
-                    src={`${assetBase}/title-line.png`}
-                    alt=""
-                    aria-hidden="true"
-                    width="532"
-                    height="74"
-                    widths={[192, 320, 480]}
-                    sizes="(max-width: 768px) 248px, 320px"
-                    className="pointer-events-none absolute left-[-22px] top-[16%] z-20 h-auto w-[320px] max-w-none origin-center translate-y-[4px] scale-y-[0.72] select-none max-md:left-[-14px] max-md:top-[17%] max-md:w-[248px]"
-                  />
+                  {copy.heroTitleLine1Before ? `${copy.heroTitleLine1Before} ` : ""}
+                  <span className="text-[#9cfb51]">{copy.heroTitleLine1Highlight}</span>
+                  {copy.heroTitleLine1After ? ` ${copy.heroTitleLine1After}` : ""}
                 </span>
-                {" "}
-                <span className="mt-[10px] block text-[31px] leading-[1.18] text-white max-md:text-[25px]">{copy.heroTitleLine2}</span>
               </span>
             </h1>
-            <p className="learn-intro mt-[22px] max-w-[534px] text-[15px] leading-[1.72] text-white/68 max-md:mx-auto max-md:text-[14px]">
-              {learnHubIntro[lang]}
-            </p>
           </div>
 
           <AuthorCard lang={lang} />

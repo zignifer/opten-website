@@ -193,6 +193,10 @@ export const learnHubFaq: Record<LearnLang, LearnFaqItem[]> = {
       q: "Подойдут ли курсы веб-дизайна новичку?",
       a: "Да, если идти от практики: Figma, референсы, структура сайта, визуальные блоки и разборы реальных экранов. В уроках Opten дизайн связан с нейросетями и современным AI-workflow.",
     },
+    {
+      q: "Что входит в обучение ИИ Opten?",
+      a: learnHubIntro.ru,
+    },
   ],
   en: [
     {
@@ -214,6 +218,10 @@ export const learnHubFaq: Record<LearnLang, LearnFaqItem[]> = {
     {
       q: "Does Opten cover prompt engineering courses?",
       a: "Opten Learn connects prompt engineering with real creative workflows: AI video, image generation, web design, and vibe coding. The lessons focus on writing clearer prompts before you generate, review, or ship the result.",
+    },
+    {
+      q: "What does Opten AI learning include?",
+      a: learnHubIntro.en,
     },
   ],
 };
