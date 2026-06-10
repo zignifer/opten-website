@@ -27,7 +27,7 @@ brief_count: 10
 | 3 | published | `prompt-examples` | `BL-prompting` | `примеры промптов` | 2736 | [03-prompt-examples.md](03-prompt-examples.md) |
 | 4 | pending | `kling-3-prompts` | `BL-news` | `kling 3.0` | 2388 | [04-kling-3-prompts.md](04-kling-3-prompts.md) |
 | 5 | published | `flux-2-prompts` | `BL-news` | `flux 2` | 541 | [05-flux-2-prompts.md](05-flux-2-prompts.md) |
-| 6 | pending | `ai-influencer` | `BL-usecase` | `ai influencer` | 554 | [06-ai-influencer.md](06-ai-influencer.md) |
+| 6 | published | `ai-influencer` | `BL-usecase` | `ai influencer` | 554 | [06-ai-influencer.md](06-ai-influencer.md) |
 | 7 | pending | `ai-lip-sync` | `BL-technique` | `ai lip sync` | 226 | [07-ai-lip-sync.md](07-ai-lip-sync.md) |
 | 8 | pending | `upscale-image-ai` | `BL-technique` | `апскейл фото нейросеть` | 204 | [08-upscale-image-ai.md](08-upscale-image-ai.md) |
 | 9 | pending | `ai-ugc-for-brands` | `BL-usecase` | `ai ugc` | 102 | [09-ai-ugc-for-brands.md](09-ai-ugc-for-brands.md) |

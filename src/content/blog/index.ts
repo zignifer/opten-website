@@ -6,6 +6,7 @@ import { post as gptImage2 } from "./gpt-image-2";
 import { post as aiFaceSwap } from "./ai-face-swap";
 import { post as flux2Prompts } from "./flux-2-prompts";
 import { post as kling3Prompts } from "./kling-3-prompts";
+import { post as aiInfluencer } from "./ai-influencer";
 import { post as seedance20Prompts } from "./seedance-2-0-prompts";
 import { post as promptExamples } from "./prompt-examples";
 import { post as bestAiVideo2026 } from "./best-ai-video-2026";
@@ -21,6 +22,7 @@ import type { BlogPost } from "./types";
 export const blogPostsBySlug = {
   "flux-2-prompts": flux2Prompts,
   "kling-3-prompts": kling3Prompts,
+  "ai-influencer": aiInfluencer,
   "prompt-examples": promptExamples,
   "seedance-2-0-prompts": seedance20Prompts,
   "ai-face-swap": aiFaceSwap,

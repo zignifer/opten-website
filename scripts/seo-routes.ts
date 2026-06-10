@@ -9,6 +9,7 @@ import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
 import { post as aiFaceSwapGuide } from "../src/content/blog/ai-face-swap";
 import { post as flux2PromptsGuide } from "../src/content/blog/flux-2-prompts";
 import { post as kling3PromptsGuide } from "../src/content/blog/kling-3-prompts";
+import { post as aiInfluencerGuide } from "../src/content/blog/ai-influencer";
 import { post as seedance20PromptsGuide } from "../src/content/blog/seedance-2-0-prompts";
 import { post as promptExamplesGuide } from "../src/content/blog/prompt-examples";
 import { post as bestAiVideo2026Guide } from "../src/content/blog/best-ai-video-2026";
@@ -1156,6 +1157,7 @@ export const routes: RouteMeta[] = [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
           { url: `${SITE_ORIGIN}/blog/flux-2-prompts`, name: flux2PromptsGuide.ru.title, datePublished: flux2PromptsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/kling-3-prompts`, name: kling3PromptsGuide.ru.title, datePublished: kling3PromptsGuide.ru.publishedAt },
+          { url: `${SITE_ORIGIN}/blog/ai-influencer`, name: aiInfluencerGuide.ru.title, datePublished: aiInfluencerGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/prompt-examples`, name: promptExamplesGuide.ru.title, datePublished: promptExamplesGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/seedance-2-0-prompts`, name: seedance20PromptsGuide.ru.title, datePublished: seedance20PromptsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-face-swap`, name: aiFaceSwapGuide.ru.title, datePublished: aiFaceSwapGuide.ru.publishedAt },
@@ -1304,6 +1306,66 @@ export const routes: RouteMeta[] = [
           { name: kling3PromptsGuide.ru.title, url: `${SITE_ORIGIN}/blog/kling-3-prompts` },
         ],
         `${SITE_ORIGIN}/blog/kling-3-prompts`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /blog/ai-influencer — consistent AI influencer workflow guide.
+  {
+    path: "/blog/ai-influencer",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-influencer`,
+      en: `${SITE_ORIGIN}/en/blog/ai-influencer`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-influencer`,
+    },
+    title: aiInfluencerGuide.ru.title,
+    description: aiInfluencerGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-influencer`,
+    ogTitle: aiInfluencerGuide.ru.title,
+    ogDescription: aiInfluencerGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiInfluencerGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-influencer`,
+        headline: aiInfluencerGuide.ru.title,
+        description: aiInfluencerGuide.ru.description,
+        datePublished: aiInfluencerGuide.ru.publishedAt,
+        dateModified: aiInfluencerGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: aiInfluencerGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiInfluencerGuide.ru.cover.src}`,
+          width: aiInfluencerGuide.ru.cover.width,
+          height: aiInfluencerGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-influencer`,
+        url: `${SITE_ORIGIN}/blog/ai-influencer`,
+        name: aiInfluencerGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiInfluencerGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/ai-influencer`,
+        aiInfluencerGuide.ru.title,
+      ),
+      faqPageBlock(aiInfluencerGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-influencer`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: aiInfluencerGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-influencer` },
+        ],
+        `${SITE_ORIGIN}/blog/ai-influencer`,
       ),
     ],
   },
@@ -2298,6 +2360,7 @@ export const routes: RouteMeta[] = [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
           { url: `${SITE_ORIGIN}/en/blog/flux-2-prompts`, name: flux2PromptsGuide.en.title, datePublished: flux2PromptsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/kling-3-prompts`, name: kling3PromptsGuide.en.title, datePublished: kling3PromptsGuide.en.publishedAt },
+          { url: `${SITE_ORIGIN}/en/blog/ai-influencer`, name: aiInfluencerGuide.en.title, datePublished: aiInfluencerGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/prompt-examples`, name: promptExamplesGuide.en.title, datePublished: promptExamplesGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/seedance-2-0-prompts`, name: seedance20PromptsGuide.en.title, datePublished: seedance20PromptsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-face-swap`, name: aiFaceSwapGuide.en.title, datePublished: aiFaceSwapGuide.en.publishedAt },
@@ -2446,6 +2509,66 @@ export const routes: RouteMeta[] = [
           { name: kling3PromptsGuide.en.title, url: `${SITE_ORIGIN}/en/blog/kling-3-prompts` },
         ],
         `${SITE_ORIGIN}/en/blog/kling-3-prompts`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /en/blog/ai-influencer EN sibling.
+  {
+    path: "/en/blog/ai-influencer",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-influencer`,
+      en: `${SITE_ORIGIN}/en/blog/ai-influencer`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-influencer`,
+    },
+    title: aiInfluencerGuide.en.title,
+    description: aiInfluencerGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-influencer`,
+    ogTitle: aiInfluencerGuide.en.title,
+    ogDescription: aiInfluencerGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiInfluencerGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-influencer`,
+        headline: aiInfluencerGuide.en.title,
+        description: aiInfluencerGuide.en.description,
+        datePublished: aiInfluencerGuide.en.publishedAt,
+        dateModified: aiInfluencerGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: aiInfluencerGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiInfluencerGuide.en.cover.src}`,
+          width: aiInfluencerGuide.en.cover.width,
+          height: aiInfluencerGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-influencer`,
+        url: `${SITE_ORIGIN}/en/blog/ai-influencer`,
+        name: aiInfluencerGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiInfluencerGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/ai-influencer`,
+        aiInfluencerGuide.en.title,
+      ),
+      faqPageBlock(aiInfluencerGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-influencer`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: aiInfluencerGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-influencer` },
+        ],
+        `${SITE_ORIGIN}/en/blog/ai-influencer`,
       ),
     ],
   },
