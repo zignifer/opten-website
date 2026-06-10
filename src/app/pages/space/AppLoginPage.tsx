@@ -13,6 +13,7 @@ import {
 import { useLang } from "../../../i18n/LangContext";
 
 const SPACE_LOGO_SRC = "/assets/space/figma/header-atoms/logo-lockup.svg";
+const GOOGLE_AUTH_VISIBLE = false;
 
 export default function AppLoginPage() {
   const { lang } = useLang();
@@ -135,9 +136,9 @@ export default function AppLoginPage() {
             className="absolute left-1/2 top-1/2 h-[940px] w-[1672px] max-w-none"
             style={{ transform: "translate(-50%, -50%)" }}
           >
-            <div className="absolute left-[657px] top-[220px] z-[2] h-[500px] w-[358px] origin-center scale-[1.3] max-[520px]:scale-100">
+            <div className="absolute left-[657px] top-[248px] z-[2] h-[433px] w-[358px] origin-center scale-[1.3] max-[520px]:scale-100">
               <LoginCardFrame />
-              <div className="absolute left-[44px] top-[20px] z-10 flex w-[270px] flex-col items-center text-center">
+              <div className="absolute left-[44px] top-[40px] z-10 flex w-[270px] flex-col items-center text-center">
           <img
             src={SPACE_LOGO_SRC}
             alt="Opten Space Beta"
@@ -154,7 +155,6 @@ export default function AppLoginPage() {
                 <span className="text-[#9cfb51]">{copy.titleHighlight}</span>
               </span>
             </h1>
-            <p className="m-0 w-[300px] text-[12px] font-normal leading-[1.3] tracking-[0] text-white/70">{copy.description}</p>
           </div>
 
           {formState === "sent" || formState === "verifying" ? (
@@ -197,7 +197,7 @@ export default function AppLoginPage() {
                 className="flex h-[44px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[24px] py-[12px] text-[13px] font-medium leading-[1.3] text-[#011417] outline-none transition hover:bg-[#8ff144] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {formState === "verifying" ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : null}
-                {copy.codeButton}
+                <span className="inline-block translate-y-px">{copy.codeButton}</span>
               </button>
             </form>
           ) : (
@@ -224,20 +224,22 @@ export default function AppLoginPage() {
                 className="flex h-[44px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[24px] py-[12px] text-[13px] font-medium leading-[1.3] text-[#011417] outline-none transition hover:bg-[#8ff144] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {formState === "sending" ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : null}
-                {formState === "sending" ? copy.sending : copy.emailButton}
+                <span className="inline-block translate-y-px">{formState === "sending" ? copy.sending : copy.emailButton}</span>
               </button>
             </form>
           )}
 
-          <button
-            type="button"
-            onClick={() => startGoogleLogin(getWebsiteAuthCallbackUrl(safeNext))}
-            className="relative mt-[12px] flex h-[44px] w-full cursor-pointer items-center justify-center gap-[12px] rounded-[8px] border-0 bg-white px-[24px] py-[11px] text-[13px] font-medium leading-[1.3] text-black outline-none transition hover:shadow-[0_2px_8px_rgba(0,0,0,0.15)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50"
-          >
-            <span className="pointer-events-none absolute inset-0 rounded-[8px] border border-black/10" aria-hidden="true" />
-            <GoogleIcon />
-            <span className="whitespace-nowrap">{copy.google}</span>
-          </button>
+          {GOOGLE_AUTH_VISIBLE ? (
+            <button
+              type="button"
+              onClick={() => startGoogleLogin(getWebsiteAuthCallbackUrl(safeNext))}
+              className="relative mt-[12px] flex h-[44px] w-full cursor-pointer items-center justify-center gap-[12px] rounded-[8px] border-0 bg-white px-[24px] py-[11px] text-[13px] font-medium leading-[1.3] text-black outline-none transition hover:shadow-[0_2px_8px_rgba(0,0,0,0.15)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50"
+            >
+              <span className="pointer-events-none absolute inset-0 rounded-[8px] border border-black/10" aria-hidden="true" />
+              <GoogleIcon />
+              <span className="whitespace-nowrap">{copy.google}</span>
+            </button>
+          ) : null}
 
           {error && <p className="mt-[12px] max-w-full truncate text-[12px] leading-[1.3] text-[#dc2626]">{copy.error}: {error}</p>}
           <LoginTrustBadges copy={copy} />
@@ -322,14 +324,14 @@ function LoginCardFrame() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 z-[2] h-[500px] w-[358px] overflow-hidden rounded-[8px] bg-[linear-gradient(180deg,rgba(7,26,27,0.74)_0%,rgba(2,13,15,0.92)_100%)] shadow-[0_22px_70px_rgba(0,0,0,0.42),0_0_38px_rgba(156,251,81,0.06)]"
+      className="pointer-events-none absolute inset-0 z-[2] h-[433px] w-[358px] overflow-hidden rounded-[8px] bg-[linear-gradient(180deg,rgba(7,26,27,0.74)_0%,rgba(2,13,15,0.92)_100%)] shadow-[0_22px_70px_rgba(0,0,0,0.42),0_0_38px_rgba(156,251,81,0.06)]"
     >
       <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_24%,rgba(255,255,255,0.05),transparent_36%),radial-gradient(circle_at_50%_100%,rgba(156,251,81,0.07),transparent_43%)]" />
       <span className="absolute inset-0 opacity-[0.28] [background-image:radial-gradient(rgba(255,255,255,0.18)_0.45px,transparent_0.68px),radial-gradient(rgba(156,251,81,0.12)_0.42px,transparent_0.7px)] [background-position:0_0,7px_9px] [background-size:12px_12px,18px_18px] [mask-image:linear-gradient(180deg,transparent_0%,black_15%,black_84%,transparent_100%)]" />
       <span className="absolute inset-0 rounded-[8px] border border-white/[0.2]" />
       <span className="absolute inset-[1px] rounded-[7px] border border-[#9cfb51]/[0.06]" />
-      <span className="absolute left-0 top-[35px] h-[350px] w-px bg-[linear-gradient(180deg,transparent_0%,rgba(156,251,81,0.62)_22%,rgba(156,251,81,0.3)_67%,transparent_100%)] shadow-[0_0_16px_rgba(156,251,81,0.5)]" />
-      <span className="absolute right-0 top-[34px] h-[350px] w-px bg-[linear-gradient(180deg,transparent_0%,rgba(156,251,81,0.48)_18%,rgba(156,251,81,0.34)_68%,transparent_100%)] shadow-[0_0_18px_rgba(156,251,81,0.45)]" />
+      <span className="absolute left-0 top-[35px] h-[300px] w-px bg-[linear-gradient(180deg,transparent_0%,rgba(156,251,81,0.62)_22%,rgba(156,251,81,0.3)_67%,transparent_100%)] shadow-[0_0_16px_rgba(156,251,81,0.5)]" />
+      <span className="absolute right-0 top-[34px] h-[300px] w-px bg-[linear-gradient(180deg,transparent_0%,rgba(156,251,81,0.48)_18%,rgba(156,251,81,0.34)_68%,transparent_100%)] shadow-[0_0_18px_rgba(156,251,81,0.45)]" />
       <span className="absolute left-[10px] right-[10px] top-0 h-px bg-[linear-gradient(90deg,transparent_0%,rgba(232,255,224,0.34)_22%,rgba(255,255,255,0.36)_50%,rgba(156,251,81,0.2)_78%,transparent_100%)]" />
       <span className="absolute bottom-0 left-[10px] right-[10px] h-px bg-[linear-gradient(90deg,transparent_0%,rgba(156,251,81,0.08)_18%,rgba(227,255,194,0.5)_51%,rgba(156,251,81,0.08)_82%,transparent_100%)]" />
       <span className="absolute bottom-0 left-[122px] h-px w-[114px] bg-[linear-gradient(90deg,transparent_0%,rgba(156,251,81,0.52)_24%,rgba(227,255,194,0.95)_50%,rgba(156,251,81,0.52)_76%,transparent_100%)] shadow-[0_0_8px_rgba(156,251,81,0.72),0_0_24px_rgba(156,251,81,0.3)]" />
@@ -343,7 +345,6 @@ const loginCopy = {
     titleLine1: "Добро пожаловать",
     titleLine2Prefix: "в ",
     titleHighlight: "Opten Space",
-    description: "Единый вход для подписки, кредитов, расширения и будущих курсов.",
     google: "Войти через Google",
     emailLabel: "Email",
     emailPlaceholder: "mail@gmail.com",
@@ -356,7 +357,7 @@ const loginCopy = {
     codeButton: "Подтвердить",
     invalidCode: "Код неверный или устарел. Проверьте цифры из последнего письма.",
     rateLimited: "Слишком много попыток. Подождите минуту и попробуйте снова.",
-    genericError: "Попробуйте ещё раз или войдите через Google.",
+    genericError: "Попробуйте ещё раз или запросите новый код.",
     error: "Не удалось выполнить вход",
     loginBadge1: "Безопасный вход",
     loginBadge2: "Безопасные платежи через ЮКасса",
@@ -366,7 +367,6 @@ const loginCopy = {
     titleLine1: "Welcome to",
     titleLine2Prefix: " ",
     titleHighlight: "Opten Space",
-    description: "One account for subscription, credits, the extension, and future courses.",
     google: "Continue with Google",
     emailLabel: "Email",
     emailPlaceholder: "mail@gmail.com",
@@ -379,7 +379,7 @@ const loginCopy = {
     codeButton: "Confirm",
     invalidCode: "The code is invalid or expired. Check the digits from the latest email.",
     rateLimited: "Too many attempts. Wait a minute and try again.",
-    genericError: "Try again or continue with Google.",
+    genericError: "Try again or request a new code.",
     error: "Could not sign in",
     loginBadge1: "Log in securely",
     loginBadge2: "Secure payments with UKassa",

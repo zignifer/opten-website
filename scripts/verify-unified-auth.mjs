@@ -58,7 +58,7 @@ assert.match(login, /useLocation/, "Login page must read next from URL search pa
 assert.match(login, /normalizeSafeNext/, "Login page must normalize next redirects");
 assert.match(login, /getWebsiteAuthCallbackUrl/, "Login page must use canonical website callback");
 assert.match(login, /cursor-pointer[\s\S]*copy\.emailButton/, "Email OTP button must show a pointer cursor when active");
-assert.match(login, /cursor-pointer[\s\S]*copy\.google/, "Google auth button must show a pointer cursor when active");
+assert.match(login, /const GOOGLE_AUTH_VISIBLE = false;/, "Google auth must be hidden while email-only visible auth is active");
 assert.doesNotMatch(login, /Navigate to="\/app\/learn"|navigate\("\/app\/learn"/, "Login page must not hardcode /app/learn as the only post-login destination");
 
 const callback = read("src/app/pages/space/AppAuthCallbackPage.tsx");

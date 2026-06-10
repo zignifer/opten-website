@@ -42,12 +42,16 @@ Supabase Edge Functions.
 Website auth is now canonical for site surfaces: `/login` stores a normal
 Supabase website session in `localStorage.opten_space_session_v1`; `/pay` and
 `/account` prefer that website JWT and fall back to the extension's
-`GET_AUTH_TOKEN` only for compatibility. Website and extension sessions are
-independent local sessions. Logging out from `/account` clears only the website
-session; it must not clear extension `ps_*` storage. If the website is signed in
-as account A and the extension as account B, subscription/credits are resolved
-by `auth.users.id`, so account B correctly remains Free until the user signs
-into the extension as account A.
+`GET_AUTH_TOKEN` only for compatibility. The visible login method on the site
+and in the extension popup is Email OTP/manual email entry only. Google OAuth
+helpers and the extension PKCE `SIGN_IN` path are retained as hidden
+architecture, but their buttons must stay hidden unless the product explicitly
+re-enables them. Website and extension sessions are independent local sessions.
+Logging out from `/account` clears only the website session; it must not clear
+extension `ps_*` storage. If the website is signed in as account A and the
+extension as account B, subscription/credits are resolved by `auth.users.id`,
+so account B correctly remains Free until the user signs into the extension as
+account A.
 
 ## CRITICAL: Read this before any change to billing/auth/routes/integration
 
@@ -136,6 +140,8 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           cloud vuywydhwkqmihfztpkgl.supabase.co is a frozen cold backup)
                           `/login`, `/auth/callback`, and `/app/*` use public
                           Supabase Auth endpoints directly for website login;
+                          visible login UI exposes Email OTP only while Google
+                          OAuth code remains hidden/disabled for now;
                           `/pay` and `/account` prefer the website JWT, then
                           fall back to the extension JWT. Account/credit state
                           comes from `/functions/v1/account-summary`;
@@ -238,7 +244,7 @@ src/
 - React Context for i18n only
 - `localStorage` for: `opten_lang_v3` (i18n, written by LangSwitcher only), `opten_pay_currency`. Legacy `opten_lang` is read-only for one-shot EN migration — do not write to it.
 - Extension-coupled auth and subscription state lives in the **extension's** `chrome.storage.local` (`ps_*` keys) — legacy site surfaces read via `chrome.runtime.sendMessage(...)`.
-- `/login`, `/pay`, `/account`, and Opten Space `/app/*` share the website Supabase session in `localStorage.opten_space_session_v1` and refresh it through public GoTrue endpoints. Credits/subscription state still comes from the shared backend by calling `/functions/v1/account-summary` with the user's Bearer JWT. `/pay` and `/account` use extension messages only as fallback compatibility. Do not put service-role keys, JWT secrets, payment secrets, or proxy API keys in the website bundle.
+- `/login`, `/pay`, `/account`, and Opten Space `/app/*` share the website Supabase session in `localStorage.opten_space_session_v1` and refresh it through public GoTrue endpoints. Visible auth uses Email OTP/manual email entry only; Google OAuth helpers may remain in code but must not render a login button unless explicitly re-enabled. Credits/subscription state still comes from the shared backend by calling `/functions/v1/account-summary` with the user's Bearer JWT. `/pay` and `/account` use extension messages only as fallback compatibility. Do not put service-role keys, JWT secrets, payment secrets, or proxy API keys in the website bundle.
 - `/account` website logout clears only `localStorage.opten_space_session_v1` and calls public Supabase logout for that website JWT. It must not send extension logout messages or mutate extension-owned `ps_*` keys.
 - `/prompt-library` private CRUD still uses the extension-provided JWT and owner-scoped `prompt_library` RLS. Public `/p/:slug` snapshot viewing is anonymous read-only through `prompt_library_get_public_snapshot`; saving a public prompt uses the website Supabase session and creates an independent private `prompt_library` copy for the viewer. Never weaken private `prompt_library` RLS to make public links work.
 - Opten Space email auth renders only an OTP code in the email. The same OTP flow is used by the website and the extension popup: send through `/auth/v1/otp`, verify through `/auth/v1/verify`, then persist a normal Supabase session for the same `auth.users.id`. GoTrue may still generate an internal confirmation URL, but the public template does not show it; a normal email magic link would open the website callback and would not automatically log the Chrome extension in unless a separate extension handoff/bridge is built.

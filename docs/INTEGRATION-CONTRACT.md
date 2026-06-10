@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-06-08 against extension `manifest.json` version **1.4.1** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
+> **Last sync:** 2026-06-10 against extension `manifest.json` version **1.4.1** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -194,7 +194,7 @@ live with these exact paths and the documented behavior.
 | Path | Trigger | Behavior expected | Code reference |
 |------|---------|-------------------|----------------|
 | `/welcome` | `chrome.runtime.onInstalled` (fresh install) | First-run greeting; explain how to pin extension + sign in. May upsell Pro. | [`background.js:9`](../../promptscore/background/background.js#L9) |
-| `/login` | User/site navigation | Canonical website login for marketing, billing, account, and app surfaces. Uses public Supabase Auth Google OAuth or email OTP and stores `localStorage.opten_space_session_v1`. SPA-only, `noindex,nofollow`, no `/en/*` sibling. | Site-only |
+| `/login` | User/site navigation | Canonical website login for marketing, billing, account, and app surfaces. Visible UI uses Email OTP/manual email entry only and stores `localStorage.opten_space_session_v1`. Google OAuth helper code is retained but its button stays hidden unless explicitly re-enabled. SPA-only, `noindex,nofollow`, no `/en/*` sibling. | Site-only |
 | `/auth/callback` | Supabase Auth redirect | Canonical website auth callback. Stores the website session and returns to safe `next=...`; never logs the extension in automatically. SPA-only, `noindex,nofollow`, no `/en/*` sibling. | Site-only |
 | `/pay` | Popup "Upgrade" CTA → opens new tab; user/site navigation | Render PayPage with RU/EN price + checkout buttons (YooKassa or Paddle). Prefers website JWT from `/login`; falls back to extension `GET_AUTH_TOKEN` for already-shipped extension flows. | [`background.js:903`](../../promptscore/background/background.js#L903) |
 | `/success` | YooKassa redirect after successful payment | Show success state, optionally autoclose tab. Used as `return_url` in [`create-payment/index.ts:65`](../../promptscore/supabase/functions/create-payment/index.ts#L65). | YooKassa `return_url` |
@@ -202,7 +202,7 @@ live with these exact paths and the documented behavior.
 | `/dashboard/download-skill` | Pro-only feature in popup → opens new tab | Auth-gated page that calls `/api/download-skill` to fetch `opten.zip`. | [popup Phase 73](../../promptscore/popup/popup.html) |
 | `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Free prompt library UI for any logged-in extension account. Calls `GET_AUTH_TOKEN` through the installed extension, then uses Supabase PostgREST for `prompt_library` CRUD/search without a subscription check. After successful mutations it calls `REFRESH_PROMPT_LIBRARY_CACHE` so native extension menus do not keep stale titles/favorite state. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 94 + Phase 97 |
 | `/p/:slug` | User-shared public Prompt Library link | Read-only random-link snapshot of a user's library at publish/refresh time. Public read uses `prompt_library_get_public_snapshot` without auth; per-prompt save uses website auth (`localStorage.opten_space_session_v1`) and `prompt_library_save_public_prompt`. SPA-only, `noindex,nofollow`, no `/en/*` sibling. No bulk-copy action. | Phase 98 |
-| `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta; `/app` redirects to `/app/learn`, but Learn/Courses is temporarily hidden from visible navigation until ready. Website auth uses the canonical `/login` and may use Google OAuth or email OTP through self-hosted Supabase Auth. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95/96 |
+| `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta; `/app` redirects to `/app/learn`, but Learn/Courses is temporarily hidden from visible navigation until ready. Website auth uses the canonical `/login`; visible login uses Email OTP only while the retained Google OAuth path is hidden. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95/96 |
 
 **Locked route names** (renames are breaking):
 - `/welcome`, `/pay`, `/success` — referenced by the extension binary that's
@@ -260,8 +260,7 @@ the extension installed. `/pay` and `/account` prefer that website session and
 fall back to extension messages only for compatibility. Website auth uses only
 public Supabase Auth endpoints on the live self-hosted backend:
 
-- Google OAuth starts at `/auth/v1/authorize?provider=google&redirect_to=...`.
-- Email login starts at `/auth/v1/otp` and renders only an OTP code in the
+- Visible auth starts with Email login at `/auth/v1/otp` and renders only an OTP code in the
   email. The GoTrue template intentionally shows `{{ .Token }}` and does not
   show `{{ .ConfirmationURL }}`: the code is the reliable path for the website
   and the extension popup. A normal email magic link would not automatically
@@ -271,6 +270,10 @@ public Supabase Auth endpoints on the live self-hosted backend:
   the relevant `GOTRUE_MAILER_TEMPLATES_*` auth-template env vars on the VPS.
   The email is English-only by product decision; keep the template copy and
   the VPS `GOTRUE_MAILER_SUBJECTS_*` subject env vars in English.
+- Google OAuth still exists in code at
+  `/auth/v1/authorize?provider=google&redirect_to=...` on the site and via
+  extension `SIGN_IN`/PKCE, but both visible buttons are hidden for now. Do not
+  remove the architecture unless the product explicitly asks for a hard removal.
 - Session refresh uses `/auth/v1/token?grant_type=refresh_token`.
 - Session inspection uses the locally stored access token and the
   `account-summary` function; the website does not call service-role APIs.
@@ -279,8 +282,9 @@ Product rule:
 
 ```text
 The subscription and credits belong to the auth.users.id that bought them.
-Google account A and Email account B are different accounts unless Supabase
-links them into the same auth user. Another account seeing Free is expected.
+If Google OAuth is re-enabled, Google account A and Email account B are
+different accounts unless Supabase links them into the same auth user. Another
+account seeing Free is expected.
 ```
 
 Website/extension session rule:
@@ -482,7 +486,7 @@ Renaming a key on the extension side requires updating the response field too.
 
 | Key | Owner | Mirrors to message field | Notes |
 |-----|-------|--------------------------|-------|
-| `ps_auth_token` | Extension (OAuth result) | `GET_AUTH_TOKEN.token` | JWT, refreshed automatically. |
+| `ps_auth_token` | Extension (Email OTP or hidden OAuth result) | `GET_AUTH_TOKEN.token` | JWT, refreshed automatically. |
 | `ps_refresh_token` | Extension | — | Internal, PKCE refresh. |
 | `ps_user_email` | Extension | `GET_AUTH_TOKEN.email` | |
 | `ps_plan` | Extension (synced from Supabase) | `GET_SUBSCRIPTION.plan` | `'free' \| 'pro' \| 'cancelled'`. |
@@ -495,7 +499,7 @@ Renaming a key on the extension side requires updating the response field too.
 | `ps_sub_has_card` | Extension | `GET_SUBSCRIPTION.has_card` | |
 | `ps_sub_auto_renew` | Extension | `GET_SUBSCRIPTION.auto_renew` | |
 | `ps_sub_provider` | Extension (set by webhook) | — (used internally for cancellation dispatch) | `'yookassa' \| 'paddle'`. Missing → fallback to `'yookassa'`. |
-| `ps_pkce_verifier` | Extension | — | Internal OAuth state. |
+| `ps_pkce_verifier` | Extension | — | Internal Google OAuth state; retained behind hidden UI. |
 | `ps_email_auth_pending` | Extension | — | Internal/local-only Email OTP popup state. Shape: `{ email, sentAt }`. Used only to restore the code-entry screen after Chrome closes the popup while the user checks email; cleared on successful sign-in, logout, and auth reset; never mirrored through the site message API. |
 | `ps_prompt_library_cache` | Extension | — | Phase 92 local-only bounded cache for Prompt Library context menus; Phase 93 uses it for insert menu rows and may refresh it through PostgREST; Phase 94 lets the site trigger a refresh via `REFRESH_PROMPT_LIBRARY_CACHE` after successful library mutations. Shape: `{ version, updated_at, last_saved_id, last_saved_at, recent, favorites }`; `recent` is capped at 20 rows, `favorites` at 10 rows, and native menus show smaller bounded subsets. Rows may include prompt `body` for insertion, so the key is cleared on logout/auth reset and is never mirrored through the site message API. |
 
