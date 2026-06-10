@@ -16,7 +16,8 @@ HTML/CSS, Sharp или другой постобработкой.
 
 Смотри `seo2/Reference/`. Это эталон: красивый кинематографичный визуал,
 темный SaaS-фон, лаймовые линии/графические акценты, крупный короткий текст,
-встроенный в саму генерацию.
+встроенный в саму генерацию. Лаймовый акцент должен быть ровно `#9CFB51`;
+не используй более желтый, более темный или примерный green/lime оттенок.
 
 ## Cover
 
@@ -29,7 +30,7 @@ Prompt base:
 
 ```text
 Minimal dark hero illustration, deep teal-black background (#011417), a single
-soft lime-green (#9cfb51) radial glow, [topic object], clean modern tech
+soft lime-green (#9CFB51) radial glow, [topic object], clean modern tech
 aesthetic, cinematic, no text, 16:9.
 ```
 
@@ -50,10 +51,14 @@ Prompt pattern:
 
 ```text
 Cinematic dark SaaS editorial image, deep teal-black background (#011417),
-lime-green (#9cfb51) graphic accents, [topic object/result], short crisp
+lime-green (#9CFB51) graphic accents, [topic object/result], short crisp
 in-image text: "[RU or EN text]", text is part of the generated image, clean
 modern tech aesthetic, 16:9.
 ```
+
+Color lock: the lime accent is exactly `#9CFB51`. Repeat that hex in every
+image prompt and avoid vague alternatives like `neon green`, `yellow-green`,
+`acid green`, or generic `lime` unless the hex is also present.
 
 Avoid:
 
