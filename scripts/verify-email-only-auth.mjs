@@ -28,6 +28,35 @@ const authHelpers = read(websiteRoot, "src/lib/optenAuth.ts");
 assert.match(authHelpers, /export function startGoogleLogin/, "Website Google OAuth helper must remain in architecture");
 assert.match(authHelpers, /provider", "google"/, "Website Google OAuth helper must still target the Google provider");
 
+const ruDict = JSON.parse(read(websiteRoot, "src/i18n/ru.json"));
+const enDict = JSON.parse(read(websiteRoot, "src/i18n/en.json"));
+const promptLibraryPage = read(websiteRoot, "src/app/pages/PromptLibraryPage.tsx");
+
+assert.doesNotMatch(ruDict["download.noAuth"], /Google|Google Sign-In|OAuth/i, "RU download auth copy must not instruct users to sign in with Google");
+assert.doesNotMatch(enDict["download.noAuth"], /Google|Google Sign-In|OAuth/i, "EN download auth copy must not instruct users to sign in with Google");
+assert.doesNotMatch(ruDict["pay.status.notInstalled.step2"], /Google|Google Sign-In|OAuth/i, "RU payment fallback copy must not instruct users to sign in with Google");
+assert.doesNotMatch(enDict["pay.status.notInstalled.step2"], /Google|Google Sign-In|OAuth/i, "EN payment fallback copy must not instruct users to sign in with Google");
+assert.doesNotMatch(ruDict["welcome.step2.desc"], /Google|Google Sign-In|OAuth/i, "RU welcome onboarding copy must not instruct users to sign in with Google");
+assert.doesNotMatch(enDict["welcome.step2.desc"], /Google|Google Sign-In|OAuth/i, "EN welcome onboarding copy must not instruct users to sign in with Google");
+assert.doesNotMatch(ruDict["welcome.slide2.alt"], /Google|Google Sign-In|OAuth/i, "RU welcome image alt text must not describe a Google sign-in button");
+assert.doesNotMatch(enDict["welcome.slide2.alt"], /Google|Google Sign-In|OAuth/i, "EN welcome image alt text must not describe a Google sign-in button");
+assert.doesNotMatch(promptLibraryPage, /войд[^\n"]{0,80}Google|sign in with Google/i, "Prompt Library logged-out copy must not instruct users to sign in with Google");
+
+assert.match(ruDict["privacy.body"], /Email OTP|одноразового кода/i, "RU privacy policy must describe the current Email OTP login flow");
+assert.match(enDict["privacy.body"], /Email OTP|one-time code/i, "EN privacy policy must describe the current Email OTP login flow");
+assert.match(ruDict["privacy.body"], /Resend[\s\S]*трансграничн|трансграничн[\s\S]*Resend/i, "RU privacy policy must connect Resend email delivery to cross-border transfer disclosure");
+assert.match(enDict["privacy.body"], /Resend[\s\S]*cross-border|cross-border[\s\S]*Resend/i, "EN privacy policy must connect Resend email delivery to cross-border transfer disclosure");
+assert.doesNotMatch(ruDict["privacy.body"], /Google LLC|Google Sign-In|OAuth 2\.0/i, "RU privacy policy must not describe Google OAuth as an active visible authentication provider");
+assert.doesNotMatch(enDict["privacy.body"], /Google LLC|Google Sign-In|OAuth 2\.0/i, "EN privacy policy must not describe Google OAuth as an active visible authentication provider");
+assert.doesNotMatch(ruDict["privacy.body"], /персональные данные Пользователей в идентифицируемой форме не передаются/i, "RU privacy policy must not deny identifiable cross-border transfer while Email OTP uses Resend");
+assert.doesNotMatch(enDict["privacy.body"], /personal data in identifiable form is not transmitted/i, "EN privacy policy must not deny identifiable cross-border transfer while Email OTP uses Resend");
+assert.doesNotMatch(ruDict["privacy.body"], /проставлен[^\n<]{0,80}отметк/i, "RU privacy policy must not claim a consent checkbox that the current login UI does not render");
+assert.doesNotMatch(enDict["privacy.body"], /ticking[^\n<]{0,80}box/i, "EN privacy policy must not claim a consent checkbox that the current login UI does not render");
+assert.match(ruDict["terms.body"], /Email OTP|одноразов/i, "RU terms must describe registration/sign-in through Email OTP");
+assert.match(enDict["terms.body"], /Email OTP|one-time/i, "EN terms must describe registration/sign-in through Email OTP");
+assert.doesNotMatch(ruDict["terms.body"], /проставлением отметки/i, "RU terms must not claim a registration consent checkbox that the current login UI does not render");
+assert.doesNotMatch(enDict["terms.body"], /marking of consent/i, "EN terms must not claim a registration consent checkbox that the current login UI does not render");
+
 const popupHtml = read(extensionRoot, "popup/popup.html");
 assert.match(popupHtml, /id="ps-popup-signin-btn"[^>]*\bhidden\b/, "Extension Google sign-in button must be hidden in initial HTML");
 assert.match(popupHtml, /id="ps-email-code-form"/, "Extension Email OTP form must remain visible in logged-out UI");
