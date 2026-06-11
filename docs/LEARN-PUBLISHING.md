@@ -8,8 +8,10 @@ compatibility redirects only.
 
 - RU hub: `/learn`
 - RU lesson: `/learn/:lessonSlug`
+- RU find: `/learn/finds/:findSlug`
 - EN hub: `/en/learn`
 - EN lesson: `/en/learn/:lessonSlug`
+- EN find: `/en/learn/finds/:findSlug`
 
 Every public lesson ships RU and EN content together. Do not publish a RU-only
 or EN-only lesson.
@@ -17,9 +19,12 @@ or EN-only lesson.
 ## Source Files
 
 - Catalog and localized lesson data: `src/content/space/learn.ts`
+- Generated Learn Finds data: `src/content/space/learnFinds.generated.json`
+- Learn Finds typed helpers: `src/content/space/learnFinds.ts`
 - Lightweight i18n slug allow-list: `src/content/space/learnSlugs.ts`
 - Overview page: `src/app/pages/space/LearnOverviewPage.tsx`
 - Lesson page UI/player: `src/app/components/space/learn/LearnComponents.tsx`
+- Learn Find detail page: `src/app/pages/space/LearnFindDetailPage.tsx`
 - Runtime routes: `src/main.tsx`
 - SSR routes: `scripts/entry-server.tsx`
 - SEO metadata/schema routes: `scripts/seo-routes.ts`
@@ -50,6 +55,33 @@ or EN-only lesson.
    npm run verify:space-learn
    npm run build
    ```
+
+## Adding A Learn Find From Suffler
+
+Learn Finds are curated third-party YouTube expert videos enriched by Opten.
+They are not Opten-authored lessons and must not mirror or re-upload the video.
+The page embeds the original YouTube video, uses the YouTube thumbnail, removes
+the Opten author/course card, and labels the source as another author/source.
+
+The normal publishing path is the local `C:\Projects\suffler` desktop app:
+
+1. Analyze the YouTube link for the story script.
+2. Click `Опубликовать на сайт`.
+3. Suffler first tries to read YouTube metadata and chapter timestamps from the
+   player payload or video description.
+4. Suffler checks `notebooklm` auth, starts `notebooklm login` if needed, adds
+   the YouTube source, asks for structured Learn Find JSON, merges it into
+   `src/content/space/learnFinds.generated.json`, runs `npm run build`, commits,
+   and pushes the generated content.
+   - If YouTube chapters exist, their exact `time`/`seconds` values are kept;
+     NotebookLM enriches titles/descriptions and translates RU/EN.
+   - If chapters do not exist, NotebookLM must return 8-14 specific timestamps
+     from the transcript, not broad rounded placeholders.
+5. Vercel deploys from the pushed commit. The app shows the final public URL.
+
+Manual edits are allowed only in `src/content/space/learnFinds.generated.json`
+or the typed helper if the schema changes. Do not commit NotebookLM auth state,
+temporary notebooks, raw transcripts, API keys, or local suffler settings.
 
 ## Adding A Local Video
 

@@ -30,10 +30,11 @@ const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 
 // Phase v2.0 MODELS-B-3b: floor bumped 22 → 144 now that all 62 model content
 // files landed. 152 = 26 baseline/blog routes + 2 hubs (/models + /en/models) + 124 model
-// pages (62 RU + 62 EN). Daily blog posts bring the floor to 170; public Learn adds 14 more routes.
+// pages (62 RU + 62 EN). Daily blog posts bring the floor to 170; public Learn adds 14 lesson routes
+// and Learn Finds adds generated third-party video breakdown routes.
 // /dashboard/*) carry prerender:"none" and are excluded from sitemapRoutes.
-if (sitemapRoutes.length < 188) {
-  throw new Error(`sitemap.mjs: expected at least 188 routes (48 baseline/blog routes + 14 Learn routes + 2 model hubs + 124 model pages), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+if (sitemapRoutes.length < 194) {
+  throw new Error(`sitemap.mjs: expected at least 194 routes (48 baseline/blog routes + 20 Learn routes + 2 model hubs + 124 model pages), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 // Post-2026-05-17 GEO audit ME-12: per-route lastmod via git mtime of the source file driving
@@ -108,6 +109,7 @@ function sourceForRoute(route) {
   if (explicit) return explicit;
   const match = route.path.match(/^\/(en\/)?models\/(.+)$/);
   if (match) return `src/content/models/${match[2]}.ts`;
+  if (/^\/(en\/)?learn\/finds\/[^/]+$/.test(route.path)) return "src/content/space/learnFinds.generated.json";
   if (/^\/(en\/)?learn\/[^/]+$/.test(route.path)) return "src/content/space/learn.ts";
   return null;
 }

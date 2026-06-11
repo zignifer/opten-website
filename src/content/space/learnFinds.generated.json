@@ -1,0 +1,392 @@
+[
+  {
+    "slug": "ideogram-mcp-claude-code",
+    "youtubeId": "MYPlBOvV6kc",
+    "youtubeUrl": "https://youtu.be/MYPlBOvV6kc",
+    "title": {
+      "ru": "Ideogram MCP внутри Claude Code",
+      "en": "Ideogram MCP inside Claude Code"
+    },
+    "description": {
+      "ru": "Разбор того, как подключить Ideogram MCP к Claude Code и использовать его для AI-фотосессий, мерча и визуальных идей вместе с Magic Path.",
+      "en": "A breakdown of connecting Ideogram MCP to Claude Code and using it for AI photoshoots, merch concepts, and visual ideation with Magic Path."
+    },
+    "seoTitle": {
+      "ru": "Ideogram MCP и Claude Code: команды, промпты, риски — Opten",
+      "en": "Ideogram MCP and Claude Code: commands, prompts, risks — Opten"
+    },
+    "seoDescription": {
+      "ru": "Короткий разбор Ideogram MCP для Claude Code: установка, команды, промпты, Magic Path workflow, полезные ссылки и риски генерации.",
+      "en": "A practical Ideogram MCP breakdown for Claude Code: setup, commands, prompts, Magic Path workflow, useful links, and generation risks."
+    },
+    "topic": "ai-image",
+    "duration": "10:02",
+    "durationIso": "PT10M2S",
+    "publishedAt": "2026-06-10",
+    "updatedAt": "2026-06-11",
+    "sourceLabel": {
+      "ru": "Другой автор",
+      "en": "External creator"
+    },
+    "summary": {
+      "ru": [
+        "Видео показывает, как Ideogram MCP подключается к Claude Code и становится генератором визуалов прямо из agent workflow.",
+        "Главная польза для зрителя Opten: можно быстро собирать AI-фотосессии, мерч и варианты визуального стиля без ручного переключения между сервисами.",
+        "Самая полезная связка: Claude Code формулирует задачу, Ideogram генерирует изображения, а Magic Path собирает результаты на бесконечном холсте."
+      ],
+      "en": [
+        "The video shows how Ideogram MCP connects to Claude Code and becomes an image generation tool inside an agent workflow.",
+        "The main Opten takeaway: you can create AI photoshoots, merch concepts, and visual style directions without manually hopping between tools.",
+        "The useful stack is Claude Code for task orchestration, Ideogram for images, and Magic Path for collecting results on an infinite canvas."
+      ]
+    },
+    "keyTakeaways": {
+      "ru": [
+        "MCP полезен, когда генерация должна быть частью большого agent workflow.",
+        "Magic Path помогает не терять результаты и сразу видеть серию изображений.",
+        "Для логотипов и мерча нужно проверять качество текста и векторность, а не принимать первый результат."
+      ],
+      "en": [
+        "MCP is useful when image generation needs to be part of a larger agent workflow.",
+        "Magic Path keeps outputs visible and helps compare a series of generated images.",
+        "For logos and merch, text quality and vector-like cleanliness still need manual review."
+      ]
+    },
+    "commands": [
+      {
+        "title": { "ru": "Установить MCP в Claude Code", "en": "Install MCP in Claude Code" },
+        "code": "install <ideogram-mcp-command-from-official-page>",
+        "note": {
+          "ru": "Команду нужно брать с актуальной страницы Ideogram MCP, потому что формат установки может меняться.",
+          "en": "Copy the command from the current Ideogram MCP page because install syntax can change."
+        }
+      },
+      {
+        "title": { "ru": "Проверить доступные действия MCP", "en": "Inspect available MCP actions" },
+        "code": "done in a table view tell us exactly what we can do with this MCP",
+        "note": {
+          "ru": "Полезный запрос после авторизации: Claude перечисляет действия Ideogram MCP в таблице.",
+          "en": "Useful after authentication: Claude lists the Ideogram MCP actions in a table."
+        }
+      }
+    ],
+    "prompts": [
+      {
+        "title": { "ru": "Серия изображений на холсте", "en": "Image series to canvas" },
+        "text": "In the Ideogram project in Magic Path, drop in all the images generated with Ideogram and automatically upload the images you generate in this conversation into this Magic Path project.",
+        "note": {
+          "ru": "Промпт связывает генерацию Ideogram с визуальным холстом Magic Path.",
+          "en": "This prompt connects Ideogram generation with a Magic Path visual board."
+        }
+      }
+    ],
+    "resources": [
+      {
+        "title": "Ideogram MCP",
+        "href": "https://ideogram.ai/features/mcp/",
+        "kind": "official"
+      },
+      {
+        "title": "Magic Path",
+        "href": "https://www.magicpath.ai/",
+        "kind": "tool"
+      },
+      {
+        "title": "Оригинал на YouTube",
+        "href": "https://youtu.be/MYPlBOvV6kc",
+        "kind": "video"
+      }
+    ],
+    "risks": {
+      "ru": [
+        "Команда установки MCP может измениться, поэтому её нельзя хардкодить в вечный гайд.",
+        "Логотипы и текст могут выглядеть пиксельными или недостаточно векторными.",
+        "Результаты нужно проверять серией, а не одним удачным кадром."
+      ],
+      "en": [
+        "The MCP install command can change, so it should not be treated as permanent documentation.",
+        "Logos and text can look pixelated or insufficiently vector-like.",
+        "Review outputs as a series instead of trusting one strong frame."
+      ]
+    },
+    "timestamps": {
+      "ru": [
+        { "time": "00:00", "seconds": 0, "title": "Вступление в Ideogram MCP", "description": "Автор объясняет, зачем Ideogram MCP нужен внутри Claude Code и какие creative workflows он собирается проверить." },
+        { "time": "00:48", "seconds": 48, "title": "Установка Ideogram в Claude Code", "description": "Показывается подключение MCP и базовая авторизация перед генерацией изображений." },
+        { "time": "02:22", "seconds": 142, "title": "Типографика и storybook-изображения", "description": "Claude Code просит Ideogram создать визуальные концепты с текстом и иллюстративной стилистикой." },
+        { "time": "03:31", "seconds": 211, "title": "Анализ бренда из Instagram", "description": "Workflow использует Instagram-референс, чтобы понять визуальный язык бренда перед генерацией новых ассетов." },
+        { "time": "05:03", "seconds": 303, "title": "Подключение к MagicPath", "description": "Сгенерированные изображения отправляются на визуальный холст, чтобы сравнивать варианты в одном месте." },
+        { "time": "05:59", "seconds": 359, "title": "Консистентные фотосессии персонажей", "description": "Автор проверяет, можно ли сохранять единый образ модели и собирать серию product-фото." },
+        { "time": "07:14", "seconds": 434, "title": "Графика и слоганы для одежды", "description": "Ideogram применяется для дизайна apparel-графики, где особенно важно контролировать текст и качество логотипов." },
+        { "time": "08:31", "seconds": 511, "title": "Product page из generated assets", "description": "Финальная часть показывает, как из ассетов собрать страницу продукта без выхода из agent workflow." }
+      ],
+      "en": [
+        { "time": "00:00", "seconds": 0, "title": "Intro to Ideogram MCP", "description": "The creator explains why Ideogram MCP is useful inside Claude Code and what creative workflows will be tested." },
+        { "time": "00:48", "seconds": 48, "title": "Installing Ideogram in Claude Code", "description": "The setup covers connecting the MCP and authenticating before generating images." },
+        { "time": "02:22", "seconds": 142, "title": "Typography and storybook images", "description": "Claude Code asks Ideogram to create visual concepts with text and illustrated styling." },
+        { "time": "03:31", "seconds": 211, "title": "Analyzing a brand from Instagram", "description": "The workflow uses an Instagram reference to understand a brand's visual language before creating new assets." },
+        { "time": "05:03", "seconds": 303, "title": "Connecting Ideogram to MagicPath", "description": "Generated images are sent to a visual canvas so the options can be compared in one place." },
+        { "time": "05:59", "seconds": 359, "title": "Consistent character photo shoots", "description": "The creator tests whether one model identity can stay consistent across a product photo series." },
+        { "time": "07:14", "seconds": 434, "title": "Apparel graphics and slogans", "description": "Ideogram is used for apparel graphics, where text quality and logo sharpness need extra review." },
+        { "time": "08:31", "seconds": 511, "title": "Product pages with generated assets", "description": "The final section turns generated assets into a product page without leaving the agent workflow." }
+      ]
+    }
+  },
+  {
+    "slug": "figma-claude-code-ui-design",
+    "youtubeId": "Xcgr-7LpzDM",
+    "youtubeUrl": "https://youtu.be/Xcgr-7LpzDM",
+    "title": {
+      "ru": "Figma и Claude Code для UI-дизайна",
+      "en": "Figma and Claude Code for UI design"
+    },
+    "description": {
+      "ru": "Разбор workflow, где Claude Code через Figma MCP генерирует UI-макеты, использует дизайн-систему и переносит результат в код.",
+      "en": "A workflow breakdown where Claude Code uses Figma MCP to generate UI screens, apply a design system, and move the result into code."
+    },
+    "seoTitle": {
+      "ru": "Figma MCP и Claude Code: UI-дизайн, команды, ошибки — Opten",
+      "en": "Figma MCP and Claude Code: UI design, commands, pitfalls — Opten"
+    },
+    "seoDescription": {
+      "ru": "Краткий конспект Figma MCP + Claude Code: slash-команды, дизайн-система, перенос в код, полезные ссылки и частые ошибки.",
+      "en": "A concise Figma MCP + Claude Code breakdown: slash commands, design systems, code handoff, useful links, and common pitfalls."
+    },
+    "topic": "vibe-design",
+    "duration": "17:43",
+    "durationIso": "PT17M43S",
+    "publishedAt": "2026-03-26",
+    "updatedAt": "2026-06-11",
+    "sourceLabel": {
+      "ru": "Другой автор",
+      "en": "External creator"
+    },
+    "summary": {
+      "ru": [
+        "Видео показывает новый workflow: Claude Code работает не только с кодом, но и с Figma-файлами через MCP.",
+        "Главная ценность — использовать реальную дизайн-систему, а не генерировать случайный красивый экран.",
+        "Для Opten-аудитории это хороший пример vibe-design: человек ставит задачу, а агент собирает UI из существующих компонентов."
+      ],
+      "en": [
+        "The video shows a workflow where Claude Code works with Figma files through MCP, not only with source code.",
+        "The key value is using a real design system instead of generating a random polished screen.",
+        "For the Opten audience, this is a strong vibe-design example: a human sets direction while an agent composes UI from existing components."
+      ]
+    },
+    "keyTakeaways": {
+      "ru": [
+        "Figma MCP полезнее, когда подключена опубликованная библиотека компонентов.",
+        "Slash-команды ускоряют генерацию, но качество зависит от структуры файла и naming слоёв.",
+        "Сначала стоит получить дизайн в Figma, потом переносить его в код."
+      ],
+      "en": [
+        "Figma MCP is more useful when a published component library is connected.",
+        "Slash commands speed up generation, but quality depends on file structure and layer naming.",
+        "It is better to shape the design in Figma before moving it to code."
+      ]
+    },
+    "commands": [
+      {
+        "title": { "ru": "Проверить подключённые плагины", "en": "Check connected plugins" },
+        "code": "/plugins",
+        "note": {
+          "ru": "Команда помогает убедиться, что Figma MCP доступен в Claude Code.",
+          "en": "Use this to confirm Figma MCP is available in Claude Code."
+        }
+      },
+      {
+        "title": { "ru": "Запустить генерацию дизайна", "en": "Generate a design" },
+        "code": "/figma generate-design",
+        "note": {
+          "ru": "Slash-команда для генерации макета в Figma.",
+          "en": "Slash command for generating a layout in Figma."
+        }
+      }
+    ],
+    "prompts": [
+      {
+        "title": { "ru": "Анализ дизайн-системы", "en": "Design system analysis" },
+        "text": "Analyze this design system file and explain which components, variables, and patterns should be used before generating new screens.",
+        "note": {
+          "ru": "Запрос перед генерацией, чтобы агент опирался на реальные компоненты.",
+          "en": "Use this before generation so the agent relies on real components."
+        }
+      }
+    ],
+    "resources": [
+      {
+        "title": "Figma MCP + Claude Code",
+        "href": "https://help.figma.com/hc/en-us/articles/39888612464151-Claude-Code-and-Figma-Set-up-the-MCP-server",
+        "kind": "official"
+      },
+      {
+        "title": "Figma Community Skills",
+        "href": "https://www.figma.com/community/skills",
+        "kind": "tool"
+      },
+      {
+        "title": "Оригинал на YouTube",
+        "href": "https://youtu.be/Xcgr-7LpzDM",
+        "kind": "video"
+      }
+    ],
+    "risks": {
+      "ru": [
+        "Странное именование слоёв может ломать качество результата.",
+        "Если дизайн-система не подключена, агент будет импровизировать вместо использования компонентов.",
+        "Figma-результат всё равно требует визуального ревью перед переносом в код."
+      ],
+      "en": [
+        "Poor layer naming can hurt the generated result.",
+        "Without a connected design system, the agent will improvise instead of using components.",
+        "The Figma result still needs visual review before implementation."
+      ]
+    },
+    "timestamps": {
+      "ru": [
+        { "time": "00:00", "seconds": 0, "title": "Введение", "description": "Автор показывает новую связку Figma AI, Claude Code и дизайн-системы для генерации UI." },
+        { "time": "00:37", "seconds": 37, "title": "Создание design system library", "description": "Разбирается подготовка библиотеки компонентов, чтобы агент не генерировал случайный интерфейс." },
+        { "time": "03:02", "seconds": 182, "title": "Запуск Claude Code для проекта", "description": "Claude Code подключается к рабочему проекту и получает контекст будущего UI." },
+        { "time": "05:19", "seconds": 319, "title": "Связка дизайн-системы с Claude", "description": "Показывается, как дать агенту доступ к дизайн-системе и правилам проекта." },
+        { "time": "08:25", "seconds": 505, "title": "Генерация дизайна по системе", "description": "Агент создаёт экран, используя существующие компоненты и токены вместо произвольной стилизации." },
+        { "time": "09:18", "seconds": 558, "title": "Первый результат", "description": "Автор оценивает получившийся макет и показывает, где workflow уже даёт пользу." },
+        { "time": "11:26", "seconds": 686, "title": "Figma Skills для Claude Code", "description": "Отдельно показывается добавление Figma Skills, чтобы расширить возможности агента." },
+        { "time": "14:10", "seconds": 850, "title": "Генерация кода из Figma", "description": "Дизайн используется как источник для реализации интерфейса в коде." },
+        { "time": "15:30", "seconds": 930, "title": "Итоговый результат", "description": "Финальный блок сравнивает workflow и показывает, что нужно проверять вручную." }
+      ],
+      "en": [
+        { "time": "00:00", "seconds": 0, "title": "Introduction", "description": "The creator introduces a Figma AI, Claude Code, and design-system workflow for UI generation." },
+        { "time": "00:37", "seconds": 37, "title": "Creating a design system library", "description": "The setup prepares a component library so the agent does not invent a random interface." },
+        { "time": "03:02", "seconds": 182, "title": "Launching Claude Code for the project", "description": "Claude Code is connected to the working project and receives context for the UI task." },
+        { "time": "05:19", "seconds": 319, "title": "Connecting the design system to Claude", "description": "The video shows how to give the agent access to the project design system and rules." },
+        { "time": "08:25", "seconds": 505, "title": "Generating design with the system", "description": "The agent creates a screen using existing components and tokens instead of freeform styling." },
+        { "time": "09:18", "seconds": 558, "title": "First result", "description": "The creator reviews the generated layout and where the workflow already helps." },
+        { "time": "11:26", "seconds": 686, "title": "Adding Figma Skills to Claude Code", "description": "Figma Skills are added separately to expand what the agent can do." },
+        { "time": "14:10", "seconds": 850, "title": "Generating code from Figma design", "description": "The design becomes the source for implementing the interface in code." },
+        { "time": "15:30", "seconds": 930, "title": "Final result", "description": "The final section compares the workflow and highlights what still needs manual review." }
+      ]
+    }
+  },
+  {
+    "slug": "claude-skills-ai-ugc-pipeline",
+    "youtubeId": "UVpUV9k951E",
+    "youtubeUrl": "https://youtu.be/UVpUV9k951E",
+    "title": {
+      "ru": "Claude Skills для AI UGC-видео",
+      "en": "Claude Skills for AI UGC video"
+    },
+    "description": {
+      "ru": "Разбор двух Claude Skills для UGC pipeline: декодирование референс-видео, генерация персонажей, сцен, voice workflow и сборка через TopView Canvas.",
+      "en": "A breakdown of two Claude Skills for an AI UGC pipeline: reference decoding, character prompts, scene generation, voice workflow, and TopView Canvas assembly."
+    },
+    "seoTitle": {
+      "ru": "Claude Skills для AI UGC: промпты, ZIP, TopView Canvas — Opten",
+      "en": "Claude Skills for AI UGC: prompts, ZIP, TopView Canvas — Opten"
+    },
+    "seoDescription": {
+      "ru": "Короткий разбор AI UGC pipeline на Claude Skills: что скачать, какие промпты использовать, как собирать сцены и какие риски учитывать.",
+      "en": "A concise Claude Skills AI UGC pipeline breakdown: what to download, which prompts to use, how to build scenes, and what risks to watch."
+    },
+    "topic": "ai-video",
+    "duration": "11:09",
+    "durationIso": "PT11M9S",
+    "publishedAt": "2026-06-10",
+    "updatedAt": "2026-06-11",
+    "sourceLabel": {
+      "ru": "Другой автор",
+      "en": "External creator"
+    },
+    "summary": {
+      "ru": [
+        "Видео показывает AI UGC pipeline, где Claude Skills разбирают референс-видео и превращают его в пошаговую структуру для новых рекламных сцен.",
+        "Главная польза — не просто сгенерировать ролик, а повторить структуру: hook, персонажи, сцены, voice, lip-sync и storyboard.",
+        "Самое ценное для Opten-аудитории: skills и prompts можно вынести в отдельные материалы, которые зритель быстро копирует."
+      ],
+      "en": [
+        "The video shows an AI UGC pipeline where Claude Skills decode a reference video into a repeatable structure for new ad scenes.",
+        "The main value is not just generating a clip, but reproducing the structure: hook, characters, scenes, voice, lip-sync, and storyboard.",
+        "For the Opten audience, the most useful assets are reusable skills and prompts that can be copied quickly."
+      ]
+    },
+    "keyTakeaways": {
+      "ru": [
+        "Сначала нужно декодировать референс, а не писать промпт с нуля.",
+        "TopView Canvas полезен как storyboard-first среда, где сцены собираются до финальной генерации.",
+        "Сначала тестируется одна сцена, потом генерируются остальные, чтобы не тратить кредиты впустую."
+      ],
+      "en": [
+        "Start by decoding the reference instead of writing a prompt from scratch.",
+        "TopView Canvas is useful as a storyboard-first environment before final generation.",
+        "Generate and review one scene first, then produce the rest to avoid wasting credits."
+      ]
+    },
+    "commands": [],
+    "prompts": [
+      {
+        "title": { "ru": "Адаптация референса под продукт", "en": "Adapt a reference to a product" },
+        "text": "Analyze this reference video frame by frame and rebuild the structure for my product. Keep the same persuasive pattern, but create a unique setup, characters, script beats, and scene prompts.",
+        "note": {
+          "ru": "Основная идея UGC Decoder: заменить продукт, но сохранить рабочую структуру.",
+          "en": "The core UGC Decoder idea: replace the product while preserving the working structure."
+        }
+      },
+      {
+        "title": { "ru": "Исправить слишком чистого персонажа", "en": "Make a character more realistic" },
+        "text": "The second character looks too polished and clean. Rewrite the prompt so the result looks more realistic, natural, and suitable for an organic UGC ad.",
+        "note": {
+          "ru": "Запрос из типичной итерации, когда AI-персонаж выглядит слишком глянцево.",
+          "en": "A typical iteration when an AI character looks too polished."
+        }
+      }
+    ],
+    "resources": [
+      {
+        "title": "TopView Canvas",
+        "href": "https://www.topview.ai/",
+        "kind": "tool"
+      },
+      {
+        "title": "Claude Skills",
+        "href": "https://support.anthropic.com/en/articles/10749185-getting-started-with-skills",
+        "kind": "official"
+      },
+      {
+        "title": "Оригинал на YouTube",
+        "href": "https://youtu.be/UVpUV9k951E",
+        "kind": "video"
+      }
+    ],
+    "risks": {
+      "ru": [
+        "Фон у разных персонажей может не совпасть, если генерировать их независимо.",
+        "Голос может меняться между клипами без storyboard-first workflow.",
+        "Не стоит генерировать все сцены сразу: сначала проверяется одна сцена."
+      ],
+      "en": [
+        "Backgrounds can mismatch when characters are generated independently.",
+        "Voice consistency can drift between clips without a storyboard-first workflow.",
+        "Do not generate all scenes blindly; test one scene first."
+      ]
+    },
+    "timestamps": {
+      "ru": [
+        { "time": "00:00", "seconds": 0, "title": "Введение", "description": "Автор объясняет, что весь AI UGC pipeline будет собираться через Claude Skills и TopView Canvas." },
+        { "time": "00:37", "seconds": 37, "title": "Установка Skills", "description": "Показывается, где взять ZIP со skills и как подключить их в Claude." },
+        { "time": "00:56", "seconds": 56, "title": "Построение workflow", "description": "Разбирается общая структура: референс, сценарий, персонажи, сцены и финальная сборка." },
+        { "time": "02:35", "seconds": 155, "title": "Генерация персонажей", "description": "Workflow переходит к созданию AI-персонажей и проверке реалистичности результата." },
+        { "time": "04:39", "seconds": 279, "title": "Анимация в Seedance 2.0", "description": "Персонажи и сцены анимируются, чтобы получить отдельные клипы для UGC-рекламы." },
+        { "time": "07:45", "seconds": 465, "title": "Финальная сборка видео", "description": "Готовые фрагменты собираются в рекламный ролик с правильной последовательностью сцен." },
+        { "time": "09:13", "seconds": 553, "title": "Pro tips", "description": "Автор делится практическими советами: тестировать одну сцену, следить за фоном и не тратить кредиты вслепую." }
+      ],
+      "en": [
+        { "time": "00:00", "seconds": 0, "title": "Introduction", "description": "The creator explains that the full AI UGC pipeline will be built with Claude Skills and TopView Canvas." },
+        { "time": "00:37", "seconds": 37, "title": "Installing the Skills", "description": "The video shows where to get the skills ZIP and how to connect it in Claude." },
+        { "time": "00:56", "seconds": 56, "title": "Building the Workflow", "description": "The overall structure is mapped out: reference, script, characters, scenes, and final assembly." },
+        { "time": "02:35", "seconds": 155, "title": "Character Generation", "description": "The workflow moves into creating AI characters and checking how realistic they look." },
+        { "time": "04:39", "seconds": 279, "title": "Animating with Seedance 2.0", "description": "Characters and scenes are animated into clips for the UGC ad." },
+        { "time": "07:45", "seconds": 465, "title": "Finishing the Video", "description": "The generated clips are assembled into an ad with the right scene order." },
+        { "time": "09:13", "seconds": 553, "title": "Pro Tips", "description": "The creator shares practical advice: test one scene, watch background consistency, and avoid wasting credits." }
+      ]
+    }
+  }
+]

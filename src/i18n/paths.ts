@@ -10,7 +10,7 @@
 // Phase v2.0 MODELS-A-7: light-import — `slugs.ts` only re-exports a string[],
 // no React or content modules pulled into the i18n bundle (R2 mitigation).
 import { MODEL_SLUGS_WITH_CONTENT } from "../content/models/slugs";
-import { LEARN_LESSON_SLUGS } from "../content/space/learnSlugs";
+import { LEARN_FIND_SLUGS, LEARN_LESSON_SLUGS } from "../content/space/learnSlugs";
 
 const STATIC_EN_SIBLINGS: readonly string[] = [
   "/",
@@ -43,8 +43,9 @@ const STATIC_EN_SIBLINGS: readonly string[] = [
 
 const MODEL_PATHS = MODEL_SLUGS_WITH_CONTENT.map((slug) => `/models/${slug}`);
 const LEARN_PATHS = LEARN_LESSON_SLUGS.map((slug) => `/learn/${slug}`);
+const LEARN_FIND_PATHS = LEARN_FIND_SLUGS.map((slug) => `/learn/finds/${slug}`);
 
-export const EN_SIBLINGS = new Set<string>([...STATIC_EN_SIBLINGS, ...MODEL_PATHS, ...LEARN_PATHS]);
+export const EN_SIBLINGS = new Set<string>([...STATIC_EN_SIBLINGS, ...MODEL_PATHS, ...LEARN_PATHS, ...LEARN_FIND_PATHS]);
 
 export const EN_LANDING = "/en/";
 

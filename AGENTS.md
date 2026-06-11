@@ -29,7 +29,10 @@ snapshots at `/p/:slug` (random-link, noindex MVP; viewers save individual
 prompts into their own private library through website auth), (6) public Learn
 pages at `/learn`
 and `/en/learn` (indexed RU/EN video lessons with schema, sitemap, llms.txt, and
-legacy redirects from `/app/learn*`), alongside the Opten Space Beta app shell
+legacy redirects from `/app/learn*`), plus Learn Finds at
+`/learn/finds/:slug` and `/en/learn/finds/:slug` for curated third-party
+YouTube expert videos enriched with Opten summaries, timestamps, commands,
+prompts, resources, and risks, alongside the Opten Space Beta app shell
 at `/app/*` (SPA-only, noindex) whose
 account/credits state is read from the same self-hosted Supabase backend as the
 extension.
@@ -77,6 +80,11 @@ Opten Space Beta app routes are **not extension-locked** yet, but `/app/*` is
 the canonical app namespace for authenticated app surfaces going forward.
 Learn is now a public SEO section at `/learn`; `/app/learn*` and `/space/learn*`
 must remain temporary redirects/backward compatibility, not canonical links.
+Learn Finds are public Learn content too. They embed the original YouTube video
+and must not mirror, re-upload, or claim ownership of third-party videos. Use
+the source YouTube thumbnail URL for cards unless a reviewed local asset is
+added later. The page removes the Opten author/course card and labels the source
+as another author/source instead.
 
 Hardcoded constants that are duplicated and must be kept in sync:
 - `EXTENSION_IDS` — appears in [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [src/app/pages/DownloadSkillPage.tsx](src/app/pages/DownloadSkillPage.tsx), [src/app/pages/PromptLibraryPage.tsx](src/app/pages/PromptLibraryPage.tsx)
@@ -404,6 +412,14 @@ sets `PYTHONIOENCODING=utf-8`, `NO_COLOR=1`, and `TERM=dumb` before calling the
 Unicode. Paste reviewed output into the relevant lesson's `timestamps` array;
 keep generated source IDs and provider notes out of the public bundle unless
 they are intentionally non-secret.
+
+Learn Finds are generated from the local `C:\Projects\suffler` desktop tool.
+The website reads them from `src/content/space/learnFinds.generated.json`.
+Suffler may call the local `notebooklm` CLI, write that generated JSON, run the
+site build, then commit and push the generated content so Vercel deploys it.
+The publisher must block before committing if the website worktree has unrelated
+tracked changes, and it must never commit NotebookLM auth files, API keys,
+temporary notebooks, raw transcripts, or local suffler settings.
 
 ## Content & SEO — read before adding pages, posts, or images
 

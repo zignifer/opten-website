@@ -6,3 +6,9 @@ export const LEARN_LESSON_SLUGS = [
   "ai-marketplace-product-cards",
   "web-design-references",
 ] as const;
+
+export const LEARN_FIND_SLUGS = [
+  "ideogram-mcp-claude-code",
+  "figma-claude-code-ui-design",
+  "claude-skills-ai-ugc-pipeline",
+] as const;

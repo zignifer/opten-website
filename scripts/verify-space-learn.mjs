@@ -6,6 +6,8 @@ const root = process.cwd();
 
 const requiredFiles = [
   "src/content/space/learn.ts",
+  "src/content/space/learnFinds.generated.json",
+  "src/content/space/learnFinds.ts",
   "src/content/space/learnSlugs.ts",
   "src/app/components/space/SpaceHeader.tsx",
   "src/app/components/space/SpaceAuthProvider.tsx",
@@ -14,6 +16,7 @@ const requiredFiles = [
   "src/app/pages/space/AppLoginPage.tsx",
   "src/app/pages/space/AppAuthCallbackPage.tsx",
   "src/app/pages/space/LearnOverviewPage.tsx",
+  "src/app/pages/space/LearnFindDetailPage.tsx",
   "src/app/pages/space/LessonDetailPage.tsx",
   "src/app/pages/space/LearnTemplatePage.tsx",
   "src/lib/optenAuth.ts",
@@ -37,9 +40,12 @@ assert.match(main, /\/app\/auth\/callback"/, "Main router must register /app/aut
 assert.match(main, /\/learn"/, "Main router must register public /learn");
 assert.match(main, /\/learn\/templates\/:templateKind"/, "Main router must register noindex Learn template routes");
 assert.match(main, /\/learn\/templates\/:templateKind\/:templateLessonSlug"/, "Main router must register noindex Learn template lesson routes");
+assert.match(main, /\/learn\/finds\/:findSlug"/, "Main router must register public Learn Finds routes");
+assert.ok(main.indexOf('/learn/finds/:findSlug') < main.indexOf('/learn/:lessonSlug'), "Learn Finds route must be registered before generic /learn/:lessonSlug");
 assert.match(main, /\/learn\/:lessonSlug"/, "Main router must register public /learn/:lessonSlug");
 assert.match(main, /\/en\/learn"/, "Main router must register public /en/learn");
 assert.match(main, /\/en\/learn\/templates\/:templateKind"/, "Main router must register EN noindex Learn template routes");
+assert.match(main, /\/en\/learn\/finds\/:findSlug"/, "Main router must register EN Learn Finds routes");
 assert.match(main, /\/en\/learn\/:lessonSlug"/, "Main router must register public /en/learn/:lessonSlug");
 assert.match(main, /\/app\/learn"[\s\S]*Navigate[\s\S]*\/learn/, "Legacy /app/learn must redirect to /learn");
 assert.match(main, /\/app\/learn\/:lessonSlug"[\s\S]*Navigate[\s\S]*\/learn/, "Legacy /app/learn/:lessonSlug must redirect to /learn");
@@ -84,12 +90,26 @@ assert.match(content, /routeBasePath/, "Template collections must keep internal 
 
 const paths = readFileSync(join(root, "src/i18n/paths.ts"), "utf8");
 assert.match(paths, /LEARN_LESSON_SLUGS/, "LocalizedLink must know public Learn lesson siblings");
+assert.match(paths, /LEARN_FIND_SLUGS/, "LocalizedLink must know public Learn Finds siblings");
 
 const seoRoutes = readFileSync(join(root, "scripts/seo-routes.ts"), "utf8");
 assert.match(seoRoutes, /learnHubRoute/, "SEO manifest must register the public Learn hub");
 assert.match(seoRoutes, /buildLearnLessonRoute/, "SEO manifest must register public Learn lesson pages");
+assert.match(seoRoutes, /buildLearnFindRoute/, "SEO manifest must register public Learn Finds pages");
 assert.match(seoRoutes, /LearningResource/, "Learn lesson schema must expose LearningResource");
 assert.match(seoRoutes, /VideoObject/, "Learn lesson schema must expose VideoObject");
+
+const learnFinds = readFileSync(join(root, "src/content/space/learnFinds.generated.json"), "utf8");
+assert.match(learnFinds, /ideogram-mcp-claude-code/, "Learn Finds seed content must include the Ideogram MCP find");
+assert.match(learnFinds, /figma-claude-code-ui-design/, "Learn Finds seed content must include the Figma Claude Code find");
+assert.match(learnFinds, /claude-skills-ai-ugc-pipeline/, "Learn Finds seed content must include the Claude Skills UGC find");
+
+const learnFindDetail = readFileSync(join(root, "src/app/pages/space/LearnFindDetailPage.tsx"), "utf8");
+assert.match(learnFindDetail, /getLearnFindSummary/, "Learn Find detail page must render short summaries");
+assert.match(learnFindDetail, /getLearnFindTakeaways/, "Learn Find detail page must render extracted takeaways");
+assert.match(learnFindDetail, /getLearnFindRisks/, "Learn Find detail page must render risks");
+assert.match(learnFindDetail, /youtube-nocookie\.com\/embed/, "Learn Find detail page must embed the original YouTube video");
+assert.doesNotMatch(learnFindDetail, /LessonAuthor|AuthorSocialLinks|UnlockProCard/, "Learn Find detail must not render the Opten lesson author or Pro sidebar cards");
 
 const header = readFileSync(join(root, "src/app/components/space/SpaceHeader.tsx"), "utf8");
 assert.match(header, /useSpaceAuth/, "Learn header must read account state from SpaceAuthProvider");

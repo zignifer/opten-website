@@ -39,11 +39,24 @@ import {
   getLearnLessonTitle,
   getLearnLessonTopics,
   getLearnLessonVideoProvider,
+  learnTopicLabels,
   learnHubFaq,
   publicLearnLessons,
   type LearnLang,
   type LearnLesson,
 } from "../src/content/space/learn";
+import {
+  getLearnFindDescription,
+  getLearnFindRisks,
+  getLearnFindSeoDescription,
+  getLearnFindSeoTitle,
+  getLearnFindSourceLabel,
+  getLearnFindTakeaways,
+  getLearnFindTitle,
+  getYoutubeThumbnailUrl,
+  learnFinds,
+  type LearnFind,
+} from "../src/content/space/learnFinds";
 
 // Phase 3 D-01/D-02: cluster pairs (reciprocal hreflang per RESEARCH.md Pitfall 5):
 //   "/"        ↔ "/en/"          "/pay"     ↔ "/en/pay"
@@ -690,6 +703,10 @@ function learnOgImageUrl(lesson: LearnLesson): string {
   return `${SITE_ORIGIN}/assets/learn/og/${lesson.slug}.jpg`;
 }
 
+function learnFindImageUrl(find: LearnFind): string {
+  return getYoutubeThumbnailUrl(find.youtubeId);
+}
+
 function learnHubRoute(lang: LearnLang): RouteMeta {
   const path = lang === "ru" ? "/learn" : "/en/learn";
   const ruUrl = `${SITE_ORIGIN}/learn`;
@@ -734,11 +751,18 @@ function learnHubRoute(lang: LearnLang): RouteMeta {
         inLanguage,
       }),
       itemListBlock(
-        publicLearnLessons.map((lesson) => ({
-          url: lang === "ru" ? `${SITE_ORIGIN}/learn/${lesson.slug}` : `${SITE_ORIGIN}/en/learn/${lesson.slug}`,
-          name: getLearnLessonTitle(lesson, lang),
-          datePublished: lesson.publishedAt,
-        })),
+        [
+          ...publicLearnLessons.map((lesson) => ({
+            url: lang === "ru" ? `${SITE_ORIGIN}/learn/${lesson.slug}` : `${SITE_ORIGIN}/en/learn/${lesson.slug}`,
+            name: getLearnLessonTitle(lesson, lang),
+            datePublished: lesson.publishedAt,
+          })),
+          ...learnFinds.map((find) => ({
+            url: lang === "ru" ? `${SITE_ORIGIN}/learn/finds/${find.slug}` : `${SITE_ORIGIN}/en/learn/finds/${find.slug}`,
+            name: getLearnFindTitle(find, lang),
+            datePublished: find.publishedAt,
+          })),
+        ],
         pageUrl,
       ),
       webPageBlock({
@@ -754,6 +778,108 @@ function learnHubRoute(lang: LearnLang): RouteMeta {
         [
           { name: homeName, url: lang === "ru" ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}/en/` },
           { name: learnName, url: pageUrl },
+        ],
+        pageUrl,
+      ),
+    ],
+  };
+}
+
+function learnFindLearningResourceBlock(find: LearnFind, lang: LearnLang, pageUrl: string, inLanguage: "ru-RU" | "en-US"): SchemaBlock {
+  return {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "@id": `${pageUrl}#learning-resource`,
+    name: getLearnFindTitle(find, lang),
+    description: getLearnFindDescription(find, lang),
+    inLanguage,
+    provider: ORG_REF,
+    publisher: ORG_REF,
+    learningResourceType: "Expert video breakdown",
+    educationalLevel: lang === "ru" ? "Начальный и средний уровень" : "Beginner to intermediate",
+    teaches: [
+      ...getLearnFindTakeaways(find, lang),
+      ...getLearnFindRisks(find, lang),
+    ],
+    keywords: [learnTopicLabels[lang][find.topic], ...find.resources.map((resource) => resource.title)].join(", "),
+    timeRequired: find.durationIso,
+    datePublished: find.publishedAt,
+    dateModified: find.updatedAt,
+    isAccessibleForFree: true,
+    mainEntityOfPage: pageUrl,
+  };
+}
+
+function learnFindVideoObjectBlock(find: LearnFind, lang: LearnLang, pageUrl: string, inLanguage: "ru-RU" | "en-US"): SchemaBlock {
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "@id": `${pageUrl}#video`,
+    name: getLearnFindTitle(find, lang),
+    description: getLearnFindDescription(find, lang),
+    thumbnailUrl: [learnFindImageUrl(find)],
+    uploadDate: find.publishedAt,
+    duration: find.durationIso,
+    inLanguage,
+    author: {
+      "@type": "Person",
+      name: getLearnFindSourceLabel(find, lang),
+    },
+    publisher: ORG_REF,
+    embedUrl: `https://www.youtube-nocookie.com/embed/${find.youtubeId}`,
+    isPartOf: { "@id": `${pageUrl}#learning-resource` },
+  };
+}
+
+function buildLearnFindRoute(find: LearnFind, lang: LearnLang): RouteMeta {
+  const path = lang === "ru" ? `/learn/finds/${find.slug}` : `/en/learn/finds/${find.slug}`;
+  const ruUrl = `${SITE_ORIGIN}/learn/finds/${find.slug}`;
+  const enUrl = `${SITE_ORIGIN}/en/learn/finds/${find.slug}`;
+  const pageUrl = lang === "ru" ? ruUrl : enUrl;
+  const inLanguage = lang === "ru" ? "ru-RU" : "en-US";
+  const homeName = lang === "ru" ? "Главная" : "Home";
+  const learnName = lang === "ru" ? "Курсы" : "Courses";
+  const findsName = lang === "ru" ? "Находки" : "Finds";
+  const title = getLearnFindSeoTitle(find, lang);
+  const description = getLearnFindSeoDescription(find, lang);
+
+  return {
+    path,
+    htmlLang: lang,
+    hreflangAlternates: {
+      ru: ruUrl,
+      en: enUrl,
+      xDefault: ruUrl,
+    },
+    title,
+    description,
+    canonical: pageUrl,
+    ogTitle: title,
+    ogDescription: description,
+    ogImage: learnFindImageUrl(find),
+    author: "Opten",
+    prerender: "full",
+    changefreq: "weekly",
+    priority: 0.72,
+    schema: [
+      lang === "en" ? ORG_BLOCK_EN : ORG_BLOCK,
+      WEBSITE_BLOCK,
+      learnFindLearningResourceBlock(find, lang, pageUrl, inLanguage),
+      learnFindVideoObjectBlock(find, lang, pageUrl, inLanguage),
+      webPageBlock({
+        pageId: pageUrl,
+        url: pageUrl,
+        name: title,
+        inLanguage,
+        cssSelector: ["h1", "h2"],
+        about: SOFTWARE_APP_REF,
+      }),
+      breadcrumbBlock(
+        [
+          { name: homeName, url: lang === "ru" ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}/en/` },
+          { name: learnName, url: lang === "ru" ? `${SITE_ORIGIN}/learn` : `${SITE_ORIGIN}/en/learn` },
+          { name: findsName, url: lang === "ru" ? `${SITE_ORIGIN}/learn` : `${SITE_ORIGIN}/en/learn` },
+          { name: getLearnFindTitle(find, lang), url: pageUrl },
         ],
         pageUrl,
       ),
@@ -881,6 +1007,10 @@ const learnRouteEntries: RouteMeta[] = [
   ...publicLearnLessons.flatMap((lesson) => [
     buildLearnLessonRoute(lesson, "ru"),
     buildLearnLessonRoute(lesson, "en"),
+  ]),
+  ...learnFinds.flatMap((find) => [
+    buildLearnFindRoute(find, "ru"),
+    buildLearnFindRoute(find, "en"),
   ]),
 ];
 

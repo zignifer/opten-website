@@ -39,6 +39,7 @@
   const AppAuthCallbackPage = lazy(() => import("./app/pages/space/AppAuthCallbackPage.tsx"));
   const LearnOverviewPage = lazy(() => import("./app/pages/space/LearnOverviewPage.tsx"));
   const LessonDetailPage = lazy(() => import("./app/pages/space/LessonDetailPage.tsx"));
+  const LearnFindDetailPage = lazy(() => import("./app/pages/space/LearnFindDetailPage.tsx"));
   const LearnTemplatePage = lazy(() => import("./app/pages/space/LearnTemplatePage.tsx"));
   // Phase 2.2: Paddle bootstrap moved to src/lib/paddle.ts.
   // /pay/index.html still gets the sync <script> tag via prerender.mjs — direct hits
@@ -198,6 +199,7 @@
               <Route path="/learn" element={<LearnOverviewPage />} />
               <Route path="/learn/templates/:templateKind" element={<LearnTemplatePage />} />
               <Route path="/learn/templates/:templateKind/:templateLessonSlug" element={<LearnTemplatePage />} />
+              <Route path="/learn/finds/:findSlug" element={<LearnFindDetailPage />} />
               <Route path="/learn/:lessonSlug" element={<LessonDetailPage />} />
               <Route path="/app" element={<AppIndexPage />} />
               <Route path="/app/login" element={<Navigate to="/login?next=/learn" replace />} />
@@ -222,6 +224,7 @@
               <Route path="/en/learn" element={<LearnOverviewPage />} />
               <Route path="/en/learn/templates/:templateKind" element={<LearnTemplatePage />} />
               <Route path="/en/learn/templates/:templateKind/:templateLessonSlug" element={<LearnTemplatePage />} />
+              <Route path="/en/learn/finds/:findSlug" element={<LearnFindDetailPage />} />
               <Route path="/en/learn/:lessonSlug" element={<LessonDetailPage />} />
               {/* Phase 4.2 / Wave 3 (P1-1): catch-all 404. MUST be LAST — React Router 7 matches in declaration order, so any earlier `*` would shadow specific routes. NotFound injects <meta name="robots" content="noindex,nofollow"> at runtime to stop search engines from indexing typo'd URLs as duplicates of the landing. Status code stays 200 (Vercel SPA rewrite is unchanged; HTTP 404 is deferred to Phase 6 per CONTEXT D-3). */}
               <Route path="*" element={<NotFound />} />
