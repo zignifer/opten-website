@@ -1,5 +1,171 @@
 [
   {
+    "slug": "graphify-obsidian-claude-code-second-brain",
+    "youtubeId": "mWLDn49_8HA",
+    "youtubeUrl": "https://youtu.be/mWLDn49_8HA",
+    "title": {
+      "ru": "Graphify + Obsidian: Вторая память для Claude Code",
+      "en": "Graphify + Obsidian: A Second Brain for Claude Code"
+    },
+    "description": {
+      "ru": "Инструкция по созданию интерактивного графа знаний из любой документации или кодовой базы для расширения контекстного окна и памяти Claude Code.",
+      "en": "A guide to creating an interactive knowledge graph from any documentation or codebase to expand Claude Code's context window and memory."
+    },
+    "seoTitle": {
+      "ru": "Как объединить Graphify и Obsidian для Claude Code — Opten",
+      "en": "How to Combine Graphify and Obsidian for Claude Code — Opten"
+    },
+    "seoDescription": {
+      "ru": "Узнайте, как превратить документацию в базу знаний Obsidian с помощью Graphify и Claude Code для эффективного управления сложными проектами.",
+      "en": "Learn how to turn documentation into an Obsidian knowledge base using Graphify and Claude Code for efficient management of complex projects."
+    },
+    "topic": "vibe-coding",
+    "duration": "15:47",
+    "durationIso": "PT15M47S",
+    "publishedAt": "2026-06-08",
+    "updatedAt": "2026-06-08",
+    "sourceLabel": {
+      "ru": "Chase AI",
+      "en": "Chase AI"
+    },
+    "summary": {
+      "ru": [
+        "Объединение Graphify и Obsidian позволяет Claude Code обращаться к структурированной внешней базе знаний.",
+        "Graphify извлекает смысловые концепты и связи, создавая карту проекта вместо простого поиска по тексту.",
+        "Автоматическая генерация сотен Markdown-файлов в Obsidian с сохранением всех перекрестных ссылок.",
+        "Четыре стратегии интеграции данных: от изолированного хранилища до полной переработки структуры папок."
+      ],
+      "en": [
+        "Combining Graphify and Obsidian allows Claude Code to access a structured external knowledge base.",
+        "Graphify extracts semantic concepts and relationships, creating a project map rather than simple text search.",
+        "Automatic generation of hundreds of Markdown files in Obsidian while preserving all cross-references.",
+        "Four data integration strategies: from a standalone vault to a complete redistribution of folder structure."
+      ]
+    },
+    "keyTakeaways": {
+      "ru": [
+        "Graphify превращает 171 страницу скучной документации в визуальный граф из ~600 связанных узлов-концептов.",
+        "Флаг `--obsidian` — ключевой инструмент для мгновенного экспорта графа знаний в формат заметок Obsidian.",
+        "Связывание узлов с исходными документами (source docs) критически важно для того, чтобы ИИ видел детали, а не только заголовки.",
+        "Метод 'Quarantine Dump' (папка-карантин) помогает безопасно импортировать данные, не засоряя основное хранилище."
+      ],
+      "en": [
+        "Graphify turns 171 pages of dry documentation into a visual graph of ~600 connected concept nodes.",
+        "The `--obsidian` flag is the key tool for instantly exporting a knowledge graph into Obsidian note format.",
+        "Wiring nodes to source documents is critical so the AI sees specific details, not just conceptual headers.",
+        "The 'Quarantine Dump' method helps safely import data without cluttering your main vault structure."
+      ]
+    },
+    "commands": [
+      {
+        "title": {
+          "ru": "Экспорт графа в Obsidian",
+          "en": "Export Graph to Obsidian"
+        },
+        "code": "graphify-obsidian",
+        "note": {
+          "ru": "Команда (или флаг) внутри Graphify для генерации структуры хранилища Obsidian.",
+          "en": "Command (or flag) within Graphify to generate an Obsidian vault structure."
+        }
+      }
+    ],
+    "prompts": [
+      {
+        "title": {
+          "ru": "Создание базы знаний из документации",
+          "en": "Creating a Knowledge Base from Docs"
+        },
+        "text": "download the official Claude Code documentation, point Graphify at it, then use the graphify obsidian command to turn it into a vault",
+        "note": {
+          "ru": "Последовательная инструкция для Claude Code по сбору и обработке данных.",
+          "en": "Sequential instruction for Claude Code to collect and process data."
+        }
+      },
+      {
+        "title": {
+          "ru": "Связывание узлов с источниками",
+          "en": "Wiring Nodes to Sources"
+        },
+        "text": "pull the source docs in and wire every node to its origin in the folder",
+        "note": {
+          "ru": "Добавляет ссылки на оригинальные файлы в каждую сгенерированную заметку для полноты контекста.",
+          "en": "Adds links to original files in every generated note for context completeness."
+        }
+      }
+    ],
+    "resources": [
+      {
+        "title": "Obsidian",
+        "href": "https://obsidian.md/",
+        "kind": "tool"
+      },
+      {
+        "title": "Claude Code",
+        "href": "https://anthropic.com",
+        "kind": "official"
+      },
+      {
+        "title": "Оригинал на YouTube",
+        "href": "https://youtu.be/mWLDn49_8HA",
+        "kind": "video"
+      }
+    ],
+    "risks": {
+      "ru": [
+        "Прямой импорт 600+ файлов может нарушить организацию вашего основного хранилища Obsidian.",
+        "Markdown-заметки без привязки к Source Docs — это просто пустые 'заглушки' с названиями.",
+        "Требуется ручная настройка в Obsidian для распознавания новой папки как хранилища (Open folder as vault)."
+      ],
+      "en": [
+        "Directly importing 600+ files can disrupt the organization of your main Obsidian vault.",
+        "Markdown notes without links to Source Docs are just empty 'stubs' with titles.",
+        "Manual setup in Obsidian is required to recognize a new folder as a vault (Open folder as vault)."
+      ]
+    },
+    "timestamps": {
+      "ru": [
+        {
+          "time": "00:00",
+          "seconds": 0,
+          "title": "Graphify + Obsidian",
+          "description": "Обзор стека инструментов и объяснение, почему связка графа знаний и Obsidian эффективнее работы в 'вакууме'."
+        },
+        {
+          "time": "02:45",
+          "seconds": 165,
+          "title": "Как это работает + Демо",
+          "description": "Пошаговый процесс: скачивание 171 страницы документации Claude Code, извлечение 591 концепта и импорт в Obsidian."
+        },
+        {
+          "time": "15:06",
+          "seconds": 906,
+          "title": "Итоговые мысли",
+          "description": "Сравнение четырех способов интеграции данных и рекомендации по выбору между использованием только Graphify или связки с Obsidian."
+        }
+      ],
+      "en": [
+        {
+          "time": "00:00",
+          "seconds": 0,
+          "title": "Graphify + Obsidian",
+          "description": "Overview of the tool stack and explanation of why combining a knowledge graph with Obsidian is more effective than working in a 'vacuum'."
+        },
+        {
+          "time": "02:45",
+          "seconds": 165,
+          "title": "How it Works + Demo",
+          "description": "Step-by-step process: downloading 171 pages of Claude Code docs, extracting 591 concepts, and importing them into Obsidian."
+        },
+        {
+          "time": "15:06",
+          "seconds": 906,
+          "title": "Final Thoughts",
+          "description": "Comparison of four data integration methods and advice on choosing between using Graphify alone or in tandem with Obsidian."
+        }
+      ]
+    }
+  },
+  {
     "slug": "claude-skills-for-designers-part-3",
     "youtubeId": "gAT9e7m74bI",
     "youtubeUrl": "https://youtu.be/gAT9e7m74bI",
