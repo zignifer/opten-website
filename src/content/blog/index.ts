@@ -7,6 +7,7 @@ import { post as aiFaceSwap } from "./ai-face-swap";
 import { post as flux2Prompts } from "./flux-2-prompts";
 import { post as kling3Prompts } from "./kling-3-prompts";
 import { post as aiInfluencer } from "./ai-influencer";
+import { post as aiLipSync } from "./ai-lip-sync";
 import { post as seedance20Prompts } from "./seedance-2-0-prompts";
 import { post as promptExamples } from "./prompt-examples";
 import { post as bestAiVideo2026 } from "./best-ai-video-2026";
@@ -20,6 +21,7 @@ import { post as aiLogoGeneratorPrompt } from "./ai-logo-generator-prompt";
 import type { BlogPost } from "./types";
 
 export const blogPostsBySlug = {
+  "ai-lip-sync": aiLipSync,
   "flux-2-prompts": flux2Prompts,
   "kling-3-prompts": kling3Prompts,
   "ai-influencer": aiInfluencer,

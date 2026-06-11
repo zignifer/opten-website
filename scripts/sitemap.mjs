@@ -32,8 +32,8 @@ const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 // files landed. 152 = 26 baseline/blog routes + 2 hubs (/models + /en/models) + 124 model
 // pages (62 RU + 62 EN). Daily blog posts bring the floor to 170; public Learn adds 14 more routes.
 // /dashboard/*) carry prerender:"none" and are excluded from sitemapRoutes.
-if (sitemapRoutes.length < 186) {
-  throw new Error(`sitemap.mjs: expected at least 186 routes (46 baseline/blog routes + 14 Learn routes + 2 model hubs + 124 model pages), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+if (sitemapRoutes.length < 188) {
+  throw new Error(`sitemap.mjs: expected at least 188 routes (48 baseline/blog routes + 14 Learn routes + 2 model hubs + 124 model pages), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 // Post-2026-05-17 GEO audit ME-12: per-route lastmod via git mtime of the source file driving
@@ -53,6 +53,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/ai-lip-sync":       "src/content/blog/ai-lip-sync.ts",
+  "/en/blog/ai-lip-sync":    "src/content/blog/ai-lip-sync.ts",
   "/blog/flux-2-prompts":    "src/content/blog/flux-2-prompts.ts",
   "/en/blog/flux-2-prompts": "src/content/blog/flux-2-prompts.ts",
   "/blog/kling-3-prompts":    "src/content/blog/kling-3-prompts.ts",

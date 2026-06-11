@@ -10,6 +10,7 @@ import { post as aiFaceSwapGuide } from "../src/content/blog/ai-face-swap";
 import { post as flux2PromptsGuide } from "../src/content/blog/flux-2-prompts";
 import { post as kling3PromptsGuide } from "../src/content/blog/kling-3-prompts";
 import { post as aiInfluencerGuide } from "../src/content/blog/ai-influencer";
+import { post as aiLipSyncGuide } from "../src/content/blog/ai-lip-sync";
 import { post as seedance20PromptsGuide } from "../src/content/blog/seedance-2-0-prompts";
 import { post as promptExamplesGuide } from "../src/content/blog/prompt-examples";
 import { post as bestAiVideo2026Guide } from "../src/content/blog/best-ai-video-2026";
@@ -1155,6 +1156,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/ai-lip-sync`, name: aiLipSyncGuide.ru.title, datePublished: aiLipSyncGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/flux-2-prompts`, name: flux2PromptsGuide.ru.title, datePublished: flux2PromptsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/kling-3-prompts`, name: kling3PromptsGuide.ru.title, datePublished: kling3PromptsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-influencer`, name: aiInfluencerGuide.ru.title, datePublished: aiInfluencerGuide.ru.publishedAt },
@@ -1186,6 +1188,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /blog/ai-lip-sync — AI lip sync prompt workflow guide.
+  {
+    path: "/blog/ai-lip-sync",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-lip-sync`,
+      en: `${SITE_ORIGIN}/en/blog/ai-lip-sync`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-lip-sync`,
+    },
+    title: aiLipSyncGuide.ru.title,
+    description: aiLipSyncGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-lip-sync`,
+    ogTitle: aiLipSyncGuide.ru.title,
+    ogDescription: aiLipSyncGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiLipSyncGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-lip-sync`,
+        headline: aiLipSyncGuide.ru.title,
+        description: aiLipSyncGuide.ru.description,
+        datePublished: aiLipSyncGuide.ru.publishedAt,
+        dateModified: aiLipSyncGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: aiLipSyncGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiLipSyncGuide.ru.cover.src}`,
+          width: aiLipSyncGuide.ru.cover.width,
+          height: aiLipSyncGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-lip-sync`,
+        url: `${SITE_ORIGIN}/blog/ai-lip-sync`,
+        name: aiLipSyncGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiLipSyncGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/ai-lip-sync`,
+        aiLipSyncGuide.ru.title,
+      ),
+      faqPageBlock(aiLipSyncGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-lip-sync`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: aiLipSyncGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-lip-sync` },
+        ],
+        `${SITE_ORIGIN}/blog/ai-lip-sync`,
       ),
     ],
   },
@@ -2358,6 +2420,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/ai-lip-sync`, name: aiLipSyncGuide.en.title, datePublished: aiLipSyncGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/flux-2-prompts`, name: flux2PromptsGuide.en.title, datePublished: flux2PromptsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/kling-3-prompts`, name: kling3PromptsGuide.en.title, datePublished: kling3PromptsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-influencer`, name: aiInfluencerGuide.en.title, datePublished: aiInfluencerGuide.en.publishedAt },
@@ -2389,6 +2452,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // Daily blog automation: /en/blog/ai-lip-sync EN sibling.
+  {
+    path: "/en/blog/ai-lip-sync",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-lip-sync`,
+      en: `${SITE_ORIGIN}/en/blog/ai-lip-sync`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-lip-sync`,
+    },
+    title: aiLipSyncGuide.en.title,
+    description: aiLipSyncGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-lip-sync`,
+    ogTitle: aiLipSyncGuide.en.title,
+    ogDescription: aiLipSyncGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiLipSyncGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-lip-sync`,
+        headline: aiLipSyncGuide.en.title,
+        description: aiLipSyncGuide.en.description,
+        datePublished: aiLipSyncGuide.en.publishedAt,
+        dateModified: aiLipSyncGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: aiLipSyncGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiLipSyncGuide.en.cover.src}`,
+          width: aiLipSyncGuide.en.cover.width,
+          height: aiLipSyncGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-lip-sync`,
+        url: `${SITE_ORIGIN}/en/blog/ai-lip-sync`,
+        name: aiLipSyncGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiLipSyncGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/ai-lip-sync`,
+        aiLipSyncGuide.en.title,
+      ),
+      faqPageBlock(aiLipSyncGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-lip-sync`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: aiLipSyncGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-lip-sync` },
+        ],
+        `${SITE_ORIGIN}/en/blog/ai-lip-sync`,
       ),
     ],
   },
