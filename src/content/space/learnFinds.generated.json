@@ -1,5 +1,196 @@
 [
   {
+    "slug": "claude-skills-for-designers-part-3",
+    "youtubeId": "gAT9e7m74bI",
+    "youtubeUrl": "https://youtu.be/gAT9e7m74bI",
+    "title": {
+      "ru": "Продвинутые навыки Claude для дизайнеров (Часть 3)",
+      "en": "Advanced Claude Skills for Designers (Part 3)"
+    },
+    "description": {
+      "ru": "Узнайте, как превратить Claude из обычного генератора кода в полноценный конвейер проектирования с помощью навыков Taste, Extract Design System и фреймворка Superpowers.",
+      "en": "Learn how to turn Claude from a basic code generator into a full design-to-production pipeline using Taste, Extract Design System, and the Superpowers framework."
+    },
+    "seoTitle": {
+      "ru": "Claude Skills для дизайнеров: Taste и Superpowers — Opten",
+      "en": "Claude Skills for Designers: Taste and Superpowers — Opten"
+    },
+    "seoDescription": {
+      "ru": "Гайд по использованию продвинутых навыков Claude для управления эстетикой интерфейса, извлечения дизайн-токенов и структурированного планирования разработки.",
+      "en": "A guide to using advanced Claude skills to manage UI aesthetics, extract design tokens, and implement structured development planning."
+    },
+    "topic": "vibe-design",
+    "duration": "12:34",
+    "durationIso": "PT12M34S",
+    "publishedAt": "2026-06-09",
+    "updatedAt": "2026-06-09",
+    "sourceLabel": {
+      "ru": "Griffin Wooldridge",
+      "en": "Griffin Wooldridge"
+    },
+    "summary": {
+      "ru": [
+        "Обзор навыка Taste для управления эстетикой интерфейса через 8 стилей и 3 параметра настройки.",
+        "Метод автоматического извлечения дизайн-токенов (цвета, шрифты, отступы) с любого публичного сайта.",
+        "Использование фреймворка Superpowers для глубокого планирования и код-ревью перед началом генерации.",
+        "Создание профессионального рабочего процесса от дизайна до продакшена внутри Claude Code или Cursor."
+      ],
+      "en": [
+        "Overview of the Taste skill for controlling UI aesthetics through 8 styles and 3 adjustable dials.",
+        "A method for automatically extracting design tokens (colors, fonts, spacing) from any public website.",
+        "Using the Superpowers framework for deep planning and code reviews before starting generation.",
+        "Building a professional design-to-production workflow within Claude Code or Cursor."
+      ]
+    },
+    "keyTakeaways": {
+      "ru": [
+        "Навык Taste позволяет работать как арт-директор, задавая плотность (visual density) и динамику (motion intensity) интерфейса.",
+        "Extract Design System экономит время на анализе конкурентов, выдавая готовые JSON и CSS токены за 30 секунд.",
+        "Фреймворк Superpowers решает проблему 'галлюцинаций' архитектуры, заставляя ИИ сначала писать спецификацию и план.",
+        "Использование навыков делает ИИ-генерацию менее шаблонной и более человекоориентированной."
+      ],
+      "en": [
+        "The Taste skill allows you to act as an art director by setting visual density and motion intensity.",
+        "Extract Design System saves time on competitor analysis by generating ready-to-use JSON and CSS tokens in 30 seconds.",
+        "The Superpowers framework solves architectural 'hallucination' issues by forcing the AI to write specs and plans first.",
+        "Using skills makes AI generation less formulaic and more human-centered."
+      ]
+    },
+    "commands": [
+      {
+        "title": {
+          "ru": "Вызов навыка Taste",
+          "en": "Call Taste Skill"
+        },
+        "code": "/design-taste-frontend",
+        "note": {
+          "ru": "Команда для выбора визуального стиля и настройки параметров в Claude Code.",
+          "en": "Command to select visual style and adjust parameters in Claude Code."
+        }
+      },
+      {
+        "title": {
+          "ru": "Извлечение дизайн-системы",
+          "en": "Extract Design System"
+        },
+        "code": "/extract-design-system [URL]",
+        "note": {
+          "ru": "Извлекает токены стилей с указанного публичного веб-сайта.",
+          "en": "Extracts style tokens from the specified public website."
+        }
+      }
+    ],
+    "prompts": [
+      {
+        "title": {
+          "ru": "Генерация лендинга с настройкой плотности",
+          "en": "Landing Page with Density Adjustment"
+        },
+        "text": "design a SAS landing page for a CRM dashboard. set visual density to 8.",
+        "note": {
+          "ru": "Используется вместе с навыком Taste для создания компактных интерфейсов.",
+          "en": "Used with the Taste skill to create compact interfaces."
+        }
+      },
+      {
+        "title": {
+          "ru": "Разработка сложного дашборда (Superpowers)",
+          "en": "Complex Dashboard Development (Superpowers)"
+        },
+        "text": "Build me a dashboard for tracking design system token usage across products.",
+        "note": {
+          "ru": "Инициирует процесс интервью и планирования в рамках фреймворка Superpowers.",
+          "en": "Initiates the interview and planning process within the Superpowers framework."
+        }
+      }
+    ],
+    "resources": [
+      {
+        "title": "Оригинал на YouTube",
+        "href": "https://youtu.be/gAT9e7m74bI",
+        "kind": "video"
+      }
+    ],
+    "risks": {
+      "ru": [
+        "Extract Design System не создает пиксель-в-пиксель клон, это лишь стартовая точка для проекта.",
+        "Методология Superpowers работает медленнее стандартной генерации из-за этапов согласования.",
+        "Инструменты работают только с публично доступными URL-адресами."
+      ],
+      "en": [
+        "Extract Design System does not create a pixel-perfect clone; it is only a starting point for a project.",
+        "The Superpowers methodology is slower than standard generation due to approval stages.",
+        "Tools only work with publicly accessible URLs."
+      ]
+    },
+    "timestamps": {
+      "ru": [
+        {
+          "time": "00:00",
+          "seconds": 0,
+          "title": "Введение",
+          "description": "Краткий обзор трех продвинутых навыков для дизайнеров: Taste, Extract Design System и Superpowers."
+        },
+        {
+          "time": "00:50",
+          "seconds": 50,
+          "title": "Навык Taste",
+          "description": "Демонстрация того, как управлять эстетикой интерфейса через стили и регуляторы плотности и динамики."
+        },
+        {
+          "time": "06:23",
+          "seconds": 383,
+          "title": "Извлечение дизайн-системы",
+          "description": "Как получить реальные токены (JSON/CSS) с любого сайта для использования в своем проекте."
+        },
+        {
+          "time": "09:23",
+          "seconds": 563,
+          "title": "Фреймворк Superpowers",
+          "description": "Методология глубокого планирования, которая заставляет ИИ думать перед написанием кода."
+        },
+        {
+          "time": "12:14",
+          "seconds": 734,
+          "title": "Заключение",
+          "description": "Итоговые рекомендации по созданию профессионального пайплайна разработки дизайна."
+        }
+      ],
+      "en": [
+        {
+          "time": "00:00",
+          "seconds": 0,
+          "title": "Intro",
+          "description": "Brief overview of three advanced designer skills: Taste, Extract Design System, and Superpowers."
+        },
+        {
+          "time": "00:50",
+          "seconds": 50,
+          "title": "Taste Skill",
+          "description": "Demonstration of controlling UI aesthetics using styles and dials for density and motion."
+        },
+        {
+          "time": "06:23",
+          "seconds": 383,
+          "title": "Extract Design System",
+          "description": "How to get real design tokens (JSON/CSS) from any website for use in your project."
+        },
+        {
+          "time": "09:23",
+          "seconds": 563,
+          "title": "Superpowers",
+          "description": "A deep planning methodology that forces AI to think before writing code."
+        },
+        {
+          "time": "12:14",
+          "seconds": 734,
+          "title": "Outro",
+          "description": "Final recommendations on building a professional design-to-production pipeline."
+        }
+      ]
+    }
+  },
+  {
     "slug": "ideogram-mcp-claude-code",
     "youtubeId": "MYPlBOvV6kc",
     "youtubeUrl": "https://youtu.be/MYPlBOvV6kc",
@@ -54,7 +245,10 @@
     },
     "commands": [
       {
-        "title": { "ru": "Установить MCP в Claude Code", "en": "Install MCP in Claude Code" },
+        "title": {
+          "ru": "Установить MCP в Claude Code",
+          "en": "Install MCP in Claude Code"
+        },
         "code": "install <ideogram-mcp-command-from-official-page>",
         "note": {
           "ru": "Команду нужно брать с актуальной страницы Ideogram MCP, потому что формат установки может меняться.",
@@ -62,7 +256,10 @@
         }
       },
       {
-        "title": { "ru": "Проверить доступные действия MCP", "en": "Inspect available MCP actions" },
+        "title": {
+          "ru": "Проверить доступные действия MCP",
+          "en": "Inspect available MCP actions"
+        },
         "code": "done in a table view tell us exactly what we can do with this MCP",
         "note": {
           "ru": "Полезный запрос после авторизации: Claude перечисляет действия Ideogram MCP в таблице.",
@@ -72,7 +269,10 @@
     ],
     "prompts": [
       {
-        "title": { "ru": "Серия изображений на холсте", "en": "Image series to canvas" },
+        "title": {
+          "ru": "Серия изображений на холсте",
+          "en": "Image series to canvas"
+        },
         "text": "In the Ideogram project in Magic Path, drop in all the images generated with Ideogram and automatically upload the images you generate in this conversation into this Magic Path project.",
         "note": {
           "ru": "Промпт связывает генерацию Ideogram с визуальным холстом Magic Path.",
@@ -111,24 +311,104 @@
     },
     "timestamps": {
       "ru": [
-        { "time": "00:00", "seconds": 0, "title": "Вступление в Ideogram MCP", "description": "Автор объясняет, зачем Ideogram MCP нужен внутри Claude Code и какие creative workflows он собирается проверить." },
-        { "time": "00:48", "seconds": 48, "title": "Установка Ideogram в Claude Code", "description": "Показывается подключение MCP и базовая авторизация перед генерацией изображений." },
-        { "time": "02:22", "seconds": 142, "title": "Типографика и storybook-изображения", "description": "Claude Code просит Ideogram создать визуальные концепты с текстом и иллюстративной стилистикой." },
-        { "time": "03:31", "seconds": 211, "title": "Анализ бренда из Instagram", "description": "Workflow использует Instagram-референс, чтобы понять визуальный язык бренда перед генерацией новых ассетов." },
-        { "time": "05:03", "seconds": 303, "title": "Подключение к MagicPath", "description": "Сгенерированные изображения отправляются на визуальный холст, чтобы сравнивать варианты в одном месте." },
-        { "time": "05:59", "seconds": 359, "title": "Консистентные фотосессии персонажей", "description": "Автор проверяет, можно ли сохранять единый образ модели и собирать серию product-фото." },
-        { "time": "07:14", "seconds": 434, "title": "Графика и слоганы для одежды", "description": "Ideogram применяется для дизайна apparel-графики, где особенно важно контролировать текст и качество логотипов." },
-        { "time": "08:31", "seconds": 511, "title": "Product page из generated assets", "description": "Финальная часть показывает, как из ассетов собрать страницу продукта без выхода из agent workflow." }
+        {
+          "time": "00:00",
+          "seconds": 0,
+          "title": "Вступление в Ideogram MCP",
+          "description": "Автор объясняет, зачем Ideogram MCP нужен внутри Claude Code и какие creative workflows он собирается проверить."
+        },
+        {
+          "time": "00:48",
+          "seconds": 48,
+          "title": "Установка Ideogram в Claude Code",
+          "description": "Показывается подключение MCP и базовая авторизация перед генерацией изображений."
+        },
+        {
+          "time": "02:22",
+          "seconds": 142,
+          "title": "Типографика и storybook-изображения",
+          "description": "Claude Code просит Ideogram создать визуальные концепты с текстом и иллюстративной стилистикой."
+        },
+        {
+          "time": "03:31",
+          "seconds": 211,
+          "title": "Анализ бренда из Instagram",
+          "description": "Workflow использует Instagram-референс, чтобы понять визуальный язык бренда перед генерацией новых ассетов."
+        },
+        {
+          "time": "05:03",
+          "seconds": 303,
+          "title": "Подключение к MagicPath",
+          "description": "Сгенерированные изображения отправляются на визуальный холст, чтобы сравнивать варианты в одном месте."
+        },
+        {
+          "time": "05:59",
+          "seconds": 359,
+          "title": "Консистентные фотосессии персонажей",
+          "description": "Автор проверяет, можно ли сохранять единый образ модели и собирать серию product-фото."
+        },
+        {
+          "time": "07:14",
+          "seconds": 434,
+          "title": "Графика и слоганы для одежды",
+          "description": "Ideogram применяется для дизайна apparel-графики, где особенно важно контролировать текст и качество логотипов."
+        },
+        {
+          "time": "08:31",
+          "seconds": 511,
+          "title": "Product page из generated assets",
+          "description": "Финальная часть показывает, как из ассетов собрать страницу продукта без выхода из agent workflow."
+        }
       ],
       "en": [
-        { "time": "00:00", "seconds": 0, "title": "Intro to Ideogram MCP", "description": "The creator explains why Ideogram MCP is useful inside Claude Code and what creative workflows will be tested." },
-        { "time": "00:48", "seconds": 48, "title": "Installing Ideogram in Claude Code", "description": "The setup covers connecting the MCP and authenticating before generating images." },
-        { "time": "02:22", "seconds": 142, "title": "Typography and storybook images", "description": "Claude Code asks Ideogram to create visual concepts with text and illustrated styling." },
-        { "time": "03:31", "seconds": 211, "title": "Analyzing a brand from Instagram", "description": "The workflow uses an Instagram reference to understand a brand's visual language before creating new assets." },
-        { "time": "05:03", "seconds": 303, "title": "Connecting Ideogram to MagicPath", "description": "Generated images are sent to a visual canvas so the options can be compared in one place." },
-        { "time": "05:59", "seconds": 359, "title": "Consistent character photo shoots", "description": "The creator tests whether one model identity can stay consistent across a product photo series." },
-        { "time": "07:14", "seconds": 434, "title": "Apparel graphics and slogans", "description": "Ideogram is used for apparel graphics, where text quality and logo sharpness need extra review." },
-        { "time": "08:31", "seconds": 511, "title": "Product pages with generated assets", "description": "The final section turns generated assets into a product page without leaving the agent workflow." }
+        {
+          "time": "00:00",
+          "seconds": 0,
+          "title": "Intro to Ideogram MCP",
+          "description": "The creator explains why Ideogram MCP is useful inside Claude Code and what creative workflows will be tested."
+        },
+        {
+          "time": "00:48",
+          "seconds": 48,
+          "title": "Installing Ideogram in Claude Code",
+          "description": "The setup covers connecting the MCP and authenticating before generating images."
+        },
+        {
+          "time": "02:22",
+          "seconds": 142,
+          "title": "Typography and storybook images",
+          "description": "Claude Code asks Ideogram to create visual concepts with text and illustrated styling."
+        },
+        {
+          "time": "03:31",
+          "seconds": 211,
+          "title": "Analyzing a brand from Instagram",
+          "description": "The workflow uses an Instagram reference to understand a brand's visual language before creating new assets."
+        },
+        {
+          "time": "05:03",
+          "seconds": 303,
+          "title": "Connecting Ideogram to MagicPath",
+          "description": "Generated images are sent to a visual canvas so the options can be compared in one place."
+        },
+        {
+          "time": "05:59",
+          "seconds": 359,
+          "title": "Consistent character photo shoots",
+          "description": "The creator tests whether one model identity can stay consistent across a product photo series."
+        },
+        {
+          "time": "07:14",
+          "seconds": 434,
+          "title": "Apparel graphics and slogans",
+          "description": "Ideogram is used for apparel graphics, where text quality and logo sharpness need extra review."
+        },
+        {
+          "time": "08:31",
+          "seconds": 511,
+          "title": "Product pages with generated assets",
+          "description": "The final section turns generated assets into a product page without leaving the agent workflow."
+        }
       ]
     }
   },
@@ -187,7 +467,10 @@
     },
     "commands": [
       {
-        "title": { "ru": "Проверить подключённые плагины", "en": "Check connected plugins" },
+        "title": {
+          "ru": "Проверить подключённые плагины",
+          "en": "Check connected plugins"
+        },
         "code": "/plugins",
         "note": {
           "ru": "Команда помогает убедиться, что Figma MCP доступен в Claude Code.",
@@ -195,7 +478,10 @@
         }
       },
       {
-        "title": { "ru": "Запустить генерацию дизайна", "en": "Generate a design" },
+        "title": {
+          "ru": "Запустить генерацию дизайна",
+          "en": "Generate a design"
+        },
         "code": "/figma generate-design",
         "note": {
           "ru": "Slash-команда для генерации макета в Figma.",
@@ -205,7 +491,10 @@
     ],
     "prompts": [
       {
-        "title": { "ru": "Анализ дизайн-системы", "en": "Design system analysis" },
+        "title": {
+          "ru": "Анализ дизайн-системы",
+          "en": "Design system analysis"
+        },
         "text": "Analyze this design system file and explain which components, variables, and patterns should be used before generating new screens.",
         "note": {
           "ru": "Запрос перед генерацией, чтобы агент опирался на реальные компоненты.",
@@ -244,26 +533,116 @@
     },
     "timestamps": {
       "ru": [
-        { "time": "00:00", "seconds": 0, "title": "Введение", "description": "Автор показывает новую связку Figma AI, Claude Code и дизайн-системы для генерации UI." },
-        { "time": "00:37", "seconds": 37, "title": "Создание design system library", "description": "Разбирается подготовка библиотеки компонентов, чтобы агент не генерировал случайный интерфейс." },
-        { "time": "03:02", "seconds": 182, "title": "Запуск Claude Code для проекта", "description": "Claude Code подключается к рабочему проекту и получает контекст будущего UI." },
-        { "time": "05:19", "seconds": 319, "title": "Связка дизайн-системы с Claude", "description": "Показывается, как дать агенту доступ к дизайн-системе и правилам проекта." },
-        { "time": "08:25", "seconds": 505, "title": "Генерация дизайна по системе", "description": "Агент создаёт экран, используя существующие компоненты и токены вместо произвольной стилизации." },
-        { "time": "09:18", "seconds": 558, "title": "Первый результат", "description": "Автор оценивает получившийся макет и показывает, где workflow уже даёт пользу." },
-        { "time": "11:26", "seconds": 686, "title": "Figma Skills для Claude Code", "description": "Отдельно показывается добавление Figma Skills, чтобы расширить возможности агента." },
-        { "time": "14:10", "seconds": 850, "title": "Генерация кода из Figma", "description": "Дизайн используется как источник для реализации интерфейса в коде." },
-        { "time": "15:30", "seconds": 930, "title": "Итоговый результат", "description": "Финальный блок сравнивает workflow и показывает, что нужно проверять вручную." }
+        {
+          "time": "00:00",
+          "seconds": 0,
+          "title": "Введение",
+          "description": "Автор показывает новую связку Figma AI, Claude Code и дизайн-системы для генерации UI."
+        },
+        {
+          "time": "00:37",
+          "seconds": 37,
+          "title": "Создание design system library",
+          "description": "Разбирается подготовка библиотеки компонентов, чтобы агент не генерировал случайный интерфейс."
+        },
+        {
+          "time": "03:02",
+          "seconds": 182,
+          "title": "Запуск Claude Code для проекта",
+          "description": "Claude Code подключается к рабочему проекту и получает контекст будущего UI."
+        },
+        {
+          "time": "05:19",
+          "seconds": 319,
+          "title": "Связка дизайн-системы с Claude",
+          "description": "Показывается, как дать агенту доступ к дизайн-системе и правилам проекта."
+        },
+        {
+          "time": "08:25",
+          "seconds": 505,
+          "title": "Генерация дизайна по системе",
+          "description": "Агент создаёт экран, используя существующие компоненты и токены вместо произвольной стилизации."
+        },
+        {
+          "time": "09:18",
+          "seconds": 558,
+          "title": "Первый результат",
+          "description": "Автор оценивает получившийся макет и показывает, где workflow уже даёт пользу."
+        },
+        {
+          "time": "11:26",
+          "seconds": 686,
+          "title": "Figma Skills для Claude Code",
+          "description": "Отдельно показывается добавление Figma Skills, чтобы расширить возможности агента."
+        },
+        {
+          "time": "14:10",
+          "seconds": 850,
+          "title": "Генерация кода из Figma",
+          "description": "Дизайн используется как источник для реализации интерфейса в коде."
+        },
+        {
+          "time": "15:30",
+          "seconds": 930,
+          "title": "Итоговый результат",
+          "description": "Финальный блок сравнивает workflow и показывает, что нужно проверять вручную."
+        }
       ],
       "en": [
-        { "time": "00:00", "seconds": 0, "title": "Introduction", "description": "The creator introduces a Figma AI, Claude Code, and design-system workflow for UI generation." },
-        { "time": "00:37", "seconds": 37, "title": "Creating a design system library", "description": "The setup prepares a component library so the agent does not invent a random interface." },
-        { "time": "03:02", "seconds": 182, "title": "Launching Claude Code for the project", "description": "Claude Code is connected to the working project and receives context for the UI task." },
-        { "time": "05:19", "seconds": 319, "title": "Connecting the design system to Claude", "description": "The video shows how to give the agent access to the project design system and rules." },
-        { "time": "08:25", "seconds": 505, "title": "Generating design with the system", "description": "The agent creates a screen using existing components and tokens instead of freeform styling." },
-        { "time": "09:18", "seconds": 558, "title": "First result", "description": "The creator reviews the generated layout and where the workflow already helps." },
-        { "time": "11:26", "seconds": 686, "title": "Adding Figma Skills to Claude Code", "description": "Figma Skills are added separately to expand what the agent can do." },
-        { "time": "14:10", "seconds": 850, "title": "Generating code from Figma design", "description": "The design becomes the source for implementing the interface in code." },
-        { "time": "15:30", "seconds": 930, "title": "Final result", "description": "The final section compares the workflow and highlights what still needs manual review." }
+        {
+          "time": "00:00",
+          "seconds": 0,
+          "title": "Introduction",
+          "description": "The creator introduces a Figma AI, Claude Code, and design-system workflow for UI generation."
+        },
+        {
+          "time": "00:37",
+          "seconds": 37,
+          "title": "Creating a design system library",
+          "description": "The setup prepares a component library so the agent does not invent a random interface."
+        },
+        {
+          "time": "03:02",
+          "seconds": 182,
+          "title": "Launching Claude Code for the project",
+          "description": "Claude Code is connected to the working project and receives context for the UI task."
+        },
+        {
+          "time": "05:19",
+          "seconds": 319,
+          "title": "Connecting the design system to Claude",
+          "description": "The video shows how to give the agent access to the project design system and rules."
+        },
+        {
+          "time": "08:25",
+          "seconds": 505,
+          "title": "Generating design with the system",
+          "description": "The agent creates a screen using existing components and tokens instead of freeform styling."
+        },
+        {
+          "time": "09:18",
+          "seconds": 558,
+          "title": "First result",
+          "description": "The creator reviews the generated layout and where the workflow already helps."
+        },
+        {
+          "time": "11:26",
+          "seconds": 686,
+          "title": "Adding Figma Skills to Claude Code",
+          "description": "Figma Skills are added separately to expand what the agent can do."
+        },
+        {
+          "time": "14:10",
+          "seconds": 850,
+          "title": "Generating code from Figma design",
+          "description": "The design becomes the source for implementing the interface in code."
+        },
+        {
+          "time": "15:30",
+          "seconds": 930,
+          "title": "Final result",
+          "description": "The final section compares the workflow and highlights what still needs manual review."
+        }
       ]
     }
   },
@@ -323,7 +702,10 @@
     "commands": [],
     "prompts": [
       {
-        "title": { "ru": "Адаптация референса под продукт", "en": "Adapt a reference to a product" },
+        "title": {
+          "ru": "Адаптация референса под продукт",
+          "en": "Adapt a reference to a product"
+        },
         "text": "Analyze this reference video frame by frame and rebuild the structure for my product. Keep the same persuasive pattern, but create a unique setup, characters, script beats, and scene prompts.",
         "note": {
           "ru": "Основная идея UGC Decoder: заменить продукт, но сохранить рабочую структуру.",
@@ -331,7 +713,10 @@
         }
       },
       {
-        "title": { "ru": "Исправить слишком чистого персонажа", "en": "Make a character more realistic" },
+        "title": {
+          "ru": "Исправить слишком чистого персонажа",
+          "en": "Make a character more realistic"
+        },
         "text": "The second character looks too polished and clean. Rewrite the prompt so the result looks more realistic, natural, and suitable for an organic UGC ad.",
         "note": {
           "ru": "Запрос из типичной итерации, когда AI-персонаж выглядит слишком глянцево.",
@@ -370,22 +755,92 @@
     },
     "timestamps": {
       "ru": [
-        { "time": "00:00", "seconds": 0, "title": "Введение", "description": "Автор объясняет, что весь AI UGC pipeline будет собираться через Claude Skills и TopView Canvas." },
-        { "time": "00:37", "seconds": 37, "title": "Установка Skills", "description": "Показывается, где взять ZIP со skills и как подключить их в Claude." },
-        { "time": "00:56", "seconds": 56, "title": "Построение workflow", "description": "Разбирается общая структура: референс, сценарий, персонажи, сцены и финальная сборка." },
-        { "time": "02:35", "seconds": 155, "title": "Генерация персонажей", "description": "Workflow переходит к созданию AI-персонажей и проверке реалистичности результата." },
-        { "time": "04:39", "seconds": 279, "title": "Анимация в Seedance 2.0", "description": "Персонажи и сцены анимируются, чтобы получить отдельные клипы для UGC-рекламы." },
-        { "time": "07:45", "seconds": 465, "title": "Финальная сборка видео", "description": "Готовые фрагменты собираются в рекламный ролик с правильной последовательностью сцен." },
-        { "time": "09:13", "seconds": 553, "title": "Pro tips", "description": "Автор делится практическими советами: тестировать одну сцену, следить за фоном и не тратить кредиты вслепую." }
+        {
+          "time": "00:00",
+          "seconds": 0,
+          "title": "Введение",
+          "description": "Автор объясняет, что весь AI UGC pipeline будет собираться через Claude Skills и TopView Canvas."
+        },
+        {
+          "time": "00:37",
+          "seconds": 37,
+          "title": "Установка Skills",
+          "description": "Показывается, где взять ZIP со skills и как подключить их в Claude."
+        },
+        {
+          "time": "00:56",
+          "seconds": 56,
+          "title": "Построение workflow",
+          "description": "Разбирается общая структура: референс, сценарий, персонажи, сцены и финальная сборка."
+        },
+        {
+          "time": "02:35",
+          "seconds": 155,
+          "title": "Генерация персонажей",
+          "description": "Workflow переходит к созданию AI-персонажей и проверке реалистичности результата."
+        },
+        {
+          "time": "04:39",
+          "seconds": 279,
+          "title": "Анимация в Seedance 2.0",
+          "description": "Персонажи и сцены анимируются, чтобы получить отдельные клипы для UGC-рекламы."
+        },
+        {
+          "time": "07:45",
+          "seconds": 465,
+          "title": "Финальная сборка видео",
+          "description": "Готовые фрагменты собираются в рекламный ролик с правильной последовательностью сцен."
+        },
+        {
+          "time": "09:13",
+          "seconds": 553,
+          "title": "Pro tips",
+          "description": "Автор делится практическими советами: тестировать одну сцену, следить за фоном и не тратить кредиты вслепую."
+        }
       ],
       "en": [
-        { "time": "00:00", "seconds": 0, "title": "Introduction", "description": "The creator explains that the full AI UGC pipeline will be built with Claude Skills and TopView Canvas." },
-        { "time": "00:37", "seconds": 37, "title": "Installing the Skills", "description": "The video shows where to get the skills ZIP and how to connect it in Claude." },
-        { "time": "00:56", "seconds": 56, "title": "Building the Workflow", "description": "The overall structure is mapped out: reference, script, characters, scenes, and final assembly." },
-        { "time": "02:35", "seconds": 155, "title": "Character Generation", "description": "The workflow moves into creating AI characters and checking how realistic they look." },
-        { "time": "04:39", "seconds": 279, "title": "Animating with Seedance 2.0", "description": "Characters and scenes are animated into clips for the UGC ad." },
-        { "time": "07:45", "seconds": 465, "title": "Finishing the Video", "description": "The generated clips are assembled into an ad with the right scene order." },
-        { "time": "09:13", "seconds": 553, "title": "Pro Tips", "description": "The creator shares practical advice: test one scene, watch background consistency, and avoid wasting credits." }
+        {
+          "time": "00:00",
+          "seconds": 0,
+          "title": "Introduction",
+          "description": "The creator explains that the full AI UGC pipeline will be built with Claude Skills and TopView Canvas."
+        },
+        {
+          "time": "00:37",
+          "seconds": 37,
+          "title": "Installing the Skills",
+          "description": "The video shows where to get the skills ZIP and how to connect it in Claude."
+        },
+        {
+          "time": "00:56",
+          "seconds": 56,
+          "title": "Building the Workflow",
+          "description": "The overall structure is mapped out: reference, script, characters, scenes, and final assembly."
+        },
+        {
+          "time": "02:35",
+          "seconds": 155,
+          "title": "Character Generation",
+          "description": "The workflow moves into creating AI characters and checking how realistic they look."
+        },
+        {
+          "time": "04:39",
+          "seconds": 279,
+          "title": "Animating with Seedance 2.0",
+          "description": "Characters and scenes are animated into clips for the UGC ad."
+        },
+        {
+          "time": "07:45",
+          "seconds": 465,
+          "title": "Finishing the Video",
+          "description": "The generated clips are assembled into an ad with the right scene order."
+        },
+        {
+          "time": "09:13",
+          "seconds": 553,
+          "title": "Pro Tips",
+          "description": "The creator shares practical advice: test one scene, watch background consistency, and avoid wasting credits."
+        }
       ]
     }
   }
