@@ -121,6 +121,7 @@ const FOUNDER_TELEGRAM_URL = "https://t.me/v_voronezhtsev";
 // previously not linked in sameAs (audit CR-2). Public about copy now positions Vlad as a
 // multi-platform AI creator across Instagram, Telegram, YouTube, TikTok and VK.
 const FOUNDER_YOUTUBE_URL = "https://www.youtube.com/@v.voronezhtsev";
+const VIDEO_UPLOAD_TIMEZONE = "+05:00";
 
 // Phase 4 D-10: @id reference pointers — used inside schema blocks to cross-link the entity graph
 // without inlining the full block (avoids duplication and gives crawlers a single canonical entity per @id).
@@ -818,7 +819,7 @@ function learnFindVideoObjectBlock(find: LearnFind, lang: LearnLang, pageUrl: st
     name: getLearnFindTitle(find, lang),
     description: getLearnFindDescription(find, lang),
     thumbnailUrl: [learnFindImageUrl(find)],
-    uploadDate: find.publishedAt,
+    uploadDate: videoUploadDate(find.publishedAt),
     duration: find.durationIso,
     inLanguage,
     author: {
@@ -919,7 +920,7 @@ function videoObjectBlock(lesson: LearnLesson, lang: LearnLang, pageUrl: string,
     name: getLearnLessonTitle(lesson, lang),
     description: getLearnLessonDescription(lesson, lang),
     thumbnailUrl: [absoluteAssetUrl(lesson.thumbnailPath)],
-    uploadDate: lesson.publishedAt,
+    uploadDate: videoUploadDate(lesson.publishedAt),
     duration: lesson.durationIso,
     inLanguage,
     author: PERSON_FOUNDER_REF,
@@ -934,6 +935,10 @@ function videoObjectBlock(lesson: LearnLesson, lang: LearnLang, pageUrl: string,
   }
 
   return block;
+}
+
+function videoUploadDate(date: string): string {
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? `${date}T00:00:00${VIDEO_UPLOAD_TIMEZONE}` : date;
 }
 
 function buildLearnLessonRoute(lesson: LearnLesson, lang: LearnLang): RouteMeta {
