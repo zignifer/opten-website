@@ -11,6 +11,7 @@ import { post as flux2PromptsGuide } from "../src/content/blog/flux-2-prompts";
 import { post as kling3PromptsGuide } from "../src/content/blog/kling-3-prompts";
 import { post as aiInfluencerGuide } from "../src/content/blog/ai-influencer";
 import { post as aiLipSyncGuide } from "../src/content/blog/ai-lip-sync";
+import { post as upscaleImageAiGuide } from "../src/content/blog/upscale-image-ai";
 import { post as seedance20PromptsGuide } from "../src/content/blog/seedance-2-0-prompts";
 import { post as promptExamplesGuide } from "../src/content/blog/prompt-examples";
 import { post as bestAiVideo2026Guide } from "../src/content/blog/best-ai-video-2026";
@@ -1291,6 +1292,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/upscale-image-ai`, name: upscaleImageAiGuide.ru.title, datePublished: upscaleImageAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-lip-sync`, name: aiLipSyncGuide.ru.title, datePublished: aiLipSyncGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/flux-2-prompts`, name: flux2PromptsGuide.ru.title, datePublished: flux2PromptsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/kling-3-prompts`, name: kling3PromptsGuide.ru.title, datePublished: kling3PromptsGuide.ru.publishedAt },
@@ -1323,6 +1325,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/upscale-image-ai — AI image upscale prompt workflow guide.
+  {
+    path: "/blog/upscale-image-ai",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/upscale-image-ai`,
+      en: `${SITE_ORIGIN}/en/blog/upscale-image-ai`,
+      xDefault: `${SITE_ORIGIN}/blog/upscale-image-ai`,
+    },
+    title: upscaleImageAiGuide.ru.title,
+    description: upscaleImageAiGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/upscale-image-ai`,
+    ogTitle: upscaleImageAiGuide.ru.title,
+    ogDescription: upscaleImageAiGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${upscaleImageAiGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/upscale-image-ai`,
+        headline: upscaleImageAiGuide.ru.title,
+        description: upscaleImageAiGuide.ru.description,
+        datePublished: upscaleImageAiGuide.ru.publishedAt,
+        dateModified: upscaleImageAiGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: upscaleImageAiGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${upscaleImageAiGuide.ru.cover.src}`,
+          width: upscaleImageAiGuide.ru.cover.width,
+          height: upscaleImageAiGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/upscale-image-ai`,
+        url: `${SITE_ORIGIN}/blog/upscale-image-ai`,
+        name: upscaleImageAiGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (upscaleImageAiGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/upscale-image-ai`,
+        upscaleImageAiGuide.ru.title,
+      ),
+      faqPageBlock(upscaleImageAiGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/upscale-image-ai`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: upscaleImageAiGuide.ru.title, url: `${SITE_ORIGIN}/blog/upscale-image-ai` },
+        ],
+        `${SITE_ORIGIN}/blog/upscale-image-ai`,
       ),
     ],
   },
@@ -2555,6 +2617,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/upscale-image-ai`, name: upscaleImageAiGuide.en.title, datePublished: upscaleImageAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-lip-sync`, name: aiLipSyncGuide.en.title, datePublished: aiLipSyncGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/flux-2-prompts`, name: flux2PromptsGuide.en.title, datePublished: flux2PromptsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/kling-3-prompts`, name: kling3PromptsGuide.en.title, datePublished: kling3PromptsGuide.en.publishedAt },
@@ -2587,6 +2650,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/upscale-image-ai EN sibling.
+  {
+    path: "/en/blog/upscale-image-ai",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/upscale-image-ai`,
+      en: `${SITE_ORIGIN}/en/blog/upscale-image-ai`,
+      xDefault: `${SITE_ORIGIN}/blog/upscale-image-ai`,
+    },
+    title: upscaleImageAiGuide.en.title,
+    description: upscaleImageAiGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/upscale-image-ai`,
+    ogTitle: upscaleImageAiGuide.en.title,
+    ogDescription: upscaleImageAiGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${upscaleImageAiGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/upscale-image-ai`,
+        headline: upscaleImageAiGuide.en.title,
+        description: upscaleImageAiGuide.en.description,
+        datePublished: upscaleImageAiGuide.en.publishedAt,
+        dateModified: upscaleImageAiGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: upscaleImageAiGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${upscaleImageAiGuide.en.cover.src}`,
+          width: upscaleImageAiGuide.en.cover.width,
+          height: upscaleImageAiGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/upscale-image-ai`,
+        url: `${SITE_ORIGIN}/en/blog/upscale-image-ai`,
+        name: upscaleImageAiGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (upscaleImageAiGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/upscale-image-ai`,
+        upscaleImageAiGuide.en.title,
+      ),
+      faqPageBlock(upscaleImageAiGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/upscale-image-ai`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: upscaleImageAiGuide.en.title, url: `${SITE_ORIGIN}/en/blog/upscale-image-ai` },
+        ],
+        `${SITE_ORIGIN}/en/blog/upscale-image-ai`,
       ),
     ],
   },

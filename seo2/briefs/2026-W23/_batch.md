@@ -29,7 +29,7 @@ brief_count: 10
 | 5 | published | `flux-2-prompts` | `BL-news` | `flux 2` | 541 | [05-flux-2-prompts.md](05-flux-2-prompts.md) |
 | 6 | published | `ai-influencer` | `BL-usecase` | `ai influencer` | 554 | [06-ai-influencer.md](06-ai-influencer.md) |
 | 7 | published | `ai-lip-sync` | `BL-technique` | `ai lip sync` | 226 | [07-ai-lip-sync.md](07-ai-lip-sync.md) |
-| 8 | pending | `upscale-image-ai` | `BL-technique` | `апскейл фото нейросеть` | 204 | [08-upscale-image-ai.md](08-upscale-image-ai.md) |
+| 8 | published | `upscale-image-ai` | `BL-technique` | `апскейл фото нейросеть` | 204 | [08-upscale-image-ai.md](08-upscale-image-ai.md) |
 | 9 | pending | `ai-ugc-for-brands` | `BL-usecase` | `ai ugc` | 102 | [09-ai-ugc-for-brands.md](09-ai-ugc-for-brands.md) |
 | 10 | pending | `ai-headshot-generator` | `BL-usecase` | `бизнес портрет нейросеть` | 2 | [10-ai-headshot-generator.md](10-ai-headshot-generator.md) |
 

@@ -33,8 +33,8 @@ const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 // pages (62 RU + 62 EN). Daily blog posts bring the floor to 170; public Learn adds 14 lesson routes
 // and Learn Finds adds generated third-party video breakdown routes.
 // /dashboard/*) carry prerender:"none" and are excluded from sitemapRoutes.
-if (sitemapRoutes.length < 194) {
-  throw new Error(`sitemap.mjs: expected at least 194 routes (48 baseline/blog routes + 20 Learn routes + 2 model hubs + 124 model pages), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+if (sitemapRoutes.length < 196) {
+  throw new Error(`sitemap.mjs: expected at least 196 routes (50 baseline/blog routes + 20 Learn routes + 2 model hubs + 124 model pages), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 // Post-2026-05-17 GEO audit ME-12: per-route lastmod via git mtime of the source file driving
@@ -54,6 +54,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/upscale-image-ai":       "src/content/blog/upscale-image-ai.ts",
+  "/en/blog/upscale-image-ai":    "src/content/blog/upscale-image-ai.ts",
   "/blog/ai-lip-sync":       "src/content/blog/ai-lip-sync.ts",
   "/en/blog/ai-lip-sync":    "src/content/blog/ai-lip-sync.ts",
   "/blog/flux-2-prompts":    "src/content/blog/flux-2-prompts.ts",
