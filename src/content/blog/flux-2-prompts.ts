@@ -17,11 +17,11 @@ const COVER_EN = {
 
 const ru: BlogPostLocale = {
   slug: "flux-2-prompts",
-  title: "Flux 2 промпты: структура для точных изображений",
+  title: "Промпты для Flux 2: структура точных изображений",
   excerpt:
-    "Flux 2 промпты работают лучше, когда вы выбираете вариант модели заранее: flux 2 klein для быстрых тестов, pro или max для финального кадра.",
+    "Промпты для Flux 2 работают лучше, когда вы выбираете вариант модели заранее: Klein для быстрых тестов, Pro или Max для финального кадра.",
   description:
-    "Flux 2 промпты: как выбрать flux 2 klein, pro или max, собрать prompt для портрета и исправить пластиковую кожу через свет, линзу, материал и texture.",
+    "Гайд по промптам для Flux 2: как выбрать Klein, Pro или Max, собрать prompt для портрета и исправить пластиковую кожу через свет, линзу и texture.",
   category: "guide",
   tags: ["release-notes", "model-deep-dive", "ai-image-gen", "prompt-engineering"],
   cover: COVER_RU,
@@ -31,7 +31,7 @@ const ru: BlogPostLocale = {
   related: ["prompt-structure", "negative-prompt", "gpt-image-2"],
   body: {
     intro:
-      "Flux 2 промпты работают как короткий арт-дирекшн для модели Black Forest Labs: сначала выбор варианта, затем сцена, объект, свет, камера, материал и запреты. В flux 2 обзор легко уйти в названия max, pro, dev и klein, но качество чаще ломается из-за слабой структуры prompt.",
+      "Промпты для Flux 2 работают как короткий арт-дирекшн для модели Black Forest Labs: сначала выбор варианта, затем сцена, объект, свет, камера, материал и запреты. В обзоре Flux 2 легко уйти в названия Max, Pro, Dev и Klein, но качество чаще ломается из-за слабой структуры prompt.",
     steps: [
       {
         title: "Сначала выберите вариант Flux 2",
@@ -46,9 +46,9 @@ const ru: BlogPostLocale = {
       {
         title: "Соберите prompt из пяти блоков",
         body:
-          "Флюкс 2 промпт лучше держать не как поток тегов, а как короткий производственный бриф. Рабочий порядок: `Scene` -> `Subject` -> `Lighting` -> `Camera` -> `Material / texture` -> `Constraints`. Если первый абзац состоит из `cinematic, detailed, beautiful`, модель получает настроение, но не получает постановку.\n\nДля Flux 2 примеры промптов особенно хорошо работают, когда в начале есть назначение кадра: campaign portrait, product hero shot, editorial still, catalog image, concept frame. Назначение помогает модели выбрать визуальный режим. Opten можно использовать как prompt generator и preflight: он разворачивает сырую идею в блоки и показывает, где отсутствует камера, материал или запрет.",
+          "Промпт для Flux 2 лучше держать не как поток тегов, а как короткий производственный бриф. Рабочий порядок: `Scene` -> `Subject` -> `Lighting` -> `Camera` -> `Material / texture` -> `Constraints`. Если первый абзац состоит из `cinematic, detailed, beautiful`, модель получает настроение, но не получает постановку.\n\nПримеры для Flux 2 особенно хорошо работают, когда в начале есть назначение кадра: campaign portrait, product hero shot, editorial still, catalog image, concept frame. Назначение помогает модели выбрать визуальный режим. Opten можно использовать как генератор и preflight-редактор промпта: он разворачивает сырую идею в блоки и показывает, где отсутствует камера, материал или запрет.",
         before:
-          "Flux 2 prompt generator: красивый портрет мужчины, студия, реализм, high detail.",
+          "Flux 2: красивый портрет мужчины, студия, реализм, high detail.",
         after:
           "Purpose: editorial studio portrait for a premium skincare campaign.\nScene: dark graphite studio, neutral background, subtle lime rim light.\nSubject: man in a black turtleneck, three-quarter view, calm expression.\nLighting: large softbox from front-left, weak rim light from back-right.\nCamera: 85mm lens, eye-level, shallow depth of field.\nMaterial / texture: visible pores, matte skin, natural imperfections.\nConstraints: no plastic skin, no waxy shine, no extra jewelry, no random text.",
         imageSrc: "/blog/flux-2-prompts/ru/step-1.jpg",
@@ -76,7 +76,7 @@ const ru: BlogPostLocale = {
       {
         title: "Итерируйте по одной оси",
         body:
-          "Flux 2 как пользоваться в production: черновик, тест, одна правка. Не стоит одновременно менять свет, фон, позу, одежду и линзу. Если результат улучшился, вы не поймете, что сработало. Если ухудшился, не поймете, что сломало кадр.\n\nЛучший цикл: сначала зафиксируйте сцену и объект, затем отдельно проверьте свет, отдельно материал, отдельно камеру, отдельно constraints. Так flux 2 примеры становятся переносимыми: вы сохраняете работающий prompt skeleton и меняете только subject, style или платформенные параметры. Это быстрее, чем каждый раз просить модель «сделать лучше».",
+          "В production с Flux 2 работает простой цикл: черновик, тест, одна правка. Не стоит одновременно менять свет, фон, позу, одежду и линзу. Если результат улучшился, вы не поймете, что сработало. Если ухудшился, не поймете, что сломало кадр.\n\nЛучший цикл: сначала зафиксируйте сцену и объект, затем отдельно проверьте свет, отдельно материал, отдельно камеру, отдельно constraints. Так примеры для Flux 2 становятся переносимыми: вы сохраняете работающий prompt skeleton и меняете только subject, style или платформенные параметры. Это быстрее, чем каждый раз просить модель «сделать лучше».",
         before:
           "Make it better: change background, improve skin, add cinematic lighting, different pose, better camera.",
         after:
@@ -90,12 +90,12 @@ const ru: BlogPostLocale = {
         a: "Flux 2 — второе поколение image-моделей Black Forest Labs для генерации и редактирования изображений. В практическом prompt workflow важны не только названия max, pro, dev и klein, а то, как вы задаете сцену, объект, свет, камеру и ограничения.",
       },
       {
-        q: "Flux 2 klein чем отличается от flux 2 pro?",
+        q: "Чем Flux 2 Klein отличается от Flux 2 Pro?",
         a: "Flux 2 klein 4B и 9B рассчитаны на быстрые и более легкие сценарии, в том числе локальные тесты и прототипы. Flux 2 pro лучше использовать для финального production-кадра, когда важны качество, скорость и стабильность результата.",
       },
       {
-        q: "Что писать в flux 2 prompt generator?",
-        a: "Пишите не один теговый запрос, а блоки: Purpose, Scene, Subject, Lighting, Camera, Material / texture и Constraints. Так prompt generator получает структуру, а не просто набор слов вроде `cinematic` и `high detail`.",
+        q: "Что писать в генераторе промптов для Flux 2?",
+        a: "Пишите не один теговый запрос, а блоки: Purpose, Scene, Subject, Lighting, Camera, Material / texture и Constraints. Так генератор получает структуру, а не просто набор слов вроде `cinematic` и `high detail`.",
       },
       {
         q: "Можно ли скачать Flux 2?",

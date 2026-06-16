@@ -433,13 +433,14 @@ Non-negotiables (the full set lives in `docs/CONTENT-AUTHORING.md`):
 
 1. RU + EN ship together. No half-translated posts.
 2. First 40-60 words = definitional answer block (`<h1>` + `.blog-intro`). AI Overviews extract this verbatim.
-3. JSON-LD must mirror the visible DOM — FAQs, dates, prices, person names. `verify-faq-mainentity.mjs` enforces FAQ parity at build time; the others are auditor-detectable.
-4. Cover images: `public/blog/<slug>/cover.jpg`, ≥1600×900, no in-image text (one asset works for RU + EN + OG + visible `<img>`).
-5. SEO2 inline blog images are locale-specific final rasters: generate RU and EN images with the short text already rendered inside the image. The Opten lime accent must be exactly `#9CFB51` in prompts and art direction; do not substitute warmer yellow-green, darker green, or approximate "lime" hues. Do not generate textless bases and add text afterward with editor/Canvas/HTML/CSS/Sharp overlays.
-6. Every `<img>` gets explicit `width`/`height` (CLS guard).
-7. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
-8. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
-9. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
+3. SEO keywords must be embedded in natural grammar. Do not paste raw search strings into visible copy (`Апскейл фото нейросеть`, `озвучка видео нейросеть тг`, `kling 3.0 цена`) unless the sentence explicitly discusses the query; rewrite as prose (`апскейл фото через нейросеть`, `нейросетевая озвучка видео для Telegram`, `цена Kling 3.0`).
+4. JSON-LD must mirror the visible DOM — FAQs, dates, prices, person names. `verify-faq-mainentity.mjs` enforces FAQ parity at build time; the others are auditor-detectable.
+5. Cover images: `public/blog/<slug>/cover.jpg`, ≥1600×900, no in-image text (one asset works for RU + EN + OG + visible `<img>`).
+6. SEO2 inline blog images are locale-specific final rasters: generate RU and EN images with the short text already rendered inside the image. The Opten lime accent must be exactly `#9CFB51` in prompts and art direction; do not substitute warmer yellow-green, darker green, or approximate "lime" hues. Do not generate textless bases and add text afterward with editor/Canvas/HTML/CSS/Sharp overlays.
+7. Every `<img>` gets explicit `width`/`height` (CLS guard).
+8. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
+9. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
+10. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
 
 **The full playbook with route-registration checklist, schema graph rules, image conventions, and a list of optimizations that have already been tried and rejected: [docs/CONTENT-AUTHORING.md](docs/CONTENT-AUTHORING.md).** Open this file alongside `seo-routes.ts` whenever adding a new page.
 
