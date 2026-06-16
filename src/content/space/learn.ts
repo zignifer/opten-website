@@ -164,6 +164,12 @@ export const learnTopicLabels: Record<LearnLang, Record<"all" | LearnTopic, stri
   },
 };
 
+export const hiddenLearnOverviewLessonSlugs = [
+  "client-website-navigation-hero",
+  "junior-designer-1100-order",
+  "web-design-references",
+] as const;
+
 export const learnHubIntro: LocalizedText = {
   ru:
     "Бесплатные курсы по нейросетям и уроки Opten помогают начать обучение ИИ с практики, если вы изучаете нейросети с нуля: AI-видео, генерация изображений, веб-дизайн в Figma, вайб-кодинг, AI-визуал для брендов и промпты для современных моделей.",
@@ -509,7 +515,7 @@ export const publicLearnLessons: LearnLesson[] = [
     durationIso: "PT7M45S",
     status: "Available",
     access: "free",
-    thumbnailPath: `${learnAssetBase}/video/actual-ai-tools-2026-poster.jpg`,
+    thumbnailPath: `${learnAssetBase}/video/actual-ai-tools-2026-cover.png`,
     publishedAt: "2026-06-06",
     updatedAt: "2026-06-06",
     releaseNote: {
@@ -531,7 +537,7 @@ export const publicLearnLessons: LearnLesson[] = [
     },
     localVideo: {
       src: `${learnAssetBase}/video/actual-ai-tools-2026.mp4`,
-      posterPath: `${learnAssetBase}/video/actual-ai-tools-2026-poster.jpg`,
+      posterPath: `${learnAssetBase}/video/actual-ai-tools-2026-cover.png`,
       contentUrl: `https://opten.space${learnAssetBase}/video/actual-ai-tools-2026.mp4`,
     },
     timestamps: { ru: actualAiToolsTimestampsRu, en: actualAiToolsTimestampsEn },

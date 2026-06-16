@@ -41,6 +41,7 @@ import {
   getLearnLessonTitle,
   getLearnLessonTopics,
   getLearnLessonVideoProvider,
+  hiddenLearnOverviewLessonSlugs,
   learnTopicLabels,
   learnHubFaq,
   publicLearnLessons,
@@ -124,6 +125,7 @@ const FOUNDER_TELEGRAM_URL = "https://t.me/v_voronezhtsev";
 // multi-platform AI creator across Instagram, Telegram, YouTube, TikTok and VK.
 const FOUNDER_YOUTUBE_URL = "https://www.youtube.com/@v.voronezhtsev";
 const VIDEO_UPLOAD_TIMEZONE = "+05:00";
+const HIDDEN_LEARN_OVERVIEW_LESSON_SLUGS = new Set<string>(hiddenLearnOverviewLessonSlugs);
 
 // Phase 4 D-10: @id reference pointers — used inside schema blocks to cross-link the entity graph
 // without inlining the full block (avoids duplication and gives crawlers a single canonical entity per @id).
@@ -724,6 +726,7 @@ function learnHubRoute(lang: LearnLang): RouteMeta {
   const description = lang === "ru"
     ? "Бесплатное обучение ИИ и нейросетям от Opten: уроки по AI-видео, веб-дизайну в Figma, вайб-кодингу и промптам. Практические разборы Влада Воронежцева."
     : "Free AI courses and tutorials from Opten: learn AI, vibe coding, Figma web design, AI video, prompt engineering and practical AI workflows with Vlad Voronezhtsev.";
+  const visibleLessons = publicLearnLessons.filter((lesson) => !HIDDEN_LEARN_OVERVIEW_LESSON_SLUGS.has(lesson.slug));
 
   return {
     path,
@@ -755,7 +758,7 @@ function learnHubRoute(lang: LearnLang): RouteMeta {
       }),
       itemListBlock(
         [
-          ...publicLearnLessons.map((lesson) => ({
+          ...visibleLessons.map((lesson) => ({
             url: lang === "ru" ? `${SITE_ORIGIN}/learn/${lesson.slug}` : `${SITE_ORIGIN}/en/learn/${lesson.slug}`,
             name: getLearnLessonTitle(lesson, lang),
             datePublished: lesson.publishedAt,

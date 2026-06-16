@@ -18,6 +18,7 @@ import {
   getLearnLessonCategoryLabel,
   getLearnLessonDescription,
   getLearnLessonTitle,
+  hiddenLearnOverviewLessonSlugs,
   learnHubFaq,
   learnTopicLabels,
   publicLearnLessons,
@@ -47,7 +48,17 @@ type TopicFilter = "all" | "ai-image" | "ai-video" | "vibe-coding" | "vibe-desig
 type SortKey = "new" | "duration";
 type ContentTab = "lessons" | "finds";
 
+const SHOW_LEARN_COLLECTIONS = false;
+const HIDDEN_LEARN_LESSON_SLUGS = new Set<string>(hiddenLearnOverviewLessonSlugs);
+const COURSE_RELEASE_AT_MS = Date.parse("2026-06-24T21:00:00.000Z");
 const topics: TopicFilter[] = ["all", "ai-image", "ai-video", "vibe-coding", "vibe-design"];
+
+const authorSocialLinks = [
+  { label: "YouTube", href: "https://www.youtube.com/channel/UC797Sd_fYNILYZFuXsjjFDA", iconPath: "/assets/space/social/youtube.svg" },
+  { label: "Instagram", href: "https://www.instagram.com/v.voronezhtsev/", iconPath: "/assets/space/social/instagram.svg" },
+  { label: "Telegram", href: "https://t.me/v_voronezhtsev", iconPath: "/assets/space/social/telegram.svg" },
+  { label: "TikTok", href: "https://www.tiktok.com/@v_voronezhtsev", iconPath: "/assets/space/social/tiktok.svg" },
+] as const;
 
 const sortLabels: Record<LearnLang, Record<SortKey, string>> = {
   ru: {
@@ -84,7 +95,7 @@ const pageCopy = {
     searchPlaceholder: "Поиск уроков...",
     collectionsTitle: "Подборки",
     viewAllCollections: "Смотреть всё",
-    allLessonsTitle: "Все уроки",
+    allLessonsTitle: "Бесплатные уроки",
     findsTitle: "Находки",
     lessonsTab: "Уроки",
     findsTab: "Находки",
@@ -107,7 +118,7 @@ const pageCopy = {
     searchPlaceholder: "Search lessons...",
     collectionsTitle: "Collections",
     viewAllCollections: "View all",
-    allLessonsTitle: "All lessons",
+    allLessonsTitle: "Free lessons",
     findsTitle: "Finds",
     lessonsTab: "Lessons",
     findsTab: "Finds",
@@ -126,8 +137,8 @@ const courseAuthor = {
     en: "Course author",
   },
   description: {
-    ru: "Веб-дизайнер и AI-креатор. Создаю видеоуроки и рабочие процессы по нейросетям с 2022 года.",
-    en: "Web designer and AI creator. I have been creating video lessons and AI workflows since 2022.",
+    ru: "3 года создаю видеоуроки и рабочие процессы по нейросетям.",
+    en: "I have been creating video lessons and AI workflows for 3 years.",
   },
   stats: [
     {
@@ -140,6 +151,22 @@ const courseAuthor = {
       label: { ru: "в дизайне", en: "in design" },
     },
   ],
+} as const;
+
+const featuredCoursePromo = {
+  coverPath: "/assets/learn/video/actual-ai-tools-2026-poster.jpg",
+  title: {
+    ru: "ИИ без Х**ни",
+    en: "AI Without BS",
+  },
+  description: {
+    ru: "Самый честный курс по нейросетям. Меньше чем за час расскажу всё, что нужно знать для создания бренда. За 15 коротких уроков мы создадим логотип, упаковку, фото и видео в соцсети, запустим сайт и всё это с помощью ИИ!",
+    en: "The most honest course on AI. In under an hour, I will cover everything you need to know to build a brand. Across 15 short lessons, we will create a logo, packaging, photos and social videos, launch a website, and do it all with AI.",
+  },
+  cta: {
+    ru: "Скоро",
+    en: "Coming soon",
+  },
 } as const;
 
 export default function LearnOverviewPage() {
@@ -175,6 +202,7 @@ export default function LearnOverviewPage() {
 
   const filteredLessons = useMemo(() => {
     const lessons = publicLearnLessons.filter((lesson) => {
+      if (HIDDEN_LEARN_LESSON_SLUGS.has(lesson.slug)) return false;
       const topicMatch = activeTopic === "all" || lesson.category === activeTopic;
       const haystack = [
         getLearnLessonTitle(lesson, lang),
@@ -228,20 +256,21 @@ export default function LearnOverviewPage() {
 
           <AuthorCard lang={lang} />
 
-          <HeroVideoCard lang={lang} className="mt-[51px] max-md:hidden min-[1120px]:col-start-1 min-[1120px]:row-start-2" />
-          <article className="mt-[51px] flex min-h-[310px] flex-col justify-center max-[1119px]:max-w-[552px] max-md:hidden min-[1120px]:col-start-2 min-[1120px]:row-start-2 min-[1120px]:-ml-[18px]">
+          <HeroVideoCard lang={lang} className="mt-[51px] max-[1119px]:max-w-[552px] max-md:mt-[24px] min-[1120px]:col-start-1 min-[1120px]:row-start-2" />
+          <article className="mt-[51px] flex min-h-[310px] flex-col justify-center max-[1119px]:max-w-[552px] max-md:mt-[20px] max-md:min-h-0 max-md:items-center max-md:text-center min-[1120px]:col-start-2 min-[1120px]:row-start-2 min-[1120px]:w-[215px] min-[1120px]:max-w-[215px] min-[1120px]:-ml-[18px]">
             <h2 className="text-[21px] font-bold leading-tight text-white">
-              {renderFeaturedLessonTitle(featuredLearnLesson, lang)}
+              {featuredCoursePromo.title[lang]}
             </h2>
             <p className="mt-[15px] text-[14px] leading-[1.55] text-white/55">
-              {getLearnLessonDescription(featuredLearnLesson, lang)}
+              {featuredCoursePromo.description[lang]}
             </p>
-            <LocalizedLink
-              to={`/learn/${featuredLearnLesson.slug}`}
-              className="mt-[24px] flex h-[43px] w-[197px] items-center justify-center rounded-[8px] bg-[#9cfb51] px-[20px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417]"
+            <button
+              type="button"
+              aria-disabled="true"
+              className="mt-[24px] flex h-[43px] w-[197px] cursor-default items-center justify-center rounded-[8px] bg-[#9cfb51] px-[20px] text-[14px] font-bold text-[#062013] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417] min-[1120px]:w-full"
             >
-              {copy.watchLesson}
-            </LocalizedLink>
+              {featuredCoursePromo.cta[lang]}
+            </button>
           </article>
         </section>
 
@@ -336,31 +365,33 @@ export default function LearnOverviewPage() {
           </div>
         </section>
 
-        <LessonSection
-          title={copy.collectionsTitle}
-          action={
-            filteredCollections.length > 1 && !showAllCollections ? (
-              <button
-                type="button"
-                onClick={() => setShowAllCollections(true)}
-                className="hidden h-[30px] shrink-0 items-center rounded-full border border-[#9cfb51]/45 px-[12px] text-[12px] font-bold leading-none text-[#9cfb51] transition hover:bg-[#9cfb51]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/70 max-md:inline-flex"
-              >
-                {copy.viewAllCollections}
-              </button>
-            ) : null
-          }
-        >
-          <div className="grid grid-cols-1 gap-[14px] min-[560px]:grid-cols-2 min-[900px]:grid-cols-3 min-[1120px]:grid-cols-5">
-            {filteredCollections.map((collection, index) => (
-              <CollectionTile
-                key={collection.id}
-                collection={collection}
-                lang={lang}
-                className={!showAllCollections && index > 0 ? "max-md:hidden" : ""}
-              />
-            ))}
-          </div>
-        </LessonSection>
+        {SHOW_LEARN_COLLECTIONS && (
+          <LessonSection
+            title={copy.collectionsTitle}
+            action={
+              filteredCollections.length > 1 && !showAllCollections ? (
+                <button
+                  type="button"
+                  onClick={() => setShowAllCollections(true)}
+                  className="hidden h-[30px] shrink-0 items-center rounded-full border border-[#9cfb51]/45 px-[12px] text-[12px] font-bold leading-none text-[#9cfb51] transition hover:bg-[#9cfb51]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/70 max-md:inline-flex"
+                >
+                  {copy.viewAllCollections}
+                </button>
+              ) : null
+            }
+          >
+            <div className="grid grid-cols-1 gap-[14px] min-[560px]:grid-cols-2 min-[900px]:grid-cols-3 min-[1120px]:grid-cols-5">
+              {filteredCollections.map((collection, index) => (
+                <CollectionTile
+                  key={collection.id}
+                  collection={collection}
+                  lang={lang}
+                  className={!showAllCollections && index > 0 ? "max-md:hidden" : ""}
+                />
+              ))}
+            </div>
+          </LessonSection>
+        )}
 
         <LessonSection
           title={contentTab === "lessons" ? copy.allLessonsTitle : copy.findsTitle}
@@ -381,12 +412,13 @@ export default function LearnOverviewPage() {
           )}
         </LessonSection>
 
-        {filteredCollections.length === 0 && (contentTab === "lessons" ? filteredLessons.length === 0 : filteredFinds.length === 0) && (
+        {(SHOW_LEARN_COLLECTIONS ? filteredCollections.length === 0 : true) &&
+          (contentTab === "lessons" ? filteredLessons.length === 0 : filteredFinds.length === 0) && (
           <section className="mt-[32px] rounded-[8px] border border-white/10 bg-[#0e2023] px-[20px] py-[38px] text-center">
             <p className="text-[16px] text-white">{copy.noResultsTitle}</p>
             <p className="mt-[6px] text-[14px] text-white/55">{copy.noResultsText}</p>
           </section>
-        )}
+          )}
 
         <LearnFaqSection lang={lang} />
       </main>
@@ -431,30 +463,85 @@ function LearnContentTabs({ activeTab, onChange, lang }: { activeTab: ContentTab
 }
 
 function HeroVideoCard({ lang, className = "" }: { lang: LearnLang; className?: string }) {
+  const countdown = useCourseCountdown();
+
   return (
-    <LocalizedLink
-      to={`/learn/${featuredLearnLesson.slug}`}
-      className={`group relative block aspect-video overflow-hidden rounded-[12px] border border-white/12 bg-[#0e2023] text-left shadow-[0_20px_60px_rgba(0,0,0,0.22)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417] ${className}`}
-      aria-label={`${pageCopy[lang].watchLesson}: ${getLearnLessonTitle(featuredLearnLesson, lang)}`}
+    <div
+      className={`relative block aspect-video overflow-hidden rounded-[12px] border border-white/12 bg-[#0e2023] text-left shadow-[0_20px_60px_rgba(0,0,0,0.22)] ${className}`}
+      aria-label={featuredCoursePromo.title[lang]}
     >
       <ResponsiveImage
-        src={featuredLearnLesson.thumbnailPath}
+        src={featuredCoursePromo.coverPath}
         alt=""
         width="1200"
         height="676"
         loading="eager"
         widths={[480, 800, 1200]}
         sizes="(max-width: 1119px) 552px, 552px"
-        className="absolute inset-0 h-full w-full object-cover opacity-88 transition duration-500 group-hover:scale-[1.025]"
+        className="absolute inset-0 h-full w-full object-cover opacity-78"
       />
-      <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.02),rgba(1,16,18,0.24))]" />
-      <span className="absolute left-1/2 top-1/2 grid size-[63px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#9cfb51] text-[#011417] shadow-[0_14px_38px_rgba(156,251,81,0.24)] transition group-hover:scale-105 group-hover:bg-[#8ff144]">
-        <Play size={32} fill="currentColor" className="ml-[3px]" />
+      <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.44),rgba(1,16,18,0.22)_48%,rgba(1,16,18,0.56))]" />
+      <span className="absolute left-1/2 top-1/2 flex w-max -translate-x-1/2 -translate-y-1/2 justify-center">
+        <CourseCountdown countdown={countdown} lang={lang} />
       </span>
-      <span className="absolute bottom-[10px] right-[11px] rounded-[4px] bg-black/70 px-[6px] py-[4px] text-[13px] font-medium leading-none text-white">
-        {featuredLearnLesson.duration}
-      </span>
-    </LocalizedLink>
+    </div>
+  );
+}
+
+type CourseCountdownState = {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+};
+
+function useCourseCountdown() {
+  const [countdown, setCountdown] = useState<CourseCountdownState | null>(null);
+
+  useEffect(() => {
+    const updateCountdown = () => setCountdown(getCourseCountdown());
+    updateCountdown();
+
+    const timerId = window.setInterval(updateCountdown, 1000);
+    return () => window.clearInterval(timerId);
+  }, []);
+
+  return countdown;
+}
+
+function getCourseCountdown(now = Date.now()): CourseCountdownState {
+  const remainingMs = Math.max(0, COURSE_RELEASE_AT_MS - now);
+  const totalSeconds = Math.floor(remainingMs / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return {
+    days,
+    hours,
+    minutes,
+    seconds,
+  };
+}
+
+function CourseCountdown({ countdown, lang }: { countdown: CourseCountdownState | null; lang: LearnLang }) {
+  const units = [
+    { value: countdown ? String(countdown.days).padStart(2, "0") : "--", label: lang === "ru" ? "дн" : "d" },
+    { value: countdown ? String(countdown.hours).padStart(2, "0") : "--", label: lang === "ru" ? "час" : "h" },
+    { value: countdown ? String(countdown.minutes).padStart(2, "0") : "--", label: lang === "ru" ? "мин" : "m" },
+    { value: countdown ? String(countdown.seconds).padStart(2, "0") : "--", label: lang === "ru" ? "сек" : "s" },
+  ];
+
+  return (
+    <span className="inline-flex items-start justify-center gap-[45px] drop-shadow-[0_4px_18px_rgba(0,0,0,0.9)] max-sm:gap-[14px]">
+      {units.map((unit) => (
+        <span key={unit.label} className="w-[72px] text-center max-sm:w-[50px]">
+          <span className="block font-['Unbounded',sans-serif] text-[50px] font-bold leading-none text-white tabular-nums max-sm:text-[36px]">{unit.value}</span>
+          <span className="mt-[8px] block text-[20px] font-bold uppercase leading-none text-white/72 max-sm:mt-[6px] max-sm:text-[18px]">{unit.label}</span>
+        </span>
+      ))}
+    </span>
   );
 }
 
@@ -477,6 +564,20 @@ function AuthorCard({ lang }: { lang: LearnLang }) {
       />
       <h2 className="mt-[22px] text-[21px] font-bold leading-tight text-white">{authorName}</h2>
       <p className="mt-[15px] text-[14px] leading-[1.55] text-white/55">{courseAuthor.description[lang]}</p>
+      <div className="mt-[16px] flex flex-wrap gap-[8px]" aria-label={lang === "ru" ? "Соцсети автора" : "Author social links"}>
+        {authorSocialLinks.map((item) => (
+          <a
+            key={item.label}
+            href={item.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={item.label}
+            className="grid size-[43px] place-items-center rounded-full opacity-80 transition hover:opacity-100 hover:drop-shadow-[0_0_14px_rgba(156,251,81,0.24)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9cfb51]/60"
+          >
+            <img src={item.iconPath} alt="" width="43" height="43" className="size-[43px]" loading="lazy" />
+          </a>
+        ))}
+      </div>
       <dl className="mt-auto flex w-[226px] items-start">
         <div aria-hidden="true" className="shrink-0">
           <ResponsiveImage
