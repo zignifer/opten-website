@@ -3,6 +3,7 @@
 // + src/i18n/paths.ts + scripts/sitemap.mjs PATH_TO_SOURCE must stay in sync.
 
 import { post as gptImage2 } from "./gpt-image-2";
+import { post as aiUgcForBrands } from "./ai-ugc-for-brands";
 import { post as aiFaceSwap } from "./ai-face-swap";
 import { post as flux2Prompts } from "./flux-2-prompts";
 import { post as kling3Prompts } from "./kling-3-prompts";
@@ -22,6 +23,7 @@ import { post as aiLogoGeneratorPrompt } from "./ai-logo-generator-prompt";
 import type { BlogPost } from "./types";
 
 export const blogPostsBySlug = {
+  "ai-ugc-for-brands": aiUgcForBrands,
   "upscale-image-ai": upscaleImageAi,
   "ai-lip-sync": aiLipSync,
   "flux-2-prompts": flux2Prompts,

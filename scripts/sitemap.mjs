@@ -54,6 +54,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/ai-ugc-for-brands":       "src/content/blog/ai-ugc-for-brands.ts",
+  "/en/blog/ai-ugc-for-brands":    "src/content/blog/ai-ugc-for-brands.ts",
   "/blog/upscale-image-ai":       "src/content/blog/upscale-image-ai.ts",
   "/en/blog/upscale-image-ai":    "src/content/blog/upscale-image-ai.ts",
   "/blog/ai-lip-sync":       "src/content/blog/ai-lip-sync.ts",

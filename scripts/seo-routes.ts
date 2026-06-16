@@ -6,6 +6,7 @@
 // intro/steps/faq under `body: { ... }`. URL still /guides/gpt-image-2 until B-07.
 // This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
+import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
 import { post as aiFaceSwapGuide } from "../src/content/blog/ai-face-swap";
 import { post as flux2PromptsGuide } from "../src/content/blog/flux-2-prompts";
 import { post as kling3PromptsGuide } from "../src/content/blog/kling-3-prompts";
@@ -1292,6 +1293,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/ai-ugc-for-brands`, name: aiUgcForBrandsGuide.ru.title, datePublished: aiUgcForBrandsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/upscale-image-ai`, name: upscaleImageAiGuide.ru.title, datePublished: upscaleImageAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-lip-sync`, name: aiLipSyncGuide.ru.title, datePublished: aiLipSyncGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/flux-2-prompts`, name: flux2PromptsGuide.ru.title, datePublished: flux2PromptsGuide.ru.publishedAt },
@@ -1325,6 +1327,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/ai-ugc-for-brands — AI UGC ad prompt workflow guide.
+  {
+    path: "/blog/ai-ugc-for-brands",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-ugc-for-brands`,
+      en: `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-ugc-for-brands`,
+    },
+    title: aiUgcForBrandsGuide.ru.title,
+    description: aiUgcForBrandsGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-ugc-for-brands`,
+    ogTitle: aiUgcForBrandsGuide.ru.title,
+    ogDescription: aiUgcForBrandsGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiUgcForBrandsGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-ugc-for-brands`,
+        headline: aiUgcForBrandsGuide.ru.title,
+        description: aiUgcForBrandsGuide.ru.description,
+        datePublished: aiUgcForBrandsGuide.ru.publishedAt,
+        dateModified: aiUgcForBrandsGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: aiUgcForBrandsGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiUgcForBrandsGuide.ru.cover.src}`,
+          width: aiUgcForBrandsGuide.ru.cover.width,
+          height: aiUgcForBrandsGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-ugc-for-brands`,
+        url: `${SITE_ORIGIN}/blog/ai-ugc-for-brands`,
+        name: aiUgcForBrandsGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiUgcForBrandsGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/ai-ugc-for-brands`,
+        aiUgcForBrandsGuide.ru.title,
+      ),
+      faqPageBlock(aiUgcForBrandsGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-ugc-for-brands`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: aiUgcForBrandsGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-ugc-for-brands` },
+        ],
+        `${SITE_ORIGIN}/blog/ai-ugc-for-brands`,
       ),
     ],
   },
@@ -2617,6 +2679,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`, name: aiUgcForBrandsGuide.en.title, datePublished: aiUgcForBrandsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/upscale-image-ai`, name: upscaleImageAiGuide.en.title, datePublished: upscaleImageAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-lip-sync`, name: aiLipSyncGuide.en.title, datePublished: aiLipSyncGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/flux-2-prompts`, name: flux2PromptsGuide.en.title, datePublished: flux2PromptsGuide.en.publishedAt },
@@ -2650,6 +2713,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/ai-ugc-for-brands EN sibling.
+  {
+    path: "/en/blog/ai-ugc-for-brands",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-ugc-for-brands`,
+      en: `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-ugc-for-brands`,
+    },
+    title: aiUgcForBrandsGuide.en.title,
+    description: aiUgcForBrandsGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`,
+    ogTitle: aiUgcForBrandsGuide.en.title,
+    ogDescription: aiUgcForBrandsGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiUgcForBrandsGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`,
+        headline: aiUgcForBrandsGuide.en.title,
+        description: aiUgcForBrandsGuide.en.description,
+        datePublished: aiUgcForBrandsGuide.en.publishedAt,
+        dateModified: aiUgcForBrandsGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: aiUgcForBrandsGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiUgcForBrandsGuide.en.cover.src}`,
+          width: aiUgcForBrandsGuide.en.cover.width,
+          height: aiUgcForBrandsGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`,
+        url: `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`,
+        name: aiUgcForBrandsGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiUgcForBrandsGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`,
+        aiUgcForBrandsGuide.en.title,
+      ),
+      faqPageBlock(aiUgcForBrandsGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: aiUgcForBrandsGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands` },
+        ],
+        `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`,
       ),
     ],
   },
