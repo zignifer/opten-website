@@ -34,6 +34,15 @@ function buildSrcSet(src: string, widths: readonly number[], format: "avif" | "w
     .join(", ");
 }
 
+function buildFallbackSrc(src: string) {
+  const hashIndex = src.indexOf("#");
+  const withoutHash = hashIndex === -1 ? src : src.slice(0, hashIndex);
+  const hash = hashIndex === -1 ? "" : src.slice(hashIndex);
+  const separator = withoutHash.includes("?") ? "&" : "?";
+
+  return `${withoutHash}${separator}responsive-fallback=1${hash}`;
+}
+
 export default function ResponsiveImage({
   src,
   widths = DEFAULT_WIDTHS,
@@ -62,7 +71,8 @@ export default function ResponsiveImage({
           if (image.dataset.generatedFallback !== "true") {
             image.dataset.generatedFallback = "true";
             image.closest("picture")?.querySelectorAll("source").forEach((source) => source.remove());
-            image.src = src;
+            image.src = buildFallbackSrc(src);
+            return;
           }
           onError?.(event);
         }}
