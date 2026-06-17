@@ -160,7 +160,7 @@ const featuredCoursePromo = {
     en: "AI for Content and Marketing 2026",
   },
   description: {
-    ru: "Самый честный курс по нейросетям. Меньше чем за час расскажу всё, что нужно знать для создания упаковки бренда, не имея навыков в дизайне и монтаже. За 15 коротких уроков мы создадим логотип, фото и видео в соцсети, запустим сайт и всё это с помощью ИИ!",
+    ru: "Всё, что нужно знать для создания упаковки бренда, не имея навыков в дизайне и монтаже. За 15 коротких уроков мы создадим логотип, фото и видео в соцсети, запустим сайт и всё это с помощью ИИ!",
     en: "The most honest AI course. In under an hour, I will cover everything you need to know to create a brand package without design or editing skills. Across 15 short lessons, we will create a logo, photos and social videos, launch a website, and do it all with AI.",
   },
   cta: {
