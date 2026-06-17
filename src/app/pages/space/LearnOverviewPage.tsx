@@ -156,12 +156,12 @@ const courseAuthor = {
 const featuredCoursePromo = {
   coverPath: "/assets/learn/video/actual-ai-tools-2026-poster.jpg",
   title: {
-    ru: "ИИ без Х**ни",
-    en: "AI Without BS",
+    ru: "Нейросети для контента и маркетинга 2026",
+    en: "AI for Content and Marketing 2026",
   },
   description: {
-    ru: "Самый честный курс по нейросетям. Меньше чем за час расскажу всё, что нужно знать для создания бренда. За 15 коротких уроков мы создадим логотип, упаковку, фото и видео в соцсети, запустим сайт и всё это с помощью ИИ!",
-    en: "The most honest course on AI. In under an hour, I will cover everything you need to know to build a brand. Across 15 short lessons, we will create a logo, packaging, photos and social videos, launch a website, and do it all with AI.",
+    ru: "Самый честный курс по нейросетям. Меньше чем за час расскажу всё, что нужно знать для создания упаковки бренда, не имея навыков в дизайне и монтаже. За 15 коротких уроков мы создадим логотип, фото и видео в соцсети, запустим сайт и всё это с помощью ИИ!",
+    en: "The most honest AI course. In under an hour, I will cover everything you need to know to create a brand package without design or editing skills. Across 15 short lessons, we will create a logo, photos and social videos, launch a website, and do it all with AI.",
   },
   cta: {
     ru: "Скоро",
@@ -240,7 +240,7 @@ export default function LearnOverviewPage() {
         aria-hidden="true"
         className="pointer-events-none absolute right-[-780px] top-[-640px] h-[982px] w-[1720px] bg-[url('/assets/landing-design/gradient-blob-shape.svg')] bg-[length:100%_100%] bg-center bg-no-repeat opacity-[0.18] blur-[140px] max-md:right-[-560px] max-md:top-[-300px] max-md:h-[548px] max-md:w-[960px] max-md:opacity-20 max-md:blur-[75px]"
       />
-      <main className="relative z-10 mx-auto max-w-[1200px] px-[32px] pb-[80px] pt-[60px] max-md:px-4 max-md:pb-[64px] max-md:pt-[28px]">
+      <main className="relative z-10 mx-auto max-w-[1200px] px-[32px] pb-[80px] pt-[60px] max-md:px-4 max-md:pb-[64px] max-md:pt-[30px]">
         <section className="grid min-[1120px]:grid-cols-[minmax(0,552px)_minmax(0,224px)_261px] min-[1120px]:justify-between">
           <div className="max-md:text-center">
             <h1 className="relative inline-block max-w-[552px] font-['Unbounded',sans-serif] text-[52px] font-bold leading-[1.05] tracking-normal text-white max-md:mx-auto max-md:text-center max-md:text-[39px]">
@@ -256,7 +256,7 @@ export default function LearnOverviewPage() {
 
           <AuthorCard lang={lang} />
 
-          <HeroVideoCard lang={lang} className="mt-[51px] max-[1119px]:max-w-[552px] max-md:mt-[24px] min-[1120px]:col-start-1 min-[1120px]:row-start-2" />
+          <HeroVideoCard lang={lang} className="mt-[51px] max-[1119px]:max-w-[552px] max-md:mt-[30px] min-[1120px]:col-start-1 min-[1120px]:row-start-2" />
           <article className="mt-[51px] flex min-h-[310px] flex-col justify-center max-[1119px]:max-w-[552px] max-md:mt-[20px] max-md:min-h-0 max-md:items-center max-md:text-center min-[1120px]:col-start-2 min-[1120px]:row-start-2 min-[1120px]:w-[215px] min-[1120px]:max-w-[215px] min-[1120px]:-ml-[18px]">
             <h2 className="text-[21px] font-bold leading-tight text-white">
               {featuredCoursePromo.title[lang]}
@@ -267,7 +267,7 @@ export default function LearnOverviewPage() {
             <button
               type="button"
               aria-disabled="true"
-              className="mt-[24px] flex h-[43px] w-[197px] cursor-default items-center justify-center rounded-[8px] bg-[#9cfb51] px-[20px] text-[14px] font-bold text-[#062013] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417] min-[1120px]:w-full"
+              className="mt-[24px] flex h-[43px] w-[197px] cursor-default items-center justify-center rounded-[8px] bg-[#9cfb51] px-[20px] text-[14px] font-bold text-[#062013] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417] max-md:w-full min-[1120px]:w-full"
             >
               {featuredCoursePromo.cta[lang]}
             </button>
@@ -534,7 +534,7 @@ function CourseCountdown({ countdown, lang }: { countdown: CourseCountdownState 
   ];
 
   return (
-    <span className="inline-flex items-start justify-center gap-[45px] drop-shadow-[0_4px_18px_rgba(0,0,0,0.9)] max-sm:gap-[14px]">
+    <span className="inline-flex items-start justify-center gap-[45px] drop-shadow-[0_4px_18px_rgba(0,0,0,0.9)] max-sm:gap-[clamp(20px,8vw,34px)]">
       {units.map((unit) => (
         <span key={unit.label} className="w-[72px] text-center max-sm:w-[50px]">
           <span className="block font-['Unbounded',sans-serif] text-[50px] font-bold leading-none text-white tabular-nums max-sm:text-[36px]">{unit.value}</span>
