@@ -6,7 +6,7 @@ import {
   KINESCOPE_PLAYBACK_ISSUER,
   findKinescopeCourseLesson,
   findKinescopeLessonByVideoId,
-} from "./_shared/kinescopeCourse";
+} from "./_shared/kinescopeCourse.js";
 
 type KinescopeAuthRequest = {
   id?: string;

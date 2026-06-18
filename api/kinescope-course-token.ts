@@ -6,14 +6,14 @@ import {
   KINESCOPE_PLAYBACK_TTL_SECONDS,
   buildKinescopeEmbedUrl,
   findKinescopeCourseLesson,
-} from "./_shared/kinescopeCourse";
+} from "./_shared/kinescopeCourse.js";
 import {
   bearerTokenFromHeader,
   hasLiveProSubscription,
   jsonResponse,
   setJsonCors,
   verifySupabaseJwt,
-} from "./_shared/optenServerAuth";
+} from "./_shared/optenServerAuth.js";
 
 type TokenRequestBody = {
   courseSlug?: string;
