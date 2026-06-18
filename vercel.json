@@ -32,6 +32,7 @@
     { "source": "/prompt-library", "destination": "/spa.html" },
     { "source": "/p/:slug", "destination": "/spa.html" },
     { "source": "/learn/templates/:path*", "destination": "/spa.html" },
+    { "source": "/learn/courses/:path*", "destination": "/spa.html" },
     { "source": "/en/learn/templates/:path*", "destination": "/spa.html" },
     { "source": "/app/:path*", "destination": "/spa.html" },
     { "source": "/space/:path*", "destination": "/spa.html" },
@@ -187,6 +188,12 @@
     },
     {
       "source": "/learn/templates/:path*",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/learn/courses/:path*",
       "headers": [
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
       ]

@@ -219,7 +219,13 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
 
       <section className="grid grid-cols-[minmax(0,1fr)_360px] items-start gap-[24px] max-lg:grid-cols-1">
         <div className="min-w-0">
-          <LessonPlayer lesson={displayedLesson} locked={locked} startSeconds={startSeconds} playRequestId={playRequestId} />
+          <LessonPlayer
+            lesson={displayedLesson}
+            collectionId={collection.id}
+            locked={locked}
+            startSeconds={startSeconds}
+            playRequestId={playRequestId}
+          />
           <LessonIntro
             lesson={displayedLesson}
             collection={displayedCollection}
@@ -250,26 +256,40 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
 
 type LessonPlayerProps = {
   lesson: LearnLesson;
+  collectionId: string;
   locked: boolean;
   startSeconds: number;
   playRequestId: number;
 };
 
-function LessonPlayer({ lesson, locked, startSeconds, playRequestId }: LessonPlayerProps) {
+type KinescopeTokenResponse = {
+  embedUrl?: string;
+  error?: string;
+};
+
+function LessonPlayer({ lesson, collectionId, locked, startSeconds, playRequestId }: LessonPlayerProps) {
   const { pathname } = useLocation();
   const { lang } = useLang();
+  const { session } = useSpaceAuth();
   const copy = detailCopy[lang];
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const provider = getLearnLessonVideoProvider(lesson);
   const [activated, setActivated] = useState(false);
+  const [kinescopeEmbedUrl, setKinescopeEmbedUrl] = useState<string | null>(null);
+  const [kinescopeLoading, setKinescopeLoading] = useState(false);
+  const [kinescopeError, setKinescopeError] = useState<string | null>(null);
   const localizedVideo = lesson.localizedVideo?.[lang];
   const youtubeId = localizedVideo?.youtubeId ?? lesson.youtubeId;
   const captionLanguage = localizedVideo?.captionLanguage ?? lang;
   const embedUrl = youtubeId ? getYoutubeEmbedUrl(youtubeId, lang, captionLanguage, startSeconds, activated) : "";
   const isLocalVideo = provider.provider === "local" && Boolean(lesson.localVideo);
+  const isKinescopeVideo = provider.provider === "kinescope";
 
   useEffect(() => {
     setActivated(false);
+    setKinescopeEmbedUrl(null);
+    setKinescopeError(null);
+    setKinescopeLoading(false);
   }, [lesson.slug]);
 
   useEffect(() => {
@@ -281,6 +301,47 @@ function LessonPlayer({ lesson, locked, startSeconds, playRequestId }: LessonPla
     videoRef.current.currentTime = startSeconds;
     void videoRef.current.play().catch(() => undefined);
   }, [activated, isLocalVideo, playRequestId, startSeconds]);
+
+  useEffect(() => {
+    if (!isKinescopeVideo || !activated || locked || kinescopeEmbedUrl || kinescopeLoading) return;
+
+    const accessToken = session?.access_token;
+    if (!accessToken) {
+      setKinescopeError("missing_session");
+      return;
+    }
+
+    let cancelled = false;
+    setKinescopeLoading(true);
+    setKinescopeError(null);
+
+    fetch("/api/kinescope-course-token", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        courseSlug: collectionId,
+        lessonSlug: lesson.slug,
+      }),
+    })
+      .then(async (response) => {
+        const body = (await response.json().catch(() => ({}))) as KinescopeTokenResponse;
+        if (!response.ok || !body.embedUrl) throw new Error(body.error || "kinescope_token_failed");
+        if (!cancelled) setKinescopeEmbedUrl(body.embedUrl);
+      })
+      .catch((error) => {
+        if (!cancelled) setKinescopeError(error instanceof Error ? error.message : "kinescope_token_failed");
+      })
+      .finally(() => {
+        if (!cancelled) setKinescopeLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activated, collectionId, isKinescopeVideo, kinescopeEmbedUrl, kinescopeLoading, lesson.slug, locked, session?.access_token]);
 
   return (
     <section
@@ -342,6 +403,24 @@ function LessonPlayer({ lesson, locked, startSeconds, playRequestId }: LessonPla
               </button>
             )}
           </>
+        ) : isKinescopeVideo ? (
+          kinescopeEmbedUrl ? (
+            <iframe
+              key={`${provider.providerAssetId}-${kinescopeEmbedUrl}`}
+              src={kinescopeEmbedUrl}
+              title={getLearnLessonTitle(lesson, lang)}
+              className="absolute inset-0 h-full w-full border-0"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+              allowFullScreen
+            />
+          ) : (
+            <div className="absolute inset-0 grid place-items-center bg-[#06191c] px-[20px] text-center">
+              <div className="max-w-[360px]">
+                <p className="text-[15px] font-bold text-white">{kinescopeLoading ? copy.loadingVideo : copy.videoTokenError}</p>
+                {kinescopeError && <p className="mt-[8px] text-[12px] leading-[1.45] text-white/45">{kinescopeError}</p>}
+              </div>
+            </div>
+          )
         ) : isLocalVideo && lesson.localVideo ? (
           <video
             ref={videoRef}
@@ -1009,6 +1088,8 @@ const detailCopy = {
     undoCompleted: "Отменить",
     lockedLesson: "Урок заблокирован",
     lockedDescription: "Разблокируйте тариф Pro, чтобы смотреть видео и получить доступ к материалам.",
+    loadingVideo: "Открываем видео...",
+    videoTokenError: "Не удалось открыть видео. Обновите страницу или войдите заново.",
     openPro: "Открыть Pro",
     signIn: "Войти",
     playLesson: "Смотреть урок",
@@ -1037,6 +1118,8 @@ const detailCopy = {
     undoCompleted: "Undo",
     lockedLesson: "Lesson locked",
     lockedDescription: "Unlock Pro to watch this video and get access to the lesson materials.",
+    loadingVideo: "Opening video...",
+    videoTokenError: "Could not open the video. Refresh the page or sign in again.",
     openPro: "Open Pro",
     signIn: "Sign in",
     playLesson: "Play lesson",

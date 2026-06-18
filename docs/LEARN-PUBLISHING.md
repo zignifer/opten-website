@@ -109,6 +109,30 @@ and timestamp seeking.
 - Manual completion is stored in `localStorage.opten_space_learn_progress_v1`
   and must always be reversible.
 
+## Hidden Kinescope Course MVP
+
+The direct-link course MVP lives outside the public SEO Learn catalog:
+
+- Course route: `/learn/courses/ai-content-marketing-2026`
+- First lesson route:
+  `/learn/courses/ai-content-marketing-2026/lesson-1-prompting`
+- Source data: `src/content/space/privateCourse.ts`
+- Client page: `src/app/pages/space/PrivateCoursePage.tsx`
+- Playback token endpoint: `POST /api/kinescope-course-token`
+- Kinescope auth callback: `POST /api/kinescope-course-auth`
+
+Keep `/learn/courses/*` noindex and out of sitemap, llms.txt, header nav, and
+`EN_SIBLINGS` until launch. Do not store Kinescope API keys or playback secrets
+in browser code. The client requests a short-lived Kinescope embed URL with the
+website Supabase JWT; the server verifies Pro access before signing
+`drmauthtoken`. Kinescope then calls the auth callback during playback and gets
+200 or 403.
+
+Before enabling Kinescope project auth backend in production, set
+`KINESCOPE_AUTH_JWT_SECRET` in Vercel and verify that the deployed callback is
+reachable. Optional Basic Auth for the callback uses
+`KINESCOPE_DRM_AUTH_USERNAME` and `KINESCOPE_DRM_AUTH_PASSWORD`.
+
 ## Future Course Collections
 
 The course-page template is intentionally preserved in code, even though the

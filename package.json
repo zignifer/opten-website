@@ -15,6 +15,7 @@
     "learn:video-notes": "node scripts/learn-video-notes.mjs",
     "sync:agents": "node scripts/sync-agent-docs.mjs",
     "verify:email-only-auth": "node scripts/verify-email-only-auth.mjs",
+    "verify:kinescope-course": "node scripts/verify-kinescope-course.mjs",
     "verify:unified-auth": "node scripts/verify-unified-auth.mjs",
     "verify:space-learn": "node scripts/verify-space-learn.mjs",
     "yandex:webmaster:hosts": "node scripts/yandex-webmaster.mjs hosts",

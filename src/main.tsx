@@ -41,6 +41,7 @@
   const LessonDetailPage = lazy(() => import("./app/pages/space/LessonDetailPage.tsx"));
   const LearnFindDetailPage = lazy(() => import("./app/pages/space/LearnFindDetailPage.tsx"));
   const LearnTemplatePage = lazy(() => import("./app/pages/space/LearnTemplatePage.tsx"));
+  const PrivateCoursePage = lazy(() => import("./app/pages/space/PrivateCoursePage.tsx"));
   // Phase 2.2: Paddle bootstrap moved to src/lib/paddle.ts.
   // /pay/index.html still gets the sync <script> tag via prerender.mjs — direct hits
   // have window.Paddle ready before PayPage mounts. Non-pay routes skip the SDK
@@ -199,6 +200,8 @@
               <Route path="/learn" element={<LearnOverviewPage />} />
               <Route path="/learn/templates/:templateKind" element={<LearnTemplatePage />} />
               <Route path="/learn/templates/:templateKind/:templateLessonSlug" element={<LearnTemplatePage />} />
+              <Route path="/learn/courses/:courseSlug" element={<PrivateCoursePage />} />
+              <Route path="/learn/courses/:courseSlug/:lessonSlug" element={<PrivateCoursePage />} />
               <Route path="/learn/finds/:findSlug" element={<LearnFindDetailPage />} />
               <Route path="/learn/:lessonSlug" element={<LessonDetailPage />} />
               <Route path="/app" element={<AppIndexPage />} />

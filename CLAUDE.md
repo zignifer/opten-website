@@ -35,7 +35,9 @@ YouTube expert videos enriched with Opten summaries, timestamps, commands,
 prompts, resources, and risks, alongside the Opten Space Beta app shell
 at `/app/*` (SPA-only, noindex) whose
 account/credits state is read from the same self-hosted Supabase backend as the
-extension.
+extension, plus a hidden/noindex Kinescope-backed course MVP under
+`/learn/courses/*` for direct-link testing of Pro-gated video lessons before the
+course is linked from public navigation.
 
 The extension is still the primary shipped product. Opten Space Beta is an
 account-based web app surface, but it must share identity, subscription, and
@@ -86,6 +88,16 @@ the source YouTube thumbnail URL for cards unless a reviewed local asset is
 added later. The page removes the Opten author/course card and labels the source
 as another author/source instead.
 
+Hidden Kinescope course routes live under `/learn/courses/:courseSlug` and
+`/learn/courses/:courseSlug/:lessonSlug`. They are SPA-only, noindex, and must
+not be added to the public Learn hub, sitemap, llms.txt, or EN sibling map until
+the course is intentionally launched. Kinescope video playback is server-gated:
+the client calls `/api/kinescope-course-token` with the website Supabase JWT,
+the server verifies Pro access and returns a short-lived Kinescope embed URL
+with `drmauthtoken`, and Kinescope calls `/api/kinescope-course-auth` during
+playback to receive 200/403. Never put the Kinescope API key, auth JWT secret,
+or raw playback token in the client bundle.
+
 Hardcoded constants that are duplicated and must be kept in sync:
 - `EXTENSION_IDS` — appears in [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [src/app/pages/DownloadSkillPage.tsx](src/app/pages/DownloadSkillPage.tsx), [src/app/pages/PromptLibraryPage.tsx](src/app/pages/PromptLibraryPage.tsx)
 - `SUPABASE_URL`, `SUPABASE_REST_URL`, and `SUPABASE_ANON_KEY` — appears in [src/lib/optenAuth.ts](src/lib/optenAuth.ts), [src/lib/promptLibraryApi.ts](src/lib/promptLibraryApi.ts), [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [api/download-skill.ts](api/download-skill.ts), plus the extension's `config/api.js`
@@ -97,7 +109,8 @@ Hardcoded constants that are duplicated and must be kept in sync:
 - **Forms:** `react-hook-form`
 - **Payments:** Paddle.js v2 (synchronous CDN script in `index.html`)
 - **Backend:** plain `fetch` to Supabase REST + Functions (no `@supabase/supabase-js`)
-- **Deploy:** Vercel, one serverless function at `api/download-skill.ts`
+- **Deploy:** Vercel, serverless functions in `api/` (`download-skill.ts` plus
+  Kinescope course playback token/auth endpoints)
 - **i18n:** Custom React context, RU/EN; URL prefix wins (`/en/*`), then `localStorage.opten_lang_v3` (explicit user choice, written by LangSwitcher), then `navigator.language`. Legacy key `opten_lang` is read **only** when its value is `"en"` for one-shot migration; RU values from the old key are intentionally ignored (they often came from auto-write, not explicit choice). Internal navigation uses `<LocalizedLink>` (drop-in `<Link>` replacement) — on `/en/*` URLs it rewrites internal hrefs to `/en/<sibling>` for EN-prefixed routes, including static/blog routes, 62 model slugs from `src/content/models/slugs.ts`, and Learn lesson slugs from `src/content/space/learnSlugs.ts`.
 
 No tests, no ESLint config, no `typecheck` script. TS errors surface during
@@ -170,12 +183,16 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           is shown in the email.
   Site → Paddle:          window.Paddle.Checkout.open(...)
   Site own API:           GET /api/download-skill (Vercel serverless, JWT + Pro-gated)
+                          POST /api/kinescope-course-token — website JWT + Pro gate;
+                          returns short-lived Kinescope embed URL with drmauthtoken
+                          POST /api/kinescope-course-auth — Kinescope server callback;
+                          validates signed drmauthtoken and returns 200/403
 
   Legacy 301 redirects:   /guides/* → /blog/*, /en/guides/* → /en/blog/*
                           (Phase 5 B-07; the /guides/* URL space is retired)
 ```
 
-**Locked/auth/noindex routes never get `/en/*` siblings by design** (Phase 3 D-03): `/success` is YooKassa-RUB only; `/login`, `/auth/*`, `/account`, `/dashboard/*`, `/prompt-library`, `/p/*`, and `/app/*` are authenticated, app, or random-link snapshot surfaces (Disallow'd/noindex) rather than content/SEO pages. Public Learn is the exception to the old app Learn prototype: canonical Learn routes are `/learn` and `/en/learn`, while `/app/learn*` redirects. On locked/auth routes the LangSwitcher or app-local language switch flips language *in place* (storage + state) instead of navigating.
+**Locked/auth/noindex routes never get `/en/*` siblings by design** (Phase 3 D-03): `/success` is YooKassa-RUB only; `/login`, `/auth/*`, `/account`, `/dashboard/*`, `/prompt-library`, `/p/*`, `/learn/courses/*`, and `/app/*` are authenticated, app, hidden-course, or random-link snapshot surfaces (Disallow'd/noindex) rather than content/SEO pages. Public Learn is the exception to the old app Learn prototype: canonical Learn routes are `/learn` and `/en/learn`, while `/app/learn*` redirects. On locked/auth routes the LangSwitcher or app-local language switch flips language *in place* (storage + state) instead of navigating.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routes, billing flows, and i18n details.
 
@@ -184,7 +201,11 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routes, billing flows, and 
 ### File structure
 
 ```
-api/                     — Vercel serverless functions (currently only download-skill.ts)
+api/                     — Vercel serverless functions:
+                             download-skill.ts — Pro-gated Claude Skill ZIP
+                             kinescope-course-token.ts — Pro-gated playback token issuer
+                             kinescope-course-auth.ts — Kinescope playback auth callback
+                             _shared/ — server-only course/auth constants
 public/                  — static assets (favicons, partner logos, welcome screenshots,
                            OG cards, founder image, blog/<slug>/cover.jpg)
 scripts/                 — build pipeline:
@@ -329,10 +350,19 @@ changes with the extension manually.
 Set in Vercel (project settings, not in repo):
 - `VITE_PADDLE_ENV` — `'sandbox'` | `'production'`
 - `VITE_PADDLE_CLIENT_TOKEN` — Paddle public client token
+- `KINESCOPE_AUTH_JWT_SECRET` — server-only HS256 secret used to sign and
+  verify short-lived Kinescope `drmauthtoken` playback tokens for hidden course
+  lessons. Must be long random text and must match both Kinescope course API
+  endpoints.
+- `KINESCOPE_DRM_AUTH_USERNAME` / `KINESCOPE_DRM_AUTH_PASSWORD` — optional
+  Basic Auth credentials for Kinescope's server-to-server callback to
+  `/api/kinescope-course-auth`, if configured in the Kinescope dashboard/API.
 
 `VITE_*` vars are public — bundled into the client at build. Real secrets
-(Supabase service role, Paddle private API key, YooKassa secrets) live in
-the **extension repo's** Supabase Edge Function secrets.
+(Supabase service role, Paddle private API key, YooKassa secrets, Kinescope API
+key, Kinescope auth JWT secret) live only in server environments. The Kinescope
+API key used for upload/catalog admin is an operational secret, not a website
+bundle variable; keep local copies in ignored files only.
 
 Self-hosted Supabase Auth SMTP is configured on the VPS, not in Vercel. The
 live OTP email template is a public static file in this repo:
@@ -396,6 +426,14 @@ public search results.
 Learn course/lesson pages embed public YouTube videos in the SPA and store
 ready-to-render timestamps in `src/content/space/learn.ts`. Do not call
 NotebookLM, YouTube Data API, or any provider key from browser code.
+
+Hidden course MVP videos use Kinescope and are defined in
+`src/content/space/privateCourse.ts`. The first Kinescope lesson is
+`/learn/courses/ai-content-marketing-2026/lesson-1-prompting` and uses
+Kinescope video id `e941e14d-c5bf-40fc-abe5-a41e247777cf`. Keep this route out
+of public navigation until launch. Configure the Kinescope project auth backend
+only after the Vercel deployment has `KINESCOPE_AUTH_JWT_SECRET` and the
+`/api/kinescope-course-auth` endpoint is live.
 
 Local-only credentials for generating lesson timestamps live in
 `.secrets/learn-video.env` (gitignored):

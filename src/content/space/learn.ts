@@ -51,7 +51,7 @@ export type LearnLocalizedVideo = {
 };
 
 export type LearnVideoProviderMetadata = {
-  provider: "youtube" | "local";
+  provider: "youtube" | "local" | "kinescope";
   providerAssetId: string;
   posterPath: string;
   playbackPolicy: "public-embed" | "subscription-gated-public-preview";
