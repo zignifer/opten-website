@@ -37,6 +37,16 @@ const components = read("src/app/components/space/learn/LearnComponents.tsx");
 assert.match(components, /provider\.provider === "kinescope"/, "Learn player must branch for Kinescope videos");
 assert.match(components, /\/api\/kinescope-course-token/, "Learn player must request Kinescope embed URLs through the server");
 assert.doesNotMatch(components, /kine\.txt|KINESCOPE_API|Bearer\s+[0-9a-f-]{36}/i, "Client code must not expose Kinescope API keys");
+const kinescopeFetchIndex = components.indexOf('fetch("/api/kinescope-course-token"');
+assert.notEqual(kinescopeFetchIndex, -1, "Learn player must keep Kinescope token fetch in source");
+const kinescopeFetchEffectStart = components.lastIndexOf("useEffect(() => {", kinescopeFetchIndex);
+const kinescopeFetchDepsStart = components.indexOf("}, [", kinescopeFetchIndex);
+const kinescopeFetchEffectEnd = components.indexOf("]);", kinescopeFetchDepsStart);
+assert.ok(kinescopeFetchEffectStart >= 0 && kinescopeFetchDepsStart > kinescopeFetchIndex && kinescopeFetchEffectEnd > kinescopeFetchDepsStart, "Learn player must keep Kinescope token fetch inside a React effect");
+const kinescopeFetchEffectBody = components.slice(kinescopeFetchEffectStart, kinescopeFetchDepsStart);
+const kinescopeFetchEffectDeps = components.slice(kinescopeFetchDepsStart, kinescopeFetchEffectEnd);
+assert.doesNotMatch(kinescopeFetchEffectBody, /if \([^\n]*\bkinescopeLoading\b/, "Kinescope token fetch must not use loading state as an effect guard because it can skip the replacement request");
+assert.doesNotMatch(kinescopeFetchEffectDeps, /\bkinescopeLoading\b/, "Kinescope token fetch must not depend on loading state because it cancels the in-flight request");
 
 const tokenApi = read("api/kinescope-course-token.ts");
 const serverAuth = read("api/_shared/optenServerAuth.ts");

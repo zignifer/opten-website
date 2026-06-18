@@ -303,7 +303,7 @@ function LessonPlayer({ lesson, collectionId, locked, startSeconds, playRequestI
   }, [activated, isLocalVideo, playRequestId, startSeconds]);
 
   useEffect(() => {
-    if (!isKinescopeVideo || !activated || locked || kinescopeEmbedUrl || kinescopeLoading) return;
+    if (!isKinescopeVideo || !activated || locked || kinescopeEmbedUrl) return;
 
     const accessToken = session?.access_token;
     if (!accessToken) {
@@ -341,7 +341,7 @@ function LessonPlayer({ lesson, collectionId, locked, startSeconds, playRequestI
     return () => {
       cancelled = true;
     };
-  }, [activated, collectionId, isKinescopeVideo, kinescopeEmbedUrl, kinescopeLoading, lesson.slug, locked, session?.access_token]);
+  }, [activated, collectionId, isKinescopeVideo, kinescopeEmbedUrl, lesson.slug, locked, session?.access_token]);
 
   return (
     <section
