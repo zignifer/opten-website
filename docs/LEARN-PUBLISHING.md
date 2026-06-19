@@ -116,6 +116,8 @@ The direct-link course MVP lives outside the public SEO Learn catalog:
 - Course route: `/learn/courses/ai-content-marketing-2026`
 - First lesson route:
   `/learn/courses/ai-content-marketing-2026/lesson-1-prompting`
+- Current Kinescope-backed lessons: 1-10. The progress card still keeps the
+  planned course total at 15 lessons until the remaining lessons are uploaded.
 - Source data: `src/content/space/privateCourse.ts`
 - Client page: `src/app/pages/space/PrivateCoursePage.tsx`
 - Playback token endpoint: `POST /api/kinescope-course-token`

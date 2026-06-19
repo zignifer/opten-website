@@ -15,6 +15,51 @@ export const KINESCOPE_COURSE_LESSONS: KinescopeCourseLesson[] = [
     lessonSlug: "lesson-1-prompting",
     videoId: "e941e14d-c5bf-40fc-abe5-a41e247777cf",
   },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-2-ai-services",
+    videoId: "c3b06c01-19dd-4a3c-8218-7a216a2ebd67",
+  },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-3-logo-generation",
+    videoId: "947a68e0-b570-4a9d-ad0c-ee55cc86b440",
+  },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-4-photo-generation",
+    videoId: "1fe7af11-23e5-46cf-bedf-e6bb41c2d3b3",
+  },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-5-references",
+    videoId: "02bcf12a-ab7c-49d4-96cb-441fafb898b9",
+  },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-6-image-editing",
+    videoId: "a6294ef7-c6e6-4744-8b2e-60967fa7bfd7",
+  },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-7-ai-video",
+    videoId: "18f00246-366f-4f43-a67a-a1b3ead807c0",
+  },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-8-frames",
+    videoId: "43d3328a-dc4d-4e60-a269-aa1eebf7e2b4",
+  },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-9-storytelling",
+    videoId: "6f742d8c-cf18-4b9d-97b7-b3e6f63aa696",
+  },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-10-prompt-library",
+    videoId: "3675dfeb-55da-47c3-aac8-35b0556dbd84",
+  },
 ];
 
 export function findKinescopeCourseLesson(courseSlug: string | undefined, lessonSlug: string | undefined) {

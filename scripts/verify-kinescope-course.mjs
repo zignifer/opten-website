@@ -21,13 +21,35 @@ for (const file of requiredFiles) {
 }
 
 const content = read("src/content/space/privateCourse.ts");
+const serverCourseContent = read("api/_shared/kinescopeCourse.ts");
+
+const expectedKinescopeLessons = [
+  ["lesson-1-prompting", "e941e14d-c5bf-40fc-abe5-a41e247777cf"],
+  ["lesson-2-ai-services", "c3b06c01-19dd-4a3c-8218-7a216a2ebd67"],
+  ["lesson-3-logo-generation", "947a68e0-b570-4a9d-ad0c-ee55cc86b440"],
+  ["lesson-4-photo-generation", "1fe7af11-23e5-46cf-bedf-e6bb41c2d3b3"],
+  ["lesson-5-references", "02bcf12a-ab7c-49d4-96cb-441fafb898b9"],
+  ["lesson-6-image-editing", "a6294ef7-c6e6-4744-8b2e-60967fa7bfd7"],
+  ["lesson-7-ai-video", "18f00246-366f-4f43-a67a-a1b3ead807c0"],
+  ["lesson-8-frames", "43d3328a-dc4d-4e60-a269-aa1eebf7e2b4"],
+  ["lesson-9-storytelling", "6f742d8c-cf18-4b9d-97b7-b3e6f63aa696"],
+  ["lesson-10-prompt-library", "3675dfeb-55da-47c3-aac8-35b0556dbd84"],
+];
+
 assert.match(content, /e941e14d-c5bf-40fc-abe5-a41e247777cf/, "Private course must use the uploaded Kinescope video id");
 assert.match(content, /ai-content-marketing-2026/, "Private course must expose a stable hidden course slug");
 assert.match(content, /lesson-1-prompting/, "Private course must expose the first lesson slug");
+for (const [lessonSlug, videoId] of expectedKinescopeLessons) {
+  assert.match(content, new RegExp(lessonSlug), `Private course content must include ${lessonSlug}`);
+  assert.match(content, new RegExp(videoId), `Private course content must include Kinescope video ${videoId}`);
+  assert.match(serverCourseContent, new RegExp(lessonSlug), `Server Kinescope whitelist must include ${lessonSlug}`);
+  assert.match(serverCourseContent, new RegExp(videoId), `Server Kinescope whitelist must include Kinescope video ${videoId}`);
+}
 assert.match(content, /chatgpt\.com\/g\/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator/, "Lesson materials must link the ChatGPT prompt generator");
 assert.match(content, /\/dashboard\/download-skill/, "Lesson materials must link the Pro skill download route");
 assert.match(content, /https:\/\/syntx\.ai\/welcome\/GlUETIt6/, "Lesson materials must link Syntx");
 assert.match(content, /https:\/\/higgsfield\.ai\//, "Lesson materials must link Higgsfield");
+assert.match(content, /https:\/\/disk\.yandex\.ru\/d\/HaU7LdU850QLVw/, "Every private course lesson must expose the current AI tools 2026 material");
 assert.match(content, /provider:\s*"kinescope"/, "Private lesson must use the Kinescope video provider");
 
 const learn = read("src/content/space/learn.ts");
@@ -50,7 +72,7 @@ assert.doesNotMatch(kinescopeFetchEffectDeps, /\bkinescopeLoading\b/, "Kinescope
 
 const tokenApi = read("api/kinescope-course-token.ts");
 const serverAuth = read("api/_shared/optenServerAuth.ts");
-const serverCourse = read("api/_shared/kinescopeCourse.ts");
+const serverCourse = serverCourseContent;
 assert.match(tokenApi, /KINESCOPE_AUTH_JWT_SECRET/, "Token API must sign playback tokens with a server env secret");
 assert.match(tokenApi, /hasLiveProSubscription/, "Token API must enforce Pro access server-side");
 assert.match(serverAuth, /subscriptions/, "Server auth helper must query subscriptions for Pro access");
