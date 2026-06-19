@@ -184,7 +184,6 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
   const lessonAccessGranted = purchase ? courseAccess.hasAccess : hasPro;
   const locked = isLessonLocked(lesson, lessonAccessGranted);
   const isCourse = collection.kind === "course";
-  const useMobileCourseLayout = isCourse;
   const [activeTab, setActiveTab] = useState<SidebarTab>(isCourse ? "lessons" : "timestamps");
   const [startSeconds, setStartSeconds] = useState(0);
   const [playRequestId, setPlayRequestId] = useState(0);
@@ -240,27 +239,23 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
 
   return (
     <LearnSectionWrapper>
-      <nav
-        className="mb-[24px] flex flex-wrap items-center gap-[9px] text-[14px] text-white/68 max-md:-mx-4 max-md:-mt-[22px] max-md:mb-[28px] max-md:flex-nowrap max-md:overflow-hidden max-md:bg-[linear-gradient(90deg,rgba(20,64,31,0.84),rgba(5,28,29,0.96))] max-md:px-4 max-md:py-[27px] max-md:text-[18px] max-md:leading-none"
-        aria-label={copy.breadcrumb}
-      >
-        <LocalizedLink to="/learn" className="shrink-0 text-white/68 no-underline hover:text-white max-md:text-white/62">
+      <nav className="mb-[24px] flex flex-wrap items-center gap-[9px] text-[14px] text-white/68" aria-label={copy.breadcrumb}>
+        <LocalizedLink to="/learn" className="text-white/68 no-underline hover:text-white">
           {copy.courses}
         </LocalizedLink>
         {isCourse && (
           <>
-            <span className="shrink-0 text-white/28">/</span>
-            <span className="hidden md:inline">{getLearnCollectionTitle(collection, lang)}</span>
-            <span className="shrink-0 text-white/62 md:hidden">...</span>
+            <span className="text-white/28">/</span>
+            <span>{getLearnCollectionTitle(collection, lang)}</span>
           </>
         )}
-        <span className="shrink-0 text-white/28">/</span>
-        <span className="min-w-0 truncate font-medium text-white">{getLearnLessonTitle(lesson, lang)}</span>
+        <span className="text-white/28">/</span>
+        <span className="font-medium text-white">{getLearnLessonTitle(lesson, lang)}</span>
       </nav>
 
       <section className="grid grid-cols-[minmax(0,1fr)_360px] items-start gap-[24px] max-lg:grid-cols-1">
-        <div className={`min-w-0 ${useMobileCourseLayout ? "max-lg:contents" : ""}`}>
-          <div ref={playerFrameRef} className={useMobileCourseLayout ? "max-lg:hidden" : undefined}>
+        <div className="min-w-0">
+          <div ref={playerFrameRef}>
             <LessonPlayer
               lesson={displayedLesson}
               collectionId={collection.id}
@@ -270,34 +265,22 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
               playRequestId={playRequestId}
             />
           </div>
-          <div className={useMobileCourseLayout ? "max-lg:hidden" : undefined}>
-            <LessonIntro
-              lesson={displayedLesson}
-              collection={displayedCollection}
-              locked={locked}
-              completed={lessonCompleted}
-              onCompletionChange={handleLessonCompletionChange}
-            />
-          </div>
-          <LessonMaterials
-            materials={getLearnLessonMaterials(displayedLesson, lang)}
+          <LessonIntro
+            lesson={displayedLesson}
+            collection={displayedCollection}
             locked={locked}
-            purchase={purchase}
-            collapseOnMobile={useMobileCourseLayout}
-            className={useMobileCourseLayout ? "max-lg:order-2 max-lg:mt-0" : undefined}
+            completed={lessonCompleted}
+            onCompletionChange={handleLessonCompletionChange}
           />
-          <div className={useMobileCourseLayout ? "max-lg:hidden" : undefined}>
-            <RelatedLessons collection={displayedCollection} currentSlug={lesson.slug} hasAccess={lessonAccessGranted} purchase={purchase} />
-          </div>
+          <LessonMaterials materials={getLearnLessonMaterials(displayedLesson, lang)} locked={locked} purchase={purchase} />
+          <RelatedLessons collection={displayedCollection} currentSlug={lesson.slug} hasAccess={lessonAccessGranted} purchase={purchase} />
         </div>
 
-        <aside className={`flex min-w-0 flex-col gap-[16px] lg:sticky lg:top-[88px] ${useMobileCourseLayout ? "max-lg:contents" : ""}`}>
+        <aside className="flex min-w-0 flex-col gap-[16px] lg:sticky lg:top-[88px]">
           {purchase ? (
             courseAccess.hasAccess ? (
               <>
-                <div className="max-lg:hidden">
-                  <CollectionSummaryCard lesson={displayedLesson} collection={displayedCollection} />
-                </div>
+                <CollectionSummaryCard lesson={displayedLesson} collection={displayedCollection} />
                 <LessonSidebar
                   lesson={displayedLesson}
                   collection={displayedCollection}
@@ -306,7 +289,6 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                   onTimestampSelect={handleTimestampSelect}
                   hasAccess={lessonAccessGranted}
                   purchase={purchase}
-                  className="max-lg:order-3"
                 />
               </>
             ) : (
@@ -318,7 +300,6 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                   loadingAccess={courseAccess.loading || authStatus === "loading"}
                   initialEmail={session?.user.email ?? account?.email ?? ""}
                   playerHeight={playerHeight}
-                  className="max-lg:order-1"
                 />
                 <LessonSidebar
                   lesson={displayedLesson}
@@ -328,15 +309,12 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                   onTimestampSelect={handleTimestampSelect}
                   hasAccess={lessonAccessGranted}
                   purchase={purchase}
-                  className="max-lg:order-3"
                 />
               </>
             )
           ) : (
             <>
-              <div className={useMobileCourseLayout ? "max-lg:hidden" : undefined}>
-                <CollectionSummaryCard lesson={displayedLesson} collection={displayedCollection} />
-              </div>
+              <CollectionSummaryCard lesson={displayedLesson} collection={displayedCollection} />
               <LessonSidebar
                 lesson={displayedLesson}
                 collection={displayedCollection}
@@ -345,11 +323,8 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                 onTimestampSelect={handleTimestampSelect}
                 hasAccess={lessonAccessGranted}
                 purchase={purchase}
-                className={useMobileCourseLayout ? "max-lg:order-3" : undefined}
               />
-              <div className={useMobileCourseLayout ? "max-lg:hidden" : undefined}>
-                <UnlockProCard hasPro={hasPro} />
-              </div>
+              <UnlockProCard hasPro={hasPro} />
             </>
           )}
         </aside>
@@ -704,41 +679,37 @@ type LessonMaterialsProps = {
   materials: LearnMaterial[];
   locked: boolean;
   purchase?: LearnCoursePurchase;
-  collapseOnMobile?: boolean;
-  className?: string;
 };
 
-function LessonMaterials({ materials, locked, purchase, collapseOnMobile = false, className = "" }: LessonMaterialsProps) {
+function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
-  const [mobileExpanded, setMobileExpanded] = useState(false);
 
   if (materials.length === 0) return null;
 
   return (
-    <section className={`mt-[34px] max-w-[820px] ${className}`}>
-      <h2 className="text-[22px] font-bold leading-tight text-white max-md:text-[28px]">{copy.lessonMaterials}</h2>
-      <div className="mt-[14px] overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023] max-md:mt-[22px] max-md:rounded-[10px]">
-        {materials.map((material, index) => {
+    <section className="mt-[34px] max-w-[820px]">
+      <h2 className="text-[22px] font-bold leading-tight text-white">{copy.lessonMaterials}</h2>
+      <div className="mt-[14px] overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]">
+        {materials.map((material) => {
           const Icon = materialIcon(material.kind);
           const external = material.href.startsWith("http");
           const disabled = locked;
           const actionLabel = purchase ? copy.paidCourseBadge : material.actionLabel;
-          const hiddenOnMobile = collapseOnMobile && !mobileExpanded && index > 0;
           const rowClass =
-            "grid grid-cols-[34px_minmax(0,1fr)_154px] items-center gap-[12px] border-b border-white/8 px-[16px] py-[10px] last:border-b-0 max-lg:grid-cols-[44px_minmax(0,1fr)] max-lg:gap-x-[14px] max-lg:gap-y-[16px] max-lg:px-[24px] max-lg:py-[20px]";
+            "grid grid-cols-[34px_minmax(0,1fr)_154px] items-center gap-[12px] border-b border-white/8 px-[16px] py-[10px] last:border-b-0 max-sm:grid-cols-[32px_minmax(0,1fr)]";
 
           return (
-            <div key={material.title} className={`${rowClass} ${hiddenOnMobile ? "max-lg:hidden" : ""}`}>
-              <span className="grid size-[30px] place-items-center rounded-full bg-white/[0.065] text-white/76 max-lg:size-[44px]">
-                <Icon size={17} className="max-lg:size-[22px]" />
+            <div key={material.title} className={rowClass}>
+              <span className="grid size-[30px] place-items-center rounded-full bg-white/[0.065] text-white/76">
+                <Icon size={17} />
               </span>
               <span className="min-w-0">
-                <span className="block truncate text-[14px] font-medium leading-tight text-white max-lg:text-[20px] max-lg:leading-[1.25]">{material.title}</span>
-                <span className="mt-[4px] block text-[12px] leading-tight text-white/42 max-lg:mt-[8px] max-lg:text-[16px] max-lg:leading-[1.35]">{material.meta}</span>
+                <span className="block truncate text-[14px] font-medium leading-tight text-white">{material.title}</span>
+                <span className="mt-[4px] block text-[12px] leading-tight text-white/42">{material.meta}</span>
               </span>
               {disabled ? (
-                <span className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.04] text-[13px] font-medium text-white/32 max-lg:col-span-2 max-lg:h-[52px] max-lg:text-[16px]">
+                <span className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.04] text-[13px] font-medium text-white/32 max-sm:col-span-2">
                   {purchase ? copy.unlocksAfterPurchase : "Pro"}
                 </span>
               ) : external ? (
@@ -746,14 +717,14 @@ function LessonMaterials({ materials, locked, purchase, collapseOnMobile = false
                   href={material.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-lg:col-span-2 max-lg:h-[52px] max-lg:text-[17px]"
+                  className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-sm:col-span-2"
                 >
                   {actionLabel}
                 </a>
               ) : (
                 <LocalizedLink
                   to={material.href}
-                  className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-lg:col-span-2 max-lg:h-[52px] max-lg:text-[17px]"
+                  className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-sm:col-span-2"
                 >
                   {actionLabel}
                 </LocalizedLink>
@@ -761,15 +732,6 @@ function LessonMaterials({ materials, locked, purchase, collapseOnMobile = false
             </div>
           );
         })}
-        {collapseOnMobile && materials.length > 1 && (
-          <button
-            type="button"
-            onClick={() => setMobileExpanded((expanded) => !expanded)}
-            className="hidden h-[64px] w-full cursor-pointer items-center justify-center border-0 border-t border-white/8 bg-transparent px-[18px] text-[18px] font-medium text-white transition hover:bg-white/[0.035] max-lg:flex"
-          >
-            {mobileExpanded ? copy.showLess : copy.showMore}
-          </button>
-        )}
       </div>
     </section>
   );
@@ -881,28 +843,27 @@ type LessonSidebarProps = {
   onTimestampSelect: (seconds: number) => void;
   hasAccess: boolean;
   purchase?: LearnCoursePurchase;
-  className?: string;
 };
 
-function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestampSelect, hasAccess, purchase, className = "" }: LessonSidebarProps) {
+function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestampSelect, hasAccess, purchase }: LessonSidebarProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const isCourse = collection.kind === "course";
   const timestampsActive = activeTab === "timestamps";
 
   return (
-    <section className={`overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]/92 max-md:rounded-[10px] ${timestampsActive ? "max-md:hidden" : ""} ${className}`}>
-      <div className="flex h-[52px] items-end border-b border-white/8 px-[16px] max-md:h-[74px] max-md:px-[28px]">
+    <section className={`overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]/92 ${timestampsActive ? "max-md:hidden" : ""}`}>
+      <div className="flex h-[52px] items-end border-b border-white/8 px-[16px]">
         {isCourse && (
           <button
             type="button"
             onClick={() => onTabChange("lessons")}
-            className={`relative h-[52px] min-w-[92px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition max-md:h-[74px] max-md:min-w-[112px] max-md:px-0 max-md:text-[19px] ${
+            className={`relative h-[52px] min-w-[92px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition ${
               activeTab === "lessons" ? "text-white" : "text-white/58 hover:text-white"
             }`}
           >
             {copy.lessonsTab}
-            {activeTab === "lessons" && <span className="absolute inset-x-[10px] bottom-0 h-[2px] rounded-full bg-[#9cfb51] max-md:inset-x-0 max-md:h-[3px]" />}
+            {activeTab === "lessons" && <span className="absolute inset-x-[10px] bottom-0 h-[2px] rounded-full bg-[#9cfb51]" />}
           </button>
         )}
         <button
@@ -939,7 +900,7 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
   const copy = detailCopy[lang];
 
   return (
-    <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] max-md:max-h-none max-md:space-y-[6px] max-md:p-[12px] ${className}`}>
+    <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] ${className}`}>
       {collection.lessons.map((outlineLesson, index) => {
         const current = outlineLesson.slug === currentSlug;
         const locked = isLessonLocked(outlineLesson, hasAccess);
@@ -953,7 +914,7 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
             key={outlineLesson.slug}
             to={getLessonHref(collection, outlineLesson.slug, lang)}
             aria-current={current ? "page" : undefined}
-            className={`group grid grid-cols-[26px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition max-md:grid-cols-[44px_minmax(0,1fr)_32px] max-md:gap-[12px] max-md:rounded-[10px] max-md:px-[14px] max-md:py-[16px] ${
+            className={`group grid grid-cols-[26px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition ${
               current
                 ? "bg-[#9cfb51]/10 text-white"
                 : locked
@@ -961,14 +922,14 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
                   : "text-white/76 hover:bg-white/[0.045] hover:text-white"
             }`}
           >
-            <span className={`text-center text-[14px] font-bold leading-none max-md:text-[20px] ${current ? "text-[#9cfb51]" : "text-white/48"}`}>
+            <span className={`text-center text-[14px] font-bold leading-none ${current ? "text-[#9cfb51]" : "text-white/48"}`}>
               {index + 1}
             </span>
             <span className="min-w-0">
-              <span className={`block text-[14px] font-bold leading-[1.35] max-md:text-[18px] max-md:leading-[1.28] ${current ? "text-white" : ""}`}>
+              <span className={`block text-[14px] font-bold leading-[1.35] ${current ? "text-white" : ""}`}>
                 {getLearnLessonTitle(outlineLesson, lang)}
               </span>
-              <span className="mt-[4px] block text-[12px] leading-tight text-white/44 max-md:mt-[7px] max-md:text-[16px]">
+              <span className="mt-[4px] block text-[12px] leading-tight text-white/44">
                 {purchase || locked ? <span className="text-[#9cfb51]">{metaLabel}</span> : metaLabel}
               </span>
             </span>
@@ -1060,7 +1021,6 @@ type CoursePurchaseCardProps = {
   loadingAccess: boolean;
   initialEmail: string;
   playerHeight?: number | null;
-  className?: string;
 };
 
 type PendingCoursePayment = {
@@ -1072,7 +1032,7 @@ type PendingCoursePayment = {
 
 const COURSE_PAYMENT_PENDING_STORAGE_KEY = "opten_course_payment_pending_v1";
 
-function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, initialEmail, playerHeight, className = "" }: CoursePurchaseCardProps) {
+function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, initialEmail, playerHeight }: CoursePurchaseCardProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const countdown = useSaleCountdown(purchase.saleEndsAt);
@@ -1125,7 +1085,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
 
   if (hasAccess) {
     return (
-      <section id="course-purchase" className={`rounded-[8px] border border-[#9cfb51]/45 bg-[#10261b] p-[18px] ${className}`}>
+      <section id="course-purchase" className="rounded-[8px] border border-[#9cfb51]/45 bg-[#10261b] p-[18px]">
         <div className="flex items-start gap-[12px]">
           <span className="grid size-[42px] shrink-0 place-items-center rounded-full bg-[#9cfb51]/12 text-[#9cfb51]">
             <Check size={20} />
@@ -1143,7 +1103,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     <section
       id="course-purchase"
       style={playerHeightStyle}
-      className={`relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[18px] py-[26px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] max-md:rounded-[10px] max-md:px-[27px] max-md:py-[34px] lg:flex lg:h-[var(--course-player-height)] lg:flex-col lg:justify-center ${className}`}
+      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[18px] py-[26px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] lg:flex lg:h-[var(--course-player-height)] lg:flex-col lg:justify-center"
     >
       <div className="relative">
         <div className="flex items-start justify-between gap-[12px]">
@@ -1584,8 +1544,6 @@ const detailCopy = {
     courseAccessActive: "Доступ к курсу активен",
     courseAccessActiveDescription: "Видео и материалы курса открыты для этого аккаунта.",
     allLessons: "Все уроки",
-    showMore: "Показать больше",
-    showLess: "Скрыть",
     watchLesson: "Смотреть урок",
   },
   en: {
@@ -1636,8 +1594,6 @@ const detailCopy = {
     courseAccessActive: "Course access active",
     courseAccessActiveDescription: "Course videos and materials are unlocked for this account.",
     allLessons: "All lessons",
-    showMore: "Show more",
-    showLess: "Hide",
     watchLesson: "Watch lesson",
   },
 } as const;
