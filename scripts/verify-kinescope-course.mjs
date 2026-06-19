@@ -8,6 +8,10 @@ function read(file) {
   return readFileSync(join(root, file), "utf8");
 }
 
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 const requiredFiles = [
   "src/content/space/privateCourse.ts",
   "src/app/pages/space/PrivateCoursePage.tsx",
@@ -36,6 +40,19 @@ const expectedKinescopeLessons = [
   ["lesson-10-prompt-library", "3675dfeb-55da-47c3-aac8-35b0556dbd84"],
 ];
 
+const expectedPrivateCourseRuTitles = [
+  "Промптинг для создания визуала",
+  "Какие сервисы использовать",
+  "Генерация логотипа в векторе",
+  "Базовая генерация фото",
+  "Продвинутая генерация фото",
+  "Редактирование фото в ИИ",
+  "Генерация видео: Картинка в видео",
+  "Генерация видео: Кейфреймс",
+  "Мультишот сцены с раскадровкой",
+  "Меняем фон в видео",
+];
+
 assert.match(content, /e941e14d-c5bf-40fc-abe5-a41e247777cf/, "Private course must use the uploaded Kinescope video id");
 assert.match(content, /ai-content-marketing-2026/, "Private course must expose a stable hidden course slug");
 assert.match(content, /lesson-1-prompting/, "Private course must expose the first lesson slug");
@@ -45,6 +62,10 @@ for (const [lessonSlug, videoId] of expectedKinescopeLessons) {
   assert.match(serverCourseContent, new RegExp(lessonSlug), `Server Kinescope whitelist must include ${lessonSlug}`);
   assert.match(serverCourseContent, new RegExp(videoId), `Server Kinescope whitelist must include Kinescope video ${videoId}`);
 }
+for (const title of expectedPrivateCourseRuTitles) {
+  assert.match(content, new RegExp(`ru:\\s*"${escapeRegExp(title)}"`), `Private course RU title must be exactly "${title}"`);
+}
+assert.doesNotMatch(content, /ru:\s*"Урок \d+:/, "Private course RU lesson titles must not include numeric lesson prefixes");
 assert.match(content, /chatgpt\.com\/g\/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator/, "Lesson materials must link the ChatGPT prompt generator");
 assert.match(content, /title:\s*"Генератор промптов в ChatGPT"[\s\S]*?actionLabel:\s*"Перейти"/, "ChatGPT prompt generator material button must say Перейти in RU");
 assert.match(content, /\/dashboard\/download-skill/, "Lesson materials must link the Pro skill download route");

@@ -151,8 +151,8 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
     slug: PRIVATE_COURSE_FIRST_LESSON_SLUG,
     videoId: PRIVATE_COURSE_FIRST_KINESCOPE_VIDEO_ID,
     title: {
-      ru: "Урок 1: промптинг для визуального контента",
-      en: "Lesson 1: prompting for visual content",
+      ru: "Промптинг для создания визуала",
+      en: "Prompting for visual creation",
     },
     description: {
       ru: "Разбираем, как собирать промпты для визуального контента и сразу использовать Opten-инструменты в ChatGPT, Claude, Syntx и Higgsfield.",
@@ -183,7 +183,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-2-ai-services",
     videoId: "c3b06c01-19dd-4a3c-8218-7a216a2ebd67",
-    title: { ru: "Урок 2: сервисы для AI-контента", en: "Lesson 2: AI content services" },
+    title: { ru: "Какие сервисы использовать", en: "Which services to use" },
     description: {
       ru: "Разбираем рабочий набор сервисов для генерации контента, маркетинговых визуалов и быстрых production-задач.",
       en: "A practical stack of services for content generation, marketing visuals, and fast production work.",
@@ -203,7 +203,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-3-logo-generation",
     videoId: "947a68e0-b570-4a9d-ad0c-ee55cc86b440",
-    title: { ru: "Урок 3: генерация логотипа", en: "Lesson 3: logo generation" },
+    title: { ru: "Генерация логотипа в векторе", en: "Vector logo generation" },
     description: {
       ru: "Показываем, как подходить к генерации логотипов через промпт, стиль, ограничения и выбор подходящего результата.",
       en: "How to approach logo generation through prompt structure, style, constraints, and result selection.",
@@ -223,7 +223,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-4-photo-generation",
     videoId: "1fe7af11-23e5-46cf-bedf-e6bb41c2d3b3",
-    title: { ru: "Урок 4: фотогенерация", en: "Lesson 4: photo generation" },
+    title: { ru: "Базовая генерация фото", en: "Basic photo generation" },
     description: {
       ru: "Создаем фотореалистичные изображения и управляем сценой, светом, объектом и визуальной подачей через промпт.",
       en: "Creating photorealistic images while controlling scene, light, subject, and visual direction through the prompt.",
@@ -243,7 +243,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-5-references",
     videoId: "02bcf12a-ab7c-49d4-96cb-441fafb898b9",
-    title: { ru: "Урок 5: работа с референсами", en: "Lesson 5: working with references" },
+    title: { ru: "Продвинутая генерация фото", en: "Advanced photo generation" },
     description: {
       ru: "Разбираем, как использовать референсы, чтобы удерживать стиль, композицию, персонажа или продукт в генерациях.",
       en: "Using references to keep style, composition, character, or product direction stable across generations.",
@@ -263,7 +263,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-6-image-editing",
     videoId: "a6294ef7-c6e6-4744-8b2e-60967fa7bfd7",
-    title: { ru: "Урок 6: редактирование изображений", en: "Lesson 6: image editing" },
+    title: { ru: "Редактирование фото в ИИ", en: "AI photo editing" },
     description: {
       ru: "Редактируем и улучшаем изображения: исправляем детали, меняем элементы и доводим генерацию до пригодного результата.",
       en: "Editing and improving images: fixing details, changing elements, and refining generations into usable results.",
@@ -283,7 +283,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-7-ai-video",
     videoId: "18f00246-366f-4f43-a67a-a1b3ead807c0",
-    title: { ru: "Урок 7: AI-видео", en: "Lesson 7: AI video" },
+    title: { ru: "Генерация видео: Картинка в видео", en: "Video generation: image to video" },
     description: {
       ru: "Переходим от статичного визуала к видео: движение, камера, длительность, ограничения и подготовка исходника.",
       en: "Moving from static visuals to video: motion, camera, duration, constraints, and source preparation.",
@@ -303,7 +303,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-8-frames",
     videoId: "43d3328a-dc4d-4e60-a269-aa1eebf7e2b4",
-    title: { ru: "Урок 8: фреймы и кадры", en: "Lesson 8: frames and shots" },
+    title: { ru: "Генерация видео: Кейфреймс", en: "Video generation: keyframes" },
     description: {
       ru: "Разбираем работу с кадрами, визуальной логикой и связкой отдельных фреймов в понятный ролик.",
       en: "Working with frames, visual logic, and connecting separate shots into a coherent video.",
@@ -323,7 +323,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-9-storytelling",
     videoId: "6f742d8c-cf18-4b9d-97b7-b3e6f63aa696",
-    title: { ru: "Урок 9: сюжет и сценарий", en: "Lesson 9: story and script" },
+    title: { ru: "Мультишот сцены с раскадровкой", en: "Multishot scenes with storyboard" },
     description: {
       ru: "Собираем сюжетную логику для AI-ролика: идея, сцены, переходы, акценты и понятный финальный результат.",
       en: "Building story logic for an AI video: idea, scenes, transitions, accents, and a clear final result.",
@@ -343,7 +343,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-10-prompt-library",
     videoId: "3675dfeb-55da-47c3-aac8-35b0556dbd84",
-    title: { ru: "Урок 10: библиотека промптов", en: "Lesson 10: prompt library" },
+    title: { ru: "Меняем фон в видео", en: "Changing the background in video" },
     description: {
       ru: "Организуем библиотеку промптов и материалов, чтобы не терять удачные формулы и быстрее повторять рабочие результаты.",
       en: "Organizing a prompt and resource library so useful formulas are not lost and working results are easier to repeat.",
