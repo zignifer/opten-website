@@ -1073,7 +1073,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   return (
     <section
       id="course-purchase"
-      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[18px] pb-[34px] pt-[18px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] xl:min-h-[459px]"
+      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[18px] py-[26px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] xl:flex xl:min-h-[459px] xl:flex-col xl:justify-center"
     >
       <div className="relative">
         <div className="flex items-start justify-between gap-[12px]">
