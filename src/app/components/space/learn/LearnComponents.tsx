@@ -951,6 +951,8 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
             to={getLessonHref(collection, outlineLesson.slug, lang)}
             aria-current={current ? "page" : undefined}
             className={`group grid grid-cols-[26px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition ${
+              locked ? "lg:min-h-[62px]" : ""
+            } ${
               current
                 ? "bg-[#9cfb51]/10 text-white"
                 : locked
@@ -965,11 +967,22 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
               <span className={`block text-[14px] font-bold leading-[1.35] ${current ? "text-white" : ""}`}>
                 {getLearnLessonTitle(outlineLesson, lang)}
               </span>
-              <span className="mt-[4px] block text-[12px] leading-tight text-white/44">
+              <span className={`mt-[4px] block text-[12px] leading-tight text-white/44 ${locked ? "lg:hidden" : ""}`}>
                 {purchase || locked ? <span className="text-[#9cfb51]">{metaLabel}</span> : metaLabel}
               </span>
             </span>
-            <LessonStatusDot lesson={outlineLesson} current={current} />
+            {locked ? (
+              <>
+                <span className="hidden size-[22px] place-items-center text-[#788183] lg:grid">
+                  <Lock size={16} strokeWidth={2.25} />
+                </span>
+                <span className="grid lg:hidden">
+                  <LessonStatusDot lesson={outlineLesson} current={current} />
+                </span>
+              </>
+            ) : (
+              <LessonStatusDot lesson={outlineLesson} current={current} />
+            )}
           </LocalizedLink>
         );
       })}
