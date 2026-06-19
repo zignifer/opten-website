@@ -1101,6 +1101,8 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   const normalizedEmail = normalizeCourseEmail(email);
   const salePrice = formatRubPrice(purchase.priceRub);
   const listPrice = formatRubPrice(purchase.listPriceRub);
+  const courseLessonsCount = collection.progress?.total || collection.lessons.length;
+  const courseTitle = `${getLearnCollectionTitle(collection, lang)} (${copy.courseLessonsCount(courseLessonsCount)})`;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -1152,37 +1154,36 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     <section
       id="course-purchase"
       style={playerHeightStyle}
-      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[18px] py-[26px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] lg:flex lg:h-[var(--course-player-height)] lg:flex-col lg:justify-center"
+      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[22px] py-[28px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] max-sm:px-[18px] max-sm:py-[26px] lg:flex lg:h-[var(--course-player-height)] lg:flex-col lg:justify-center lg:px-[22px] lg:py-[28px]"
     >
       <div className="relative">
-        <div className="flex items-start justify-between gap-[12px]">
+        <div className="flex items-start justify-between gap-[16px]">
           <div className="min-w-0">
-            <p className="text-[11px] font-bold uppercase leading-none tracking-[0.08em] text-[#9cfb51]">{copy.courseOfferLabel}</p>
-            <h2 className="mt-[8px] text-[17px] font-bold leading-[1.25] text-white">{getLearnCollectionTitle(collection, lang)}</h2>
+            <h2 className="text-[17px] font-bold leading-[1.25] text-white">{courseTitle}</h2>
           </div>
-          <span className="shrink-0 rounded-[6px] bg-[#9cfb51] px-[8px] py-[5px] text-[12px] font-black leading-none text-[#062013]">
+          <span className="mt-[2px] shrink-0 rounded-[6px] bg-[#9cfb51] px-[8px] py-[5px] text-[12px] font-black leading-none text-[#062013]">
             -{purchase.discountPercent}%
           </span>
         </div>
 
-        <div className="mt-[16px] flex items-end gap-[10px]">
-          <span className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-none text-white">{salePrice} ₽</span>
-          <span className="pb-[4px] text-[18px] font-bold leading-none text-white/36 line-through">{listPrice} ₽</span>
+        <div className="mt-[18px] flex items-end gap-[10px] max-sm:mt-[16px]">
+          <span className="font-['Unbounded',sans-serif] text-[38px] font-bold leading-none text-white max-sm:text-[36px]">{salePrice} ₽</span>
+          <span className="pb-[4px] text-[19px] font-bold leading-none text-white/36 line-through max-sm:text-[18px]">{listPrice} ₽</span>
         </div>
 
-        <div className="mt-[16px] rounded-[8px] border border-white/10 bg-black/16 p-[12px]">
-          <div className="mb-[10px] flex items-center gap-[7px] text-[12px] font-bold leading-none text-white/68">
+        <div className="mt-[18px] rounded-[8px] border border-white/10 bg-black/16 p-[13px] max-sm:mt-[16px] max-sm:p-[12px]">
+          <div className="mb-[11px] flex items-center gap-[7px] text-[12px] font-bold leading-none text-white/68">
             <Clock size={14} className="text-[#9cfb51]" />
             <span>{copy.courseSaleEnds}</span>
           </div>
           <CourseSaleCountdown countdown={countdown} lang={lang} />
         </div>
 
-        <form className="mt-[16px]" onSubmit={handleSubmit}>
+        <form className="mt-[20px] max-sm:mt-[16px]" onSubmit={handleSubmit}>
           <label className="text-[12px] font-bold leading-none text-white/62" htmlFor="course-purchase-email">
             {copy.courseEmailLabel}
           </label>
-          <div className="mt-[8px] flex items-center gap-[8px] rounded-[8px] border border-white/12 bg-[#06191c] px-[12px] focus-within:border-[#9cfb51]/65">
+          <div className="mt-[9px] flex items-center gap-[8px] rounded-[8px] border border-white/12 bg-[#06191c] px-[12px] focus-within:border-[#9cfb51]/65 max-sm:mt-[8px]">
             <Mail size={16} className="shrink-0 text-white/38" />
             <input
               id="course-purchase-email"
@@ -1194,7 +1195,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
               }}
               placeholder={copy.courseEmailPlaceholder}
               autoComplete="email"
-              className="h-[44px] min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium text-white outline-none placeholder:text-white/28"
+              className="h-[46px] min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium text-white outline-none placeholder:text-white/28 max-sm:h-[44px]"
             />
           </div>
 
@@ -1211,7 +1212,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
           <button
             type="submit"
             disabled={submitting}
-            className="mt-[14px] flex h-[44px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[16px] text-[14px] font-black text-[#062013] transition hover:bg-[#8ee943] disabled:cursor-wait disabled:opacity-70"
+            className="mt-[16px] flex h-[46px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[16px] text-[14px] font-black text-[#062013] transition hover:bg-[#8ee943] disabled:cursor-wait disabled:opacity-70 max-sm:mt-[14px] max-sm:h-[44px]"
           >
             <CreditCard size={17} />
             {submitting ? copy.coursePaymentOpening : copy.courseBuyButton(salePrice)}
@@ -1544,6 +1545,14 @@ function hasProAccess(account: AccountSummary | null) {
   return Boolean(account && account.plan !== "free" && (account.status === "active" || account.status === "cancelled"));
 }
 
+function getRussianPlural(count: number, one: string, few: string, many: string) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+}
+
 const detailCopy = {
   ru: {
     breadcrumb: "Навигация по курсу",
@@ -1580,7 +1589,7 @@ const detailCopy = {
     unlockAllLessons: "Разблокируйте все уроки",
     unlockAllDescription: "Получите доступ ко всем материалам курса и Pro-урокам без ограничений.",
     unlockOnPro: "Разблокировать на Pro",
-    courseOfferLabel: "Купить курс",
+    courseLessonsCount: (count: number) => `${count} ${getRussianPlural(count, "урок", "урока", "уроков")}`,
     courseSaleEnds: "Скидка закончится через",
     courseEmailLabel: "Email для доступа",
     courseEmailPlaceholder: "you@example.com",
@@ -1632,7 +1641,7 @@ const detailCopy = {
     unlockAllLessons: "Unlock all lessons",
     unlockAllDescription: "Get access to every course material and Pro lesson without limits.",
     unlockOnPro: "Unlock on Pro",
-    courseOfferLabel: "Buy course",
+    courseLessonsCount: (count: number) => `${count} ${count === 1 ? "lesson" : "lessons"}`,
     courseSaleEnds: "Discount ends in",
     courseEmailLabel: "Access email",
     courseEmailPlaceholder: "you@example.com",
