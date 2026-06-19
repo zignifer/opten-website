@@ -11,7 +11,7 @@ import {
   Play,
   Video,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 import { useLocation } from "react-router";
 import { useLang } from "../../../../i18n/LangContext";
 import type { AccountSummary } from "../../../../lib/optenAuth";
@@ -187,11 +187,33 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
   const [activeTab, setActiveTab] = useState<SidebarTab>(isCourse ? "lessons" : "timestamps");
   const [startSeconds, setStartSeconds] = useState(0);
   const [playRequestId, setPlayRequestId] = useState(0);
+  const playerFrameRef = useRef<HTMLDivElement | null>(null);
+  const [playerHeight, setPlayerHeight] = useState<number | null>(null);
   const [manualProgress, setManualProgress] = useState<StoredLearnProgress>(() => readStoredLearnProgress());
 
   useEffect(() => {
     setStartSeconds(0);
     setPlayRequestId(0);
+  }, [lesson.slug]);
+
+  useEffect(() => {
+    const element = playerFrameRef.current;
+    if (!element) return;
+
+    const updatePlayerHeight = () => {
+      setPlayerHeight(Math.round(element.getBoundingClientRect().height));
+    };
+
+    updatePlayerHeight();
+
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updatePlayerHeight);
+      return () => window.removeEventListener("resize", updatePlayerHeight);
+    }
+
+    const observer = new ResizeObserver(updatePlayerHeight);
+    observer.observe(element);
+    return () => observer.disconnect();
   }, [lesson.slug]);
 
   const completedSlugs = useMemo(() => getCompletedLessonSlugs(collection, manualProgress), [collection, manualProgress]);
@@ -233,14 +255,16 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
 
       <section className="grid grid-cols-[minmax(0,1fr)_360px] items-start gap-[24px] max-lg:grid-cols-1">
         <div className="min-w-0">
-          <LessonPlayer
-            lesson={displayedLesson}
-            collectionId={collection.id}
-            locked={locked}
-            purchase={purchase}
-            startSeconds={startSeconds}
-            playRequestId={playRequestId}
-          />
+          <div ref={playerFrameRef}>
+            <LessonPlayer
+              lesson={displayedLesson}
+              collectionId={collection.id}
+              locked={locked}
+              purchase={purchase}
+              startSeconds={startSeconds}
+              playRequestId={playRequestId}
+            />
+          </div>
           <LessonIntro
             lesson={displayedLesson}
             collection={displayedCollection}
@@ -275,6 +299,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                   hasAccess={courseAccess.hasAccess}
                   loadingAccess={courseAccess.loading || authStatus === "loading"}
                   initialEmail={session?.user.email ?? account?.email ?? ""}
+                  playerHeight={playerHeight}
                 />
                 <LessonSidebar
                   lesson={displayedLesson}
@@ -995,6 +1020,7 @@ type CoursePurchaseCardProps = {
   hasAccess: boolean;
   loadingAccess: boolean;
   initialEmail: string;
+  playerHeight?: number | null;
 };
 
 type PendingCoursePayment = {
@@ -1006,7 +1032,7 @@ type PendingCoursePayment = {
 
 const COURSE_PAYMENT_PENDING_STORAGE_KEY = "opten_course_payment_pending_v1";
 
-function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, initialEmail }: CoursePurchaseCardProps) {
+function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, initialEmail, playerHeight }: CoursePurchaseCardProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const countdown = useSaleCountdown(purchase.saleEndsAt);
@@ -1015,6 +1041,9 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pendingPayment, setPendingPayment] = useState<PendingCoursePayment | null>(() => readPendingCoursePayment(purchase.courseSlug));
+  const playerHeightStyle = playerHeight
+    ? ({ "--course-player-height": `${playerHeight}px` } as CSSProperties)
+    : undefined;
 
   useEffect(() => {
     if (!emailTouched && initialEmail) setEmail(initialEmail);
@@ -1073,7 +1102,8 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   return (
     <section
       id="course-purchase"
-      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[18px] py-[26px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] xl:flex xl:min-h-[459px] xl:flex-col xl:justify-center"
+      style={playerHeightStyle}
+      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[18px] py-[26px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] lg:flex lg:h-[var(--course-player-height)] lg:flex-col lg:justify-center"
     >
       <div className="relative">
         <div className="flex items-start justify-between gap-[12px]">
