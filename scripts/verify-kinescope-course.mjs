@@ -46,10 +46,15 @@ for (const [lessonSlug, videoId] of expectedKinescopeLessons) {
   assert.match(serverCourseContent, new RegExp(videoId), `Server Kinescope whitelist must include Kinescope video ${videoId}`);
 }
 assert.match(content, /chatgpt\.com\/g\/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator/, "Lesson materials must link the ChatGPT prompt generator");
+assert.match(content, /title:\s*"Генератор промптов в ChatGPT"[\s\S]*?actionLabel:\s*"Перейти"/, "ChatGPT prompt generator material button must say Перейти in RU");
 assert.match(content, /\/dashboard\/download-skill/, "Lesson materials must link the Pro skill download route");
 assert.match(content, /https:\/\/syntx\.ai\/welcome\/GlUETIt6/, "Lesson materials must link Syntx");
 assert.match(content, /https:\/\/higgsfield\.ai\//, "Lesson materials must link Higgsfield");
 assert.match(content, /https:\/\/disk\.yandex\.ru\/d\/HaU7LdU850QLVw/, "Every private course lesson must expose the current AI tools 2026 material");
+assert.match(content, /const courseMaterials:/, "Private course must define one shared material set");
+assert.match(content, /materials:\s*courseMaterials/, "Every private course lesson must use the same shared material set");
+assert.doesNotMatch(content, /materials\?:/, "Private course lesson config must not allow per-lesson material overrides");
+assert.doesNotMatch(content, /materials:\s*firstLessonSpecificMaterials/, "Private course lessons must not keep first-lesson-only material overrides");
 assert.match(content, /provider:\s*"kinescope"/, "Private lesson must use the Kinescope video provider");
 
 const learn = read("src/content/space/learn.ts");

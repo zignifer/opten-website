@@ -9,34 +9,13 @@ const privateCourseUpdatedAt = "2026-06-19";
 const privateCourseTotalLessons = 15;
 const currentAiTools2026Url = "https://disk.yandex.ru/d/HaU7LdU850QLVw";
 
-const sharedCourseMaterials: Record<LearnLang, LearnMaterial[]> = {
-  ru: [
-    {
-      title: "Актуальные нейросети 2026",
-      meta: "Подборка актуальных AI-сервисов и инструментов для курса",
-      kind: "link",
-      actionLabel: "Скачать",
-      href: currentAiTools2026Url,
-    },
-  ],
-  en: [
-    {
-      title: "Current AI tools 2026",
-      meta: "A course pack with current AI services and tools",
-      kind: "link",
-      actionLabel: "Download",
-      href: currentAiTools2026Url,
-    },
-  ],
-};
-
-const firstLessonSpecificMaterials: Record<LearnLang, LearnMaterial[]> = {
+const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
   ru: [
     {
       title: "Генератор промптов в ChatGPT",
       meta: "Opten Prompt Improver для генерации промптов под изображения",
       kind: "link",
-      actionLabel: "Открыть",
+      actionLabel: "Перейти",
       href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
     },
     {
@@ -59,6 +38,13 @@ const firstLessonSpecificMaterials: Record<LearnLang, LearnMaterial[]> = {
       kind: "link",
       actionLabel: "Перейти",
       href: "https://higgsfield.ai/",
+    },
+    {
+      title: "Актуальные нейросети 2026",
+      meta: "Подборка актуальных AI-сервисов и инструментов для курса",
+      kind: "link",
+      actionLabel: "Скачать",
+      href: currentAiTools2026Url,
     },
   ],
   en: [
@@ -90,6 +76,13 @@ const firstLessonSpecificMaterials: Record<LearnLang, LearnMaterial[]> = {
       actionLabel: "Open",
       href: "https://higgsfield.ai/",
     },
+    {
+      title: "Current AI tools 2026",
+      meta: "A course pack with current AI services and tools",
+      kind: "link",
+      actionLabel: "Download",
+      href: currentAiTools2026Url,
+    },
   ],
 };
 
@@ -103,18 +96,10 @@ type PrivateCourseLessonConfig = {
   durationIso: string;
   topics: Record<LearnLang, string[]>;
   whatYouWillLearn: Record<LearnLang, string[]>;
-  materials?: Record<LearnLang, LearnMaterial[]>;
 };
 
 function poster(videoId: string) {
   return `https://kinescope.io/${videoId}/poster/lg.webp`;
-}
-
-function materialsWithShared(materials?: Record<LearnLang, LearnMaterial[]>): Record<LearnLang, LearnMaterial[]> {
-  return {
-    ru: [...(materials?.ru ?? []), ...sharedCourseMaterials.ru],
-    en: [...(materials?.en ?? []), ...sharedCourseMaterials.en],
-  };
 }
 
 function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
@@ -149,7 +134,7 @@ function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
       ru: [],
       en: [],
     },
-    materials: materialsWithShared(config.materials),
+    materials: courseMaterials,
     videoProvider: {
       provider: "kinescope",
       providerAssetId: config.videoId,
@@ -176,7 +161,6 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
     category: "ai-video",
     duration: "07:39",
     durationIso: "PT7M39S",
-    materials: firstLessonSpecificMaterials,
     topics: {
       ru: ["Промптинг", "AI-визуал", "ChatGPT", "Claude", "Syntx", "Higgsfield"],
       en: ["Prompting", "AI visuals", "ChatGPT", "Claude", "Syntx", "Higgsfield"],
