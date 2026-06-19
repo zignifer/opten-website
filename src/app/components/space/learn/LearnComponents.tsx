@@ -407,11 +407,24 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
     >
       <div className="relative aspect-video overflow-hidden bg-[#06191c]">
         {locked && purchase ? (
-          <div className="absolute inset-0 grid place-items-center bg-[#06191c]">
-            <span className="grid size-[52px] place-items-center rounded-full bg-white/10 text-white/72">
-              <Lock size={21} />
-            </span>
-          </div>
+          <>
+            <ResponsiveImage
+              src={provider.posterPath}
+              alt=""
+              width="1200"
+              height="676"
+              loading="eager"
+              widths={[480, 800, 1200]}
+              sizes="(max-width: 1023px) calc(100vw - 32px), 816px"
+              className="h-full w-full object-cover opacity-62"
+            />
+            <div className="absolute inset-0 bg-[#011417]/58 backdrop-blur-[1px]" />
+            <div className="absolute inset-0 grid place-items-center">
+              <span className="grid size-[52px] place-items-center rounded-full bg-white/10 text-white/72">
+                <Lock size={21} />
+              </span>
+            </div>
+          </>
         ) : locked || !activated ? (
           <>
             <ResponsiveImage
@@ -1290,19 +1303,23 @@ function RelatedLessons({ collection, currentSlug, hasAccess, purchase }: Relate
               className="group overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023] text-white no-underline transition hover:border-[#9cfb51]/45 hover:bg-[#10282c]"
             >
               <div className="relative aspect-video overflow-hidden bg-[#06191c]">
-                {!showCourseLockVisual && (
-                  <ResponsiveImage
-                    src={item.thumbnailPath}
-                    alt=""
-                    width="1200"
-                    height="676"
-                    loading="lazy"
-                    widths={[360, 480, 720]}
-                    sizes="(max-width: 639px) calc(100vw - 32px), 400px"
-                    className="h-full w-full object-cover opacity-82 transition duration-500 group-hover:scale-[1.035]"
-                  />
-                )}
-                <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.04),rgba(1,16,18,0.36))]" />
+                <ResponsiveImage
+                  src={item.thumbnailPath}
+                  alt=""
+                  width="1200"
+                  height="676"
+                  loading="lazy"
+                  widths={[360, 480, 720]}
+                  sizes="(max-width: 639px) calc(100vw - 32px), 400px"
+                  className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.035] ${
+                    locked || showCourseLockVisual ? "opacity-60" : "opacity-82"
+                  }`}
+                />
+                <span
+                  className={`absolute inset-0 ${
+                    locked || showCourseLockVisual ? "bg-[#011417]/52" : "bg-[linear-gradient(180deg,rgba(1,16,18,0.04),rgba(1,16,18,0.36))]"
+                  }`}
+                />
                 <span
                   className={`absolute left-1/2 top-1/2 grid size-[52px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full ${
                     locked || showCourseLockVisual ? "bg-white/10 text-white/72" : "bg-[#9cfb51] text-[#011417] shadow-[0_14px_38px_rgba(156,251,81,0.22)]"
