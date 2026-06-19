@@ -6,9 +6,9 @@ import {
   FileText,
   Link as LinkIcon,
   Lock,
+  LockOpen,
   Mail,
   Play,
-  ShieldCheck,
   Video,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
@@ -253,26 +253,54 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
         </div>
 
         <aside className="flex min-w-0 flex-col gap-[16px] lg:sticky lg:top-[88px]">
-          <CollectionSummaryCard lesson={displayedLesson} collection={displayedCollection} />
-          <LessonSidebar
-            lesson={displayedLesson}
-            collection={displayedCollection}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            onTimestampSelect={handleTimestampSelect}
-            hasAccess={lessonAccessGranted}
-            purchase={purchase}
-          />
           {purchase ? (
-            <CoursePurchaseCard
-              collection={displayedCollection}
-              purchase={purchase}
-              hasAccess={courseAccess.hasAccess}
-              loadingAccess={courseAccess.loading || authStatus === "loading"}
-              initialEmail={session?.user.email ?? account?.email ?? ""}
-            />
+            courseAccess.hasAccess ? (
+              <>
+                <CollectionSummaryCard lesson={displayedLesson} collection={displayedCollection} />
+                <LessonSidebar
+                  lesson={displayedLesson}
+                  collection={displayedCollection}
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                  onTimestampSelect={handleTimestampSelect}
+                  hasAccess={lessonAccessGranted}
+                  purchase={purchase}
+                />
+              </>
+            ) : (
+              <>
+                <CoursePurchaseCard
+                  collection={displayedCollection}
+                  purchase={purchase}
+                  hasAccess={courseAccess.hasAccess}
+                  loadingAccess={courseAccess.loading || authStatus === "loading"}
+                  initialEmail={session?.user.email ?? account?.email ?? ""}
+                />
+                <LessonSidebar
+                  lesson={displayedLesson}
+                  collection={displayedCollection}
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                  onTimestampSelect={handleTimestampSelect}
+                  hasAccess={lessonAccessGranted}
+                  purchase={purchase}
+                />
+              </>
+            )
           ) : (
-            <UnlockProCard hasPro={hasPro} />
+            <>
+              <CollectionSummaryCard lesson={displayedLesson} collection={displayedCollection} />
+              <LessonSidebar
+                lesson={displayedLesson}
+                collection={displayedCollection}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                onTimestampSelect={handleTimestampSelect}
+                hasAccess={lessonAccessGranted}
+                purchase={purchase}
+              />
+              <UnlockProCard hasPro={hasPro} />
+            </>
           )}
         </aside>
       </section>
@@ -378,7 +406,13 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
       data-playback-policy={provider.playbackPolicy}
     >
       <div className="relative aspect-video overflow-hidden bg-[#06191c]">
-        {locked || !activated ? (
+        {locked && purchase ? (
+          <div className="absolute inset-0 grid place-items-center bg-[#06191c]">
+            <span className="grid size-[52px] place-items-center rounded-full bg-white/10 text-white/72">
+              <Lock size={21} />
+            </span>
+          </div>
+        ) : locked || !activated ? (
           <>
             <ResponsiveImage
               src={provider.posterPath}
@@ -541,17 +575,24 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
               {position}
             </span>
           )}
-          <span className="rounded-[6px] bg-white/[0.05] px-[9px] py-[5px] text-[12px] font-medium leading-none text-white/56">
-            {getLearnCollectionCategoryLabel(collection, lang)}
-          </span>
-          {locked && (
-            <span className="inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
-              <Lock size={13} />
-              {collection.purchase ? copy.paidCourseBadge : "Pro"}
+          {!collection.purchase && (
+            <span className="rounded-[6px] bg-white/[0.05] px-[9px] py-[5px] text-[12px] font-medium leading-none text-white/56">
+              {getLearnCollectionCategoryLabel(collection, lang)}
             </span>
           )}
+          {collection.purchase ? (
+            <span className="inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
+              {locked ? <Lock size={13} /> : <LockOpen size={13} />}
+              {locked ? copy.unlocksAfterPurchase : copy.courseOpenBadge}
+            </span>
+          ) : locked ? (
+            <span className="inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
+              <Lock size={13} />
+              Pro
+            </span>
+          ) : null}
         </div>
-        {!locked && (
+        {!locked && !collection.purchase && (
           <LessonCompletionAction
             completed={completed}
             copy={copy}
@@ -616,8 +657,9 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
           const Icon = materialIcon(material.kind);
           const external = material.href.startsWith("http");
           const disabled = locked;
+          const actionLabel = purchase ? copy.paidCourseBadge : material.actionLabel;
           const rowClass =
-            "grid grid-cols-[34px_minmax(0,1fr)_104px] items-center gap-[12px] border-b border-white/8 px-[16px] py-[10px] last:border-b-0 max-sm:grid-cols-[32px_minmax(0,1fr)]";
+            "grid grid-cols-[34px_minmax(0,1fr)_154px] items-center gap-[12px] border-b border-white/8 px-[16px] py-[10px] last:border-b-0 max-sm:grid-cols-[32px_minmax(0,1fr)]";
 
           return (
             <div key={material.title} className={rowClass}>
@@ -630,7 +672,7 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
               </span>
               {disabled ? (
                 <span className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.04] text-[13px] font-medium text-white/32 max-sm:col-span-2">
-                  {purchase ? copy.paidCourseBadge : "Pro"}
+                  {purchase ? copy.unlocksAfterPurchase : "Pro"}
                 </span>
               ) : external ? (
                 <a
@@ -639,14 +681,14 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
                   rel="noopener noreferrer"
                   className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-sm:col-span-2"
                 >
-                  {material.actionLabel}
+                  {actionLabel}
                 </a>
               ) : (
                 <LocalizedLink
                   to={material.href}
                   className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-sm:col-span-2"
                 >
-                  {material.actionLabel}
+                  {actionLabel}
                 </LocalizedLink>
               )}
             </div>
@@ -676,10 +718,15 @@ function CollectionSummaryCard({ lesson, collection }: CollectionSummaryCardProp
   const progress = collection.progress;
   const percent = progress ? Math.round((progress.completed / progress.total) * 100) : 0;
   const isStandalone = collection.kind === "standalone";
+  const eyebrow = collection.purchase
+    ? copy.courseAccessOpen
+    : isStandalone
+      ? copy.singleLesson
+      : getLearnCollectionCategoryLabel(collection, lang);
 
   return (
     <section className="rounded-[8px] border border-white/10 bg-[#0e2023]/92 px-[20px] py-[20px] shadow-[0_16px_50px_rgba(0,0,0,0.18)]">
-      <p className="text-[13px] font-medium leading-tight text-white/42">{isStandalone ? copy.singleLesson : getLearnCollectionCategoryLabel(collection, lang)}</p>
+      <p className="text-[13px] font-medium leading-tight text-white/42">{eyebrow}</p>
       <h2 className="mt-[14px] text-[20px] font-bold leading-[1.2] text-white">{isStandalone ? copy.lessonAuthor : getLearnCollectionTitle(collection, lang)}</h2>
       {isStandalone && <p className="mt-[10px] text-[13px] leading-[1.45] text-white/58">{getLearnLessonAuthorIntro(lesson, lang)}</p>}
       <div className="mt-[20px] flex items-center gap-[11px]">
@@ -819,6 +866,11 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
       {collection.lessons.map((outlineLesson, index) => {
         const current = outlineLesson.slug === currentSlug;
         const locked = isLessonLocked(outlineLesson, hasAccess);
+        const metaLabel = purchase
+          ? copy.unlocksAfterPurchase
+          : locked
+            ? copy.unlocksOnPro
+            : outlineLesson.duration;
         return (
           <LocalizedLink
             key={outlineLesson.slug}
@@ -840,7 +892,7 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
                 {getLearnLessonTitle(outlineLesson, lang)}
               </span>
               <span className="mt-[4px] block text-[12px] leading-tight text-white/44">
-                {locked ? <span className="text-[#9cfb51]">{purchase ? copy.unlocksAfterPurchase : copy.unlocksOnPro}</span> : outlineLesson.duration}
+                {purchase || locked ? <span className="text-[#9cfb51]">{metaLabel}</span> : metaLabel}
               </span>
             </span>
             <LessonStatusDot lesson={outlineLesson} current={current} />
@@ -1008,7 +1060,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   return (
     <section
       id="course-purchase"
-      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/55 bg-[linear-gradient(135deg,rgba(13,46,34,0.96),rgba(14,32,35,0.98))] p-[18px] shadow-[0_18px_60px_rgba(54,134,28,0.16)]"
+      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] p-[18px] shadow-[0_18px_60px_rgba(54,134,28,0.16)]"
     >
       <div className="relative">
         <div className="flex items-start justify-between gap-[12px]">
@@ -1022,8 +1074,8 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
         </div>
 
         <div className="mt-[16px] flex items-end gap-[10px]">
-          <span className="font-['Unbounded',sans-serif] text-[31px] font-bold leading-none text-white">{salePrice} ₽</span>
-          <span className="pb-[3px] text-[14px] font-bold leading-none text-white/36 line-through">{listPrice} ₽</span>
+          <span className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-none text-white">{salePrice} ₽</span>
+          <span className="pb-[4px] text-[18px] font-bold leading-none text-white/36 line-through">{listPrice} ₽</span>
         </div>
 
         <div className="mt-[16px] rounded-[8px] border border-white/10 bg-black/16 p-[12px]">
@@ -1073,11 +1125,6 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
             {submitting ? copy.coursePaymentOpening : copy.courseBuyButton(salePrice)}
           </button>
         </form>
-
-        <div className="mt-[13px] flex items-start gap-[8px] text-[11px] leading-[1.45] text-white/42">
-          <ShieldCheck size={14} className="mt-[1px] shrink-0 text-[#9cfb51]/80" />
-          <p>{copy.courseCheckoutNote}</p>
-        </div>
       </div>
     </section>
   );
@@ -1235,6 +1282,7 @@ function RelatedLessons({ collection, currentSlug, hasAccess, purchase }: Relate
       <div className="mt-[16px] grid grid-cols-2 gap-[16px] max-sm:grid-cols-1">
         {lessons.map((item) => {
           const locked = isLessonLocked(item, hasAccess);
+          const showCourseLockVisual = Boolean(purchase);
           return (
             <LocalizedLink
               key={item.slug}
@@ -1242,23 +1290,25 @@ function RelatedLessons({ collection, currentSlug, hasAccess, purchase }: Relate
               className="group overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023] text-white no-underline transition hover:border-[#9cfb51]/45 hover:bg-[#10282c]"
             >
               <div className="relative aspect-video overflow-hidden bg-[#06191c]">
-                <ResponsiveImage
-                  src={item.thumbnailPath}
-                  alt=""
-                  width="1200"
-                  height="676"
-                  loading="lazy"
-                  widths={[360, 480, 720]}
-                  sizes="(max-width: 639px) calc(100vw - 32px), 400px"
-                  className="h-full w-full object-cover opacity-82 transition duration-500 group-hover:scale-[1.035]"
-                />
+                {!showCourseLockVisual && (
+                  <ResponsiveImage
+                    src={item.thumbnailPath}
+                    alt=""
+                    width="1200"
+                    height="676"
+                    loading="lazy"
+                    widths={[360, 480, 720]}
+                    sizes="(max-width: 639px) calc(100vw - 32px), 400px"
+                    className="h-full w-full object-cover opacity-82 transition duration-500 group-hover:scale-[1.035]"
+                  />
+                )}
                 <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.04),rgba(1,16,18,0.36))]" />
                 <span
                   className={`absolute left-1/2 top-1/2 grid size-[52px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full ${
-                    locked ? "bg-white/10 text-white/72" : "bg-[#9cfb51] text-[#011417] shadow-[0_14px_38px_rgba(156,251,81,0.22)]"
+                    locked || showCourseLockVisual ? "bg-white/10 text-white/72" : "bg-[#9cfb51] text-[#011417] shadow-[0_14px_38px_rgba(156,251,81,0.22)]"
                   }`}
                 >
-                  {locked ? <Lock size={21} /> : <Play size={22} fill="currentColor" className="ml-[2px]" />}
+                  {locked || showCourseLockVisual ? <Lock size={21} /> : <Play size={22} fill="currentColor" className="ml-[2px]" />}
                 </span>
                 <span className="absolute bottom-[8px] right-[8px] rounded-[4px] bg-black/72 px-[6px] py-[4px] text-[13px] font-medium leading-none text-white">
                   {item.duration}
@@ -1270,7 +1320,7 @@ function RelatedLessons({ collection, currentSlug, hasAccess, purchase }: Relate
                   {getLearnLessonTitle(item, lang)}
                 </h3>
                 <p className="mt-[14px] text-[13px] font-medium text-[#9cfb51]">
-                  {locked ? (purchase ? copy.unlocksAfterPurchase : copy.unlocksOnPro) : copy.watchLesson}
+                  {purchase ? copy.unlocksAfterPurchase : locked ? copy.unlocksOnPro : copy.watchLesson}
                 </p>
               </div>
             </LocalizedLink>
@@ -1425,12 +1475,14 @@ const detailCopy = {
     unlocksOnPro: "Разблокируется на Pro",
     unlocksAfterPurchase: "Доступ после покупки",
     paidCourseBadge: "Курс",
+    courseOpenBadge: "Курс открыт",
+    courseAccessOpen: "Доступ открыт",
     proActive: "Pro активен",
     proActiveDescription: "Все Pro-уроки и материалы доступны без дополнительных оплат.",
     unlockAllLessons: "Разблокируйте все уроки",
     unlockAllDescription: "Получите доступ ко всем материалам курса и Pro-урокам без ограничений.",
     unlockOnPro: "Разблокировать на Pro",
-    courseOfferLabel: "Разовый доступ",
+    courseOfferLabel: "Купить курс",
     courseSaleEnds: "Скидка закончится через",
     courseEmailLabel: "Email для доступа",
     courseEmailPlaceholder: "you@example.com",
@@ -1473,12 +1525,14 @@ const detailCopy = {
     unlocksOnPro: "Unlocks on Pro",
     unlocksAfterPurchase: "Access after purchase",
     paidCourseBadge: "Course",
+    courseOpenBadge: "Course open",
+    courseAccessOpen: "Access open",
     proActive: "Pro active",
     proActiveDescription: "All Pro lessons and materials are available without extra payments.",
     unlockAllLessons: "Unlock all lessons",
     unlockAllDescription: "Get access to every course material and Pro lesson without limits.",
     unlockOnPro: "Unlock on Pro",
-    courseOfferLabel: "One-time access",
+    courseOfferLabel: "Buy course",
     courseSaleEnds: "Discount ends in",
     courseEmailLabel: "Access email",
     courseEmailPlaceholder: "you@example.com",
