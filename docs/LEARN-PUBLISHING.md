@@ -122,13 +122,29 @@ The direct-link course MVP lives outside the public SEO Learn catalog:
 - Client page: `src/app/pages/space/PrivateCoursePage.tsx`
 - Playback token endpoint: `POST /api/kinescope-course-token`
 - Kinescope auth callback: `POST /api/kinescope-course-auth`
+- Course checkout Edge Function: `POST /functions/v1/create-course-payment`
+- Course access Edge Function: `POST /functions/v1/course-access-summary`
 
 Keep `/learn/courses/*` noindex and out of sitemap, llms.txt, header nav, and
 `EN_SIBLINGS` until launch. Do not store Kinescope API keys or playback secrets
 in browser code. The client requests a short-lived Kinescope embed URL with the
-website Supabase JWT; the server verifies Pro access before signing
-`drmauthtoken`. Kinescope then calls the auth callback during playback and gets
-200 or 403.
+website Supabase JWT; the server verifies the standalone course entitlement
+before signing `drmauthtoken`. Kinescope then calls the auth callback during
+playback and gets 200 or 403.
+
+The hidden course `ai-content-marketing-2026` is not unlocked by Pro. It uses a
+separate one-time YooKassa purchase:
+
+- list price `4 990 ₽`
+- sale price `2 990 ₽`
+- discount label `40%`
+- sale countdown deadline from `src/content/space/privateCourse.ts`
+
+The buyer can pay before registration by entering an email on the lesson page.
+After YooKassa confirms the payment, the backend grants a course entitlement to
+that email and sends a direct website auth link. If the link expires, the buyer
+can use the normal `/login` Email OTP flow with the same email; the access
+function binds the entitlement to `auth.users.id` on first authenticated check.
 
 Before enabling Kinescope project auth backend in production, set
 `KINESCOPE_AUTH_JWT_SECRET` in Vercel and verify that the deployed callback is

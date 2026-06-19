@@ -8,6 +8,15 @@ export type LearnLessonStatus = "Available" | "In progress" | "Completed";
 
 export type LearnAccess = "free" | "full-platform";
 
+export type LearnCoursePurchase = {
+  provider: "yookassa";
+  courseSlug: string;
+  priceRub: number;
+  listPriceRub: number;
+  discountPercent: number;
+  saleEndsAt: string;
+};
+
 export type LearnCollectionKind = "course" | "standalone";
 
 export type LearnFilter = "All" | "Standalone" | "Prompt packs" | "Builder" | "Brand" | "Models";
@@ -54,7 +63,7 @@ export type LearnVideoProviderMetadata = {
   provider: "youtube" | "local" | "kinescope";
   providerAssetId: string;
   posterPath: string;
-  playbackPolicy: "public-embed" | "subscription-gated-public-preview";
+  playbackPolicy: "public-embed" | "subscription-gated-public-preview" | "course-entitlement-gated-preview";
   signedPlaybackUrl: null;
   contentUrl?: string;
   notes: string;
@@ -137,6 +146,7 @@ export type LearnCollection = {
   kind: LearnCollectionKind;
   categoryLabel: LocalizedText;
   routeBasePath?: LocalizedText;
+  purchase?: LearnCoursePurchase;
   progress?: LearnCourseProgress;
   lessons: LearnLesson[];
 };
@@ -233,7 +243,7 @@ export const learnHubFaq: Record<LearnLang, LearnFaqItem[]> = {
 };
 
 export const futureProtectedVideoDeliveryNote =
-  "Current Learn launch embeds public YouTube lessons and one optimized local public video. Future protected video delivery should use backend-issued signed short-lived playback URLs and a proper streaming/video provider if private Pro-only video files become required.";
+  "Current Learn launch embeds public YouTube lessons and one optimized local public video. Protected video delivery uses backend-issued signed short-lived playback URLs and a proper streaming/video provider when private course or Pro video files are required.";
 
 const legacyLearnAssetBase = "/assets/space/learn-v2";
 const learnAssetBase = "/assets/learn";

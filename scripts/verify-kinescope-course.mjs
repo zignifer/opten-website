@@ -14,6 +14,7 @@ function escapeRegExp(value) {
 
 const requiredFiles = [
   "src/content/space/privateCourse.ts",
+  "src/lib/courseAccess.ts",
   "src/app/pages/space/PrivateCoursePage.tsx",
   "api/kinescope-course-token.ts",
   "api/kinescope-course-auth.ts",
@@ -56,6 +57,11 @@ const expectedPrivateCourseRuTitles = [
 assert.match(content, /e941e14d-c5bf-40fc-abe5-a41e247777cf/, "Private course must use the uploaded Kinescope video id");
 assert.match(content, /ai-content-marketing-2026/, "Private course must expose a stable hidden course slug");
 assert.match(content, /lesson-1-prompting/, "Private course must expose the first lesson slug");
+assert.match(content, /PRIVATE_COURSE_PRICE_RUB\s*=\s*2990/, "Private course sale price must be 2 990 RUB");
+assert.match(content, /PRIVATE_COURSE_LIST_PRICE_RUB\s*=\s*4990/, "Private course list price must be 4 990 RUB");
+assert.match(content, /PRIVATE_COURSE_DISCOUNT_PERCENT\s*=\s*40/, "Private course discount must be 40%");
+assert.match(content, /PRIVATE_COURSE_SALE_ENDS_AT/, "Private course must define a sale countdown deadline");
+assert.match(content, /purchase:\s*{[\s\S]*provider:\s*"yookassa"[\s\S]*priceRub:\s*PRIVATE_COURSE_PRICE_RUB[\s\S]*discountPercent:\s*PRIVATE_COURSE_DISCOUNT_PERCENT/, "Private course collection must expose YooKassa purchase metadata");
 for (const [lessonSlug, videoId] of expectedKinescopeLessons) {
   assert.match(content, new RegExp(lessonSlug), `Private course content must include ${lessonSlug}`);
   assert.match(content, new RegExp(videoId), `Private course content must include Kinescope video ${videoId}`);
@@ -68,7 +74,7 @@ for (const title of expectedPrivateCourseRuTitles) {
 assert.doesNotMatch(content, /ru:\s*"Урок \d+:/, "Private course RU lesson titles must not include numeric lesson prefixes");
 assert.match(content, /chatgpt\.com\/g\/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator/, "Lesson materials must link the ChatGPT prompt generator");
 assert.match(content, /title:\s*"Генератор промптов в ChatGPT"[\s\S]*?actionLabel:\s*"Перейти"/, "ChatGPT prompt generator material button must say Перейти in RU");
-assert.match(content, /\/dashboard\/download-skill/, "Lesson materials must link the Pro skill download route");
+assert.doesNotMatch(content, /\/dashboard\/download-skill/, "Standalone course materials must not link the Pro-only skill download route");
 assert.match(content, /https:\/\/syntx\.ai\/welcome\/GlUETIt6/, "Lesson materials must link Syntx");
 assert.match(content, /https:\/\/higgsfield\.ai\//, "Lesson materials must link Higgsfield");
 assert.match(content, /https:\/\/disk\.yandex\.ru\/d\/HaU7LdU850QLVw/, "Every private course lesson must expose the current AI tools 2026 material");
@@ -77,13 +83,20 @@ assert.match(content, /materials:\s*courseMaterials/, "Every private course less
 assert.doesNotMatch(content, /materials\?:/, "Private course lesson config must not allow per-lesson material overrides");
 assert.doesNotMatch(content, /materials:\s*firstLessonSpecificMaterials/, "Private course lessons must not keep first-lesson-only material overrides");
 assert.match(content, /provider:\s*"kinescope"/, "Private lesson must use the Kinescope video provider");
+assert.match(content, /playbackPolicy:\s*"course-entitlement-gated-preview"/, "Private Kinescope lessons must use course entitlement playback policy");
+assert.doesNotMatch(content, /Pro-gate|Pro gate/, "Private course content must not describe Kinescope access as Pro-gated");
 
 const learn = read("src/content/space/learn.ts");
 assert.match(learn, /provider:\s*"youtube"\s*\|\s*"local"\s*\|\s*"kinescope"/, "Learn provider type must include Kinescope");
+assert.match(learn, /course-entitlement-gated-preview/, "Learn playback policy type must include course entitlement gating");
 
 const components = read("src/app/components/space/learn/LearnComponents.tsx");
 assert.match(components, /provider\.provider === "kinescope"/, "Learn player must branch for Kinescope videos");
 assert.match(components, /\/api\/kinescope-course-token/, "Learn player must request Kinescope embed URLs through the server");
+assert.match(components, /createCoursePayment/, "Private course UI must create a standalone course payment");
+assert.match(components, /fetchCourseAccessSummary/, "Private course UI must check standalone course access");
+assert.match(components, /courseLockedDescription/, "Private course locked overlay must use course purchase copy");
+assert.match(components, /unlocksAfterPurchase/, "Private course outline must label locked lessons as purchase-gated");
 assert.doesNotMatch(components, /kine\.txt|KINESCOPE_API|Bearer\s+[0-9a-f-]{36}/i, "Client code must not expose Kinescope API keys");
 const kinescopeFetchIndex = components.indexOf('fetch("/api/kinescope-course-token"');
 assert.notEqual(kinescopeFetchIndex, -1, "Learn player must keep Kinescope token fetch in source");
@@ -100,8 +113,9 @@ const tokenApi = read("api/kinescope-course-token.ts");
 const serverAuth = read("api/_shared/optenServerAuth.ts");
 const serverCourse = serverCourseContent;
 assert.match(tokenApi, /KINESCOPE_AUTH_JWT_SECRET/, "Token API must sign playback tokens with a server env secret");
-assert.match(tokenApi, /hasLiveProSubscription/, "Token API must enforce Pro access server-side");
-assert.match(serverAuth, /subscriptions/, "Server auth helper must query subscriptions for Pro access");
+assert.match(tokenApi, /hasCourseAccess/, "Token API must enforce standalone course access server-side");
+assert.doesNotMatch(tokenApi, /hasLiveProSubscription|not_pro/, "Kinescope token API must not unlock the private course through Pro");
+assert.match(serverAuth, /course-access-summary/, "Server auth helper must call course-access-summary for course entitlements");
 assert.match(tokenApi, /buildKinescopeEmbedUrl/, "Token API must return Kinescope embed URLs through the shared builder");
 assert.match(serverCourse, /drmauthtoken/, "Kinescope embed URL builder must attach the DRM auth token");
 
@@ -122,5 +136,7 @@ assert.match(vercel, /"source": "\/learn\/courses\/:path\*"[\s\S]*"X-Robots-Tag"
 const agents = read("AGENTS.md");
 assert.match(agents, /Kinescope/i, "AGENTS.md must document the Kinescope course integration");
 assert.match(agents, /KINESCOPE_AUTH_JWT_SECRET/, "AGENTS.md must document the Kinescope playback env secret");
+assert.match(agents, /create-course-payment/, "AGENTS.md must document standalone course checkout");
+assert.match(agents, /course-access-summary/, "AGENTS.md must document standalone course entitlement checks");
 
 console.log("Kinescope private course integration artifacts are present.");

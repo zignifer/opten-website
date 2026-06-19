@@ -9,7 +9,7 @@ import {
 } from "./_shared/kinescopeCourse.js";
 import {
   bearerTokenFromHeader,
-  hasLiveProSubscription,
+  hasCourseAccess,
   jsonResponse,
   setJsonCors,
   verifySupabaseJwt,
@@ -59,12 +59,15 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   }
 
   try {
-    const isPro = await hasLiveProSubscription(authToken, userId);
-    if (!isPro) {
-      return jsonResponse(res, 403, { error: "not_pro", upgrade_url: "/pay" });
+    const allowed = await hasCourseAccess(authToken, lesson.courseSlug);
+    if (!allowed) {
+      return jsonResponse(res, 403, {
+        error: "course_access_required",
+        purchase_url: `/learn/courses/${lesson.courseSlug}/${lesson.lessonSlug}`,
+      });
     }
   } catch {
-    return jsonResponse(res, 502, { error: "sub_query_failed" });
+    return jsonResponse(res, 502, { error: "course_access_query_failed" });
   }
 
   const playbackSecret = process.env.KINESCOPE_AUTH_JWT_SECRET;

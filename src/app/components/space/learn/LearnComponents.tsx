@@ -1,22 +1,33 @@
 import {
   Check,
+  Clock,
+  CreditCard,
   Crown,
   FileText,
   Link as LinkIcon,
   Lock,
+  Mail,
   Play,
+  ShieldCheck,
   Video,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useLocation } from "react-router";
 import { useLang } from "../../../../i18n/LangContext";
 import type { AccountSummary } from "../../../../lib/optenAuth";
+import {
+  createCoursePayment,
+  fetchCourseAccessSummary,
+  formatRubPrice,
+  isValidCourseEmail,
+  normalizeCourseEmail,
+} from "../../../../lib/courseAccess";
 import LocalizedLink from "../../LocalizedLink";
 import ResponsiveImage from "../../ResponsiveImage";
 import SiteFooter from "../../SiteFooter";
 import SpaceHeader from "../SpaceHeader";
 import { useSpaceAuth } from "../SpaceAuthProvider";
-import type { LearnCollection, LearnLesson, LearnMaterial, LearnOverviewSection, LearnTimestamp } from "../../../../content/space/learn";
+import type { LearnCollection, LearnCoursePurchase, LearnLesson, LearnMaterial, LearnOverviewSection, LearnTimestamp } from "../../../../content/space/learn";
 import {
   getLearnCollectionCategoryLabel,
   getLearnCollectionTitle,
@@ -166,9 +177,12 @@ type SidebarTab = "lessons" | "timestamps";
 export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
-  const { account } = useSpaceAuth();
+  const { account, session, status: authStatus } = useSpaceAuth();
   const hasPro = hasProAccess(account);
-  const locked = isLessonLocked(lesson, hasPro);
+  const purchase = collection.purchase;
+  const courseAccess = useCourseAccess(purchase, session?.access_token ?? null);
+  const lessonAccessGranted = purchase ? courseAccess.hasAccess : hasPro;
+  const locked = isLessonLocked(lesson, lessonAccessGranted);
   const isCourse = collection.kind === "course";
   const [activeTab, setActiveTab] = useState<SidebarTab>(isCourse ? "lessons" : "timestamps");
   const [startSeconds, setStartSeconds] = useState(0);
@@ -223,6 +237,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
             lesson={displayedLesson}
             collectionId={collection.id}
             locked={locked}
+            purchase={purchase}
             startSeconds={startSeconds}
             playRequestId={playRequestId}
           />
@@ -233,8 +248,8 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
             completed={lessonCompleted}
             onCompletionChange={handleLessonCompletionChange}
           />
-          <LessonMaterials materials={getLearnLessonMaterials(displayedLesson, lang)} locked={locked} />
-          <RelatedLessons collection={displayedCollection} currentSlug={lesson.slug} hasPro={hasPro} />
+          <LessonMaterials materials={getLearnLessonMaterials(displayedLesson, lang)} locked={locked} purchase={purchase} />
+          <RelatedLessons collection={displayedCollection} currentSlug={lesson.slug} hasAccess={lessonAccessGranted} purchase={purchase} />
         </div>
 
         <aside className="flex min-w-0 flex-col gap-[16px] lg:sticky lg:top-[88px]">
@@ -245,9 +260,20 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
             activeTab={activeTab}
             onTabChange={setActiveTab}
             onTimestampSelect={handleTimestampSelect}
-            hasPro={hasPro}
+            hasAccess={lessonAccessGranted}
+            purchase={purchase}
           />
-          <UnlockProCard hasPro={hasPro} />
+          {purchase ? (
+            <CoursePurchaseCard
+              collection={displayedCollection}
+              purchase={purchase}
+              hasAccess={courseAccess.hasAccess}
+              loadingAccess={courseAccess.loading || authStatus === "loading"}
+              initialEmail={session?.user.email ?? account?.email ?? ""}
+            />
+          ) : (
+            <UnlockProCard hasPro={hasPro} />
+          )}
         </aside>
       </section>
     </LearnSectionWrapper>
@@ -258,6 +284,7 @@ type LessonPlayerProps = {
   lesson: LearnLesson;
   collectionId: string;
   locked: boolean;
+  purchase?: LearnCoursePurchase;
   startSeconds: number;
   playRequestId: number;
 };
@@ -267,7 +294,7 @@ type KinescopeTokenResponse = {
   error?: string;
 };
 
-function LessonPlayer({ lesson, collectionId, locked, startSeconds, playRequestId }: LessonPlayerProps) {
+function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, playRequestId }: LessonPlayerProps) {
   const { pathname } = useLocation();
   const { lang } = useLang();
   const { session } = useSpaceAuth();
@@ -372,20 +399,29 @@ function LessonPlayer({ lesson, collectionId, locked, startSeconds, playRequestI
                   </span>
                   <h2 className="mt-[16px] text-[18px] font-bold leading-tight text-white">{copy.lockedLesson}</h2>
                   <p className="mt-[8px] text-[13px] leading-[1.45] text-white/68">
-                    {copy.lockedDescription}
+                    {purchase ? copy.courseLockedDescription : copy.lockedDescription}
                   </p>
                   <div className="mt-[18px] flex gap-[8px] max-sm:flex-col">
-                    <LocalizedLink
-                      to="/pay"
-                      className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] bg-[#9cfb51] px-[14px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943]"
-                    >
-                      {copy.openPro}
-                    </LocalizedLink>
+                    {purchase ? (
+                      <a
+                        href="#course-purchase"
+                        className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] bg-[#9cfb51] px-[14px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943]"
+                      >
+                        {copy.buyCourseShort(formatRubPrice(purchase.priceRub))}
+                      </a>
+                    ) : (
+                      <LocalizedLink
+                        to="/pay"
+                        className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] bg-[#9cfb51] px-[14px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943]"
+                      >
+                        {copy.openPro}
+                      </LocalizedLink>
+                    )}
                     <LocalizedLink
                       to={`/login?next=${encodeURIComponent(pathname)}`}
                       className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] border border-[#9cfb51]/65 px-[14px] text-[14px] font-bold text-[#9cfb51] no-underline transition hover:bg-[#9cfb51]/10"
                     >
-                      {copy.signIn}
+                      {purchase ? copy.signInPurchased : copy.signIn}
                     </LocalizedLink>
                   </div>
                 </div>
@@ -511,7 +547,7 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
           {locked && (
             <span className="inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
               <Lock size={13} />
-              Pro
+              {collection.purchase ? copy.paidCourseBadge : "Pro"}
             </span>
           )}
         </div>
@@ -563,9 +599,10 @@ function LessonCompletionAction({ completed, copy, onToggle }: LessonCompletionA
 type LessonMaterialsProps = {
   materials: LearnMaterial[];
   locked: boolean;
+  purchase?: LearnCoursePurchase;
 };
 
-function LessonMaterials({ materials, locked }: LessonMaterialsProps) {
+function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
 
@@ -593,7 +630,7 @@ function LessonMaterials({ materials, locked }: LessonMaterialsProps) {
               </span>
               {disabled ? (
                 <span className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.04] text-[13px] font-medium text-white/32 max-sm:col-span-2">
-                  Pro
+                  {purchase ? copy.paidCourseBadge : "Pro"}
                 </span>
               ) : external ? (
                 <a
@@ -719,10 +756,11 @@ type LessonSidebarProps = {
   activeTab: SidebarTab;
   onTabChange: (tab: SidebarTab) => void;
   onTimestampSelect: (seconds: number) => void;
-  hasPro: boolean;
+  hasAccess: boolean;
+  purchase?: LearnCoursePurchase;
 };
 
-function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestampSelect, hasPro }: LessonSidebarProps) {
+function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestampSelect, hasAccess, purchase }: LessonSidebarProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const isCourse = collection.kind === "course";
@@ -756,7 +794,7 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
       </div>
 
       {activeTab === "lessons" && isCourse ? (
-        <CourseOutline collection={collection} currentSlug={lesson.slug} hasPro={hasPro} />
+        <CourseOutline collection={collection} currentSlug={lesson.slug} hasAccess={hasAccess} purchase={purchase} />
       ) : (
         <TimestampList timestamps={getLearnLessonTimestamps(lesson, lang)} onSelect={onTimestampSelect} />
       )}
@@ -767,11 +805,12 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
 type CourseOutlineProps = {
   collection: LearnCollection;
   currentSlug: string;
-  hasPro: boolean;
+  hasAccess: boolean;
+  purchase?: LearnCoursePurchase;
   className?: string;
 };
 
-export function CourseOutline({ collection, currentSlug, hasPro, className = "" }: CourseOutlineProps) {
+export function CourseOutline({ collection, currentSlug, hasAccess, purchase, className = "" }: CourseOutlineProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
 
@@ -779,7 +818,7 @@ export function CourseOutline({ collection, currentSlug, hasPro, className = "" 
     <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] ${className}`}>
       {collection.lessons.map((outlineLesson, index) => {
         const current = outlineLesson.slug === currentSlug;
-        const locked = isLessonLocked(outlineLesson, hasPro);
+        const locked = isLessonLocked(outlineLesson, hasAccess);
         return (
           <LocalizedLink
             key={outlineLesson.slug}
@@ -801,7 +840,7 @@ export function CourseOutline({ collection, currentSlug, hasPro, className = "" 
                 {getLearnLessonTitle(outlineLesson, lang)}
               </span>
               <span className="mt-[4px] block text-[12px] leading-tight text-white/44">
-                {locked ? <span className="text-[#9cfb51]">{copy.unlocksOnPro}</span> : outlineLesson.duration}
+                {locked ? <span className="text-[#9cfb51]">{purchase ? copy.unlocksAfterPurchase : copy.unlocksOnPro}</span> : outlineLesson.duration}
               </span>
             </span>
             <LessonStatusDot lesson={outlineLesson} current={current} />
@@ -838,6 +877,291 @@ function TimestampList({ timestamps, onSelect }: TimestampListProps) {
       ))}
     </div>
   );
+}
+
+type CourseAccessState = {
+  hasAccess: boolean;
+  loading: boolean;
+  error: string | null;
+};
+
+function useCourseAccess(purchase: LearnCoursePurchase | undefined, accessToken: string | null): CourseAccessState {
+  const [state, setState] = useState<CourseAccessState>({ hasAccess: false, loading: false, error: null });
+
+  useEffect(() => {
+    if (!purchase) {
+      setState({ hasAccess: false, loading: false, error: null });
+      return;
+    }
+
+    if (!accessToken) {
+      setState({ hasAccess: false, loading: false, error: null });
+      return;
+    }
+
+    let cancelled = false;
+    setState((current) => ({ ...current, loading: true, error: null }));
+
+    fetchCourseAccessSummary(accessToken, purchase.courseSlug)
+      .then((summary) => {
+        if (!cancelled) setState({ hasAccess: summary.has_access === true, loading: false, error: null });
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          setState({
+            hasAccess: false,
+            loading: false,
+            error: error instanceof Error ? error.message : "course_access_failed",
+          });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken, purchase?.courseSlug]);
+
+  return state;
+}
+
+type CoursePurchaseCardProps = {
+  collection: LearnCollection;
+  purchase: LearnCoursePurchase;
+  hasAccess: boolean;
+  loadingAccess: boolean;
+  initialEmail: string;
+};
+
+type PendingCoursePayment = {
+  courseSlug: string;
+  email: string;
+  orderId?: string;
+  at: number;
+};
+
+const COURSE_PAYMENT_PENDING_STORAGE_KEY = "opten_course_payment_pending_v1";
+
+function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, initialEmail }: CoursePurchaseCardProps) {
+  const { lang } = useLang();
+  const copy = detailCopy[lang];
+  const countdown = useSaleCountdown(purchase.saleEndsAt);
+  const [email, setEmail] = useState(initialEmail);
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pendingPayment, setPendingPayment] = useState<PendingCoursePayment | null>(() => readPendingCoursePayment(purchase.courseSlug));
+
+  useEffect(() => {
+    if (!emailTouched && initialEmail) setEmail(initialEmail);
+  }, [emailTouched, initialEmail]);
+
+  const normalizedEmail = normalizeCourseEmail(email);
+  const salePrice = formatRubPrice(purchase.priceRub);
+  const listPrice = formatRubPrice(purchase.listPriceRub);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+
+    if (!isValidCourseEmail(normalizedEmail)) {
+      setError(copy.courseInvalidEmail);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const returnUrl = typeof window !== "undefined" ? window.location.href.split("#")[0] : `/learn/courses/${purchase.courseSlug}`;
+      const result = await createCoursePayment(purchase.courseSlug, normalizedEmail, returnUrl);
+      if (!result.confirmation_url) throw new Error("no_confirmation_url");
+
+      const pending = {
+        courseSlug: purchase.courseSlug,
+        email: normalizedEmail,
+        orderId: result.order_id,
+        at: Date.now(),
+      };
+      writePendingCoursePayment(pending);
+      setPendingPayment(pending);
+      window.location.href = result.confirmation_url;
+    } catch (paymentError) {
+      setError(paymentError instanceof Error ? copy.coursePaymentError : copy.coursePaymentError);
+      setSubmitting(false);
+    }
+  };
+
+  if (hasAccess) {
+    return (
+      <section id="course-purchase" className="rounded-[8px] border border-[#9cfb51]/45 bg-[#10261b] p-[18px]">
+        <div className="flex items-start gap-[12px]">
+          <span className="grid size-[42px] shrink-0 place-items-center rounded-full bg-[#9cfb51]/12 text-[#9cfb51]">
+            <Check size={20} />
+          </span>
+          <div>
+            <h2 className="text-[16px] font-bold leading-tight text-white">{copy.courseAccessActive}</h2>
+            <p className="mt-[8px] text-[13px] leading-[1.45] text-white/62">{copy.courseAccessActiveDescription}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section
+      id="course-purchase"
+      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/55 bg-[linear-gradient(135deg,rgba(13,46,34,0.96),rgba(14,32,35,0.98))] p-[18px] shadow-[0_18px_60px_rgba(54,134,28,0.16)]"
+    >
+      <div className="relative">
+        <div className="flex items-start justify-between gap-[12px]">
+          <div className="min-w-0">
+            <p className="text-[11px] font-bold uppercase leading-none tracking-[0.08em] text-[#9cfb51]">{copy.courseOfferLabel}</p>
+            <h2 className="mt-[8px] text-[17px] font-bold leading-[1.25] text-white">{getLearnCollectionTitle(collection, lang)}</h2>
+          </div>
+          <span className="shrink-0 rounded-[6px] bg-[#9cfb51] px-[8px] py-[5px] text-[12px] font-black leading-none text-[#062013]">
+            -{purchase.discountPercent}%
+          </span>
+        </div>
+
+        <div className="mt-[16px] flex items-end gap-[10px]">
+          <span className="font-['Unbounded',sans-serif] text-[31px] font-bold leading-none text-white">{salePrice} ₽</span>
+          <span className="pb-[3px] text-[14px] font-bold leading-none text-white/36 line-through">{listPrice} ₽</span>
+        </div>
+
+        <div className="mt-[16px] rounded-[8px] border border-white/10 bg-black/16 p-[12px]">
+          <div className="mb-[10px] flex items-center gap-[7px] text-[12px] font-bold leading-none text-white/68">
+            <Clock size={14} className="text-[#9cfb51]" />
+            <span>{copy.courseSaleEnds}</span>
+          </div>
+          <CourseSaleCountdown countdown={countdown} lang={lang} />
+        </div>
+
+        <form className="mt-[16px]" onSubmit={handleSubmit}>
+          <label className="text-[12px] font-bold leading-none text-white/62" htmlFor="course-purchase-email">
+            {copy.courseEmailLabel}
+          </label>
+          <div className="mt-[8px] flex items-center gap-[8px] rounded-[8px] border border-white/12 bg-[#06191c] px-[12px] focus-within:border-[#9cfb51]/65">
+            <Mail size={16} className="shrink-0 text-white/38" />
+            <input
+              id="course-purchase-email"
+              type="email"
+              value={email}
+              onChange={(event) => {
+                setEmailTouched(true);
+                setEmail(event.target.value);
+              }}
+              placeholder={copy.courseEmailPlaceholder}
+              autoComplete="email"
+              className="h-[44px] min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium text-white outline-none placeholder:text-white/28"
+            />
+          </div>
+
+          {error && <p className="mt-[9px] text-[12px] font-medium leading-[1.35] text-[#ff8f8f]">{error}</p>}
+          {pendingPayment && !error && (
+            <p className="mt-[9px] text-[12px] font-medium leading-[1.4] text-white/54">
+              {copy.coursePaymentPending(pendingPayment.email)}
+            </p>
+          )}
+          {loadingAccess && (
+            <p className="mt-[9px] text-[12px] font-medium leading-[1.4] text-white/44">{copy.courseAccessLoading}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="mt-[14px] flex h-[44px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[16px] text-[14px] font-black text-[#062013] transition hover:bg-[#8ee943] disabled:cursor-wait disabled:opacity-70"
+          >
+            <CreditCard size={17} />
+            {submitting ? copy.coursePaymentOpening : copy.courseBuyButton(salePrice)}
+          </button>
+        </form>
+
+        <div className="mt-[13px] flex items-start gap-[8px] text-[11px] leading-[1.45] text-white/42">
+          <ShieldCheck size={14} className="mt-[1px] shrink-0 text-[#9cfb51]/80" />
+          <p>{copy.courseCheckoutNote}</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+type SaleCountdownState = {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+};
+
+function useSaleCountdown(saleEndsAt: string) {
+  const [countdown, setCountdown] = useState<SaleCountdownState | null>(null);
+
+  useEffect(() => {
+    const updateCountdown = () => setCountdown(getSaleCountdown(saleEndsAt));
+    updateCountdown();
+
+    const timerId = window.setInterval(updateCountdown, 1000);
+    return () => window.clearInterval(timerId);
+  }, [saleEndsAt]);
+
+  return countdown;
+}
+
+function getSaleCountdown(saleEndsAt: string, now = Date.now()): SaleCountdownState {
+  const endsAt = Date.parse(saleEndsAt);
+  const remainingMs = Math.max(0, (Number.isNaN(endsAt) ? now : endsAt) - now);
+  const totalSeconds = Math.floor(remainingMs / 1000);
+  return {
+    days: Math.floor(totalSeconds / 86400),
+    hours: Math.floor((totalSeconds % 86400) / 3600),
+    minutes: Math.floor((totalSeconds % 3600) / 60),
+    seconds: totalSeconds % 60,
+  };
+}
+
+function CourseSaleCountdown({ countdown, lang }: { countdown: SaleCountdownState | null; lang: "ru" | "en" }) {
+  const units = [
+    { value: countdown ? String(countdown.days).padStart(2, "0") : "--", label: lang === "ru" ? "дн" : "d" },
+    { value: countdown ? String(countdown.hours).padStart(2, "0") : "--", label: lang === "ru" ? "час" : "h" },
+    { value: countdown ? String(countdown.minutes).padStart(2, "0") : "--", label: lang === "ru" ? "мин" : "m" },
+    { value: countdown ? String(countdown.seconds).padStart(2, "0") : "--", label: lang === "ru" ? "сек" : "s" },
+  ];
+
+  return (
+    <div className="grid grid-cols-4 gap-[8px]">
+      {units.map((unit) => (
+        <div key={unit.label} className="min-w-0 text-center">
+          <span className="block font-['Unbounded',sans-serif] text-[22px] font-bold leading-none text-white tabular-nums">{unit.value}</span>
+          <span className="mt-[5px] block text-[11px] font-bold uppercase leading-none text-white/54">{unit.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function readPendingCoursePayment(courseSlug: string): PendingCoursePayment | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(COURSE_PAYMENT_PENDING_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<PendingCoursePayment>;
+    if (parsed.courseSlug !== courseSlug || typeof parsed.email !== "string") return null;
+    if (typeof parsed.at !== "number" || Date.now() - parsed.at > 24 * 60 * 60 * 1000) return null;
+    return {
+      courseSlug,
+      email: parsed.email,
+      orderId: typeof parsed.orderId === "string" ? parsed.orderId : undefined,
+      at: parsed.at,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writePendingCoursePayment(payment: PendingCoursePayment) {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(COURSE_PAYMENT_PENDING_STORAGE_KEY, JSON.stringify(payment));
+  } catch {
+    // Best-effort checkout hint only.
+  }
 }
 
 type UnlockProCardProps = {
@@ -891,10 +1215,11 @@ function UnlockProCard({ hasPro }: UnlockProCardProps) {
 type RelatedLessonsProps = {
   collection: LearnCollection;
   currentSlug: string;
-  hasPro: boolean;
+  hasAccess: boolean;
+  purchase?: LearnCoursePurchase;
 };
 
-function RelatedLessons({ collection, currentSlug, hasPro }: RelatedLessonsProps) {
+function RelatedLessons({ collection, currentSlug, hasAccess, purchase }: RelatedLessonsProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const lessons = useMemo(
@@ -909,7 +1234,7 @@ function RelatedLessons({ collection, currentSlug, hasPro }: RelatedLessonsProps
       <h2 className="text-[24px] font-bold leading-tight text-white">{copy.allLessons}</h2>
       <div className="mt-[16px] grid grid-cols-2 gap-[16px] max-sm:grid-cols-1">
         {lessons.map((item) => {
-          const locked = isLessonLocked(item, hasPro);
+          const locked = isLessonLocked(item, hasAccess);
           return (
             <LocalizedLink
               key={item.slug}
@@ -945,7 +1270,7 @@ function RelatedLessons({ collection, currentSlug, hasPro }: RelatedLessonsProps
                   {getLearnLessonTitle(item, lang)}
                 </h3>
                 <p className="mt-[14px] text-[13px] font-medium text-[#9cfb51]">
-                  {locked ? copy.unlocksOnPro : copy.watchLesson}
+                  {locked ? (purchase ? copy.unlocksAfterPurchase : copy.unlocksOnPro) : copy.watchLesson}
                 </p>
               </div>
             </LocalizedLink>
@@ -1065,8 +1390,8 @@ function applyLessonProgress(collection: LearnCollection, completedSlugs: Set<st
   };
 }
 
-function isLessonLocked(lesson: LearnLesson, hasPro: boolean) {
-  return lesson.access === "full-platform" && !hasPro;
+function isLessonLocked(lesson: LearnLesson, hasAccess: boolean) {
+  return lesson.access === "full-platform" && !hasAccess;
 }
 
 function hasProAccess(account: AccountSummary | null) {
@@ -1088,19 +1413,37 @@ const detailCopy = {
     undoCompleted: "Отменить",
     lockedLesson: "Урок заблокирован",
     lockedDescription: "Разблокируйте тариф Pro, чтобы смотреть видео и получить доступ к материалам.",
+    courseLockedDescription: "Этот урок открывается после разовой покупки курса. Введите email, оплатите курс и получите ссылку для входа.",
     loadingVideo: "Открываем видео...",
     videoTokenError: "Не удалось открыть видео. Обновите страницу или войдите заново.",
     openPro: "Открыть Pro",
     signIn: "Войти",
+    signInPurchased: "Уже купили",
     playLesson: "Смотреть урок",
     courseProgress: "Прогресс курса",
     progressCount: (completed: number, total: number) => `${completed} из ${total} уроков`,
     unlocksOnPro: "Разблокируется на Pro",
+    unlocksAfterPurchase: "Доступ после покупки",
+    paidCourseBadge: "Курс",
     proActive: "Pro активен",
     proActiveDescription: "Все Pro-уроки и материалы доступны без дополнительных оплат.",
     unlockAllLessons: "Разблокируйте все уроки",
     unlockAllDescription: "Получите доступ ко всем материалам курса и Pro-урокам без ограничений.",
     unlockOnPro: "Разблокировать на Pro",
+    courseOfferLabel: "Разовый доступ",
+    courseSaleEnds: "Скидка закончится через",
+    courseEmailLabel: "Email для доступа",
+    courseEmailPlaceholder: "you@example.com",
+    courseInvalidEmail: "Введите корректный email.",
+    coursePaymentError: "Не удалось открыть оплату. Попробуйте ещё раз.",
+    coursePaymentOpening: "Открываем оплату...",
+    courseCheckoutNote: "Оплата через YooKassa. После оплаты отправим ссылку для входа на этот email; позже можно входить обычным кодом на ту же почту.",
+    courseAccessLoading: "Проверяем доступ к курсу...",
+    coursePaymentPending: (email: string) => `Если оплата уже прошла, письмо со ссылкой отправлено на ${email}.`,
+    courseBuyButton: (price: string) => `Купить за ${price} ₽`,
+    buyCourseShort: (price: string) => `Купить за ${price} ₽`,
+    courseAccessActive: "Доступ к курсу активен",
+    courseAccessActiveDescription: "Видео и материалы курса открыты для этого аккаунта.",
     allLessons: "Все уроки",
     watchLesson: "Смотреть урок",
   },
@@ -1118,19 +1461,37 @@ const detailCopy = {
     undoCompleted: "Undo",
     lockedLesson: "Lesson locked",
     lockedDescription: "Unlock Pro to watch this video and get access to the lesson materials.",
+    courseLockedDescription: "This lesson opens after a one-time course purchase. Enter your email, pay for the course, and receive a sign-in link.",
     loadingVideo: "Opening video...",
     videoTokenError: "Could not open the video. Refresh the page or sign in again.",
     openPro: "Open Pro",
     signIn: "Sign in",
+    signInPurchased: "Already bought",
     playLesson: "Play lesson",
     courseProgress: "Course progress",
     progressCount: (completed: number, total: number) => `${completed} of ${total} lessons`,
     unlocksOnPro: "Unlocks on Pro",
+    unlocksAfterPurchase: "Access after purchase",
+    paidCourseBadge: "Course",
     proActive: "Pro active",
     proActiveDescription: "All Pro lessons and materials are available without extra payments.",
     unlockAllLessons: "Unlock all lessons",
     unlockAllDescription: "Get access to every course material and Pro lesson without limits.",
     unlockOnPro: "Unlock on Pro",
+    courseOfferLabel: "One-time access",
+    courseSaleEnds: "Discount ends in",
+    courseEmailLabel: "Access email",
+    courseEmailPlaceholder: "you@example.com",
+    courseInvalidEmail: "Enter a valid email.",
+    coursePaymentError: "Could not open checkout. Try again.",
+    coursePaymentOpening: "Opening checkout...",
+    courseCheckoutNote: "Checkout is handled by YooKassa. After payment, we send a sign-in link to this email; later you can sign in with the usual email code.",
+    courseAccessLoading: "Checking course access...",
+    coursePaymentPending: (email: string) => `If payment has succeeded, the access email was sent to ${email}.`,
+    courseBuyButton: (price: string) => `Buy for ${price} ₽`,
+    buyCourseShort: (price: string) => `Buy for ${price} ₽`,
+    courseAccessActive: "Course access active",
+    courseAccessActiveDescription: "Course videos and materials are unlocked for this account.",
     allLessons: "All lessons",
     watchLesson: "Watch lesson",
   },

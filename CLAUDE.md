@@ -18,8 +18,8 @@ React 18 + TypeScript + Tailwind 4, SPA, deployed on Vercel.
 
 Six jobs: (1) marketing surface (landing in RU/EN), (2) website-first auth and
 billing surface (`/login`, `/auth/callback`, `/pay`, `/account`, `/success` for
-YooKassa RUB + Paddle USD — Pro is the only purchasable tier; free-аккаунт даёт
-0 операций, нужен для логина), (3)
+YooKassa RUB + Paddle USD — Pro is the only purchasable tier for AI-operations;
+free-аккаунт даёт 0 операций, нужен для логина), (3)
 Pro-only utilities (`/dashboard/download-skill` — streams `opten.zip` Claude
 Skill bundle sourced from the extension repo's `opten/` dir, Phase 73), (4)
 free Prompt Library at `/prompt-library` for any logged-in extension account
@@ -36,8 +36,8 @@ prompts, resources, and risks, alongside the Opten Space Beta app shell
 at `/app/*` (SPA-only, noindex) whose
 account/credits state is read from the same self-hosted Supabase backend as the
 extension, plus a hidden/noindex Kinescope-backed course MVP under
-`/learn/courses/*` for direct-link testing of Pro-gated video lessons before the
-course is linked from public navigation.
+`/learn/courses/*` for direct-link testing of standalone paid Kinescope video
+lessons before the course is linked from public navigation.
 
 The extension is still the primary shipped product. Opten Space Beta is an
 account-based web app surface, but it must share identity, subscription, and
@@ -91,12 +91,18 @@ as another author/source instead.
 Hidden Kinescope course routes live under `/learn/courses/:courseSlug` and
 `/learn/courses/:courseSlug/:lessonSlug`. They are SPA-only, noindex, and must
 not be added to the public Learn hub, sitemap, llms.txt, or EN sibling map until
-the course is intentionally launched. Kinescope video playback is server-gated:
-the client calls `/api/kinescope-course-token` with the website Supabase JWT,
-the server verifies Pro access and returns a short-lived Kinescope embed URL
-with `drmauthtoken`, and Kinescope calls `/api/kinescope-course-auth` during
-playback to receive 200/403. Never put the Kinescope API key, auth JWT secret,
-or raw playback token in the client bundle.
+the course is intentionally launched. The hidden course
+`ai-content-marketing-2026` is a standalone YooKassa one-time course purchase,
+not a Pro entitlement. Guest checkout is initiated by
+`/functions/v1/create-course-payment` with an email address; the YooKassa
+webhook grants a course entitlement and sends a direct website auth link to the
+same email. Kinescope video playback is server-gated: the client calls
+`/api/kinescope-course-token` with the website Supabase JWT, the server verifies
+course access through `/functions/v1/course-access-summary` and returns a
+short-lived Kinescope embed URL with `drmauthtoken`, and Kinescope calls
+`/api/kinescope-course-auth` during playback to receive 200/403. Never put the
+Kinescope API key, auth JWT secret, Supabase service-role key, YooKassa secret,
+Resend key, or raw playback token in the client bundle.
 
 Hardcoded constants that are duplicated and must be kept in sync:
 - `EXTENSION_IDS` — appears in [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [src/app/pages/DownloadSkillPage.tsx](src/app/pages/DownloadSkillPage.tsx), [src/app/pages/PromptLibraryPage.tsx](src/app/pages/PromptLibraryPage.tsx)
@@ -183,7 +189,7 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           is shown in the email.
   Site → Paddle:          window.Paddle.Checkout.open(...)
   Site own API:           GET /api/download-skill (Vercel serverless, JWT + Pro-gated)
-                          POST /api/kinescope-course-token — website JWT + Pro gate;
+                          POST /api/kinescope-course-token — website JWT + course entitlement gate;
                           returns short-lived Kinescope embed URL with drmauthtoken
                           POST /api/kinescope-course-auth — Kinescope server callback;
                           validates signed drmauthtoken and returns 200/403
@@ -203,7 +209,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routes, billing flows, and 
 ```
 api/                     — Vercel serverless functions:
                              download-skill.ts — Pro-gated Claude Skill ZIP
-                             kinescope-course-token.ts — Pro-gated playback token issuer
+                             kinescope-course-token.ts — course-entitlement-gated playback token issuer
                              kinescope-course-auth.ts — Kinescope playback auth callback
                              _shared/ — server-only course/auth constants
 public/                  — static assets (favicons, partner logos, welcome screenshots,

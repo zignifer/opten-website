@@ -69,6 +69,26 @@ export async function hasLiveProSubscription(token: string, userId: string): Pro
   return Array.isArray(rows) && rows.some((row) => isSubscriptionPeriodLive(row.expires_at));
 }
 
+export async function hasCourseAccess(token: string, courseSlug: string): Promise<boolean> {
+  const accessRes = await fetch(`${SUPABASE_URL}/functions/v1/course-access-summary`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      apikey: SUPABASE_ANON_KEY,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({ course_slug: courseSlug }),
+  });
+
+  if (!accessRes.ok) {
+    throw new Error(`course_access_failed:${accessRes.status}`);
+  }
+
+  const body = (await accessRes.json()) as { has_access?: boolean };
+  return body.has_access === true;
+}
+
 export function isSubscriptionPeriodLive(expiresAt: string | null): boolean {
   if (!expiresAt) return true;
   const expiresMs = Date.parse(expiresAt);

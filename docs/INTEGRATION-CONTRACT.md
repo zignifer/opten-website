@@ -233,10 +233,12 @@ The site only **calls** them; it does not own them.
 |----------|--------|------|-------|
 | `POST /create-payment` | Site (`PayPage` RU path) | Bearer JWT | YooKassa. Body: `{ recurring: boolean }`. Returns `{ confirmation_url }`. `return_url` is hardcoded to `https://opten.space/success`. The JWT may come from website auth or extension fallback. |
 | `POST /create-payment-paddle` | Site (`PayPage` EN path) | Bearer JWT | Paddle. Returns `{ priceId, customerEmail, userId }`. Site then calls `Paddle.Checkout.open(...)`. The JWT may come from website auth or extension fallback. |
+| `POST /create-course-payment` | Hidden Learn course page (`/learn/courses/ai-content-marketing-2026/*`) | Public anon + email | YooKassa one-time checkout for a standalone course, not Pro. Body: `{ course_slug, email, return_url }`. Returns `{ confirmation_url, order_id, amount_value, list_amount_value, discount_percent, currency }`. The checkout email becomes the entitlement email; no website login is required before payment. |
 | `POST /cancel-subscription` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | YooKassa cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
 | `POST /cancel-subscription-paddle` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | Paddle cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
 | `POST /get-subscription` | Site (optional) | Bearer JWT | Reads `subscriptions` table. Used as a fallback if the extension is not installed (rare path). |
 | `POST /account-summary` | Site `/login` consumers, `/pay`, `/account`, `/app/*` | Bearer JWT | Reads the verified user's account, latest subscription, and `usage_logs` count using service role, then returns a single account/credit summary. No payment mutation. Response is the canonical website source for `email`, `plan`, `status`, `limit`, `used`, `remaining`, `expires_at`, `provider`, `currency`, and card metadata. |
+| `POST /course-access-summary` | Hidden Learn course page + `/api/kinescope-course-token` | Bearer website JWT | Reads/claims a standalone course entitlement for the verified user. If an active entitlement exists for the JWT email and has no `user_id`, the function binds it to `auth.users.id`. Returns `{ course_slug, has_access, status, email, granted_at }`. |
 | `POST /webhook` | YooKassa | IP-whitelist | Provider-only. Updates `subscriptions` table with `provider='yookassa'`. |
 | `POST /webhook-paddle` | Paddle | HMAC-SHA256 | Provider-only. Updates `subscriptions` table with `provider='paddle'`. |
 | `POST /webhook-paddle-sandbox` | Paddle sandbox | HMAC-SHA256 | Provider-only. For E2E testing. |
@@ -249,6 +251,29 @@ The site only **calls** them; it does not own them.
 - `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"` — **UNCHANGED** (JWT secret reused; self-hosted Kong accepts the same anon key). (see [`src/lib/optenAuth.ts`](../src/lib/optenAuth.ts), [`src/lib/promptLibraryApi.ts`](../src/lib/promptLibraryApi.ts), [`PayPage.tsx`](../src/app/pages/PayPage.tsx), [`AccountPage.tsx`](../src/app/pages/AccountPage.tsx), [`api/download-skill.ts`](../api/download-skill.ts))
 
 **Token verification (Phase 87 / D-03, updated Phase 88):** the site (`api/download-skill.ts`) and the Edge Functions verify the user JWT **locally** (jose, dual-issuer allowlist: cloud + self-hosted). `supabase.auth.getUser()` / `/auth/v1/user` is no longer called — it performs a session lookup that rejects cloud-issued tokens on self-hosted (sessions not migrated, Phase 86). **Cloud migrated to ASYMMETRIC signing keys, so cloud-issued tokens are now ES256 — verified via the cloud JWKS (`/auth/v1/.well-known/jwks.json`); self-hosted GoTrue still signs HS256 with the shared secret.** The verifier branches by the token's `alg`: HS256 → shared secret, ES256 → cloud JWKS. Both issuers are accepted during the transition so old-extension tokens keep working (CLIENT-06). Edge `create-payment*` additionally run a server-side preflight (user-exists + not-already-Pro) before charging.
+
+### 4.1 Standalone course purchases
+
+Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
+
+- The site shows a fixed RUB course offer: list price `4 990 ₽`, sale price
+  `2 990 ₽`, discount `40%`, and a sale countdown. This offer is not the Pro
+  subscription and must not be surfaced through extension subscription state.
+- A guest enters email on the course page and calls
+  `POST /create-course-payment`; the function creates a `course_orders` row
+  and a YooKassa payment with `metadata.kind = "course_purchase"`.
+- The YooKassa `/webhook` handler must branch on `metadata.kind` before
+  requiring `metadata.user_id`. Course webhooks grant/confirm
+  `course_entitlements`, create or reuse the Supabase Auth user for that email,
+  generate a direct website magic link, and send it via Resend. They must not
+  insert/update `subscriptions`, must not change `users.plan`, and must not
+  reset `usage_logs`.
+- If the magic link expires, the buyer can still use the normal `/login` Email
+  OTP flow with the same email. `course-access-summary` claims the entitlement
+  by email and binds it to `auth.users.id`.
+- The Vercel endpoint `POST /api/kinescope-course-token` still verifies the
+  website JWT locally and signs the Kinescope `drmauthtoken`, but its access
+  check is now `course-access-summary`, not Pro subscription lookup.
 
 If the Supabase project is ever rotated/migrated, **all listed site files** plus the extension's
 [`config/api.js`](../../promptscore/config/api.js) must be updated in one coordinated commit.

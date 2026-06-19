@@ -4,6 +4,10 @@ import { futureProtectedVideoDeliveryNote, learnDefaultAuthor } from "./learn";
 export const PRIVATE_COURSE_SLUG = "ai-content-marketing-2026";
 export const PRIVATE_COURSE_FIRST_LESSON_SLUG = "lesson-1-prompting";
 export const PRIVATE_COURSE_FIRST_KINESCOPE_VIDEO_ID = "e941e14d-c5bf-40fc-abe5-a41e247777cf";
+export const PRIVATE_COURSE_PRICE_RUB = 2990;
+export const PRIVATE_COURSE_LIST_PRICE_RUB = 4990;
+export const PRIVATE_COURSE_DISCOUNT_PERCENT = 40;
+export const PRIVATE_COURSE_SALE_ENDS_AT = "2026-06-30T23:59:59+05:00";
 
 const privateCourseUpdatedAt = "2026-06-19";
 const privateCourseTotalLessons = 15;
@@ -17,13 +21,6 @@ const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
       kind: "link",
       actionLabel: "Перейти",
       href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
-    },
-    {
-      title: "Скилл для генерации промптов в Claude",
-      meta: "Скачивание Pro-сборки opten.zip через расширение Opten",
-      kind: "link",
-      actionLabel: "Скачать",
-      href: "/dashboard/download-skill",
     },
     {
       title: "Syntx",
@@ -54,13 +51,6 @@ const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
       kind: "link",
       actionLabel: "Open",
       href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
-    },
-    {
-      title: "Claude prompt-generation Skill",
-      meta: "Downloads the Pro opten.zip bundle through the Opten extension flow",
-      kind: "link",
-      actionLabel: "Download",
-      href: "/dashboard/download-skill",
     },
     {
       title: "Syntx",
@@ -120,8 +110,8 @@ function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
     publishedAt: privateCourseUpdatedAt,
     updatedAt: privateCourseUpdatedAt,
     releaseNote: {
-      ru: "Закрытый урок курса. Видео хранится в Kinescope и открывается через серверный Pro-gate.",
-      en: "Private course lesson. Video is hosted on Kinescope and opened through the server-side Pro gate.",
+      ru: "Закрытый урок курса. Видео хранится в Kinescope и открывается через серверный course-entitlement gate.",
+      en: "Private course lesson. Video is hosted on Kinescope and opened through the server-side course entitlement gate.",
     },
     filters: ["Standalone", "Prompt packs"],
     topics: config.topics,
@@ -139,7 +129,7 @@ function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
       provider: "kinescope",
       providerAssetId: config.videoId,
       posterPath,
-      playbackPolicy: "subscription-gated-public-preview",
+      playbackPolicy: "course-entitlement-gated-preview",
       signedPlaybackUrl: null,
       notes: futureProtectedVideoDeliveryNote,
     },
@@ -169,13 +159,13 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
       ru: [
         "Понять структуру промпта для визуального результата",
         "Использовать генератор промптов Opten в ChatGPT",
-        "Скачать Claude Skill для генерации промптов",
+        "Понять, как переносить промпт в рабочие AI-инструменты",
         "Перенести готовый промпт в Syntx или Higgsfield",
       ],
       en: [
         "Understand the structure of a prompt for visual output",
         "Use the Opten prompt generator in ChatGPT",
-        "Download the Claude Skill for prompt generation",
+        "Understand how to move the prompt into practical AI tools",
         "Move the finished prompt into Syntx or Higgsfield",
       ],
     },
@@ -382,6 +372,14 @@ export const privateCourseCollection: LearnCollection = {
   routeBasePath: {
     ru: `/learn/courses/${PRIVATE_COURSE_SLUG}`,
     en: `/learn/courses/${PRIVATE_COURSE_SLUG}`,
+  },
+  purchase: {
+    provider: "yookassa",
+    courseSlug: PRIVATE_COURSE_SLUG,
+    priceRub: PRIVATE_COURSE_PRICE_RUB,
+    listPriceRub: PRIVATE_COURSE_LIST_PRICE_RUB,
+    discountPercent: PRIVATE_COURSE_DISCOUNT_PERCENT,
+    saleEndsAt: PRIVATE_COURSE_SALE_ENDS_AT,
   },
   progress: {
     completed: 0,
