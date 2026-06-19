@@ -223,6 +223,14 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
   );
   const displayedLesson = displayedCollection.lessons.find((item) => item.slug === lesson.slug) ?? lesson;
   const lessonCompleted = completedSlugs.has(lesson.slug);
+  const courseMobileContentsClass = isCourse ? "max-lg:contents" : "";
+  const courseMobileOrder = (order: 1 | 2 | 3 | 4) => {
+    if (!isCourse) return "";
+    if (order === 1) return "max-lg:order-1";
+    if (order === 2) return "max-lg:order-2";
+    if (order === 3) return "max-lg:order-3";
+    return "max-lg:order-4";
+  };
 
   const handleTimestampSelect = (seconds: number) => {
     setStartSeconds(seconds);
@@ -246,7 +254,8 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
         {isCourse && (
           <>
             <span className="text-white/28">/</span>
-            <span>{getLearnCollectionTitle(collection, lang)}</span>
+            <span className="max-md:hidden">{getLearnCollectionTitle(collection, lang)}</span>
+            <span className="hidden max-md:inline">...</span>
           </>
         )}
         <span className="text-white/28">/</span>
@@ -254,62 +263,76 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
       </nav>
 
       <section className="grid grid-cols-[minmax(0,1fr)_360px] items-start gap-[24px] max-lg:grid-cols-1">
-        <div className="min-w-0">
-          <div ref={playerFrameRef}>
-            <LessonPlayer
+        <div className={`min-w-0 ${courseMobileContentsClass}`}>
+          <div className={courseMobileOrder(1)}>
+            <div ref={playerFrameRef}>
+              <LessonPlayer
+                lesson={displayedLesson}
+                collectionId={collection.id}
+                locked={locked}
+                purchase={purchase}
+                startSeconds={startSeconds}
+                playRequestId={playRequestId}
+              />
+            </div>
+            <LessonIntro
               lesson={displayedLesson}
-              collectionId={collection.id}
+              collection={displayedCollection}
               locked={locked}
-              purchase={purchase}
-              startSeconds={startSeconds}
-              playRequestId={playRequestId}
+              completed={lessonCompleted}
+              onCompletionChange={handleLessonCompletionChange}
             />
           </div>
-          <LessonIntro
-            lesson={displayedLesson}
-            collection={displayedCollection}
-            locked={locked}
-            completed={lessonCompleted}
-            onCompletionChange={handleLessonCompletionChange}
-          />
-          <LessonMaterials materials={getLearnLessonMaterials(displayedLesson, lang)} locked={locked} purchase={purchase} />
-          <RelatedLessons collection={displayedCollection} currentSlug={lesson.slug} hasAccess={lessonAccessGranted} purchase={purchase} />
+          <div className={courseMobileOrder(3)}>
+            <LessonMaterials materials={getLearnLessonMaterials(displayedLesson, lang)} locked={locked} purchase={purchase} />
+          </div>
+          <div className={isCourse ? "max-lg:hidden" : undefined}>
+            <RelatedLessons collection={displayedCollection} currentSlug={lesson.slug} hasAccess={lessonAccessGranted} purchase={purchase} />
+          </div>
         </div>
 
-        <aside className="flex min-w-0 flex-col gap-[16px] lg:sticky lg:top-[88px]">
+        <aside className={`flex min-w-0 flex-col gap-[16px] lg:sticky lg:top-[88px] ${courseMobileContentsClass}`}>
           {purchase ? (
             courseAccess.hasAccess ? (
               <>
-                <CollectionSummaryCard lesson={displayedLesson} collection={displayedCollection} />
-                <LessonSidebar
-                  lesson={displayedLesson}
-                  collection={displayedCollection}
-                  activeTab={activeTab}
-                  onTabChange={setActiveTab}
-                  onTimestampSelect={handleTimestampSelect}
-                  hasAccess={lessonAccessGranted}
-                  purchase={purchase}
-                />
+                <div className={`min-w-0 ${courseMobileOrder(2)}`}>
+                  <CollectionSummaryCard lesson={displayedLesson} collection={displayedCollection} />
+                </div>
+                <div className={`min-w-0 ${courseMobileOrder(4)}`}>
+                  <LessonSidebar
+                    lesson={displayedLesson}
+                    collection={displayedCollection}
+                    activeTab={activeTab}
+                    onTabChange={setActiveTab}
+                    onTimestampSelect={handleTimestampSelect}
+                    hasAccess={lessonAccessGranted}
+                    purchase={purchase}
+                  />
+                </div>
               </>
             ) : (
               <>
-                <CoursePurchaseCard
-                  collection={displayedCollection}
-                  purchase={purchase}
-                  hasAccess={courseAccess.hasAccess}
-                  loadingAccess={courseAccess.loading || authStatus === "loading"}
-                  initialEmail={session?.user.email ?? account?.email ?? ""}
-                  playerHeight={playerHeight}
-                />
-                <LessonSidebar
-                  lesson={displayedLesson}
-                  collection={displayedCollection}
-                  activeTab={activeTab}
-                  onTabChange={setActiveTab}
-                  onTimestampSelect={handleTimestampSelect}
-                  hasAccess={lessonAccessGranted}
-                  purchase={purchase}
-                />
+                <div className={`min-w-0 ${courseMobileOrder(2)}`}>
+                  <CoursePurchaseCard
+                    collection={displayedCollection}
+                    purchase={purchase}
+                    hasAccess={courseAccess.hasAccess}
+                    loadingAccess={courseAccess.loading || authStatus === "loading"}
+                    initialEmail={session?.user.email ?? account?.email ?? ""}
+                    playerHeight={playerHeight}
+                  />
+                </div>
+                <div className={`min-w-0 ${courseMobileOrder(4)}`}>
+                  <LessonSidebar
+                    lesson={displayedLesson}
+                    collection={displayedCollection}
+                    activeTab={activeTab}
+                    onTabChange={setActiveTab}
+                    onTimestampSelect={handleTimestampSelect}
+                    hasAccess={lessonAccessGranted}
+                    purchase={purchase}
+                  />
+                </div>
               </>
             )
           ) : (
@@ -684,20 +707,24 @@ type LessonMaterialsProps = {
 function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
+  const [expanded, setExpanded] = useState(false);
 
   if (materials.length === 0) return null;
+  const canCollapseOnMobile = materials.length > 1;
 
   return (
     <section className="mt-[34px] max-w-[820px]">
       <h2 className="text-[22px] font-bold leading-tight text-white">{copy.lessonMaterials}</h2>
       <div className="mt-[14px] overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]">
-        {materials.map((material) => {
+        {materials.map((material, index) => {
           const Icon = materialIcon(material.kind);
           const external = material.href.startsWith("http");
           const disabled = locked;
           const actionLabel = purchase ? copy.paidCourseBadge : material.actionLabel;
           const rowClass =
-            "grid grid-cols-[34px_minmax(0,1fr)_154px] items-center gap-[12px] border-b border-white/8 px-[16px] py-[10px] last:border-b-0 max-sm:grid-cols-[32px_minmax(0,1fr)]";
+            `grid grid-cols-[34px_minmax(0,1fr)_154px] items-center gap-[12px] border-b border-white/8 px-[16px] py-[10px] last:border-b-0 max-sm:grid-cols-[32px_minmax(0,1fr)] ${
+              canCollapseOnMobile && !expanded && index > 0 ? "max-md:hidden" : ""
+            }`;
 
           return (
             <div key={material.title} className={rowClass}>
@@ -732,6 +759,15 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
             </div>
           );
         })}
+        {canCollapseOnMobile && (
+          <button
+            type="button"
+            onClick={() => setExpanded((current) => !current)}
+            className="hidden h-[52px] w-full cursor-pointer items-center justify-center border-0 border-t border-white/8 bg-transparent px-[16px] text-[14px] font-bold text-white/82 transition hover:bg-white/[0.035] hover:text-white max-md:flex"
+          >
+            {expanded ? copy.showLessMaterials : copy.showMoreMaterials}
+          </button>
+        )}
       </div>
     </section>
   );
@@ -1505,6 +1541,8 @@ const detailCopy = {
     lessonsTab: "Уроки",
     timestampsTab: "Тайм-коды",
     lessonMaterials: "Материалы урока",
+    showMoreMaterials: "Показать больше",
+    showLessMaterials: "Скрыть",
     markLessonCompleted: "Отметить как изучено",
     lessonCompleted: "Урок изучен",
     undoCompleted: "Отменить",
@@ -1555,6 +1593,8 @@ const detailCopy = {
     lessonsTab: "Lessons",
     timestampsTab: "Timestamps",
     lessonMaterials: "Lesson materials",
+    showMoreMaterials: "Show more",
+    showLessMaterials: "Show less",
     markLessonCompleted: "Mark as learned",
     lessonCompleted: "Lesson learned",
     undoCompleted: "Undo",
