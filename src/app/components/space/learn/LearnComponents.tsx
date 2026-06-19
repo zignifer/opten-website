@@ -418,10 +418,10 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
               sizes="(max-width: 1023px) calc(100vw - 32px), 816px"
               className="h-full w-full object-cover opacity-62"
             />
-            <div className="absolute inset-0 bg-[#011417]/58 backdrop-blur-[1px]" />
+            <div className="absolute inset-0 bg-[#011417]/58" />
             <div className="absolute inset-0 grid place-items-center">
-              <span className="grid size-[52px] place-items-center rounded-full bg-white/10 text-white/72">
-                <Lock size={21} />
+              <span className="grid size-[104px] place-items-center rounded-full bg-white/10 text-white/72">
+                <Lock size={42} />
               </span>
             </div>
           </>
@@ -1073,7 +1073,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   return (
     <section
       id="course-purchase"
-      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] p-[18px] shadow-[0_18px_60px_rgba(54,134,28,0.16)]"
+      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[18px] pb-[34px] pt-[18px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] xl:min-h-[459px]"
     >
       <div className="relative">
         <div className="flex items-start justify-between gap-[12px]">
