@@ -56,26 +56,28 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
         aria-label="Opten Space"
         className="mx-auto grid h-[64px] max-w-[1200px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center px-[32px] py-[16px] font-['PT_Root_UI',sans-serif] text-white max-lg:grid-cols-[auto_1fr_auto] max-md:px-4"
       >
-        <LocalizedLink
-          to="/"
-          aria-label="Opten home"
-          className="-ml-[4px] inline-flex h-[32px] w-[132px] items-center rounded-sm px-[4px] no-underline outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011012]"
-        >
-          <img
-            src={`${figmaHeaderAssetBase}/logo-lockup.svg`}
-            alt=""
-            aria-hidden="true"
-            width="124"
-            height="23"
-            className="block h-[23px] w-[124px] shrink-0"
-          />
-        </LocalizedLink>
+        <div className="flex min-w-0 items-center gap-[8px]">
+          <LocalizedLink
+            to="/"
+            aria-label="Opten home"
+            className="-ml-[4px] inline-flex h-[32px] w-[132px] shrink-0 items-center rounded-sm px-[4px] no-underline outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011012]"
+          >
+            <img
+              src={`${figmaHeaderAssetBase}/logo-lockup.svg`}
+              alt=""
+              aria-hidden="true"
+              width="124"
+              height="23"
+              className="block h-[23px] w-[124px] shrink-0"
+            />
+          </LocalizedLink>
+
+          <LangSwitcher className="flex h-[32px] min-w-[42px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-transparent px-[10px] text-[13px] font-bold text-white/70 transition hover:border-white/25 hover:text-white max-lg:h-[36px] max-lg:bg-white/[0.02] max-lg:text-white/76" />
+
+          <CurrencySwitcher className="flex h-[32px] min-w-[48px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-transparent px-[10px] text-[13px] font-bold text-white/70 transition hover:border-white/25 hover:text-white max-lg:h-[36px] max-lg:bg-white/[0.02] max-lg:text-white/76" />
+        </div>
 
         <div className="flex items-center justify-center gap-[8px] max-lg:hidden" aria-label="Space navigation">
-          <LangSwitcher className="flex h-[32px] min-w-[42px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-transparent px-[10px] text-[13px] font-bold text-white/70 transition hover:border-white/25 hover:text-white" />
-
-          <CurrencySwitcher className="flex h-[32px] min-w-[48px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-transparent px-[10px] text-[13px] font-bold text-white/70 transition hover:border-white/25 hover:text-white" />
-
           {navItems.map((item) => {
             const active = isActiveNavItem(item.label, pathname);
             const Icon = item.icon;
@@ -149,8 +151,6 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
         </div>
 
         <div className="flex min-w-0 items-center justify-end gap-[8px] lg:hidden">
-          <CurrencySwitcher className="flex h-[36px] min-w-[48px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/[0.02] px-[10px] text-[13px] font-bold text-white/76 transition hover:border-white/25 hover:text-white" />
-          <LangSwitcher className="flex h-[36px] min-w-[42px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/[0.02] px-[10px] text-[13px] font-bold text-white/76 transition hover:border-white/25 hover:text-white" />
           <button
             type="button"
             aria-label={mobileMenuOpen ? copy.closeMenu : copy.openMenu}
