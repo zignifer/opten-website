@@ -92,11 +92,17 @@ Hidden Kinescope course routes live under `/learn/courses/:courseSlug` and
 `/learn/courses/:courseSlug/:lessonSlug`. They are SPA-only, noindex, and must
 not be added to the public Learn hub, sitemap, llms.txt, or EN sibling map until
 the course is intentionally launched. The hidden course
-`ai-content-marketing-2026` is a standalone YooKassa one-time course purchase,
-not a Pro entitlement. Guest checkout is initiated by
-`/functions/v1/create-course-payment` with an email address; the YooKassa
-webhook grants a course entitlement and sends a direct website auth link to the
-same email. Kinescope video playback is server-gated: the client calls
+`ai-content-marketing-2026` is a standalone one-time course purchase, not a Pro
+entitlement. RUB checkout uses YooKassa; USD checkout uses Paddle with
+course-specific one-time price IDs returned by
+`/functions/v1/create-course-payment`. Guest checkout is initiated with an
+email address, selected currency, and optional uppercase promo code. Provider
+webhooks grant a course entitlement and send a direct website auth link to the
+same email. The internal test promo `FREE` maps to `100 ₽` or `$1` and requires
+a separate Paddle `$1` price ID. Marketing/partner course promo codes live in
+the extension-owned `course_promo_codes` table (RLS on, no public policies) and
+must use uppercase `A-Z0-9` so the same code can be applied to YooKassa/RUB
+server pricing and Paddle/USD `discountCode`. Kinescope video playback is server-gated: the client calls
 `/api/kinescope-course-token` with the website Supabase JWT, the server verifies
 course access through `/functions/v1/course-access-summary` and returns a
 short-lived Kinescope embed URL with `drmauthtoken`, and Kinescope calls
@@ -356,6 +362,13 @@ changes with the extension manually.
 Set in Vercel (project settings, not in repo):
 - `VITE_PADDLE_ENV` — `'sandbox'` | `'production'`
 - `VITE_PADDLE_CLIENT_TOKEN` — Paddle public client token
+- Course Paddle one-time price IDs are server-only in the extension-owned
+  Supabase Edge Function environment:
+  `PADDLE_PRICE_ID_COURSE_AI_CONTENT_MARKETING_2026_{SANDBOX|PRODUCTION}` and
+  `PADDLE_PRICE_ID_COURSE_AI_CONTENT_MARKETING_2026_FREE_{SANDBOX|PRODUCTION}`.
+  Current live production price IDs: `$41` =
+  `pri_01kvk9vzec7cwgq7zgs9azw2re`, `$1` FREE test =
+  `pri_01kvk9x5mcnadfj0beymk23ze5`.
 - `KINESCOPE_AUTH_JWT_SECRET` — server-only HS256 secret used to sign and
   verify short-lived Kinescope `drmauthtoken` playback tokens for hidden course
   lessons. Must be long random text and must match both Kinescope course API

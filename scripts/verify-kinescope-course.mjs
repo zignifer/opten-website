@@ -59,9 +59,11 @@ assert.match(content, /ai-content-marketing-2026/, "Private course must expose a
 assert.match(content, /lesson-1-prompting/, "Private course must expose the first lesson slug");
 assert.match(content, /PRIVATE_COURSE_PRICE_RUB\s*=\s*2990/, "Private course sale price must be 2 990 RUB");
 assert.match(content, /PRIVATE_COURSE_LIST_PRICE_RUB\s*=\s*4990/, "Private course list price must be 4 990 RUB");
+assert.match(content, /PRIVATE_COURSE_PRICE_USD\s*=\s*41/, "Private course sale price must be 41 USD");
+assert.match(content, /PRIVATE_COURSE_LIST_PRICE_USD\s*=\s*69/, "Private course list price must be 69 USD");
 assert.match(content, /PRIVATE_COURSE_DISCOUNT_PERCENT\s*=\s*40/, "Private course discount must be 40%");
 assert.match(content, /PRIVATE_COURSE_SALE_ENDS_AT/, "Private course must define a sale countdown deadline");
-assert.match(content, /purchase:\s*{[\s\S]*provider:\s*"yookassa"[\s\S]*priceRub:\s*PRIVATE_COURSE_PRICE_RUB[\s\S]*discountPercent:\s*PRIVATE_COURSE_DISCOUNT_PERCENT/, "Private course collection must expose YooKassa purchase metadata");
+assert.match(content, /purchase:\s*{[\s\S]*priceRub:\s*PRIVATE_COURSE_PRICE_RUB[\s\S]*priceUsd:\s*PRIVATE_COURSE_PRICE_USD[\s\S]*discountPercent:\s*PRIVATE_COURSE_DISCOUNT_PERCENT/, "Private course collection must expose RUB and USD purchase metadata");
 for (const [lessonSlug, videoId] of expectedKinescopeLessons) {
   assert.match(content, new RegExp(lessonSlug), `Private course content must include ${lessonSlug}`);
   assert.match(content, new RegExp(videoId), `Private course content must include Kinescope video ${videoId}`);
@@ -95,6 +97,10 @@ assert.match(components, /provider\.provider === "kinescope"/, "Learn player mus
 assert.match(components, /\/api\/kinescope-course-token/, "Learn player must request Kinescope embed URLs through the server");
 assert.match(components, /createCoursePayment/, "Private course UI must create a standalone course payment");
 assert.match(components, /fetchCourseAccessSummary/, "Private course UI must check standalone course access");
+assert.match(components, /normalizeCoursePromoCode/, "Private course UI must normalize promo codes");
+assert.match(components, /isValidCoursePromoCode/, "Private course UI must accept server-managed promo codes");
+assert.match(components, /Paddle\.Checkout\.open/, "Private course UI must support Paddle checkout for USD course purchases");
+assert.match(components, /discountCode/, "Private course UI must pass Paddle discount codes for USD course promos");
 assert.match(components, /courseLockedDescription/, "Private course locked overlay must use course purchase copy");
 assert.match(components, /unlocksAfterPurchase/, "Private course outline must label locked lessons as purchase-gated");
 assert.doesNotMatch(components, /kine\.txt|KINESCOPE_API|Bearer\s+[0-9a-f-]{36}/i, "Client code must not expose Kinescope API keys");

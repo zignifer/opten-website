@@ -6,6 +6,8 @@ export const PRIVATE_COURSE_FIRST_LESSON_SLUG = "lesson-1-prompting";
 export const PRIVATE_COURSE_FIRST_KINESCOPE_VIDEO_ID = "e941e14d-c5bf-40fc-abe5-a41e247777cf";
 export const PRIVATE_COURSE_PRICE_RUB = 2990;
 export const PRIVATE_COURSE_LIST_PRICE_RUB = 4990;
+export const PRIVATE_COURSE_PRICE_USD = 41;
+export const PRIVATE_COURSE_LIST_PRICE_USD = 69;
 export const PRIVATE_COURSE_DISCOUNT_PERCENT = 40;
 export const PRIVATE_COURSE_SALE_ENDS_AT = "2026-06-30T23:59:59+05:00";
 
@@ -374,10 +376,12 @@ export const privateCourseCollection: LearnCollection = {
     en: `/learn/courses/${PRIVATE_COURSE_SLUG}`,
   },
   purchase: {
-    provider: "yookassa",
+    provider: "course",
     courseSlug: PRIVATE_COURSE_SLUG,
     priceRub: PRIVATE_COURSE_PRICE_RUB,
     listPriceRub: PRIVATE_COURSE_LIST_PRICE_RUB,
+    priceUsd: PRIVATE_COURSE_PRICE_USD,
+    listPriceUsd: PRIVATE_COURSE_LIST_PRICE_USD,
     discountPercent: PRIVATE_COURSE_DISCOUNT_PERCENT,
     saleEndsAt: PRIVATE_COURSE_SALE_ENDS_AT,
   },

@@ -9,10 +9,12 @@ export type LearnLessonStatus = "Available" | "In progress" | "Completed";
 export type LearnAccess = "free" | "full-platform";
 
 export type LearnCoursePurchase = {
-  provider: "yookassa";
+  provider: "course";
   courseSlug: string;
   priceRub: number;
   listPriceRub: number;
+  priceUsd: number;
+  listPriceUsd: number;
   discountPercent: number;
   saleEndsAt: string;
 };

@@ -7,6 +7,7 @@ import { useT, useLang } from "../../i18n/LangContext";
 import InstallButton from "./InstallButton";
 import type { ModelMeta } from "../../content/models/types";
 import { metaField } from "../../content/models/metaEn";
+import { ModelPricingLine } from "./DynamicPriceCopy";
 
 interface Props {
   meta: ModelMeta;
@@ -51,7 +52,7 @@ export default function ModelInstallCta({ meta }: Props) {
       <div className="flex flex-col items-start gap-[14px] sm:flex-row sm:items-center sm:gap-[20px]">
         <InstallButton />
         <p className="text-[13px] leading-[1.4] text-white/55 md:text-[14px]">
-          {t("models.installCta.pricing")}
+          <ModelPricingLine />
         </p>
       </div>
     </section>

@@ -133,17 +133,25 @@ before signing `drmauthtoken`. Kinescope then calls the auth callback during
 playback and gets 200 or 403.
 
 The hidden course `ai-content-marketing-2026` is not unlocked by Pro. It uses a
-separate one-time YooKassa purchase:
+separate one-time course purchase:
 
 - list price `4 990 ₽`
 - sale price `2 990 ₽`
+- USD list price `$69`
+- USD sale price `$41`
 - discount label `40%`
-- sale countdown deadline from `src/content/space/privateCourse.ts`
+- internal test promo `FREE`: `100 ₽` or `$1`
+- partner/owner promo codes are stored server-side in `course_promo_codes`;
+  use uppercase `A-Z0-9` codes so RUB/YooKassa and USD/Paddle stay in sync
 
 The buyer can pay before registration by entering an email on the lesson page.
-After YooKassa confirms the payment, the backend grants a course entitlement to
-that email and sends a direct website auth link. If the link expires, the buyer
-can use the normal `/login` Email OTP flow with the same email; the access
+RUB checkout goes through YooKassa; USD checkout goes through Paddle Checkout
+with course-specific one-time price IDs returned by `create-course-payment`.
+For USD percentage promos, `create-course-payment` also returns a Paddle
+`discountCode`/`discountId` for the checkout overlay.
+After the provider confirms the payment, the backend grants a course entitlement
+to that email and sends a direct website auth link. If the link expires, the
+buyer can use the normal `/login` Email OTP flow with the same email; the access
 function binds the entitlement to `auth.users.id` on first authenticated check.
 
 Before enabling Kinescope project auth backend in production, set

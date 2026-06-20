@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from "react";
 import { BookOpen, Chrome, Library, LogIn, Menu, X, type LucideIcon } from "lucide-react";
 import { useLocation } from "react-router";
+import CurrencySwitcher from "../CurrencySwitcher";
 import HeaderMobileMenu, { type HeaderMobileNavItem } from "../HeaderMobileMenu";
 import LangSwitcher from "../LangSwitcher";
 import LocalizedLink from "../LocalizedLink";
@@ -70,7 +71,11 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
           />
         </LocalizedLink>
 
-        <div className="flex items-center justify-center gap-[12px] max-lg:hidden" aria-label="Space navigation">
+        <div className="flex items-center justify-center gap-[8px] max-lg:hidden" aria-label="Space navigation">
+          <LangSwitcher className="flex h-[32px] min-w-[42px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-transparent px-[10px] text-[13px] font-bold text-white/70 transition hover:border-white/25 hover:text-white" />
+
+          <CurrencySwitcher className="flex h-[32px] min-w-[48px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-transparent px-[10px] text-[13px] font-bold text-white/70 transition hover:border-white/25 hover:text-white" />
+
           {navItems.map((item) => {
             const active = isActiveNavItem(item.label, pathname);
             const Icon = item.icon;
@@ -114,8 +119,6 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
             <span className="text-[14px] font-medium leading-[1.1] text-white">{creditLabel}</span>
           </LocalizedLink>
 
-          <LangSwitcher className="flex h-[32px] min-w-[42px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-transparent px-[10px] text-[13px] font-bold text-white/70 transition hover:border-white/25 hover:text-white" />
-
           {status === "signed_in" ? (
             <LocalizedLink
               to="/account"
@@ -146,6 +149,7 @@ export default function SpaceHeader({ variant = "space" }: SpaceHeaderProps) {
         </div>
 
         <div className="flex min-w-0 items-center justify-end gap-[8px] lg:hidden">
+          <CurrencySwitcher className="flex h-[36px] min-w-[48px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/[0.02] px-[10px] text-[13px] font-bold text-white/76 transition hover:border-white/25 hover:text-white" />
           <LangSwitcher className="flex h-[36px] min-w-[42px] cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/[0.02] px-[10px] text-[13px] font-bold text-white/76 transition hover:border-white/25 hover:text-white" />
           <button
             type="button"

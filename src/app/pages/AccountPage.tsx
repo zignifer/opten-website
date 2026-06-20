@@ -8,6 +8,7 @@ import {
   signOut as signOutWebsite,
   type AccountSummary,
 } from "../../lib/optenAuth";
+import { useCurrencyPreference } from "../../lib/currency";
 import { useSpaceAuth } from "../components/space/SpaceAuthProvider";
 import svgPaths from "../../imports/LandingPage/svg-bvy0jfb1g6";
 
@@ -109,6 +110,7 @@ function subscriptionFromAccount(account: AccountSummary | null): Subscription |
 export default function AccountPage() {
   const t = useT();
   const { lang } = useLang();
+  const [currency] = useCurrencyPreference();
   const navigate = useNavigate();
   const {
     status: authStatus,
@@ -330,6 +332,11 @@ export default function AccountPage() {
   const isFree = !hasPaidAccess;
   const isOneTime = (isActive || isCancelled) && !sub?.auto_renew;
   const isSubscription = (isActive || isCancelled) && !!sub?.auto_renew;
+  const selectedProPrice = currency === "USD" ? t("pricing.pro.priceUsd") : t("pricing.pro.price");
+  const activeProPrice = sub?.currency === "USD"
+    ? (lang === "en" ? "$2.99/mo (auto-renewal)" : "$2.99 / мес (автоматическое продление)")
+    : (lang === "en" ? "199 ₽ / mo (auto-renewal)" : "199 ₽ / мес (автоматическое продление)");
+  const upgradeLabel = lang === "en" ? `Upgrade to Pro — ${selectedProPrice}/mo` : `Перейти на Pro — ${selectedProPrice}/мес`;
 
 
   return (
@@ -473,7 +480,7 @@ export default function AccountPage() {
                   {isSubscription && isActive && (
                     <div className="flex flex-col gap-[4px]">
                       <p className="text-[13px] text-white/50">{t("account.plan.priceLabel")}</p>
-                      <p className="text-[16px] text-white">{t("account.plan.priceValue")}</p>
+                      <p className="text-[16px] text-white">{activeProPrice}</p>
                     </div>
                   )}
 
@@ -486,7 +493,7 @@ export default function AccountPage() {
                         to="/pay"
                         className="mt-[30px] inline-block rounded-[100px] bg-[#9cfb51] px-[32px] py-[14px] text-center text-[16px] font-bold !text-[#011417] no-underline transition hover:-translate-y-0.5"
                       >
-                        {t("account.plan.upgradeBtn")}
+                        {upgradeLabel}
                       </LocalizedLink>
                     </div>
                   )}

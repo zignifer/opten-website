@@ -13,6 +13,8 @@ declare global {
     items: Array<{ priceId: string; quantity: number }>;
     customer?: { id?: string; email?: string };
     customData?: Record<string, unknown>;
+    discountCode?: string;
+    discountId?: string;
     settings?: {
       theme?: "dark" | "light";
       locale?: string;

@@ -5,6 +5,7 @@
 import { useT, useLang } from "../../i18n/LangContext";
 import LocalizedLink from "./LocalizedLink";
 import InstallButton from "./InstallButton";
+import { FooterDefinitionText } from "./DynamicPriceCopy";
 
 function Accent({ children }: { children: React.ReactNode }) {
   return <span className="text-[#9cfb51]">{children}</span>;
@@ -59,7 +60,7 @@ export default function SiteFooter({ variant = "full" }: SiteFooterProps): JSX.E
           <InstallButton />
         </div>
         <p className="mx-auto mt-8 w-full max-w-[760px] font-['PT_Root_UI',sans-serif] text-[14px] leading-[1.6] text-white/55 md:text-[15px]">
-          {t("hero.definitional")}
+          <FooterDefinitionText />
         </p>
         <div className="mt-20 flex flex-wrap justify-center gap-x-5 gap-y-4 font-['PT_Root_UI',sans-serif] text-[16px] text-white/40 sm:gap-8">
           {footerLinks}

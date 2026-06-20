@@ -10,6 +10,7 @@ import FaqBlock from "./components/FaqBlock";
 import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
 import InstallButton from "./components/InstallButton";
+import { useCurrencyPreference } from "../lib/currency";
 import { landingFaq } from "../content/landingFaq";
 import OptenHeroAnimation from "./components/OptenHeroAnimation";
 import { Picture } from "./components/Picture";
@@ -426,10 +427,9 @@ function PrivacyItem({ title, desc, last = false }: { title: string; desc: strin
 
 function Pricing() {
   const t = useT();
-  const { lang } = useLang();
-  const isRu = lang === "ru";
-  const onetimePrice = isRu ? t("pricing.onetime.price") : t("pricing.onetime.priceUsd");
-  const proPrice = isRu ? t("pricing.pro.price") : t("pricing.pro.priceUsd");
+  const [currency] = useCurrencyPreference();
+  const onetimePrice = currency === "USD" ? t("pricing.onetime.priceUsd") : t("pricing.onetime.price");
+  const proPrice = currency === "USD" ? t("pricing.pro.priceUsd") : t("pricing.pro.price");
   return (
     <section id="pricing" className="bg-[#011417] px-5 py-[70px] md:py-24">
       <div className="mx-auto max-w-[800px]">

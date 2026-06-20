@@ -1,6 +1,5 @@
 import {
   Check,
-  Clock,
   CreditCard,
   Crown,
   FileText,
@@ -9,6 +8,7 @@ import {
   LockOpen,
   Mail,
   Play,
+  Tag,
   Video,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
@@ -18,10 +18,15 @@ import type { AccountSummary } from "../../../../lib/optenAuth";
 import {
   createCoursePayment,
   fetchCourseAccessSummary,
-  formatRubPrice,
+  formatCoursePrice,
+  isCourseTestPromoCode,
   isValidCourseEmail,
+  isValidCoursePromoCode,
   normalizeCourseEmail,
+  normalizeCoursePromoCode,
 } from "../../../../lib/courseAccess";
+import { useCurrencyPreference } from "../../../../lib/currency";
+import { ensurePaddle } from "../../../../lib/paddle";
 import LocalizedLink from "../../LocalizedLink";
 import ResponsiveImage from "../../ResponsiveImage";
 import SiteFooter from "../../SiteFooter";
@@ -373,6 +378,7 @@ type KinescopeTokenResponse = {
 function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, playRequestId }: LessonPlayerProps) {
   const { pathname } = useLocation();
   const { lang } = useLang();
+  const [currency] = useCurrencyPreference();
   const { session } = useSpaceAuth();
   const copy = detailCopy[lang];
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -387,6 +393,9 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
   const embedUrl = youtubeId ? getYoutubeEmbedUrl(youtubeId, lang, captionLanguage, startSeconds, activated) : "";
   const isLocalVideo = provider.provider === "local" && Boolean(lesson.localVideo);
   const isKinescopeVideo = provider.provider === "kinescope";
+  const purchasePrice = purchase
+    ? formatCoursePrice(currency === "USD" ? purchase.priceUsd : purchase.priceRub, currency)
+    : "";
 
   useEffect(() => {
     setActivated(false);
@@ -502,7 +511,7 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
                         href="#course-purchase"
                         className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] bg-[#9cfb51] px-[14px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943]"
                       >
-                        {copy.buyCourseShort(formatRubPrice(purchase.priceRub))}
+                        {copy.buyCourseShort(purchasePrice)}
                       </a>
                     ) : (
                       <LocalizedLink
@@ -1074,14 +1083,22 @@ type PendingCoursePayment = {
   at: number;
 };
 
+type CoursePromoFeedback = {
+  tone: "success" | "error";
+  text: string;
+} | null;
+
 const COURSE_PAYMENT_PENDING_STORAGE_KEY = "opten_course_payment_pending_v1";
 
 function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, initialEmail, playerHeight }: CoursePurchaseCardProps) {
   const { lang } = useLang();
+  const [currency] = useCurrencyPreference();
   const copy = detailCopy[lang];
-  const countdown = useSaleCountdown(purchase.saleEndsAt);
   const [email, setEmail] = useState(initialEmail);
   const [emailTouched, setEmailTouched] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null);
+  const [promoFeedback, setPromoFeedback] = useState<CoursePromoFeedback>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pendingPayment, setPendingPayment] = useState<PendingCoursePayment | null>(() => readPendingCoursePayment(purchase.courseSlug));
@@ -1094,10 +1111,48 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   }, [emailTouched, initialEmail]);
 
   const normalizedEmail = normalizeCourseEmail(email);
-  const salePrice = formatRubPrice(purchase.priceRub);
-  const listPrice = formatRubPrice(purchase.listPriceRub);
+  const normalizedPromoCode = normalizeCoursePromoCode(promoCode);
+  const promoApplied = appliedPromoCode === "FREE";
+  const baseSaleValue = currency === "USD" ? purchase.priceUsd : purchase.priceRub;
+  const listValue = currency === "USD" ? purchase.listPriceUsd : purchase.listPriceRub;
+  const effectiveSaleValue = promoApplied ? (currency === "USD" ? 1 : 100) : baseSaleValue;
+  const salePrice = formatCoursePrice(effectiveSaleValue, currency);
+  const listPrice = formatCoursePrice(listValue, currency);
   const courseLessonsCount = collection.progress?.total || collection.lessons.length;
   const courseTitle = `${getLearnCollectionTitle(collection, lang)} (${copy.courseLessonsCount(courseLessonsCount)})`;
+  const formMessage = error
+    ? { tone: "error" as const, text: error }
+    : pendingPayment
+      ? { tone: "muted" as const, text: copy.coursePaymentPending(pendingPayment.email) }
+      : loadingAccess
+        ? { tone: "muted" as const, text: copy.courseAccessLoading }
+        : promoFeedback;
+
+  const handlePromoApply = () => {
+    const normalized = normalizeCoursePromoCode(promoCode);
+    setPromoCode(normalized);
+    setError(null);
+
+    if (!normalized) {
+      setAppliedPromoCode(null);
+      setPromoFeedback(null);
+      return;
+    }
+
+    if (!isValidCoursePromoCode(normalized)) {
+      setAppliedPromoCode(null);
+      setPromoFeedback({ tone: "error", text: copy.coursePromoInvalid });
+      return;
+    }
+
+    setAppliedPromoCode(normalized);
+    setPromoFeedback({
+      tone: "success",
+      text: isCourseTestPromoCode(normalized)
+        ? copy.coursePromoApplied(currency === "USD" ? "$1" : "100 ₽")
+        : copy.coursePromoWillCheck,
+    });
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -1111,8 +1166,8 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     setSubmitting(true);
     try {
       const returnUrl = typeof window !== "undefined" ? window.location.href.split("#")[0] : `/learn/courses/${purchase.courseSlug}`;
-      const result = await createCoursePayment(purchase.courseSlug, normalizedEmail, returnUrl);
-      if (!result.confirmation_url) throw new Error("no_confirmation_url");
+      const effectivePromoCode = appliedPromoCode ?? (isValidCoursePromoCode(normalizedPromoCode) ? normalizedPromoCode : undefined);
+      const result = await createCoursePayment(purchase.courseSlug, normalizedEmail, returnUrl, currency, effectivePromoCode);
 
       const pending = {
         courseSlug: purchase.courseSlug,
@@ -1122,6 +1177,41 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
       };
       writePendingCoursePayment(pending);
       setPendingPayment(pending);
+
+      if (currency === "USD") {
+        if (!result.price_id) throw new Error("no_paddle_price_id");
+        try {
+          await ensurePaddle();
+        } catch {
+          throw new Error("paddle_sdk_blocked");
+        }
+        if (!window.Paddle) throw new Error("paddle_sdk_missing");
+        window.Paddle.Checkout.open({
+          items: [{ priceId: result.price_id, quantity: 1 }],
+          customer: { email: normalizedEmail },
+          ...(result.discount_id ? { discountId: result.discount_id } : {}),
+          ...(result.discount_code ? { discountCode: result.discount_code } : {}),
+          customData: result.custom_data ?? {
+            kind: "course_purchase",
+            course_slug: purchase.courseSlug,
+            email: normalizedEmail,
+            order_id: result.order_id ?? "",
+          },
+          settings: {
+            theme: "dark",
+            locale: "en",
+            successUrl: appendCourseOrderParam(returnUrl, result.order_id),
+            displayMode: "overlay",
+            showAddDiscounts: false,
+          },
+          eventCallback: (event) => {
+            if (event.name === "checkout.closed") setSubmitting(false);
+          },
+        });
+        return;
+      }
+
+      if (!result.confirmation_url) throw new Error("no_confirmation_url");
       window.location.href = result.confirmation_url;
     } catch (paymentError) {
       setError(paymentError instanceof Error ? copy.coursePaymentError : copy.coursePaymentError);
@@ -1149,7 +1239,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     <section
       id="course-purchase"
       style={playerHeightStyle}
-      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[22px] py-[28px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] max-sm:px-[18px] max-sm:py-[26px] lg:flex lg:h-[var(--course-player-height)] lg:flex-col lg:justify-center lg:px-[22px] lg:py-[28px]"
+      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[22px] py-[24px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] max-sm:px-[18px] max-sm:py-[24px] lg:flex lg:h-[var(--course-player-height)] lg:flex-col lg:justify-center lg:px-[22px] lg:py-[24px]"
     >
       <div className="relative">
         <div className="flex items-start justify-between gap-[16px]">
@@ -1161,20 +1251,42 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
           </span>
         </div>
 
-        <div className="mt-[18px] flex items-end gap-[10px] max-sm:mt-[16px]">
-          <span className="font-['Unbounded',sans-serif] text-[38px] font-bold leading-none text-white max-sm:text-[36px]">{salePrice} ₽</span>
-          <span className="pb-[4px] text-[19px] font-bold leading-none text-white/36 line-through max-sm:text-[18px]">{listPrice} ₽</span>
+        <div className="mt-[15px] flex items-end gap-[10px] max-sm:mt-[14px]">
+          <span className="font-['Unbounded',sans-serif] text-[38px] font-bold leading-none text-white max-sm:text-[36px]">{salePrice}</span>
+          <span className="pb-[4px] text-[19px] font-bold leading-none text-white/36 line-through max-sm:text-[18px]">{listPrice}</span>
         </div>
 
-        <div className="mt-[18px] rounded-[8px] border border-white/10 bg-black/16 p-[13px] max-sm:mt-[16px] max-sm:p-[12px]">
-          <div className="mb-[11px] flex items-center gap-[7px] text-[12px] font-bold leading-none text-white/68">
-            <Clock size={14} className="text-[#9cfb51]" />
-            <span>{copy.courseSaleEnds}</span>
+        <div className="mt-[15px] max-sm:mt-[14px]">
+          <label className="text-[12px] font-bold leading-none text-white/62" htmlFor="course-purchase-promo">
+            {copy.coursePromoLabel}
+          </label>
+          <div className="mt-[9px] flex items-center gap-[8px] rounded-[8px] border border-white/12 bg-[#06191c] px-[12px] focus-within:border-[#9cfb51]/65 max-sm:mt-[8px]">
+            <Tag size={16} className="shrink-0 text-white/38" />
+            <input
+              id="course-purchase-promo"
+              type="text"
+              value={promoCode}
+              onChange={(event) => {
+                setPromoCode(normalizeCoursePromoCode(event.target.value).replace(/[^A-Z0-9]/g, "").slice(0, 32));
+                setAppliedPromoCode(null);
+                setPromoFeedback(null);
+              }}
+              placeholder={copy.coursePromoPlaceholder}
+              autoComplete="off"
+              autoCapitalize="characters"
+              className="h-[40px] min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium uppercase text-white outline-none placeholder:normal-case placeholder:text-white/28 max-sm:h-[40px]"
+            />
+            <button
+              type="button"
+              onClick={handlePromoApply}
+              className="h-[30px] shrink-0 cursor-pointer rounded-[6px] border-0 bg-white/8 px-[10px] text-[12px] font-black text-white/78 transition hover:bg-white/12 hover:text-white"
+            >
+              {copy.coursePromoApply}
+            </button>
           </div>
-          <CourseSaleCountdown countdown={countdown} lang={lang} />
         </div>
 
-        <form className="mt-[20px] max-sm:mt-[16px]" onSubmit={handleSubmit}>
+        <form className="mt-[15px] max-sm:mt-[14px]" onSubmit={handleSubmit}>
           <label className="text-[12px] font-bold leading-none text-white/62" htmlFor="course-purchase-email">
             {copy.courseEmailLabel}
           </label>
@@ -1190,19 +1302,25 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
               }}
               placeholder={copy.courseEmailPlaceholder}
               autoComplete="email"
-              className="h-[46px] min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium text-white outline-none placeholder:text-white/28 max-sm:h-[44px]"
+              className="h-[42px] min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium text-white outline-none placeholder:text-white/28 max-sm:h-[42px]"
             />
           </div>
 
-          {error && <p className="mt-[9px] text-[12px] font-medium leading-[1.35] text-[#ff8f8f]">{error}</p>}
-          {pendingPayment && !error && (
-            <p className="mt-[9px] text-[12px] font-medium leading-[1.4] text-white/54">
-              {copy.coursePaymentPending(pendingPayment.email)}
-            </p>
-          )}
-          {loadingAccess && (
-            <p className="mt-[9px] text-[12px] font-medium leading-[1.4] text-white/44">{copy.courseAccessLoading}</p>
-          )}
+          <div className="mt-[7px] h-[30px] overflow-hidden" aria-live="polite">
+            {formMessage && (
+              <p
+                className={`line-clamp-2 text-[12px] font-medium leading-[1.25] ${
+                  formMessage.tone === "error"
+                    ? "text-[#ff8f8f]"
+                    : formMessage.tone === "success"
+                      ? "text-[#9cfb51]"
+                      : "text-white/50"
+                }`}
+              >
+                {formMessage.text}
+              </p>
+            )}
+          </div>
 
           <button
             type="submit"
@@ -1218,57 +1336,15 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   );
 }
 
-type SaleCountdownState = {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-};
-
-function useSaleCountdown(saleEndsAt: string) {
-  const [countdown, setCountdown] = useState<SaleCountdownState | null>(null);
-
-  useEffect(() => {
-    const updateCountdown = () => setCountdown(getSaleCountdown(saleEndsAt));
-    updateCountdown();
-
-    const timerId = window.setInterval(updateCountdown, 1000);
-    return () => window.clearInterval(timerId);
-  }, [saleEndsAt]);
-
-  return countdown;
-}
-
-function getSaleCountdown(saleEndsAt: string, now = Date.now()): SaleCountdownState {
-  const endsAt = Date.parse(saleEndsAt);
-  const remainingMs = Math.max(0, (Number.isNaN(endsAt) ? now : endsAt) - now);
-  const totalSeconds = Math.floor(remainingMs / 1000);
-  return {
-    days: Math.floor(totalSeconds / 86400),
-    hours: Math.floor((totalSeconds % 86400) / 3600),
-    minutes: Math.floor((totalSeconds % 3600) / 60),
-    seconds: totalSeconds % 60,
-  };
-}
-
-function CourseSaleCountdown({ countdown, lang }: { countdown: SaleCountdownState | null; lang: "ru" | "en" }) {
-  const units = [
-    { value: countdown ? String(countdown.days).padStart(2, "0") : "--", label: lang === "ru" ? "дн" : "d" },
-    { value: countdown ? String(countdown.hours).padStart(2, "0") : "--", label: lang === "ru" ? "час" : "h" },
-    { value: countdown ? String(countdown.minutes).padStart(2, "0") : "--", label: lang === "ru" ? "мин" : "m" },
-    { value: countdown ? String(countdown.seconds).padStart(2, "0") : "--", label: lang === "ru" ? "сек" : "s" },
-  ];
-
-  return (
-    <div className="grid grid-cols-4 gap-[8px]">
-      {units.map((unit) => (
-        <div key={unit.label} className="min-w-0 text-center">
-          <span className="block font-['Unbounded',sans-serif] text-[22px] font-bold leading-none text-white tabular-nums">{unit.value}</span>
-          <span className="mt-[5px] block text-[11px] font-bold uppercase leading-none text-white/54">{unit.label}</span>
-        </div>
-      ))}
-    </div>
-  );
+function appendCourseOrderParam(returnUrl: string, orderId?: string) {
+  if (!orderId) return returnUrl;
+  try {
+    const url = new URL(returnUrl, window.location.origin);
+    url.searchParams.set("course_order", orderId);
+    return url.toString();
+  } catch {
+    return returnUrl;
+  }
 }
 
 function readPendingCoursePayment(courseSlug: string): PendingCoursePayment | null {
@@ -1586,6 +1662,12 @@ const detailCopy = {
     unlockOnPro: "Разблокировать на Pro",
     courseLessonsCount: (count: number) => `${count} ${getRussianPlural(count, "урок", "урока", "уроков")}`,
     courseSaleEnds: "Скидка закончится через",
+    coursePromoLabel: "Промокод",
+    coursePromoPlaceholder: "FREE",
+    coursePromoApply: "Применить",
+    coursePromoInvalid: "Промокод не найден.",
+    coursePromoApplied: (price: string) => `Промокод применён: ${price}.`,
+    coursePromoWillCheck: "Промокод будет проверен при оплате.",
     courseEmailLabel: "Email для доступа",
     courseEmailPlaceholder: "you@example.com",
     courseInvalidEmail: "Введите корректный email.",
@@ -1594,8 +1676,8 @@ const detailCopy = {
     courseCheckoutNote: "Оплата через YooKassa. После оплаты отправим ссылку для входа на этот email; позже можно входить обычным кодом на ту же почту.",
     courseAccessLoading: "Проверяем доступ к курсу...",
     coursePaymentPending: (email: string) => `Если оплата уже прошла, письмо со ссылкой отправлено на ${email}.`,
-    courseBuyButton: (price: string) => `Купить за ${price} ₽`,
-    buyCourseShort: (price: string) => `Купить за ${price} ₽`,
+    courseBuyButton: (price: string) => `Купить за ${price}`,
+    buyCourseShort: (price: string) => `Купить за ${price}`,
     courseAccessActive: "Доступ к курсу активен",
     courseAccessActiveDescription: "Видео и материалы курса открыты для этого аккаунта.",
     allLessons: "Все уроки",
@@ -1638,6 +1720,12 @@ const detailCopy = {
     unlockOnPro: "Unlock on Pro",
     courseLessonsCount: (count: number) => `${count} ${count === 1 ? "lesson" : "lessons"}`,
     courseSaleEnds: "Discount ends in",
+    coursePromoLabel: "Promo code",
+    coursePromoPlaceholder: "FREE",
+    coursePromoApply: "Apply",
+    coursePromoInvalid: "Promo code was not found.",
+    coursePromoApplied: (price: string) => `Promo code applied: ${price}.`,
+    coursePromoWillCheck: "Promo code will be checked at checkout.",
     courseEmailLabel: "Access email",
     courseEmailPlaceholder: "you@example.com",
     courseInvalidEmail: "Enter a valid email.",
@@ -1646,8 +1734,8 @@ const detailCopy = {
     courseCheckoutNote: "Checkout is handled by YooKassa. After payment, we send a sign-in link to this email; later you can sign in with the usual email code.",
     courseAccessLoading: "Checking course access...",
     coursePaymentPending: (email: string) => `If payment has succeeded, the access email was sent to ${email}.`,
-    courseBuyButton: (price: string) => `Buy for ${price} ₽`,
-    buyCourseShort: (price: string) => `Buy for ${price} ₽`,
+    courseBuyButton: (price: string) => `Buy for ${price}`,
+    buyCourseShort: (price: string) => `Buy for ${price}`,
     courseAccessActive: "Course access active",
     courseAccessActiveDescription: "Course videos and materials are unlocked for this account.",
     allLessons: "All lessons",

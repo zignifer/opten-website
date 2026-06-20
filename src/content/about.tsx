@@ -12,6 +12,7 @@
 
 import type { ReactNode } from "react";
 import LocalizedLink from "../app/components/LocalizedLink";
+import { AboutPricingParagraph } from "../app/components/DynamicPriceCopy";
 
 export interface AboutSection {
   heading: string;
@@ -106,12 +107,7 @@ const ru: AboutContent = {
             <li className="mb-[8px]"><strong className="text-white font-semibold">Privacy</strong> — ваши промпты и референсы <strong className="text-white font-semibold">не сохраняются на серверах Opten</strong>. Анализ идёт через Claude Haiku 4.5 за приватным Vercel-прокси, чисто транзитом.</li>
             <li className="mb-[8px]"><strong className="text-white font-semibold">RU / EN</strong> — интерфейс сам подхватывает язык браузера.</li>
           </ul>
-          <p className="mb-[14px]">
-            По цене: <strong className="text-white font-semibold">установка и регистрация бесплатны</strong>. Pro — 199 ₽/мес с автопродлением
-            через ЮKassa, либо 299 ₽ разово без подписки на месяц. Для платежей в долларах — Paddle,
-            около $2.99/мес или $4.99 разово. Это в пять раз дешевле PromptPerfect ($9.99), и при этом
-            Opten работает в десятках интерфейсов, а не только в собственном чате.
-          </p>
+          <AboutPricingParagraph />
         </>
       ),
     },
@@ -230,12 +226,7 @@ const en: AboutContent = {
             <li className="mb-[8px]"><strong className="text-white font-semibold">Privacy</strong> — your prompts and references <strong className="text-white font-semibold">are not stored on Opten servers</strong>. Analysis runs through Claude Haiku 4.5 behind a private Vercel proxy, pure pass-through.</li>
             <li className="mb-[8px]"><strong className="text-white font-semibold">RU / EN</strong> — the interface picks up the browser language.</li>
           </ul>
-          <p className="mb-[14px]">
-            On pricing: <strong className="text-white font-semibold">install and registration are free</strong>. Pro is 199 ₽/mo auto-renewed
-            through YooKassa, or 299 ₽ one-time without a monthly subscription. For USD payments —
-            Paddle, around $2.99/mo or $4.99 one-time. That's five times cheaper than PromptPerfect
-            ($9.99), and Opten works across dozens of interfaces rather than just inside its own chat.
-          </p>
+          <AboutPricingParagraph />
         </>
       ),
     },

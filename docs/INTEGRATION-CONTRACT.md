@@ -233,7 +233,7 @@ The site only **calls** them; it does not own them.
 |----------|--------|------|-------|
 | `POST /create-payment` | Site (`PayPage` RU path) | Bearer JWT | YooKassa. Body: `{ recurring: boolean }`. Returns `{ confirmation_url }`. `return_url` is hardcoded to `https://opten.space/success`. The JWT may come from website auth or extension fallback. |
 | `POST /create-payment-paddle` | Site (`PayPage` EN path) | Bearer JWT | Paddle. Returns `{ priceId, customerEmail, userId }`. Site then calls `Paddle.Checkout.open(...)`. The JWT may come from website auth or extension fallback. |
-| `POST /create-course-payment` | Hidden Learn course page (`/learn/courses/ai-content-marketing-2026/*`) | Public anon + email | YooKassa one-time checkout for a standalone course, not Pro. Body: `{ course_slug, email, return_url }`. Returns `{ confirmation_url, order_id, amount_value, list_amount_value, discount_percent, currency }`. The checkout email becomes the entitlement email; no website login is required before payment. |
+| `POST /create-course-payment` | Hidden Learn course page (`/learn/courses/ai-content-marketing-2026/*`) | Public anon + email | Standalone course checkout, not Pro. Body: `{ course_slug, email, return_url, currency?, promo_code? }`. `currency="RUB"` returns YooKassa `{ confirmation_url, order_id, amount_value, list_amount_value, discount_percent, currency }`; `currency="USD"` returns Paddle `{ provider:"paddle", price_id, order_id, customer_email, custom_data, amount_value, list_amount_value, discount_percent, discount_code?, discount_id?, currency }`. The checkout email becomes the entitlement email; no website login is required before payment. |
 | `POST /cancel-subscription` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | YooKassa cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
 | `POST /cancel-subscription-paddle` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | Paddle cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
 | `POST /get-subscription` | Site (optional) | Bearer JWT | Reads `subscriptions` table. Used as a fallback if the extension is not installed (rare path). |
@@ -256,18 +256,35 @@ The site only **calls** them; it does not own them.
 
 Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
 
-- The site shows a fixed RUB course offer: list price `4 990 ₽`, sale price
-  `2 990 ₽`, discount `40%`, and a sale countdown. This offer is not the Pro
-  subscription and must not be surfaced through extension subscription state.
+- The site shows a standalone course offer controlled by the global website
+  currency switcher: RUB list/sale `4 990 ₽` → `2 990 ₽`, USD list/sale
+  `$69` → `$41`, discount `40%`. This offer is not the Pro subscription and
+  must not be surfaced through extension subscription state.
 - A guest enters email on the course page and calls
-  `POST /create-course-payment`; the function creates a `course_orders` row
-  and a YooKassa payment with `metadata.kind = "course_purchase"`.
+  `POST /create-course-payment`; the function creates a `course_orders` row.
+  RUB checkout creates a YooKassa payment with
+  `metadata.kind = "course_purchase"`. USD checkout returns a Paddle `price_id`
+  and `custom_data.kind = "course_purchase"` for `Paddle.Checkout.open(...)`.
+- Internal test promo code `FREE` is server-normalized to uppercase and is not
+  a public marketing coupon. It maps the course price to `100 ₽` for RUB and
+  `$1` for USD. Paddle requires a separate `$1` one-time price ID; do not let
+  the browser set arbitrary checkout amounts.
+- Marketing/partner promo codes live in `course_promo_codes`, not in the
+  browser. The table is RLS-enabled with no anon/authenticated policies; only
+  Edge Functions with service-role validate codes. Codes are uppercase
+  `A-Z0-9`, up to 32 chars, so the same code can be passed to Paddle as
+  `discountCode`. Percentage codes discount the current sale price (`2 990 ₽`
+  or `$41`); the resulting order stores the effective discount from list price.
 - The YooKassa `/webhook` handler must branch on `metadata.kind` before
   requiring `metadata.user_id`. Course webhooks grant/confirm
   `course_entitlements`, create or reuse the Supabase Auth user for that email,
   generate a direct website magic link, and send it via Resend. They must not
   insert/update `subscriptions`, must not change `users.plan`, and must not
   reset `usage_logs`.
+- The Paddle `/webhook-paddle` and `/webhook-paddle-sandbox` handlers must
+  branch on verified `custom_data.kind = "course_purchase"` before requiring
+  `custom_data.user_id`. Course Paddle webhooks grant the same
+  `course_entitlements` and must not write Pro subscription state.
 - If the magic link expires, the buyer can still use the normal `/login` Email
   OTP flow with the same email. `course-access-summary` claims the entitlement
   by email and binds it to `auth.users.id`.
@@ -542,6 +559,7 @@ Never rename a key in one repo without the other.
 
 Paddle's checkout SDK is initialized in [`src/lib/paddle.ts`](../src/lib/paddle.ts) via `ensurePaddle()`,
 called from [`PayPage.tsx`](../src/app/pages/PayPage.tsx) on mount and again before `Paddle.Checkout.open()`.
+The hidden course purchase card also calls `ensurePaddle()` lazily before USD course checkout.
 
 **Per-route loading strategy (Phase 2.2, extended symmetrically in Phase 3 D-03b):**
 - The CDN `<script src="paddle.js">` tag is injected **synchronously** into `dist/pay/index.html`
@@ -557,10 +575,10 @@ called from [`PayPage.tsx`](../src/app/pages/PayPage.tsx) on mount and again bef
   `/en/privacy`, `/en/terms`, `/en/refund`) and SPA-fallback routes (`/account`, `/success`,
   `/dashboard/download-skill`) do NOT load Paddle in HTML.
   Loading the SDK on every page cost 500-1500 ms of render-blocking on mobile 3G and provided
-  no benefit (only `PayPage` consumes `window.Paddle`).
-- SPA-navigation to `/pay` (user clicks a `<Link to="/pay">` from landing) triggers
-  `ensurePaddle()` inside `PayPage`, which appends the `<script>` tag dynamically and resolves
-  once it loads + `Paddle.Initialize()` has run.
+  no benefit.
+- SPA-navigation to `/pay` (user clicks a `<Link to="/pay">` from landing) or USD course checkout
+  triggers `ensurePaddle()`, which appends the `<script>` tag dynamically and resolves once it
+  loads + `Paddle.Initialize()` has run.
 
 **Don't:**
 - Switch the `<script>` tag inside `dist/pay/index.html` to `async` or `defer` — `PayPage` will
@@ -573,8 +591,15 @@ called from [`PayPage.tsx`](../src/app/pages/PayPage.tsx) on mount and again bef
 **Env vars (Vercel):**
 - `VITE_PADDLE_ENV` — `'sandbox'` | `'production'`
 - `VITE_PADDLE_CLIENT_TOKEN` — Paddle public client token
+- Course Paddle price IDs live in the extension-owned Edge Function
+  environment, not in the website bundle:
+  `PADDLE_PRICE_ID_COURSE_AI_CONTENT_MARKETING_2026_{SANDBOX|PRODUCTION}`
+  and `PADDLE_PRICE_ID_COURSE_AI_CONTENT_MARKETING_2026_FREE_{SANDBOX|PRODUCTION}`.
+  The current live production IDs are
+  `pri_01kvk9vzec7cwgq7zgs9azw2re` (`$41`) and
+  `pri_01kvk9x5mcnadfj0beymk23ze5` (`$1` FREE test).
 
-If you switch envs, you must also flip the corresponding Paddle priceIds in the extension's `create-payment-paddle` Edge Function.
+If you switch envs, you must also flip the corresponding Paddle priceIds in the extension's `create-payment-paddle` and `create-course-payment` Edge Functions.
 
 ---
 

@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react";
-import { useT, useLang } from "../../i18n/LangContext";
+import { useState, useEffect } from "react";
+import { useT } from "../../i18n/LangContext";
 import LocalizedLink from "../components/LocalizedLink";
 import SiteHeader from "../components/SiteHeader";
+import { useCurrencyPreference } from "../../lib/currency";
 import { ensurePaddle } from "../../lib/paddle";
 import {
   fetchAccountSummary,
@@ -23,11 +24,6 @@ const EXTENSION_IDS = [
   "iphkppgbobpilmphloffcalicmejacfl",  // Chrome Web Store
   "kcmcaeenfmfnpiaihicecnfnagejpcog",  // Local dev
 ];
-
-// --- Phase 66: currency state (D-04, FE-02) ---
-const CURRENCY_STORAGE_KEY = "opten_pay_currency";
-type Currency = "RUB" | "USD";
-const langToCurrency = (lang: string): Currency => (lang === "ru" ? "RUB" : "USD");
 
 type ExtStatus = "detecting" | "not_installed" | "not_logged_in" | "ready";
 type AuthSource = "website" | "extension" | null;
@@ -149,43 +145,8 @@ function Divider() {
 
 export default function PayPage() {
   const t = useT();
-  const { lang } = useLang();
+  const [currency] = useCurrencyPreference();
   const { status: authStatus, session, account } = useSpaceAuth();
-  // Phase 66 D-04 + FE-02 + Phase 4 D-12 (SSR safety): currency state with lang-driven default
-  // and manual override. SSR initializes from lang only — localStorage is browser-only and would
-  // crash renderToString. A post-mount useEffect hydrates the stored override (one repaint,
-  // acceptable because SSR cards just show pricing copy; the currency toggle UI is interactive
-  // anyway and not part of the SEO-critical static content).
-  // Pitfall #1 fix (RESEARCH §Pitfall 1): guard the lang-change useEffect with useRef(true) so
-  // that on MOUNT we do NOT wipe the localStorage override. Only actual lang *changes* should reset it.
-  const [currency, setCurrencyState] = useState<Currency>(() => langToCurrency(lang));
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(CURRENCY_STORAGE_KEY);
-    if (stored === "RUB" || stored === "USD") {
-      setCurrencyState(stored);
-    }
-    // Only runs once on mount to hydrate from localStorage; lang-change reset is in the next effect.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const isFirstCurrencyRun = useRef(true);
-  useEffect(() => {
-    if (isFirstCurrencyRun.current) {
-      isFirstCurrencyRun.current = false;
-      return; // skip mount — preserve just-restored localStorage value
-    }
-    // Real lang change: drop the manual override and re-derive from new lang
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem(CURRENCY_STORAGE_KEY);
-    }
-    setCurrencyState(langToCurrency(lang));
-  }, [lang]);
-  const setCurrency = (c: Currency) => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(CURRENCY_STORAGE_KEY, c);
-    }
-    setCurrencyState(c);
-  };
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -449,39 +410,6 @@ export default function PayPage() {
             <h1 className="text-center font-['Unbounded',sans-serif] text-[34px] font-bold leading-[1.1] tracking-[-0.4px] text-white md:text-[46px]">
               {t("pay.h1")}
             </h1>
-            {/* Phase 66 (FE-01): RUB/USD pill toggle (D-01 style, D-02 position, D-03 compact width, D-07 i18n keys) */}
-            <div
-              role="tablist"
-              aria-label="Select payment currency"
-              className="mx-auto flex gap-0 rounded-[100px] border border-white/10 bg-white/5 p-[4px] font-['PT_Root_UI',sans-serif]"
-            >
-              <button
-                role="tab"
-                aria-selected={currency === "RUB"}
-                onClick={() => setCurrency("RUB")}
-                className={
-                  "rounded-[100px] border-none px-[22px] py-[10px] text-[14px] font-bold transition-colors cursor-pointer " +
-                  (currency === "RUB"
-                    ? "bg-white text-black"
-                    : "bg-transparent text-[rgba(255,255,255,0.7)] hover:bg-[rgba(255,255,255,0.08)] hover:text-white")
-                }
-              >
-                {t("pricing.currency.rub")}
-              </button>
-              <button
-                role="tab"
-                aria-selected={currency === "USD"}
-                onClick={() => setCurrency("USD")}
-                className={
-                  "rounded-[100px] border-none px-[22px] py-[10px] text-[14px] font-bold transition-colors cursor-pointer " +
-                  (currency === "USD"
-                    ? "bg-white text-black"
-                    : "bg-transparent text-[rgba(255,255,255,0.7)] hover:bg-[rgba(255,255,255,0.08)] hover:text-white")
-                }
-              >
-                {t("pricing.currency.usd")}
-              </button>
-            </div>
 
             {/* Phase 4 (post-04-04 revert): runtime-conditional cards back inline. SSR renders with
                 extStatus="detecting" → ChromeStore anchor branch (visible pricing facts in initial HTML

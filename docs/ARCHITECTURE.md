@@ -69,7 +69,7 @@ hits get a populated `<head>` + body before React mounts.
 | `/` | [`App.tsx`](../../src/app/App.tsx) | full | Landing page, scroll-reveal | No | No |
 | `/login` | `AppLoginPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Canonical website login for billing, account, and app surfaces. | No | Supabase Auth public endpoints |
 | `/auth/callback` | `AppAuthCallbackPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Receives Supabase Auth hash tokens, stores website session, returns to safe `next`. | No | No |
-| `/pay` | [`PayPage.tsx`](../../src/app/pages/PayPage.tsx) | full | Website-first checkout — YooKassa for RU/RUB, Paddle for EN/USD | Fallback `GET_AUTH_TOKEN` only when no website session exists | `account-summary`, `create-payment` or `create-payment-paddle` |
+| `/pay` | [`PayPage.tsx`](../../src/app/pages/PayPage.tsx) | full | Website-first checkout — YooKassa for RUB, Paddle for USD via the global header currency switcher | Fallback `GET_AUTH_TOKEN` only when no website session exists | `account-summary`, `create-payment` or `create-payment-paddle` |
 | `/welcome` | [`WelcomePage.tsx`](../../src/app/pages/WelcomePage.tsx) | full | First-install onboarding (opened by extension on install) | No (extension navigates *to* this) | No |
 | `/about` | [`AboutPage.tsx`](../../src/app/pages/AboutPage.tsx) | full | E-E-A-T founder page (Person schema + Article) | No | No |
 | `/blog` | [`BlogListPage.tsx`](../../src/app/pages/BlogListPage.tsx) | full | Blog hub — CollectionPage + ItemList; search + tag filter (client) | No | No |
