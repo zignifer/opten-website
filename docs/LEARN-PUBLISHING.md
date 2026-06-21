@@ -116,8 +116,10 @@ The direct-link course MVP lives outside the public SEO Learn catalog:
 - Course route: `/learn/courses/ai-content-marketing-2026`
 - First lesson route:
   `/learn/courses/ai-content-marketing-2026/lesson-1-prompting`
-- Current Kinescope-backed lessons: 1-10. The progress card still keeps the
-  planned course total at 15 lessons until the remaining lessons are uploaded.
+- Course content total: 16 lessons.
+- Current Kinescope-backed lessons: 1-10. Lessons 11-16 are present in content
+  but must not be treated as connected playback until their Kinescope video IDs
+  are added to both the course content and the server whitelist.
 - Source data: `src/content/space/privateCourse.ts`
 - Client page: `src/app/pages/space/PrivateCoursePage.tsx`
 - Playback token endpoint: `POST /api/kinescope-course-token`
@@ -129,8 +131,11 @@ Keep `/learn/courses/*` noindex and out of sitemap, llms.txt, header nav, and
 `EN_SIBLINGS` until launch. Do not store Kinescope API keys or playback secrets
 in browser code. The client requests a short-lived Kinescope embed URL with the
 website Supabase JWT; the server verifies the standalone course entitlement
-before signing `drmauthtoken`. Kinescope then calls the auth callback during
-playback and gets 200 or 403.
+before signing `drmauthtoken`, then adds a dynamic `watermark` query parameter
+from the authenticated email/user id. Kinescope then calls the auth callback
+during playback and gets 200 or 403. For the watermark to render, enable
+Watermark in the Kinescope player template/dashboard; otherwise Kinescope
+ignores the URL parameter.
 
 The hidden course `ai-content-marketing-2026` is not unlocked by Pro. It uses a
 separate one-time course purchase:
@@ -158,6 +163,17 @@ Before enabling Kinescope project auth backend in production, set
 `KINESCOPE_AUTH_JWT_SECRET` in Vercel and verify that the deployed callback is
 reachable. Optional Basic Auth for the callback uses
 `KINESCOPE_DRM_AUTH_USERNAME` and `KINESCOPE_DRM_AUTH_PASSWORD`.
+
+Paid-plan Kinescope protection checklist for this course:
+
+1. Enable project-level DRM encryption for the course project.
+2. Restrict embedding/playback to `opten.space` and `www.opten.space`.
+3. Enable Watermark in the player template so the server-provided `watermark`
+   query parameter is visible during playback.
+4. Configure the Kinescope authorization backend URL to
+   `https://opten.space/api/kinescope-course-auth` with strict mode.
+5. Add every uploaded video ID to `src/content/space/privateCourse.ts` and
+   `api/_shared/kinescopeCourse.ts`, then run `npm run verify:kinescope-course`.
 
 ## Future Course Collections
 

@@ -290,7 +290,10 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
   by email and binds it to `auth.users.id`.
 - The Vercel endpoint `POST /api/kinescope-course-token` still verifies the
   website JWT locally and signs the Kinescope `drmauthtoken`, but its access
-  check is now `course-access-summary`, not Pro subscription lookup.
+  check is now `course-access-summary`, not Pro subscription lookup. The same
+  endpoint appends a per-viewer `watermark` query parameter based on the
+  authenticated email/user id; Kinescope only renders it after Watermark is
+  enabled in the player template/dashboard.
 
 If the Supabase project is ever rotated/migrated, **all listed site files** plus the extension's
 [`config/api.js`](../../promptscore/config/api.js) must be updated in one coordinated commit.

@@ -124,6 +124,8 @@ assert.doesNotMatch(tokenApi, /hasLiveProSubscription|not_pro/, "Kinescope token
 assert.match(serverAuth, /course-access-summary/, "Server auth helper must call course-access-summary for course entitlements");
 assert.match(tokenApi, /buildKinescopeEmbedUrl/, "Token API must return Kinescope embed URLs through the shared builder");
 assert.match(serverCourse, /drmauthtoken/, "Kinescope embed URL builder must attach the DRM auth token");
+assert.match(serverCourse, /watermark/, "Kinescope embed URL builder must support per-viewer watermark text");
+assert.match(tokenApi, /viewerWatermark/, "Token API must pass per-viewer watermark text into Kinescope embed URLs");
 
 const authApi = read("api/kinescope-course-auth.ts");
 assert.match(authApi, /KINESCOPE_AUTH_JWT_SECRET/, "Kinescope auth callback must verify the same server env secret");
