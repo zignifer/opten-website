@@ -95,8 +95,10 @@ the course is intentionally launched. The hidden course
 `ai-content-marketing-2026` is a standalone one-time course purchase, not a Pro
 entitlement. RUB checkout uses YooKassa; USD checkout uses Paddle with
 course-specific one-time price IDs returned by
-`/functions/v1/create-course-payment`. Guest checkout is initiated with an
-email address, selected currency, and optional uppercase promo code. Provider
+`/functions/v1/create-course-payment`. Promo preview uses the same endpoint with
+optional `quote_only: true`; this validates the uppercase promo code and returns
+the effective amount without creating `course_orders` or provider payments.
+Guest checkout is initiated with an email address, selected currency, and optional uppercase promo code. Provider
 webhooks grant a course entitlement and send a direct website auth link to the
 same email. The internal test promo `FREE` maps to `100 ₽` or `$1` and requires
 a separate Paddle `$1` price ID. Marketing/partner course promo codes live in

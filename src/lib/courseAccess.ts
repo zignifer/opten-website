@@ -20,6 +20,8 @@ export type CoursePaymentResponse = {
   amount_value?: number;
   list_amount_value?: number;
   discount_percent?: number;
+  promo_discount_percent?: number | null;
+  promo_code?: string | null;
   discount_code?: string | null;
   discount_id?: string | null;
   currency?: Currency;
@@ -105,5 +107,29 @@ export async function createCoursePayment(
   });
   const body = (await response.json().catch(() => ({}))) as CoursePaymentResponse;
   if (!response.ok || body.error) throw new Error(body.error || "course_payment_failed");
+  return body;
+}
+
+export async function quoteCoursePayment(
+  courseSlug: string,
+  currency: Currency = "RUB",
+  promoCode?: string,
+): Promise<CoursePaymentResponse> {
+  const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-course-payment`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      apikey: SUPABASE_ANON_KEY,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      course_slug: courseSlug,
+      currency,
+      promo_code: promoCode ? normalizeCoursePromoCode(promoCode) : undefined,
+      quote_only: true,
+    }),
+  });
+  const body = (await response.json().catch(() => ({}))) as CoursePaymentResponse;
+  if (!response.ok || body.error) throw new Error(body.error || "course_quote_failed");
   return body;
 }

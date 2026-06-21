@@ -9,6 +9,7 @@ interface CurrencySwitcherProps {
 export default function CurrencySwitcher({ className, label, onSwitch }: CurrencySwitcherProps): JSX.Element {
   const [currency, setCurrency] = useCurrencyPreference();
   const nextCurrency = currency === "RUB" ? "USD" : "RUB";
+  const activeLabel = currency;
 
   return (
     <button
@@ -23,12 +24,11 @@ export default function CurrencySwitcher({ className, label, onSwitch }: Currenc
       {label ? (
         <>
           <span>{label}</span>
-          <span>{nextCurrency}</span>
+          <span>{activeLabel}</span>
         </>
       ) : (
-        nextCurrency
+        activeLabel
       )}
     </button>
   );
 }
-

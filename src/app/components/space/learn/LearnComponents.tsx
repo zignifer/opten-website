@@ -16,6 +16,7 @@ import { useLocation } from "react-router";
 import { useLang } from "../../../../i18n/LangContext";
 import type { AccountSummary } from "../../../../lib/optenAuth";
 import {
+  type CoursePaymentResponse,
   createCoursePayment,
   fetchCourseAccessSummary,
   formatCoursePrice,
@@ -24,6 +25,7 @@ import {
   isValidCoursePromoCode,
   normalizeCourseEmail,
   normalizeCoursePromoCode,
+  quoteCoursePayment,
 } from "../../../../lib/courseAccess";
 import { useCurrencyPreference } from "../../../../lib/currency";
 import { ensurePaddle } from "../../../../lib/paddle";
@@ -894,10 +896,9 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const isCourse = collection.kind === "course";
-  const timestampsActive = activeTab === "timestamps";
 
   return (
-    <section className={`overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]/92 ${timestampsActive ? "max-md:hidden" : ""}`}>
+    <section className="overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]/92">
       <div className="flex h-[52px] items-end border-b border-white/8 px-[16px]">
         {isCourse && (
           <button
@@ -914,7 +915,7 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
         <button
           type="button"
           onClick={() => onTabChange("timestamps")}
-          className={`relative h-[52px] min-w-[116px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition max-md:hidden ${
+          className={`relative h-[52px] min-w-[116px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition ${
             activeTab === "timestamps" ? "text-white" : "text-white/58 hover:text-white"
           }`}
         >
@@ -942,18 +943,13 @@ type CourseOutlineProps = {
 
 export function CourseOutline({ collection, currentSlug, hasAccess, purchase, className = "" }: CourseOutlineProps) {
   const { lang } = useLang();
-  const copy = detailCopy[lang];
 
   return (
     <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] ${className}`}>
       {collection.lessons.map((outlineLesson, index) => {
         const current = outlineLesson.slug === currentSlug;
         const locked = isLessonLocked(outlineLesson, hasAccess);
-        const metaLabel = purchase
-          ? copy.unlocksAfterPurchase
-          : locked
-            ? copy.unlocksOnPro
-            : outlineLesson.duration;
+        const metaLabel = outlineLesson.duration;
         return (
           <LocalizedLink
             key={outlineLesson.slug}
@@ -976,8 +972,8 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
               <span className={`block text-[14px] font-bold leading-[1.35] ${current ? "text-white" : ""}`}>
                 {getLearnLessonTitle(outlineLesson, lang)}
               </span>
-              <span className={`mt-[4px] block text-[12px] leading-tight text-white/44 ${locked ? "hidden" : ""}`}>
-                {purchase || locked ? <span className="text-[#9cfb51]">{metaLabel}</span> : metaLabel}
+              <span className="mt-[4px] block text-[12px] leading-tight text-white/44">
+                {metaLabel}
               </span>
             </span>
             {locked ? (
@@ -1014,7 +1010,9 @@ function TimestampList({ timestamps, onSelect }: TimestampListProps) {
             <span className="block text-[14px] font-bold leading-[1.35] text-white group-hover:text-[#9cfb51]">
               {timestamp.title}
             </span>
-            <span className="mt-[4px] block text-[12px] leading-[1.35] text-white/48">{timestamp.description}</span>
+            {timestamp.description && (
+              <span className="mt-[4px] block text-[12px] leading-[1.35] text-white/48">{timestamp.description}</span>
+            )}
           </span>
         </button>
       ))}
@@ -1098,6 +1096,8 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   const [emailTouched, setEmailTouched] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null);
+  const [appliedPromoQuote, setAppliedPromoQuote] = useState<CoursePaymentResponse | null>(null);
+  const [promoChecking, setPromoChecking] = useState(false);
   const [promoFeedback, setPromoFeedback] = useState<CoursePromoFeedback>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -1111,24 +1111,66 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   }, [emailTouched, initialEmail]);
 
   const normalizedEmail = normalizeCourseEmail(email);
-  const normalizedPromoCode = normalizeCoursePromoCode(promoCode);
-  const promoApplied = appliedPromoCode === "FREE";
   const baseSaleValue = currency === "USD" ? purchase.priceUsd : purchase.priceRub;
   const listValue = currency === "USD" ? purchase.listPriceUsd : purchase.listPriceRub;
-  const effectiveSaleValue = promoApplied ? (currency === "USD" ? 1 : 100) : baseSaleValue;
+  const quotedAmountValue = typeof appliedPromoQuote?.amount_value === "number" ? appliedPromoQuote.amount_value : null;
+  const effectiveSaleValue = quotedAmountValue ?? baseSaleValue;
+  const crossedValue = appliedPromoQuote ? baseSaleValue : listValue;
   const salePrice = formatCoursePrice(effectiveSaleValue, currency);
-  const listPrice = formatCoursePrice(listValue, currency);
+  const listPrice = formatCoursePrice(crossedValue, currency);
   const courseLessonsCount = collection.progress?.total || collection.lessons.length;
   const courseTitle = `${getLearnCollectionTitle(collection, lang)} (${copy.courseLessonsCount(courseLessonsCount)})`;
+  const promoBadgeLabel = getCoursePromoBadgeLabel(appliedPromoCode, appliedPromoQuote);
   const formMessage = error
     ? { tone: "error" as const, text: error }
     : pendingPayment
       ? { tone: "muted" as const, text: copy.coursePaymentPending(pendingPayment.email) }
       : loadingAccess
         ? { tone: "muted" as const, text: copy.courseAccessLoading }
-        : promoFeedback;
+        : { tone: "muted" as const, text: copy.courseSecurePayment(currency === "USD" ? "Paddle" : "ЮКасса") };
+
+  useEffect(() => {
+    if (!appliedPromoCode) {
+      setAppliedPromoQuote(null);
+      return;
+    }
+
+    let cancelled = false;
+    setPromoChecking(true);
+    setPromoFeedback(null);
+
+    quoteCoursePayment(purchase.courseSlug, currency, appliedPromoCode)
+      .then((quote) => {
+        if (cancelled) return;
+        setAppliedPromoQuote({
+          ...quote,
+          promo_code: quote.promo_code ?? appliedPromoCode,
+        });
+        setPromoFeedback({ tone: "success", text: copy.coursePromoApplied });
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setAppliedPromoCode(null);
+        setAppliedPromoQuote(null);
+        setPromoFeedback({ tone: "error", text: copy.coursePromoInvalid });
+      })
+      .finally(() => {
+        if (!cancelled) setPromoChecking(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [appliedPromoCode, currency, purchase.courseSlug, copy.coursePromoApplied, copy.coursePromoInvalid]);
 
   const handlePromoApply = () => {
+    if (appliedPromoCode) {
+      setAppliedPromoCode(null);
+      setAppliedPromoQuote(null);
+      setPromoFeedback(null);
+      return;
+    }
+
     const normalized = normalizeCoursePromoCode(promoCode);
     setPromoCode(normalized);
     setError(null);
@@ -1146,12 +1188,8 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     }
 
     setAppliedPromoCode(normalized);
-    setPromoFeedback({
-      tone: "success",
-      text: isCourseTestPromoCode(normalized)
-        ? copy.coursePromoApplied(currency === "USD" ? "$1" : "100 ₽")
-        : copy.coursePromoWillCheck,
-    });
+    setAppliedPromoQuote(null);
+    setPromoFeedback(null);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -1166,7 +1204,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     setSubmitting(true);
     try {
       const returnUrl = typeof window !== "undefined" ? window.location.href.split("#")[0] : `/learn/courses/${purchase.courseSlug}`;
-      const effectivePromoCode = appliedPromoCode ?? (isValidCoursePromoCode(normalizedPromoCode) ? normalizedPromoCode : undefined);
+      const effectivePromoCode = appliedPromoCode ?? undefined;
       const result = await createCoursePayment(purchase.courseSlug, normalizedEmail, returnUrl, currency, effectivePromoCode);
 
       const pending = {
@@ -1239,28 +1277,39 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     <section
       id="course-purchase"
       style={playerHeightStyle}
-      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[22px] py-[24px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] max-sm:px-[18px] max-sm:py-[24px] lg:flex lg:h-[var(--course-player-height)] lg:flex-col lg:justify-center lg:px-[22px] lg:py-[24px]"
+      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[24px] py-[26px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] max-sm:px-[18px] max-sm:py-[24px] lg:flex lg:h-[var(--course-player-height)] lg:flex-col lg:justify-center lg:px-[24px] lg:py-[26px]"
     >
       <div className="relative">
         <div className="flex items-start justify-between gap-[16px]">
           <div className="min-w-0">
-            <h2 className="text-[17px] font-bold leading-[1.25] text-white">{courseTitle}</h2>
+            <h2 className="text-[18px] font-bold leading-[1.25] text-white">{courseTitle}</h2>
           </div>
-          <span className="mt-[2px] shrink-0 rounded-[6px] bg-[#9cfb51] px-[8px] py-[5px] text-[12px] font-black leading-none text-[#062013]">
-            -{purchase.discountPercent}%
-          </span>
+          {promoBadgeLabel && (
+            <span className="mt-[2px] shrink-0 rounded-[6px] bg-[#9cfb51] px-[9px] py-[5px] text-[12px] font-black leading-none text-[#062013]">
+              {promoBadgeLabel}
+            </span>
+          )}
         </div>
 
-        <div className="mt-[15px] flex items-end gap-[10px] max-sm:mt-[14px]">
-          <span className="font-['Unbounded',sans-serif] text-[38px] font-bold leading-none text-white max-sm:text-[36px]">{salePrice}</span>
-          <span className="pb-[4px] text-[19px] font-bold leading-none text-white/36 line-through max-sm:text-[18px]">{listPrice}</span>
+        <div className="mt-[20px] flex items-end gap-[12px] max-sm:mt-[18px]">
+          <span className="font-['Unbounded',sans-serif] text-[42px] font-bold leading-none text-white max-sm:text-[40px]">{salePrice}</span>
+          <span className="pb-[6px] text-[21px] font-bold leading-none text-white/34 line-through max-sm:text-[19px]">{listPrice}</span>
         </div>
 
-        <div className="mt-[15px] max-sm:mt-[14px]">
+        <div className="mt-[24px] max-sm:mt-[22px]">
           <label className="text-[12px] font-bold leading-none text-white/62" htmlFor="course-purchase-promo">
             {copy.coursePromoLabel}
           </label>
-          <div className="mt-[9px] flex items-center gap-[8px] rounded-[8px] border border-white/12 bg-[#06191c] px-[12px] focus-within:border-[#9cfb51]/65 max-sm:mt-[8px]">
+          <div
+            className={`mt-[9px] flex h-[42px] items-center gap-[8px] rounded-[8px] border bg-[#06191c] px-[12px] transition focus-within:border-[#9cfb51]/65 max-sm:mt-[8px] ${
+              promoFeedback?.tone === "error"
+                ? "border-[#ff8f8f]/55"
+                : appliedPromoCode
+                  ? "border-[#9cfb51]/65"
+                  : "border-white/12"
+            }`}
+            title={promoFeedback?.text ?? undefined}
+          >
             <Tag size={16} className="shrink-0 text-white/38" />
             <input
               id="course-purchase-promo"
@@ -1269,28 +1318,31 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
               onChange={(event) => {
                 setPromoCode(normalizeCoursePromoCode(event.target.value).replace(/[^A-Z0-9]/g, "").slice(0, 32));
                 setAppliedPromoCode(null);
+                setAppliedPromoQuote(null);
                 setPromoFeedback(null);
               }}
               placeholder={copy.coursePromoPlaceholder}
               autoComplete="off"
               autoCapitalize="characters"
-              className="h-[40px] min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium uppercase text-white outline-none placeholder:normal-case placeholder:text-white/28 max-sm:h-[40px]"
+              readOnly={Boolean(appliedPromoCode) || promoChecking}
+              className="h-full min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium uppercase text-white outline-none placeholder:normal-case placeholder:text-white/28"
             />
             <button
               type="button"
+              disabled={promoChecking}
               onClick={handlePromoApply}
-              className="h-[30px] shrink-0 cursor-pointer rounded-[6px] border-0 bg-white/8 px-[10px] text-[12px] font-black text-white/78 transition hover:bg-white/12 hover:text-white"
+              className="h-[30px] min-w-[82px] shrink-0 cursor-pointer rounded-[6px] border-0 bg-white/8 px-[10px] text-[12px] font-black text-white/78 transition hover:bg-white/12 hover:text-white disabled:cursor-wait disabled:opacity-70"
             >
-              {copy.coursePromoApply}
+              {promoChecking ? copy.coursePromoChecking : appliedPromoCode ? copy.coursePromoCancel : copy.coursePromoApply}
             </button>
           </div>
         </div>
 
-        <form className="mt-[15px] max-sm:mt-[14px]" onSubmit={handleSubmit}>
+        <form className="mt-[22px] max-sm:mt-[20px]" onSubmit={handleSubmit}>
           <label className="text-[12px] font-bold leading-none text-white/62" htmlFor="course-purchase-email">
             {copy.courseEmailLabel}
           </label>
-          <div className="mt-[9px] flex items-center gap-[8px] rounded-[8px] border border-white/12 bg-[#06191c] px-[12px] focus-within:border-[#9cfb51]/65 max-sm:mt-[8px]">
+          <div className={`mt-[9px] flex h-[44px] items-center gap-[8px] rounded-[8px] border bg-[#06191c] px-[12px] focus-within:border-[#9cfb51]/65 max-sm:mt-[8px] ${error ? "border-[#ff8f8f]/55" : "border-white/12"}`}>
             <Mail size={16} className="shrink-0 text-white/38" />
             <input
               id="course-purchase-email"
@@ -1302,34 +1354,29 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
               }}
               placeholder={copy.courseEmailPlaceholder}
               autoComplete="email"
-              className="h-[42px] min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium text-white outline-none placeholder:text-white/28 max-sm:h-[42px]"
+              className="h-full min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium text-white outline-none placeholder:text-white/28"
             />
           </div>
 
-          <div className="mt-[7px] h-[30px] overflow-hidden" aria-live="polite">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="mt-[22px] flex h-[46px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[16px] text-[15px] font-black text-[#062013] transition hover:bg-[#8ee943] disabled:cursor-wait disabled:opacity-70 max-sm:mt-[20px]"
+          >
+            <CreditCard size={17} />
+            {submitting ? copy.coursePaymentOpening : copy.courseBuyButton(salePrice)}
+          </button>
+          <div className="mt-[14px] h-[16px] overflow-hidden text-center" aria-live="polite">
             {formMessage && (
               <p
-                className={`line-clamp-2 text-[12px] font-medium leading-[1.25] ${
-                  formMessage.tone === "error"
-                    ? "text-[#ff8f8f]"
-                    : formMessage.tone === "success"
-                      ? "text-[#9cfb51]"
-                      : "text-white/50"
+                className={`truncate text-[12px] font-medium leading-[16px] ${
+                  formMessage.tone === "error" ? "text-[#ff8f8f]" : "text-white/45"
                 }`}
               >
                 {formMessage.text}
               </p>
             )}
           </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="mt-[16px] flex h-[46px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[16px] text-[14px] font-black text-[#062013] transition hover:bg-[#8ee943] disabled:cursor-wait disabled:opacity-70 max-sm:mt-[14px] max-sm:h-[44px]"
-          >
-            <CreditCard size={17} />
-            {submitting ? copy.coursePaymentOpening : copy.courseBuyButton(salePrice)}
-          </button>
         </form>
       </div>
     </section>
@@ -1345,6 +1392,16 @@ function appendCourseOrderParam(returnUrl: string, orderId?: string) {
   } catch {
     return returnUrl;
   }
+}
+
+function getCoursePromoBadgeLabel(promoCode: string | null, quote: CoursePaymentResponse | null) {
+  if (!promoCode || !quote) return null;
+  if (isCourseTestPromoCode(promoCode)) return "FREE";
+  const promoPercent = typeof quote.promo_discount_percent === "number" ? quote.promo_discount_percent : null;
+  if (promoPercent && promoPercent > 0 && promoPercent < 100) return `-${Math.round(promoPercent)}%`;
+  const fallbackPercent = typeof quote.discount_percent === "number" ? quote.discount_percent : null;
+  if (fallbackPercent && fallbackPercent > 0 && fallbackPercent < 100) return `-${Math.round(fallbackPercent)}%`;
+  return null;
 }
 
 function readPendingCoursePayment(courseSlug: string): PendingCoursePayment | null {
@@ -1665,15 +1722,17 @@ const detailCopy = {
     coursePromoLabel: "Промокод",
     coursePromoPlaceholder: "FREE",
     coursePromoApply: "Применить",
+    coursePromoCancel: "Отменить",
+    coursePromoChecking: "Проверяем",
     coursePromoInvalid: "Промокод не найден.",
-    coursePromoApplied: (price: string) => `Промокод применён: ${price}.`,
-    coursePromoWillCheck: "Промокод будет проверен при оплате.",
+    coursePromoApplied: "Промокод применён.",
     courseEmailLabel: "Email для доступа",
     courseEmailPlaceholder: "you@example.com",
     courseInvalidEmail: "Введите корректный email.",
     coursePaymentError: "Не удалось открыть оплату. Попробуйте ещё раз.",
     coursePaymentOpening: "Открываем оплату...",
     courseCheckoutNote: "Оплата через YooKassa. После оплаты отправим ссылку для входа на этот email; позже можно входить обычным кодом на ту же почту.",
+    courseSecurePayment: (provider: string) => `Безопасные платежи через ${provider}`,
     courseAccessLoading: "Проверяем доступ к курсу...",
     coursePaymentPending: (email: string) => `Если оплата уже прошла, письмо со ссылкой отправлено на ${email}.`,
     courseBuyButton: (price: string) => `Купить за ${price}`,
@@ -1723,15 +1782,17 @@ const detailCopy = {
     coursePromoLabel: "Promo code",
     coursePromoPlaceholder: "FREE",
     coursePromoApply: "Apply",
+    coursePromoCancel: "Cancel",
+    coursePromoChecking: "Checking",
     coursePromoInvalid: "Promo code was not found.",
-    coursePromoApplied: (price: string) => `Promo code applied: ${price}.`,
-    coursePromoWillCheck: "Promo code will be checked at checkout.",
+    coursePromoApplied: "Promo code applied.",
     courseEmailLabel: "Access email",
     courseEmailPlaceholder: "you@example.com",
     courseInvalidEmail: "Enter a valid email.",
     coursePaymentError: "Could not open checkout. Try again.",
     coursePaymentOpening: "Opening checkout...",
     courseCheckoutNote: "Checkout is handled by YooKassa. After payment, we send a sign-in link to this email; later you can sign in with the usual email code.",
+    courseSecurePayment: (provider: string) => `Secure payments via ${provider}`,
     courseAccessLoading: "Checking course access...",
     coursePaymentPending: (email: string) => `If payment has succeeded, the access email was sent to ${email}.`,
     courseBuyButton: (price: string) => `Buy for ${price}`,

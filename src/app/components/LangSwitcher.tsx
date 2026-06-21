@@ -29,6 +29,7 @@ export default function LangSwitcher({ className, label, onSwitch }: LangSwitche
   const navigate = useNavigate();
 
   const nextLang = lang === "ru" ? "en" : "ru";
+  const activeLabel = lang === "ru" ? "RU" : "EN";
 
   return (
     <button
@@ -58,10 +59,10 @@ export default function LangSwitcher({ className, label, onSwitch }: LangSwitche
       {label ? (
         <>
           <span>{label}</span>
-          <span>{lang === "ru" ? "EN" : "RU"}</span>
+          <span>{activeLabel}</span>
         </>
       ) : (
-        lang === "ru" ? "EN" : "RU"
+        activeLabel
       )}
     </button>
   );
