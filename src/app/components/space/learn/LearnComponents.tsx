@@ -1305,6 +1305,29 @@ function CourseSecurePaymentIcon({ className = "" }: { className?: string }) {
   );
 }
 
+function CoursePurchaseTitle({ count, compact }: { count: number; compact: boolean }) {
+  const { lang } = useLang();
+  const titleClass = `text-[17px] font-bold leading-[1.22] tracking-normal text-white max-sm:text-[16px] ${
+    compact ? "max-w-[248px]" : "max-w-[280px]"
+  }`;
+
+  if (lang === "en") {
+    return (
+      <h2 className={titleClass}>
+        <span className="text-[#9cfb51]">{count}-lesson course</span> about AI for content marketing in{" "}
+        <span className="text-[#9cfb51]">2026</span>
+      </h2>
+    );
+  }
+
+  return (
+    <h2 className={titleClass}>
+      <span className="text-[#9cfb51]">Курс из {count} уроков</span> про ИИ для контента и маркетинга в{" "}
+      <span className="text-[#9cfb51]">2026г</span>
+    </h2>
+  );
+}
+
 function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, initialEmail, playerHeight }: CoursePurchaseCardProps) {
   const { lang } = useLang();
   const [currency] = useCurrencyPreference();
@@ -1332,11 +1355,11 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   const listValue = currency === "USD" ? purchase.listPriceUsd : purchase.listPriceRub;
   const quotedAmountValue = typeof appliedPromoQuote?.amount_value === "number" ? appliedPromoQuote.amount_value : null;
   const effectiveSaleValue = quotedAmountValue ?? baseSaleValue;
-  const crossedValue = appliedPromoQuote ? baseSaleValue : listValue;
+  const crossedValue = typeof appliedPromoQuote?.list_amount_value === "number" ? appliedPromoQuote.list_amount_value : listValue;
+  const showCrossedPrice = Boolean(appliedPromoCode && appliedPromoQuote);
   const salePrice = formatCoursePrice(effectiveSaleValue, currency);
   const listPrice = formatCoursePrice(crossedValue, currency);
   const courseLessonsCount = collection.progress?.total || collection.lessons.length;
-  const courseTitle = copy.coursePurchaseTitle(courseLessonsCount);
   const promoBadgeLabel = getCoursePromoBadgeLabel(appliedPromoCode, appliedPromoQuote);
   const formMessage = error
     ? { tone: "error" as const, text: error }
@@ -1499,7 +1522,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
       <div className="relative h-[373px] w-[calc(100%-46px)] max-w-[314px]">
         <div className="absolute left-0 top-0 flex w-full items-start justify-between gap-[16px]">
           <div className="min-w-0">
-            <h2 className="max-w-[252px] text-[18px] font-bold leading-[21.25px] text-white">{courseTitle}</h2>
+            <CoursePurchaseTitle count={courseLessonsCount} compact={Boolean(promoBadgeLabel)} />
           </div>
           {promoBadgeLabel && (
             <span className="mt-[1px] shrink-0 rounded-[6px] bg-[#9cfb51] px-[8px] py-[5px] text-[12px] font-bold leading-none text-[#062013]">
@@ -1508,9 +1531,11 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
           )}
         </div>
 
-        <div className="absolute left-0 top-[64px] flex w-full items-end gap-[24px]">
+        <div className="absolute left-0 top-[74px] flex w-full items-end gap-[24px]">
           <span className="font-['Unbounded',sans-serif] text-[41px] font-bold leading-[38px] text-white max-sm:text-[40px]">{salePrice}</span>
-          <span className="text-[24px] font-bold leading-[19px] text-white/36 line-through max-sm:text-[22px]">{listPrice}</span>
+          {showCrossedPrice && (
+            <span className="text-[24px] font-bold leading-[19px] text-white/36 line-through max-sm:text-[22px]">{listPrice}</span>
+          )}
         </div>
 
         <div className="absolute left-0 top-[129px] h-[62px] w-full">
