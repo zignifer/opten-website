@@ -571,6 +571,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   },
   {
     slug: "lesson-11-ai-avatars",
+    videoId: "602d64ae-48ab-4730-a4fc-81b4d9677c14",
     title: { ru: "AI-аватары: lipsync и говорящая картинка", en: "AI avatars: lip sync and talking image" },
     description: {
       ru: "Вы научитесь делать говорящего аватара из картинки и аудио. Разберёте, как подготовить персонажа, записать голос и синхронизировать губы с озвучкой.",
@@ -612,6 +613,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   },
   {
     slug: "lesson-12-motion-control",
+    videoId: "d01c3455-92fe-4ffa-b878-d367211cfb5a",
     title: { ru: "AI-аватары: motion control и движение по референсу", en: "AI avatars: motion control from a reference" },
     description: {
       ru: "Вы научитесь переносить движение с референса на AI-персонажа. Разберёте первый кадр, позу, голос, результат в Kling и монтаж финального ролика.",
@@ -655,6 +657,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   },
   {
     slug: "lesson-13-upscale",
+    videoId: "c8494fb4-b8cf-4b4e-b6e8-7b43aebd9189",
     title: { ru: "Апскейл фото и видео", en: "Photo and video upscaling" },
     description: {
       ru: "Вы разберёте, когда нужен апскейл, почему плохой исходник не спасается магически и как выбирать режимы для фото и видео. Отдельно покажем, когда сначала монтировать, а уже потом улучшать качество.",
@@ -696,6 +699,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   },
   {
     slug: "lesson-14-codex",
+    videoId: "7a62c38c-b75d-4777-8ee8-74c81eda7a18",
     title: { ru: "Codex: настройки для автоматизации контента", en: "Codex settings for content automation" },
     description: {
       ru: "Вы настроите Codex как рабочее окружение для проекта, а не просто чат. Разберёте папку проекта, доступ к файлам, модель, режимы, AGENTS.md, MCP и подключение Opten.",
@@ -743,6 +747,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   },
   {
     slug: "lesson-15-higgsfield-mcp",
+    videoId: "54757622-4f97-4d8f-a97e-1f95ac2561f1",
     title: { ru: "Повторяем видео-референс через Higgsfield MCP", en: "Repeating a video reference with Higgsfield MCP" },
     description: {
       ru: "Вы научитесь разбирать чужой видео-референс и превращать его в понятное ТЗ для генерации. На примере первого кадра и Seedance проверите, насколько близко получается повторить механику ролика.",
@@ -782,6 +787,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   },
   {
     slug: "lesson-16-nova-website",
+    videoId: "34992868-3dc1-416c-8438-d25ced15833a",
     title: { ru: "Создаём сайт для NOVA через ChatGPT и Codex", en: "Building a NOVA website with ChatGPT and Codex" },
     description: {
       ru: "Вы соберёте структуру лендинга, подготовите ассеты NOVA и превратите ТЗ в сайт через Codex. В уроке есть локальный запуск, проверка в браузере, мобильная версия, Vercel-деплой и подключение домена.",

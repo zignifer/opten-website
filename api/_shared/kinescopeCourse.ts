@@ -60,6 +60,36 @@ export const KINESCOPE_COURSE_LESSONS: KinescopeCourseLesson[] = [
     lessonSlug: "lesson-10-prompt-library",
     videoId: "3675dfeb-55da-47c3-aac8-35b0556dbd84",
   },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-11-ai-avatars",
+    videoId: "602d64ae-48ab-4730-a4fc-81b4d9677c14",
+  },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-12-motion-control",
+    videoId: "d01c3455-92fe-4ffa-b878-d367211cfb5a",
+  },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-13-upscale",
+    videoId: "c8494fb4-b8cf-4b4e-b6e8-7b43aebd9189",
+  },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-14-codex",
+    videoId: "7a62c38c-b75d-4777-8ee8-74c81eda7a18",
+  },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-15-higgsfield-mcp",
+    videoId: "54757622-4f97-4d8f-a97e-1f95ac2561f1",
+  },
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: "lesson-16-nova-website",
+    videoId: "34992868-3dc1-416c-8438-d25ced15833a",
+  },
 ];
 
 export function findKinescopeCourseLesson(courseSlug: string | undefined, lessonSlug: string | undefined) {

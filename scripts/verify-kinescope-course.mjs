@@ -39,6 +39,12 @@ const expectedKinescopeLessons = [
   ["lesson-8-frames", "43d3328a-dc4d-4e60-a269-aa1eebf7e2b4"],
   ["lesson-9-storytelling", "6f742d8c-cf18-4b9d-97b7-b3e6f63aa696"],
   ["lesson-10-prompt-library", "3675dfeb-55da-47c3-aac8-35b0556dbd84"],
+  ["lesson-11-ai-avatars", "602d64ae-48ab-4730-a4fc-81b4d9677c14"],
+  ["lesson-12-motion-control", "d01c3455-92fe-4ffa-b878-d367211cfb5a"],
+  ["lesson-13-upscale", "c8494fb4-b8cf-4b4e-b6e8-7b43aebd9189"],
+  ["lesson-14-codex", "7a62c38c-b75d-4777-8ee8-74c81eda7a18"],
+  ["lesson-15-higgsfield-mcp", "54757622-4f97-4d8f-a97e-1f95ac2561f1"],
+  ["lesson-16-nova-website", "34992868-3dc1-416c-8438-d25ced15833a"],
 ];
 
 const expectedPrivateCourseRuTitles = [
@@ -52,6 +58,12 @@ const expectedPrivateCourseRuTitles = [
   "Keyframes: первый и последний кадр в AI-видео",
   "Мультишот: сюжет из нескольких сцен в Kling и Seedance",
   "Замена фона и объектов в видео через Bible Switch X",
+  "AI-аватары: lipsync и говорящая картинка",
+  "AI-аватары: motion control и движение по референсу",
+  "Апскейл фото и видео",
+  "Codex: настройки для автоматизации контента",
+  "Повторяем видео-референс через Higgsfield MCP",
+  "Создаём сайт для NOVA через ChatGPT и Codex",
 ];
 
 assert.match(content, /e941e14d-c5bf-40fc-abe5-a41e247777cf/, "Private course must use the uploaded Kinescope video id");
