@@ -8,6 +8,7 @@ import {
   LockOpen,
   Mail,
   Play,
+  ShieldCheck,
   Tag,
   Video,
 } from "lucide-react";
@@ -1119,7 +1120,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   const salePrice = formatCoursePrice(effectiveSaleValue, currency);
   const listPrice = formatCoursePrice(crossedValue, currency);
   const courseLessonsCount = collection.progress?.total || collection.lessons.length;
-  const courseTitle = `${getLearnCollectionTitle(collection, lang)} (${copy.courseLessonsCount(courseLessonsCount)})`;
+  const courseTitle = copy.coursePurchaseTitle(courseLessonsCount);
   const promoBadgeLabel = getCoursePromoBadgeLabel(appliedPromoCode, appliedPromoQuote);
   const formMessage = error
     ? { tone: "error" as const, text: error }
@@ -1127,7 +1128,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
       ? { tone: "muted" as const, text: copy.coursePaymentPending(pendingPayment.email) }
       : loadingAccess
         ? { tone: "muted" as const, text: copy.courseAccessLoading }
-        : { tone: "muted" as const, text: copy.courseSecurePayment(currency === "USD" ? "Paddle" : "ЮКасса") };
+        : { tone: "secure" as const, text: copy.courseSecurePayment(currency === "USD" ? "Paddle" : "ЮКасса") };
 
   useEffect(() => {
     if (!appliedPromoCode) {
@@ -1277,31 +1278,31 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     <section
       id="course-purchase"
       style={playerHeightStyle}
-      className="relative overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[24px] py-[26px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] max-sm:px-[18px] max-sm:py-[24px] lg:flex lg:h-[var(--course-player-height)] lg:flex-col lg:justify-center lg:px-[24px] lg:py-[26px]"
+      className="relative min-h-[424px] overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[22px] pb-[26px] pt-[24px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] max-sm:px-[22px] max-sm:pb-[26px] max-sm:pt-[24px] lg:flex lg:h-[var(--course-player-height)] lg:flex-col lg:justify-center"
     >
       <div className="relative">
         <div className="flex items-start justify-between gap-[16px]">
           <div className="min-w-0">
-            <h2 className="text-[18px] font-bold leading-[1.25] text-white">{courseTitle}</h2>
+            <h2 className="max-w-[252px] text-[20px] font-bold leading-[1.12] text-white">{courseTitle}</h2>
           </div>
           {promoBadgeLabel && (
-            <span className="mt-[2px] shrink-0 rounded-[6px] bg-[#9cfb51] px-[9px] py-[5px] text-[12px] font-black leading-none text-[#062013]">
+            <span className="mt-[1px] shrink-0 rounded-[6px] bg-[#9cfb51] px-[9px] py-[5px] text-[12px] font-black leading-none text-[#062013]">
               {promoBadgeLabel}
             </span>
           )}
         </div>
 
-        <div className="mt-[20px] flex items-end gap-[12px] max-sm:mt-[18px]">
+        <div className="mt-[20px] flex items-end gap-[12px]">
           <span className="font-['Unbounded',sans-serif] text-[42px] font-bold leading-none text-white max-sm:text-[40px]">{salePrice}</span>
-          <span className="pb-[6px] text-[21px] font-bold leading-none text-white/34 line-through max-sm:text-[19px]">{listPrice}</span>
+          <span className="pb-[5px] text-[21px] font-bold leading-none text-white/34 line-through max-sm:text-[19px]">{listPrice}</span>
         </div>
 
-        <div className="mt-[24px] max-sm:mt-[22px]">
+        <div className="mt-[27px]">
           <label className="text-[12px] font-bold leading-none text-white/62" htmlFor="course-purchase-promo">
             {copy.coursePromoLabel}
           </label>
           <div
-            className={`mt-[9px] flex h-[42px] items-center gap-[8px] rounded-[8px] border bg-[#06191c] px-[12px] transition focus-within:border-[#9cfb51]/65 max-sm:mt-[8px] ${
+            className={`mt-[8px] flex h-[42px] items-center gap-[8px] rounded-[8px] border bg-[#06191c] px-[12px] transition focus-within:border-[#9cfb51]/65 ${
               promoFeedback?.tone === "error"
                 ? "border-[#ff8f8f]/55"
                 : appliedPromoCode
@@ -1338,11 +1339,11 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
           </div>
         </div>
 
-        <form className="mt-[22px] max-sm:mt-[20px]" onSubmit={handleSubmit}>
+        <form className="mt-[14px]" onSubmit={handleSubmit}>
           <label className="text-[12px] font-bold leading-none text-white/62" htmlFor="course-purchase-email">
             {copy.courseEmailLabel}
           </label>
-          <div className={`mt-[9px] flex h-[44px] items-center gap-[8px] rounded-[8px] border bg-[#06191c] px-[12px] focus-within:border-[#9cfb51]/65 max-sm:mt-[8px] ${error ? "border-[#ff8f8f]/55" : "border-white/12"}`}>
+          <div className={`mt-[8px] flex h-[44px] items-center gap-[8px] rounded-[8px] border bg-[#06191c] px-[12px] focus-within:border-[#9cfb51]/65 ${error ? "border-[#ff8f8f]/55" : "border-white/12"}`}>
             <Mail size={16} className="shrink-0 text-white/38" />
             <input
               id="course-purchase-email"
@@ -1361,19 +1362,24 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
           <button
             type="submit"
             disabled={submitting}
-            className="mt-[22px] flex h-[46px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[16px] text-[15px] font-black text-[#062013] transition hover:bg-[#8ee943] disabled:cursor-wait disabled:opacity-70 max-sm:mt-[20px]"
+            className="mt-[24px] flex h-[46px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[16px] text-[15px] font-black text-[#062013] transition hover:bg-[#8ee943] disabled:cursor-wait disabled:opacity-70"
           >
             <CreditCard size={17} />
             {submitting ? copy.coursePaymentOpening : copy.courseBuyButton(salePrice)}
           </button>
-          <div className="mt-[14px] h-[16px] overflow-hidden text-center" aria-live="polite">
+          <div className="mt-[14px] flex h-[16px] items-center justify-center overflow-hidden" aria-live="polite">
             {formMessage && (
               <p
-                className={`truncate text-[12px] font-medium leading-[16px] ${
-                  formMessage.tone === "error" ? "text-[#ff8f8f]" : "text-white/45"
+                className={`flex min-w-0 items-center justify-center gap-[8px] truncate text-[12px] font-medium leading-[16px] ${
+                  formMessage.tone === "error"
+                    ? "text-[#ff8f8f]"
+                    : formMessage.tone === "secure"
+                      ? "text-[#76d84f]"
+                      : "text-white/45"
                 }`}
               >
-                {formMessage.text}
+                {formMessage.tone === "secure" && <ShieldCheck size={14} className="shrink-0" strokeWidth={2.4} />}
+                <span className="truncate">{formMessage.text}</span>
               </p>
             )}
           </div>
@@ -1718,16 +1724,17 @@ const detailCopy = {
     unlockAllDescription: "Получите доступ ко всем материалам курса и Pro-урокам без ограничений.",
     unlockOnPro: "Разблокировать на Pro",
     courseLessonsCount: (count: number) => `${count} ${getRussianPlural(count, "урок", "урока", "уроков")}`,
+    coursePurchaseTitle: (count: number) => `Курс из ${count} ${getRussianPlural(count, "урока", "уроков", "уроков")} про нейросети для контента`,
     courseSaleEnds: "Скидка закончится через",
     coursePromoLabel: "Промокод",
-    coursePromoPlaceholder: "FREE",
+    coursePromoPlaceholder: "",
     coursePromoApply: "Применить",
     coursePromoCancel: "Отменить",
     coursePromoChecking: "Проверяем",
     coursePromoInvalid: "Промокод не найден.",
     coursePromoApplied: "Промокод применён.",
     courseEmailLabel: "Email для доступа",
-    courseEmailPlaceholder: "you@example.com",
+    courseEmailPlaceholder: "Ваш Email",
     courseInvalidEmail: "Введите корректный email.",
     coursePaymentError: "Не удалось открыть оплату. Попробуйте ещё раз.",
     coursePaymentOpening: "Открываем оплату...",
@@ -1778,9 +1785,10 @@ const detailCopy = {
     unlockAllDescription: "Get access to every course material and Pro lesson without limits.",
     unlockOnPro: "Unlock on Pro",
     courseLessonsCount: (count: number) => `${count} ${count === 1 ? "lesson" : "lessons"}`,
+    coursePurchaseTitle: (count: number) => `${count}-lesson course about AI for content`,
     courseSaleEnds: "Discount ends in",
     coursePromoLabel: "Promo code",
-    coursePromoPlaceholder: "FREE",
+    coursePromoPlaceholder: "",
     coursePromoApply: "Apply",
     coursePromoCancel: "Cancel",
     coursePromoChecking: "Checking",
