@@ -8,7 +8,6 @@ import {
   LockOpen,
   Mail,
   Play,
-  ShieldCheck,
   Tag,
   Video,
 } from "lucide-react";
@@ -1089,6 +1088,19 @@ type CoursePromoFeedback = {
 
 const COURSE_PAYMENT_PENDING_STORAGE_KEY = "opten_course_payment_pending_v1";
 
+function CourseSecurePaymentIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg className={className} width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M7.4376 1.49524C7.31728 1.38762 7.16152 1.32812 7.0001 1.32812C6.83868 1.32812 6.68292 1.38762 6.5626 1.49524C5.37998 2.55584 3.90315 3.23231 2.3276 3.43511C2.17291 3.45499 2.03036 3.52932 1.9255 3.64476C1.82064 3.76021 1.76032 3.90923 1.75535 4.06511C1.69618 5.79831 2.1288 7.51286 3.0032 9.01049C3.87759 10.5081 5.15804 11.7277 6.69648 12.5281C6.79028 12.5769 6.89448 12.6023 7.00021 12.6021C7.10594 12.602 7.21006 12.5763 7.30373 12.5272C8.84216 11.7268 10.1226 10.5073 10.997 9.00962C11.8714 7.51198 12.304 5.79743 12.2449 4.06423C12.2397 3.90851 12.1793 3.7597 12.0744 3.64443C11.9696 3.52917 11.8271 3.45497 11.6726 3.43511C10.0971 3.23256 8.62033 2.5564 7.4376 1.49611V1.49524ZM9.4851 6.31123C9.59101 6.17419 9.63845 6.00083 9.61707 5.82895C9.5957 5.65707 9.50724 5.50061 9.37098 5.39368C9.23472 5.28675 9.06172 5.23803 8.88968 5.25813C8.71765 5.27823 8.56054 5.36552 8.4526 5.50099L6.46985 8.02361L5.45835 7.15736C5.39347 7.09795 5.3173 7.05218 5.23438 7.02279C5.15146 6.9934 5.06347 6.98098 4.97566 6.98628C4.88784 6.99157 4.80198 7.01447 4.72319 7.05361C4.6444 7.09275 4.57428 7.14733 4.51701 7.21411C4.45974 7.28089 4.41648 7.35851 4.3898 7.44234C4.36312 7.52618 4.35357 7.61452 4.36172 7.70212C4.36987 7.78972 4.39555 7.87478 4.43723 7.95226C4.47891 8.02973 4.53574 8.09804 4.60435 8.15311L6.1356 9.46561C6.20282 9.52326 6.28101 9.5667 6.36547 9.59333C6.44992 9.61996 6.53889 9.62922 6.62702 9.62055C6.71515 9.61189 6.80061 9.58547 6.87826 9.5429C6.95591 9.50034 7.02415 9.44249 7.07885 9.37286L9.4851 6.31123Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, initialEmail, playerHeight }: CoursePurchaseCardProps) {
   const { lang } = useLang();
   const [currency] = useCurrencyPreference();
@@ -1278,31 +1290,31 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     <section
       id="course-purchase"
       style={playerHeightStyle}
-      className="relative min-h-[424px] overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] px-[22px] pb-[26px] pt-[24px] shadow-[0_18px_60px_rgba(54,134,28,0.16)] max-sm:px-[22px] max-sm:pb-[26px] max-sm:pt-[24px] lg:flex lg:h-[var(--course-player-height)] lg:flex-col lg:justify-center"
+      className="relative flex min-h-[424px] items-center justify-center overflow-hidden rounded-[8px] border border-[#9cfb51]/60 bg-[linear-gradient(135deg,rgba(16,48,34,0.96),rgba(14,32,35,0.98))] shadow-[0_18px_60px_rgba(54,134,28,0.16)] lg:h-[var(--course-player-height)]"
     >
-      <div className="relative">
-        <div className="flex items-start justify-between gap-[16px]">
+      <div className="relative h-[373px] w-[calc(100%-46px)] max-w-[314px]">
+        <div className="absolute left-0 top-0 flex w-full items-start justify-between gap-[16px]">
           <div className="min-w-0">
-            <h2 className="max-w-[252px] text-[20px] font-bold leading-[1.12] text-white">{courseTitle}</h2>
+            <h2 className="max-w-[252px] text-[18px] font-bold leading-[21.25px] text-white">{courseTitle}</h2>
           </div>
           {promoBadgeLabel && (
-            <span className="mt-[1px] shrink-0 rounded-[6px] bg-[#9cfb51] px-[9px] py-[5px] text-[12px] font-black leading-none text-[#062013]">
+            <span className="mt-[1px] shrink-0 rounded-[6px] bg-[#9cfb51] px-[8px] py-[5px] text-[12px] font-bold leading-none text-[#062013]">
               {promoBadgeLabel}
             </span>
           )}
         </div>
 
-        <div className="mt-[20px] flex items-end gap-[12px]">
-          <span className="font-['Unbounded',sans-serif] text-[42px] font-bold leading-none text-white max-sm:text-[40px]">{salePrice}</span>
-          <span className="pb-[5px] text-[21px] font-bold leading-none text-white/34 line-through max-sm:text-[19px]">{listPrice}</span>
+        <div className="absolute left-0 top-[64px] flex w-full items-end gap-[24px]">
+          <span className="font-['Unbounded',sans-serif] text-[41px] font-bold leading-[38px] text-white max-sm:text-[40px]">{salePrice}</span>
+          <span className="text-[24px] font-bold leading-[19px] text-white/36 line-through max-sm:text-[22px]">{listPrice}</span>
         </div>
 
-        <div className="mt-[27px]">
-          <label className="text-[12px] font-bold leading-none text-white/62" htmlFor="course-purchase-promo">
+        <div className="absolute left-0 top-[129px] h-[62px] w-full">
+          <label className="block h-[12px] text-[12px] font-bold leading-[12px] text-white/62" htmlFor="course-purchase-promo">
             {copy.coursePromoLabel}
           </label>
           <div
-            className={`mt-[8px] flex h-[42px] items-center gap-[8px] rounded-[8px] border bg-[#06191c] px-[12px] transition focus-within:border-[#9cfb51]/65 ${
+            className={`mt-[8px] flex h-[42px] items-center gap-[8px] rounded-[8px] border bg-[#06191c] pl-[12px] pr-[6px] transition focus-within:border-[#9cfb51]/65 ${
               promoFeedback?.tone === "error"
                 ? "border-[#ff8f8f]/55"
                 : appliedPromoCode
@@ -1311,7 +1323,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
             }`}
             title={promoFeedback?.text ?? undefined}
           >
-            <Tag size={16} className="shrink-0 text-white/38" />
+            <Tag size={16} strokeWidth={2} className="shrink-0 text-white/38" />
             <input
               id="course-purchase-promo"
               type="text"
@@ -1332,53 +1344,55 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
               type="button"
               disabled={promoChecking}
               onClick={handlePromoApply}
-              className="h-[30px] min-w-[82px] shrink-0 cursor-pointer rounded-[6px] border-0 bg-white/8 px-[10px] text-[12px] font-black text-white/78 transition hover:bg-white/12 hover:text-white disabled:cursor-wait disabled:opacity-70"
+              className="h-[30px] min-w-[82px] shrink-0 cursor-pointer rounded-[6px] border-0 bg-white/8 px-[10px] text-[12px] font-bold text-white/78 transition hover:bg-white/12 hover:text-white disabled:cursor-wait disabled:opacity-70"
             >
               {promoChecking ? copy.coursePromoChecking : appliedPromoCode ? copy.coursePromoCancel : copy.coursePromoApply}
             </button>
           </div>
         </div>
 
-        <form className="mt-[14px]" onSubmit={handleSubmit}>
-          <label className="text-[12px] font-bold leading-none text-white/62" htmlFor="course-purchase-email">
-            {copy.courseEmailLabel}
-          </label>
-          <div className={`mt-[8px] flex h-[44px] items-center gap-[8px] rounded-[8px] border bg-[#06191c] px-[12px] focus-within:border-[#9cfb51]/65 ${error ? "border-[#ff8f8f]/55" : "border-white/12"}`}>
-            <Mail size={16} className="shrink-0 text-white/38" />
-            <input
-              id="course-purchase-email"
-              type="email"
-              value={email}
-              onChange={(event) => {
-                setEmailTouched(true);
-                setEmail(event.target.value);
-              }}
-              placeholder={copy.courseEmailPlaceholder}
-              autoComplete="email"
-              className="h-full min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium text-white outline-none placeholder:text-white/28"
-            />
+        <form className="contents" onSubmit={handleSubmit}>
+          <div className="absolute left-0 top-[207px] h-[64px] w-full">
+            <label className="block h-[12px] text-[12px] font-bold leading-[12px] text-white/62" htmlFor="course-purchase-email">
+              {copy.courseEmailLabel}
+            </label>
+            <div className={`mt-[8px] flex h-[44px] items-center gap-[8px] rounded-[8px] border bg-[#06191c] px-[12px] focus-within:border-[#9cfb51]/65 ${error ? "border-[#ff8f8f]/55" : "border-white/12"}`}>
+              <Mail size={16} strokeWidth={2} className="shrink-0 text-white/38" />
+              <input
+                id="course-purchase-email"
+                type="email"
+                value={email}
+                onChange={(event) => {
+                  setEmailTouched(true);
+                  setEmail(event.target.value);
+                }}
+                placeholder={copy.courseEmailPlaceholder}
+                autoComplete="email"
+                className="h-full min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium text-white outline-none placeholder:text-white/28"
+              />
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={submitting}
-            className="mt-[24px] flex h-[46px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[16px] text-[15px] font-black text-[#062013] transition hover:bg-[#8ee943] disabled:cursor-wait disabled:opacity-70"
+            className="absolute left-0 top-[295px] flex h-[46px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border-0 bg-[#9cfb51] px-[16px] text-[14px] font-bold text-[#062013] transition hover:bg-[#8ee943] disabled:cursor-wait disabled:opacity-70"
           >
-            <CreditCard size={17} />
+            <CreditCard size={17} strokeWidth={2} />
             {submitting ? copy.coursePaymentOpening : copy.courseBuyButton(salePrice)}
           </button>
-          <div className="mt-[14px] flex h-[16px] items-center justify-center overflow-hidden" aria-live="polite">
+          <div className="absolute left-0 top-[355px] flex h-[16px] w-full items-center justify-center overflow-hidden" aria-live="polite">
             {formMessage && (
               <p
-                className={`flex min-w-0 items-center justify-center gap-[8px] truncate text-[12px] font-medium leading-[16px] ${
+                className={`flex min-w-0 items-center justify-center gap-[8px] truncate font-['Inter',sans-serif] text-[12px] font-normal leading-[16px] ${
                   formMessage.tone === "error"
                     ? "text-[#ff8f8f]"
                     : formMessage.tone === "secure"
-                      ? "text-[#76d84f]"
+                      ? "text-[#9cfb51]/60"
                       : "text-white/45"
                 }`}
               >
-                {formMessage.tone === "secure" && <ShieldCheck size={14} className="shrink-0" strokeWidth={2.4} />}
+                {formMessage.tone === "secure" && <CourseSecurePaymentIcon className="size-[14px] shrink-0" />}
                 <span className="truncate">{formMessage.text}</span>
               </p>
             )}
