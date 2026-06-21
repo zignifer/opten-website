@@ -46,6 +46,23 @@ export type LearnMaterial = {
   kind: "pdf" | "video" | "link";
   actionLabel: string;
   href: string;
+  status?: "ready" | "pending";
+};
+
+export type LearnPromptBlock = {
+  id?: string;
+  title: string;
+  meta: string;
+  body?: string;
+  language?: "text" | "markdown" | "bash";
+  sourceLabel?: string;
+  status?: "ready" | "pending";
+};
+
+export type LearnMissingItem = {
+  title: string;
+  meta: string;
+  actionLabel?: string;
 };
 
 export type LearnLocalVideo = {
@@ -99,6 +116,8 @@ export type LearnLesson = {
   localVideo?: LearnLocalVideo;
   timestamps: Record<LearnLang, LearnTimestamp[]>;
   materials: Partial<Record<LearnLang, LearnMaterial[]>>;
+  prompts?: Partial<Record<LearnLang, LearnPromptBlock[]>>;
+  missingItems?: Partial<Record<LearnLang, LearnMissingItem[]>>;
   videoProvider?: LearnVideoProviderMetadata;
 };
 
@@ -1125,6 +1144,14 @@ export function getLearnLessonTimestamps(item: LearnLesson, lang: LearnLang) {
 
 export function getLearnLessonMaterials(item: LearnLesson, lang: LearnLang) {
   return item.materials[lang] ?? item.materials.ru ?? [];
+}
+
+export function getLearnLessonPrompts(item: LearnLesson, lang: LearnLang) {
+  return item.prompts?.[lang] ?? item.prompts?.ru ?? [];
+}
+
+export function getLearnLessonMissingItems(item: LearnLesson, lang: LearnLang) {
+  return item.missingItems?.[lang] ?? item.missingItems?.ru ?? [];
 }
 
 export function getLearnLessonReleaseNote(item: LearnLesson, lang: LearnLang = "ru") {

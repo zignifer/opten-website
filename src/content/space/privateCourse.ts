@@ -1,5 +1,6 @@
 import type { LearnCollection, LearnLang, LearnLesson, LearnMaterial, LearnTimestamp } from "./learn";
 import { futureProtectedVideoDeliveryNote, learnDefaultAuthor } from "./learn";
+import { getPrivateCourseLessonExtras } from "./privateCourseExtras";
 
 export const PRIVATE_COURSE_SLUG = "ai-content-marketing-2026";
 export const PRIVATE_COURSE_FIRST_LESSON_SLUG = "lesson-1-prompting";
@@ -112,6 +113,7 @@ function timestamps(items: Array<[string, string]>): LearnTimestamp[] {
 
 function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
   const posterPath = config.videoId ? poster(config.videoId) : pendingKinescopePosterPath;
+  const extras = getPrivateCourseLessonExtras(config.slug);
 
   const lesson: LearnLesson = {
     slug: config.slug,
@@ -139,7 +141,9 @@ function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
       en: config.videoId ? "Kinescope video id connected on 2026-06-21." : "Kinescope video id needs to be added from the dashboard.",
     },
     timestamps: config.timestamps,
-    materials: courseMaterials,
+    materials: extras?.materials ?? courseMaterials,
+    prompts: extras?.prompts,
+    missingItems: extras?.missingItems,
   };
 
   if (config.videoId) {

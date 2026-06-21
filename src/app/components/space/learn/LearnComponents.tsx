@@ -1,5 +1,6 @@
 import {
   Check,
+  Copy,
   CreditCard,
   Crown,
   FileText,
@@ -34,7 +35,7 @@ import ResponsiveImage from "../../ResponsiveImage";
 import SiteFooter from "../../SiteFooter";
 import SpaceHeader from "../SpaceHeader";
 import { useSpaceAuth } from "../SpaceAuthProvider";
-import type { LearnCollection, LearnCoursePurchase, LearnLesson, LearnMaterial, LearnOverviewSection, LearnTimestamp } from "../../../../content/space/learn";
+import type { LearnCollection, LearnCoursePurchase, LearnLesson, LearnMaterial, LearnMissingItem, LearnOverviewSection, LearnPromptBlock, LearnTimestamp } from "../../../../content/space/learn";
 import {
   getLearnCollectionCategoryLabel,
   getLearnCollectionTitle,
@@ -44,6 +45,8 @@ import {
   getLearnLessonCategoryLabel,
   getLearnLessonDescription,
   getLearnLessonMaterials,
+  getLearnLessonMissingItems,
+  getLearnLessonPrompts,
   getLearnLessonTimestamps,
   getLearnLessonTitle,
   getLearnLessonVideoProvider,
@@ -292,6 +295,15 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
           </div>
           <div className={courseMobileOrder(3)}>
             <LessonMaterials materials={getLearnLessonMaterials(displayedLesson, lang)} locked={locked} purchase={purchase} />
+            <LessonPrompts
+              prompts={getLearnLessonPrompts(displayedLesson, lang)}
+              locked={locked}
+              purchase={purchase}
+              courseSlug={purchase?.courseSlug}
+              lessonSlug={displayedLesson.slug}
+              accessToken={session?.access_token ?? null}
+            />
+            <LessonMissingItems items={getLearnLessonMissingItems(displayedLesson, lang)} />
           </div>
           <div className={isCourse ? "max-lg:hidden" : undefined}>
             <RelatedLessons collection={displayedCollection} currentSlug={lesson.slug} hasAccess={lessonAccessGranted} purchase={purchase} />
@@ -730,8 +742,9 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
         {materials.map((material, index) => {
           const Icon = materialIcon(material.kind);
           const external = material.href.startsWith("http");
-          const disabled = locked;
-          const actionLabel = purchase ? copy.paidCourseBadge : material.actionLabel;
+          const pending = material.status === "pending";
+          const disabled = locked || pending;
+          const actionLabel = pending ? copy.materialPendingAction : purchase ? copy.paidCourseBadge : material.actionLabel;
           const rowClass =
             `grid grid-cols-[34px_minmax(0,1fr)_154px] items-center gap-[12px] border-b border-white/8 px-[16px] py-[10px] last:border-b-0 max-sm:grid-cols-[32px_minmax(0,1fr)] ${
               canCollapseOnMobile && !expanded && index > 0 ? "max-md:hidden" : ""
@@ -747,8 +760,8 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
                 <span className="mt-[4px] block text-[12px] leading-tight text-white/42">{material.meta}</span>
               </span>
               {disabled ? (
-                <span className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.04] text-[13px] font-medium text-white/32 max-sm:col-span-2">
-                  {purchase ? copy.unlocksAfterPurchase : "Pro"}
+                <span className={`flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.04] text-[13px] font-medium max-sm:col-span-2 ${pending ? "text-[#9cfb51]/58" : "text-white/32"}`}>
+                  {pending ? actionLabel : purchase ? copy.unlocksAfterPurchase : "Pro"}
                 </span>
               ) : external ? (
                 <a
@@ -779,6 +792,197 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
             {expanded ? copy.showLessMaterials : copy.showMoreMaterials}
           </button>
         )}
+      </div>
+    </section>
+  );
+}
+
+type LessonPromptsProps = {
+  prompts: LearnPromptBlock[];
+  locked: boolean;
+  purchase?: LearnCoursePurchase;
+  courseSlug?: string;
+  lessonSlug: string;
+  accessToken: string | null;
+};
+
+type LoadedPromptBody = {
+  status: "loading" | "loaded" | "error";
+  body?: string;
+  sourceLabel?: string;
+};
+
+function LessonPrompts({ prompts, locked, purchase, courseSlug, lessonSlug, accessToken }: LessonPromptsProps) {
+  const { lang } = useLang();
+  const copy = detailCopy[lang];
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [loadedBodies, setLoadedBodies] = useState<Record<string, LoadedPromptBody>>({});
+
+  useEffect(() => {
+    setLoadedBodies({});
+    setCopiedKey(null);
+  }, [accessToken, lessonSlug]);
+
+  if (prompts.length === 0) return null;
+
+  const getLoadedBody = (prompt: LearnPromptBlock, key: string) => prompt.body ?? loadedBodies[key]?.body;
+
+  const loadPromptBody = async (prompt: LearnPromptBlock, key: string) => {
+    if (locked || prompt.status === "pending" || prompt.body || !prompt.id || !courseSlug || !accessToken) return;
+    if (loadedBodies[key]?.status === "loading" || loadedBodies[key]?.status === "loaded") return;
+
+    setLoadedBodies((current) => ({ ...current, [key]: { status: "loading" } }));
+
+    try {
+      const response = await fetch("/api/course-prompt", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          courseSlug,
+          lessonSlug,
+          promptId: prompt.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`prompt_load_failed:${response.status}`);
+      }
+
+      const payload = (await response.json()) as {
+        prompt?: {
+          body?: string;
+          sourceLabel?: string | null;
+        };
+      };
+
+      if (!payload.prompt?.body) {
+        throw new Error("prompt_body_missing");
+      }
+
+      setLoadedBodies((current) => ({
+        ...current,
+        [key]: {
+          status: "loaded",
+          body: payload.prompt?.body,
+          sourceLabel: payload.prompt?.sourceLabel ?? undefined,
+        },
+      }));
+    } catch {
+      setLoadedBodies((current) => ({ ...current, [key]: { status: "error" } }));
+    }
+  };
+
+  const handleCopy = async (prompt: LearnPromptBlock, key: string) => {
+    const body = getLoadedBody(prompt, key);
+    if (!body || locked || prompt.status === "pending") return;
+    try {
+      await navigator.clipboard.writeText(body);
+      setCopiedKey(key);
+      window.setTimeout(() => setCopiedKey((current) => (current === key ? null : current)), 1400);
+    } catch {
+      setCopiedKey(null);
+    }
+  };
+
+  return (
+    <section className="mt-[34px] max-w-[820px]">
+      <h2 className="text-[22px] font-bold leading-tight text-white">{copy.lessonPrompts}</h2>
+      <div className="mt-[14px] space-y-[10px]">
+        {prompts.map((prompt, index) => {
+          const key = `${prompt.title}-${index}`;
+          const loaded = loadedBodies[key];
+          const promptBody = getLoadedBody(prompt, key);
+          const pending = prompt.status === "pending" || (!prompt.body && !prompt.id);
+          const disabled = locked || pending;
+          const sourceLabel = prompt.sourceLabel ?? loaded?.sourceLabel;
+
+          return (
+            <details
+              key={key}
+              className="group overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]"
+              onToggle={(event) => {
+                if (event.currentTarget.open) {
+                  void loadPromptBody(prompt, key);
+                }
+              }}
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-[14px] px-[16px] py-[14px] marker:hidden">
+                <span className="min-w-0">
+                  <span className="block text-[14px] font-bold leading-tight text-white">{prompt.title}</span>
+                  <span className="mt-[5px] block text-[12px] leading-[1.35] text-white/44">{prompt.meta}</span>
+                </span>
+                <span className={`shrink-0 rounded-[6px] px-[9px] py-[6px] text-[12px] font-bold leading-none ${pending ? "bg-[#9cfb51]/10 text-[#9cfb51]/70" : "bg-white/[0.06] text-white/68 group-open:text-[#9cfb51]"}`}>
+                  {pending ? copy.materialPendingAction : copy.openPrompt}
+                </span>
+              </summary>
+              <div className="border-t border-white/8 px-[16px] pb-[16px] pt-[14px]">
+                {disabled ? (
+                  <div className="flex min-h-[72px] items-center justify-center rounded-[8px] bg-white/[0.035] px-[16px] text-center text-[13px] font-medium leading-[1.35] text-white/44">
+                    {pending ? copy.promptPendingText : purchase ? copy.unlocksAfterPurchase : "Pro"}
+                  </div>
+                ) : !promptBody ? (
+                  <div className="flex min-h-[72px] items-center justify-center rounded-[8px] bg-white/[0.035] px-[16px] text-center text-[13px] font-medium leading-[1.35] text-white/44">
+                    {loaded?.status === "error" ? copy.promptLoadError : loaded?.status === "loading" ? copy.promptLoading : copy.promptOpenToLoad}
+                  </div>
+                ) : (
+                  <>
+                    {sourceLabel && <div className="mb-[10px] text-[12px] font-medium text-[#9cfb51]/72">{sourceLabel}</div>}
+                    <pre className="max-h-[420px] overflow-auto rounded-[8px] bg-[#06191c] p-[14px] text-[12px] leading-[1.55] text-white/78">
+                      <code>{promptBody}</code>
+                    </pre>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(prompt, key)}
+                      className="mt-[10px] inline-flex h-[34px] cursor-pointer items-center gap-[7px] rounded-[7px] border border-white/10 bg-white/[0.055] px-[11px] text-[12px] font-bold text-white/78 transition hover:border-[#9cfb51]/40 hover:text-[#9cfb51]"
+                    >
+                      {copiedKey === key ? <Check size={14} /> : <Copy size={14} />}
+                      {copiedKey === key ? copy.copiedPrompt : copy.copyPrompt}
+                    </button>
+                  </>
+                )}
+              </div>
+            </details>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+type LessonMissingItemsProps = {
+  items: LearnMissingItem[];
+};
+
+function LessonMissingItems({ items }: LessonMissingItemsProps) {
+  const { lang } = useLang();
+  const copy = detailCopy[lang];
+
+  if (items.length === 0) return null;
+
+  return (
+    <section className="mt-[34px] max-w-[820px]">
+      <div className="flex flex-wrap items-end justify-between gap-[10px]">
+        <div>
+          <h2 className="text-[22px] font-bold leading-tight text-white">{copy.missingFromVideoTitle}</h2>
+          <p className="mt-[7px] text-[13px] leading-[1.45] text-white/48">{copy.missingFromVideoDescription}</p>
+        </div>
+      </div>
+      <div className="mt-[14px] overflow-hidden rounded-[8px] border border-[#9cfb51]/24 bg-[#10261b]/65">
+        {items.map((item) => (
+          <div key={item.title} className="grid grid-cols-[minmax(0,1fr)_136px] items-center gap-[12px] border-b border-[#9cfb51]/12 px-[16px] py-[12px] last:border-b-0 max-sm:grid-cols-1">
+            <span className="min-w-0">
+              <span className="block text-[14px] font-bold leading-tight text-white">{item.title}</span>
+              <span className="mt-[5px] block text-[12px] leading-[1.35] text-white/48">{item.meta}</span>
+            </span>
+            <span className="flex h-[34px] items-center justify-center rounded-[7px] bg-[#9cfb51]/10 px-[10px] text-[12px] font-bold text-[#9cfb51]/78">
+              {item.actionLabel ?? copy.materialPendingAction}
+            </span>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -1711,6 +1915,17 @@ const detailCopy = {
     lessonsTab: "Уроки",
     timestampsTab: "Тайм-коды",
     lessonMaterials: "Материалы урока",
+    lessonPrompts: "Промпты урока",
+    openPrompt: "Открыть",
+    copyPrompt: "Скопировать",
+    copiedPrompt: "Скопировано",
+    promptLoading: "Загружаем промпт...",
+    promptLoadError: "Не удалось загрузить промпт. Проверьте доступ и попробуйте снова.",
+    promptOpenToLoad: "Промпт загрузится после открытия.",
+    promptPendingText: "Точный текст нужно добрать из видео или загрузить отдельным файлом.",
+    materialPendingAction: "Нужно добавить",
+    missingFromVideoTitle: "Нужно добрать из видео",
+    missingFromVideoDescription: "Поля уже заведены. Когда будет ссылка, скриншот, файл или точный текст, сюда можно просто подставить готовый материал.",
     showMoreMaterials: "Показать больше",
     showLessMaterials: "Скрыть",
     markLessonCompleted: "Отметить как изучено",
@@ -1772,6 +1987,17 @@ const detailCopy = {
     lessonsTab: "Lessons",
     timestampsTab: "Timestamps",
     lessonMaterials: "Lesson materials",
+    lessonPrompts: "Lesson prompts",
+    openPrompt: "Open",
+    copyPrompt: "Copy",
+    copiedPrompt: "Copied",
+    promptLoading: "Loading prompt...",
+    promptLoadError: "Could not load the prompt. Check access and try again.",
+    promptOpenToLoad: "The prompt will load after opening.",
+    promptPendingText: "The exact text needs to be captured from the video or uploaded as a separate file.",
+    materialPendingAction: "Need to add",
+    missingFromVideoTitle: "Need to capture from video",
+    missingFromVideoDescription: "The fields are already prepared. Once a link, screenshot, file, or exact text is available, it can be dropped in here.",
     showMoreMaterials: "Show more",
     showLessMaterials: "Show less",
     markLessonCompleted: "Mark as learned",
