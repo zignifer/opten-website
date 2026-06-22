@@ -145,11 +145,11 @@ player overlay. Kinescope then calls the auth callback during playback and gets
 The hidden course `ai-content-marketing-2026` is not unlocked by Pro. It uses a
 separate one-time course purchase:
 
-- list price `4 990 ₽`
-- sale price `2 990 ₽`
+- RUB base price `4 990 ₽`
+- public discounts are server-side promo codes, not hard-coded sale pricing
 - USD list price `$69`
-- USD sale price `$41`
-- discount label `40%`
+- current USD checkout price is controlled by the Paddle price ID returned from
+  `create-course-payment`
 - internal test promo `FREE`: `100 ₽` or `$1`
 - partner/owner promo codes are stored server-side in `course_promo_codes`;
   use uppercase `A-Z0-9` codes so RUB/YooKassa and USD/Paddle stay in sync
@@ -174,8 +174,8 @@ Course promo operations:
 - `quote_only: true` on `create-course-payment` previews a promo price and must
   not create `course_orders`, provider payments, or `times_used` increments.
 - `course_promo_codes.discount_kind` is either `percentage` or `fixed_price`.
-  Percentage codes discount the current sale price; fixed-price codes require
-  both RUB and USD fixed amounts.
+  Percentage codes discount the current course base price; fixed-price codes
+  require both RUB and USD fixed amounts.
 - `enabled`, `usage_limit`, `times_used`, `starts_at`, and `expires_at` are
   enforced only in the Edge Function with service-role access.
 - `times_used` increments only from successful YooKassa/Paddle course webhooks,

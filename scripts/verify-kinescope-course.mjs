@@ -74,11 +74,11 @@ const expectedPrivateCourseRuTitles = [
 assert.match(content, /e941e14d-c5bf-40fc-abe5-a41e247777cf/, "Private course must use the uploaded Kinescope video id");
 assert.match(content, /ai-content-marketing-2026/, "Private course must expose a stable hidden course slug");
 assert.match(content, /lesson-1-prompting/, "Private course must expose the first lesson slug");
-assert.match(content, /PRIVATE_COURSE_PRICE_RUB\s*=\s*2990/, "Private course sale price must be 2 990 RUB");
-assert.match(content, /PRIVATE_COURSE_LIST_PRICE_RUB\s*=\s*4990/, "Private course list price must be 4 990 RUB");
+assert.match(content, /PRIVATE_COURSE_PRICE_RUB\s*=\s*4990/, "Private course base RUB price must be 4 990");
+assert.match(content, /PRIVATE_COURSE_LIST_PRICE_RUB\s*=\s*4990/, "Private course list RUB price must stay 4 990");
 assert.match(content, /PRIVATE_COURSE_PRICE_USD\s*=\s*41/, "Private course sale price must be 41 USD");
 assert.match(content, /PRIVATE_COURSE_LIST_PRICE_USD\s*=\s*69/, "Private course list price must be 69 USD");
-assert.match(content, /PRIVATE_COURSE_DISCOUNT_PERCENT\s*=\s*40/, "Private course discount must be 40%");
+assert.match(content, /PRIVATE_COURSE_DISCOUNT_PERCENT\s*=\s*0/, "Private course must not hard-code a public discount; promo codes own discounting");
 assert.match(content, /PRIVATE_COURSE_SALE_ENDS_AT/, "Private course must define a sale countdown deadline");
 assert.match(content, /purchase:\s*{[\s\S]*priceRub:\s*PRIVATE_COURSE_PRICE_RUB[\s\S]*priceUsd:\s*PRIVATE_COURSE_PRICE_USD[\s\S]*discountPercent:\s*PRIVATE_COURSE_DISCOUNT_PERCENT/, "Private course collection must expose RUB and USD purchase metadata");
 for (const [lessonSlug, videoId] of expectedKinescopeLessons) {
@@ -168,6 +168,16 @@ assert.match(components, /Paddle\.Checkout\.open/, "Private course UI must suppo
 assert.match(components, /discountCode/, "Private course UI must pass Paddle discount codes for USD course promos");
 assert.match(components, /courseLockedDescription/, "Private course locked overlay must use course purchase copy");
 assert.match(components, /unlocksAfterPurchase/, "Private course outline must label locked lessons as purchase-gated");
+assert.match(components, /const courseBreadcrumbTitle = isCourse \? getLearnCollectionTitle\(collection, lang\) : getLearnLessonTitle\(lesson, lang\)/, "Course breadcrumbs must stay stable per course instead of changing per lesson");
+assert.match(components, /const courseMobileOrder = \(order: 1 \| 2 \| 3 \| 4 \| 5\)/, "Private course mobile layout must support separate player, progress, outline, purchase, and content ordering");
+assert.match(components, /max-md:max-h-\[254px\]/, "Mobile course outline must show roughly three lessons with a fourth lesson peeking");
+assert.match(components, /courseBuyButton:\s*\(price: string\) => `Открыть весь курс за \$\{price\}`/, "Course purchase button copy must say 'Открыть весь курс за ...'");
+assert.match(components, /buyCourseShort:\s*\(price: string\) => `Открыть весь курс за \$\{price\}`/, "Locked player CTA copy must say 'Открыть весь курс за ...'");
+assert.match(components, /markLessonCompleted:\s*"Отметить как пройдено"/, "Completion CTA must use the requested passed-lesson wording");
+assert.match(components, /lessonCompleted:\s*"Отмечено как пройдено"/, "Completed lesson state must use the requested passed-lesson wording");
+assert.match(components, /function CourseProgressCard/, "Opened paid course must render a focused course progress card");
+assert.match(components, /<div className=\{`min-w-0 \$\{courseMobileOrder\(3\)\}`\}>\s*<CoursePurchaseCard/, "Locked private-course purchase form must be third on mobile");
+assert.match(components, /<div className=\{`min-w-0 \$\{courseMobileOrder\(2\)\}`\}>\s*<LessonSidebar/, "Locked private-course outline must be second on mobile");
 assert.doesNotMatch(components, /kine\.txt|KINESCOPE_API|Bearer\s+[0-9a-f-]{36}/i, "Client code must not expose Kinescope API keys");
 const kinescopeFetchIndex = components.indexOf('fetch("/api/kinescope-course-token"');
 assert.notEqual(kinescopeFetchIndex, -1, "Learn player must keep Kinescope token fetch in source");

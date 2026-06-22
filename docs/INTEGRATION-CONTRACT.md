@@ -260,9 +260,12 @@ The site only **calls** them; it does not own them.
 Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
 
 - The site shows a standalone course offer controlled by the global website
-  currency switcher: RUB list/sale `4 990 ₽` → `2 990 ₽`, USD list/sale
-  `$69` → `$41`, discount `40%`. This offer is not the Pro subscription and
-  must not be surfaced through extension subscription state.
+  currency switcher. The public RUB base price is `4 990 ₽`; public discounts
+  are not hard-coded in the website and must come from server-side promo codes
+  (planned common campaigns: `-20%` and `-40%`). The current USD checkout still
+  uses the configured course Paddle one-time price ID returned by the backend.
+  This offer is not the Pro subscription and must not be surfaced through
+  extension subscription state.
 - A guest enters email on the course page and calls
   `POST /create-course-payment`; the function creates a `course_orders` row.
   RUB checkout creates a YooKassa payment with
@@ -276,8 +279,8 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
   browser. The table is RLS-enabled with no anon/authenticated policies; only
   Edge Functions with service-role validate codes. Codes are uppercase
   `A-Z0-9`, up to 32 chars, so the same code can be passed to Paddle as
-  `discountCode`. Percentage codes discount the current sale price (`2 990 ₽`
-  or `$41`); the resulting order stores the effective discount from list price.
+  `discountCode`. Percentage codes discount the current course base price; the
+  resulting order stores the effective discount from list price.
 - `course_promo_codes` supports `discount_kind = "percentage"` and
   `discount_kind = "fixed_price"`. Percentage codes may define
   `paddle_discount_code` / `paddle_discount_id`; for USD checkout the site must

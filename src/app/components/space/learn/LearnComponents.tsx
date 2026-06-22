@@ -234,13 +234,15 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
   const displayedLesson = displayedCollection.lessons.find((item) => item.slug === lesson.slug) ?? lesson;
   const lessonCompleted = completedSlugs.has(lesson.slug);
   const courseMobileContentsClass = isCourse ? "max-lg:contents" : "";
-  const courseMobileOrder = (order: 1 | 2 | 3 | 4) => {
+  const courseMobileOrder = (order: 1 | 2 | 3 | 4 | 5) => {
     if (!isCourse) return "";
     if (order === 1) return "max-lg:order-1";
     if (order === 2) return "max-lg:order-2";
     if (order === 3) return "max-lg:order-3";
-    return "max-lg:order-4";
+    if (order === 4) return "max-lg:order-4";
+    return "max-lg:order-5";
   };
+  const courseBreadcrumbTitle = isCourse ? getLearnCollectionTitle(collection, lang) : getLearnLessonTitle(lesson, lang);
 
   const handleTimestampSelect = (seconds: number) => {
     setStartSeconds(seconds);
@@ -257,19 +259,12 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
 
   return (
     <LearnSectionWrapper>
-      <nav className="mb-[24px] flex flex-wrap items-center gap-[9px] text-[14px] text-white/68" aria-label={copy.breadcrumb}>
+      <nav className="mb-[24px] flex flex-wrap items-center gap-[9px] text-[14px] text-white/68 max-md:mb-[28px] max-md:text-[16px]" aria-label={copy.breadcrumb}>
         <LocalizedLink to="/learn" className="text-white/68 no-underline hover:text-white">
           {copy.courses}
         </LocalizedLink>
-        {isCourse && (
-          <>
-            <span className="text-white/28">/</span>
-            <span className="max-md:hidden">{getLearnCollectionTitle(collection, lang)}</span>
-            <span className="hidden max-md:inline">...</span>
-          </>
-        )}
         <span className="text-white/28">/</span>
-        <span className="font-medium text-white">{getLearnLessonTitle(lesson, lang)}</span>
+        <span className="font-medium text-white">{courseBreadcrumbTitle}</span>
       </nav>
 
       <section className="grid grid-cols-[minmax(0,1fr)_360px] items-start gap-[24px] max-lg:grid-cols-1">
@@ -294,7 +289,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
               onCompletionChange={handleLessonCompletionChange}
             />
           </div>
-          <div className={courseMobileOrder(3)}>
+          <div className={courseMobileOrder(4)}>
             <LessonMaterials materials={getLearnLessonMaterials(displayedLesson, lang)} locked={locked} purchase={purchase} />
             <LessonPrompts
               prompts={getLearnLessonPrompts(displayedLesson, lang)}
@@ -318,7 +313,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                 <div className={`min-w-0 ${courseMobileOrder(2)}`}>
                   <CollectionSummaryCard lesson={displayedLesson} collection={displayedCollection} />
                 </div>
-                <div className={`min-w-0 ${courseMobileOrder(4)}`}>
+                <div className={`min-w-0 ${courseMobileOrder(3)}`}>
                   <LessonSidebar
                     lesson={displayedLesson}
                     collection={displayedCollection}
@@ -332,7 +327,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
               </>
             ) : (
               <>
-                <div className={`min-w-0 ${courseMobileOrder(2)}`}>
+                <div className={`min-w-0 ${courseMobileOrder(3)}`}>
                   <CoursePurchaseCard
                     collection={displayedCollection}
                     purchase={purchase}
@@ -342,7 +337,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                     playerHeight={playerHeight}
                   />
                 </div>
-                <div className={`min-w-0 ${courseMobileOrder(4)}`}>
+                <div className={`min-w-0 ${courseMobileOrder(2)}`}>
                   <LessonSidebar
                     lesson={displayedLesson}
                     collection={displayedCollection}
@@ -683,10 +678,17 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
               className="h-full w-full object-cover opacity-62"
             />
             <div className="absolute inset-0 bg-[#011417]/58" />
-            <div className="absolute inset-0 grid place-items-center">
-              <span className="grid size-[104px] place-items-center rounded-full bg-white/10 text-white/72">
+            <div className="absolute inset-0 grid place-items-center px-[18px]">
+              <span className="hidden size-[104px] place-items-center rounded-full bg-white/10 text-white/72 md:grid">
                 <Lock size={42} />
               </span>
+              <a
+                href="#course-purchase"
+                className="flex h-[52px] max-w-full items-center justify-center gap-[8px] rounded-[8px] bg-[#9cfb51] px-[22px] text-center text-[15px] font-bold leading-none text-[#062013] no-underline shadow-[0_18px_50px_rgba(156,251,81,0.22)] transition hover:bg-[#8ee943] md:hidden"
+              >
+                <CreditCard size={17} strokeWidth={2.2} />
+                <span>{copy.buyCourseShort(purchasePrice)}</span>
+              </a>
             </div>
           </>
         ) : locked || !activated ? (
@@ -910,7 +912,7 @@ function LessonCompletionAction({ completed, copy, onToggle }: LessonCompletionA
       type="button"
       aria-pressed={completed}
       onClick={onToggle}
-      className={`inline-flex h-[30px] cursor-pointer items-center gap-[7px] rounded-[7px] border px-[10px] text-[12px] font-bold leading-none outline-none transition focus-visible:ring-2 focus-visible:ring-[#9cfb51]/65 ${
+      className={`inline-flex h-[34px] cursor-pointer items-center gap-[7px] rounded-[8px] border px-[12px] text-[13px] font-bold leading-none outline-none transition focus-visible:ring-2 focus-visible:ring-[#9cfb51]/65 max-sm:h-[32px] max-sm:text-[12px] ${
         completed
           ? "border-[#9cfb51]/35 bg-[#9cfb51]/12 text-[#9cfb51] hover:bg-[#9cfb51]/16"
           : "border-white/10 bg-white/[0.035] text-white/64 hover:border-[#9cfb51]/35 hover:text-[#9cfb51]"
@@ -1211,13 +1213,16 @@ function CollectionSummaryCard({ lesson, collection }: CollectionSummaryCardProp
   const author = getLearnLessonAuthor(lesson);
   const authorName = getLearnAuthorName(author, lang);
   const progress = collection.progress;
-  const percent = progress ? Math.round((progress.completed / progress.total) * 100) : 0;
   const isStandalone = collection.kind === "standalone";
   const eyebrow = collection.purchase
     ? copy.courseAccessOpen
     : isStandalone
       ? copy.singleLesson
       : getLearnCollectionCategoryLabel(collection, lang);
+
+  if (collection.purchase && progress) {
+    return <CourseProgressCard progress={progress} copy={copy} />;
+  }
 
   return (
     <section className="rounded-[8px] border border-white/10 bg-[#0e2023]/92 px-[20px] py-[20px] shadow-[0_16px_50px_rgba(0,0,0,0.18)]">
@@ -1241,21 +1246,37 @@ function CollectionSummaryCard({ lesson, collection }: CollectionSummaryCardProp
         </div>
       </div>
       <AuthorSocialLinks copy={copy} />
-      {progress && (
-        <div className="mt-[22px] border-t border-white/8 pt-[18px]">
-          <div className="flex items-center justify-between gap-[12px]">
-            <span className="text-[13px] font-medium text-white/72">{copy.courseProgress}</span>
-            <span className="text-[13px] font-bold text-[#9cfb51]">{percent}%</span>
-          </div>
-          <div className="mt-[12px] h-[5px] overflow-hidden rounded-full bg-white/12">
-            <div className="h-full rounded-full bg-[#9cfb51]" style={{ width: `${percent}%` }} />
-          </div>
-          <p className="mt-[8px] text-right text-[12px] leading-tight text-white/44">
-            {copy.progressCount(progress.completed, progress.total)}
-          </p>
-        </div>
-      )}
+      {progress && <CourseProgressBlock progress={progress} copy={copy} />}
     </section>
+  );
+}
+
+type CourseProgress = NonNullable<LearnCollection["progress"]>;
+
+function CourseProgressCard({ progress, copy }: { progress: CourseProgress; copy: (typeof detailCopy)["ru"] }) {
+  return (
+    <section className="rounded-[8px] border border-white/10 bg-[#0e2023]/92 px-[20px] py-[20px] shadow-[0_16px_50px_rgba(0,0,0,0.18)] max-md:px-[22px] max-md:py-[22px]">
+      <CourseProgressBlock progress={progress} copy={copy} />
+    </section>
+  );
+}
+
+function CourseProgressBlock({ progress, copy }: { progress: CourseProgress; copy: (typeof detailCopy)["ru"] }) {
+  const percent = Math.round((progress.completed / progress.total) * 100);
+
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-[12px]">
+        <span className="text-[13px] font-medium text-white/72 max-md:text-[16px]">{copy.courseProgress}</span>
+        <span className="text-[13px] font-bold text-[#9cfb51] max-md:text-[16px]">{percent}%</span>
+      </div>
+      <div className="mt-[12px] h-[5px] overflow-hidden rounded-full bg-white/12 max-md:mt-[18px]">
+        <div className="h-full rounded-full bg-[#9cfb51]" style={{ width: `${percent}%` }} />
+      </div>
+      <p className="mt-[8px] text-right text-[12px] leading-tight text-white/44 max-md:mt-[14px] max-md:text-[14px]">
+        {copy.progressCount(progress.completed, progress.total)}
+      </p>
+    </div>
   );
 }
 
@@ -1308,15 +1329,15 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
   const isCourse = collection.kind === "course";
 
   return (
-    <section className="overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]/92">
-      <div className="flex h-[52px] items-end border-b border-white/8 px-[16px]">
+    <section className="overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]/92 max-md:rounded-[10px]">
+      <div className="flex h-[52px] items-end border-b border-white/8 px-[16px] max-md:h-[60px] max-md:px-[22px]">
         {isCourse && (
           <button
             type="button"
             onClick={() => onTabChange("lessons")}
             className={`relative h-[52px] min-w-[92px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition ${
               activeTab === "lessons" ? "text-white" : "text-white/58 hover:text-white"
-            }`}
+            } max-md:h-[60px] max-md:min-w-[118px] max-md:text-[18px]`}
           >
             {copy.lessonsTab}
             {activeTab === "lessons" && <span className="absolute inset-x-[10px] bottom-0 h-[2px] rounded-full bg-[#9cfb51]" />}
@@ -1327,7 +1348,7 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
           onClick={() => onTabChange("timestamps")}
           className={`relative h-[52px] min-w-[116px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition ${
             activeTab === "timestamps" ? "text-white" : "text-white/58 hover:text-white"
-          }`}
+          } max-md:h-[60px] max-md:min-w-[142px] max-md:text-[18px]`}
         >
           {copy.timestampsTab}
           {activeTab === "timestamps" && <span className="absolute inset-x-[10px] bottom-0 h-[2px] rounded-full bg-[#9cfb51]" />}
@@ -1355,7 +1376,7 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
   const { lang } = useLang();
 
   return (
-    <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] ${className}`}>
+    <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] max-md:max-h-[254px] max-md:space-y-[4px] max-md:p-[10px] ${className}`}>
       {collection.lessons.map((outlineLesson, index) => {
         const current = outlineLesson.slug === currentSlug;
         const locked = isLessonLocked(outlineLesson, hasAccess);
@@ -1365,24 +1386,24 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
             key={outlineLesson.slug}
             to={getLessonHref(collection, outlineLesson.slug, lang)}
             aria-current={current ? "page" : undefined}
-            className={`group grid grid-cols-[26px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition ${
+            className={`group grid grid-cols-[26px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition max-md:grid-cols-[42px_minmax(0,1fr)_28px] max-md:gap-[8px] max-md:py-[12px] ${
               locked ? "min-h-[62px]" : ""
             } ${
               current
-                ? "bg-[#9cfb51]/10 text-white"
+                ? "bg-[#173a22] text-white"
                 : locked
                   ? "bg-white/[0.035] text-white/68 hover:bg-white/[0.055] hover:text-white"
                   : "text-white/76 hover:bg-white/[0.045] hover:text-white"
             }`}
           >
-            <span className={`text-center text-[14px] font-bold leading-none ${current ? "text-[#9cfb51]" : "text-white/48"}`}>
+            <span className={`text-center text-[14px] font-bold leading-none max-md:text-[18px] ${current ? "text-[#9cfb51]" : "text-white/48"}`}>
               {index + 1}
             </span>
             <span className="min-w-0">
-              <span className={`block text-[14px] font-bold leading-[1.35] ${current ? "text-white" : ""}`}>
+              <span className={`block text-[14px] font-bold leading-[1.35] max-md:text-[16px] ${current ? "text-white" : ""}`}>
                 {getLearnLessonTitle(outlineLesson, lang)}
               </span>
-              <span className="mt-[4px] block text-[12px] leading-tight text-white/44">
+              <span className="mt-[4px] block text-[12px] leading-tight text-white/44 max-md:text-[14px]">
                 {metaLabel}
               </span>
             </span>
@@ -2159,8 +2180,8 @@ const detailCopy = {
     missingFromVideoDescription: "Поля уже заведены. Когда будет ссылка, скриншот, файл или точный текст, сюда можно просто подставить готовый материал.",
     showMoreMaterials: "Показать больше",
     showLessMaterials: "Скрыть",
-    markLessonCompleted: "Отметить как изучено",
-    lessonCompleted: "Урок изучен",
+    markLessonCompleted: "Отметить как пройдено",
+    lessonCompleted: "Отмечено как пройдено",
     undoCompleted: "Отменить",
     lockedLesson: "Урок заблокирован",
     lockedDescription: "Разблокируйте тариф Pro, чтобы смотреть видео и получить доступ к материалам.",
@@ -2172,7 +2193,7 @@ const detailCopy = {
     signInPurchased: "Уже купили",
     playLesson: "Смотреть урок",
     courseProgress: "Прогресс курса",
-    progressCount: (completed: number, total: number) => `${completed} из ${total} уроков`,
+    progressCount: (completed: number, total: number) => `${completed} из ${total} уроков пройдено`,
     unlocksOnPro: "Разблокируется на Pro",
     unlocksAfterPurchase: "Доступ после покупки",
     paidCourseBadge: "Курс",
@@ -2202,8 +2223,8 @@ const detailCopy = {
     courseSecurePayment: (provider: string) => `Безопасные платежи через ${provider}`,
     courseAccessLoading: "Проверяем доступ к курсу...",
     coursePaymentPending: (email: string) => `Если оплата уже прошла, письмо со ссылкой отправлено на ${email}.`,
-    courseBuyButton: (price: string) => `Купить за ${price}`,
-    buyCourseShort: (price: string) => `Купить за ${price}`,
+    courseBuyButton: (price: string) => `Открыть весь курс за ${price}`,
+    buyCourseShort: (price: string) => `Открыть весь курс за ${price}`,
     courseAccessActive: "Доступ к курсу активен",
     courseAccessActiveDescription: "Видео и материалы курса открыты для этого аккаунта.",
     allLessons: "Все уроки",
@@ -2231,8 +2252,8 @@ const detailCopy = {
     missingFromVideoDescription: "The fields are already prepared. Once a link, screenshot, file, or exact text is available, it can be dropped in here.",
     showMoreMaterials: "Show more",
     showLessMaterials: "Show less",
-    markLessonCompleted: "Mark as learned",
-    lessonCompleted: "Lesson learned",
+    markLessonCompleted: "Mark as completed",
+    lessonCompleted: "Marked as completed",
     undoCompleted: "Undo",
     lockedLesson: "Lesson locked",
     lockedDescription: "Unlock Pro to watch this video and get access to the lesson materials.",
@@ -2244,7 +2265,7 @@ const detailCopy = {
     signInPurchased: "Already bought",
     playLesson: "Play lesson",
     courseProgress: "Course progress",
-    progressCount: (completed: number, total: number) => `${completed} of ${total} lessons`,
+    progressCount: (completed: number, total: number) => `${completed} of ${total} lessons completed`,
     unlocksOnPro: "Unlocks on Pro",
     unlocksAfterPurchase: "Access after purchase",
     paidCourseBadge: "Course",
@@ -2274,8 +2295,8 @@ const detailCopy = {
     courseSecurePayment: (provider: string) => `Secure payments via ${provider}`,
     courseAccessLoading: "Checking course access...",
     coursePaymentPending: (email: string) => `If payment has succeeded, the access email was sent to ${email}.`,
-    courseBuyButton: (price: string) => `Buy for ${price}`,
-    buyCourseShort: (price: string) => `Buy for ${price}`,
+    courseBuyButton: (price: string) => `Open full course for ${price}`,
+    buyCourseShort: (price: string) => `Open full course for ${price}`,
     courseAccessActive: "Course access active",
     courseAccessActiveDescription: "Course videos and materials are unlocked for this account.",
     allLessons: "All lessons",

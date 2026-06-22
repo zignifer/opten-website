@@ -102,7 +102,9 @@ Guest checkout is initiated with an email address, selected currency, and
 optional uppercase promo code. Provider webhooks grant a course entitlement and
 send a direct website auth link to the same email. The internal test promo
 `FREE` maps to `100 ₽` or `$1` and requires a separate Paddle `$1` price ID.
-Marketing/partner course promo codes live in the extension-owned
+The public RUB base price is `4 990 ₽`; public discounts are not hard-coded in
+the website and must be represented by server-side promo codes (planned common
+campaigns: `-20%` and `-40%`). Marketing/partner course promo codes live in the extension-owned
 `course_promo_codes` table (RLS on, no public policies) with `discount_kind` =
 `fixed_price` or `percentage`, `enabled`, optional `usage_limit`, `times_used`,
 `starts_at`, and `expires_at`. Codes must use uppercase `A-Z0-9` so the same
