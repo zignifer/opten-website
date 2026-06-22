@@ -973,7 +973,7 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
                   href={material.href}
                   target={external ? "_blank" : undefined}
                   rel={external ? "noopener noreferrer" : undefined}
-                  download={material.href.endsWith(".zip") ? "" : undefined}
+                  download={staticAsset || material.href.endsWith(".zip") ? "" : undefined}
                   className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-sm:col-span-2"
                 >
                   {actionLabel}

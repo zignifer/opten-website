@@ -30,6 +30,8 @@ const extrasContent = read("src/content/space/privateCourseExtras.ts");
 const promptBodiesContent = read("api/_shared/coursePromptBodies.ts");
 const serverCourseContent = read("api/_shared/kinescopeCourse.ts");
 const lessonOneSkillAsset = "public/assets/space/courses/ai-content-marketing-2026/opten-skill.zip";
+const lessonFourCheatsheetAsset = "public/assets/space/courses/ai-content-marketing-2026/lesson-4-model-cheatsheet.pdf";
+const lessonFourResultAsset = "public/assets/space/courses/ai-content-marketing-2026/lesson-4-cofe1-result.jpg";
 
 const expectedKinescopeLessons = [
   ["lesson-1-prompting", "e941e14d-c5bf-40fc-abe5-a41e247777cf"],
@@ -92,8 +94,12 @@ assert.doesNotMatch(content, /ru:\s*"Урок \d+:/, "Private course RU lesson t
 assert.match(content, /chatgpt\.com\/g\/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator/, "Lesson materials must link the ChatGPT prompt generator");
 const lessonOneExtrasStart = extrasContent.indexOf('"lesson-1-prompting"');
 const lessonTwoExtrasStart = extrasContent.indexOf('"lesson-2-ai-services"', lessonOneExtrasStart);
+const lessonFourExtrasStart = extrasContent.indexOf('"lesson-4-photo-generation"');
+const lessonFiveExtrasStart = extrasContent.indexOf('"lesson-5-references"', lessonFourExtrasStart);
 assert.ok(lessonOneExtrasStart >= 0 && lessonTwoExtrasStart > lessonOneExtrasStart, "Private course extras must include lesson 1 and lesson 2 blocks");
 const lessonOneExtras = extrasContent.slice(lessonOneExtrasStart, lessonTwoExtrasStart);
+assert.ok(lessonFourExtrasStart >= 0 && lessonFiveExtrasStart > lessonFourExtrasStart, "Private course extras must include lesson 4 and lesson 5 blocks");
+const lessonFourExtras = extrasContent.slice(lessonFourExtrasStart, lessonFiveExtrasStart);
 assert.match(lessonOneExtras, /links\.optenPromptImprover/, "Lesson 1 materials must keep the Opten ChatGPT prompt generator");
 assert.match(lessonOneExtras, /links\.chatgpt[\s\S]*links\.claude[\s\S]*links\.optenPromptImprover[\s\S]*Opten скилл для генерации промптов \(Claude\)/, "Lesson 1 materials must list ChatGPT, Claude, prompt improver, and Claude skill in order");
 assert.match(extrasContent, /Opten генератор промптов \(ChatGPT\)/, "ChatGPT prompt generator material must use the current RU title");
@@ -108,6 +114,15 @@ assert.match(lessonOneExtras, /actionLabel:\s*"Скачать"/, "Lesson 1 Claud
 assert.match(lessonOneExtras, /\/assets\/space\/courses\/ai-content-marketing-2026\/opten-skill\.zip/, "Lesson 1 Claude skill material must link the downloadable ZIP asset");
 assert.ok(existsSync(join(root, lessonOneSkillAsset)), `Lesson 1 Claude skill ZIP must exist: ${lessonOneSkillAsset}`);
 assert.ok(statSync(join(root, lessonOneSkillAsset)).size > 0, "Lesson 1 Claude skill ZIP must not be empty");
+assert.match(lessonFourExtras, /lesson-4-model-cheatsheet\.pdf/, "Lesson 4 must link the downloadable model cheat sheet");
+assert.match(lessonFourExtras, /lesson-4-cofe1-result\.jpg/, "Lesson 4 must link the Cofe1 generated image");
+assert.match(lessonFourExtras, /l4-cofe1-photo/, "Lesson 4 prompts must expose the exact Cofe1 prompt");
+assert.doesNotMatch(lessonFourExtras, /Настройки генерации/, "Lesson 4 must not show generation settings as a missing item");
+assert.match(promptBodiesContent, /Photorealistic square-format product lifestyle photograph/, "Course prompt API must serve the exact lesson 4 Cofe1 prompt");
+assert.ok(existsSync(join(root, lessonFourCheatsheetAsset)), `Lesson 4 model cheat sheet must exist: ${lessonFourCheatsheetAsset}`);
+assert.ok(statSync(join(root, lessonFourCheatsheetAsset)).size > 0, "Lesson 4 model cheat sheet must not be empty");
+assert.ok(existsSync(join(root, lessonFourResultAsset)), `Lesson 4 Cofe1 image must exist: ${lessonFourResultAsset}`);
+assert.ok(statSync(join(root, lessonFourResultAsset)).size > 0, "Lesson 4 Cofe1 image must not be empty");
 assert.doesNotMatch(lessonOneExtras, /links\.opten\b/, "Lesson 1 materials must not include the generic Opten site link");
 assert.doesNotMatch(lessonOneExtras, /Шпаргалка: формула промпта/, "Lesson 1 materials must not include the obsolete prompt formula cheat sheet");
 assert.match(lessonOneExtras, /l1-nova-formula-image/, "Lesson 1 prompts must expose the single NOVA formula example");
@@ -136,7 +151,7 @@ const components = read("src/app/components/space/learn/LearnComponents.tsx");
 assert.match(components, /const actionLabel = pending \? copy\.materialPendingAction : material\.actionLabel;/, "Course material buttons must use each material action label");
 assert.doesNotMatch(components, /purchase \? copy\.paidCourseBadge : material\.actionLabel/, "Course material buttons must not replace actions with a generic course badge");
 assert.match(components, /const staticAsset = material\.href\.startsWith\("\/assets\/"\);/, "Static asset materials must bypass SPA routing");
-assert.match(components, /download=\{material\.href\.endsWith\("\.zip"\) \? "" : undefined\}/, "ZIP materials must set the browser download attribute");
+assert.match(components, /download=\{staticAsset \|\| material\.href\.endsWith\("\.zip"\) \? "" : undefined\}/, "Static course materials must set the browser download attribute");
 assert.doesNotMatch(components, /!locked && !collection\.purchase/, "Opened paid-course lessons must still show the lesson completion button");
 assert.match(components, /<LessonCompletionAction[\s\S]*onToggle=\{\(\) => onCompletionChange\(!completed\)\}/, "Lesson completion button must toggle local lesson progress");
 assert.match(components, /provider\.provider === "kinescope"/, "Learn player must branch for Kinescope videos");

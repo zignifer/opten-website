@@ -95,21 +95,25 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
     materials: {
       ru: [
         links.syntx,
-        pending("Шпаргалка по моделям", "Nano Banana, GPT Image, Midjourney, Recraft: когда что брать", "Оформить", "pdf"),
-        pending("Результат первой генерации", "Добавить изображение/файл результата из проекта", "Загрузить", "pdf"),
+        {
+          title: "Шпаргалка по моделям",
+          meta: "Nano Banana, GPT Image, Midjourney, Recraft: когда что брать",
+          kind: "pdf",
+          actionLabel: "Скачать",
+          href: "/assets/space/courses/ai-content-marketing-2026/lesson-4-model-cheatsheet.pdf",
+        },
+        {
+          title: "Результат первой генерации Cofe1",
+          meta: "Фото кофейной сцены с жёлтыми акцентами из урока",
+          kind: "link",
+          actionLabel: "Скачать",
+          href: "/assets/space/courses/ai-content-marketing-2026/lesson-4-cofe1-result.jpg",
+        },
       ],
     },
     prompts: {
       ru: [
-        prompt("l4-nano-idea", "Nano Banana Pro: улучшить идею", "Prompt pack, блок 3", "course-v2-prompt-pack.md"),
-        prompt("l4-nano-hero", "Nano Banana Pro: hero-изображение кофейни", "Prompt pack, блок 4", "course-v2-prompt-pack.md"),
-        prompt("l4-gpt-poster", "GPT Image 2.0: постер с точным текстом", "Prompt pack, блок 6", "course-v2-prompt-pack.md"),
-      ],
-    },
-    missingItems: {
-      ru: [
-        missing("Точный prompt из Syntx", "Если в видео был другой вставленный prompt, забрать текст с экрана."),
-        missing("Настройки генерации", "Модель, качество 1K/2K/4K и формат кадра."),
+        prompt("l4-cofe1-photo", "Cofe1: фото кофейной сцены", "Точный prompt из урока"),
       ],
     },
   },
