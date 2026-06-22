@@ -102,17 +102,8 @@ export function findKinescopeLessonByVideoId(videoId: string | undefined) {
   return KINESCOPE_COURSE_LESSONS.find((lesson) => lesson.videoId === videoId);
 }
 
-export function buildKinescopeViewerWatermark(email: string | null, userId: string) {
-  const normalizedEmail = email?.trim();
-  if (normalizedEmail) return normalizedEmail.slice(0, 128);
-  return `user:${userId.slice(0, 8)}`;
-}
-
-export function buildKinescopeEmbedUrl(videoId: string, drmAuthToken: string, watermark?: string) {
+export function buildKinescopeEmbedUrl(videoId: string, drmAuthToken: string) {
   const url = new URL(`https://kinescope.io/embed/${videoId}`);
   url.searchParams.set("drmauthtoken", drmAuthToken);
-  if (watermark?.trim()) {
-    url.searchParams.set("watermark", watermark.trim());
-  }
   return url.toString();
 }

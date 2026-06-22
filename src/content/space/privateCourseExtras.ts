@@ -33,9 +33,10 @@ const links = {
   claude: link("Claude", "Альтернативный LLM для длинного контекста и объяснений", "https://claude.ai/"),
   opten: link("Opten", "Сайт Opten и вход в аккаунт", "https://opten.space/"),
   optenPromptImprover: link(
-    "Opten Prompt Improver",
-    "GPT для улучшения промптов под изображения",
+    "Opten генератор промптов (ChatGPT)",
+    "GPT для генерации промптов под изображения",
     "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
+    "Открыть",
   ),
   syntx: link("Syntx", "Платформа для запуска AI-моделей, изображений и видео", "https://syntx.ai/welcome/GlUETIt6"),
   higgsfield: link("Higgsfield", "AI-видео, камера, motion и MCP-интеграция", "https://higgsfield.ai/"),
@@ -47,23 +48,19 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
       ru: [
         links.chatgpt,
         links.claude,
-        links.opten,
         links.optenPromptImprover,
-        pending("Opten skill archive", "Нужно загрузить архив или ссылку на skill для ChatGPT/Claude", "Нужно добавить", "pdf"),
-        pending("Шпаргалка: формула промпта", "задача -> контекст -> сцена -> стиль -> ограничения -> формат", "Оформить", "pdf"),
+        {
+          title: "Opten скилл для генерации промптов (Claude)",
+          meta: "ZIP-архив Claude Skill для генерации промптов",
+          kind: "pdf",
+          actionLabel: "Скачать",
+          href: "/assets/space/courses/ai-content-marketing-2026/opten-skill.zip",
+        },
       ],
     },
     prompts: {
       ru: [
-        prompt("l1-business-name", "Короткий запрос: название бизнеса", "Пример простого запроса из озвучки"),
-        prompt("l1-opten-image-prompt", "Запрос в Opten для image prompt", "Короткий пример из урока"),
-        prompt("l1-skill-explanation", "Что такое skill", "Prompt pack, блок 14", "course-v2-prompt-pack.md"),
-      ],
-    },
-    missingItems: {
-      ru: [
-        missing("Экранные ссылки на Opten skills", "Нужно забрать ссылки или скриншоты из видео."),
-        missing("Установка skill в Claude/ChatGPT", "Если интерфейс показан в видео, добавить 2-3 шага или скрина."),
+        prompt("l1-nova-formula-image", "Пример промпта по формуле", "задача -> контекст -> сцена -> стиль -> ограничения -> формат"),
       ],
     },
   },
@@ -347,7 +344,13 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
         pending("Codex app / OpenAI", "Добавить актуальную ссылку", "Нужно добавить"),
         pending("Шаблон AGENTS.md для NOVA", "Загрузить готовый файл", "Загрузить", "pdf"),
         pending("Higgsfield MCP", "Добавить ссылку/инструкцию подключения", "Нужно добавить"),
-        pending("Opten skill archive", "Загрузить archive для Codex/Claude/ChatGPT, если был в уроке", "Загрузить", "pdf"),
+        {
+          title: "Opten скилл для генерации промптов (Claude)",
+          meta: "ZIP-архив Claude Skill для генерации промптов",
+          kind: "pdf",
+          actionLabel: "Скачать",
+          href: "/assets/space/courses/ai-content-marketing-2026/opten-skill.zip",
+        },
       ],
     },
     prompts: {

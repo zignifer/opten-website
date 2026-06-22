@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import assert from "node:assert/strict";
 
@@ -26,7 +26,10 @@ for (const file of requiredFiles) {
 }
 
 const content = read("src/content/space/privateCourse.ts");
+const extrasContent = read("src/content/space/privateCourseExtras.ts");
+const promptBodiesContent = read("api/_shared/coursePromptBodies.ts");
 const serverCourseContent = read("api/_shared/kinescopeCourse.ts");
+const lessonOneSkillAsset = "public/assets/space/courses/ai-content-marketing-2026/opten-skill.zip";
 
 const expectedKinescopeLessons = [
   ["lesson-1-prompting", "e941e14d-c5bf-40fc-abe5-a41e247777cf"],
@@ -48,13 +51,13 @@ const expectedKinescopeLessons = [
 ];
 
 const expectedPrivateCourseRuTitles = [
-  "LLM, чаты и промптинг без каши",
-  "Syntx и Higgsfield: где запускать модели",
+  "Работа с ChatGPT и Claude",
+  "Обзор Syntx и Higgsfield",
   "Растр, вектор и логотип NOVA",
   "Картинки: форматы, модели и первая генерация",
   "Референсы: как удерживать внешность, стиль и текст",
   "Редактирование фото: как не убить качество",
-  "Видео: форматы и 9:16 ролик со стаканом",
+  "Все форматы видео и первая генерация",
   "Keyframes: первый и последний кадр в AI-видео",
   "Мультишот: сюжет из нескольких сцен в Kling и Seedance",
   "Замена фона и объектов в видео через Bible Switch X",
@@ -87,13 +90,38 @@ for (const title of expectedPrivateCourseRuTitles) {
 }
 assert.doesNotMatch(content, /ru:\s*"Урок \d+:/, "Private course RU lesson titles must not include numeric lesson prefixes");
 assert.match(content, /chatgpt\.com\/g\/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator/, "Lesson materials must link the ChatGPT prompt generator");
-assert.match(content, /title:\s*"Генератор промптов в ChatGPT"[\s\S]*?actionLabel:\s*"Перейти"/, "ChatGPT prompt generator material button must say Перейти in RU");
+const lessonOneExtrasStart = extrasContent.indexOf('"lesson-1-prompting"');
+const lessonTwoExtrasStart = extrasContent.indexOf('"lesson-2-ai-services"', lessonOneExtrasStart);
+assert.ok(lessonOneExtrasStart >= 0 && lessonTwoExtrasStart > lessonOneExtrasStart, "Private course extras must include lesson 1 and lesson 2 blocks");
+const lessonOneExtras = extrasContent.slice(lessonOneExtrasStart, lessonTwoExtrasStart);
+assert.match(lessonOneExtras, /links\.optenPromptImprover/, "Lesson 1 materials must keep the Opten ChatGPT prompt generator");
+assert.match(lessonOneExtras, /links\.chatgpt[\s\S]*links\.claude[\s\S]*links\.optenPromptImprover[\s\S]*Opten скилл для генерации промптов \(Claude\)/, "Lesson 1 materials must list ChatGPT, Claude, prompt improver, and Claude skill in order");
+assert.match(extrasContent, /Opten генератор промптов \(ChatGPT\)/, "ChatGPT prompt generator material must use the current RU title");
+assert.match(content, /title:\s*"Opten генератор промптов \(ChatGPT\)"/, "Shared ChatGPT prompt generator fallback must use the current RU title");
+assert.doesNotMatch(`${content}\n${extrasContent}`, /Генератор промптов в ChatGPT|Opten Prompt Improver"/, "Private course materials must not use old ChatGPT prompt generator titles");
+assert.match(extrasContent, /optenPromptImprover:[\s\S]*"Открыть"/, "Prompt improver material button must say Открыть");
+assert.match(lessonOneExtras, /Opten скилл для генерации промптов \(Claude\)/, "Lesson 1 materials must label the Claude skill archive in RU");
+assert.match(lessonOneExtras, /ZIP-архив Claude Skill для генерации промптов/, "Lesson 1 Claude skill material must show user-facing download copy");
+assert.doesNotMatch(lessonOneExtras, /Скилл для загрузки на рабочем столе\./, "Lesson 1 Claude skill material must not expose internal desktop note");
+assert.doesNotMatch(extrasContent, /Скилл для загрузки на рабочем столе\./, "Private course extras must not expose internal desktop notes");
+assert.match(lessonOneExtras, /actionLabel:\s*"Скачать"/, "Lesson 1 Claude skill material button must say Скачать");
+assert.match(lessonOneExtras, /\/assets\/space\/courses\/ai-content-marketing-2026\/opten-skill\.zip/, "Lesson 1 Claude skill material must link the downloadable ZIP asset");
+assert.ok(existsSync(join(root, lessonOneSkillAsset)), `Lesson 1 Claude skill ZIP must exist: ${lessonOneSkillAsset}`);
+assert.ok(statSync(join(root, lessonOneSkillAsset)).size > 0, "Lesson 1 Claude skill ZIP must not be empty");
+assert.doesNotMatch(lessonOneExtras, /links\.opten\b/, "Lesson 1 materials must not include the generic Opten site link");
+assert.doesNotMatch(lessonOneExtras, /Шпаргалка: формула промпта/, "Lesson 1 materials must not include the obsolete prompt formula cheat sheet");
+assert.match(lessonOneExtras, /l1-nova-formula-image/, "Lesson 1 prompts must expose the single NOVA formula example");
+assert.doesNotMatch(lessonOneExtras, /l1-business-name|l1-opten-image-prompt|l1-skill-explanation/, "Lesson 1 prompts must not expose obsolete prompt examples");
+assert.match(promptBodiesContent, /l1-nova-formula-image/, "Course prompt API must serve the lesson 1 NOVA formula prompt");
+assert.match(promptBodiesContent, /Задача:[\s\S]*Контекст:[\s\S]*Сцена:[\s\S]*Стиль:[\s\S]*Ограничения:[\s\S]*Формат:/, "Lesson 1 prompt body must follow the requested prompt formula");
+assert.doesNotMatch(promptBodiesContent, /l1-business-name|l1-opten-image-prompt|l1-skill-explanation/, "Course prompt API must not serve obsolete lesson 1 prompt ids");
+assert.doesNotMatch(extrasContent, /Opten skill archive/, "Private course materials must not use the old English Opten skill archive label");
 assert.doesNotMatch(content, /\/dashboard\/download-skill/, "Standalone course materials must not link the Pro-only skill download route");
 assert.match(content, /https:\/\/syntx\.ai\/welcome\/GlUETIt6/, "Lesson materials must link Syntx");
 assert.match(content, /https:\/\/higgsfield\.ai\//, "Lesson materials must link Higgsfield");
 assert.match(content, /https:\/\/disk\.yandex\.ru\/d\/HaU7LdU850QLVw/, "Every private course lesson must expose the current AI tools 2026 material");
 assert.match(content, /const courseMaterials:/, "Private course must define one shared material set");
-assert.match(content, /materials:\s*courseMaterials/, "Every private course lesson must use the same shared material set");
+assert.match(content, /materials:\s*extras\?\.materials\s*\?\?\s*courseMaterials/, "Private course lessons must use lesson extras with the shared material fallback");
 assert.doesNotMatch(content, /materials\?:/, "Private course lesson config must not allow per-lesson material overrides");
 assert.doesNotMatch(content, /materials:\s*firstLessonSpecificMaterials/, "Private course lessons must not keep first-lesson-only material overrides");
 assert.match(content, /provider:\s*"kinescope"/, "Private lesson must use the Kinescope video provider");
@@ -105,8 +133,18 @@ assert.match(learn, /provider:\s*"youtube"\s*\|\s*"local"\s*\|\s*"kinescope"/, "
 assert.match(learn, /course-entitlement-gated-preview/, "Learn playback policy type must include course entitlement gating");
 
 const components = read("src/app/components/space/learn/LearnComponents.tsx");
+assert.match(components, /const actionLabel = pending \? copy\.materialPendingAction : material\.actionLabel;/, "Course material buttons must use each material action label");
+assert.doesNotMatch(components, /purchase \? copy\.paidCourseBadge : material\.actionLabel/, "Course material buttons must not replace actions with a generic course badge");
+assert.match(components, /const staticAsset = material\.href\.startsWith\("\/assets\/"\);/, "Static asset materials must bypass SPA routing");
+assert.match(components, /download=\{material\.href\.endsWith\("\.zip"\) \? "" : undefined\}/, "ZIP materials must set the browser download attribute");
+assert.doesNotMatch(components, /!locked && !collection\.purchase/, "Opened paid-course lessons must still show the lesson completion button");
+assert.match(components, /<LessonCompletionAction[\s\S]*onToggle=\{\(\) => onCompletionChange\(!completed\)\}/, "Lesson completion button must toggle local lesson progress");
 assert.match(components, /provider\.provider === "kinescope"/, "Learn player must branch for Kinescope videos");
 assert.match(components, /\/api\/kinescope-course-token/, "Learn player must request Kinescope embed URLs through the server");
+assert.match(components, /KINESCOPE_IFRAME_API_SRC = "https:\/\/player\.kinescope\.io\/latest\/iframe\.player\.js"/, "Learn player must load the official Kinescope iframe API for timestamp seeking");
+assert.match(components, /pendingKinescopeSeekRef/, "Learn player must preserve pending Kinescope timestamp seeks while the player loads");
+assert.match(components, /\.seekTo\(Math\.max\(0, Math\.floor\(startSeconds\)\)\)/, "Kinescope timestamp clicks must call player.seekTo");
+assert.match(components, /player\.once\(player\.Events\.Loaded/, "Kinescope player must seek after the iframe API reports the video as loaded");
 assert.match(components, /createCoursePayment/, "Private course UI must create a standalone course payment");
 assert.match(components, /fetchCourseAccessSummary/, "Private course UI must check standalone course access");
 assert.match(components, /normalizeCoursePromoCode/, "Private course UI must normalize promo codes");
@@ -136,8 +174,8 @@ assert.doesNotMatch(tokenApi, /hasLiveProSubscription|not_pro/, "Kinescope token
 assert.match(serverAuth, /course-access-summary/, "Server auth helper must call course-access-summary for course entitlements");
 assert.match(tokenApi, /buildKinescopeEmbedUrl/, "Token API must return Kinescope embed URLs through the shared builder");
 assert.match(serverCourse, /drmauthtoken/, "Kinescope embed URL builder must attach the DRM auth token");
-assert.match(serverCourse, /watermark/, "Kinescope embed URL builder must support per-viewer watermark text");
-assert.match(tokenApi, /viewerWatermark/, "Token API must pass per-viewer watermark text into Kinescope embed URLs");
+assert.doesNotMatch(serverCourse, /buildKinescopeViewerWatermark|watermark/i, "Kinescope embed URL builder must not attach viewer watermark text");
+assert.doesNotMatch(tokenApi, /buildKinescopeViewerWatermark|viewerWatermark|watermark/i, "Token API must not pass per-viewer watermark text into Kinescope embed URLs");
 
 const authApi = read("api/kinescope-course-auth.ts");
 assert.match(authApi, /KINESCOPE_AUTH_JWT_SECRET/, "Kinescope auth callback must verify the same server env secret");

@@ -389,6 +389,123 @@ type KinescopeTokenResponse = {
   error?: string;
 };
 
+type KinescopeIframePlayer = {
+  Events: {
+    Loaded: string;
+  };
+  once(type: string, listener: (event: { target: KinescopeIframePlayer }) => void): KinescopeIframePlayer;
+  seekTo(time: number): Promise<void>;
+  play(): Promise<void>;
+  destroy(): Promise<void>;
+};
+
+type KinescopeIframePlayerFactory = {
+  create(
+    elementId: string,
+    options: {
+      url: string;
+      size?: { width?: number | string; height?: number | string };
+      behavior?: {
+        autoPlay?: boolean | "viewable";
+        playsInline?: boolean;
+        preload?: boolean | "none" | "metadata" | "auto";
+        localStorage?: boolean | { time?: boolean };
+      };
+      ui?: { language?: "ru" | "en" };
+    },
+  ): Promise<KinescopeIframePlayer>;
+};
+
+declare global {
+  interface Window {
+    Kinescope?: {
+      IframePlayer?: KinescopeIframePlayerFactory;
+    };
+    onKinescopeIframeAPIReady?: (playerFactory: KinescopeIframePlayerFactory) => void;
+    __optenKinescopeIframeApiPromise?: Promise<KinescopeIframePlayerFactory>;
+  }
+}
+
+const KINESCOPE_IFRAME_API_SRC = "https://player.kinescope.io/latest/iframe.player.js";
+
+function loadKinescopeIframeApi(): Promise<KinescopeIframePlayerFactory> {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return Promise.reject(new Error("kinescope_browser_required"));
+  }
+
+  const loadedFactory = window.Kinescope?.IframePlayer;
+  if (loadedFactory) return Promise.resolve(loadedFactory);
+  if (window.__optenKinescopeIframeApiPromise) return window.__optenKinescopeIframeApiPromise;
+
+  window.__optenKinescopeIframeApiPromise = new Promise<KinescopeIframePlayerFactory>((resolve, reject) => {
+    let settled = false;
+    let timeoutId: number | undefined;
+    const previousReady = window.onKinescopeIframeAPIReady;
+
+    const restoreCallback = () => {
+      window.onKinescopeIframeAPIReady = previousReady;
+    };
+
+    const resolveFactory = (playerFactory: KinescopeIframePlayerFactory) => {
+      if (settled) return;
+      settled = true;
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+      restoreCallback();
+      try {
+        previousReady?.(playerFactory);
+      } catch {
+        // Keep our course player independent from another optional page-level callback.
+      }
+      resolve(playerFactory);
+    };
+
+    const rejectFactory = (error: Error) => {
+      if (settled) return;
+      settled = true;
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+      restoreCallback();
+      delete window.__optenKinescopeIframeApiPromise;
+      reject(error);
+    };
+
+    window.onKinescopeIframeAPIReady = resolveFactory;
+    timeoutId = window.setTimeout(() => rejectFactory(new Error("kinescope_player_timeout")), 12000);
+
+    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${KINESCOPE_IFRAME_API_SRC}"]`);
+    if (existingScript) {
+      existingScript.addEventListener("error", () => rejectFactory(new Error("kinescope_player_load_failed")), { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = KINESCOPE_IFRAME_API_SRC;
+    script.async = true;
+    script.addEventListener("error", () => rejectFactory(new Error("kinescope_player_load_failed")), { once: true });
+    document.head.appendChild(script);
+  });
+
+  return window.__optenKinescopeIframeApiPromise;
+}
+
+function buildKinescopePlayerApiUrl(embedUrl: string) {
+  try {
+    const embed = new URL(embedUrl);
+    const pathParts = embed.pathname.split("/").filter(Boolean);
+    const videoId = pathParts[0] === "embed" ? pathParts[1] : pathParts[0];
+    if (!videoId) return embedUrl;
+
+    const playerUrl = new URL(`https://kinescope.io/${videoId}`);
+    embed.searchParams.forEach((value, key) => playerUrl.searchParams.set(key, value));
+    return playerUrl.toString();
+  } catch {
+    return embedUrl;
+  }
+}
+
+function kinescopeElementId(lessonSlug: string) {
+  return `kinescope-player-${lessonSlug.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+}
+
 function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, playRequestId }: LessonPlayerProps) {
   const { pathname } = useLocation();
   const { lang } = useLang();
@@ -396,17 +513,21 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
   const { session } = useSpaceAuth();
   const copy = detailCopy[lang];
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const kinescopePlayerRef = useRef<KinescopeIframePlayer | null>(null);
+  const pendingKinescopeSeekRef = useRef({ seconds: 0, requestId: 0 });
   const provider = getLearnLessonVideoProvider(lesson);
   const [activated, setActivated] = useState(false);
   const [kinescopeEmbedUrl, setKinescopeEmbedUrl] = useState<string | null>(null);
   const [kinescopeLoading, setKinescopeLoading] = useState(false);
   const [kinescopeError, setKinescopeError] = useState<string | null>(null);
+  const [kinescopeApiFallback, setKinescopeApiFallback] = useState(false);
   const localizedVideo = lesson.localizedVideo?.[lang];
   const youtubeId = localizedVideo?.youtubeId ?? lesson.youtubeId;
   const captionLanguage = localizedVideo?.captionLanguage ?? lang;
   const embedUrl = youtubeId ? getYoutubeEmbedUrl(youtubeId, lang, captionLanguage, startSeconds, activated) : "";
   const isLocalVideo = provider.provider === "local" && Boolean(lesson.localVideo);
   const isKinescopeVideo = provider.provider === "kinescope";
+  const kinescopePlayerElementId = useMemo(() => kinescopeElementId(lesson.slug), [lesson.slug]);
   const purchasePrice = purchase
     ? formatCoursePrice(currency === "USD" ? purchase.priceUsd : purchase.priceRub, currency)
     : "";
@@ -416,6 +537,9 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
     setKinescopeEmbedUrl(null);
     setKinescopeError(null);
     setKinescopeLoading(false);
+    setKinescopeApiFallback(false);
+    kinescopePlayerRef.current = null;
+    pendingKinescopeSeekRef.current = { seconds: 0, requestId: 0 };
   }, [lesson.slug]);
 
   useEffect(() => {
@@ -427,6 +551,19 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
     videoRef.current.currentTime = startSeconds;
     void videoRef.current.play().catch(() => undefined);
   }, [activated, isLocalVideo, playRequestId, startSeconds]);
+
+  useEffect(() => {
+    if (!isKinescopeVideo || !activated || playRequestId <= 0) return;
+
+    pendingKinescopeSeekRef.current = { seconds: startSeconds, requestId: playRequestId };
+    const player = kinescopePlayerRef.current;
+    if (!player) return;
+
+    void player
+      .seekTo(Math.max(0, Math.floor(startSeconds)))
+      .then(() => player.play())
+      .catch(() => undefined);
+  }, [activated, isKinescopeVideo, playRequestId, startSeconds]);
 
   useEffect(() => {
     if (!isKinescopeVideo || !activated || locked || kinescopeEmbedUrl) return;
@@ -468,6 +605,55 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
       cancelled = true;
     };
   }, [activated, collectionId, isKinescopeVideo, kinescopeEmbedUrl, lesson.slug, locked, session?.access_token]);
+
+  useEffect(() => {
+    if (!isKinescopeVideo || !activated || !kinescopeEmbedUrl || kinescopeApiFallback) return;
+
+    let cancelled = false;
+    let playerForCleanup: KinescopeIframePlayer | null = null;
+    setKinescopeError(null);
+
+    loadKinescopeIframeApi()
+      .then((playerFactory) =>
+        playerFactory.create(kinescopePlayerElementId, {
+          url: buildKinescopePlayerApiUrl(kinescopeEmbedUrl),
+          size: { width: "100%", height: "100%" },
+          behavior: {
+            autoPlay: true,
+            playsInline: true,
+            preload: "auto",
+            localStorage: { time: false },
+          },
+          ui: { language: lang === "ru" ? "ru" : "en" },
+        }),
+      )
+      .then((player) => {
+        if (cancelled) {
+          void player.destroy().catch(() => undefined);
+          return;
+        }
+
+        playerForCleanup = player;
+        kinescopePlayerRef.current = player;
+        player.once(player.Events.Loaded, () => {
+          const seconds = Math.max(0, Math.floor(pendingKinescopeSeekRef.current.seconds));
+          const seek = seconds > 0 ? player.seekTo(seconds) : Promise.resolve();
+          void seek.then(() => player.play()).catch(() => undefined);
+        });
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setKinescopeError(error instanceof Error ? error.message : "kinescope_player_failed");
+        setKinescopeApiFallback(true);
+      });
+
+    return () => {
+      cancelled = true;
+      const player = playerForCleanup ?? kinescopePlayerRef.current;
+      if (kinescopePlayerRef.current === player) kinescopePlayerRef.current = null;
+      if (player) void player.destroy().catch(() => undefined);
+    };
+  }, [activated, isKinescopeVideo, kinescopeApiFallback, kinescopeEmbedUrl, kinescopePlayerElementId, lang]);
 
   return (
     <section
@@ -559,14 +745,23 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
           </>
         ) : isKinescopeVideo ? (
           kinescopeEmbedUrl ? (
-            <iframe
-              key={`${provider.providerAssetId}-${kinescopeEmbedUrl}`}
-              src={kinescopeEmbedUrl}
-              title={getLearnLessonTitle(lesson, lang)}
-              className="absolute inset-0 h-full w-full border-0"
-              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-              allowFullScreen
-            />
+            kinescopeApiFallback ? (
+              <iframe
+                key={`${provider.providerAssetId}-${kinescopeEmbedUrl}`}
+                src={kinescopeEmbedUrl}
+                title={getLearnLessonTitle(lesson, lang)}
+                className="absolute inset-0 h-full w-full border-0"
+                allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                allowFullScreen
+              />
+            ) : (
+              <div
+                key={kinescopePlayerElementId}
+                id={kinescopePlayerElementId}
+                className="absolute inset-0 h-full w-full"
+                aria-label={getLearnLessonTitle(lesson, lang)}
+              />
+            )
           ) : (
             <div className="absolute inset-0 grid place-items-center bg-[#06191c] px-[20px] text-center">
               <div className="max-w-[360px]">
@@ -676,7 +871,7 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
             </span>
           ) : null}
         </div>
-        {!locked && !collection.purchase && (
+        {!locked && (
           <LessonCompletionAction
             completed={completed}
             copy={copy}
@@ -742,9 +937,10 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
         {materials.map((material, index) => {
           const Icon = materialIcon(material.kind);
           const external = material.href.startsWith("http");
+          const staticAsset = material.href.startsWith("/assets/");
           const pending = material.status === "pending";
           const disabled = locked || pending;
-          const actionLabel = pending ? copy.materialPendingAction : purchase ? copy.paidCourseBadge : material.actionLabel;
+          const actionLabel = pending ? copy.materialPendingAction : material.actionLabel;
           const rowClass =
             `grid grid-cols-[34px_minmax(0,1fr)_154px] items-center gap-[12px] border-b border-white/8 px-[16px] py-[10px] last:border-b-0 max-sm:grid-cols-[32px_minmax(0,1fr)] ${
               canCollapseOnMobile && !expanded && index > 0 ? "max-md:hidden" : ""
@@ -763,11 +959,12 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
                 <span className={`flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.04] text-[13px] font-medium max-sm:col-span-2 ${pending ? "text-[#9cfb51]/58" : "text-white/32"}`}>
                   {pending ? actionLabel : purchase ? copy.unlocksAfterPurchase : "Pro"}
                 </span>
-              ) : external ? (
+              ) : external || staticAsset ? (
                 <a
                   href={material.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  target={external ? "_blank" : undefined}
+                  rel={external ? "noopener noreferrer" : undefined}
+                  download={material.href.endsWith(".zip") ? "" : undefined}
                   className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-sm:col-span-2"
                 >
                   {actionLabel}

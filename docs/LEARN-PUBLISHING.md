@@ -130,10 +130,10 @@ Keep `/learn/courses/*` noindex and out of sitemap, llms.txt, header nav, and
 `EN_SIBLINGS` until launch. Do not store Kinescope API keys or playback secrets
 in browser code. The client requests a short-lived Kinescope embed URL with the
 website Supabase JWT; the server verifies the standalone course entitlement
-before signing `drmauthtoken`, then adds a dynamic `watermark` query parameter
-from the authenticated email/user id. Kinescope then calls the auth callback
-during playback and gets 200 or 403. The course player template has Watermark
-enabled so the server-provided URL parameter is visible during playback.
+before signing `drmauthtoken`. The server must not append a dynamic
+`watermark` query parameter because it renders visible email/user overlays in
+the player. Kinescope then calls the auth callback during playback and gets 200
+or 403.
 
 The hidden course `ai-content-marketing-2026` is not unlocked by Pro. It uses a
 separate one-time course purchase:
@@ -166,8 +166,8 @@ Paid-plan Kinescope protection checklist for this course:
 
 1. Project-level DRM encryption is enabled for the course project.
 2. Embedding/playback is restricted to `opten.space` and `www.opten.space`.
-3. Watermark is enabled in the course player template so the server-provided
-   `watermark` query parameter is visible during playback.
+3. Visible Kinescope watermark overlays are disabled for the current course
+   player; the website intentionally does not pass `watermark` query parameters.
 4. Kinescope authorization backend is configured as
    `https://opten.space/api/kinescope-course-auth` with strict mode.
 5. All 16 uploaded video IDs are present in `src/content/space/privateCourse.ts`

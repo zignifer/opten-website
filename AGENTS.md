@@ -107,8 +107,7 @@ must use uppercase `A-Z0-9` so the same code can be applied to YooKassa/RUB
 server pricing and Paddle/USD `discountCode`. Kinescope video playback is server-gated: the client calls
 `/api/kinescope-course-token` with the website Supabase JWT, the server verifies
 course access through `/functions/v1/course-access-summary` and returns a
-short-lived Kinescope embed URL with `drmauthtoken` plus a per-viewer
-`watermark` value derived from the website JWT email/user id, and Kinescope calls
+short-lived Kinescope embed URL with `drmauthtoken`. Kinescope calls
 `/api/kinescope-course-auth` during playback to receive 200/403. Never put the
 Kinescope API key, auth JWT secret, Supabase service-role key, YooKassa secret,
 Resend key, or raw playback token in the client bundle.
@@ -200,7 +199,6 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
   Site own API:           GET /api/download-skill (Vercel serverless, JWT + Pro-gated)
                           POST /api/kinescope-course-token — website JWT + course entitlement gate;
                           returns short-lived Kinescope embed URL with drmauthtoken
-                          and per-viewer watermark query params
                           POST /api/kinescope-course-auth — Kinescope server callback;
                           validates signed drmauthtoken and returns 200/403
 
@@ -376,9 +374,7 @@ Set in Vercel (project settings, not in repo):
 - `KINESCOPE_AUTH_JWT_SECRET` — server-only HS256 secret used to sign and
   verify short-lived Kinescope `drmauthtoken` playback tokens for hidden course
   lessons. Must be long random text and must match both Kinescope course API
-  endpoints. The token endpoint also adds a dynamic `watermark` URL parameter
-  based on the authenticated email/user id; Kinescope player watermark support
-  is enabled on the current course player template.
+  endpoints.
 - `KINESCOPE_DRM_AUTH_USERNAME` / `KINESCOPE_DRM_AUTH_PASSWORD` — optional
   Basic Auth credentials for Kinescope's server-to-server callback to
   `/api/kinescope-course-auth`, if configured in the Kinescope dashboard/API.
@@ -458,8 +454,8 @@ Hidden course MVP videos use Kinescope and are defined in
 `api/_shared/kinescopeCourse.ts`. Keep this route out of public navigation until
 launch. The Kinescope project has project encryption enabled, strict DRM auth
 configured to `https://opten.space/api/kinescope-course-auth`, domain
-restrictions for `opten.space` and `www.opten.space`, dynamic watermark enabled
-on the course player, subtitle display enabled, and course chapters. Kinescope
+restrictions for `opten.space` and `www.opten.space`, subtitle display enabled,
+and course chapters. Kinescope
 does not expose an API endpoint for starting AI subtitle generation; the public
 API can upload ready `.srt/.vtt` subtitle files or enable existing subtitle
 tracks. Kinescope lesson IDs are random provider UUIDs; new uploaded lessons

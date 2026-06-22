@@ -5,7 +5,6 @@ import {
   KINESCOPE_PLAYBACK_ISSUER,
   KINESCOPE_PLAYBACK_TTL_SECONDS,
   buildKinescopeEmbedUrl,
-  buildKinescopeViewerWatermark,
   findKinescopeCourseLesson,
 } from "./_shared/kinescopeCourse.js";
 import {
@@ -52,11 +51,9 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   }
 
   let userId: string;
-  let userEmail: string | null;
   try {
     const verified = await verifySupabaseJwt(authToken);
     userId = verified.userId;
-    userEmail = verified.email;
   } catch {
     return jsonResponse(res, 401, { error: "invalid_token" });
   }
@@ -91,11 +88,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     .setExpirationTime(expiresAtSeconds)
     .setIssuedAt()
     .sign(new TextEncoder().encode(playbackSecret));
-  const viewerWatermark = buildKinescopeViewerWatermark(userEmail, userId);
 
   return jsonResponse(res, 200, {
     provider: "kinescope",
-    embedUrl: buildKinescopeEmbedUrl(lesson.videoId, drmAuthToken, viewerWatermark),
+    embedUrl: buildKinescopeEmbedUrl(lesson.videoId, drmAuthToken),
     expiresAt: expiresAtSeconds,
   });
 }

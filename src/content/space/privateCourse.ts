@@ -20,8 +20,8 @@ const pendingKinescopePosterPath = "/assets/space/learn-v2/ai-design-dashboard.j
 const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
   ru: [
     {
-      title: "Генератор промптов в ChatGPT",
-      meta: "Opten Prompt Improver для генерации промптов под изображения",
+      title: "Opten генератор промптов (ChatGPT)",
+      meta: "Генератор промптов под изображения в ChatGPT",
       kind: "link",
       actionLabel: "Перейти",
       href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
@@ -50,8 +50,8 @@ const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
   ],
   en: [
     {
-      title: "ChatGPT prompt generator",
-      meta: "Opten Prompt Improver for image-generation prompts",
+      title: "Opten prompt generator (ChatGPT)",
+      meta: "Image-generation prompt generator in ChatGPT",
       kind: "link",
       actionLabel: "Open",
       href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
@@ -164,7 +164,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: PRIVATE_COURSE_FIRST_LESSON_SLUG,
     videoId: PRIVATE_COURSE_FIRST_KINESCOPE_VIDEO_ID,
-    title: { ru: "LLM, чаты и промптинг без каши", en: "LLMs, chats, and clear prompting" },
+    title: { ru: "Работа с ChatGPT и Claude", en: "Working with ChatGPT and Claude" },
     description: {
       ru: "Вы узнаете, зачем в курсе нужны ChatGPT, Claude и другие языковые модели. Научитесь писать промпт как понятное ТЗ, разделять задачи по чатам и использовать простую формулу запроса.",
       en: "Why the course uses ChatGPT, Claude, and other language models. You will learn to write prompts as clear briefs, split tasks into separate chats, and use a simple request formula.",
@@ -206,7 +206,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-2-ai-services",
     videoId: "c3b06c01-19dd-4a3c-8218-7a216a2ebd67",
-    title: { ru: "Syntx и Higgsfield: где запускать модели", en: "Syntx and Higgsfield: where to run models" },
+    title: { ru: "Обзор Syntx и Higgsfield", en: "Syntx and Higgsfield overview" },
     description: {
       ru: "Вы разберётесь, где запускать генерации и почему в курсе используется Syntx. Научитесь выбирать модель, добавлять референсы, сохранять промпты и заранее считать кредиты.",
       en: "Where to run generations and why the course uses Syntx. You will learn to pick models, add references, save prompts, and estimate credits in advance.",
@@ -412,7 +412,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-7-ai-video",
     videoId: "18f00246-366f-4f43-a67a-a1b3ead807c0",
-    title: { ru: "Видео: форматы и 9:16 ролик со стаканом", en: "Video formats and a 9:16 cup clip" },
+    title: { ru: "Все форматы видео и первая генерация", en: "All video formats and first generation" },
     description: {
       ru: "Вы разберётесь, почему видео стоит дороже картинок и как не тратить кредиты впустую. Научитесь запускать видео из текста, из картинки и сделаете простой вертикальный ролик.",
       en: "Why video costs more than images and how not to waste credits. You will run text-to-video, image-to-video, and build a simple vertical clip.",
