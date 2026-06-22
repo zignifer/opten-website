@@ -410,7 +410,7 @@ type KinescopeIframePlayerFactory = {
         autoPlay?: boolean | "viewable";
         playsInline?: boolean;
         preload?: boolean | "none" | "metadata" | "auto";
-        localStorage?: boolean | { time?: boolean };
+        localStorage?: boolean;
       };
       ui?: { language?: "ru" | "en" };
       keepElement?: boolean;
@@ -629,7 +629,7 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
             autoPlay: true,
             playsInline: true,
             preload: "auto",
-            localStorage: { time: false },
+            localStorage: false,
           },
           ui: { language: lang === "ru" ? "ru" : "en" },
         }),
