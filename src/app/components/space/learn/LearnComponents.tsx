@@ -1548,19 +1548,6 @@ type CoursePromoFeedback = {
 
 const COURSE_PAYMENT_PENDING_STORAGE_KEY = "opten_course_payment_pending_v1";
 
-function CourseSecurePaymentIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg className={className} width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M7.4376 1.49524C7.31728 1.38762 7.16152 1.32812 7.0001 1.32812C6.83868 1.32812 6.68292 1.38762 6.5626 1.49524C5.37998 2.55584 3.90315 3.23231 2.3276 3.43511C2.17291 3.45499 2.03036 3.52932 1.9255 3.64476C1.82064 3.76021 1.76032 3.90923 1.75535 4.06511C1.69618 5.79831 2.1288 7.51286 3.0032 9.01049C3.87759 10.5081 5.15804 11.7277 6.69648 12.5281C6.79028 12.5769 6.89448 12.6023 7.00021 12.6021C7.10594 12.602 7.21006 12.5763 7.30373 12.5272C8.84216 11.7268 10.1226 10.5073 10.997 9.00962C11.8714 7.51198 12.304 5.79743 12.2449 4.06423C12.2397 3.90851 12.1793 3.7597 12.0744 3.64443C11.9696 3.52917 11.8271 3.45497 11.6726 3.43511C10.0971 3.23256 8.62033 2.5564 7.4376 1.49611V1.49524ZM9.4851 6.31123C9.59101 6.17419 9.63845 6.00083 9.61707 5.82895C9.5957 5.65707 9.50724 5.50061 9.37098 5.39368C9.23472 5.28675 9.06172 5.23803 8.88968 5.25813C8.71765 5.27823 8.56054 5.36552 8.4526 5.50099L6.46985 8.02361L5.45835 7.15736C5.39347 7.09795 5.3173 7.05218 5.23438 7.02279C5.15146 6.9934 5.06347 6.98098 4.97566 6.98628C4.88784 6.99157 4.80198 7.01447 4.72319 7.05361C4.6444 7.09275 4.57428 7.14733 4.51701 7.21411C4.45974 7.28089 4.41648 7.35851 4.3898 7.44234C4.36312 7.52618 4.35357 7.61452 4.36172 7.70212C4.36987 7.78972 4.39555 7.87478 4.43723 7.95226C4.47891 8.02973 4.53574 8.09804 4.60435 8.15311L6.1356 9.46561C6.20282 9.52326 6.28101 9.5667 6.36547 9.59333C6.44992 9.61996 6.53889 9.62922 6.62702 9.62055C6.71515 9.61189 6.80061 9.58547 6.87826 9.5429C6.95591 9.50034 7.02415 9.44249 7.07885 9.37286L9.4851 6.31123Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-
 function CoursePurchaseTitle({ count }: { count: number }) {
   const { lang } = useLang();
   const titleClass = "max-w-[314px] text-[19px] font-bold leading-[1.22] tracking-normal text-white max-sm:text-[18px]";
@@ -1620,7 +1607,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
       ? { tone: "muted" as const, text: copy.coursePaymentPending(pendingPayment.email) }
       : loadingAccess
         ? { tone: "muted" as const, text: copy.courseAccessLoading }
-        : { tone: "secure" as const, text: copy.courseSecurePayment(currency === "USD" ? "Paddle" : "ЮКасса") };
+        : { tone: "legal" as const, text: copy.courseLegalNotice };
 
   useEffect(() => {
     if (!appliedPromoCode) {
@@ -1864,12 +1851,11 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
                 className={`flex min-w-0 items-center justify-center gap-[8px] truncate font-['Inter',sans-serif] text-[12px] font-normal leading-[16px] ${
                   formMessage.tone === "error"
                     ? "text-[#ff8f8f]"
-                    : formMessage.tone === "secure"
+                    : formMessage.tone === "legal"
                       ? "text-[#9cfb51]/60"
                       : "text-white/45"
                 }`}
               >
-                {formMessage.tone === "secure" && <CourseSecurePaymentIcon className="size-[14px] shrink-0" />}
                 <span className="truncate">{formMessage.text}</span>
               </p>
             )}
@@ -2233,7 +2219,7 @@ const detailCopy = {
     coursePaymentError: "Не удалось открыть оплату. Попробуйте ещё раз.",
     coursePaymentOpening: "Открываем оплату...",
     courseCheckoutNote: "Оплата через YooKassa. После оплаты отправим ссылку для входа на этот email; позже можно входить обычным кодом на ту же почту.",
-    courseSecurePayment: (provider: string) => `Безопасные платежи через ${provider}`,
+    courseLegalNotice: "Оплачивая, принимаете оферту и политику.",
     courseAccessLoading: "Проверяем доступ к курсу...",
     coursePaymentPending: (email: string) => `Если оплата уже прошла, письмо со ссылкой отправлено на ${email}.`,
     courseBuyButton: (price: string) => `Открыть весь курс за ${price}`,
@@ -2307,7 +2293,7 @@ const detailCopy = {
     coursePaymentError: "Could not open checkout. Try again.",
     coursePaymentOpening: "Opening checkout...",
     courseCheckoutNote: "Checkout is handled by YooKassa. After payment, we send a sign-in link to this email; later you can sign in with the usual email code.",
-    courseSecurePayment: (provider: string) => `Secure payments via ${provider}`,
+    courseLegalNotice: "By paying, you accept terms and privacy.",
     courseAccessLoading: "Checking course access...",
     coursePaymentPending: (email: string) => `If payment has succeeded, the access email was sent to ${email}.`,
     courseBuyButton: (price: string) => `Open full course for ${price}`,

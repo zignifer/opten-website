@@ -1,6 +1,7 @@
 import { useRef, useState, type ClipboardEvent, type FormEvent, type KeyboardEvent } from "react";
 import { Loader2 } from "lucide-react";
 import { Navigate, useLocation, useNavigate } from "react-router";
+import LocalizedLink from "../../components/LocalizedLink";
 import SpaceHeader from "../../components/space/SpaceHeader";
 import { useSpaceAuth } from "../../components/space/SpaceAuthProvider";
 import {
@@ -229,6 +230,13 @@ export default function AppLoginPage() {
             </form>
           )}
 
+          <p className="mt-[10px] max-w-full truncate text-center text-[11px] leading-[1.35] text-white/38">
+            {copy.legalPrefix}{" "}
+            <LocalizedLink to="/terms" className="text-white/55 underline underline-offset-2">{copy.legalTerms}</LocalizedLink>
+            {" "}{copy.legalAnd}{" "}
+            <LocalizedLink to="/privacy" className="text-white/55 underline underline-offset-2">{copy.legalPrivacy}</LocalizedLink>.
+          </p>
+
           {GOOGLE_AUTH_VISIBLE ? (
             <button
               type="button"
@@ -362,6 +370,10 @@ const loginCopy = {
     loginBadge1: "Безопасный вход",
     loginBadge2: "Безопасные платежи через ЮКасса",
     loginBadge3: "Opten никогда не хранит ваши промпты",
+    legalPrefix: "Продолжая, вы принимаете",
+    legalTerms: "оферту",
+    legalAnd: "и",
+    legalPrivacy: "политику",
   },
   en: {
     titleLine1: "Welcome to",
@@ -384,6 +396,10 @@ const loginCopy = {
     loginBadge1: "Log in securely",
     loginBadge2: "Secure payments with UKassa",
     loginBadge3: "Opten never stores your prompts",
+    legalPrefix: "By continuing, you accept",
+    legalTerms: "terms",
+    legalAnd: "and",
+    legalPrivacy: "privacy",
   },
 } as const;
 
