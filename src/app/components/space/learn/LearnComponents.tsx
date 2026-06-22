@@ -21,7 +21,6 @@ import {
   createCoursePayment,
   fetchCourseAccessSummary,
   formatCoursePrice,
-  isCourseTestPromoCode,
   isValidCourseEmail,
   isValidCoursePromoCode,
   normalizeCourseEmail,
@@ -855,6 +854,7 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const position = getLessonPosition(lesson.slug, lang);
+  const description = getLearnLessonDescription(lesson, lang);
 
   return (
     <section className="mt-[26px]">
@@ -893,10 +893,39 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
       <h1 className="mt-[18px] max-w-[820px] text-[30px] font-bold leading-[1.14] text-white max-md:text-[25px]">
         {getLearnLessonTitle(lesson, lang)}
       </h1>
-      <p className="mt-[18px] max-w-[820px] pb-[20px] text-[14px] leading-[1.55] text-white/70">
-        {getLearnLessonDescription(lesson, lang)}
-      </p>
+      <LessonDescription description={description} copy={copy} />
     </section>
+  );
+}
+
+const MOBILE_DESCRIPTION_PREVIEW_LENGTH = 102;
+
+function LessonDescription({ description, copy }: { description: string; copy: (typeof detailCopy)["ru"] }) {
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    setExpanded(false);
+  }, [description]);
+
+  const canCollapse = description.length > MOBILE_DESCRIPTION_PREVIEW_LENGTH;
+  const preview = canCollapse ? description.slice(0, MOBILE_DESCRIPTION_PREVIEW_LENGTH).trimEnd() : description;
+
+  return (
+    <div className="mt-[18px] max-w-[820px] pb-[20px] text-[14px] leading-[1.55] text-white/70 max-md:text-[16px]">
+      <p className="max-md:hidden">{description}</p>
+      <p className="hidden max-md:block">
+        {expanded || !canCollapse ? description : `${preview}...`}
+        {canCollapse && (
+          <button
+            type="button"
+            onClick={() => setExpanded((current) => !current)}
+            className="ml-[2px] inline cursor-pointer border-0 bg-transparent p-0 align-baseline text-[16px] font-bold leading-[inherit] text-white"
+          >
+            {expanded ? copy.showLessDescription : copy.showMoreDescription}
+          </button>
+        )}
+      </p>
+    </div>
   );
 }
 
@@ -1337,7 +1366,7 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
             onClick={() => onTabChange("lessons")}
             className={`relative h-[52px] min-w-[92px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition ${
               activeTab === "lessons" ? "text-white" : "text-white/58 hover:text-white"
-            } max-md:h-[60px] max-md:min-w-[118px] max-md:text-[18px]`}
+            } max-md:h-[60px] max-md:min-w-[118px] max-md:text-[16px]`}
           >
             {copy.lessonsTab}
             {activeTab === "lessons" && <span className="absolute inset-x-[10px] bottom-0 h-[2px] rounded-full bg-[#9cfb51]" />}
@@ -1348,7 +1377,7 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
           onClick={() => onTabChange("timestamps")}
           className={`relative h-[52px] min-w-[116px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition ${
             activeTab === "timestamps" ? "text-white" : "text-white/58 hover:text-white"
-          } max-md:h-[60px] max-md:min-w-[142px] max-md:text-[18px]`}
+          } max-md:h-[60px] max-md:min-w-[142px] max-md:text-[16px]`}
         >
           {copy.timestampsTab}
           {activeTab === "timestamps" && <span className="absolute inset-x-[10px] bottom-0 h-[2px] rounded-full bg-[#9cfb51]" />}
@@ -1532,11 +1561,9 @@ function CourseSecurePaymentIcon({ className = "" }: { className?: string }) {
   );
 }
 
-function CoursePurchaseTitle({ count, compact }: { count: number; compact: boolean }) {
+function CoursePurchaseTitle({ count }: { count: number }) {
   const { lang } = useLang();
-  const titleClass = `text-[17px] font-bold leading-[1.22] tracking-normal text-white max-sm:text-[16px] ${
-    compact ? "max-w-[248px]" : "max-w-[280px]"
-  }`;
+  const titleClass = "max-w-[314px] text-[19px] font-bold leading-[1.22] tracking-normal text-white max-sm:text-[18px]";
 
   if (lang === "en") {
     return (
@@ -1587,7 +1614,6 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   const salePrice = formatCoursePrice(effectiveSaleValue, currency);
   const listPrice = formatCoursePrice(crossedValue, currency);
   const courseLessonsCount = collection.progress?.total || collection.lessons.length;
-  const promoBadgeLabel = getCoursePromoBadgeLabel(appliedPromoCode, appliedPromoQuote);
   const formMessage = error
     ? { tone: "error" as const, text: error }
     : pendingPayment
@@ -1749,13 +1775,8 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
       <div className="relative h-[373px] w-[calc(100%-46px)] max-w-[314px]">
         <div className="absolute left-0 top-0 flex w-full items-start justify-between gap-[16px]">
           <div className="min-w-0">
-            <CoursePurchaseTitle count={courseLessonsCount} compact={Boolean(promoBadgeLabel)} />
+            <CoursePurchaseTitle count={courseLessonsCount} />
           </div>
-          {promoBadgeLabel && (
-            <span className="mt-[1px] shrink-0 rounded-[6px] bg-[#9cfb51] px-[8px] py-[5px] text-[12px] font-bold leading-none text-[#062013]">
-              {promoBadgeLabel}
-            </span>
-          )}
         </div>
 
         <div className="absolute left-0 top-[74px] flex w-full items-end gap-[24px]">
@@ -1868,16 +1889,6 @@ function appendCourseOrderParam(returnUrl: string, orderId?: string) {
   } catch {
     return returnUrl;
   }
-}
-
-function getCoursePromoBadgeLabel(promoCode: string | null, quote: CoursePaymentResponse | null) {
-  if (!promoCode || !quote) return null;
-  if (isCourseTestPromoCode(promoCode)) return "FREE";
-  const promoPercent = typeof quote.promo_discount_percent === "number" ? quote.promo_discount_percent : null;
-  if (promoPercent && promoPercent > 0 && promoPercent < 100) return `-${Math.round(promoPercent)}%`;
-  const fallbackPercent = typeof quote.discount_percent === "number" ? quote.discount_percent : null;
-  if (fallbackPercent && fallbackPercent > 0 && fallbackPercent < 100) return `-${Math.round(fallbackPercent)}%`;
-  return null;
 }
 
 function readPendingCoursePayment(courseSlug: string): PendingCoursePayment | null {
@@ -2180,6 +2191,8 @@ const detailCopy = {
     missingFromVideoDescription: "Поля уже заведены. Когда будет ссылка, скриншот, файл или точный текст, сюда можно просто подставить готовый материал.",
     showMoreMaterials: "Показать больше",
     showLessMaterials: "Скрыть",
+    showMoreDescription: "Показать ещё",
+    showLessDescription: "Скрыть",
     markLessonCompleted: "Отметить как пройдено",
     lessonCompleted: "Отмечено как пройдено",
     undoCompleted: "Отменить",
@@ -2252,6 +2265,8 @@ const detailCopy = {
     missingFromVideoDescription: "The fields are already prepared. Once a link, screenshot, file, or exact text is available, it can be dropped in here.",
     showMoreMaterials: "Show more",
     showLessMaterials: "Show less",
+    showMoreDescription: "Show more",
+    showLessDescription: "Show less",
     markLessonCompleted: "Mark as completed",
     lessonCompleted: "Marked as completed",
     undoCompleted: "Undo",

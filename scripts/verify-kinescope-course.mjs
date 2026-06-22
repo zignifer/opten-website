@@ -176,6 +176,11 @@ assert.match(components, /buyCourseShort:\s*\(price: string\) => `Открыть
 assert.match(components, /markLessonCompleted:\s*"Отметить как пройдено"/, "Completion CTA must use the requested passed-lesson wording");
 assert.match(components, /lessonCompleted:\s*"Отмечено как пройдено"/, "Completed lesson state must use the requested passed-lesson wording");
 assert.match(components, /function CourseProgressCard/, "Opened paid course must render a focused course progress card");
+assert.match(components, /function LessonDescription/, "Lesson intro description must use the compact mobile show-more component");
+assert.match(components, /showMoreDescription:\s*"Показать ещё"/, "Lesson intro mobile expander must say 'Показать ещё'");
+assert.match(components, /max-md:text-\[16px\]/, "Course lesson/timestamp tabs must use 16px text on mobile");
+assert.match(components, /text-\[19px\][\s\S]*max-sm:text-\[18px\]/, "Course purchase title must be 2px larger on desktop and mobile");
+assert.doesNotMatch(components, /promoBadgeLabel/, "Course purchase card must not render FREE or discount promo badges");
 assert.match(components, /<div className=\{`min-w-0 \$\{courseMobileOrder\(3\)\}`\}>\s*<CoursePurchaseCard/, "Locked private-course purchase form must be third on mobile");
 assert.match(components, /<div className=\{`min-w-0 \$\{courseMobileOrder\(2\)\}`\}>\s*<LessonSidebar/, "Locked private-course outline must be second on mobile");
 assert.doesNotMatch(components, /kine\.txt|KINESCOPE_API|Bearer\s+[0-9a-f-]{36}/i, "Client code must not expose Kinescope API keys");
