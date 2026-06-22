@@ -41,7 +41,7 @@ export default function AppAuthCallbackPage() {
         {error ? (
           <>
             <h1 className="text-[24px] font-bold leading-tight">{copy.errorTitle}</h1>
-            <p className="mt-[10px] text-[14px] leading-[1.5] text-white/68">{error}</p>
+            <p className="mt-[10px] text-[14px] leading-[1.5] text-white/68">{copy.errorText}</p>
             <button
               type="button"
               onClick={() => navigate(`/login?next=${encodeURIComponent(safeNext)}`, { replace: true })}
@@ -67,12 +67,14 @@ const callbackCopy = {
     loadingTitle: "Входим в Opten Space",
     loadingText: "Проверяем сессию и возвращаем вас в Learn.",
     errorTitle: "Войти не удалось",
+    errorText: "Если ссылка истекла, войдите на opten.space через одноразовый код на этот же email — доступ уже закреплен за ним.",
     back: "Вернуться ко входу",
   },
   en: {
     loadingTitle: "Signing in to Opten Space",
     loadingText: "Checking the session and returning you to Learn.",
     errorTitle: "Could not sign in",
+    errorText: "If the link expired, sign in to opten.space with a one-time code for the same email. Access is already attached to that email.",
     back: "Back to sign in",
   },
 } as const;

@@ -65,6 +65,7 @@ const callback = read("src/app/pages/space/AppAuthCallbackPage.tsx");
 assert.match(callback, /normalizeSafeNext/, "Auth callback must normalize next redirects");
 assert.match(callback, /useSpaceAuth[\s\S]*refresh[\s\S]*await refresh\(\)[\s\S]*navigate\(safeNext/, "Auth callback must refresh website account state before redirecting");
 assert.doesNotMatch(callback, /navigate\("\/app\/learn"/, "Auth callback must not always return to /app/learn");
+assert.match(callback, /Если ссылка истекла, войдите на opten\.space через одноразовый код на этот же email — доступ уже закреплен за ним\./, "Auth callback expired-link error must explain course access recovery in Russian");
 
 const pay = read("src/app/pages/PayPage.tsx");
 assert.match(pay, /useSpaceAuth/, "PayPage must prefer website auth");

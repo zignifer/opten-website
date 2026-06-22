@@ -76,25 +76,18 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
   "lesson-3-logo-generation": {
     materials: {
       ru: [
-        pending("Recraft", "Добавить актуальную ссылку на сервис или конкретный workspace", "Нужно добавить"),
+        link("Recraft", "Сервис для генерации векторного логотипа", "https://www.recraft.ai/"),
         links.higgsfield,
-        pending("Figma", "Добавить актуальную ссылку на файл/макет, если его можно открыть ученикам", "Нужно добавить"),
-        pending("Pinterest-референс логотипа", "Нужна точная ссылка на референс из видео", "Нужно добавить"),
+        link("Pinterest-референс логотипа", "Референс логотипа из урока", "https://ru.pinterest.com/pin/440789882308217256/"),
+        link("Quiver", "AI-инструмент для работы с визуалом", "https://quiver.ai/"),
+        link("Ролик про Quiver", "Instagram-видео с примером Quiver", "https://www.instagram.com/p/DVQyhkXDSSk/", "Смотреть"),
         pending("Исходник логотипа NOVA", "Добавить SVG/PNG экспорта логотипа", "Загрузить", "pdf"),
-        pending("Шпаргалка PNG/JPG/SVG", "Оформить короткий файл или карточку", "Оформить", "pdf"),
       ],
     },
     prompts: {
       ru: [
         prompt("l3-opten-recraft-logo", "Запрос в Opten для Recraft", "Короткий запрос из озвучки"),
         prompt("l3-recraft-logo", "Recraft V4: логотип NOVA", "Prompt pack, блок 7", "course-v2-prompt-pack.md"),
-      ],
-    },
-    missingItems: {
-      ru: [
-        missing("Pinterest-референс", "Нужна конкретная ссылка или скрин референса."),
-        missing("Настройки Recraft/Higgsfield", "Vector Mode, формат скачивания, тариф/доступ."),
-        missing("Экспорт SVG", "Добавить файл логотипа NOVA в материалы."),
       ],
     },
   },
