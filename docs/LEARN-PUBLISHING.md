@@ -109,9 +109,9 @@ and timestamp seeking.
 - Manual completion is stored in `localStorage.opten_space_learn_progress_v1`
   and must always be reversible.
 
-## Hidden Kinescope Course MVP
+## Hidden Kinescope Course
 
-The direct-link course MVP lives outside the public SEO Learn catalog:
+The direct-link paid course lives outside the public SEO Learn catalog:
 
 - Course route: `/learn/courses/ai-content-marketing-2026`
 - First lesson route:
@@ -120,9 +120,16 @@ The direct-link course MVP lives outside the public SEO Learn catalog:
 - Current Kinescope-backed lessons: 1-16. Every course lesson has a Kinescope
   video ID in both the course content and the server whitelist.
 - Source data: `src/content/space/privateCourse.ts`
+- Lesson materials, prompt cards, and downloadable ZIP link:
+  `src/content/space/privateCourseExtras.ts`
+- Server-only full prompt bodies: `api/_shared/coursePromptBodies.ts`
+- Server Kinescope course/video whitelist: `api/_shared/kinescopeCourse.ts`
+- Downloadable Claude skill archive:
+  `public/assets/space/courses/ai-content-marketing-2026/opten-skill.zip`
 - Client page: `src/app/pages/space/PrivateCoursePage.tsx`
 - Playback token endpoint: `POST /api/kinescope-course-token`
 - Kinescope auth callback: `POST /api/kinescope-course-auth`
+- Locked course prompt endpoint: `POST /api/course-prompt`
 - Course checkout Edge Function: `POST /functions/v1/create-course-payment`
 - Course access Edge Function: `POST /functions/v1/course-access-summary`
 
@@ -130,10 +137,10 @@ Keep `/learn/courses/*` noindex and out of sitemap, llms.txt, header nav, and
 `EN_SIBLINGS` until launch. Do not store Kinescope API keys or playback secrets
 in browser code. The client requests a short-lived Kinescope embed URL with the
 website Supabase JWT; the server verifies the standalone course entitlement
-before signing `drmauthtoken`. The server must not append a dynamic
-`watermark` query parameter because it renders visible email/user overlays in
-the player. Kinescope then calls the auth callback during playback and gets 200
-or 403.
+before signing `drmauthtoken`. Player display settings stay in Kinescope
+operational config; the website should not pass viewer identity as a visible
+player overlay. Kinescope then calls the auth callback during playback and gets
+200 or 403.
 
 The hidden course `ai-content-marketing-2026` is not unlocked by Pro. It uses a
 separate one-time course purchase:
@@ -157,6 +164,25 @@ to that email and sends a direct website auth link. If the link expires, the
 buyer can use the normal `/login` Email OTP flow with the same email; the access
 function binds the entitlement to `auth.users.id` on first authenticated check.
 
+Course promo operations:
+
+- Backend source lives in the extension repo:
+  `C:\Projects\promptscore\supabase\functions\_shared\course-promos.ts`,
+  `supabase/functions/create-course-payment/index.ts`,
+  `supabase/functions/_shared/course-webhook.ts`, and migration
+  `supabase/migrations/20260620173034_course_paddle_promos.sql`.
+- `quote_only: true` on `create-course-payment` previews a promo price and must
+  not create `course_orders`, provider payments, or `times_used` increments.
+- `course_promo_codes.discount_kind` is either `percentage` or `fixed_price`.
+  Percentage codes discount the current sale price; fixed-price codes require
+  both RUB and USD fixed amounts.
+- `enabled`, `usage_limit`, `times_used`, `starts_at`, and `expires_at` are
+  enforced only in the Edge Function with service-role access.
+- `times_used` increments only from successful YooKassa/Paddle course webhooks,
+  and only once per order.
+- The public site should show only the normalized code and effective quote; it
+  must not query or expose the promo table directly.
+
 Before enabling Kinescope project auth backend in production, set
 `KINESCOPE_AUTH_JWT_SECRET` in Vercel and verify that the deployed callback is
 reachable. Optional Basic Auth for the callback uses
@@ -166,8 +192,8 @@ Paid-plan Kinescope protection checklist for this course:
 
 1. Project-level DRM encryption is enabled for the course project.
 2. Embedding/playback is restricted to `opten.space` and `www.opten.space`.
-3. Visible Kinescope watermark overlays are disabled for the current course
-   player; the website intentionally does not pass `watermark` query parameters.
+3. Visible viewer-identity overlays are disabled in the current course player;
+   the website does not pass viewer identity in embed URL parameters.
 4. Kinescope authorization backend is configured as
    `https://opten.space/api/kinescope-course-auth` with strict mode.
 5. All 16 uploaded video IDs are present in `src/content/space/privateCourse.ts`
@@ -176,6 +202,13 @@ Paid-plan Kinescope protection checklist for this course:
 6. Kinescope chapters and subtitle display are enabled for all 16 videos.
    Kinescope's public API can upload ready `.srt/.vtt` files and enable existing
    subtitle tracks, but does not expose the dashboard's AI Auto-generate action.
+
+Local Kinescope operational API access is stored in gitignored
+`.secrets/kinescope.env` as `KINESCOPE_API_KEY`. The key was originally copied
+from `C:\Users\КОМП\Desktop\kine.txt`; keep using the `.secrets` copy for
+future checks and never commit or expose it to the browser. Current objects for
+this course: project `2b95951a-c2f0-4bbd-b5c4-0642539438b2`, player
+`f4e68659-b78f-4b48-8134-3856d827efa9`.
 
 ## Future Course Collections
 
@@ -210,10 +243,13 @@ Direct noindex template URLs:
 YouTube lessons use a custom Opten poster and play button before activation.
 After click, the embedded YouTube iframe controls are controlled by YouTube and
 cannot be fully restyled or hidden. Local MP4 lessons use the native video
-player and can seek directly from timestamp clicks.
+player and can seek directly from timestamp clicks. Kinescope lessons load the
+official iframe player script (`https://player.kinescope.io/latest/iframe.player.js`);
+timestamp clicks must call the iframe API seek method instead of only changing
+React state or scrolling the page.
 
 ## Secrets
 
-NotebookLM and YouTube access belongs in local `.secrets/*` files or process
-environment only. Do not commit API keys, cookies, OAuth tokens, or NotebookLM
-session material.
+NotebookLM, YouTube, and Kinescope operational access belongs in local
+`.secrets/*` files or process environment only. Do not commit API keys, cookies,
+OAuth tokens, playback secrets, or NotebookLM session material.

@@ -1,12 +1,12 @@
 # Tech Stack — opten.space
 
-> Snapshot taken 2026-05-14, refreshed 2026-05-21 (perf pass: subset fonts, model-content
-> data-island split, eager-EN dict, iOS-Safari blur fix).
+> Snapshot taken 2026-05-14, refreshed 2026-06-22 (public Learn, Learn Finds,
+> hidden Kinescope course, course API endpoints, route count update).
 > Re-run discovery when `package.json` or build tooling changes meaningfully.
 
 ## Build & runtime
 
-- **Vite 6.3.5** (pinned via pnpm overrides) — `npm run dev` for local, `npm run build` for production
+- **Vite 6.4.3** (pinned via pnpm overrides) — `npm run dev` for local, `npm run build` for production
 - **React 18.3.1** + **React DOM 18.3.1** (peer deps, marked optional in `package.json` — unusual but works for Figma Make export origin)
 - **TypeScript** via Vite's transpilation (no `tsc` in scripts)
 - **`@vitejs/plugin-react` 4.7.0** + **`@tailwindcss/vite` 4.1.12** — both plugins required even though only React is heavily used. Do not remove (commented note in `vite.config.ts:9`).
@@ -14,11 +14,13 @@
 
 ## Routing
 
-- **React Router 7.13.0** (`react-router` package, not `react-router-dom` — v7 unified API)
-- **~22 client route patterns** declared in [`src/main.tsx`](../../src/main.tsx) + a catch-all 404, expanding to **144 prerendered routes**:
-  - **Prerendered, full-tier (9 RU + 9 EN siblings):** `/`, `/pay`, `/welcome`, `/about`, `/blog`, `/blog/:slug`, `/privacy`, `/terms`, `/refund` (plus `/en/*` mirrors)
-  - **Model pages (Phase v2.0):** `/models` hub + `/models/:slug` (62 models) + `/en/*` mirrors = 2 hubs + 124 model pages
-  - **SPA-only (no EN siblings, `X-Robots-Tag: noindex`):** `/account`, `/success`, `/dashboard/download-skill`
+- **React Router 7.17.0** (`react-router` package, not `react-router-dom` — v7 unified API)
+- **~39 client route patterns** declared in [`src/main.tsx`](../../src/main.tsx) + a catch-all 404, expanding to **202 prerendered SEO routes**:
+  - **Marketing/legal/pricing/welcome:** 14 routes across RU + EN.
+  - **Blog:** 38 routes across RU + EN.
+  - **Model pages (Phase v2.0):** `/models` hub + `/models/:slug` (62 models) + `/en/*` mirrors = 2 hubs + 124 model pages, 126 routes total.
+  - **Public Learn:** `/learn`, `/learn/:lessonSlug`, `/learn/finds/:findSlug` + `/en/*` mirrors = 24 routes total.
+  - **SPA-only/noindex:** `/login`, `/auth/callback`, `/account`, `/success`, `/dashboard/download-skill`, `/prompt-library`, `/p/:slug`, `/app/*`, `/space/*`, `/internal/*`, `/learn/templates/*`, `/learn/courses/*`, `/en/learn/templates/*`.
   - **Catch-all** `<Route path="*">` → `<NotFound>` (locale-aware, injects `<meta robots=noindex>` at runtime)
 - **Legacy redirects** (`vercel.json` `redirects[]`): `/guides`, `/en/guides`, `/guides/gpt-image-2`, `/en/guides/gpt-image-2` → `/blog`, `/en/blog`, `/blog/gpt-image-2`, `/en/blog/gpt-image-2` (Phase 5 B-07)
 - **`vercel.json` rewrite:** all non-`/api/` paths → `/index.html` (SPA fallback at runtime; the prerendered HTML files in `dist/<route>/index.html` are what AI crawlers and link-unfurl bots see on first byte)
@@ -50,10 +52,12 @@
 ## Backend integration
 
 - **Plain `fetch`** to Supabase REST + Functions endpoints — no `@supabase/supabase-js` SDK
-- **Hardcoded constants** in [`PayPage.tsx`](../../src/app/pages/PayPage.tsx), [`AccountPage.tsx`](../../src/app/pages/AccountPage.tsx), [`api/download-skill.ts`](../../api/download-skill.ts):
+- **Website auth/session helpers** live in [`src/lib/optenAuth.ts`](../../src/lib/optenAuth.ts) and store the website Supabase session in `localStorage.opten_space_session_v1`. `/pay`, `/account`, `/app/*`, and hidden course access prefer website JWTs; `/pay` and `/account` retain extension JWT fallback for shipped flows.
+- **Hardcoded constants** in [`src/lib/optenAuth.ts`](../../src/lib/optenAuth.ts), [`src/lib/promptLibraryApi.ts`](../../src/lib/promptLibraryApi.ts), [`PayPage.tsx`](../../src/app/pages/PayPage.tsx), [`AccountPage.tsx`](../../src/app/pages/AccountPage.tsx), [`api/download-skill.ts`](../../api/download-skill.ts), and server shared helpers:
   - `SUPABASE_URL = "https://supabase.opten.space"` — **self-hosted** on Beget RU VPS (PG17, Caddy v2.11.3 front) since the Phase 88 cutover (2026-05-25, extension v2.8 milestone). The cloud project `https://vuywydhwkqmihfztpkgl.supabase.co` is now a frozen cold backup, not an active backend; it was removed from the extension's `host_permissions` in v1.3.7.
   - `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"` — **unchanged** across the cutover. Self-hosted GoTrue reuses the same `JWT_SECRET` as the cloud project, so the existing anon key (issuer `ref: vuywydhwkqmihfztpkgl` baked into the JWT payload) is still accepted by self-hosted Kong. No key rotation required.
-- **JWT verification (Phase 88 dual-issuer):** `api/download-skill.ts` verifies user JWTs **locally** with `jose` against a dual-issuer allowlist — HS256 (self-hosted shared secret) for post-cutover tokens, ES256 (cloud JWKS via `createRemoteJWKSet`) for legacy pre-cutover users. The legacy `EXTENSION_SECRET` bearer path has been removed; only JWT auth is accepted now. The same dual-issuer pattern runs in the proxy (`lib/helpers.js:65-82`) and in self-hosted Edge Functions during the transition window.
+- **JWT verification (Phase 88 dual-issuer):** site serverless functions verify user JWTs **locally** with `jose` against the Supabase issuer allowlist and `SUPABASE_JWT_SECRET`; no `/auth/v1/user` session lookup. `api/download-skill.ts` gates Pro skill ZIP by `subscriptions`. `api/kinescope-course-token.ts` and `api/course-prompt.ts` gate hidden course content by `course-access-summary`.
+- **Standalone course checkout/access** is owned by extension-side Supabase Edge Functions: `create-course-payment` (guest email + RUB/YooKassa or USD/Paddle one-time checkout, optional uppercase promo code, optional `quote_only: true` price preview) and `course-access-summary` (claim/read `course_entitlements` by website JWT email/user id). Promo rules live server-side in `course_promo_codes`; the browser receives only the quote/payment response and must not query promo rows directly.
 - **Paddle.js v2** loaded synchronously from `cdn.paddle.com` in [`index.html`](../../index.html). Initialized in [`main.tsx`](../../src/main.tsx) (Phase 67 fix: do not call `Environment.set('production')` — only sandbox).
 
 ## i18n (post-Phase-3)
@@ -65,14 +69,18 @@
 - `<html lang>` is **baked at prerender time** per output file (`scripts/prerender.mjs`) — not mutated at runtime (Phase 3 D-06 — runtime DOM mutation caused hydration mismatch)
 - **`hreflang` triplet** (ru, en, x-default) injected into every prerendered `<head>`; sitemap.xml also carries `xhtml:link` reciprocal annotations (Phase 3 GEO-C-2/C-3)
 - `<LocalizedLink>` ([src/app/components/LocalizedLink.tsx](../../src/app/components/LocalizedLink.tsx)) is the canonical internal-navigation primitive — preserves the `/en/` prefix when on EN routes
-- `EN_SIBLINGS` constant lives in [`src/i18n/paths.ts`](../../src/i18n/paths.ts) — must stay in sync with EN entries in `scripts/seo-routes.ts`
+- `EN_SIBLINGS` constant lives in [`src/i18n/paths.ts`](../../src/i18n/paths.ts) — must stay in sync with EN entries in `scripts/seo-routes.ts` for marketing, blog, models, public Learn lessons, and Learn Finds. Hidden course/template/app routes intentionally do not get EN siblings for SEO.
 
 ## Vercel-side serverless
 
-- **Single function:** [`api/download-skill.ts`](../../api/download-skill.ts) (Node.js handler signature `(req, res)`)
-- Bundles ZIP via `vercel.json` `includeFiles: "api/_assets/**"`
-- Validates Supabase JWT and Pro subscription before streaming the ZIP
-- CORS locked to `https://opten.space`
+- **Functions** use Vercel's Node.js handler signature `(req, res)`:
+  - [`api/download-skill.ts`](../../api/download-skill.ts) — validates Supabase JWT + live Pro subscription and streams `api/_assets/opten.zip`.
+  - [`api/kinescope-course-token.ts`](../../api/kinescope-course-token.ts) — validates website JWT, checks `course-access-summary`, signs a short-lived Kinescope `drmauthtoken`, and returns an embed URL.
+  - [`api/kinescope-course-auth.ts`](../../api/kinescope-course-auth.ts) — Kinescope server-to-server playback callback; verifies the signed playback token and returns 200/403.
+  - [`api/course-prompt.ts`](../../api/course-prompt.ts) — validates website JWT + course access and returns a whitelisted private course prompt body.
+- `api/download-skill.ts` bundles the Pro ZIP via `vercel.json` `includeFiles: "api/_assets/**"`.
+- Hidden course downloadable materials under `public/assets/space/courses/**` are static public assets; locked prompt bodies stay server-side in `api/_shared/coursePromptBodies.ts`.
+- JSON CORS is locked to `https://opten.space`.
 
 ## Env vars (Vercel)
 
@@ -80,35 +88,42 @@
 |-----|---------|------------|
 | `VITE_PADDLE_ENV` | `'sandbox'` \| `'production'` | [`main.tsx:26`](../../src/main.tsx#L26) |
 | `VITE_PADDLE_CLIENT_TOKEN` | Paddle public client token | [`main.tsx:30`](../../src/main.tsx#L30) |
+| `SUPABASE_JWT_SECRET` | Server-side HS256 JWT verification for site API functions | `api/download-skill.ts`, `api/_shared/optenServerAuth.ts` |
+| `KINESCOPE_AUTH_JWT_SECRET` | Server-side HS256 secret for short-lived Kinescope `drmauthtoken` playback tokens | `api/kinescope-course-token.ts`, `api/kinescope-course-auth.ts` |
+| `KINESCOPE_DRM_AUTH_USERNAME` / `KINESCOPE_DRM_AUTH_PASSWORD` | Optional Basic Auth for Kinescope's callback, if enabled in Kinescope settings | `api/kinescope-course-auth.ts` |
 
 `VITE_*` vars are bundled into the client at build time — they're public. Real
-secrets (Supabase service role, etc.) are NOT in this repo; they live on the
-**self-hosted Supabase VPS** (loaded by Edge Functions from `.env.functions` on
-`supabase.opten.space`, see extension repo `supabase/functions/` for source).
-The Supabase anon key in this repo is also public-by-design (it's the `anon`
-role).
+secrets are NOT in the client bundle. Supabase service-role, payment secrets,
+Resend, and course Paddle price IDs live in the extension-owned Supabase Edge
+Function environment; Kinescope playback/token secrets live in Vercel server
+environment. Local Kinescope operational API access belongs in gitignored
+`.secrets/kinescope.env`, not in Vercel `VITE_*` vars.
 
 ## Scripts
 
 ```json
 {
-  "build": "node scripts/generate-summaries.mjs && vite build && vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache --emptyOutDir && vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta && node scripts/prerender.mjs && node scripts/sitemap.mjs && node scripts/llms.mjs && node scripts/verify-faq-mainentity.mjs && node scripts/verify-fonts.mjs && node scripts/indexnow.mjs",
-  "dev": "vite"
+  "build": "node scripts/generate-summaries.mjs && node scripts/generate-responsive-images.mjs && vite build && vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache --emptyOutDir && vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta && node scripts/prerender.mjs && node scripts/sitemap.mjs && node scripts/llms.mjs && node scripts/verify-faq-mainentity.mjs && node scripts/verify-fonts.mjs && node scripts/indexnow.mjs",
+  "dev": "node scripts/generate-responsive-images.mjs && vite",
+  "verify:space-learn": "node scripts/verify-space-learn.mjs",
+  "verify:kinescope-course": "node scripts/verify-kinescope-course.mjs"
 }
 ```
 
 - The build chain is the SEO surface. In order:
   1. `node scripts/generate-summaries.mjs` → regenerates `src/content/models/_summaries.ts` (lightweight name+intro barrel the hub uses, so full model prose stays out of the entry chunk).
-  2. `vite build` → SPA bundle in `dist/`. The **browser** build aliases the model barrel to `src/content/models/index.client.ts` — a data-island-backed lazy store — so the eager 62-file model-content glob never ships in the entry chunk (entry dropped ~2.1 MB → ~449 KB raw on 2026-05-21).
-  3. `vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache` → SSR React bundle for prerender (SSR keeps the full eager barrel).
-  4. `vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta` → per-route metadata manifest
-  5. `node scripts/prerender.mjs` → 144 `dist/<route>/index.html` files with per-route `<head>`, JSON-LD, `<html lang>`, hreflang (also localizes the static `keywords`/`og:image:alt`/author head tags on EN routes, and injects each model page's content as a `<script type="application/json" id="opten-model">` data-island the client store reads synchronously at hydration)
-  6. `node scripts/sitemap.mjs` → `dist/sitemap.xml` with per-route `<lastmod>` (git mtime). **Has a floor check that fails the build if route count drops.**
-  7. `node scripts/llms.mjs` → `dist/llms.txt` + `dist/llms-full.txt`. Same floor check.
-  8. `node scripts/verify-faq-mainentity.mjs` → asserts visible FAQ DOM ≡ JSON-LD `FAQPage.mainEntity`. Build-time gate.
-  9. `node scripts/verify-fonts.mjs` → asserts the subset `*.woff2` are present, within size bounds, weight axis intact, and the Unbounded preload survived. Build-time gate.
-  10. `node scripts/indexnow.mjs` → pings Bing IndexNow with the updated URL set. Non-fatal on network failure.
+  2. `node scripts/generate-responsive-images.mjs` → emits responsive image derivatives into `public/generated/`.
+  3. `vite build` → SPA bundle in `dist/`. The **browser** build aliases the model barrel to `src/content/models/index.client.ts` — a data-island-backed lazy store — so the eager 62-file model-content glob never ships in the entry chunk (entry dropped ~2.1 MB → ~449 KB raw on 2026-05-21).
+  4. `vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache` → SSR React bundle for prerender (SSR keeps the full eager barrel).
+  5. `vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta` → per-route metadata manifest.
+  6. `node scripts/prerender.mjs` → 202 `dist/<route>/index.html` files with per-route `<head>`, JSON-LD, `<html lang>`, hreflang (also localizes the static `keywords`/`og:image:alt`/author head tags on EN routes, and injects each model page's content as a `<script type="application/json" id="opten-model">` data-island the client store reads synchronously at hydration).
+  7. `node scripts/sitemap.mjs` → `dist/sitemap.xml` with per-route `<lastmod>` (git mtime). **Has a floor check that fails the build if route count drops.**
+  8. `node scripts/llms.mjs` → `dist/llms.txt` + `dist/llms-full.txt`. Same floor check.
+  9. `node scripts/verify-faq-mainentity.mjs` → asserts visible FAQ DOM ≡ JSON-LD `FAQPage.mainEntity`. Build-time gate.
+  10. `node scripts/verify-fonts.mjs` → asserts the subset `*.woff2` are present, within size bounds, weight axis intact, and the Unbounded preload survived. Build-time gate.
+  11. `node scripts/indexnow.mjs` → pings Bing IndexNow with the updated URL set. Non-fatal on network failure.
 - **Out-of-build model tooling** (run manually, NOT in the `build` chain): `node scripts/sync-skills.mjs` (copies promptscore-proxy `skills/*.md` → `src/content/models/_skills/`), `node scripts/build-models-registry.mjs` (parses `_skills/*.md` → AUTO-GEN `_registry.ts`, 62 `ModelMeta`), `node scripts/verify-models-content.mjs` (model content + EN-meta-cyrillic gate — a follow-up wants this wired into the build once Vercel Node ≥22.18 is confirmed).
+- Learn guards: `npm run verify:space-learn` checks public Learn/Learn Finds route/content invariants; `npm run verify:kinescope-course` checks the hidden 16-video Kinescope course, lesson extras, server whitelist, and prompt/material guards.
 - Ad-hoc: `node scripts/smoke-blog.mjs` (requires `npx playwright install chromium` once) — Playwright smoke for the blog flows.
 - No `test` script — no Vitest/Jest.
 - No `lint` script — no ESLint config.
@@ -124,9 +139,11 @@ role).
 
 ## Content & SEO tooling
 
-- **Per-route metadata**: [`scripts/seo-routes.ts`](../../scripts/seo-routes.ts) — single source of truth. Each route declares `title`, `description`, `canonical`, `ogImage`, `hreflangAlternates`, `prerender` tier, and a `schema: SchemaBlock[]` array built from typed helpers (`faqPageBlock`, `howToBlock`, `productBlock`, `articleBlock`, `webPageBlock`, `breadcrumbBlock`, `collectionPageBlock`, `itemListBlock`, `blogPostingBlock`, `softwareApplicationModelBlock`, plus reusable `ORG_BLOCK` / `WEBSITE_BLOCK` / `SOFTWARE_APP_BLOCK` / `PERSON_FOUNDER_BLOCK` consts cross-linked via `@id` references — Phase 4 D-10). Model routes built by `buildModelRoute` / `buildModelsHubRoute`.
+- **Per-route metadata**: [`scripts/seo-routes.ts`](../../scripts/seo-routes.ts) — single source of truth. Each route declares `title`, `description`, `canonical`, `ogImage`, `hreflangAlternates`, `prerender` tier, and a `schema: SchemaBlock[]` array built from typed helpers (`faqPageBlock`, `howToBlock`, `productBlock`, `articleBlock`, `webPageBlock`, `breadcrumbBlock`, `collectionPageBlock`, `itemListBlock`, `blogPostingBlock`, `softwareApplicationModelBlock`, plus reusable `ORG_BLOCK` / `WEBSITE_BLOCK` / `SOFTWARE_APP_BLOCK` / `PERSON_FOUNDER_BLOCK` consts cross-linked via `@id` references — Phase 4 D-10). Model routes are built by `buildModelRoute` / `buildModelsHubRoute`; public Learn routes are expanded from `src/content/space/learn.ts` and `src/content/space/learnFinds.ts`.
 - **Blog content**: [`src/content/blog/`](../../src/content/blog/) — one file per post implementing `BlogPost = { ru, en }`. Cover images in [`public/blog/<slug>/`](../../public/blog/). See [CONTENT-AUTHORING.md](CONTENT-AUTHORING.md).
 - **Model content (Phase v2.0)**: [`src/content/models/`](../../src/content/models/) — 62 `<slug>.ts` files implementing `ModelContent = { ru, en }`, an AUTO-GEN `_registry.ts` (62 `ModelMeta` parsed from RU `_skills/*.md`), and `metaEn.ts` (hand-maintained EN overrides for the free-text meta fields + `metaField` helper). `index.ts` exports `allModels` + `HUB_HIDDEN_SLUGS` (11 umbrella models hidden from the hub grid/ItemList but kept live).
+- **Public Learn content**: [`src/content/space/learn.ts`](../../src/content/space/learn.ts) for Opten-authored lessons, [`src/content/space/learnFinds.generated.json`](../../src/content/space/learnFinds.generated.json) + [`learnFinds.ts`](../../src/content/space/learnFinds.ts) for curated third-party YouTube videos. See [`docs/LEARN-PUBLISHING.md`](LEARN-PUBLISHING.md).
+- **Hidden course content**: [`src/content/space/privateCourse.ts`](../../src/content/space/privateCourse.ts), [`privateCourseExtras.ts`](../../src/content/space/privateCourseExtras.ts), [`api/_shared/kinescopeCourse.ts`](../../api/_shared/kinescopeCourse.ts), and [`api/_shared/coursePromptBodies.ts`](../../api/_shared/coursePromptBodies.ts). Hidden course routes are noindex and excluded from sitemap/llms until launch. Promo-code pricing is not content; it is extension-owned backend data in `course_promo_codes`.
 - **Static crawler files** (rooted in `public/`, served verbatim):
   - `robots.txt` — explicit blocks for 16 user-agents (Google/Bing/Yandex + 13 AI crawlers); `Content-Signal: search=yes, ai-train=yes, ai-input=yes` (Cloudflare AI-Preferences draft).
   - `llms.txt`, `llms-full.txt` — emitted by `scripts/llms.mjs` at build time (the `public/` versions are fallback only).
@@ -134,7 +151,7 @@ role).
 - **OG cards** at `public/og-card-{ru,en}.png` (1200×630). EN routes set `ogImage: DEFAULT_OG_IMAGE_EN`; RU routes inherit `DEFAULT_OG_IMAGE` (RU card). Per-post covers (blog) override this.
 - **Headers** (`vercel.json`):
   - Global: `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-Frame-Options: SAMEORIGIN`.
-  - Per-path `X-Robots-Tag: noindex, nofollow` on `/account`, `/en/account`, `/success`, `/dashboard/*`, `/api/*` (Phase 4.2 P0-4b).
+  - Per-path `X-Robots-Tag: noindex, nofollow` on `/account`, `/en/account`, `/login`, `/auth/*`, `/success`, `/dashboard/*`, `/prompt-library`, `/p/:slug`, `/learn/templates/*`, `/learn/courses/*`, `/en/learn/templates/*`, `/app/*`, `/space/*`, `/internal/*`, `/api/*`.
 
 ## Dependency hygiene flags
 

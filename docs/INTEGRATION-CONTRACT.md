@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-06-10 against extension `manifest.json` version **1.4.1** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
+> **Last sync:** 2026-06-22 against extension `manifest.json` version **1.4.1** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; hidden standalone course checkout/access and Kinescope course playback documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -202,7 +202,8 @@ live with these exact paths and the documented behavior.
 | `/dashboard/download-skill` | Pro-only feature in popup → opens new tab | Auth-gated page that calls `/api/download-skill` to fetch `opten.zip`. | [popup Phase 73](../../promptscore/popup/popup.html) |
 | `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Free prompt library UI for any logged-in extension account. Calls `GET_AUTH_TOKEN` through the installed extension, then uses Supabase PostgREST for `prompt_library` CRUD/search without a subscription check. After successful mutations it calls `REFRESH_PROMPT_LIBRARY_CACHE` so native extension menus do not keep stale titles/favorite state. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 94 + Phase 97 |
 | `/p/:slug` | User-shared public Prompt Library link | Read-only random-link snapshot of a user's library at publish/refresh time. Public read uses `prompt_library_get_public_snapshot` without auth; per-prompt save uses website auth (`localStorage.opten_space_session_v1`) and `prompt_library_save_public_prompt`. SPA-only, `noindex,nofollow`, no `/en/*` sibling. No bulk-copy action. | Phase 98 |
-| `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta; `/app` redirects to `/app/learn`, but Learn/Courses is temporarily hidden from visible navigation until ready. Website auth uses the canonical `/login`; visible login uses Email OTP only while the retained Google OAuth path is hidden. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95/96 |
+| `/learn/courses/:courseSlug/*` | Direct-link hidden course testing and course checkout | Hidden/noindex standalone paid course surface. It is not a Pro subscription entitlement and is not opened by the extension. Payment starts through `create-course-payment`; access is checked through website auth + `course-access-summary`; Kinescope playback is gated by this site's `/api/kinescope-course-token` and `/api/kinescope-course-auth`. | Site-only |
+| `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta app surfaces. `/app/learn*` and `/space/learn*` are compatibility redirects to public `/learn*`; public Learn is no longer indexed inside `/app`. Website auth uses the canonical `/login`; visible login uses Email OTP only while the retained Google OAuth path is hidden. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95/96 |
 
 **Locked route names** (renames are breaking):
 - `/welcome`, `/pay`, `/success` — referenced by the extension binary that's
@@ -214,6 +215,8 @@ live with these exact paths and the documented behavior.
 - `/app/*` is not yet opened by shipped extension binaries, but it is the
   canonical Opten Space Beta web-app namespace. Do not move the app back to
   `/space/*`; keep `/space/*` only as temporary redirect/backward compatibility.
+- `/learn/courses/*` is site-only and hidden/noindex. Keep it out of extension
+  navigation and public SEO lists until the course is intentionally launched.
 
 > **Note (Phase 3 D-03b):** the site additionally emits `/en/pay` as an EN sibling of `/pay`.
 > The extension does NOT navigate to `/en/pay` in current shipped versions; this is a site-side
@@ -233,7 +236,7 @@ The site only **calls** them; it does not own them.
 |----------|--------|------|-------|
 | `POST /create-payment` | Site (`PayPage` RU path) | Bearer JWT | YooKassa. Body: `{ recurring: boolean }`. Returns `{ confirmation_url }`. `return_url` is hardcoded to `https://opten.space/success`. The JWT may come from website auth or extension fallback. |
 | `POST /create-payment-paddle` | Site (`PayPage` EN path) | Bearer JWT | Paddle. Returns `{ priceId, customerEmail, userId }`. Site then calls `Paddle.Checkout.open(...)`. The JWT may come from website auth or extension fallback. |
-| `POST /create-course-payment` | Hidden Learn course page (`/learn/courses/ai-content-marketing-2026/*`) | Public anon + email | Standalone course checkout, not Pro. Body: `{ course_slug, email, return_url, currency?, promo_code? }`. For promo preview, body may be `{ course_slug, currency?, promo_code, quote_only: true }`; it validates the code and returns `{ provider, amount_value, list_amount_value, discount_percent, promo_discount_percent?, promo_code?, discount_code?, discount_id?, currency }` without creating `course_orders` or provider payments. Normal `currency="RUB"` checkout returns YooKassa `{ confirmation_url, order_id, amount_value, list_amount_value, discount_percent, promo_discount_percent?, currency }`; `currency="USD"` returns Paddle `{ provider:"paddle", price_id, order_id, customer_email, custom_data, amount_value, list_amount_value, discount_percent, promo_discount_percent?, discount_code?, discount_id?, currency }`. The checkout email becomes the entitlement email; no website login is required before payment. |
+| `POST /create-course-payment` | Hidden Learn course page (`/learn/courses/ai-content-marketing-2026/*`) | Public anon + email | Standalone course checkout, not Pro. Body: `{ course_slug, email, return_url, currency?, promo_code? }`. For promo preview, body may be `{ course_slug, currency?, promo_code, quote_only: true }`; it validates the code and returns `{ provider, amount_value, list_amount_value, discount_percent, promo_discount_percent?, promo_code?, discount_code?, discount_id?, currency }` without creating `course_orders`, provider payments, or incrementing promo usage. Normal `currency="RUB"` checkout returns YooKassa `{ confirmation_url, order_id, amount_value, list_amount_value, discount_percent, promo_discount_percent?, currency }`; `currency="USD"` returns Paddle `{ provider:"paddle", price_id, order_id, customer_email, custom_data, amount_value, list_amount_value, discount_percent, promo_discount_percent?, discount_code?, discount_id?, currency }`. Promo errors are `invalid_promo_code`, `promo_not_active`, `promo_not_configured`, or `promo_lookup_failed`. The checkout email becomes the entitlement email; no website login is required before payment. |
 | `POST /cancel-subscription` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | YooKassa cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
 | `POST /cancel-subscription-paddle` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | Paddle cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
 | `POST /get-subscription` | Site (optional) | Bearer JWT | Reads `subscriptions` table. Used as a fallback if the extension is not installed (rare path). |
@@ -275,6 +278,20 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
   `A-Z0-9`, up to 32 chars, so the same code can be passed to Paddle as
   `discountCode`. Percentage codes discount the current sale price (`2 990 ₽`
   or `$41`); the resulting order stores the effective discount from list price.
+- `course_promo_codes` supports `discount_kind = "percentage"` and
+  `discount_kind = "fixed_price"`. Percentage codes may define
+  `paddle_discount_code` / `paddle_discount_id`; for USD checkout the site must
+  pass those through to `Paddle.Checkout.open(...)` as `discountCode` /
+  `discountId`. If `paddle_discount_code` is empty, the backend may return the
+  normalized promo code as `discount_code`.
+- Promo activation is server-side only: `enabled`, optional `usage_limit`,
+  `times_used`, `starts_at`, and `expires_at` are checked by
+  `create-course-payment`. Quote preview must never create a `course_orders`
+  row or increment `times_used`; successful YooKassa/Paddle course webhooks
+  increment `times_used` once, only when the order was not already succeeded.
+- Fixed-price promos require configured RUB and USD fixed amounts. The current
+  internal fixed-price path is `FREE` (`100 ₽` / `$1`) and uses the separate
+  Paddle `$1` price ID; do not let the browser set arbitrary checkout amounts.
 - The YooKassa `/webhook` handler must branch on `metadata.kind` before
   requiring `metadata.user_id`. Course webhooks grant/confirm
   `course_entitlements`, create or reuse the Supabase Auth user for that email,
@@ -288,11 +305,14 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
 - If the magic link expires, the buyer can still use the normal `/login` Email
   OTP flow with the same email. `course-access-summary` claims the entitlement
   by email and binds it to `auth.users.id`.
-- The Vercel endpoint `POST /api/kinescope-course-token` still verifies the
-  website JWT locally and signs the Kinescope `drmauthtoken`, but its access
-  check is now `course-access-summary`, not Pro subscription lookup. The same
-  endpoint must not append per-viewer `watermark` query parameters because
-  Kinescope renders them as visible email/user overlays in the player.
+- The Vercel endpoint `POST /api/kinescope-course-token` verifies the website
+  JWT locally and signs the Kinescope `drmauthtoken`, but its access check is
+  `course-access-summary`, not Pro subscription lookup. Player display settings
+  are Kinescope operational config and must not be modeled as extension/site
+  entitlement state.
+- The Vercel endpoint `POST /api/course-prompt` verifies the website JWT and
+  `course-access-summary` before returning a whitelisted private course prompt
+  body from `api/_shared/coursePromptBodies.ts`.
 
 If the Supabase project is ever rotated/migrated, **all listed site files** plus the extension's
 [`config/api.js`](../../promptscore/config/api.js) must be updated in one coordinated commit.

@@ -1,7 +1,24 @@
-<!-- refreshed: 2026-05-21 -->
+<!-- refreshed: 2026-06-22 -->
 # Architecture
 
-**Analysis Date:** 2026-05-21
+**Analysis Date:** 2026-06-22
+
+## Current delta since the original May audit
+
+The authoritative living docs are `docs/ARCHITECTURE.md`, `docs/TECH.md`, and
+`docs/LEARN-PUBLISHING.md`. This planning snapshot now reflects the high-level
+shape after public Learn, Learn Finds, and the hidden Kinescope course:
+
+- Client routing is ~39 patterns + catch-all.
+- SEO prerender output is 202 routes: 126 model, 38 blog, 24 public Learn, and
+  14 marketing/legal/pricing/welcome routes.
+- Public Learn lives at `/learn`, `/learn/:lessonSlug`, `/learn/finds/:findSlug`
+  plus `/en/*` siblings. `/app/learn*` and `/space/learn*` are compatibility
+  redirects only.
+- Hidden paid course routes live at `/learn/courses/*`, are SPA-only/noindex,
+  and use Kinescope through site serverless endpoints.
+- Site API functions are now `download-skill`, `course-prompt`,
+  `kinescope-course-token`, and `kinescope-course-auth`.
 
 ## System Overview
 
@@ -49,7 +66,7 @@
                ▼
     ┌──────────────────────────────────────────────────────────┐
     │   Build-Time Output (scripts/ pipeline)                  │
-    │  - 144 prerendered HTML (18 base + 2 hubs + 124 models)  │
+    │  - 202 prerendered SEO HTML routes                       │
     │  - SEO routes manifest (seo-routes.ts)                   │
     │  - Sitemap.xml + llms.txt + IndexNow ping                │
     │  - FAQBlock ↔ FAQPage parity verification                │
@@ -62,7 +79,7 @@
     │  - Supabase: /functions/v1/* + /rest/v1/* (fetch)        │
     │  - Paddle.js: window.Paddle.Checkout (CDN synced on /pay)│
     │  - Chrome Runtime: chrome.runtime.sendMessage (ext auth)  │
-    │  - Vercel: /api/download-skill (serverless)              │
+    │  - Vercel: /api/download-skill + course/Kinescope APIs   │
     └──────────────────────────────────────────────────────────┘
 ```
 
@@ -97,6 +114,7 @@
 - **Hydration safety:** `__PRERENDER_PATH` marker in emitted HTML prevents React #418/#423 when extension deep-links to SPA-only routes
 - **i18n first-class:** URL prefix (/en/*) wins over storage/browser language; <html lang> baked at prerender
 - **Programmatic SEO:** 62 model pages × 2 languages (124 routes) + 2 hubs generated from `_registry.ts` + content modules
+- **Public Learn SEO:** `/learn`, public lessons, and Learn Finds are prerendered in RU/EN; hidden courses/templates are noindex SPA-only
 - **Data-islands:** Model content injected as `<script type="application/json" id="opten-model">` to avoid eager 62-file glob in entry chunk
 - **Extension coupling:** Locked routes (/welcome, /pay, /success, /account, /dashboard/download-skill) and duplicated constants (EXTENSION_IDS, SUPABASE_URL) tied to extension binaries via Integration Contract
 
@@ -105,12 +123,12 @@
 **Client Bundle (Vite):**
 - Purpose: React SPA with routing, i18n, UI components, and lazy-loaded content
 - Location: `src/main.tsx` entry; `src/app/` components & pages; `src/i18n/` context; `src/lib/paddle.ts` lazy-loader
-- Contains: Router, LangProvider, 22 route patterns, Suspense boundaries, Tailwind styling
+- Contains: Router, LangProvider, ~39 route patterns, Suspense boundaries, Tailwind styling
 - Depends on: React Router 7, React 18.3, Radix UI, i18n dicts (ru.json, en.json)
 - Used by: Browser (hydration on prerendered HTML, SPA for non-prerendered routes)
 
 **SSR Bundle (.ssr-cache):**
-- Purpose: Build-time pre-rendering of 144 routes to static HTML
+- Purpose: Build-time pre-rendering of 202 SEO routes to static HTML
 - Location: `scripts/entry-server.tsx` (renderRoute export)
 - Contains: React components rendered to strings; no browser APIs
 - Depends on: React Router (StaticRouter), LangProvider, same component tree as client
@@ -119,8 +137,8 @@
 **Metadata Bundle (.ssr-meta):**
 - Purpose: Route manifest with per-route metadata (title, description, schema, lang, hreflang)
 - Location: `scripts/seo-routes.ts` (routes export + schema blocks)
-- Contains: 144 RouteMeta entries (9 marketing RU + 9 EN + 2 hubs + 62 models RU + 62 EN), JSON-LD schema blocks
-- Depends on: `src/content/models` (model registry + content); `src/content/landingFaq`
+- Contains: 202 RouteMeta entries (marketing/legal/pricing/welcome, blog, models, public Learn, Learn Finds), JSON-LD schema blocks
+- Depends on: `src/content/models` (model registry + content), `src/content/space` (Learn/Learn Finds), `src/content/landingFaq`
 - Used by: `prerender.mjs` (applies meta to each emitted HTML), sitemap.mjs, llms.mjs
 
 **Content Layer:**
@@ -260,10 +278,19 @@
 - Triggers: `npm run build` (vite build → vite build --ssr → prerender.mjs)
 - Responsibilities: Loop routes from seo-routes.ts, SSR each path, splice meta, inject markers, write dist/<route>/index.html
 
-**API (Extension Download):**
-- Location: `api/download-skill.ts` (Vercel serverless)
-- Triggers: GET /api/download-skill?token=JWT (from extension)
-- Responsibilities: Verify JWT, check Pro tier, stream opten.zip from promptscore-proxy skills
+**API (Vercel serverless):**
+- Location: `api/download-skill.ts`
+  - Trigger: `GET /api/download-skill`
+  - Responsibilities: verify JWT locally, check live Pro tier, stream `api/_assets/opten.zip`
+- Location: `api/kinescope-course-token.ts`
+  - Trigger: `POST /api/kinescope-course-token`
+  - Responsibilities: verify website JWT, check standalone course access, sign Kinescope `drmauthtoken`
+- Location: `api/kinescope-course-auth.ts`
+  - Trigger: `POST /api/kinescope-course-auth`
+  - Responsibilities: Kinescope playback callback, verify signed token, return 200/403
+- Location: `api/course-prompt.ts`
+  - Trigger: `POST /api/course-prompt`
+  - Responsibilities: verify website JWT + course access, return whitelisted prompt body
 
 ## Architectural Constraints
 
@@ -271,7 +298,7 @@
 - **i18n synchronization:** <html lang> baked at prerender; runtime lang mutations are forbidden (Phase 3 D-06); dicts.en must be eagerly available on /en/* routes to prevent hydration mismatch
 - **Global state:** localStorage only (opten_lang_v3, opten_pay_currency); no module-level singletons except paddleReady promise (idempotent) and dicts (immutable after boot)
 - **Circular imports:** None detected; content/models/index.ts deliberately does NOT import from index.client.ts (vite alias + build-time swapping handles it)
-- **Route duplication:** 22 client patterns in main.tsx MUST match entry-server.tsx routes exactly (Rule 1 rule: both define RU + EN variants)
+- **Route duplication:** ~39 client patterns in main.tsx MUST match entry-server.tsx routes for prerendered public SEO routes; SPA-only hidden/app routes intentionally exist only in the client router
 - **Extension coupling:** EXTENSION_IDS, SUPABASE_URL, SUPABASE_ANON_KEY hardcoded in 3 pages + api/download-skill.ts; changes here are breaking changes to shipped extension binaries
 - **Data-island injection:** prerender.mjs must run AFTER all SSR outputs; order matters (entry-server.js + seo-routes.js must be ready before splicing)
 

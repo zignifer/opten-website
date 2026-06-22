@@ -277,6 +277,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
           <div className={courseMobileOrder(1)}>
             <div ref={playerFrameRef}>
               <LessonPlayer
+                key={displayedLesson.slug}
                 lesson={displayedLesson}
                 collectionId={collection.id}
                 locked={locked}
@@ -396,7 +397,7 @@ type KinescopeIframePlayer = {
   once(type: string, listener: (event: { target: KinescopeIframePlayer }) => void): KinescopeIframePlayer;
   seekTo(time: number): Promise<void>;
   play(): Promise<void>;
-  destroy(): Promise<void>;
+  destroy(options?: { keepElement?: boolean }): Promise<void>;
 };
 
 type KinescopeIframePlayerFactory = {
@@ -412,6 +413,7 @@ type KinescopeIframePlayerFactory = {
         localStorage?: boolean | { time?: boolean };
       };
       ui?: { language?: "ru" | "en" };
+      keepElement?: boolean;
     },
   ): Promise<KinescopeIframePlayer>;
 };
@@ -504,6 +506,10 @@ function buildKinescopePlayerApiUrl(embedUrl: string) {
 
 function kinescopeElementId(lessonSlug: string) {
   return `kinescope-player-${lessonSlug.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+}
+
+function destroyKinescopePlayer(player: KinescopeIframePlayer) {
+  void player.destroy({ keepElement: true }).catch(() => undefined);
 }
 
 function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, playRequestId }: LessonPlayerProps) {
@@ -618,6 +624,7 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
         playerFactory.create(kinescopePlayerElementId, {
           url: buildKinescopePlayerApiUrl(kinescopeEmbedUrl),
           size: { width: "100%", height: "100%" },
+          keepElement: true,
           behavior: {
             autoPlay: true,
             playsInline: true,
@@ -629,7 +636,7 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
       )
       .then((player) => {
         if (cancelled) {
-          void player.destroy().catch(() => undefined);
+          destroyKinescopePlayer(player);
           return;
         }
 
@@ -651,7 +658,7 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
       cancelled = true;
       const player = playerForCleanup ?? kinescopePlayerRef.current;
       if (kinescopePlayerRef.current === player) kinescopePlayerRef.current = null;
-      if (player) void player.destroy().catch(() => undefined);
+      if (player) destroyKinescopePlayer(player);
     };
   }, [activated, isKinescopeVideo, kinescopeApiFallback, kinescopeEmbedUrl, kinescopePlayerElementId, lang]);
 
@@ -755,11 +762,13 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
                 allowFullScreen
               />
             ) : (
-              <div
+              <iframe
                 key={kinescopePlayerElementId}
                 id={kinescopePlayerElementId}
                 className="absolute inset-0 h-full w-full"
-                aria-label={getLearnLessonTitle(lesson, lang)}
+                title={getLearnLessonTitle(lesson, lang)}
+                allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                allowFullScreen
               />
             )
           ) : (

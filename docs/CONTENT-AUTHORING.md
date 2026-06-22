@@ -6,10 +6,12 @@
 > (canonical, hreflang, schema graph, citability, mobile perf — all caught by
 > `geo-seo-claude` audit and the build-time gates in [scripts/](../scripts/)).
 
-> The site is small enough that nothing here is auto-generated. Every new
-> route/post touches **6 files in sync** (see §1) and **adds one entry to two
-> schema graphs**. If you skip a file, the build either fails (`verify-faq-mainentity.mjs`,
-> sitemap floor count) or ships silently broken (hreflang/canonical drift).
+> Most marketing/blog routes are still hand-listed. New hand-authored
+> route/post work touches **6 files in sync** (see §1) and **adds one entry to
+> two schema graphs**. Generated surfaces (models, public Learn, Learn Finds)
+> have their own pipelines below. If you skip a required file, the build either
+> fails (`verify-faq-mainentity.mjs`, sitemap floor count) or ships silently
+> broken (hreflang/canonical drift).
 
 ---
 
@@ -36,12 +38,12 @@ will collapse this into one data model — until then, **every new route updates
 all 6 or the build silently drifts**:
 
 **Exception:** authenticated/noindex app routes such as `/app/*`, `/account`,
-`/success`, `/dashboard/*`, `/prompt-library`, `/p/*`, and `/internal/*` are SPA-only
-surfaces. They must be added to `src/main.tsx` and Vercel rewrite/noindex
-headers, but they must **not** be added to `scripts/seo-routes.ts`,
-`EN_SIBLINGS`, sitemap, llms.txt, or JSON-LD. Language switches in-place through
-`opten_lang_v3`. If Learn/course content later needs search traffic, create a
-separate public RU+EN content route instead of indexing the app shell.
+`/success`, `/dashboard/*`, `/prompt-library`, `/p/*`, `/learn/courses/*`,
+`/learn/templates/*`, and `/internal/*` are SPA-only surfaces. They must be
+added to `src/main.tsx` and Vercel rewrite/noindex headers, but they must **not**
+be added to `scripts/seo-routes.ts`, `EN_SIBLINGS`, sitemap, llms.txt, or
+JSON-LD. Language switches in-place through `opten_lang_v3`. Public Learn SEO
+content lives at `/learn` + `/en/learn`; never index `/app/learn*`.
 
 | # | File | What you add |
 |---|------|--------------|
@@ -49,7 +51,7 @@ separate public RU+EN content route instead of indexing the app shell.
 | 2 | [scripts/seo-routes.ts](../scripts/seo-routes.ts) | One `RouteMeta` entry per locale. Include `path`, `htmlLang`, `hreflangAlternates` (reciprocal triplet — RU+EN+xDefault), `title`, `description`, `canonical`, `ogTitle`, `ogDescription`, `ogImage` (EN routes set `DEFAULT_OG_IMAGE_EN`; RU leaves undefined to inherit `DEFAULT_OG_IMAGE`), `author` (set `FOUNDER_NAME` on pages with a human byline), `prerender: "full"`, `changefreq`, `priority`, and `schema: SchemaBlock[]` (see §4). |
 | 3 | [src/i18n/paths.ts](../src/i18n/paths.ts) | Append the RU canonical path to `EN_SIBLINGS`. This is what `<LocalizedLink>` + `LangSwitcher` use to decide "do I navigate to /en/<path> or flip language in place?" Forgetting this means the LangSwitcher dumps users back on the EN landing. |
 | 4 | [scripts/sitemap.mjs](../scripts/sitemap.mjs) | Add both locale entries to `PATH_TO_SOURCE` so `<lastmod>` can be derived from `git log -1 --format=%cI -- <source-file>`. Bump the `if (sitemapRoutes.length < N)` floor at the top by 2 (RU + EN). |
-| 5 | [scripts/llms.mjs](../scripts/llms.mjs) | If the path doesn't match an existing `SECTIONS` rule (Marketing / Pricing / Welcome / About / Blog / Legal), add a new section with `match: (p) => …`. Bump the floor check `if (prerenderedRoutes.length < N)` by 2. |
+| 5 | [scripts/llms.mjs](../scripts/llms.mjs) | If the path doesn't match an existing `SECTIONS` rule (Marketing / Pricing / Welcome / About / Blog / Legal / Learn / Models), add a new section with `match: (p) => …`. Bump the floor check `if (prerenderedRoutes.length < N)` by 2. |
 | 6 | [src/i18n/ru.json](../src/i18n/ru.json) + [src/i18n/en.json](../src/i18n/en.json) | Add the dict keys the page uses. Dot-namespaced (`nav.blog`, `about.bio.p1`). RU + EN keys MUST match 1:1 — missing keys fall back to RU then to the key string itself, which is a visible bug. |
 
 If you're adding a **blog post**, also:
@@ -71,9 +73,33 @@ The "6 files in sync" rule above is for **marketing + blog pages**. The 62 `/mod
 - **Content:** one `src/content/models/<slug>.ts` (`ModelContent = { ru, en }`). The Quick-Facts meta comes from the AUTO-GEN `_registry.ts` (parsed from RU `_skills/*.md` by `build-models-registry.mjs`).
 - **EN meta:** the registry's free-text meta (name/platform/duration/resolution) is **Russian** — supply English in `src/content/models/metaEn.ts` (resolved by `metaField(meta, field, lang)`). **No build gate enforces this** — run `node scripts/verify-models-content.mjs` to catch Cyrillic leaking onto `/en/*` (it also checks intro length, FAQ count, RU/EN parity).
 - **Hub visibility:** general/umbrella models (bare-brand name with versioned siblings) go in `HUB_HIDDEN_SLUGS` (`index.ts`) — hidden from the `/models` grid + ItemList schema, but kept live + sitemap'd.
-- **Floors:** `sitemap.mjs` + `llms.mjs` floor is 144 (18 baseline + 2 hubs + 124 model pages). Adding/removing models shifts this.
+- **Floors:** models currently contribute 126 prerendered routes (2 hubs + 124 model pages) to the total 202-route SEO surface. Adding/removing models shifts the sitemap/llms route floor.
 
 Full pipeline diagram: [ARCHITECTURE.md](ARCHITECTURE.md) §"Models content pipeline".
+
+### Learn pages are the second exception
+
+Public Learn is indexable and generated from `src/content/space/*`, not from
+per-route manual entries:
+
+- **Opten-authored lessons:** add/update `src/content/space/learn.ts` and
+  `src/content/space/learnSlugs.ts`. Routes are `/learn/:lessonSlug` and
+  `/en/learn/:lessonSlug`.
+- **Learn Finds:** generated third-party video data lives in
+  `src/content/space/learnFinds.generated.json`; typed helpers/routes live in
+  `src/content/space/learnFinds.ts`. Routes are `/learn/finds/:findSlug` and
+  `/en/learn/finds/:findSlug`.
+- **SEO expansion:** `scripts/seo-routes.ts`, `scripts/sitemap.mjs`, and
+  `scripts/llms.mjs` consume those content files. Keep route count and
+  `EN_SIBLINGS` in sync through the content slug sources, not ad hoc strings.
+- **Hidden course:** `/learn/courses/*` is noindex and separate from public
+  Learn. Course content lives in `src/content/space/privateCourse.ts`,
+  `privateCourseExtras.ts`, `api/_shared/kinescopeCourse.ts`, and
+  `api/_shared/coursePromptBodies.ts`. Run `npm run verify:kinescope-course`
+  after touching it.
+
+See [LEARN-PUBLISHING.md](LEARN-PUBLISHING.md) for the detailed Learn and
+Kinescope course publishing rules.
 
 ---
 
@@ -249,14 +275,17 @@ export default function MyPage() {
 
 Running `npm run build` invokes (in order):
 
-1. `vite build` — the SPA bundle.
-2. `vite build --ssr scripts/entry-server.tsx` — the SSR bundle.
-3. `vite build --ssr scripts/seo-routes.ts` — the route manifest.
-4. `node scripts/prerender.mjs` — produces ≥18 prerendered `dist/<route>/index.html` files with per-route `<head>`, JSON-LD, hreflang, `<html lang>`.
-5. `node scripts/sitemap.mjs` — emits `dist/sitemap.xml` with per-route `<lastmod>` from git mtime. **Floor check** (`sitemapRoutes.length < 18`) will fail if you forgot to register a route.
-6. `node scripts/llms.mjs` — emits `dist/llms.txt` + `dist/llms-full.txt`. Also has a floor check.
-7. `node scripts/verify-faq-mainentity.mjs` — asserts visible FAQ DOM ≡ FAQPage `mainEntity` for every route emitting one. Fails the build on drift.
-8. `node scripts/indexnow.mjs` — pings Bing IndexNow with the updated URL set. Non-fatal on network failure.
+1. `node scripts/generate-summaries.mjs` — regenerates model summaries.
+2. `node scripts/generate-responsive-images.mjs` — keeps responsive image derivatives fresh.
+3. `vite build` — the SPA bundle.
+4. `vite build --ssr scripts/entry-server.tsx` — the SSR bundle.
+5. `vite build --ssr scripts/seo-routes.ts` — the route manifest.
+6. `node scripts/prerender.mjs` — produces the current 202 prerendered SEO `dist/<route>/index.html` files with per-route `<head>`, JSON-LD, hreflang, `<html lang>`.
+7. `node scripts/sitemap.mjs` — emits `dist/sitemap.xml` with per-route `<lastmod>` from git mtime. **Floor check** fails if route registration drifts.
+8. `node scripts/llms.mjs` — emits `dist/llms.txt` + `dist/llms-full.txt`. Also has a floor check.
+9. `node scripts/verify-faq-mainentity.mjs` — asserts visible FAQ DOM ≡ FAQPage `mainEntity` for every route emitting one. Fails the build on drift.
+10. `node scripts/verify-fonts.mjs` — checks local font files and preload invariants.
+11. `node scripts/indexnow.mjs` — pings Bing IndexNow with the updated URL set. Non-fatal on network failure.
 
 **If the build fails:** read the error. The most common culprit is the sitemap floor count (added a route but forgot a `PATH_TO_SOURCE` entry or the EN sibling). Second-most-common: FAQ items in `landingFaq.ts` diverged from the visible `<FaqBlock>` in `App.tsx`. Third: a new Edge case in `productBlock` (non-finite price string).
 

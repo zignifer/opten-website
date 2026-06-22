@@ -2,20 +2,29 @@
 
 **Analysis Date:** 2026-05-21
 
+**Refreshed:** 2026-06-22 for website auth, public Learn, hidden Kinescope
+course, and additional Vercel site APIs. The authoritative contract is
+`docs/INTEGRATION-CONTRACT.md`; this planning file is a compact integration
+snapshot.
+
 ## APIs & External Services
 
-**Supabase (Auth + Subscriptions):**
+**Supabase (Auth + Subscriptions + Course Entitlements):**
 - Project (production): `https://supabase.opten.space` — **self-hosted** on Beget RU VPS (PG17, Caddy v2.11.3 front) since the Phase 88 cutover (2026-05-25, extension v2.8 milestone). The cloud project `https://vuywydhwkqmihfztpkgl.supabase.co` is now a frozen cold backup, not an active backend. The same Supabase backend serves both the extension and this site (auth/billing/skill-download).
 - Access: Plain `fetch` with `Authorization: Bearer <jwt>` + `apikey: <anon>` headers (no `@supabase/supabase-js` SDK)
-- JWT verification: local (`jose` library), dual-issuer allowlist — HS256 (self-hosted shared secret) for post-cutover tokens, ES256 (cloud JWKS via `createRemoteJWKSet`) for legacy pre-cutover users. `/auth/v1/user` is no longer called from `api/download-skill.ts` (sessions were not migrated).
+- JWT verification: site serverless functions verify JWTs locally with `jose`
+  against the Supabase issuer allowlist and `SUPABASE_JWT_SECRET`.
+  `/auth/v1/user` is no longer called from site API functions for access gates.
 - Endpoints:
   - `/rest/v1/subscriptions` — query user's subscription plan/status (RLS enforced, user reads own row only)
-  - `/functions/v1/create-payment-paddle` — initiate USD payment (site calls from `PayPage.tsx`)
-  - `/functions/v1/create-payment-yookassa` — initiate RUB payment (site calls from `PayPage.tsx`)
-  - `/functions/v1/get-subscription` — fetch full subscription record with card details (AccountPage calls)
-  - `/functions/v1/cancel-subscription-*` — cancel subscription (triggered by extension or site AccountPage)
+  - `/functions/v1/create-payment` — initiate RUB Pro subscription (site calls from `PayPage.tsx`)
+  - `/functions/v1/create-payment-paddle` — initiate USD Pro subscription (site calls from `PayPage.tsx`)
+  - `/functions/v1/account-summary` — website-first account/credits/subscription summary
+  - `/functions/v1/create-course-payment` — standalone hidden course checkout by email; RUB YooKassa or USD Paddle one-time price; optional uppercase promo code; optional `quote_only: true` promo price preview
+  - `/functions/v1/course-access-summary` — claim/read course entitlement for website JWT email/user id
+  - `/functions/v1/cancel-subscription-*` — cancel Pro subscription (triggered by extension fallback or site AccountPage)
 - Hardcoded constants (must be kept in sync across all usage sites):
-  - `SUPABASE_URL = "https://supabase.opten.space"` — appears in `src/app/pages/PayPage.tsx`, `src/app/pages/AccountPage.tsx`, `api/download-skill.ts`
+  - `SUPABASE_URL = "https://supabase.opten.space"` — appears in `src/lib/optenAuth.ts`, `src/lib/promptLibraryApi.ts`, `src/app/pages/PayPage.tsx`, `src/app/pages/AccountPage.tsx`, `api/download-skill.ts`, and `api/_shared/optenServerAuth.ts`
   - `SUPABASE_ANON_KEY = "eyJhbGc..."` — **unchanged** across the cutover. Self-hosted GoTrue reuses the same `JWT_SECRET` as the cloud project, so the issuer `ref: vuywydhwkqmihfztpkgl` baked into the JWT payload is still accepted by self-hosted Kong. Used for read-only authenticated access + JWT validation.
   - Also appears in extension repo's `config/api.js` — must be kept in sync
 
@@ -26,28 +35,42 @@
 - Public token: `VITE_PADDLE_CLIENT_TOKEN` set in Vercel project settings
 - Usage: `PayPage.tsx` calls `window.Paddle.Checkout.open(...)` to open payment modal
 - CORS: allowed only from `https://opten.space`
-- Flow: site creates payment via Supabase Edge Function `/create-payment-paddle` (returns `checkout_id`), then opens Paddle checkout modal. Paddle calls YooKassa backend (for RUB) or Paddle backend (for USD) based on `currency`.
+- Flow: Pro subscription uses `/create-payment-paddle` (returns `priceId`, customer email/user id data), then opens Paddle Checkout. Standalone course USD checkout uses `/create-course-payment`, which returns a course-specific one-time `price_id` and optional Paddle `discountCode`/`discountId` for percentage promos.
 
 **YooKassa (Payment Processing — RUB):**
-- Accessed indirectly via Supabase Edge Function `/create-payment-yookassa` (extension repo owns the webhook secrets)
+- Accessed indirectly via Supabase Edge Function `/create-payment` for Pro subscriptions and `/create-course-payment` for standalone course purchases (extension repo owns the webhook secrets)
 - Webhook URL: hardcoded in extension repo's Edge Function environment, points back to Supabase
 - Return URL: `https://opten.space/success` (locked route, not prefixed with `/en/*`; site handles currency redirect via `success_url` param)
-- Payment flow: site calls Edge Function with plan/currency/lang, Edge Function creates YooKassa payment ID, returns checkout URL, site redirects user to YooKassa
-- Webhook: YooKassa pings Supabase Edge Function on payment success; Edge Function updates `subscriptions` table + generates JWT for new user/subscriber
+- Payment flow: site calls the relevant Edge Function, function creates YooKassa payment, returns checkout URL, site redirects user to YooKassa.
+- Webhook: YooKassa pings Supabase Edge Function on payment success. Subscription payments update `subscriptions`; course payments grant `course_entitlements` and must not alter Pro state.
 
 ## Data Storage
 
 **Databases:**
 - Supabase PostgreSQL (production, owned by extension repo)
-  - Tables: `users`, `subscriptions` (RLS row-level security enforced)
+  - Tables: `users`, `subscriptions`, `course_orders`, `course_entitlements`,
+    `course_promo_codes` (RLS row-level security enforced)
   - Connection: via public REST API (`/rest/v1/`) + JWT auth headers
   - Client: plain `fetch()` (no ORM)
   - Analytics replica: `opten-seo` project (read-only from this repo)
+
+**Course promo code rules:**
+- `course_promo_codes` rows are validated only by Edge Functions with
+  service-role access; there are no anon/authenticated public policies.
+- Codes normalize to uppercase `A-Z0-9`, 1-32 chars.
+- `discount_kind` is `percentage` or `fixed_price`; activity is gated by
+  `enabled`, `usage_limit`, `times_used`, `starts_at`, and `expires_at`.
+- `quote_only: true` previews an effective price without creating an order or
+  incrementing `times_used`.
+- Provider webhooks increment `times_used` only once, after a successful course
+  payment and only if the order was not already `succeeded`.
 
 **File Storage:**
 - Local filesystem only — no cloud storage integration
 - Assets: `public/` directory (static, served by Vercel CDN)
 - Skill bundle: `api/_assets/opten.zip` (bundled into Vercel serverless function via `vercel.json` `includeFiles`)
+- Hidden course downloadable skill archive:
+  `public/assets/space/courses/ai-content-marketing-2026/opten-skill.zip`
 
 **Caching:**
 - Browser caching via HTTP headers (cache-control, etag)
@@ -57,15 +80,20 @@
 
 **Auth Provider:**
 - Supabase Auth (JWT-based)
-  - Extension owns the user account creation flow (on extension first-run)
-  - Site validates JWTs from extension via `/auth/v1/user` endpoint
-  - JWTs refreshed by extension via `chrome.runtime.sendMessage(...)` (site never refreshes directly)
-  - No email/password auth on site — delegation to extension
+  - Website auth is canonical for site surfaces: `/login` sends Email OTP and
+    stores `localStorage.opten_space_session_v1`.
+  - The extension still owns its own Chrome-side session; site and extension
+    sessions are independent and may point to different `auth.users.id` values.
+  - `/pay` and `/account` prefer website JWTs and fall back to extension
+    `GET_AUTH_TOKEN` for compatibility.
+  - `/dashboard/download-skill` and `/prompt-library` still require the
+    extension to provide `GET_AUTH_TOKEN`.
 
 **Implementation:**
-- Site reads auth state from extension via `chrome.runtime.sendMessage(id, { type: "GET_AUTH_TOKEN" }, callback)`
-- Response: `{ token: string, email: string }` | `{ token: null, reason: "not_logged_in" | "error" }`
-- Pages: `PayPage.tsx`, `AccountPage.tsx`, `DownloadSkillPage.tsx` all iterate `EXTENSION_IDS` and accept first responder
+- Website session helpers live in `src/lib/optenAuth.ts`.
+- Extension auth fallback uses `chrome.runtime.sendMessage(id, { type: "GET_AUTH_TOKEN" }, callback)`.
+- Response: `{ token: string, email: string }` | `{ token: null, reason: "not_logged_in" | "error" }`.
+- Course access uses website JWT + `course-access-summary`, not the extension session.
 
 ## Monitoring & Observability
 
@@ -80,7 +108,7 @@
 ## CI/CD & Deployment
 
 **Hosting:**
-- Vercel — static hosting for `dist/` + one serverless function `api/download-skill.ts`
+- Vercel — static hosting for `dist/` + site serverless functions in `api/`
 - Auto-deploy on push to `main` branch (GitHub integration via Vercel)
 - Preview URLs: `https://<branch>-<project>.vercel.app` or custom domain preview (e.g., `https://preview.opten.space`)
 
@@ -89,7 +117,7 @@
 - Local build gate: `npm run build` must pass (validates routes, fonts, FAQ schema, URLs)
 
 **Build Artifacts:**
-- `dist/` — static HTML (144 prerendered routes) + CSS + JS + assets
+- `dist/` — static HTML (202 prerendered SEO routes) + CSS + JS + assets
 - `.ssr-cache/` — temporary SSR build output (deleted after prerender)
 - `.ssr-meta/` — temporary metadata build output (deleted after prerender)
 - All committed post-build outputs are removed before commit
@@ -99,11 +127,15 @@
 **Required env vars (set in Vercel project settings, not in repo):**
 - `VITE_PADDLE_ENV` — `'sandbox'` or `'production'` (affects Paddle SDK initialization)
 - `VITE_PADDLE_CLIENT_TOKEN` — Paddle public client token (for USD payments)
+- `SUPABASE_JWT_SECRET` — server-side JWT verification for site API functions
+- `KINESCOPE_AUTH_JWT_SECRET` — signs/verifies Kinescope `drmauthtoken` playback tokens
+- `KINESCOPE_DRM_AUTH_USERNAME` / `KINESCOPE_DRM_AUTH_PASSWORD` — optional Basic Auth for Kinescope callback
 
 **Secrets (NOT in this repo):**
 - Supabase service role key — in extension repo's Supabase Edge Function secrets
 - Paddle private API key — in extension repo's Supabase Edge Function secrets
-- YooKasha shop ID, secret key — in extension repo's Supabase Edge Function secrets
+- YooKassa shop ID, secret key — in extension repo's Supabase Edge Function secrets
+- Kinescope operational API key — local-only in `.secrets/kinescope.env`
 
 **Secrets location:**
 - Extension repo (`C:\Projects\promptscore`) owns all API secrets via Supabase Edge Function environment
@@ -114,12 +146,14 @@
 
 **Incoming (Vercel serverless handles):**
 - `GET /api/download-skill` — extension calls with JWT in `Authorization` header. Verifies JWT + Pro subscription, streams `opten.zip` or returns 403/401 error.
+- `POST /api/course-prompt` — website course lesson calls with website JWT. Verifies course entitlement, returns a whitelisted prompt body.
+- `POST /api/kinescope-course-token` — website course lesson calls with website JWT. Verifies course entitlement, returns short-lived Kinescope embed URL.
+- `POST /api/kinescope-course-auth` — Kinescope server-to-server callback. Verifies playback token and returns 200/403.
 
 **Outgoing:**
-- None directly from this site
-- Extension calls Supabase Edge Functions for payment creation, subscription cancellation, etc.
-- Supabase Edge Functions receive webhooks from YooKassa on payment success
-- Paddle webhooks sent to Paddle backend (payment processing handled server-side by Paddle, not by this site)
+- Site calls Supabase Edge Functions for Pro payment/account management and standalone course checkout/access.
+- Supabase Edge Functions receive YooKassa/Paddle webhooks for both Pro subscription and course purchase branches.
+- Site calls Kinescope only through browser embeds and Kinescope's callback flow; operational Kinescope admin API use is local/manual.
 
 **URL callbacks (hardcoded, locked):**
 - YooKassa `return_url`: `https://opten.space/success` (site-side success page, shows confirmation)
@@ -128,6 +162,7 @@
   - `https://opten.space/pay` on upgrade CTA click
   - `https://opten.space/account` for account management (extension-gated SPA-only route)
   - `https://opten.space/dashboard/download-skill` for skill bundle download (extension-gated SPA-only route)
+- Hidden course direct links live under `https://opten.space/learn/courses/ai-content-marketing-2026/*`; extension does not open them.
 
 ## Chrome Extension Integration (Opten / promptscore)
 

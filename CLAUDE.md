@@ -35,7 +35,7 @@ YouTube expert videos enriched with Opten summaries, timestamps, commands,
 prompts, resources, and risks, alongside the Opten Space Beta app shell
 at `/app/*` (SPA-only, noindex) whose
 account/credits state is read from the same self-hosted Supabase backend as the
-extension, plus a hidden/noindex Kinescope-backed course MVP under
+extension, plus a hidden/noindex Kinescope-backed course under
 `/learn/courses/*` for direct-link testing of standalone paid Kinescope video
 lessons before the course is linked from public navigation.
 
@@ -98,13 +98,17 @@ course-specific one-time price IDs returned by
 `/functions/v1/create-course-payment`. Promo preview uses the same endpoint with
 optional `quote_only: true`; this validates the uppercase promo code and returns
 the effective amount without creating `course_orders` or provider payments.
-Guest checkout is initiated with an email address, selected currency, and optional uppercase promo code. Provider
-webhooks grant a course entitlement and send a direct website auth link to the
-same email. The internal test promo `FREE` maps to `100 ₽` or `$1` and requires
-a separate Paddle `$1` price ID. Marketing/partner course promo codes live in
-the extension-owned `course_promo_codes` table (RLS on, no public policies) and
-must use uppercase `A-Z0-9` so the same code can be applied to YooKassa/RUB
-server pricing and Paddle/USD `discountCode`. Kinescope video playback is server-gated: the client calls
+Guest checkout is initiated with an email address, selected currency, and
+optional uppercase promo code. Provider webhooks grant a course entitlement and
+send a direct website auth link to the same email. The internal test promo
+`FREE` maps to `100 ₽` or `$1` and requires a separate Paddle `$1` price ID.
+Marketing/partner course promo codes live in the extension-owned
+`course_promo_codes` table (RLS on, no public policies) with `discount_kind` =
+`fixed_price` or `percentage`, `enabled`, optional `usage_limit`, `times_used`,
+`starts_at`, and `expires_at`. Codes must use uppercase `A-Z0-9` so the same
+code can be applied to YooKassa/RUB server pricing and Paddle/USD
+`discountCode`; `times_used` is incremented only by a successful provider
+webhook, never by quote preview. Kinescope video playback is server-gated: the client calls
 `/api/kinescope-course-token` with the website Supabase JWT, the server verifies
 course access through `/functions/v1/course-access-summary` and returns a
 short-lived Kinescope embed URL with `drmauthtoken`. Kinescope calls
@@ -150,24 +154,27 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
      │
      └→ main.tsx → <BrowserRouter> → <LangProvider> → <Routes>
             ↓
-        ~33 client route patterns + catch-all 404 → 182 prerendered routes:
+        ~39 client route patterns + catch-all 404 → 202 prerendered SEO routes:
           Marketing/billing RU (9): /, /pay, /welcome, /about, /blog, /blog/:slug,
                   /privacy, /terms, /refund
           Models RU (Phase v2.0): /models hub + /models/:slug (62 model pages)
           Learn RU: /learn hub + /learn/:lessonSlug (public video lessons)
+                    + /learn/finds/:slug (curated third-party expert videos)
+          Hidden course SPA-only: /learn/courses/:courseSlug(/:lessonSlug)
           RU SPA-only (7, X-Robots-Tag noindex): /success, /login,
                                                   /auth/callback, /account,
                                                   /dashboard/download-skill,
                                                   /prompt-library, /p/:slug
           App SPA-only (X-Robots-Tag noindex): /app, /app/login,
                   /app/auth/callback; /app/learn* redirects to /learn*
-          EN: /en/ sibling for each prerendered RU route + /en/models(/:slug) + /en/learn(/:slug)
+          EN: /en/ sibling for each prerendered RU route + /en/models(/:slug)
+              + /en/learn(/:slug) + /en/learn/finds/:slug
           Catch-all: <Route path="*"> → NotFound (runtime noindex injection)
 
-  Prerender (postbuild):  scripts/prerender.mjs → 182 dist/<route>/index.html files
-                          (42 baseline/blog + 14 Learn + 2 model hubs + 124 model pages —
+  Prerender (postbuild):  scripts/prerender.mjs → 202 dist/<route>/index.html files
+                          (38 blog + 24 Learn + 126 model + marketing/legal/pricing —
                           with hreflang triplets + baked <html lang>)
-                          + sitemap.xml (182 URL) + llms.txt + IndexNow ping
+                          + sitemap.xml (202 URL) + llms.txt + IndexNow ping
                           + FaqBlock ↔ FAQPage parity assertion
   Site ↔ Extension:       chrome.runtime.sendMessage (externally_connectable, opten.space only)
   Site → Supabase:        fetch to /functions/v1/* and /rest/v1/* — base URL is
@@ -189,6 +196,10 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           active snapshot without auth; per-prompt save uses
                           the website JWT and inserts a private copy under
                           the viewer's `auth.users.id`.
+                          Course checkout/access uses extension-owned Edge
+                          Functions: `/create-course-payment` for one-time
+                          RUB/USD checkout and `/course-access-summary` for
+                          entitlement checks; it is separate from Pro.
                           Auth email for OTP login is sent by
                           self-hosted Supabase Auth through Resend SMTP and
                           uses the public GoTrue template at
@@ -197,6 +208,8 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           is shown in the email.
   Site → Paddle:          window.Paddle.Checkout.open(...)
   Site own API:           GET /api/download-skill (Vercel serverless, JWT + Pro-gated)
+                          POST /api/course-prompt — website JWT + course entitlement gate;
+                          returns whitelisted private course prompt bodies
                           POST /api/kinescope-course-token — website JWT + course entitlement gate;
                           returns short-lived Kinescope embed URL with drmauthtoken
                           POST /api/kinescope-course-auth — Kinescope server callback;
@@ -217,9 +230,10 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routes, billing flows, and 
 ```
 api/                     — Vercel serverless functions:
                              download-skill.ts — Pro-gated Claude Skill ZIP
+                             course-prompt.ts — course-entitlement-gated prompt body endpoint
                              kinescope-course-token.ts — course-entitlement-gated playback token issuer
                              kinescope-course-auth.ts — Kinescope playback auth callback
-                             _shared/ — server-only course/auth constants
+                             _shared/ — server-only auth, course, and Kinescope constants
 public/                  — static assets (favicons, partner logos, welcome screenshots,
                            OG cards, founder image, blog/<slug>/cover.jpg)
 scripts/                 — build pipeline:
@@ -235,7 +249,7 @@ scripts/                 — build pipeline:
                              build-models-registry.mjs — parses _skills/*.md → _registry.ts (62 ModelMeta; AUTO-GEN)
                              verify-models-content.mjs — model content + EN-meta-cyrillic gate (run manually, not in build)
 src/
-├── main.tsx             — entry, route patterns (incl. /models hub + /models/:slug, /learn, /prompt-library, /p/:slug, RU+EN siblings) + catch-all, hydrate-vs-mount discriminator
+├── main.tsx             — entry, route patterns (incl. /models, /learn, /learn/finds, hidden /learn/courses, /prompt-library, /p/:slug, RU+EN siblings) + catch-all, hydrate-vs-mount discriminator
 ├── app/
 │   ├── App.tsx          — landing
 │   ├── components/      — shared UI:
@@ -258,6 +272,9 @@ src/
 │                          meta name/platform/duration/resolution + metaField helper) +
 │                          index.ts (allModels barrel + HUB_HIDDEN_SLUGS) + slugs.ts
 │                          (light import for paths.ts) + types.ts
+│   └── space/           — public Learn lessons/finds and hidden Kinescope course:
+│                          learn.ts, learnSlugs.ts, learnFinds.generated.json,
+│                          learnFinds.ts, privateCourse.ts, privateCourseExtras.ts
 ├── i18n/                — LangContext + ru.json/en.json + paths.ts (EN_SIBLINGS)
 ├── imports/             — Figma-Make-generated SVG paths (auto-generated; brittle)
 ├── lib/                 — paddle.ts (ensurePaddle lazy loader, Phase 2.2),
@@ -267,7 +284,7 @@ src/
 └── types/               — TS type defs
 ```
 
-`src/i18n/paths.ts` is the single source of truth for `EN_SIBLINGS` (9 static routes + every `/models/<slug>`, derived from `src/content/models/slugs.ts`). It MUST stay in sync with the EN entries in `scripts/seo-routes.ts` — easy to miss when adding a route.
+`src/i18n/paths.ts` is the single source of truth for `EN_SIBLINGS` (static marketing routes + every `/models/<slug>` from `src/content/models/slugs.ts` + public Learn lesson/find slugs). It MUST stay in sync with the EN entries in `scripts/seo-routes.ts` — easy to miss when adding a route.
 
 **Adding a new page or blog post touches 6 files in sync** (route, manifest, EN siblings, sitemap, llms.txt, dicts) plus optional content/blog files. The full checklist + GEO/SEO patterns are in [docs/CONTENT-AUTHORING.md](docs/CONTENT-AUTHORING.md) — read that before touching content.
 
@@ -364,6 +381,9 @@ changes with the extension manually.
 Set in Vercel (project settings, not in repo):
 - `VITE_PADDLE_ENV` — `'sandbox'` | `'production'`
 - `VITE_PADDLE_CLIENT_TOKEN` — Paddle public client token
+- `SUPABASE_JWT_SECRET` — server-only self-hosted Supabase JWT secret used by
+  site API functions to verify website/extension JWTs locally. Must match the
+  self-hosted GoTrue `JWT_SECRET`.
 - Course Paddle one-time price IDs are server-only in the extension-owned
   Supabase Edge Function environment:
   `PADDLE_PRICE_ID_COURSE_AI_CONTENT_MARKETING_2026_{SANDBOX|PRODUCTION}` and
@@ -442,13 +462,27 @@ popular search queries returned 41 rows for 2026-05-24..2026-05-30. Use this
 API directly for Yandex indexing/search visibility checks before guessing from
 public search results.
 
+### Kinescope local API access
+
+Kinescope operational API access for the hidden course is local-only and
+gitignored in `.secrets/kinescope.env`:
+
+- `KINESCOPE_API_KEY`
+
+The key was originally copied from `C:\Users\КОМП\Desktop\kine.txt`. Use it
+only from server-side scripts or terminal checks, never in client code or
+`VITE_*` variables. Current Kinescope objects for
+`ai-content-marketing-2026`: project `2b95951a-c2f0-4bbd-b5c4-0642539438b2`,
+player `f4e68659-b78f-4b48-8134-3856d827efa9`, 16 video IDs whitelisted in
+`api/_shared/kinescopeCourse.ts`.
+
 ### Opten Space Learn video timestamp tooling
 
 Learn course/lesson pages embed public YouTube videos in the SPA and store
 ready-to-render timestamps in `src/content/space/learn.ts`. Do not call
 NotebookLM, YouTube Data API, or any provider key from browser code.
 
-Hidden course MVP videos use Kinescope and are defined in
+Hidden course videos use Kinescope and are defined in
 `src/content/space/privateCourse.ts`. The `ai-content-marketing-2026` course has
 16 connected Kinescope videos, all whitelisted in
 `api/_shared/kinescopeCourse.ts`. Keep this route out of public navigation until
@@ -489,8 +523,10 @@ temporary notebooks, raw transcripts, or local suffler settings.
 ## Content & SEO — read before adding pages, posts, or images
 
 The site shipped v1.0 (GEO Optimization, 12 → ~72.6 score, 7 phases) and v2.0
-(Programmatic SEO — 62 model pages × RU/EN + 2 hubs = 144 prerendered routes,
-shipped 2026-05-20) with a JSON-LD entity graph enforced by build-time gates.
+(Programmatic SEO — 62 model pages × RU/EN + 2 hubs = 126 prerendered model
+routes, shipped 2026-05-20) with a JSON-LD entity graph enforced by build-time
+gates. Total prerendered SEO route count is currently 202 after public Learn
+and Learn Finds.
 **Adding a marketing/blog page is a coordinated 6-file change** (model pages
 follow the generated flow above), not a one-shot file write.
 
