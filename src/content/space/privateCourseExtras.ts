@@ -99,7 +99,7 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
         link("Recraft", "Сервис для генерации векторного логотипа", "https://www.recraft.ai/"),
         links.higgsfield,
         link("Pinterest-референс логотипа", "Референс логотипа из урока", "https://ru.pinterest.com/pin/440789882308217256/"),
-        link("Quiver", "AI-инструмент для работы с визуалом", "https://quiver.ai/"),
+        link("Quiver", "Переводим растровое фото в вектор", "https://quiver.ai/"),
         link("Ролик про Quiver", "Instagram-видео с примером Quiver", "https://www.instagram.com/p/DVQyhkXDSSk/", "Перейти"),
       ],
     },

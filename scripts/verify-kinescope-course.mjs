@@ -185,7 +185,7 @@ assert.match(components, /courseLockedDescription/, "Private course locked overl
 assert.match(components, /unlocksAfterPurchase/, "Private course outline must label locked lessons as purchase-gated");
 assert.match(components, /const courseBreadcrumbTitle = isCourse \? getLearnCollectionTitle\(collection, lang\) : getLearnLessonTitle\(lesson, lang\)/, "Course breadcrumbs must stay stable per course instead of changing per lesson");
 assert.match(components, /const courseMobileOrder = \(order: 1 \| 2 \| 3 \| 4 \| 5\)/, "Private course mobile layout must support separate player, progress, outline, purchase, and content ordering");
-assert.match(components, /max-md:max-h-\[254px\]/, "Mobile course outline must show roughly three lessons with a fourth lesson peeking");
+assert.match(components, /max-md:max-h-\[312px\]/, "Mobile course outline must show more of the lesson list while keeping the next content visible");
 assert.match(components, /courseBuyButton:\s*\(price: string\) => `Открыть весь курс за \$\{price\}`/, "Course purchase button copy must say 'Открыть весь курс за ...'");
 assert.match(components, /buyCourseShort:\s*\(price: string\) => `Открыть весь курс за \$\{price\}`/, "Locked player CTA copy must say 'Открыть весь курс за ...'");
 assert.match(components, /markLessonCompleted:\s*"Отметить как пройдено"/, "Completion CTA must use the requested passed-lesson wording");

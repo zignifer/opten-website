@@ -72,7 +72,7 @@ export function LearnSectionWrapper({ children }: LearnSectionWrapperProps) {
         aria-hidden="true"
         className="pointer-events-none absolute right-[-760px] top-[-620px] h-[982px] w-[1720px] bg-[url('/assets/landing-design/gradient-blob-shape.svg')] bg-[length:100%_100%] bg-center bg-no-repeat opacity-[0.15] blur-[140px]"
       />
-      <main className="relative z-10 mx-auto max-w-[1200px] px-[32px] pb-[76px] pt-[30px] max-md:px-4 max-md:pb-[58px] max-md:pt-[22px]">
+      <main className="relative z-10 mx-auto max-w-[1200px] px-[32px] pb-[76px] pt-[30px] max-md:px-[20px] max-md:pb-[54px] max-md:pt-[30px]">
         {children}
       </main>
       <SiteFooter variant="linksOnly" />
@@ -258,7 +258,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
 
   return (
     <LearnSectionWrapper>
-      <nav className="mb-[24px] flex min-w-0 flex-nowrap items-center gap-[9px] overflow-hidden whitespace-nowrap text-[14px] text-white/68 max-md:mb-[20px] max-md:gap-[5px] max-md:text-[12px]" aria-label={copy.breadcrumb}>
+      <nav className="mb-[24px] flex min-w-0 flex-nowrap items-center gap-[9px] overflow-hidden whitespace-nowrap text-[14px] text-white/68 max-md:mb-[26px] max-md:gap-[5px] max-md:text-[12px]" aria-label={copy.breadcrumb}>
         <LocalizedLink to="/learn" className="shrink-0 text-white/68 no-underline hover:text-white">
           {copy.courses}
         </LocalizedLink>
@@ -266,7 +266,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
         <span className="min-w-0 truncate font-medium text-white">{courseBreadcrumbTitle}</span>
       </nav>
 
-      <section className="grid grid-cols-[minmax(0,1fr)_360px] items-start gap-[24px] max-lg:grid-cols-1">
+      <section className="grid grid-cols-[minmax(0,1fr)_360px] items-start gap-[24px] max-lg:grid-cols-1 max-lg:gap-[18px]">
         <div className={`min-w-0 ${courseMobileContentsClass}`}>
           <div className={courseMobileOrder(1)}>
             <div ref={playerFrameRef}>
@@ -305,7 +305,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
           </div>
         </div>
 
-        <aside className={`flex min-w-0 flex-col gap-[16px] lg:sticky lg:top-[88px] ${courseMobileContentsClass}`}>
+        <aside className={`flex min-w-0 flex-col gap-[16px] lg:sticky lg:top-[88px] max-lg:gap-[18px] ${courseMobileContentsClass}`}>
           {purchase ? (
             courseAccess.hasAccess ? (
               <>
@@ -858,8 +858,8 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
   const title = getNumberedCourseLessonTitle(collection, lesson, lang);
 
   return (
-    <section className="mt-[26px]">
-      <div className="flex flex-wrap items-center justify-between gap-[12px] max-md:flex-col max-md:items-start">
+    <section className="mt-[26px] max-md:mt-[22px]">
+      <div className="flex flex-wrap items-center justify-between gap-[12px] max-md:flex-col max-md:items-start max-md:gap-[10px]">
         <div className="flex flex-wrap items-center gap-[10px]">
           {position && (
             <span className="rounded-[6px] bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
@@ -891,7 +891,7 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
           />
         )}
       </div>
-      <h1 className="mt-[18px] max-w-[820px] text-[30px] font-bold leading-[1.14] text-white max-md:text-[25px]">
+      <h1 className="mt-[18px] max-w-[820px] text-[30px] font-bold leading-[1.14] text-white max-md:mt-[20px] max-md:text-[25px]">
         {title}
       </h1>
       <LessonDescription description={description} copy={copy} />
@@ -912,7 +912,7 @@ function LessonDescription({ description, copy }: { description: string; copy: (
   const preview = canCollapse ? description.slice(0, MOBILE_DESCRIPTION_PREVIEW_LENGTH).trimEnd() : description;
 
   return (
-    <div className="mt-[18px] max-w-[820px] pb-[20px] text-[14px] leading-[1.55] text-white/70 max-md:text-[16px]">
+    <div className="mt-[18px] max-w-[820px] pb-[20px] text-[14px] leading-[1.55] text-white/70 max-md:mt-[20px] max-md:pb-[14px] max-md:text-[16px]">
       <p className="max-md:hidden">{description}</p>
       <p className="hidden max-md:block">
         {expanded || !canCollapse ? description : `${preview}...`}
@@ -942,7 +942,7 @@ function LessonCompletionAction({ completed, copy, onToggle }: LessonCompletionA
       type="button"
       aria-pressed={completed}
       onClick={onToggle}
-      className={`inline-flex h-[34px] cursor-pointer items-center gap-[7px] rounded-[8px] border px-[12px] text-[13px] font-bold leading-none outline-none transition focus-visible:ring-2 focus-visible:ring-[#9cfb51]/65 max-sm:h-[32px] max-sm:text-[12px] ${
+      className={`inline-flex h-[34px] cursor-pointer items-center gap-[7px] rounded-[8px] border px-[12px] text-[13px] font-bold leading-none outline-none transition focus-visible:ring-2 focus-visible:ring-[#9cfb51]/65 max-sm:h-[38px] max-sm:px-[14px] max-sm:text-[13px] ${
         completed
           ? "border-[#9cfb51]/35 bg-[#9cfb51]/12 text-[#9cfb51] hover:bg-[#9cfb51]/16"
           : "border-white/10 bg-white/[0.035] text-white/64 hover:border-[#9cfb51]/35 hover:text-[#9cfb51]"
@@ -972,9 +972,9 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
   const canCollapseOnMobile = materials.length > 1;
 
   return (
-    <section className="mt-[34px] max-w-[820px]">
+    <section className="mt-[34px] max-w-[820px] max-md:mt-[38px]">
       <h2 className="text-[22px] font-bold leading-tight text-white">{copy.lessonMaterials}</h2>
-      <div className="mt-[14px] overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]">
+      <div className="mt-[14px] overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023] max-md:mt-[18px]">
         {materials.map((material, index) => {
           const Icon = materialIcon(material.kind);
           const external = material.href.startsWith("http");
@@ -983,7 +983,7 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
           const disabled = locked || pending;
           const actionLabel = getMaterialActionLabel(material);
           const rowClass =
-            `grid grid-cols-[34px_minmax(0,1fr)_154px] items-center gap-[12px] border-b border-white/8 px-[16px] py-[10px] last:border-b-0 max-sm:grid-cols-[32px_minmax(0,1fr)] ${
+            `grid grid-cols-[34px_minmax(0,1fr)_154px] items-center gap-[12px] border-b border-white/8 px-[16px] py-[10px] last:border-b-0 max-sm:grid-cols-[32px_minmax(0,1fr)] max-sm:gap-[14px] max-sm:px-[18px] max-sm:py-[16px] ${
               canCollapseOnMobile && !expanded && index > 0 ? "max-md:hidden" : ""
             }`;
 
@@ -997,7 +997,7 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
                 <span className="mt-[4px] block text-[12px] leading-tight text-white/42">{material.meta}</span>
               </span>
               {disabled ? (
-                <span className={`flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.04] text-[13px] font-medium max-sm:col-span-2 ${pending ? "text-[#9cfb51]/58" : "text-white/32"}`}>
+                <span className={`flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.04] text-[13px] font-medium max-sm:col-span-2 max-sm:h-[44px] ${pending ? "text-[#9cfb51]/58" : "text-white/32"}`}>
                   {pending ? actionLabel : purchase ? copy.unlocksAfterPurchase : "Pro"}
                 </span>
               ) : external || staticAsset ? (
@@ -1006,14 +1006,14 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
                   target={external ? "_blank" : undefined}
                   rel={external ? "noopener noreferrer" : undefined}
                   download={staticAsset || material.href.endsWith(".zip") ? "" : undefined}
-                  className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-sm:col-span-2"
+                  className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-sm:col-span-2 max-sm:h-[44px]"
                 >
                   {actionLabel}
                 </a>
               ) : (
                 <LocalizedLink
                   to={material.href}
-                  className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-sm:col-span-2"
+                  className="flex h-[36px] items-center justify-center rounded-[7px] bg-white/[0.06] text-[13px] font-medium text-white no-underline transition hover:bg-white/[0.1] max-sm:col-span-2 max-sm:h-[44px]"
                 >
                   {actionLabel}
                 </LocalizedLink>
@@ -1025,7 +1025,7 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
           <button
             type="button"
             onClick={() => setExpanded((current) => !current)}
-            className="hidden h-[52px] w-full cursor-pointer items-center justify-center border-0 border-t border-white/8 bg-transparent px-[16px] text-[14px] font-bold text-white/82 transition hover:bg-white/[0.035] hover:text-white max-md:flex"
+            className="hidden h-[52px] w-full cursor-pointer items-center justify-center border-0 border-t border-white/8 bg-transparent px-[16px] text-[14px] font-bold text-white/82 transition hover:bg-white/[0.035] hover:text-white max-md:flex max-md:h-[60px]"
           >
             {expanded ? copy.showLessMaterials : copy.showMoreMaterials}
           </button>
@@ -1127,9 +1127,9 @@ function LessonPrompts({ prompts, locked, purchase, courseSlug, lessonSlug, acce
   };
 
   return (
-    <section className="mt-[34px] max-w-[820px]">
+    <section className="mt-[34px] max-w-[820px] max-md:mt-[42px]">
       <h2 className="text-[22px] font-bold leading-tight text-white">{copy.lessonPrompts}</h2>
-      <div className="mt-[14px] space-y-[10px]">
+      <div className="mt-[14px] space-y-[10px] max-md:mt-[18px] max-md:space-y-[12px]">
         {prompts.map((prompt, index) => {
           const key = `${prompt.title}-${index}`;
           const loaded = loadedBodies[key];
@@ -1148,7 +1148,7 @@ function LessonPrompts({ prompts, locked, purchase, courseSlug, lessonSlug, acce
                 }
               }}
             >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-[14px] px-[16px] py-[14px] marker:hidden">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-[14px] px-[16px] py-[14px] marker:hidden max-md:px-[18px] max-md:py-[17px]">
                 <span className="min-w-0">
                   <span className="block text-[14px] font-bold leading-tight text-white">{prompt.title}</span>
                   <span className="mt-[5px] block text-[12px] leading-[1.35] text-white/44">{prompt.meta}</span>
@@ -1296,7 +1296,7 @@ type CourseProgress = NonNullable<LearnCollection["progress"]>;
 
 function CourseProgressCard({ progress, copy }: { progress: CourseProgress; copy: (typeof detailCopy)["ru"] }) {
   return (
-    <section className="rounded-[8px] border border-white/10 bg-[#0e2023]/92 px-[20px] py-[20px] shadow-[0_16px_50px_rgba(0,0,0,0.18)] max-md:px-[22px] max-md:py-[22px] lg:hidden">
+    <section className="rounded-[8px] border border-white/10 bg-[#0e2023]/92 px-[20px] py-[20px] shadow-[0_16px_50px_rgba(0,0,0,0.18)] max-md:px-[28px] max-md:py-[28px] lg:hidden">
       <CourseProgressBlock progress={progress} copy={copy} />
     </section>
   );
@@ -1311,10 +1311,10 @@ function CourseProgressBlock({ progress, copy, framed = false }: { progress: Cou
         <span className="text-[13px] font-medium text-white/72 max-md:text-[16px]">{copy.courseProgress}</span>
         <span className="text-[13px] font-bold text-[#9cfb51] max-md:text-[16px]">{percent}%</span>
       </div>
-      <div className="mt-[12px] h-[5px] overflow-hidden rounded-full bg-white/12 max-md:mt-[18px]">
+      <div className="mt-[12px] h-[5px] overflow-hidden rounded-full bg-white/12 max-md:mt-[24px]">
         <div className="h-full rounded-full bg-[#9cfb51]" style={{ width: `${percent}%` }} />
       </div>
-      <p className="mt-[8px] text-right text-[12px] leading-tight text-white/44 max-md:mt-[14px] max-md:text-[14px]">
+      <p className="mt-[8px] text-right text-[12px] leading-tight text-white/44 max-md:mt-[18px] max-md:text-[14px]">
         {copy.progressCount(progress.completed, progress.total)}
       </p>
     </div>
@@ -1371,14 +1371,14 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
 
   return (
     <section className="overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]/92 max-md:rounded-[10px]">
-      <div className="flex h-[52px] items-end border-b border-white/8 px-[16px] max-md:h-[60px] max-md:px-[22px]">
+      <div className="flex h-[52px] items-end border-b border-white/8 px-[16px] max-md:h-[72px] max-md:px-[28px]">
         {isCourse && (
           <button
             type="button"
             onClick={() => onTabChange("lessons")}
             className={`relative h-[52px] min-w-[92px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition ${
               activeTab === "lessons" ? "text-white" : "text-white/58 hover:text-white"
-            } max-md:h-[60px] max-md:min-w-[118px] max-md:text-[16px]`}
+            } max-md:h-[72px] max-md:min-w-[118px] max-md:text-[16px]`}
           >
             {copy.lessonsTab}
             {activeTab === "lessons" && <span className="absolute inset-x-[10px] bottom-0 h-[2px] rounded-full bg-[#9cfb51]" />}
@@ -1389,7 +1389,7 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
           onClick={() => onTabChange("timestamps")}
           className={`relative h-[52px] min-w-[116px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition ${
             activeTab === "timestamps" ? "text-white" : "text-white/58 hover:text-white"
-          } max-md:h-[60px] max-md:min-w-[142px] max-md:text-[16px]`}
+          } max-md:h-[72px] max-md:min-w-[142px] max-md:text-[16px]`}
         >
           {copy.timestampsTab}
           {activeTab === "timestamps" && <span className="absolute inset-x-[10px] bottom-0 h-[2px] rounded-full bg-[#9cfb51]" />}
@@ -1417,7 +1417,7 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
   const { lang } = useLang();
 
   return (
-    <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] max-md:max-h-[254px] max-md:space-y-[4px] max-md:p-[10px] ${className}`}>
+    <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] max-md:max-h-[312px] max-md:space-y-[4px] max-md:p-[12px] ${className}`}>
       {collection.lessons.map((outlineLesson, index) => {
         const current = outlineLesson.slug === currentSlug;
         const locked = isLessonLocked(outlineLesson, hasAccess);
@@ -1427,7 +1427,7 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
             key={outlineLesson.slug}
             to={getLessonHref(collection, outlineLesson.slug, lang)}
             aria-current={current ? "page" : undefined}
-            className={`group grid grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition max-md:grid-cols-[42px_minmax(0,1fr)_28px] max-md:gap-[8px] max-md:py-[12px] ${
+            className={`group grid grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition max-md:grid-cols-[42px_minmax(0,1fr)_28px] max-md:gap-[10px] max-md:px-[12px] max-md:py-[14px] ${
               locked ? "min-h-[62px]" : ""
             } ${
               current
