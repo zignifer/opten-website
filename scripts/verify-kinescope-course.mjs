@@ -97,12 +97,16 @@ const lessonTwoExtrasStart = extrasContent.indexOf('"lesson-2-ai-services"', les
 const lessonThreeExtrasStart = extrasContent.indexOf('"lesson-3-logo-generation"', lessonTwoExtrasStart);
 const lessonFourExtrasStart = extrasContent.indexOf('"lesson-4-photo-generation"');
 const lessonFiveExtrasStart = extrasContent.indexOf('"lesson-5-references"', lessonFourExtrasStart);
+const lessonSixExtrasStart = extrasContent.indexOf('"lesson-6-image-editing"', lessonFiveExtrasStart);
+const lessonSevenExtrasStart = extrasContent.indexOf('"lesson-7-ai-video"', lessonSixExtrasStart);
 assert.ok(lessonOneExtrasStart >= 0 && lessonTwoExtrasStart > lessonOneExtrasStart, "Private course extras must include lesson 1 and lesson 2 blocks");
 const lessonOneExtras = extrasContent.slice(lessonOneExtrasStart, lessonTwoExtrasStart);
 assert.ok(lessonThreeExtrasStart > lessonTwoExtrasStart, "Private course extras must include lesson 3 after lesson 2");
 const lessonTwoExtras = extrasContent.slice(lessonTwoExtrasStart, lessonThreeExtrasStart);
 assert.ok(lessonFourExtrasStart >= 0 && lessonFiveExtrasStart > lessonFourExtrasStart, "Private course extras must include lesson 4 and lesson 5 blocks");
 const lessonFourExtras = extrasContent.slice(lessonFourExtrasStart, lessonFiveExtrasStart);
+assert.ok(lessonSixExtrasStart > lessonFiveExtrasStart && lessonSevenExtrasStart > lessonSixExtrasStart, "Private course extras must include lesson 6 and lesson 7 blocks");
+const lessonSixExtras = extrasContent.slice(lessonSixExtrasStart, lessonSevenExtrasStart);
 assert.match(extrasContent, /const requiredCourseMaterials = \[links\.syntx, links\.optenPromptImprover, optenSkill\]/, "Every lesson must start with Syntx, Opten ChatGPT prompt generator, and Claude skill");
 assert.match(extrasContent, /ru:\s*withRequiredCourseMaterials\(extras\.materials\.ru\)/, "Private course extras must apply the shared required material prefix to every lesson");
 assert.match(extrasContent, /const optenSkill:[\s\S]*Opten \(Claude и Codex\)/, "Shared course materials must define the Claude/Codex skill archive");
@@ -128,6 +132,7 @@ assert.match(lessonFourExtras, /lesson-4-model-cheatsheet\.pdf/, "Lesson 4 must 
 assert.match(lessonFourExtras, /lesson-4-cofe1-result\.jpg/, "Lesson 4 must link the Cofe1 generated image");
 assert.match(lessonFourExtras, /l4-cofe1-photo/, "Lesson 4 prompts must expose the exact Cofe1 prompt");
 assert.doesNotMatch(lessonFourExtras, /Настройки генерации/, "Lesson 4 must not show generation settings as a missing item");
+assert.match(lessonSixExtras, /Photopea[\s\S]*Бесплатный Photoshop в браузере[\s\S]*https:\/\/www\.photopea\.com\//, "Lesson 6 materials must include Photopea as a free browser Photoshop");
 assert.match(promptBodiesContent, /Photorealistic square-format product lifestyle photograph/, "Course prompt API must serve the exact lesson 4 Cofe1 prompt");
 assert.ok(existsSync(join(root, lessonFourCheatsheetAsset)), `Lesson 4 model cheat sheet must exist: ${lessonFourCheatsheetAsset}`);
 assert.ok(statSync(join(root, lessonFourCheatsheetAsset)).size > 0, "Lesson 4 model cheat sheet must not be empty");

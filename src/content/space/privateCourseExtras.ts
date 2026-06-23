@@ -154,7 +154,9 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
   },
   "lesson-6-image-editing": {
     materials: {
-      ru: [],
+      ru: [
+        link("Photopea", "Бесплатный Photoshop в браузере", "https://www.photopea.com/"),
+      ],
     },
   },
   "lesson-7-ai-video": {
