@@ -20,18 +20,25 @@ const pendingKinescopePosterPath = "/assets/space/learn-v2/ai-design-dashboard.j
 const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
   ru: [
     {
-      title: "Opten генератор промптов (ChatGPT)",
-      meta: "Генератор промптов под изображения в ChatGPT",
-      kind: "link",
-      actionLabel: "Перейти",
-      href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
-    },
-    {
       title: "Syntx",
       meta: "AI-платформа для генерации изображений и видео",
       kind: "link",
       actionLabel: "Перейти",
       href: "https://syntx.ai/welcome/GlUETIt6",
+    },
+    {
+      title: "Opten генератор промптов (ChatGPT)",
+      meta: "GPT для генерации промптов под изображения",
+      kind: "link",
+      actionLabel: "Открыть",
+      href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
+    },
+    {
+      title: "Opten скилл для генерации промптов (Claude)",
+      meta: "ZIP-архив Claude Skill для генерации промптов",
+      kind: "pdf",
+      actionLabel: "Скачать",
+      href: "/assets/space/courses/ai-content-marketing-2026/opten-skill.zip",
     },
     {
       title: "Higgsfield",
@@ -50,6 +57,13 @@ const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
   ],
   en: [
     {
+      title: "Syntx",
+      meta: "AI platform for image and video generation",
+      kind: "link",
+      actionLabel: "Open",
+      href: "https://syntx.ai/welcome/GlUETIt6",
+    },
+    {
       title: "Opten prompt generator (ChatGPT)",
       meta: "Image-generation prompt generator in ChatGPT",
       kind: "link",
@@ -57,11 +71,11 @@ const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
       href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
     },
     {
-      title: "Syntx",
-      meta: "AI platform for image and video generation",
-      kind: "link",
-      actionLabel: "Open",
-      href: "https://syntx.ai/welcome/GlUETIt6",
+      title: "Opten prompt generation skill (Claude)",
+      meta: "ZIP archive with a Claude Skill for prompt generation",
+      kind: "pdf",
+      actionLabel: "Download",
+      href: "/assets/space/courses/ai-content-marketing-2026/opten-skill.zip",
     },
     {
       title: "Higgsfield",
@@ -328,7 +342,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-5-references",
     videoId: "02bcf12a-ab7c-49d4-96cb-441fafb898b9",
-    title: { ru: "Референсы: как удерживать внешность и стиль", en: "References: keeping identity and style" },
+    title: { ru: "Референсы: как удерживать внешность, стиль и текст", en: "References: keeping identity, style, and text" },
     description: {
       ru: "Вы научитесь использовать референсы так, чтобы картинки не выглядели случайными. Разберёте, как отдельно удерживать внешность, стиль, логотип и композицию.",
       en: "How to use references so generated images do not feel random. You will separate identity, style, logo, and composition control.",
@@ -494,7 +508,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-9-storytelling",
     videoId: "6f742d8c-cf18-4b9d-97b7-b3e6f63aa696",
-    title: { ru: "Мультишот: сюжет из нескольких сцен", en: "Multishot story from multiple scenes" },
+    title: { ru: "Мультишот: сюжет из нескольких сцен в Kling и Seedance", en: "Multishot story in Kling and Seedance" },
     description: {
       ru: "Вы научитесь собирать ролик из нескольких сцен. Разберёте, как придумать структуру, сделать раскадровку и не выбрасывать всю генерацию из-за одного плохого фрагмента.",
       en: "How to build a video from several scenes. You will plan structure, storyboard the idea, and avoid throwing away a whole generation because of one weak fragment.",
@@ -536,7 +550,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-10-prompt-library",
     videoId: "3675dfeb-55da-47c3-aac8-35b0556dbd84",
-    title: { ru: "Замена фона и объектов в видео через Switch X", en: "Replacing backgrounds and objects in video with Switch X" },
+    title: { ru: "Замена фона и объектов в видео через Bible Switch X", en: "Replacing backgrounds and objects in video with Bible Switch X" },
     description: {
       ru: "Вы научитесь менять фон или одежду в уже готовом видео. Разберёте, как подготовить первый кадр, где ставить маску и какие ограничения есть у такой правки.",
       en: "How to change a background or clothing in an existing video. You will prepare the first frame, place masks, and understand the limits of this kind of edit.",
@@ -618,7 +632,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-12-motion-control",
     videoId: "d01c3455-92fe-4ffa-b878-d367211cfb5a",
-    title: { ru: "AI-аватары: motion control и повтор движений", en: "AI avatars: motion control and motion repeat" },
+    title: { ru: "AI-аватары: motion control и движение по референсу", en: "AI avatars: motion control and reference movement" },
     description: {
       ru: "Вы научитесь переносить движение с референса на AI-персонажа. Разберёте первый кадр, позу, голос, результат в Kling и монтаж финального ролика.",
       en: "How to transfer motion from a reference to an AI character. You will work with the first frame, pose, voice, Kling result, and final edit.",

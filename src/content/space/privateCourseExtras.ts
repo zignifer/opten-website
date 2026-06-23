@@ -29,9 +29,6 @@ function missing(title: string, meta: string, actionLabel = "Добрать"): L
 }
 
 const links = {
-  chatgpt: link("ChatGPT", "Чат для идей, структуры и текстовых промптов", "https://chatgpt.com/"),
-  claude: link("Claude", "Альтернативный LLM для длинного контекста и объяснений", "https://claude.ai/"),
-  opten: link("Opten", "Сайт Opten и вход в аккаунт", "https://opten.space/"),
   optenPromptImprover: link(
     "Opten генератор промптов (ChatGPT)",
     "GPT для генерации промптов под изображения",
@@ -42,21 +39,47 @@ const links = {
   higgsfield: link("Higgsfield", "AI-видео, камера, motion и MCP-интеграция", "https://higgsfield.ai/"),
 };
 
+const optenSkill: LearnMaterial = {
+  title: "Opten скилл для генерации промптов (Claude)",
+  meta: "ZIP-архив Claude Skill для генерации промптов",
+  kind: "pdf",
+  actionLabel: "Скачать",
+  href: "/assets/space/courses/ai-content-marketing-2026/opten-skill.zip",
+};
+
+const modelCheatsheet: LearnMaterial = {
+  title: "Шпаргалка по моделям",
+  meta: "Nano Banana, GPT Image, Midjourney, Recraft: когда что брать",
+  kind: "pdf",
+  actionLabel: "Скачать",
+  href: "/assets/space/courses/ai-content-marketing-2026/lesson-4-model-cheatsheet.pdf",
+};
+
+const characterReferenceSheet: LearnMaterial = {
+  title: "Чит-лист с вашей внешностью",
+  meta: "Character reference sheet для сохранения внешности персонажа",
+  kind: "link",
+  actionLabel: "Скачать",
+  href: "/assets/space/courses/ai-content-marketing-2026/lesson-5-character-reference-sheet.png",
+};
+
+const requiredCourseMaterials = [links.syntx, links.optenPromptImprover, optenSkill];
+const removedSharedMaterialHrefs = new Set(["https://chatgpt.com/", "https://claude.ai/", "https://opten.space/"]);
+
+function withRequiredCourseMaterials(materials: LearnMaterial[] | undefined) {
+  const list = materials ?? [];
+  const lessonMaterials = list.filter((material) => {
+    if (removedSharedMaterialHrefs.has(material.href)) return false;
+    return !requiredCourseMaterials.some((required) => required.href === material.href);
+  });
+  const withModel = lessonMaterials.some((material) => material.href === modelCheatsheet.href) ? lessonMaterials : [...lessonMaterials, modelCheatsheet];
+  return [...requiredCourseMaterials, ...withModel];
+}
+
 const privateCourseLessonExtras: Record<string, LessonExtras> = {
   "lesson-1-prompting": {
     materials: {
-      ru: [
-        links.chatgpt,
-        links.claude,
-        links.optenPromptImprover,
-        {
-          title: "Opten скилл для генерации промптов (Claude)",
-          meta: "ZIP-архив Claude Skill для генерации промптов",
-          kind: "pdf",
-          actionLabel: "Скачать",
-          href: "/assets/space/courses/ai-content-marketing-2026/opten-skill.zip",
-        },
-      ],
+      ru: [],
     },
     prompts: {
       ru: [
@@ -81,7 +104,6 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
         link("Pinterest-референс логотипа", "Референс логотипа из урока", "https://ru.pinterest.com/pin/440789882308217256/"),
         link("Quiver", "AI-инструмент для работы с визуалом", "https://quiver.ai/"),
         link("Ролик про Quiver", "Instagram-видео с примером Quiver", "https://www.instagram.com/p/DVQyhkXDSSk/", "Смотреть"),
-        pending("Исходник логотипа NOVA", "Добавить SVG/PNG экспорта логотипа", "Загрузить", "pdf"),
       ],
     },
     prompts: {
@@ -121,22 +143,15 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
     materials: {
       ru: [
         links.syntx,
-        links.opten,
-        pending("Pinterest-референсы", "Добавить ссылки или скрины брендовых референсов NOVA", "Нужно добавить"),
-        pending("Шпаргалка по референсам", "identity, style, lighting, logo, composition", "Оформить", "pdf"),
-        pending("Чит-лист ракурсов", "Ракурсы для сохранения внешности персонажа", "Оформить", "pdf"),
+        link("Pinterest-референсы", "Брендовые референсы NOVA из 5 урока", "https://ru.pinterest.com/pin/863354191108943126/", "Открыть"),
+        characterReferenceSheet,
       ],
     },
     prompts: {
       ru: [
+        prompt("l5-character-reference-sheet", "Генерация чит-листа с вашей внешностью", "GPT Image 2: 4K, высокая детализация, strict identity preservation"),
         prompt("l5-opten-references", "Opten: сохранить внешность по референсам", "Запрос из озвучки"),
-        prompt("l5-nano-barista-identity", "Nano Banana 2/Pro: сохранить внешность бариста", "Prompt pack, блок 5", "course-v2-prompt-pack.md"),
-      ],
-    },
-    missingItems: {
-      ru: [
-        missing("Загруженные reference images", "Какие именно изображения использовались как identity/style/logo/composition."),
-        missing("@-обозначения в Syntx", "Забрать точные роли референсов: @Image 1, @Image 2 и т.д."),
+        prompt("l5-nano-barista-identity", "Кадр с баристой NOVA по референсам", "Точный prompt из урока"),
       ],
     },
   },
@@ -214,7 +229,6 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
     materials: {
       ru: [
         links.syntx,
-        links.opten,
         pending("Kling", "Добавить актуальную ссылку или путь внутри Syntx", "Нужно добавить"),
         pending("Seedance", "Добавить актуальную ссылку или путь внутри Syntx", "Нужно добавить"),
         pending("Инструкция Seedance по @-референсам", "Загрузить/связать opten-model-rules/seedance-2.0.md", "Загрузить", "pdf"),
@@ -333,13 +347,6 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
         pending("Codex app / OpenAI", "Добавить актуальную ссылку", "Нужно добавить"),
         pending("Шаблон AGENTS.md для NOVA", "Загрузить готовый файл", "Загрузить", "pdf"),
         pending("Higgsfield MCP", "Добавить ссылку/инструкцию подключения", "Нужно добавить"),
-        {
-          title: "Opten скилл для генерации промптов (Claude)",
-          meta: "ZIP-архив Claude Skill для генерации промптов",
-          kind: "pdf",
-          actionLabel: "Скачать",
-          href: "/assets/space/courses/ai-content-marketing-2026/opten-skill.zip",
-        },
       ],
     },
     prompts: {
@@ -412,5 +419,14 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
 };
 
 export function getPrivateCourseLessonExtras(slug: string): LessonExtras | undefined {
-  return privateCourseLessonExtras[slug];
+  const extras = privateCourseLessonExtras[slug];
+  if (!extras) return undefined;
+
+  return {
+    ...extras,
+    materials: {
+      ...extras.materials,
+      ru: withRequiredCourseMaterials(extras.materials.ru),
+    },
+  };
 }
