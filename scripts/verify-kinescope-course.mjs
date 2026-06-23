@@ -77,8 +77,8 @@ const expectedPrivateCourseRuTitles = [
 assert.match(content, /e941e14d-c5bf-40fc-abe5-a41e247777cf/, "Private course must use the uploaded Kinescope video id");
 assert.match(content, /ai-content-marketing-2026/, "Private course must expose a stable hidden course slug");
 assert.match(content, /lesson-1-prompting/, "Private course must expose the first lesson slug");
-assert.match(content, /PRIVATE_COURSE_PRICE_RUB\s*=\s*4990/, "Private course base RUB price must be 4 990");
-assert.match(content, /PRIVATE_COURSE_LIST_PRICE_RUB\s*=\s*4990/, "Private course list RUB price must stay 4 990");
+assert.match(content, /PRIVATE_COURSE_PRICE_RUB\s*=\s*2990/, "Private course base RUB price must be 2 990");
+assert.match(content, /PRIVATE_COURSE_LIST_PRICE_RUB\s*=\s*2990/, "Private course list RUB price must stay 2 990");
 assert.match(content, /PRIVATE_COURSE_PRICE_USD\s*=\s*41/, "Private course sale price must be 41 USD");
 assert.match(content, /PRIVATE_COURSE_LIST_PRICE_USD\s*=\s*69/, "Private course list price must be 69 USD");
 assert.match(content, /PRIVATE_COURSE_DISCOUNT_PERCENT\s*=\s*0/, "Private course must not hard-code a public discount; promo codes own discounting");

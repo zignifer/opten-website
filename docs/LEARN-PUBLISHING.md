@@ -145,7 +145,7 @@ player overlay. Kinescope then calls the auth callback during playback and gets
 The hidden course `ai-content-marketing-2026` is not unlocked by Pro. It uses a
 separate one-time course purchase:
 
-- RUB base price `4 990 ₽`
+- RUB base price `2 990 ₽`
 - public discounts are server-side promo codes, not hard-coded sale pricing
 - USD list price `$69`
 - current USD checkout price is controlled by the Paddle price ID returned from

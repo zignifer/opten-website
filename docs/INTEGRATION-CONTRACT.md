@@ -260,7 +260,7 @@ The site only **calls** them; it does not own them.
 Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
 
 - The site shows a standalone course offer controlled by the global website
-  currency switcher. The public RUB base price is `4 990 ₽`; public discounts
+  currency switcher. The public RUB base price is `2 990 ₽`; public discounts
   are not hard-coded in the website and must come from server-side promo codes
   (planned common campaigns: `-20%` and `-40%`). The current USD checkout still
   uses the configured course Paddle one-time price ID returned by the backend.
