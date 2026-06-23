@@ -328,7 +328,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-5-references",
     videoId: "02bcf12a-ab7c-49d4-96cb-441fafb898b9",
-    title: { ru: "Референсы: как удерживать внешность, стиль и текст", en: "References: keeping identity, style, and text" },
+    title: { ru: "Референсы: как удерживать внешность и стиль", en: "References: keeping identity and style" },
     description: {
       ru: "Вы научитесь использовать референсы так, чтобы картинки не выглядели случайными. Разберёте, как отдельно удерживать внешность, стиль, логотип и композицию.",
       en: "How to use references so generated images do not feel random. You will separate identity, style, logo, and composition control.",
@@ -494,7 +494,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-9-storytelling",
     videoId: "6f742d8c-cf18-4b9d-97b7-b3e6f63aa696",
-    title: { ru: "Мультишот: сюжет из нескольких сцен в Kling и Seedance", en: "Multishot story in Kling and Seedance" },
+    title: { ru: "Мультишот: сюжет из нескольких сцен", en: "Multishot story from multiple scenes" },
     description: {
       ru: "Вы научитесь собирать ролик из нескольких сцен. Разберёте, как придумать структуру, сделать раскадровку и не выбрасывать всю генерацию из-за одного плохого фрагмента.",
       en: "How to build a video from several scenes. You will plan structure, storyboard the idea, and avoid throwing away a whole generation because of one weak fragment.",
@@ -536,7 +536,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-10-prompt-library",
     videoId: "3675dfeb-55da-47c3-aac8-35b0556dbd84",
-    title: { ru: "Замена фона и объектов в видео через Bible Switch X", en: "Replacing backgrounds and objects in video with Bible Switch X" },
+    title: { ru: "Замена фона и объектов в видео через Switch X", en: "Replacing backgrounds and objects in video with Switch X" },
     description: {
       ru: "Вы научитесь менять фон или одежду в уже готовом видео. Разберёте, как подготовить первый кадр, где ставить маску и какие ограничения есть у такой правки.",
       en: "How to change a background or clothing in an existing video. You will prepare the first frame, place masks, and understand the limits of this kind of edit.",
@@ -618,7 +618,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-12-motion-control",
     videoId: "d01c3455-92fe-4ffa-b878-d367211cfb5a",
-    title: { ru: "AI-аватары: motion control и движение по референсу", en: "AI avatars: motion control from a reference" },
+    title: { ru: "AI-аватары: motion control и повтор движений", en: "AI avatars: motion control and motion repeat" },
     description: {
       ru: "Вы научитесь переносить движение с референса на AI-персонажа. Разберёте первый кадр, позу, голос, результат в Kling и монтаж финального ролика.",
       en: "How to transfer motion from a reference to an AI character. You will work with the first frame, pose, voice, Kling result, and final edit.",

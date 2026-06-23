@@ -1244,40 +1244,44 @@ function CollectionSummaryCard({ lesson, collection }: CollectionSummaryCardProp
   const authorName = getLearnAuthorName(author, lang);
   const progress = collection.progress;
   const isStandalone = collection.kind === "standalone";
+  const mobileCourseProgress = collection.purchase ? progress : undefined;
   const eyebrow = collection.purchase
     ? copy.courseAccessOpen
     : isStandalone
       ? copy.singleLesson
       : getLearnCollectionCategoryLabel(collection, lang);
 
-  if (collection.purchase && progress) {
-    return <CourseProgressCard progress={progress} copy={copy} />;
-  }
-
   return (
-    <section className="rounded-[8px] border border-white/10 bg-[#0e2023]/92 px-[20px] py-[20px] shadow-[0_16px_50px_rgba(0,0,0,0.18)]">
-      <p className="text-[13px] font-medium leading-tight text-white/42">{eyebrow}</p>
-      <h2 className="mt-[14px] text-[20px] font-bold leading-[1.2] text-white">{isStandalone ? copy.lessonAuthor : getLearnCollectionTitle(collection, lang)}</h2>
-      {isStandalone && <p className="mt-[10px] text-[13px] leading-[1.45] text-white/58">{getLearnLessonAuthorIntro(lesson, lang)}</p>}
-      <div className="mt-[20px] flex items-center gap-[11px]">
-        <ResponsiveImage
-          src={author.avatarPath}
-          alt=""
-          width="400"
-          height="400"
-          loading="lazy"
-          widths={[64, 96]}
-          sizes="40px"
-          className="size-[40px] shrink-0 rounded-full border border-white/14 object-cover"
-        />
-        <div className="min-w-0">
-          <p className="truncate text-[14px] font-bold leading-tight text-white">{authorName}</p>
-          <p className="mt-[4px] truncate text-[12px] leading-tight text-white/50">{getLearnLessonAuthorRole(lesson, lang)}</p>
+    <>
+      {mobileCourseProgress && <CourseProgressCard progress={mobileCourseProgress} copy={copy} />}
+      <section
+        className={`rounded-[8px] border border-white/10 bg-[#0e2023]/92 px-[20px] py-[20px] shadow-[0_16px_50px_rgba(0,0,0,0.18)] ${
+          mobileCourseProgress ? "max-lg:hidden" : ""
+        }`}
+      >
+        <p className="text-[13px] font-medium leading-tight text-white/42">{eyebrow}</p>
+        <h2 className="mt-[14px] text-[20px] font-bold leading-[1.2] text-white">{isStandalone ? copy.lessonAuthor : getLearnCollectionTitle(collection, lang)}</h2>
+        {isStandalone && <p className="mt-[10px] text-[13px] leading-[1.45] text-white/58">{getLearnLessonAuthorIntro(lesson, lang)}</p>}
+        <div className="mt-[20px] flex items-center gap-[11px]">
+          <ResponsiveImage
+            src={author.avatarPath}
+            alt=""
+            width="400"
+            height="400"
+            loading="lazy"
+            widths={[64, 96]}
+            sizes="40px"
+            className="size-[40px] shrink-0 rounded-full border border-white/14 object-cover"
+          />
+          <div className="min-w-0">
+            <p className="truncate text-[14px] font-bold leading-tight text-white">{authorName}</p>
+            <p className="mt-[4px] truncate text-[12px] leading-tight text-white/50">{getLearnLessonAuthorRole(lesson, lang)}</p>
+          </div>
         </div>
-      </div>
-      <AuthorSocialLinks copy={copy} />
-      {progress && <CourseProgressBlock progress={progress} copy={copy} />}
-    </section>
+        <AuthorSocialLinks copy={copy} />
+        {progress && <CourseProgressBlock progress={progress} copy={copy} framed />}
+      </section>
+    </>
   );
 }
 
@@ -1285,17 +1289,17 @@ type CourseProgress = NonNullable<LearnCollection["progress"]>;
 
 function CourseProgressCard({ progress, copy }: { progress: CourseProgress; copy: (typeof detailCopy)["ru"] }) {
   return (
-    <section className="rounded-[8px] border border-white/10 bg-[#0e2023]/92 px-[20px] py-[20px] shadow-[0_16px_50px_rgba(0,0,0,0.18)] max-md:px-[22px] max-md:py-[22px]">
+    <section className="rounded-[8px] border border-white/10 bg-[#0e2023]/92 px-[20px] py-[20px] shadow-[0_16px_50px_rgba(0,0,0,0.18)] max-md:px-[22px] max-md:py-[22px] lg:hidden">
       <CourseProgressBlock progress={progress} copy={copy} />
     </section>
   );
 }
 
-function CourseProgressBlock({ progress, copy }: { progress: CourseProgress; copy: (typeof detailCopy)["ru"] }) {
+function CourseProgressBlock({ progress, copy, framed = false }: { progress: CourseProgress; copy: (typeof detailCopy)["ru"]; framed?: boolean }) {
   const percent = Math.round((progress.completed / progress.total) * 100);
 
   return (
-    <div>
+    <div className={framed ? "mt-[22px] border-t border-white/8 pt-[18px]" : undefined}>
       <div className="flex items-center justify-between gap-[12px]">
         <span className="text-[13px] font-medium text-white/72 max-md:text-[16px]">{copy.courseProgress}</span>
         <span className="text-[13px] font-bold text-[#9cfb51] max-md:text-[16px]">{percent}%</span>
