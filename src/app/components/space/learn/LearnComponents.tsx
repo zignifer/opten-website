@@ -855,6 +855,7 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
   const copy = detailCopy[lang];
   const position = getLessonPosition(lesson.slug, lang);
   const description = getLearnLessonDescription(lesson, lang);
+  const title = getNumberedCourseLessonTitle(collection, lesson, lang);
 
   return (
     <section className="mt-[26px]">
@@ -891,7 +892,7 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
         )}
       </div>
       <h1 className="mt-[18px] max-w-[820px] text-[30px] font-bold leading-[1.14] text-white max-md:text-[25px]">
-        {getLearnLessonTitle(lesson, lang)}
+        {title}
       </h1>
       <LessonDescription description={description} copy={copy} />
     </section>
@@ -1415,7 +1416,7 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
             key={outlineLesson.slug}
             to={getLessonHref(collection, outlineLesson.slug, lang)}
             aria-current={current ? "page" : undefined}
-            className={`group grid grid-cols-[26px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition max-md:grid-cols-[42px_minmax(0,1fr)_28px] max-md:gap-[8px] max-md:py-[12px] ${
+            className={`group grid grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition max-md:grid-cols-[42px_minmax(0,1fr)_28px] max-md:gap-[8px] max-md:py-[12px] ${
               locked ? "min-h-[62px]" : ""
             } ${
               current
@@ -1426,7 +1427,7 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
             }`}
           >
             <span className={`text-center text-[14px] font-bold leading-none max-md:text-[18px] ${current ? "text-[#9cfb51]" : "text-white/48"}`}>
-              {index + 1}
+              {index + 1}.
             </span>
             <span className="min-w-0">
               <span className={`block text-[14px] font-bold leading-[1.35] max-md:text-[16px] ${current ? "text-white" : ""}`}>
@@ -2015,7 +2016,7 @@ function RelatedLessons({ collection, currentSlug, hasAccess, purchase }: Relate
               <div className="px-[14px] pb-[18px] pt-[13px]">
                 <p className="text-[12px] leading-none text-white/38">{getLearnLessonCategoryLabel(item, lang)}</p>
                 <h3 className="mt-[9px] min-h-[48px] text-[18px] font-bold leading-[1.3] text-white">
-                  {getLearnLessonTitle(item, lang)}
+                  {getNumberedCourseLessonTitle(collection, item, lang)}
                 </h3>
                 <p className="mt-[14px] text-[13px] font-medium text-[#9cfb51]">
                   {purchase ? copy.unlocksAfterPurchase : locked ? copy.unlocksOnPro : copy.watchLesson}
@@ -2032,6 +2033,13 @@ function RelatedLessons({ collection, currentSlug, hasAccess, purchase }: Relate
 function getLessonHref(collection: LearnCollection, slug: string, lang: "ru" | "en") {
   const basePath = collection.routeBasePath?.[lang] ?? "/learn";
   return `${basePath}/${slug}`;
+}
+
+function getNumberedCourseLessonTitle(collection: LearnCollection, lesson: LearnLesson, lang: "ru" | "en") {
+  const title = getLearnLessonTitle(lesson, lang);
+  if (collection.kind !== "course") return title;
+  const index = collection.lessons.findIndex((item) => item.slug === lesson.slug);
+  return index >= 0 ? `${index + 1}. ${title}` : title;
 }
 
 type LessonStatusDotProps = {
