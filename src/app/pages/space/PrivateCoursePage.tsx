@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { Navigate, useParams } from "react-router";
-import { LessonDetailLayout } from "../../components/space/learn/LearnComponents";
+import { CourseIntroLayout, LessonDetailLayout } from "../../components/space/learn/LearnComponents";
 import {
   findPrivateCourseLesson,
   getAdjacentPrivateCourseLessons,
   getPrivateCourseCollection,
+  privateCourseIntroContent,
 } from "../../../content/space/privateCourse";
 import { getLearnLessonTitle } from "../../../content/space/learn";
 import { useLang } from "../../../i18n/LangContext";
@@ -14,10 +15,23 @@ export default function PrivateCoursePage() {
   const { lang } = useLang();
   const collection = getPrivateCourseCollection(courseSlug);
   const lesson = findPrivateCourseLesson(courseSlug, lessonSlug);
+  const pageTitle = !lessonSlug
+    ? `${privateCourseIntroContent.title[lang]} — Opten course`
+    : lesson
+      ? `${getLearnLessonTitle(lesson, lang)} — Opten course`
+      : "Opten private course";
 
-  useNoIndexPrivateCourse(lesson ? `${getLearnLessonTitle(lesson, lang)} — Opten course` : "Opten private course");
+  useNoIndexPrivateCourse(pageTitle);
 
-  if (!collection || !lesson) {
+  if (!collection) {
+    return <Navigate to="/learn" replace />;
+  }
+
+  if (!lessonSlug) {
+    return <CourseIntroLayout collection={collection} intro={privateCourseIntroContent} />;
+  }
+
+  if (!lesson) {
     return <Navigate to="/learn" replace />;
   }
 

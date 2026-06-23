@@ -34,6 +34,7 @@ import ResponsiveImage from "../../ResponsiveImage";
 import SiteFooter from "../../SiteFooter";
 import SpaceHeader from "../SpaceHeader";
 import { useSpaceAuth } from "../SpaceAuthProvider";
+import type { PrivateCourseIntroContent } from "../../../../content/space/privateCourse";
 import type { LearnCollection, LearnCoursePurchase, LearnLesson, LearnMaterial, LearnMissingItem, LearnOverviewSection, LearnPromptBlock, LearnTimestamp } from "../../../../content/space/learn";
 import {
   getLearnCollectionCategoryLabel,
@@ -367,6 +368,238 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
         </aside>
       </section>
     </LearnSectionWrapper>
+  );
+}
+
+type CourseIntroLayoutProps = {
+  collection: LearnCollection;
+  intro: PrivateCourseIntroContent;
+};
+
+export function CourseIntroLayout({ collection, intro }: CourseIntroLayoutProps) {
+  const { lang } = useLang();
+  const copy = detailCopy[lang];
+  const { account, session, status: authStatus } = useSpaceAuth();
+  const hasPro = hasProAccess(account);
+  const purchase = collection.purchase;
+  const courseAccess = useCourseAccess(purchase, session?.access_token ?? null);
+  const lessonAccessGranted = purchase ? courseAccess.hasAccess : hasPro;
+  const [activeTab, setActiveTab] = useState<SidebarTab>("lessons");
+  const playerFrameRef = useRef<HTMLDivElement | null>(null);
+  const [playerHeight, setPlayerHeight] = useState<number | null>(null);
+  const [manualProgress] = useState<StoredLearnProgress>(() => readStoredLearnProgress());
+
+  useEffect(() => {
+    const element = playerFrameRef.current;
+    if (!element) return;
+
+    const updatePlayerHeight = () => {
+      setPlayerHeight(Math.round(element.getBoundingClientRect().height));
+    };
+
+    updatePlayerHeight();
+
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updatePlayerHeight);
+      return () => window.removeEventListener("resize", updatePlayerHeight);
+    }
+
+    const observer = new ResizeObserver(updatePlayerHeight);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [collection.id]);
+
+  const completedSlugs = useMemo(() => getCompletedLessonSlugs(collection, manualProgress), [collection, manualProgress]);
+  const displayedCollection = useMemo(() => applyLessonProgress(collection, completedSlugs, ""), [collection, completedSlugs]);
+  const sidebarLesson = displayedCollection.lessons[0];
+  const courseMobileContentsClass = "max-lg:contents";
+  const courseMobileOrder = (order: 1 | 2 | 3 | 4 | 5) => {
+    if (order === 1) return "max-lg:order-1";
+    if (order === 2) return "max-lg:order-2";
+    if (order === 3) return "max-lg:order-3";
+    if (order === 4) return "max-lg:order-4";
+    return "max-lg:order-5";
+  };
+
+  return (
+    <LearnSectionWrapper>
+      <nav className="mb-[24px] flex min-w-0 flex-nowrap items-center gap-[9px] overflow-hidden whitespace-nowrap text-[14px] text-white/68 max-md:mb-[26px] max-md:gap-[5px] max-md:text-[12px]" aria-label={copy.breadcrumb}>
+        <LocalizedLink to="/learn" className="shrink-0 text-white/68 no-underline hover:text-white">
+          {copy.courses}
+        </LocalizedLink>
+        <span className="shrink-0 text-white/28">/</span>
+        <span className="min-w-0 truncate font-medium text-white">{getLearnCollectionTitle(collection, lang)}</span>
+      </nav>
+
+      <section className="grid grid-cols-[minmax(0,1fr)_360px] items-start gap-[24px] max-lg:grid-cols-1 max-lg:gap-[18px]">
+        <div className={`min-w-0 ${courseMobileContentsClass}`}>
+          <div className={courseMobileOrder(1)}>
+            <div ref={playerFrameRef}>
+              <CourseIntroVideoPlaceholder intro={intro} />
+            </div>
+            <CourseIntroHeader intro={intro} />
+          </div>
+          <div className={courseMobileOrder(4)}>
+            <CourseIntroShowcase intro={intro} />
+          </div>
+        </div>
+
+        {sidebarLesson && (
+          <aside className={`flex min-w-0 flex-col gap-[16px] lg:sticky lg:top-[88px] max-lg:gap-[18px] ${courseMobileContentsClass}`}>
+            {purchase ? (
+              courseAccess.hasAccess ? (
+                <>
+                  <div className={`min-w-0 ${courseMobileOrder(2)}`}>
+                    <CollectionSummaryCard lesson={sidebarLesson} collection={displayedCollection} />
+                  </div>
+                  <div className={`min-w-0 ${courseMobileOrder(3)}`}>
+                    <LessonSidebar
+                      lesson={sidebarLesson}
+                      collection={displayedCollection}
+                      activeTab={activeTab}
+                      onTabChange={setActiveTab}
+                      onTimestampSelect={() => undefined}
+                      hasAccess={lessonAccessGranted}
+                      purchase={purchase}
+                      currentSlug=""
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className={`min-w-0 ${courseMobileOrder(3)}`}>
+                    <CoursePurchaseCard
+                      collection={displayedCollection}
+                      purchase={purchase}
+                      hasAccess={courseAccess.hasAccess}
+                      loadingAccess={courseAccess.loading || authStatus === "loading"}
+                      initialEmail={session?.user.email ?? account?.email ?? ""}
+                      playerHeight={playerHeight}
+                    />
+                  </div>
+                  <div className={`min-w-0 ${courseMobileOrder(2)}`}>
+                    <LessonSidebar
+                      lesson={sidebarLesson}
+                      collection={displayedCollection}
+                      activeTab={activeTab}
+                      onTabChange={setActiveTab}
+                      onTimestampSelect={() => undefined}
+                      hasAccess={lessonAccessGranted}
+                      purchase={purchase}
+                      currentSlug=""
+                    />
+                  </div>
+                </>
+              )
+            ) : (
+              <>
+                <CollectionSummaryCard lesson={sidebarLesson} collection={displayedCollection} />
+                <LessonSidebar
+                  lesson={sidebarLesson}
+                  collection={displayedCollection}
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                  onTimestampSelect={() => undefined}
+                  hasAccess={lessonAccessGranted}
+                  purchase={purchase}
+                  currentSlug=""
+                />
+                <UnlockProCard hasPro={hasPro} />
+              </>
+            )}
+          </aside>
+        )}
+      </section>
+    </LearnSectionWrapper>
+  );
+}
+
+function CourseIntroVideoPlaceholder({ intro }: { intro: PrivateCourseIntroContent }) {
+  const { lang } = useLang();
+
+  return (
+    <section
+      className="group relative aspect-video overflow-hidden rounded-[8px] border border-white/10 bg-[#03191c] shadow-[0_24px_80px_rgba(0,0,0,0.22)] max-md:rounded-[8px]"
+      aria-label={intro.videoAriaLabel[lang]}
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(156,251,81,0.12),transparent_28%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(156,251,81,0.04),transparent_40%,rgba(255,255,255,0.03))]" />
+      <button
+        type="button"
+        className="absolute left-1/2 top-1/2 grid size-[82px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-0 bg-[#9cfb51] text-[#011417] shadow-[0_18px_58px_rgba(156,251,81,0.28)] transition duration-200 group-hover:scale-[1.03] group-hover:bg-[#8ff144] max-md:size-[92px]"
+        aria-label={intro.videoAriaLabel[lang]}
+      >
+        <Play size={32} fill="currentColor" className="translate-x-[2px] max-md:size-[38px]" />
+      </button>
+    </section>
+  );
+}
+
+function CourseIntroHeader({ intro }: { intro: PrivateCourseIntroContent }) {
+  const { lang } = useLang();
+
+  return (
+    <section className="mt-[32px] max-w-[820px] max-md:mt-[28px]">
+      <h1 className="text-[32px] font-bold leading-[1.12] tracking-[-0.01em] text-white max-md:text-[30px]">{intro.title[lang]}</h1>
+      <p className="mt-[18px] max-w-[760px] text-[16px] leading-[1.55] text-white/64 max-md:mt-[18px] max-md:text-[18px] max-md:leading-[1.5]">
+        {intro.description[lang]}
+      </p>
+    </section>
+  );
+}
+
+function CourseIntroShowcase({ intro }: { intro: PrivateCourseIntroContent }) {
+  const { lang } = useLang();
+  const showcase = intro.showcase;
+
+  return (
+    <section className="mt-[28px] max-w-[820px] max-md:mt-[28px]" aria-labelledby="course-intro-showcase-title">
+      <div className="relative min-h-[680px] overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]/92 p-[24px] shadow-[0_24px_80px_rgba(0,0,0,0.18)] max-md:min-h-[560px] max-md:p-[18px]">
+        <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_22%_16%,rgba(156,251,81,0.16),transparent_28%),radial-gradient(circle_at_82%_38%,rgba(255,255,255,0.08),transparent_24%)]" />
+        <div className="relative grid gap-[18px] lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="flex min-h-[244px] flex-col justify-between rounded-[8px] border border-white/8 bg-[#081c1f]/88 p-[20px] max-md:min-h-[220px]">
+            <div>
+              <p className="text-[13px] font-bold uppercase leading-none tracking-[0.08em] text-[#9cfb51]">{showcase.eyebrow[lang]}</p>
+              <h2 id="course-intro-showcase-title" className="mt-[14px] text-[30px] font-bold leading-[1.05] text-white max-md:text-[26px]">
+                {showcase.title[lang]}
+              </h2>
+              <p className="mt-[12px] max-w-[420px] text-[15px] leading-[1.48] text-white/62 max-md:text-[16px]">{showcase.description[lang]}</p>
+            </div>
+            <div className="mt-[22px] flex flex-wrap gap-[8px]">
+              {showcase.tags[lang].map((tag) => (
+                <span key={tag} className="rounded-full border border-[#9cfb51]/22 bg-[#9cfb51]/8 px-[10px] py-[6px] text-[12px] font-bold leading-none text-[#9cfb51]">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-[10px] sm:grid-cols-2 lg:grid-cols-1">
+            {showcase.items.map((item) => (
+              <article key={item.title[lang]} className="rounded-[8px] border border-white/8 bg-white/[0.045] p-[16px]">
+                <h3 className="text-[15px] font-bold leading-[1.25] text-white">{item.title[lang]}</h3>
+                <p className="mt-[8px] text-[13px] leading-[1.42] text-white/54">{item.description[lang]}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative mt-[18px] grid gap-[12px] md:grid-cols-3">
+          {showcase.videoSlots.map((slot) => (
+            <article key={slot.title[lang]} className="min-h-[138px] rounded-[8px] border border-white/8 bg-[#03191c]/88 p-[14px]">
+              <div className="flex items-center justify-between gap-[12px]">
+                <span className="grid size-[34px] place-items-center rounded-full bg-[#9cfb51] text-[#011417]">
+                  <Play size={15} fill="currentColor" className="translate-x-[1px]" />
+                </span>
+                <Video size={17} className="text-white/34" />
+              </div>
+              <h3 className="mt-[24px] text-[15px] font-bold leading-tight text-white">{slot.title[lang]}</h3>
+              <p className="mt-[7px] text-[12px] leading-[1.4] text-white/50">{slot.description[lang]}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -1362,9 +1595,10 @@ type LessonSidebarProps = {
   onTimestampSelect: (seconds: number) => void;
   hasAccess: boolean;
   purchase?: LearnCoursePurchase;
+  currentSlug?: string;
 };
 
-function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestampSelect, hasAccess, purchase }: LessonSidebarProps) {
+function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestampSelect, hasAccess, purchase, currentSlug }: LessonSidebarProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const isCourse = collection.kind === "course";
@@ -1397,7 +1631,7 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
       </div>
 
       {activeTab === "lessons" && isCourse ? (
-        <CourseOutline collection={collection} currentSlug={lesson.slug} hasAccess={hasAccess} purchase={purchase} />
+        <CourseOutline collection={collection} currentSlug={currentSlug ?? lesson.slug} hasAccess={hasAccess} purchase={purchase} />
       ) : (
         <TimestampList timestamps={getLearnLessonTimestamps(lesson, lang)} onSelect={onTimestampSelect} />
       )}

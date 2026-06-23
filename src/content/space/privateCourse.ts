@@ -12,6 +12,133 @@ export const PRIVATE_COURSE_LIST_PRICE_USD = 69;
 export const PRIVATE_COURSE_DISCOUNT_PERCENT = 0;
 export const PRIVATE_COURSE_SALE_ENDS_AT = "2026-06-30T23:59:59+05:00";
 
+export type PrivateCourseIntroContent = {
+  title: Record<LearnLang, string>;
+  description: Record<LearnLang, string>;
+  videoAriaLabel: Record<LearnLang, string>;
+  showcase: {
+    eyebrow: Record<LearnLang, string>;
+    title: Record<LearnLang, string>;
+    description: Record<LearnLang, string>;
+    tags: Record<LearnLang, string[]>;
+    items: Array<{
+      title: Record<LearnLang, string>;
+      description: Record<LearnLang, string>;
+    }>;
+    videoSlots: Array<{
+      title: Record<LearnLang, string>;
+      description: Record<LearnLang, string>;
+    }>;
+  };
+};
+
+export const privateCourseIntroContent: PrivateCourseIntroContent = {
+  title: {
+    ru: "Курс про нейросети для контента и маркетинга",
+    en: "AI for Content and Marketing Course",
+  },
+  description: {
+    ru: "Курс показывает весь путь от промпта и выбора моделей до готовой визуальной упаковки проекта NOVA: логотип, изображения, референсы, видео, AI-аватар, озвучка, апскейл, настройка Codex и сборка сайта. В каждом блоке разбирается рабочий процесс, сервисы и материалы, которые можно адаптировать под свой проект.",
+    en: "The course walks through the full path from prompting and model selection to a complete visual package for the NOVA project: logo, images, references, video, AI avatar, voiceover, upscale, Codex setup, and website assembly. Each block focuses on the workflow, tools, and assets that can be adapted for a real project.",
+  },
+  videoAriaLabel: {
+    ru: "Вводный ролик курса",
+    en: "Course intro video",
+  },
+  showcase: {
+    eyebrow: {
+      ru: "Что будет собрано в курсе",
+      en: "What the course builds",
+    },
+    title: {
+      ru: "Визуальная система NOVA",
+      en: "NOVA visual system",
+    },
+    description: {
+      ru: "От идеи и референсов до набора готовых материалов для сайта, рекламы и презентации продукта.",
+      en: "From idea and references to a finished set of assets for a website, ads, and product presentation.",
+    },
+    tags: {
+      ru: ["логотип", "изображения", "видео", "аватар", "сайт"],
+      en: ["logo", "images", "video", "avatar", "website"],
+    },
+    items: [
+      {
+        title: {
+          ru: "Логотип и вектор",
+          en: "Logo and vector",
+        },
+        description: {
+          ru: "NOVA, SVG, Recraft, Quiver и правки в Figma.",
+          en: "NOVA, SVG, Recraft, Quiver, and Figma edits.",
+        },
+      },
+      {
+        title: {
+          ru: "Фото и референсы",
+          en: "Photos and references",
+        },
+        description: {
+          ru: "Бариста, интерьер, продуктовые кадры и сетка для генераций.",
+          en: "Barista, interior, product frames, and a generation grid.",
+        },
+      },
+      {
+        title: {
+          ru: "Видео и аватар",
+          en: "Video and avatar",
+        },
+        description: {
+          ru: "Latte art, motion control, мультишот и говорящий AI-персонаж.",
+          en: "Latte art, motion control, multishot, and a speaking AI character.",
+        },
+      },
+      {
+        title: {
+          ru: "Лендинг NOVA",
+          en: "NOVA landing page",
+        },
+        description: {
+          ru: "Сборка структуры, ассетов и сайта через Codex.",
+          en: "Structuring, preparing assets, and building the site with Codex.",
+        },
+      },
+    ],
+    videoSlots: [
+      {
+        title: {
+          ru: "AI-video",
+          en: "AI video",
+        },
+        description: {
+          ru: "Latte art и продуктовый ролик",
+          en: "Latte art and product clip",
+        },
+      },
+      {
+        title: {
+          ru: "AI-аватар",
+          en: "AI avatar",
+        },
+        description: {
+          ru: "Говорящий бариста NOVA",
+          en: "Speaking NOVA barista",
+        },
+      },
+      {
+        title: {
+          ru: "Motion control",
+          en: "Motion control",
+        },
+        description: {
+          ru: "Финальный рекламный кадр",
+          en: "Final advertising shot",
+        },
+      },
+    ],
+  },
+};
+
 const privateCourseUpdatedAt = "2026-06-23";
 const privateCourseTotalLessons = 16;
 const currentAiTools2026Url = "https://disk.yandex.ru/d/HaU7LdU850QLVw";
@@ -916,7 +1043,7 @@ export function getPrivateCourseCollection(courseSlug: string | undefined): Lear
 export function findPrivateCourseLesson(courseSlug: string | undefined, lessonSlug: string | undefined): LearnLesson | undefined {
   const collection = getPrivateCourseCollection(courseSlug);
   if (!collection) return undefined;
-  if (!lessonSlug) return collection.lessons[0];
+  if (!lessonSlug) return undefined;
   return collection.lessons.find((lesson) => lesson.slug === lessonSlug);
 }
 

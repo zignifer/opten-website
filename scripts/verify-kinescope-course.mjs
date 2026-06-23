@@ -162,6 +162,20 @@ assert.match(learn, /provider:\s*"youtube"\s*\|\s*"local"\s*\|\s*"kinescope"/, "
 assert.match(learn, /course-entitlement-gated-preview/, "Learn playback policy type must include course entitlement gating");
 
 const components = read("src/app/components/space/learn/LearnComponents.tsx");
+const privateCoursePage = read("src/app/pages/space/PrivateCoursePage.tsx");
+assert.match(content, /privateCourseIntroContent/, "Private course must define dedicated intro content");
+assert.match(content, /Курс про нейросети для контента и маркетинга/, "Private course intro title must use the requested wording");
+assert.doesNotMatch(content, /if \(!lessonSlug\) return collection\.lessons\[0\]/, "Private course root must not fall back to lesson 1");
+assert.match(privateCoursePage, /!lessonSlug[\s\S]*<CourseIntroLayout collection=\{collection\} intro=\{privateCourseIntroContent\}/, "Private course root route must render the course intro layout");
+assert.match(components, /export function CourseIntroLayout/, "Private course root must have a dedicated intro layout");
+assert.match(components, /function CourseIntroVideoPlaceholder/, "Private course intro must render a video placeholder");
+assert.match(components, /function CourseIntroShowcase/, "Private course intro must render a showcase section instead of lesson materials");
+assert.match(components, /currentSlug=\{currentSlug \?\? lesson\.slug\}/, "Course sidebar must support a course overview with no selected lesson");
+const courseIntroStart = components.indexOf("export function CourseIntroLayout");
+const courseIntroEnd = components.indexOf("type LessonPlayerProps", courseIntroStart);
+assert.ok(courseIntroStart >= 0 && courseIntroEnd > courseIntroStart, "Private course intro source block must be readable");
+const courseIntroSource = components.slice(courseIntroStart, courseIntroEnd);
+assert.doesNotMatch(courseIntroSource, /<LessonPlayer|<LessonMaterials|<LessonPrompts|<LessonMissingItems|<video\b|<iframe\b/, "Private course intro must not embed a real lesson video, materials, or prompts");
 assert.match(components, /const actionLabel = getMaterialActionLabel\(material\);/, "Course material buttons must normalize labels to Перейти or Скачать");
 assert.doesNotMatch(components, /pending \? copy\.materialPendingAction : material\.actionLabel/, "Pending course material buttons must not use a third label");
 assert.doesNotMatch(components, /purchase \? copy\.paidCourseBadge : material\.actionLabel/, "Course material buttons must not replace actions with a generic course badge");
