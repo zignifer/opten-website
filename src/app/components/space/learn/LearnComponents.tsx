@@ -258,12 +258,12 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
 
   return (
     <LearnSectionWrapper>
-      <nav className="mb-[24px] flex flex-wrap items-center gap-[9px] text-[14px] text-white/68 max-md:mb-[28px] max-md:text-[16px]" aria-label={copy.breadcrumb}>
-        <LocalizedLink to="/learn" className="text-white/68 no-underline hover:text-white">
+      <nav className="mb-[24px] flex min-w-0 flex-nowrap items-center gap-[9px] overflow-hidden whitespace-nowrap text-[14px] text-white/68 max-md:mb-[20px] max-md:gap-[5px] max-md:text-[12px]" aria-label={copy.breadcrumb}>
+        <LocalizedLink to="/learn" className="shrink-0 text-white/68 no-underline hover:text-white">
           {copy.courses}
         </LocalizedLink>
-        <span className="text-white/28">/</span>
-        <span className="font-medium text-white">{courseBreadcrumbTitle}</span>
+        <span className="shrink-0 text-white/28">/</span>
+        <span className="min-w-0 truncate font-medium text-white">{courseBreadcrumbTitle}</span>
       </nav>
 
       <section className="grid grid-cols-[minmax(0,1fr)_360px] items-start gap-[24px] max-lg:grid-cols-1">
@@ -859,7 +859,7 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
 
   return (
     <section className="mt-[26px]">
-      <div className="flex flex-wrap items-center justify-between gap-[12px]">
+      <div className="flex flex-wrap items-center justify-between gap-[12px] max-md:flex-col max-md:items-start">
         <div className="flex flex-wrap items-center gap-[10px]">
           {position && (
             <span className="rounded-[6px] bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
@@ -872,7 +872,7 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
             </span>
           )}
           {collection.purchase ? (
-            <span className="inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
+            <span className={`inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51] ${locked ? "" : "max-md:hidden"}`}>
               {locked ? <Lock size={13} /> : <LockOpen size={13} />}
               {locked ? copy.unlocksAfterPurchase : copy.courseOpenBadge}
             </span>
@@ -2190,10 +2190,10 @@ const detailCopy = {
     promptLoading: "Загружаем промпт...",
     promptLoadError: "Не удалось загрузить промпт. Проверьте доступ и попробуйте снова.",
     promptOpenToLoad: "Промпт загрузится после открытия.",
-    promptPendingText: "Точный текст нужно добрать из видео или загрузить отдельным файлом.",
-    materialPendingAction: "Нужно добавить",
-    missingFromVideoTitle: "Нужно добрать из видео",
-    missingFromVideoDescription: "Поля уже заведены. Когда будет ссылка, скриншот, файл или точный текст, сюда можно просто подставить готовый материал.",
+    promptPendingText: "Текст промпта появится после обновления материала.",
+    materialPendingAction: "Скоро",
+    missingFromVideoTitle: "Дополнительные материалы",
+    missingFromVideoDescription: "Здесь будут ссылки, файлы или уточнения к уроку.",
     showMoreMaterials: "Показать больше",
     showLessMaterials: "Скрыть",
     showMoreDescription: "Показать ещё",
@@ -2264,10 +2264,10 @@ const detailCopy = {
     promptLoading: "Loading prompt...",
     promptLoadError: "Could not load the prompt. Check access and try again.",
     promptOpenToLoad: "The prompt will load after opening.",
-    promptPendingText: "The exact text needs to be captured from the video or uploaded as a separate file.",
-    materialPendingAction: "Need to add",
-    missingFromVideoTitle: "Need to capture from video",
-    missingFromVideoDescription: "The fields are already prepared. Once a link, screenshot, file, or exact text is available, it can be dropped in here.",
+    promptPendingText: "The prompt text will appear after the material is updated.",
+    materialPendingAction: "Soon",
+    missingFromVideoTitle: "Additional materials",
+    missingFromVideoDescription: "Links, files, or lesson notes can appear here.",
     showMoreMaterials: "Show more",
     showLessMaterials: "Show less",
     showMoreDescription: "Show more",

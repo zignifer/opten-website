@@ -12,7 +12,7 @@ export const PRIVATE_COURSE_LIST_PRICE_USD = 69;
 export const PRIVATE_COURSE_DISCOUNT_PERCENT = 0;
 export const PRIVATE_COURSE_SALE_ENDS_AT = "2026-06-30T23:59:59+05:00";
 
-const privateCourseUpdatedAt = "2026-06-21";
+const privateCourseUpdatedAt = "2026-06-23";
 const privateCourseTotalLessons = 16;
 const currentAiTools2026Url = "https://disk.yandex.ru/d/HaU7LdU850QLVw";
 const pendingKinescopePosterPath = "/assets/space/learn-v2/ai-design-dashboard.jpg";
@@ -21,35 +21,35 @@ const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
   ru: [
     {
       title: "Syntx",
-      meta: "AI-платформа для генерации изображений и видео",
+      meta: "Платформа для генерации фото и видео",
       kind: "link",
       actionLabel: "Перейти",
       href: "https://syntx.ai/welcome/GlUETIt6",
     },
     {
-      title: "Opten генератор промптов (ChatGPT)",
-      meta: "GPT для генерации промптов под изображения",
+      title: "Opten (ChatGPT)",
+      meta: "Сервис для генерации промптов в ChatGPT",
       kind: "link",
       actionLabel: "Перейти",
       href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
     },
     {
-      title: "Opten скилл для генерации промптов (Claude)",
-      meta: "ZIP-архив Claude Skill для генерации промптов",
+      title: "Opten (Claude и Codex)",
+      meta: "Скилл для генерации промптов в Claude и Codex",
       kind: "pdf",
       actionLabel: "Скачать",
       href: "/assets/space/courses/ai-content-marketing-2026/opten-skill.zip",
     },
     {
       title: "Higgsfield",
-      meta: "AI-видео, движение камеры и визуальные эффекты",
+      meta: "Платформа для генерации и управления видео",
       kind: "link",
       actionLabel: "Перейти",
       href: "https://higgsfield.ai/",
     },
     {
       title: "Актуальные нейросети 2026",
-      meta: "Подборка актуальных AI-сервисов и инструментов для курса",
+      meta: "Список актуальных AI-сервисов и инструментов",
       kind: "link",
       actionLabel: "Скачать",
       href: currentAiTools2026Url,
@@ -64,29 +64,29 @@ const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
       href: "https://syntx.ai/welcome/GlUETIt6",
     },
     {
-      title: "Opten prompt generator (ChatGPT)",
-      meta: "Image-generation prompt generator in ChatGPT",
+      title: "Opten (ChatGPT)",
+      meta: "Prompt generation service in ChatGPT",
       kind: "link",
       actionLabel: "Перейти",
       href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
     },
     {
-      title: "Opten prompt generation skill (Claude)",
-      meta: "ZIP archive with a Claude Skill for prompt generation",
+      title: "Opten (Claude and Codex)",
+      meta: "Prompt generation skill for Claude and Codex",
       kind: "pdf",
       actionLabel: "Скачать",
       href: "/assets/space/courses/ai-content-marketing-2026/opten-skill.zip",
     },
     {
       title: "Higgsfield",
-      meta: "AI video, camera motion, and visual effects",
+      meta: "Platform for video generation and control",
       kind: "link",
       actionLabel: "Перейти",
       href: "https://higgsfield.ai/",
     },
     {
       title: "Current AI tools 2026",
-      meta: "A course pack with current AI services and tools",
+      meta: "Current AI services and tools list",
       kind: "link",
       actionLabel: "Скачать",
       href: currentAiTools2026Url,
@@ -147,7 +147,7 @@ function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
       ru: "Закрытый урок курса. Видео хранится в Kinescope и открывается через серверный course-entitlement gate.",
       en: "Private course lesson. Video is hosted on Kinescope and opened through the server-side course entitlement gate.",
     },
-    filters: ["Standalone", "Prompt packs"],
+    filters: ["Standalone", "Course"],
     topics: config.topics,
     whatYouWillLearn: config.whatYouWillLearn,
     updatedNote: {
@@ -184,8 +184,8 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
       en: "Why the course uses ChatGPT, Claude, and other language models. You will learn to write prompts as clear briefs, split tasks into separate chats, and use a simple request formula.",
     },
     category: "ai-video",
-    duration: "07:38",
-    durationIso: "PT7M38S",
+    duration: "11:26",
+    durationIso: "PT11M26S",
     topics: {
       ru: ["LLM", "Промптинг", "ChatGPT", "Claude", "Opten"],
       en: ["LLM", "Prompting", "ChatGPT", "Claude", "Opten"],
@@ -196,24 +196,26 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
     },
     timestamps: {
       ru: timestamps([
-        ["00:00", "ChatGPT и Claude"],
-        ["00:45", "Что такое промпт"],
-        ["01:30", "Голосовой ввод"],
-        ["02:15", "Ошибка новичков"],
-        ["03:05", "Отдельные чаты"],
-        ["04:10", "Память и контекст"],
-        ["05:10", "Формула промпта"],
-        ["06:20", "Opten и скиллы"],
+        ["00:00", "План курса и нейросети"],
+        ["00:52", "Что такое промпт"],
+        ["01:45", "Контекст и отдельные чаты"],
+        ["03:10", "Формула промпта"],
+        ["04:15", "Opten для промптов"],
+        ["05:15", "Инструкции в ChatGPT и Claude"],
+        ["07:10", "Актуальные модели"],
+        ["08:35", "Syntx и тарифы"],
+        ["09:40", "Доступ и оплата сервисов"],
       ]),
       en: timestamps([
-        ["00:00", "ChatGPT and Claude"],
-        ["00:45", "What a prompt is"],
-        ["01:30", "Voice input"],
-        ["02:15", "Beginner mistake"],
-        ["03:05", "Separate chats"],
-        ["04:10", "Memory and context"],
-        ["05:10", "Prompt formula"],
-        ["06:20", "Opten and skills"],
+        ["00:00", "Course plan and AI models"],
+        ["00:52", "What a prompt is"],
+        ["01:45", "Context and separate chats"],
+        ["03:10", "Prompt formula"],
+        ["04:15", "Opten for prompts"],
+        ["05:15", "Instructions in ChatGPT and Claude"],
+        ["07:10", "Current models"],
+        ["08:35", "Syntx and plans"],
+        ["09:40", "Access and payments"],
       ]),
     },
   },
@@ -262,14 +264,14 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-3-logo-generation",
     videoId: "947a68e0-b570-4a9d-ad0c-ee55cc86b440",
-    title: { ru: "Растр, вектор и логотип NOVA", en: "Raster, vector, and the NOVA logo" },
+    title: { ru: "Создание логотипа", en: "Logo creation" },
     description: {
       ru: "Вы узнаете, чем растровая картинка отличается от векторного логотипа. Сделаете логотип NOVA через Recraft, скачаете SVG и поймёте, как потом править его в Figma.",
       en: "How raster images differ from vector logos. You will create a NOVA logo in Recraft, export SVG, and understand how to edit it in Figma.",
     },
     category: "ai-image",
-    duration: "04:55",
-    durationIso: "PT4M55S",
+    duration: "08:03",
+    durationIso: "PT8M3S",
     topics: {
       ru: ["Логотип", "Вектор", "Recraft", "Figma"],
       en: ["Logo", "Vector", "Recraft", "Figma"],
@@ -280,29 +282,33 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
     },
     timestamps: {
       ru: timestamps([
-        ["00:00", "Зачем вектор"],
-        ["00:50", "PNG, JPG и SVG"],
-        ["01:40", "Ищем референс"],
-        ["02:25", "Промпт для Recraft"],
-        ["03:05", "Векторный режим"],
-        ["03:55", "Скачиваем SVG"],
-        ["04:25", "Правим в Figma"],
+        ["00:00", "Растр и вектор"],
+        ["00:48", "Идеи и референсы"],
+        ["01:35", "Промпт для Recraft"],
+        ["02:20", "Генерация логотипа"],
+        ["03:05", "SVG в Figma"],
+        ["03:50", "Растровые варианты"],
+        ["04:35", "Векторизация через Quiver"],
+        ["05:20", "Recraft напрямую"],
+        ["06:05", "Экспорт логотипа"],
       ]),
       en: timestamps([
-        ["00:00", "Why vector matters"],
-        ["00:50", "PNG, JPG, and SVG"],
-        ["01:40", "Finding a reference"],
-        ["02:25", "Prompt for Recraft"],
-        ["03:05", "Vector mode"],
-        ["03:55", "Downloading SVG"],
-        ["04:25", "Editing in Figma"],
+        ["00:00", "Raster and vector"],
+        ["00:48", "Ideas and references"],
+        ["01:35", "Prompt for Recraft"],
+        ["02:20", "Logo generation"],
+        ["03:05", "SVG in Figma"],
+        ["03:50", "Raster variants"],
+        ["04:35", "Vectorizing with Quiver"],
+        ["05:20", "Recraft directly"],
+        ["06:05", "Logo export"],
       ]),
     },
   },
   {
     slug: "lesson-4-photo-generation",
     videoId: "1fe7af11-23e5-46cf-bedf-e6bb41c2d3b3",
-    title: { ru: "Картинки: форматы, модели и первая генерация", en: "Images: formats, models, and first generation" },
+    title: { ru: "Генерация изображений", en: "Image generation" },
     description: {
       ru: "Вы узнаете, какую модель брать под разные задачи с картинками. Сделаете первый кадр для NOVA и поймёте, почему сначала лучше запускать дешёвый тест, а не сразу дорогой рендер.",
       en: "Which model to choose for different image tasks. You will create the first NOVA frame and learn why a cheap test should come before an expensive render.",
@@ -342,7 +348,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-5-references",
     videoId: "02bcf12a-ab7c-49d4-96cb-441fafb898b9",
-    title: { ru: "Референсы: как удерживать внешность, стиль и текст", en: "References: keeping identity, style, and text" },
+    title: { ru: "Работа с референсами", en: "Working with references" },
     description: {
       ru: "Вы научитесь использовать референсы так, чтобы картинки не выглядели случайными. Разберёте, как отдельно удерживать внешность, стиль, логотип и композицию.",
       en: "How to use references so generated images do not feel random. You will separate identity, style, logo, and composition control.",
@@ -386,14 +392,14 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-6-image-editing",
     videoId: "a6294ef7-c6e6-4744-8b2e-60967fa7bfd7",
-    title: { ru: "Редактирование фото: как не убить качество", en: "Photo editing without killing quality" },
+    title: { ru: "ИИ редактирование фото", en: "AI photo editing" },
     description: {
       ru: "Вы узнаете, почему картинка портится после множества правок. Научитесь аккуратно удалять лишние детали, работать с маской и сохранять качество исходного изображения.",
       en: "Why images degrade after too many edits. You will learn to remove unwanted details, work with masks, and preserve the source quality.",
     },
     category: "ai-image",
-    duration: "06:40",
-    durationIso: "PT6M40S",
+    duration: "08:53",
+    durationIso: "PT8M53S",
     topics: {
       ru: ["Редактирование", "Маски", "Photoshop", "Качество"],
       en: ["Editing", "Masks", "Photoshop", "Quality"],
@@ -404,29 +410,35 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
     },
     timestamps: {
       ru: timestamps([
-        ["00:00", "Почему появляется мыло"],
-        ["00:55", "Точечная правка"],
-        ["01:45", "Убираем лишнее"],
-        ["02:40", "Маска"],
-        ["03:45", "Правка в Photoshop"],
-        ["05:10", "Сохраняем качество"],
-        ["06:05", "Когда генерировать заново"],
+        ["00:00", "Деградация качества"],
+        ["00:55", "Потеря деталей"],
+        ["01:40", "Быстрые правки в Syntx"],
+        ["02:25", "Побочные эффекты правок"],
+        ["03:05", "Двойная генерация"],
+        ["04:10", "Маски в Photoshop"],
+        ["05:25", "Сохраняем оригинал"],
+        ["06:35", "Проверка артефактов"],
+        ["07:10", "Photopea"],
+        ["08:00", "Кисти и горячие клавиши"],
       ]),
       en: timestamps([
-        ["00:00", "Why blur appears"],
-        ["00:55", "Precise edit"],
-        ["01:45", "Removing extras"],
-        ["02:40", "Mask"],
-        ["03:45", "Photoshop edit"],
-        ["05:10", "Preserving quality"],
-        ["06:05", "When to regenerate"],
+        ["00:00", "Quality degradation"],
+        ["00:55", "Detail loss"],
+        ["01:40", "Quick edits in Syntx"],
+        ["02:25", "Edit side effects"],
+        ["03:05", "Double generation"],
+        ["04:10", "Masks in Photoshop"],
+        ["05:25", "Keeping the original"],
+        ["06:35", "Artifact check"],
+        ["07:10", "Photopea"],
+        ["08:00", "Brushes and hotkeys"],
       ]),
     },
   },
   {
     slug: "lesson-7-ai-video",
     videoId: "18f00246-366f-4f43-a67a-a1b3ead807c0",
-    title: { ru: "Все форматы видео и первая генерация", en: "All video formats and first generation" },
+    title: { ru: "Генерация видео", en: "Video generation" },
     description: {
       ru: "Вы разберётесь, почему видео стоит дороже картинок и как не тратить кредиты впустую. Научитесь запускать видео из текста, из картинки и сделаете простой вертикальный ролик.",
       en: "Why video costs more than images and how not to waste credits. You will run text-to-video, image-to-video, and build a simple vertical clip.",
@@ -468,7 +480,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-8-frames",
     videoId: "43d3328a-dc4d-4e60-a269-aa1eebf7e2b4",
-    title: { ru: "Keyframes: первый и последний кадр в AI-видео", en: "Keyframes: first and last frame in AI video" },
+    title: { ru: "Режим ключевых кадров", en: "Keyframe mode" },
     description: {
       ru: "Вы научитесь задавать первый и последний кадр видео. Это поможет контролировать движение и получать понятный переход, а не случайную анимацию.",
       en: "How to set the first and last frame of a video. This gives better motion control and a clear transition instead of random animation.",
@@ -508,7 +520,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-9-storytelling",
     videoId: "6f742d8c-cf18-4b9d-97b7-b3e6f63aa696",
-    title: { ru: "Мультишот: сюжет из нескольких сцен в Kling и Seedance", en: "Multishot story in Kling and Seedance" },
+    title: { ru: "Режим мультишот", en: "Multishot mode" },
     description: {
       ru: "Вы научитесь собирать ролик из нескольких сцен. Разберёте, как придумать структуру, сделать раскадровку и не выбрасывать всю генерацию из-за одного плохого фрагмента.",
       en: "How to build a video from several scenes. You will plan structure, storyboard the idea, and avoid throwing away a whole generation because of one weak fragment.",
@@ -550,17 +562,17 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-10-prompt-library",
     videoId: "3675dfeb-55da-47c3-aac8-35b0556dbd84",
-    title: { ru: "Замена фона и объектов в видео через Bible Switch X", en: "Replacing backgrounds and objects in video with Bible Switch X" },
+    title: { ru: "ИИ редактирование видео", en: "AI video editing" },
     description: {
-      ru: "Вы научитесь менять фон или одежду в уже готовом видео. Разберёте, как подготовить первый кадр, где ставить маску и какие ограничения есть у такой правки.",
-      en: "How to change a background or clothing in an existing video. You will prepare the first frame, place masks, and understand the limits of this kind of edit.",
+      ru: "Вы научитесь менять фон и одежду в уже готовом видео. Разберёте исходник, первый кадр, финальный результат и ограничения такой AI-правки.",
+      en: "How to change a background and clothing in an existing video. You will review the source clip, first frame, final result, and limits of this AI edit.",
     },
     category: "ai-video",
     duration: "05:05",
     durationIso: "PT5M5S",
     topics: {
-      ru: ["Bible Switch X", "Видео", "Маска", "Фон"],
-      en: ["Bible Switch X", "Video", "Mask", "Background"],
+      ru: ["ИИ-правка", "Видео", "Фон", "Одежда"],
+      en: ["AI editing", "Video", "Background", "Clothing"],
     },
     whatYouWillLearn: {
       ru: ["Подготовить первый кадр", "Поставить маску", "Понять ограничения модели"],
@@ -590,7 +602,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-11-ai-avatars",
     videoId: "602d64ae-48ab-4730-a4fc-81b4d9677c14",
-    title: { ru: "AI-аватары: lipsync и говорящая картинка", en: "AI avatars: lip sync and talking image" },
+    title: { ru: "Создание AI-аватаров", en: "Creating AI avatars" },
     description: {
       ru: "Вы научитесь делать говорящего аватара из картинки и аудио. Разберёте, как подготовить персонажа, записать голос и синхронизировать губы с озвучкой.",
       en: "How to make a talking avatar from an image and audio. You will prepare a character, record a voice, and sync the lips to narration.",
@@ -632,21 +644,21 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-12-motion-control",
     videoId: "d01c3455-92fe-4ffa-b878-d367211cfb5a",
-    title: { ru: "AI-аватары: motion control и движение по референсу", en: "AI avatars: motion control and reference movement" },
+    title: { ru: "Генерация озвучки", en: "Voiceover generation" },
     description: {
-      ru: "Вы научитесь переносить движение с референса на AI-персонажа. Разберёте первый кадр, позу, голос, результат в Kling и монтаж финального ролика.",
-      en: "How to transfer motion from a reference to an AI character. You will work with the first frame, pose, voice, Kling result, and final edit.",
+      ru: "Вы подготовите озвучку, замените внешность по референсу и соберёте финальный ролик в CapCut. Урок связывает голос, персонажа, первый кадр и motion control.",
+      en: "You will prepare voiceover, replace appearance using a reference, and assemble the final clip in CapCut. The lesson connects voice, character, first frame, and motion control.",
     },
     category: "ai-video",
     duration: "09:08",
     durationIso: "PT9M8S",
     topics: {
-      ru: ["Motion Control", "Kling", "CapCut", "Референсы"],
-      en: ["Motion Control", "Kling", "CapCut", "References"],
+      ru: ["Озвучка", "ElevenLabs", "CapCut", "Motion Control"],
+      en: ["Voiceover", "ElevenLabs", "CapCut", "Motion Control"],
     },
     whatYouWillLearn: {
-      ru: ["Подбирать референс движения", "Сохранять позу", "Собирать результат в монтаже"],
-      en: ["Pick a motion reference", "Preserve the pose", "Assemble the final edit"],
+      ru: ["Подготовить озвучку", "Заменить внешность по референсу", "Собрать результат в монтаже"],
+      en: ["Prepare voiceover", "Replace appearance from a reference", "Assemble the final edit"],
     },
     timestamps: {
       ru: timestamps([
@@ -718,7 +730,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-14-codex",
     videoId: "7a62c38c-b75d-4777-8ee8-74c81eda7a18",
-    title: { ru: "Codex: настройки для автоматизации контента", en: "Codex settings for content automation" },
+    title: { ru: "Настройка Codex", en: "Codex setup" },
     description: {
       ru: "Вы настроите Codex как рабочее окружение для проекта, а не просто чат. Разберёте папку проекта, доступ к файлам, модель, режимы, AGENTS.md, MCP и подключение Opten.",
       en: "Set up Codex as a project workspace, not just a chat. You will cover the project folder, file access, model, modes, AGENTS.md, MCP, and Opten connection.",
@@ -766,7 +778,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-15-higgsfield-mcp",
     videoId: "54757622-4f97-4d8f-a97e-1f95ac2561f1",
-    title: { ru: "Повторяем видео-референс через Higgsfield MCP", en: "Repeating a video reference with Higgsfield MCP" },
+    title: { ru: "Автоматизация контента", en: "Content automation" },
     description: {
       ru: "Вы научитесь разбирать чужой видео-референс и превращать его в понятное ТЗ для генерации. На примере первого кадра и Seedance проверите, насколько близко получается повторить механику ролика.",
       en: "How to analyze a video reference and turn it into a clear generation brief. You will use a first frame and Seedance to test how closely the motion can be repeated.",
@@ -806,7 +818,7 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
     slug: "lesson-16-nova-website",
     videoId: "34992868-3dc1-416c-8438-d25ced15833a",
-    title: { ru: "Создаём сайт для NOVA через ChatGPT и Codex", en: "Building a NOVA website with ChatGPT and Codex" },
+    title: { ru: "Вайб-кодинг сайта", en: "Vibe-coding a website" },
     description: {
       ru: "Вы соберёте структуру лендинга, подготовите ассеты NOVA и превратите ТЗ в сайт через Codex. В уроке есть локальный запуск, проверка в браузере, мобильная версия, Vercel-деплой и подключение домена.",
       en: "You will structure a landing page, prepare NOVA assets, and turn a brief into a website through Codex. The lesson covers local run, browser checks, mobile layout, Vercel deploy, and domain connection.",

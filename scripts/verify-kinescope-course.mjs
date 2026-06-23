@@ -55,20 +55,20 @@ const expectedKinescopeLessons = [
 const expectedPrivateCourseRuTitles = [
   "Работа с ChatGPT и Claude",
   "Обзор Syntx и Higgsfield",
-  "Растр, вектор и логотип NOVA",
-  "Картинки: форматы, модели и первая генерация",
-  "Референсы: как удерживать внешность, стиль и текст",
-  "Редактирование фото: как не убить качество",
-  "Все форматы видео и первая генерация",
-  "Keyframes: первый и последний кадр в AI-видео",
-  "Мультишот: сюжет из нескольких сцен в Kling и Seedance",
-  "Замена фона и объектов в видео через Bible Switch X",
-  "AI-аватары: lipsync и говорящая картинка",
-  "AI-аватары: motion control и движение по референсу",
+  "Создание логотипа",
+  "Генерация изображений",
+  "Работа с референсами",
+  "ИИ редактирование фото",
+  "Генерация видео",
+  "Режим ключевых кадров",
+  "Режим мультишот",
+  "ИИ редактирование видео",
+  "Создание AI-аватаров",
+  "Генерация озвучки",
   "Апскейл фото и видео",
-  "Codex: настройки для автоматизации контента",
-  "Повторяем видео-референс через Higgsfield MCP",
-  "Создаём сайт для NOVA через ChatGPT и Codex",
+  "Настройка Codex",
+  "Автоматизация контента",
+  "Вайб-кодинг сайта",
 ];
 
 assert.match(content, /e941e14d-c5bf-40fc-abe5-a41e247777cf/, "Private course must use the uploaded Kinescope video id");
@@ -105,19 +105,19 @@ assert.ok(lessonFourExtrasStart >= 0 && lessonFiveExtrasStart > lessonFourExtras
 const lessonFourExtras = extrasContent.slice(lessonFourExtrasStart, lessonFiveExtrasStart);
 assert.match(extrasContent, /const requiredCourseMaterials = \[links\.syntx, links\.optenPromptImprover, optenSkill\]/, "Every lesson must start with Syntx, Opten ChatGPT prompt generator, and Claude skill");
 assert.match(extrasContent, /ru:\s*withRequiredCourseMaterials\(extras\.materials\.ru\)/, "Private course extras must apply the shared required material prefix to every lesson");
-assert.match(extrasContent, /const optenSkill:[\s\S]*Opten скилл для генерации промптов \(Claude\)/, "Shared course materials must define the Claude skill archive");
-assert.match(extrasContent, /Opten генератор промптов \(ChatGPT\)/, "ChatGPT prompt generator material must use the current RU title");
-assert.match(content, /title:\s*"Opten генератор промптов \(ChatGPT\)"/, "Shared ChatGPT prompt generator fallback must use the current RU title");
-assert.match(content, /title:\s*"Syntx"[\s\S]*title:\s*"Opten генератор промптов \(ChatGPT\)"[\s\S]*title:\s*"Opten скилл для генерации промптов \(Claude\)"/, "Shared course material fallback must use Syntx, Opten ChatGPT prompt generator, then Claude skill");
-assert.doesNotMatch(`${content}\n${extrasContent}`, /Генератор промптов в ChatGPT|Opten Prompt Improver"/, "Private course materials must not use old ChatGPT prompt generator titles");
+assert.match(extrasContent, /const optenSkill:[\s\S]*Opten \(Claude и Codex\)/, "Shared course materials must define the Claude/Codex skill archive");
+assert.match(extrasContent, /Opten \(ChatGPT\)/, "ChatGPT prompt generator material must use the current RU title");
+assert.match(content, /title:\s*"Opten \(ChatGPT\)"/, "Shared ChatGPT prompt generator fallback must use the current RU title");
+assert.match(content, /title:\s*"Syntx"[\s\S]*title:\s*"Opten \(ChatGPT\)"[\s\S]*title:\s*"Opten \(Claude и Codex\)"/, "Shared course material fallback must use Syntx, Opten ChatGPT prompt generator, then Claude/Codex skill");
+assert.doesNotMatch(`${content}\n${extrasContent}`, /Генератор промптов в ChatGPT|Opten Prompt Improver"|Opten генератор промптов/, "Private course materials must not use old ChatGPT prompt generator titles");
 assert.match(extrasContent, /optenPromptImprover:[\s\S]*"Перейти"/, "Prompt improver material button must say Перейти");
 const invalidMaterialActionLabels = [...`${content}\n${extrasContent}`.matchAll(/actionLabel:\s*"([^"]+)"/g)]
   .map((match) => match[1])
   .filter((label) => label !== "Перейти" && label !== "Скачать");
 assert.deepEqual(invalidMaterialActionLabels, [], "Private course material action labels must only be Перейти or Скачать");
-assert.match(extrasContent, /const actionLabel = kind === "link" \? "Перейти" : "Скачать";/, "Pending course material action labels must resolve only to Перейти or Скачать");
-assert.match(extrasContent, /Opten скилл для генерации промптов \(Claude\)/, "Course materials must label the Claude skill archive in RU");
-assert.match(extrasContent, /ZIP-архив Claude Skill для генерации промптов/, "Course Claude skill material must show user-facing download copy");
+assert.doesNotMatch(extrasContent, /function pending|promptPending|missing\(/, "Private course extras must not expose pending lesson placeholders");
+assert.match(extrasContent, /Opten \(Claude и Codex\)/, "Course materials must label the Claude/Codex skill archive in RU");
+assert.match(extrasContent, /Скилл для генерации промптов в Claude и Codex/, "Course Claude/Codex skill material must show user-facing download copy");
 assert.doesNotMatch(lessonOneExtras, /Скилл для загрузки на рабочем столе\./, "Lesson 1 Claude skill material must not expose internal desktop note");
 assert.doesNotMatch(extrasContent, /Скилл для загрузки на рабочем столе\./, "Private course extras must not expose internal desktop notes");
 assert.match(extrasContent, /actionLabel:\s*"Скачать"/, "Course Claude skill material button must say Скачать");
