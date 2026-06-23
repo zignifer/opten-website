@@ -12,7 +12,8 @@ function link(title: string, meta: string, href: string, actionLabel = "Пере
   return { title, meta, kind: "link", actionLabel, href };
 }
 
-function pending(title: string, meta: string, actionLabel = "Нужно добавить", kind: LearnMaterial["kind"] = "link"): LearnMaterial {
+function pending(title: string, meta: string, _actionLabel = "Перейти", kind: LearnMaterial["kind"] = "link"): LearnMaterial {
+  const actionLabel = kind === "link" ? "Перейти" : "Скачать";
   return { title, meta, kind, actionLabel, href: PENDING_HREF, status: "pending" };
 }
 
@@ -33,7 +34,7 @@ const links = {
     "Opten генератор промптов (ChatGPT)",
     "GPT для генерации промптов под изображения",
     "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
-    "Открыть",
+    "Перейти",
   ),
   syntx: link("Syntx", "Платформа для запуска AI-моделей, изображений и видео", "https://syntx.ai/welcome/GlUETIt6"),
   higgsfield: link("Higgsfield", "AI-видео, камера, motion и MCP-интеграция", "https://higgsfield.ai/"),
@@ -79,7 +80,18 @@ function withRequiredCourseMaterials(materials: LearnMaterial[] | undefined) {
 const privateCourseLessonExtras: Record<string, LessonExtras> = {
   "lesson-1-prompting": {
     materials: {
-      ru: [],
+      ru: [
+        link(
+          "VPN который рекомендую",
+          "Рекомендованный VPN для доступа к зарубежным сервисам",
+          "https://sotavpn.app/?utm_source=f37531d3-c013-45cc-858c-9e1690fa3d43",
+        ),
+        link(
+          "Сервис для оплаты зарубежных сервисов",
+          "Telegram-бот для оплаты зарубежных сервисов",
+          "https://t.me/zarub_robot?start=ref_xAulfY",
+        ),
+      ],
     },
     prompts: {
       ru: [
@@ -92,7 +104,6 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
       ru: [
         links.syntx,
         links.higgsfield,
-        pending("Шпаргалка по Syntx", "Разделы интерфейса, кредиты, история генераций, как не потерять prompt", "Оформить", "pdf"),
       ],
     },
   },
@@ -103,7 +114,7 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
         links.higgsfield,
         link("Pinterest-референс логотипа", "Референс логотипа из урока", "https://ru.pinterest.com/pin/440789882308217256/"),
         link("Quiver", "AI-инструмент для работы с визуалом", "https://quiver.ai/"),
-        link("Ролик про Quiver", "Instagram-видео с примером Quiver", "https://www.instagram.com/p/DVQyhkXDSSk/", "Смотреть"),
+        link("Ролик про Quiver", "Instagram-видео с примером Quiver", "https://www.instagram.com/p/DVQyhkXDSSk/", "Перейти"),
       ],
     },
     prompts: {
@@ -143,7 +154,7 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
     materials: {
       ru: [
         links.syntx,
-        link("Pinterest-референсы", "Брендовые референсы NOVA из 5 урока", "https://ru.pinterest.com/pin/863354191108943126/", "Открыть"),
+        link("Pinterest-референсы", "Брендовые референсы NOVA из 5 урока", "https://ru.pinterest.com/pin/863354191108943126/", "Перейти"),
         characterReferenceSheet,
       ],
     },

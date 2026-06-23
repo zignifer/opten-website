@@ -981,7 +981,7 @@ function LessonMaterials({ materials, locked, purchase }: LessonMaterialsProps) 
           const staticAsset = material.href.startsWith("/assets/");
           const pending = material.status === "pending";
           const disabled = locked || pending;
-          const actionLabel = pending ? copy.materialPendingAction : material.actionLabel;
+          const actionLabel = getMaterialActionLabel(material);
           const rowClass =
             `grid grid-cols-[34px_minmax(0,1fr)_154px] items-center gap-[12px] border-b border-white/8 px-[16px] py-[10px] last:border-b-0 max-sm:grid-cols-[32px_minmax(0,1fr)] ${
               canCollapseOnMobile && !expanded && index > 0 ? "max-md:hidden" : ""
@@ -1230,6 +1230,13 @@ function materialIcon(kind: LearnMaterial["kind"]) {
   if (kind === "pdf") return FileText;
   if (kind === "video") return Video;
   return LinkIcon;
+}
+
+function getMaterialActionLabel(material: LearnMaterial) {
+  if (material.kind === "pdf" || material.kind === "video" || material.href.startsWith("/assets/") || material.href.endsWith(".zip")) {
+    return "Скачать";
+  }
+  return "Перейти";
 }
 
 type CollectionSummaryCardProps = {

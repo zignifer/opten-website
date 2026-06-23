@@ -94,10 +94,13 @@ assert.doesNotMatch(content, /ru:\s*"Урок \d+:/, "Private course RU lesson t
 assert.match(content, /chatgpt\.com\/g\/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator/, "Lesson materials must link the ChatGPT prompt generator");
 const lessonOneExtrasStart = extrasContent.indexOf('"lesson-1-prompting"');
 const lessonTwoExtrasStart = extrasContent.indexOf('"lesson-2-ai-services"', lessonOneExtrasStart);
+const lessonThreeExtrasStart = extrasContent.indexOf('"lesson-3-logo-generation"', lessonTwoExtrasStart);
 const lessonFourExtrasStart = extrasContent.indexOf('"lesson-4-photo-generation"');
 const lessonFiveExtrasStart = extrasContent.indexOf('"lesson-5-references"', lessonFourExtrasStart);
 assert.ok(lessonOneExtrasStart >= 0 && lessonTwoExtrasStart > lessonOneExtrasStart, "Private course extras must include lesson 1 and lesson 2 blocks");
 const lessonOneExtras = extrasContent.slice(lessonOneExtrasStart, lessonTwoExtrasStart);
+assert.ok(lessonThreeExtrasStart > lessonTwoExtrasStart, "Private course extras must include lesson 3 after lesson 2");
+const lessonTwoExtras = extrasContent.slice(lessonTwoExtrasStart, lessonThreeExtrasStart);
 assert.ok(lessonFourExtrasStart >= 0 && lessonFiveExtrasStart > lessonFourExtrasStart, "Private course extras must include lesson 4 and lesson 5 blocks");
 const lessonFourExtras = extrasContent.slice(lessonFourExtrasStart, lessonFiveExtrasStart);
 assert.match(extrasContent, /const requiredCourseMaterials = \[links\.syntx, links\.optenPromptImprover, optenSkill\]/, "Every lesson must start with Syntx, Opten ChatGPT prompt generator, and Claude skill");
@@ -107,7 +110,12 @@ assert.match(extrasContent, /Opten генератор промптов \(ChatGPT
 assert.match(content, /title:\s*"Opten генератор промптов \(ChatGPT\)"/, "Shared ChatGPT prompt generator fallback must use the current RU title");
 assert.match(content, /title:\s*"Syntx"[\s\S]*title:\s*"Opten генератор промптов \(ChatGPT\)"[\s\S]*title:\s*"Opten скилл для генерации промптов \(Claude\)"/, "Shared course material fallback must use Syntx, Opten ChatGPT prompt generator, then Claude skill");
 assert.doesNotMatch(`${content}\n${extrasContent}`, /Генератор промптов в ChatGPT|Opten Prompt Improver"/, "Private course materials must not use old ChatGPT prompt generator titles");
-assert.match(extrasContent, /optenPromptImprover:[\s\S]*"Открыть"/, "Prompt improver material button must say Открыть");
+assert.match(extrasContent, /optenPromptImprover:[\s\S]*"Перейти"/, "Prompt improver material button must say Перейти");
+const invalidMaterialActionLabels = [...`${content}\n${extrasContent}`.matchAll(/actionLabel:\s*"([^"]+)"/g)]
+  .map((match) => match[1])
+  .filter((label) => label !== "Перейти" && label !== "Скачать");
+assert.deepEqual(invalidMaterialActionLabels, [], "Private course material action labels must only be Перейти or Скачать");
+assert.match(extrasContent, /const actionLabel = kind === "link" \? "Перейти" : "Скачать";/, "Pending course material action labels must resolve only to Перейти or Скачать");
 assert.match(extrasContent, /Opten скилл для генерации промптов \(Claude\)/, "Course materials must label the Claude skill archive in RU");
 assert.match(extrasContent, /ZIP-архив Claude Skill для генерации промптов/, "Course Claude skill material must show user-facing download copy");
 assert.doesNotMatch(lessonOneExtras, /Скилл для загрузки на рабочем столе\./, "Lesson 1 Claude skill material must not expose internal desktop note");
@@ -128,6 +136,9 @@ assert.ok(statSync(join(root, lessonFourResultAsset)).size > 0, "Lesson 4 Cofe1 
 assert.doesNotMatch(extrasContent, /links\.opten\b|opten:\s*link\("Opten"/, "Private course materials must not include the generic Opten site link");
 assert.doesNotMatch(extrasContent, /chatgpt:\s*link\("ChatGPT"|claude:\s*link\("Claude"/, "Private course materials must not include generic ChatGPT or Claude links");
 assert.doesNotMatch(lessonOneExtras, /Шпаргалка: формула промпта/, "Lesson 1 materials must not include the obsolete prompt formula cheat sheet");
+assert.match(lessonOneExtras, /VPN который рекомендую[\s\S]*https:\/\/sotavpn\.app\/\?utm_source=f37531d3-c013-45cc-858c-9e1690fa3d43/, "Lesson 1 materials must include the recommended VPN link");
+assert.match(lessonOneExtras, /Сервис для оплаты зарубежных сервисов[\s\S]*https:\/\/t\.me\/zarub_robot\?start=ref_xAulfY/, "Lesson 1 materials must include the foreign services payment link");
+assert.doesNotMatch(lessonTwoExtras, /Шпаргалка по Syntx/, "Lesson 2 materials must not include the Syntx cheat sheet");
 assert.match(lessonOneExtras, /l1-nova-formula-image/, "Lesson 1 prompts must expose the single NOVA formula example");
 assert.doesNotMatch(lessonOneExtras, /l1-business-name|l1-opten-image-prompt|l1-skill-explanation/, "Lesson 1 prompts must not expose obsolete prompt examples");
 assert.match(promptBodiesContent, /l1-nova-formula-image/, "Course prompt API must serve the lesson 1 NOVA formula prompt");
@@ -151,7 +162,8 @@ assert.match(learn, /provider:\s*"youtube"\s*\|\s*"local"\s*\|\s*"kinescope"/, "
 assert.match(learn, /course-entitlement-gated-preview/, "Learn playback policy type must include course entitlement gating");
 
 const components = read("src/app/components/space/learn/LearnComponents.tsx");
-assert.match(components, /const actionLabel = pending \? copy\.materialPendingAction : material\.actionLabel;/, "Course material buttons must use each material action label");
+assert.match(components, /const actionLabel = getMaterialActionLabel\(material\);/, "Course material buttons must normalize labels to Перейти or Скачать");
+assert.doesNotMatch(components, /pending \? copy\.materialPendingAction : material\.actionLabel/, "Pending course material buttons must not use a third label");
 assert.doesNotMatch(components, /purchase \? copy\.paidCourseBadge : material\.actionLabel/, "Course material buttons must not replace actions with a generic course badge");
 assert.match(components, /const staticAsset = material\.href\.startsWith\("\/assets\/"\);/, "Static asset materials must bypass SPA routing");
 assert.match(components, /download=\{staticAsset \|\| material\.href\.endsWith\("\.zip"\) \? "" : undefined\}/, "Static course materials must set the browser download attribute");
