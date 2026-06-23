@@ -30,6 +30,9 @@ const extrasContent = read("src/content/space/privateCourseExtras.ts");
 const promptBodiesContent = read("api/_shared/coursePromptBodies.ts");
 const serverCourseContent = read("api/_shared/kinescopeCourse.ts");
 const lessonOneSkillAsset = "public/assets/space/courses/ai-content-marketing-2026/opten-skill.zip";
+const introVideoOneAsset = "public/assets/space/courses/ai-content-marketing-2026/intro/course-intro-video-1.mp4";
+const introVideoTwoAsset = "public/assets/space/courses/ai-content-marketing-2026/intro/course-intro-video-2.mp4";
+const introPhotoThreeAsset = "public/assets/space/courses/ai-content-marketing-2026/intro/course-intro-photo-3.png";
 const lessonFourCheatsheetAsset = "public/assets/space/courses/ai-content-marketing-2026/lesson-4-model-cheatsheet.pdf";
 const lessonFourResultAsset = "public/assets/space/courses/ai-content-marketing-2026/lesson-4-cofe1-result.jpg";
 
@@ -176,11 +179,19 @@ assert.match(components, /export function CourseIntroLayout/, "Private course ro
 assert.match(components, /function CourseIntroVideoPlaceholder/, "Private course intro must render a video placeholder");
 assert.match(components, /function CourseIntroShowcase/, "Private course intro must render a showcase section instead of lesson materials");
 assert.match(components, /currentSlug=\{currentSlug \?\? lesson\.slug\}/, "Course sidebar must support a course overview with no selected lesson");
+assert.match(components, /course-intro-video-1\.mp4/, "Private course intro bento must use video 1");
+assert.match(components, /course-intro-video-2\.mp4/, "Private course intro bento must use video 2");
+assert.match(components, /course-intro-photo-3\.png/, "Private course intro bento must use photo 3");
+assert.match(components, /autoPlay[\s\S]*loop[\s\S]*muted[\s\S]*playsInline/, "Private course intro bento videos must autoplay, loop, stay muted, and play inline");
 const courseIntroStart = components.indexOf("export function CourseIntroLayout");
 const courseIntroEnd = components.indexOf("type LessonPlayerProps", courseIntroStart);
 assert.ok(courseIntroStart >= 0 && courseIntroEnd > courseIntroStart, "Private course intro source block must be readable");
 const courseIntroSource = components.slice(courseIntroStart, courseIntroEnd);
-assert.doesNotMatch(courseIntroSource, /<LessonPlayer|<LessonMaterials|<LessonPrompts|<LessonMissingItems|<video\b|<iframe\b/, "Private course intro must not embed a real lesson video, materials, or prompts");
+assert.doesNotMatch(courseIntroSource, /<LessonPlayer|<LessonMaterials|<LessonPrompts|<LessonMissingItems|<iframe\b/, "Private course intro must not embed a gated lesson player, materials, prompts, or iframe");
+for (const assetPath of [introVideoOneAsset, introVideoTwoAsset, introPhotoThreeAsset]) {
+  assert.ok(existsSync(join(root, assetPath)), `Private course intro asset must exist: ${assetPath}`);
+  assert.ok(statSync(join(root, assetPath)).size > 0, `Private course intro asset must not be empty: ${assetPath}`);
+}
 assert.match(components, /const actionLabel = getMaterialActionLabel\(material\);/, "Course material buttons must normalize labels to Перейти or Скачать");
 assert.doesNotMatch(components, /pending \? copy\.materialPendingAction : material\.actionLabel/, "Pending course material buttons must not use a third label");
 assert.doesNotMatch(components, /purchase \? copy\.paidCourseBadge : material\.actionLabel/, "Course material buttons must not replace actions with a generic course badge");

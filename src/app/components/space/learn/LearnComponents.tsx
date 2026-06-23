@@ -541,7 +541,7 @@ function CourseIntroHeader({ intro }: { intro: PrivateCourseIntroContent }) {
   return (
     <section className="mt-[32px] max-w-[820px] max-md:mt-[28px]">
       <h1 className="text-[32px] font-bold leading-[1.12] tracking-[-0.01em] text-white max-md:text-[30px]">{intro.title[lang]}</h1>
-      <p className="mt-[18px] max-w-[760px] text-[16px] leading-[1.55] text-white/64 max-md:mt-[18px] max-md:text-[18px] max-md:leading-[1.5]">
+      <p className="mt-[18px] line-clamp-2 max-w-[760px] text-[16px] leading-[1.55] text-white/64 max-md:mt-[18px] max-md:text-[18px] max-md:leading-[1.5]">
         {intro.description[lang]}
       </p>
     </section>
@@ -550,56 +550,67 @@ function CourseIntroHeader({ intro }: { intro: PrivateCourseIntroContent }) {
 
 function CourseIntroShowcase({ intro }: { intro: PrivateCourseIntroContent }) {
   const { lang } = useLang();
-  const showcase = intro.showcase;
 
   return (
     <section className="mt-[28px] max-w-[820px] max-md:mt-[28px]" aria-labelledby="course-intro-showcase-title">
-      <div className="relative min-h-[680px] overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]/92 p-[24px] shadow-[0_24px_80px_rgba(0,0,0,0.18)] max-md:min-h-[560px] max-md:p-[18px]">
-        <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_22%_16%,rgba(156,251,81,0.16),transparent_28%),radial-gradient(circle_at_82%_38%,rgba(255,255,255,0.08),transparent_24%)]" />
-        <div className="relative grid gap-[18px] lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="flex min-h-[244px] flex-col justify-between rounded-[8px] border border-white/8 bg-[#081c1f]/88 p-[20px] max-md:min-h-[220px]">
-            <div>
-              <p className="text-[13px] font-bold uppercase leading-none tracking-[0.08em] text-[#9cfb51]">{showcase.eyebrow[lang]}</p>
-              <h2 id="course-intro-showcase-title" className="mt-[14px] text-[30px] font-bold leading-[1.05] text-white max-md:text-[26px]">
-                {showcase.title[lang]}
-              </h2>
-              <p className="mt-[12px] max-w-[420px] text-[15px] leading-[1.48] text-white/62 max-md:text-[16px]">{showcase.description[lang]}</p>
-            </div>
-            <div className="mt-[22px] flex flex-wrap gap-[8px]">
-              {showcase.tags[lang].map((tag) => (
-                <span key={tag} className="rounded-full border border-[#9cfb51]/22 bg-[#9cfb51]/8 px-[10px] py-[6px] text-[12px] font-bold leading-none text-[#9cfb51]">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid gap-[10px] sm:grid-cols-2 lg:grid-cols-1">
-            {showcase.items.map((item) => (
-              <article key={item.title[lang]} className="rounded-[8px] border border-white/8 bg-white/[0.045] p-[16px]">
-                <h3 className="text-[15px] font-bold leading-[1.25] text-white">{item.title[lang]}</h3>
-                <p className="mt-[8px] text-[13px] leading-[1.42] text-white/54">{item.description[lang]}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <div className="relative mt-[18px] grid gap-[12px] md:grid-cols-3">
-          {showcase.videoSlots.map((slot) => (
-            <article key={slot.title[lang]} className="min-h-[138px] rounded-[8px] border border-white/8 bg-[#03191c]/88 p-[14px]">
-              <div className="flex items-center justify-between gap-[12px]">
-                <span className="grid size-[34px] place-items-center rounded-full bg-[#9cfb51] text-[#011417]">
-                  <Play size={15} fill="currentColor" className="translate-x-[1px]" />
-                </span>
-                <Video size={17} className="text-white/34" />
-              </div>
-              <h3 className="mt-[24px] text-[15px] font-bold leading-tight text-white">{slot.title[lang]}</h3>
-              <p className="mt-[7px] text-[12px] leading-[1.4] text-white/50">{slot.description[lang]}</p>
-            </article>
-          ))}
+      <div className="border-t border-white/10 pt-[25px]">
+        <h2 id="course-intro-showcase-title" className="text-[24px] font-bold leading-[1.2] text-white max-md:text-[25px]">
+          {intro.showcase.eyebrow[lang]}
+        </h2>
+        <div className="mt-[25px] grid h-[548px] grid-cols-2 grid-rows-2 gap-[25px] max-md:h-auto max-md:grid-cols-1 max-md:grid-rows-none">
+          <CourseIntroMediaCard
+            className="row-span-2 max-md:row-span-1 max-md:h-[540px]"
+            videoSrc="/assets/space/courses/ai-content-marketing-2026/intro/course-intro-video-1.mp4"
+            label={lang === "ru" ? "Создавать и редактировать видео" : "Create and edit video"}
+          />
+          <CourseIntroMediaCard
+            className="max-md:aspect-[1.15/1]"
+            videoSrc="/assets/space/courses/ai-content-marketing-2026/intro/course-intro-video-2.mp4"
+            label={lang === "ru" ? "Фото и логотипы" : "Photos and logos"}
+          />
+          <CourseIntroMediaCard
+            className="max-md:aspect-[1.15/1]"
+            imageSrc="/assets/space/courses/ai-content-marketing-2026/intro/course-intro-photo-3.png"
+            imageAlt=""
+            label={lang === "ru" ? "Сайты и автоматизацию" : "Websites and automation"}
+          />
         </div>
       </div>
     </section>
+  );
+}
+
+type CourseIntroMediaCardProps = {
+  className?: string;
+  imageAlt?: string;
+  imageSrc?: string;
+  label: string;
+  videoSrc?: string;
+};
+
+function CourseIntroMediaCard({ className = "", imageAlt = "", imageSrc, label, videoSrc }: CourseIntroMediaCardProps) {
+  return (
+    <article className={`relative overflow-hidden rounded-[8px] bg-[#0e2023] shadow-[0_18px_54px_rgba(0,0,0,0.24)] ${className}`}>
+      {videoSrc ? (
+        <video
+          className="h-full w-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          aria-label={label}
+        >
+          <source src={videoSrc} type="video/mp4" />
+        </video>
+      ) : (
+        <img src={imageSrc} alt={imageAlt} loading="lazy" className="h-full w-full object-cover" />
+      )}
+      <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[46%] bg-[linear-gradient(180deg,rgba(1,20,23,0)_0%,rgba(1,20,23,0.68)_54%,rgba(1,20,23,0.92)_100%)]" />
+      <h3 className="absolute bottom-[25px] left-[25px] right-[25px] text-[20px] font-bold leading-[1.12] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.42)] max-md:text-[20px]">
+        {label}
+      </h3>
+    </article>
   );
 }
 
