@@ -55,6 +55,8 @@ import {
 } from "../../../../content/space/learn";
 
 const LEARN_PROGRESS_STORAGE_KEY = "opten_space_learn_progress_v1";
+const AI_CONTENT_MARKETING_COURSE_SLUG = "ai-content-marketing-2026";
+const COURSE_INTRO_SHOWCASE_HEADING_ID = "course-intro-showcase-title";
 
 type StoredLearnProgress = {
   completed: string[];
@@ -412,6 +414,13 @@ export function CourseIntroLayout({ collection, intro }: CourseIntroLayoutProps)
   const completedSlugs = useMemo(() => getCompletedLessonSlugs(collection, manualProgress), [collection, manualProgress]);
   const displayedCollection = useMemo(() => applyLessonProgress(collection, completedSlugs, ""), [collection, completedSlugs]);
   const sidebarLesson = displayedCollection.lessons[0];
+  const mobileTimestampsTabOverride =
+    purchase?.courseSlug === AI_CONTENT_MARKETING_COURSE_SLUG
+      ? {
+          label: intro.showcase.eyebrow[lang].replace(/:$/, ""),
+          targetId: COURSE_INTRO_SHOWCASE_HEADING_ID,
+        }
+      : undefined;
   const courseMobileContentsClass = "max-lg:contents";
   const courseMobileOrder = (order: 1 | 2 | 3 | 4 | 5) => {
     if (order === 1) return "max-lg:order-1";
@@ -462,6 +471,7 @@ export function CourseIntroLayout({ collection, intro }: CourseIntroLayoutProps)
                       hasAccess={lessonAccessGranted}
                       purchase={purchase}
                       currentSlug=""
+                      mobileTimestampsTabOverride={mobileTimestampsTabOverride}
                     />
                   </div>
                 </>
@@ -487,6 +497,7 @@ export function CourseIntroLayout({ collection, intro }: CourseIntroLayoutProps)
                       hasAccess={lessonAccessGranted}
                       purchase={purchase}
                       currentSlug=""
+                      mobileTimestampsTabOverride={mobileTimestampsTabOverride}
                     />
                   </div>
                 </>
@@ -503,6 +514,7 @@ export function CourseIntroLayout({ collection, intro }: CourseIntroLayoutProps)
                   hasAccess={lessonAccessGranted}
                   purchase={purchase}
                   currentSlug=""
+                  mobileTimestampsTabOverride={mobileTimestampsTabOverride}
                 />
                 <UnlockProCard hasPro={hasPro} />
               </>
@@ -552,9 +564,9 @@ function CourseIntroShowcase({ intro }: { intro: PrivateCourseIntroContent }) {
   const { lang } = useLang();
 
   return (
-    <section className="mt-[28px] max-w-[820px] max-md:mt-[28px]" aria-labelledby="course-intro-showcase-title">
+    <section className="mt-[28px] max-w-[820px] max-md:mt-[28px]" aria-labelledby={COURSE_INTRO_SHOWCASE_HEADING_ID}>
       <div className="border-t border-white/10 pt-[25px]">
-        <h2 id="course-intro-showcase-title" className="text-[24px] font-bold leading-[1.2] text-white max-md:text-[25px]">
+        <h2 id={COURSE_INTRO_SHOWCASE_HEADING_ID} className="scroll-mt-[88px] text-[24px] font-bold leading-[1.2] text-white max-md:text-[25px]">
           {intro.showcase.eyebrow[lang]}
         </h2>
         <div className="mt-[25px] grid h-[548px] grid-cols-2 grid-rows-2 gap-[25px] max-md:h-auto max-md:grid-cols-1 max-md:grid-rows-none">
@@ -1607,12 +1619,34 @@ type LessonSidebarProps = {
   hasAccess: boolean;
   purchase?: LearnCoursePurchase;
   currentSlug?: string;
+  mobileTimestampsTabOverride?: {
+    label: string;
+    targetId: string;
+  };
 };
 
-function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestampSelect, hasAccess, purchase, currentSlug }: LessonSidebarProps) {
+function LessonSidebar({
+  lesson,
+  collection,
+  activeTab,
+  onTabChange,
+  onTimestampSelect,
+  hasAccess,
+  purchase,
+  currentSlug,
+  mobileTimestampsTabOverride,
+}: LessonSidebarProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const isCourse = collection.kind === "course";
+  const handleTimestampsTabClick = () => {
+    if (mobileTimestampsTabOverride && typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches) {
+      document.getElementById(mobileTimestampsTabOverride.targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    onTabChange("timestamps");
+  };
 
   return (
     <section className="overflow-hidden rounded-[8px] border border-white/10 bg-[#0e2023]/92 max-md:rounded-[10px]">
@@ -1631,12 +1665,19 @@ function LessonSidebar({ lesson, collection, activeTab, onTabChange, onTimestamp
         )}
         <button
           type="button"
-          onClick={() => onTabChange("timestamps")}
+          onClick={handleTimestampsTabClick}
           className={`relative h-[52px] min-w-[116px] cursor-pointer border-0 bg-transparent px-[10px] text-[14px] font-bold transition ${
             activeTab === "timestamps" ? "text-white" : "text-white/58 hover:text-white"
           } max-md:h-[72px] max-md:min-w-[142px] max-md:text-[16px]`}
         >
-          {copy.timestampsTab}
+          {mobileTimestampsTabOverride ? (
+            <>
+              <span className="max-lg:hidden">{copy.timestampsTab}</span>
+              <span className="lg:hidden">{mobileTimestampsTabOverride.label}</span>
+            </>
+          ) : (
+            copy.timestampsTab
+          )}
           {activeTab === "timestamps" && <span className="absolute inset-x-[10px] bottom-0 h-[2px] rounded-full bg-[#9cfb51]" />}
         </button>
       </div>
