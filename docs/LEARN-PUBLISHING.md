@@ -147,7 +147,7 @@ separate one-time course purchase:
 
 - RUB base price `2 990 ₽`
 - public discounts are server-side promo codes, not hard-coded sale pricing
-- USD list price `$69`
+- USD list price `$41`
 - current USD checkout price is controlled by the Paddle price ID returned from
   `create-course-payment`
 - internal test promo `FREE`: `100 ₽` or `$1`

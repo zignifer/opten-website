@@ -8,7 +8,7 @@ export const PRIVATE_COURSE_FIRST_KINESCOPE_VIDEO_ID = "e941e14d-c5bf-40fc-abe5-
 export const PRIVATE_COURSE_PRICE_RUB = 2990;
 export const PRIVATE_COURSE_LIST_PRICE_RUB = 2990;
 export const PRIVATE_COURSE_PRICE_USD = 41;
-export const PRIVATE_COURSE_LIST_PRICE_USD = 69;
+export const PRIVATE_COURSE_LIST_PRICE_USD = 41;
 export const PRIVATE_COURSE_DISCOUNT_PERCENT = 0;
 export const PRIVATE_COURSE_SALE_ENDS_AT = "2026-06-30T23:59:59+05:00";
 
@@ -27,8 +27,8 @@ export const privateCourseIntroContent: PrivateCourseIntroContent = {
     en: "AI for Content and Marketing Course",
   },
   description: {
-    ru: "Практический курс: промпты, фото, логотипы, видео и сайт для бренда.",
-    en: "A hands-on course: prompts, photos, logos, video, and a brand website.",
+    ru: "На практике создадим с нуля бренд кофейни NOVA: промпты, фото, логотип и видео.\nЗатем соберём сайт и контент для рекламы, чтобы всё выглядело как одна система.",
+    en: "In practice, we build the NOVA coffee brand from scratch: prompts, photos, logo, and video.\nThen we assemble the website and ad content so the whole system feels consistent.",
   },
   videoAriaLabel: {
     ru: "Вводный ролик курса",

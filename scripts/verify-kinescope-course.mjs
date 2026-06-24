@@ -80,7 +80,7 @@ assert.match(content, /lesson-1-prompting/, "Private course must expose the firs
 assert.match(content, /PRIVATE_COURSE_PRICE_RUB\s*=\s*2990/, "Private course base RUB price must be 2 990");
 assert.match(content, /PRIVATE_COURSE_LIST_PRICE_RUB\s*=\s*2990/, "Private course list RUB price must stay 2 990");
 assert.match(content, /PRIVATE_COURSE_PRICE_USD\s*=\s*41/, "Private course sale price must be 41 USD");
-assert.match(content, /PRIVATE_COURSE_LIST_PRICE_USD\s*=\s*69/, "Private course list price must be 69 USD");
+assert.match(content, /PRIVATE_COURSE_LIST_PRICE_USD\s*=\s*41/, "Private course list price must be 41 USD");
 assert.match(content, /PRIVATE_COURSE_DISCOUNT_PERCENT\s*=\s*0/, "Private course must not hard-code a public discount; promo codes own discounting");
 assert.match(content, /PRIVATE_COURSE_SALE_ENDS_AT/, "Private course must define a sale countdown deadline");
 assert.match(content, /purchase:\s*{[\s\S]*priceRub:\s*PRIVATE_COURSE_PRICE_RUB[\s\S]*priceUsd:\s*PRIVATE_COURSE_PRICE_USD[\s\S]*discountPercent:\s*PRIVATE_COURSE_DISCOUNT_PERCENT/, "Private course collection must expose RUB and USD purchase metadata");
