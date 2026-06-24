@@ -566,13 +566,13 @@ function CourseIntroShowcase({ intro }: { intro: PrivateCourseIntroContent }) {
           <CourseIntroMediaCard
             className="max-md:aspect-[1.15/1]"
             videoSrc="/assets/space/courses/ai-content-marketing-2026/intro/course-intro-video-2.mp4"
-            label={lang === "ru" ? "Фото и логотипы" : "Photos and logos"}
+            label={lang === "ru" ? "Генерировать фото и логотипы" : "Generate photos and logos"}
           />
           <CourseIntroMediaCard
             className="max-md:aspect-[1.15/1]"
             imageSrc="/assets/space/courses/ai-content-marketing-2026/intro/course-intro-photo-3.png"
             imageAlt=""
-            label={lang === "ru" ? "Сайты и автоматизацию" : "Websites and automation"}
+            label={lang === "ru" ? "Вайб-кодить сайты" : "Vibe-code websites"}
           />
         </div>
       </div>

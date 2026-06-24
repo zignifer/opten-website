@@ -36,8 +36,8 @@ export const privateCourseIntroContent: PrivateCourseIntroContent = {
   },
   showcase: {
     eyebrow: {
-      ru: "Что научитесь делать:",
-      en: "What you will learn:",
+      ru: "Вы научитесь:",
+      en: "You will learn:",
     },
   },
 };
