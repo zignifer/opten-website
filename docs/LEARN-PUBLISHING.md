@@ -208,7 +208,11 @@ Local Kinescope operational API access is stored in gitignored
 from `C:\Users\КОМП\Desktop\kine.txt`; keep using the `.secrets` copy for
 future checks and never commit or expose it to the browser. Current objects for
 this course: project `2b95951a-c2f0-4bbd-b5c4-0642539438b2`, player
-`f4e68659-b78f-4b48-8134-3856d827efa9`.
+`f4e68659-b78f-4b48-8134-3856d827efa9`. The public course-root intro uses the
+separate public project `ca34b0dc-484e-49ac-8981-9d7485d32c09` and player
+`84928f86-0df1-4a04-885e-183ca8fdb5d2`; that player has
+`enable_default_subtitle=true` so the checked RU subtitle track opens by
+default without changing the gated lesson player.
 
 ## Future Course Collections
 

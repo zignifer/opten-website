@@ -475,7 +475,8 @@ The key was originally copied from `C:\Users\КОМП\Desktop\kine.txt`. Use it
 only from server-side scripts or terminal checks, never in client code or
 `VITE_*` variables. Current Kinescope objects for
 `ai-content-marketing-2026`: project `2b95951a-c2f0-4bbd-b5c4-0642539438b2`,
-player `f4e68659-b78f-4b48-8134-3856d827efa9`, 16 video IDs whitelisted in
+gated lesson player `f4e68659-b78f-4b48-8134-3856d827efa9`, public intro
+player `84928f86-0df1-4a04-885e-183ca8fdb5d2`, 16 video IDs whitelisted in
 `api/_shared/kinescopeCourse.ts`.
 
 ### Opten Space Learn video timestamp tooling
@@ -498,7 +499,10 @@ the separate public Kinescope project `Public`
 `/learn/courses/ai-content-marketing-2026/` without
 `/api/kinescope-course-token` or `drmauthtoken`. Current public intro video:
 Kinescope video `9c0fc06c-0063-4d9d-98f8-5333f993072b`, embed
-`https://kinescope.io/embed/kgJ8g56Bu5BpggbbaFLhqc`. Kinescope
+`https://kinescope.io/embed/kgJ8g56Bu5BpggbbaFLhqc`, player
+`84928f86-0df1-4a04-885e-183ca8fdb5d2` with
+`enable_default_subtitle=true` so the checked RU subtitle track opens by
+default. Kinescope
 does not expose an API endpoint for starting AI subtitle generation; the public
 API can upload ready `.srt/.vtt` subtitle files or enable existing subtitle
 tracks. Kinescope lesson IDs are random provider UUIDs; new uploaded lessons
