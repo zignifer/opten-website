@@ -189,28 +189,6 @@ const promptLesson15FourGraphicVariants = `Сделай ещё четыре от
 
 Попробуй добавить графические элементы, иконки и плашки. В этот раз добавь чуть больше визуального дизайна и системы, но сохрани стиль кофейни NOVA, логотип и атмосферу из загруженных референсов.`;
 
-const promptLesson15FontReference = `Используй шрифт [название шрифта].
-
-Я загрузил его в референсы для русской и английской раскладки. Используй эти скриншоты как визуальный font reference.
-
-Русский тест для скриншота:
-Съешь ещё этих мягких французских булок, да выпей же чаю.
-
-Английский тест для скриншота:
-The quick brown fox jumps over the lazy dog.
-
-Сохраняй характер шрифта в заголовках и коротких надписях внутри баннера.`;
-
-const promptLesson15DesignMd = `Посмотри папку banner.
-
-В ней лежит выбранный нами баннер под названием ref.png, логотип NOVA в белом и чёрном варианте, а также скриншоты шрифтов, которые используем.
-
-На основании этих файлов создай Markdown-файл под названием design.md.
-
-В этом файле зафиксируй визуальный стиль для будущих генераций баннеров. Опиши цвета, типографику, композицию, правила использования логотипа, правила использования текста, что можно делать и что нельзя.
-
-Пиши это как инструкцию для будущих генераций на основании данного визуального стиля.`;
-
 const promptLesson15TextInsideImage = `Отдельно зафиксируй правило:
 
 текст должен генерироваться сразу внутри изображения как часть дизайна.
@@ -250,8 +228,6 @@ const COURSE_PROMPT_BODIES: CoursePromptBody[] = [
   prompt("l15-generate-frame-and-video", "lesson-15-higgsfield-mcp", promptLesson15GenerateFrameAndVideo),
   prompt("l15-four-social-covers", "lesson-15-higgsfield-mcp", promptLesson15FourSocialCovers),
   prompt("l15-four-graphic-variants", "lesson-15-higgsfield-mcp", promptLesson15FourGraphicVariants),
-  prompt("l15-font-reference", "lesson-15-higgsfield-mcp", promptLesson15FontReference),
-  prompt("l15-design-md", "lesson-15-higgsfield-mcp", promptLesson15DesignMd),
   prompt("l15-text-inside-image", "lesson-15-higgsfield-mcp", promptLesson15TextInsideImage),
   prompt("l15-posts-from-design-md", "lesson-15-higgsfield-mcp", promptLesson15PostsFromDesignMd),
   prompt("l16-layout-grid", "lesson-16-nova-website", promptLayoutGrid),

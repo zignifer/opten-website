@@ -345,8 +345,6 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
         prompt("l15-generate-frame-and-video", "Сгенерировать кадр и ролик", "Сначала GPT Image, затем Seedance 2.0"),
         prompt("l15-four-social-covers", "4 обложки для соцсетей", "GPT Image 2.0 High Quality с логотипом и фото-референсами"),
         prompt("l15-four-graphic-variants", "Ещё 4 графических варианта", "Добавляем иконки, плашки и больше визуальной системы"),
-        prompt("l15-font-reference", "Шрифт через референсы", "Скриншоты русского и английского алфавита как font reference"),
-        prompt("l15-design-md", "design.md для стиля баннеров", "Фиксируем цвета, типографику, композицию, логотип и правила текста"),
         prompt("l15-text-inside-image", "Правило текста внутри кадра", "Не пустая фотография плюс текст поверх, а готовый дизайн внутри изображения"),
         prompt("l15-posts-from-design-md", "3 поста по design.md", "Генерируем серию постов в зафиксированном стиле бренда"),
       ],
