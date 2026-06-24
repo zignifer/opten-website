@@ -161,6 +161,68 @@ const promptInstallSkill = `Установи этот скилл npx skills add 
 
 const promptOptenCodex = `Оптен, сгенерируй промпт для GPT Image 2.0: нужно сделать вертикальный рекламный кадр для кофейни NOVA с бариста, стаканом кофе, тёплым светом и чистым местом под текст. Сохрани логотип, стиль бренда и реалистичную фотографическую подачу.`;
 
+const promptLesson15VideoReferenceAnalysis = `Используй Higgsfield MCP и инструмент Video Analysis.
+
+Проанализируй видео и дай промпт на создание такого же ролика для кофейни NOVA.
+
+Хочу сделать первый кадр через GPT Image 2.0, а видео сделаю через Seedance 2.0. Нужны два промпта: один для первого кадра, второй для видео.
+
+Используй skill Opten для генерации промптов.
+
+Фото буду генерировать со своим логотипом на стаканчике, который загружу в референсы. Видео буду генерировать из полученного первого кадра. Обязательно упомяни этот кадр как начальный кадр видео.`;
+
+const promptLesson15GenerateFrameAndVideo = `Используй Higgsfield MCP.
+
+В соответствии с данным промптом сначала сгенерируй мне изображение для GPT Image 2.0 и отправь его сюда, чтобы я посмотрел результат.
+
+После того как я согласую изображение, сразу сгенерируй готовый ролик в соответствии со вторым промптом через Seedance 2.0.`;
+
+const promptLesson15FourSocialCovers = `Сгенерируй четыре отдельных изображения через GPT Image 2.0, High Quality.
+
+Это должны быть четыре отдельные фотографии, а не одна картинка с четырьмя маленькими вариантами внутри.
+
+Нужна обложка для поста социальных сетей для нашей кофейни NOVA. Тема поста: "5 сортов кофе, которые стоит попробовать".
+
+Используй загруженный логотип. Фотографии используй как визуальный референс по цвету, освещению и атмосфере.`;
+
+const promptLesson15FourGraphicVariants = `Сделай ещё четыре отдельных варианта через GPT Image 2.0, High Quality.
+
+Попробуй добавить графические элементы, иконки и плашки. В этот раз добавь чуть больше визуального дизайна и системы, но сохрани стиль кофейни NOVA, логотип и атмосферу из загруженных референсов.`;
+
+const promptLesson15FontReference = `Используй шрифт [название шрифта].
+
+Я загрузил его в референсы для русской и английской раскладки. Используй эти скриншоты как визуальный font reference.
+
+Русский тест для скриншота:
+Съешь ещё этих мягких французских булок, да выпей же чаю.
+
+Английский тест для скриншота:
+The quick brown fox jumps over the lazy dog.
+
+Сохраняй характер шрифта в заголовках и коротких надписях внутри баннера.`;
+
+const promptLesson15DesignMd = `Посмотри папку banner.
+
+В ней лежит выбранный нами баннер под названием ref.png, логотип NOVA в белом и чёрном варианте, а также скриншоты шрифтов, которые используем.
+
+На основании этих файлов создай Markdown-файл под названием design.md.
+
+В этом файле зафиксируй визуальный стиль для будущих генераций баннеров. Опиши цвета, типографику, композицию, правила использования логотипа, правила использования текста, что можно делать и что нельзя.
+
+Пиши это как инструкцию для будущих генераций на основании данного визуального стиля.`;
+
+const promptLesson15TextInsideImage = `Отдельно зафиксируй правило:
+
+текст должен генерироваться сразу внутри изображения как часть дизайна.
+
+Не описывай процесс так, будто мы сначала делаем пустую фотографию, а потом накладываем поверх текст. Нам нужен сразу готовый баннер с типографикой, отступами, композицией и текстом внутри кадра.`;
+
+const promptLesson15PostsFromDesignMd = `Используй design.md из папки бренда.
+
+Сгенерируй через GPT Image Gen три отдельных поста в нашем стиле. Темы сделай разные на своё усмотрение.
+
+Используй правила из design.md, загруженные логотипы, шрифты и сохранённые референсы. Сохраняй единый визуальный стиль бренда NOVA.`;
+
 const promptLayoutGrid = `Layout: Desktop viewport 1440px. Centered 1200px max-width container. 120px side gutters. 12-column grid. 24px gutters. No full-width text. Keep text blocks max 560–640px. Keep visible whitespace on both sides. Do not stretch text across the full page width.`;
 
 const promptImageToCode = `Используй skill image to code. Сверстай эту страницу для моей кофейни NOVA. Логотипы и фотографии находятся в папке с готовыми генерациями. Если нужны дополнительные иконки или небольшие графические элементы, сгенерируй их в едином стиле, с одинаковой толщиной линий. Сделай адаптив для компьютера, планшета и телефона. После реализации запусти локальный сервер и проверь результат через Playwright: сделай скриншот каждой секции и сравни с референсом.`;
@@ -184,6 +246,14 @@ const COURSE_PROMPT_BODIES: CoursePromptBody[] = [
   prompt("l12-replace-appearance", "lesson-12-motion-control", promptReplaceAppearance),
   prompt("l14-install-skill", "lesson-14-codex", promptInstallSkill),
   prompt("l14-opten-codex", "lesson-14-codex", promptOptenCodex),
+  prompt("l15-video-reference-analysis", "lesson-15-higgsfield-mcp", promptLesson15VideoReferenceAnalysis),
+  prompt("l15-generate-frame-and-video", "lesson-15-higgsfield-mcp", promptLesson15GenerateFrameAndVideo),
+  prompt("l15-four-social-covers", "lesson-15-higgsfield-mcp", promptLesson15FourSocialCovers),
+  prompt("l15-four-graphic-variants", "lesson-15-higgsfield-mcp", promptLesson15FourGraphicVariants),
+  prompt("l15-font-reference", "lesson-15-higgsfield-mcp", promptLesson15FontReference),
+  prompt("l15-design-md", "lesson-15-higgsfield-mcp", promptLesson15DesignMd),
+  prompt("l15-text-inside-image", "lesson-15-higgsfield-mcp", promptLesson15TextInsideImage),
+  prompt("l15-posts-from-design-md", "lesson-15-higgsfield-mcp", promptLesson15PostsFromDesignMd),
   prompt("l16-layout-grid", "lesson-16-nova-website", promptLayoutGrid),
   prompt("l16-image-to-code", "lesson-16-nova-website", promptImageToCode),
 ];
