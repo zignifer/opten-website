@@ -606,7 +606,7 @@ function CourseIntroShowcase({ intro }: { intro: PrivateCourseIntroContent }) {
           />
           <CourseIntroMediaCard
             className="max-md:aspect-[1.15/1]"
-            imageSrc="/assets/space/courses/ai-content-marketing-2026/intro/course-intro-photo-3.png"
+            imageSrc="/assets/space/courses/ai-content-marketing-2026/intro/course-intro-photo-4.png"
             imageAlt=""
             label={lang === "ru" ? "Вайб-кодить сайты" : "Vibe-code websites"}
           />
