@@ -486,12 +486,19 @@ NotebookLM, YouTube Data API, or any provider key from browser code.
 
 Hidden course videos use Kinescope and are defined in
 `src/content/space/privateCourse.ts`. The `ai-content-marketing-2026` course has
-16 connected Kinescope videos, all whitelisted in
+16 connected Kinescope lesson videos, all whitelisted in
 `api/_shared/kinescopeCourse.ts`. Keep this route out of public navigation until
-launch. The Kinescope project has project encryption enabled, strict DRM auth
+launch. The gated lesson project has project encryption enabled, strict DRM auth
 configured to `https://opten.space/api/kinescope-course-auth`, domain
 restrictions for `opten.space` and `www.opten.space`, subtitle display enabled,
-and course chapters. Kinescope
+and course chapters. The course root intro video is the exception: it lives in
+the separate public Kinescope project `Public`
+(`ca34b0dc-484e-49ac-8981-9d7485d32c09`, `privacy_type=anywhere`,
+`encrypted=false`) and embeds directly on
+`/learn/courses/ai-content-marketing-2026/` without
+`/api/kinescope-course-token` or `drmauthtoken`. Current public intro video:
+Kinescope video `9c0fc06c-0063-4d9d-98f8-5333f993072b`, embed
+`https://kinescope.io/embed/kgJ8g56Bu5BpggbbaFLhqc`. Kinescope
 does not expose an API endpoint for starting AI subtitle generation; the public
 API can upload ready `.srt/.vtt` subtitle files or enable existing subtitle
 tracks. Kinescope lesson IDs are random provider UUIDs; new uploaded lessons

@@ -16,6 +16,10 @@ export type PrivateCourseIntroContent = {
   title: Record<LearnLang, string>;
   description: Record<LearnLang, string>;
   posterPath: string;
+  publicIntroVideo?: {
+    providerAssetId: string;
+    embedUrl: string;
+  };
   videoAriaLabel: Record<LearnLang, string>;
   showcase: {
     eyebrow: Record<LearnLang, string>;
@@ -32,6 +36,10 @@ export const privateCourseIntroContent: PrivateCourseIntroContent = {
     en: "In practice, we build the NOVA coffee brand from scratch: prompts, photos, logo, and video.\nThen we assemble the nova-coffee.ru website and ad content so the whole system feels consistent.",
   },
   posterPath: "/assets/learn/video/actual-ai-tools-2026-poster.jpg",
+  publicIntroVideo: {
+    providerAssetId: "9c0fc06c-0063-4d9d-98f8-5333f993072b",
+    embedUrl: "https://kinescope.io/embed/kgJ8g56Bu5BpggbbaFLhqc",
+  },
   videoAriaLabel: {
     ru: "Вводный ролик курса",
     en: "Course intro video",

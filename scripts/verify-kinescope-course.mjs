@@ -177,9 +177,9 @@ assert.match(content, /posterPath:\s*"\/assets\/learn\/video\/actual-ai-tools-20
 assert.doesNotMatch(content, /if \(!lessonSlug\) return collection\.lessons\[0\]/, "Private course root must not fall back to lesson 1");
 assert.match(privateCoursePage, /!lessonSlug[\s\S]*<CourseIntroLayout collection=\{collection\} intro=\{privateCourseIntroContent\}/, "Private course root route must render the course intro layout");
 assert.match(components, /export function CourseIntroLayout/, "Private course root must have a dedicated intro layout");
-assert.match(components, /function CourseIntroVideoPlaceholder/, "Private course intro must render a video placeholder");
-assert.match(components, /<ResponsiveImage[\s\S]*src=\{intro\.posterPath\}[\s\S]*className="absolute inset-0 h-full w-full object-cover opacity-78"/, "Private course intro player must render the shared course cover");
-assert.match(components, /absolute inset-0 bg-\[linear-gradient\(180deg,rgba\(1,16,18,0\.44\),rgba\(1,16,18,0\.22\)_48%,rgba\(1,16,18,0\.56\)\)\]/, "Private course intro player must dim the cover like the Learn hero");
+assert.match(components, /function CourseIntroVideoPlaceholder/, "Private course intro must render the intro player slot");
+assert.match(content, /publicIntroVideo:\s*{[\s\S]*9c0fc06c-0063-4d9d-98f8-5333f993072b[\s\S]*https:\/\/kinescope\.io\/embed\/kgJ8g56Bu5BpggbbaFLhqc/, "Private course root must point at the public Kinescope intro video");
+assert.match(components, /publicIntroVideo \? \([\s\S]*<iframe[\s\S]*src=\{publicIntroVideo\.embedUrl\}[\s\S]*allow="autoplay; fullscreen; picture-in-picture; encrypted-media"/, "Private course intro must embed the public Kinescope player directly");
 assert.match(components, /function CourseIntroShowcase/, "Private course intro must render a showcase section instead of lesson materials");
 assert.match(components, /currentSlug=\{currentSlug \?\? lesson\.slug\}/, "Course sidebar must support a course overview with no selected lesson");
 assert.match(components, /course-intro-video-1\.mp4/, "Private course intro bento must use video 1");
@@ -190,7 +190,7 @@ const courseIntroStart = components.indexOf("export function CourseIntroLayout")
 const courseIntroEnd = components.indexOf("type LessonPlayerProps", courseIntroStart);
 assert.ok(courseIntroStart >= 0 && courseIntroEnd > courseIntroStart, "Private course intro source block must be readable");
 const courseIntroSource = components.slice(courseIntroStart, courseIntroEnd);
-assert.doesNotMatch(courseIntroSource, /<LessonPlayer|<LessonMaterials|<LessonPrompts|<LessonMissingItems|<iframe\b/, "Private course intro must not embed a gated lesson player, materials, prompts, or iframe");
+assert.doesNotMatch(courseIntroSource, /<LessonPlayer|<LessonMaterials|<LessonPrompts|<LessonMissingItems|\/api\/kinescope-course-token|drmauthtoken/, "Private course intro must not embed a gated lesson player, materials, prompts, or tokenized playback");
 for (const assetPath of [introVideoOneAsset, introVideoTwoAsset, introPhotoFourAsset]) {
   assert.ok(existsSync(join(root, assetPath)), `Private course intro asset must exist: ${assetPath}`);
   assert.ok(statSync(join(root, assetPath)).size > 0, `Private course intro asset must not be empty: ${assetPath}`);
