@@ -536,8 +536,18 @@ function CourseIntroVideoPlaceholder({ intro }: { intro: PrivateCourseIntroConte
       className="group relative aspect-video overflow-hidden rounded-[8px] border border-white/10 bg-[#03191c] shadow-[0_24px_80px_rgba(0,0,0,0.22)] max-md:rounded-[8px]"
       aria-label={intro.videoAriaLabel[lang]}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(156,251,81,0.12),transparent_28%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(156,251,81,0.04),transparent_40%,rgba(255,255,255,0.03))]" />
+      <ResponsiveImage
+        src={intro.posterPath}
+        alt=""
+        width="1200"
+        height="676"
+        loading="eager"
+        widths={[480, 800, 1200]}
+        sizes="(max-width: 1023px) calc(100vw - 32px), 816px"
+        className="absolute inset-0 h-full w-full object-cover opacity-78"
+      />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.44),rgba(1,16,18,0.22)_48%,rgba(1,16,18,0.56))]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(156,251,81,0.1),transparent_30%)]" />
       <button
         type="button"
         className="absolute left-1/2 top-1/2 grid size-[82px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-0 bg-[#9cfb51] text-[#011417] shadow-[0_18px_58px_rgba(156,251,81,0.28)] transition duration-200 group-hover:scale-[1.03] group-hover:bg-[#8ff144] max-md:size-[92px]"
@@ -596,7 +606,7 @@ function CourseIntroShowcase({ intro }: { intro: PrivateCourseIntroContent }) {
           />
           <CourseIntroMediaCard
             className="max-md:aspect-[1.15/1]"
-            imageSrc="/assets/space/courses/ai-content-marketing-2026/intro/course-intro-photo-4.png"
+            imageSrc="/assets/space/courses/ai-content-marketing-2026/intro/course-intro-photo-3.png"
             imageAlt=""
             label={lang === "ru" ? "Вайб-кодить сайты" : "Vibe-code websites"}
           />

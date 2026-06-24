@@ -15,6 +15,7 @@ export const PRIVATE_COURSE_SALE_ENDS_AT = "2026-06-30T23:59:59+05:00";
 export type PrivateCourseIntroContent = {
   title: Record<LearnLang, string>;
   description: Record<LearnLang, string>;
+  posterPath: string;
   videoAriaLabel: Record<LearnLang, string>;
   showcase: {
     eyebrow: Record<LearnLang, string>;
@@ -30,6 +31,7 @@ export const privateCourseIntroContent: PrivateCourseIntroContent = {
     ru: "На практике создадим с нуля бренд кофейни NOVA: промпты, фото, логотип и видео.\nЗатем соберём сайт nova-coffee.ru и контент для рекламы, чтобы всё выглядело как одна система.",
     en: "In practice, we build the NOVA coffee brand from scratch: prompts, photos, logo, and video.\nThen we assemble the nova-coffee.ru website and ad content so the whole system feels consistent.",
   },
+  posterPath: "/assets/learn/video/actual-ai-tools-2026-poster.jpg",
   videoAriaLabel: {
     ru: "Вводный ролик курса",
     en: "Course intro video",
