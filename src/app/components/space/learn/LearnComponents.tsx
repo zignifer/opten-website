@@ -57,6 +57,8 @@ import {
 const LEARN_PROGRESS_STORAGE_KEY = "opten_space_learn_progress_v1";
 const AI_CONTENT_MARKETING_COURSE_SLUG = "ai-content-marketing-2026";
 const COURSE_INTRO_SHOWCASE_HEADING_ID = "course-intro-showcase-title";
+const COURSE_INTRO_SITE_LABEL = "nova-coffee.ru";
+const COURSE_INTRO_SITE_URL = "https://nova-coffee.ru/";
 
 type StoredLearnProgress = {
   completed: string[];
@@ -549,12 +551,24 @@ function CourseIntroVideoPlaceholder({ intro }: { intro: PrivateCourseIntroConte
 
 function CourseIntroHeader({ intro }: { intro: PrivateCourseIntroContent }) {
   const { lang } = useLang();
+  const description = intro.description[lang];
+  const [descriptionBeforeSite, descriptionAfterSite] = description.split(COURSE_INTRO_SITE_LABEL);
 
   return (
     <section className="mt-[32px] max-w-[820px] max-md:mt-[28px]">
       <h1 className="text-[32px] font-bold leading-[1.12] tracking-[-0.01em] text-white max-md:text-[30px]">{intro.title[lang]}</h1>
       <p className="mt-[18px] max-w-[760px] whitespace-normal text-[16px] leading-[1.55] text-white/64 md:line-clamp-2 md:whitespace-pre-line max-md:mt-[18px] max-md:text-[18px] max-md:leading-[1.5]">
-        {intro.description[lang]}
+        {descriptionAfterSite === undefined ? (
+          description
+        ) : (
+          <>
+            {descriptionBeforeSite}
+            <a className="text-[#9cfb51] no-underline" href={COURSE_INTRO_SITE_URL} target="_blank" rel="noopener noreferrer">
+              {COURSE_INTRO_SITE_LABEL}
+            </a>
+            {descriptionAfterSite}
+          </>
+        )}
       </p>
     </section>
   );
@@ -582,7 +596,7 @@ function CourseIntroShowcase({ intro }: { intro: PrivateCourseIntroContent }) {
           />
           <CourseIntroMediaCard
             className="max-md:aspect-[1.15/1]"
-            imageSrc="/assets/space/courses/ai-content-marketing-2026/intro/course-intro-photo-3.png"
+            imageSrc="/assets/space/courses/ai-content-marketing-2026/intro/course-intro-photo-4.png"
             imageAlt=""
             label={lang === "ru" ? "Вайб-кодить сайты" : "Vibe-code websites"}
           />

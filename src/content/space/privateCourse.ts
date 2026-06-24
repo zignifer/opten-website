@@ -27,8 +27,8 @@ export const privateCourseIntroContent: PrivateCourseIntroContent = {
     en: "AI for Content and Marketing Course",
   },
   description: {
-    ru: "На практике создадим с нуля бренд кофейни NOVA: промпты, фото, логотип и видео.\nЗатем соберём сайт и контент для рекламы, чтобы всё выглядело как одна система.",
-    en: "In practice, we build the NOVA coffee brand from scratch: prompts, photos, logo, and video.\nThen we assemble the website and ad content so the whole system feels consistent.",
+    ru: "На практике создадим с нуля бренд кофейни NOVA: промпты, фото, логотип и видео.\nЗатем соберём сайт nova-coffee.ru и контент для рекламы, чтобы всё выглядело как одна система.",
+    en: "In practice, we build the NOVA coffee brand from scratch: prompts, photos, logo, and video.\nThen we assemble the nova-coffee.ru website and ad content so the whole system feels consistent.",
   },
   videoAriaLabel: {
     ru: "Вводный ролик курса",
