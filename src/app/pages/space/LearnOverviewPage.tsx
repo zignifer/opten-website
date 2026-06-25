@@ -50,7 +50,6 @@ type ContentTab = "lessons" | "finds";
 
 const SHOW_LEARN_COLLECTIONS = false;
 const HIDDEN_LEARN_LESSON_SLUGS = new Set<string>(hiddenLearnOverviewLessonSlugs);
-const COURSE_RELEASE_AT_MS = Date.parse("2026-06-24T21:00:00.000Z");
 const topics: TopicFilter[] = ["all", "ai-image", "ai-video", "vibe-coding", "vibe-design"];
 
 const authorSocialLinks = [
@@ -164,9 +163,10 @@ const featuredCoursePromo = {
     en: "The most honest AI course. In under an hour, I will cover everything you need to know to create a brand package without design or editing skills. Across 15 short lessons, we will create a logo, photos and social videos, launch a website, and do it all with AI.",
   },
   cta: {
-    ru: "Скоро",
-    en: "Coming soon",
+    ru: "Перейти",
+    en: "Open",
   },
+  href: "/learn/courses/ai-content-marketing-2026",
 } as const;
 
 export default function LearnOverviewPage() {
@@ -264,13 +264,12 @@ export default function LearnOverviewPage() {
             <p className="mt-[15px] text-[14px] leading-[1.55] text-white/55">
               {featuredCoursePromo.description[lang]}
             </p>
-            <button
-              type="button"
-              aria-disabled="true"
-              className="mt-[24px] flex h-[43px] w-[197px] cursor-default items-center justify-center rounded-[8px] bg-[#9cfb51] px-[20px] text-[14px] font-bold text-[#062013] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417] max-md:w-full min-[1120px]:w-full"
+            <LocalizedLink
+              to={featuredCoursePromo.href}
+              className="mt-[24px] flex h-[43px] w-[197px] items-center justify-center rounded-[8px] bg-[#9cfb51] px-[20px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#adff6f] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417] max-md:w-full min-[1120px]:w-full"
             >
               {featuredCoursePromo.cta[lang]}
-            </button>
+            </LocalizedLink>
           </article>
         </section>
 
@@ -463,8 +462,6 @@ function LearnContentTabs({ activeTab, onChange, lang }: { activeTab: ContentTab
 }
 
 function HeroVideoCard({ lang, className = "" }: { lang: LearnLang; className?: string }) {
-  const countdown = useCourseCountdown();
-
   return (
     <div
       className={`relative block aspect-video overflow-hidden rounded-[12px] border border-white/12 bg-[#0e2023] text-left shadow-[0_20px_60px_rgba(0,0,0,0.22)] ${className}`}
@@ -481,67 +478,7 @@ function HeroVideoCard({ lang, className = "" }: { lang: LearnLang; className?: 
         className="absolute inset-0 h-full w-full object-cover opacity-78"
       />
       <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.44),rgba(1,16,18,0.22)_48%,rgba(1,16,18,0.56))]" />
-      <span className="absolute left-1/2 top-1/2 flex w-max -translate-x-1/2 -translate-y-1/2 justify-center">
-        <CourseCountdown countdown={countdown} lang={lang} />
-      </span>
     </div>
-  );
-}
-
-type CourseCountdownState = {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-};
-
-function useCourseCountdown() {
-  const [countdown, setCountdown] = useState<CourseCountdownState | null>(null);
-
-  useEffect(() => {
-    const updateCountdown = () => setCountdown(getCourseCountdown());
-    updateCountdown();
-
-    const timerId = window.setInterval(updateCountdown, 1000);
-    return () => window.clearInterval(timerId);
-  }, []);
-
-  return countdown;
-}
-
-function getCourseCountdown(now = Date.now()): CourseCountdownState {
-  const remainingMs = Math.max(0, COURSE_RELEASE_AT_MS - now);
-  const totalSeconds = Math.floor(remainingMs / 1000);
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor((totalSeconds % 86400) / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  return {
-    days,
-    hours,
-    minutes,
-    seconds,
-  };
-}
-
-function CourseCountdown({ countdown, lang }: { countdown: CourseCountdownState | null; lang: LearnLang }) {
-  const units = [
-    { value: countdown ? String(countdown.days).padStart(2, "0") : "--", label: lang === "ru" ? "дн" : "d" },
-    { value: countdown ? String(countdown.hours).padStart(2, "0") : "--", label: lang === "ru" ? "час" : "h" },
-    { value: countdown ? String(countdown.minutes).padStart(2, "0") : "--", label: lang === "ru" ? "мин" : "m" },
-    { value: countdown ? String(countdown.seconds).padStart(2, "0") : "--", label: lang === "ru" ? "сек" : "s" },
-  ];
-
-  return (
-    <span className="inline-flex items-start justify-center gap-[45px] drop-shadow-[0_4px_18px_rgba(0,0,0,0.9)] max-sm:gap-[clamp(20px,8vw,34px)]">
-      {units.map((unit) => (
-        <span key={unit.label} className="w-[72px] text-center max-sm:w-[50px]">
-          <span className="block font-['Unbounded',sans-serif] text-[50px] font-bold leading-none text-white tabular-nums max-sm:text-[36px]">{unit.value}</span>
-          <span className="mt-[8px] block text-[20px] font-bold uppercase leading-none text-white/72 max-sm:mt-[6px] max-sm:text-[18px]">{unit.label}</span>
-        </span>
-      ))}
-    </span>
   );
 }
 
