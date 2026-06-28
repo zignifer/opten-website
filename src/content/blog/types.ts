@@ -21,6 +21,15 @@ export interface BlogImage {
   alt: string;
 }
 
+export interface BlogPromoBanner {
+  eyebrow?: string;
+  title: string;
+  body: string;
+  ctaLabel: string;
+  href: string;
+  image: BlogImage;
+}
+
 export interface BlogFaqItem {
   q: string;
   a: string;
@@ -32,12 +41,14 @@ export interface BlogStep {
   before?: string;
   after?: string;
   imageSrc?: string;
+  promoBanner?: BlogPromoBanner;
 }
 
 export interface BlogSection {
   heading: string;
   body: string;
   image?: BlogImage;
+  promoBanner?: BlogPromoBanner;
 }
 
 export interface BlogPostBody {

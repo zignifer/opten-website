@@ -19,6 +19,7 @@ import BlogPostCard from "../components/BlogPostCard";
 import FaqBlock from "../components/FaqBlock";
 import ResponsiveImage from "../components/ResponsiveImage";
 import { blogPostsBySlug, allBlogPosts, type BlogSlug } from "../../content/blog";
+import type { BlogPromoBanner } from "../../content/blog/types";
 
 function formatPostDate(iso: string, lang: "ru" | "en"): string {
   const d = new Date(iso);
@@ -44,6 +45,45 @@ function NotFoundFallback() {
         {t("blog.backToList")}
       </LocalizedLink>
     </div>
+  );
+}
+
+function BlogPromoBanner({ banner }: { banner: BlogPromoBanner }) {
+  return (
+    <aside className="relative mt-[24px] min-h-[320px] overflow-hidden rounded-[8px] border border-white/10 bg-[#011417] md:min-h-[280px]">
+      <div className="absolute inset-0" aria-hidden="true">
+        <ResponsiveImage
+          src={banner.image.src}
+          alt=""
+          width={banner.image.width}
+          height={banner.image.height}
+          loading="lazy"
+          widths={[480, 800, 1200, 1600]}
+          sizes="(max-width: 840px) calc(100vw - 40px), 800px"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-r from-[#011417] via-[#011417]/92 to-[#011417]/8" aria-hidden="true" />
+      <div className="relative z-10 flex min-h-[320px] max-w-[430px] flex-col justify-center px-[22px] py-[28px] md:min-h-[280px] md:px-[32px]">
+        {banner.eyebrow && (
+          <p className="mb-[10px] text-[11px] font-bold uppercase tracking-[1.4px] text-[#9cfb51]">
+            {banner.eyebrow}
+          </p>
+        )}
+        <h3 className="font-['Unbounded',sans-serif] text-[22px] font-medium leading-[1.2] tracking-[-0.4px] text-white md:text-[26px]">
+          {banner.title}
+        </h3>
+        <p className="mt-[12px] text-[15px] leading-[1.55] text-white/72 md:text-[16px]">
+          {banner.body}
+        </p>
+        <LocalizedLink
+          to={banner.href}
+          className="mt-[20px] inline-flex w-fit items-center rounded-full bg-[#9cfb51] px-[18px] py-[10px] text-[14px] font-bold text-[#011417] no-underline transition hover:-translate-y-0.5 hover:shadow-[0_14px_32px_rgba(156,251,81,0.2)]"
+        >
+          {banner.ctaLabel} →
+        </LocalizedLink>
+      </div>
+    </aside>
   );
 }
 
@@ -172,6 +212,7 @@ export default function BlogPostPage() {
                     className="mt-[16px] w-full rounded-[8px] border border-white/10"
                   />
                 )}
+                {step.promoBanner && <BlogPromoBanner banner={step.promoBanner} />}
               </li>
             ))}
           </ol>
@@ -202,6 +243,7 @@ export default function BlogPostPage() {
                     className="mt-[12px] w-full rounded-[8px] border border-white/10"
                   />
                 )}
+                {sec.promoBanner && <BlogPromoBanner banner={sec.promoBanner} />}
               </section>
             ))}
           </div>

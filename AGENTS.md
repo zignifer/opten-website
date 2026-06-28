@@ -559,10 +559,11 @@ Non-negotiables (the full set lives in `docs/CONTENT-AUTHORING.md`):
 4. JSON-LD must mirror the visible DOM — FAQs, dates, prices, person names. `verify-faq-mainentity.mjs` enforces FAQ parity at build time; the others are auditor-detectable.
 5. Cover images: `public/blog/<slug>/cover.jpg`, ≥1600×900, no in-image text (one asset works for RU + EN + OG + visible `<img>`).
 6. SEO2 inline blog images are locale-specific final rasters: generate RU and EN images with the short text already rendered inside the image. Use **Bebas Neue only** for all visible typography in SEO2 generated images, and attach/use `seo2/Reference/bebas-neue-font-reference.png` as the font reference in generation prompts. The Opten lime accent must be exactly `#9CFB51` in prompts and art direction; do not substitute warmer yellow-green, darker green, or approximate "lime" hues. Do not generate textless bases and add text afterward with editor/Canvas/HTML/CSS/Sharp overlays.
-7. Every `<img>` gets explicit `width`/`height` (CLS guard).
-8. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
-9. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
-10. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
+7. Course promo banners are the exception to the inline-text rule: they are reusable generated rasters with a clean left-side negative-space zone and a right-side Opten-style visual; the heading, description, and CTA button are rendered as accessible HTML so the same asset can be reused and localized. Save them under `public/blog/_banners/`, use dark SaaS editorial styling (`#011417` + exact `#9CFB51`), and link blog CTAs to `/learn/courses/ai-content-marketing-2026`. Future blog promo CTAs should advertise this course, not the Chrome extension, unless the article is specifically about extension install/use.
+8. Every `<img>` gets explicit `width`/`height` (CLS guard).
+9. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
+10. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
+11. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
 
 **The full playbook with route-registration checklist, schema graph rules, image conventions, and a list of optimizations that have already been tried and rejected: [docs/CONTENT-AUTHORING.md](docs/CONTENT-AUTHORING.md).** Open this file alongside `seo-routes.ts` whenever adding a new page.
 

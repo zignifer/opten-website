@@ -15,6 +15,33 @@ const COVER_EN = {
   alt: "Cover image for an AI headshot generator guide for business portraits",
 };
 
+const COURSE_URL = "/learn/courses/ai-content-marketing-2026";
+
+const COURSE_BANNER_WORKFLOW_RU = {
+  src: "/blog/_banners/course-workflow.jpg",
+  width: 1600,
+  height: 560,
+  alt: "Схема курса по созданию контента, видео и сайта через нейросети",
+};
+const COURSE_BANNER_WORKFLOW_EN = {
+  src: COURSE_BANNER_WORKFLOW_RU.src,
+  width: COURSE_BANNER_WORKFLOW_RU.width,
+  height: COURSE_BANNER_WORKFLOW_RU.height,
+  alt: "Course workflow visual for creating content, video, and a website with AI",
+};
+const COURSE_BANNER_AUTOMATION_RU = {
+  src: "/blog/_banners/course-automation.jpg",
+  width: 1600,
+  height: 560,
+  alt: "Схема автоматизации контента через проект, промпты и нейросети",
+};
+const COURSE_BANNER_AUTOMATION_EN = {
+  src: COURSE_BANNER_AUTOMATION_RU.src,
+  width: COURSE_BANNER_AUTOMATION_RU.width,
+  height: COURSE_BANNER_AUTOMATION_RU.height,
+  alt: "Content automation visual with project files, prompts, and AI outputs",
+};
+
 const ru: BlogPostLocale = {
   slug: "ai-headshot-generator",
   title: "Бизнес-портрет через нейросеть: деловое фото без стока",
@@ -52,6 +79,15 @@ const ru: BlogPostLocale = {
         after:
           "Shoulders-up business portrait, neutral gray seamless background, navy blazer over a plain black knit, soft key light from front-left, subtle rim light, 85mm lens, natural skin texture, relaxed mouth, direct eye contact, no luxury office, no glossy retouching.",
         imageSrc: "/blog/ai-headshot-generator/ru/step-2.jpg",
+        promoBanner: {
+          eyebrow: "Курс Opten",
+          title: "Соберите систему контента на нейросетях",
+          body:
+            "В курсе показываю полный цикл: промпты, фото, видео, сайт и рекламные материалы для бренда, а не отдельные случайные генерации.",
+          ctaLabel: "Перейти в курс",
+          href: COURSE_URL,
+          image: COURSE_BANNER_WORKFLOW_RU,
+        },
       },
       {
         title: "Исправьте стоковый первый результат",
@@ -72,6 +108,15 @@ const ru: BlogPostLocale = {
         after:
           "Preflight: role defined; age range defined; neutral background locked; soft key light specified; 85mm lens specified; wardrobe simple; constraints block plastic skin, stock smile, logo, office clutter, age drift.",
         imageSrc: "/blog/ai-headshot-generator/ru/step-4.jpg",
+        promoBanner: {
+          eyebrow: "Практика",
+          title: "Автоматизируйте баннеры, видео и лендинг",
+          body:
+            "Внутри курса есть блок про Codex, Higgsfield MCP и повторяемый визуальный стиль, чтобы новые материалы собирались быстрее.",
+          ctaLabel: "Смотреть программу",
+          href: COURSE_URL,
+          image: COURSE_BANNER_AUTOMATION_RU,
+        },
       },
     ],
     faq: [
@@ -136,6 +181,15 @@ const en: BlogPostLocale = {
         after:
           "Shoulders-up business portrait, neutral gray seamless background, navy blazer over a plain black knit, soft key light from front-left, subtle rim light, 85mm lens, natural skin texture, relaxed mouth, direct eye contact, no luxury office, no glossy retouching.",
         imageSrc: "/blog/ai-headshot-generator/en/step-2.jpg",
+        promoBanner: {
+          eyebrow: "Opten course",
+          title: "Build an AI content system",
+          body:
+            "The course walks through prompts, images, video, a website, and campaign assets for one brand instead of disconnected one-off generations.",
+          ctaLabel: "Open the course",
+          href: COURSE_URL,
+          image: COURSE_BANNER_WORKFLOW_EN,
+        },
       },
       {
         title: "Fix the first stock-looking render",
@@ -156,6 +210,15 @@ const en: BlogPostLocale = {
         after:
           "Preflight: role defined; age range defined; neutral background locked; soft key light specified; 85mm lens specified; wardrobe simple; constraints block plastic skin, stock smile, logo, office clutter, age drift.",
         imageSrc: "/blog/ai-headshot-generator/en/step-4.jpg",
+        promoBanner: {
+          eyebrow: "Practice",
+          title: "Automate banners, video, and landing pages",
+          body:
+            "Inside the course, Codex, Higgsfield MCP, and a locked visual style turn repeated content production into a reusable workflow.",
+          ctaLabel: "View curriculum",
+          href: COURSE_URL,
+          image: COURSE_BANNER_AUTOMATION_EN,
+        },
       },
     ],
     faq: [
