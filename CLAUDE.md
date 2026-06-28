@@ -290,6 +290,14 @@ src/
 
 **Adding a new page or blog post touches 6 files in sync** (route, manifest, EN siblings, sitemap, llms.txt, dicts) plus optional content/blog files. The full checklist + GEO/SEO patterns are in [docs/CONTENT-AUTHORING.md](docs/CONTENT-AUTHORING.md) — read that before touching content.
 
+SEO briefs contain search intent, not literal copy. Do not paste raw,
+ungrammatical keyword strings into visible text, titles, descriptions, FAQ,
+or examples just to preserve exact match. Inflect and rewrite keys naturally
+(`бизнес портрет нейросеть` → `бизнес-портрет через нейросеть`,
+`деловой портрет нейросеть` → `деловой портрет в нейросети/через нейросеть`).
+Exact raw query strings are allowed only when explicitly discussing the search
+query itself.
+
 **Model pages (Phase v2.0) follow a different flow:** they are generated, not hand-listed. Source = `src/content/models/_skills/*.md` (synced from promptscore-proxy via `sync-skills.mjs`) → `build-models-registry.mjs` emits `_registry.ts` (62 `ModelMeta`) → one `<slug>.ts` content file per model (`ModelContent = { ru, en }`). `seo-routes.ts` expands all models with content into routes; `slugs.ts` drives `EN_SIBLINGS`. Free-text meta (name/platform/duration/resolution) is RU-only in the registry → English comes from hand-maintained `metaEn.ts` overrides via the `metaField(meta, field, lang)` helper (the build has no gate for this; run `node scripts/verify-models-content.mjs` to catch Cyrillic leaking into EN). `HUB_HIDDEN_SLUGS` (in `index.ts`) hides 11 general/umbrella models from the `/models` grid + ItemList schema while keeping their pages live.
 
 ### Code style
