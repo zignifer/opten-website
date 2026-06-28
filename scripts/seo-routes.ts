@@ -6,6 +6,7 @@
 // intro/steps/faq under `body: { ... }`. URL still /guides/gpt-image-2 until B-07.
 // This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
+import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
 import { post as aiFaceSwapGuide } from "../src/content/blog/ai-face-swap";
 import { post as flux2PromptsGuide } from "../src/content/blog/flux-2-prompts";
@@ -1296,6 +1297,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/ai-headshot-generator`, name: aiHeadshotGeneratorGuide.ru.title, datePublished: aiHeadshotGeneratorGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-ugc-for-brands`, name: aiUgcForBrandsGuide.ru.title, datePublished: aiUgcForBrandsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/upscale-image-ai`, name: upscaleImageAiGuide.ru.title, datePublished: upscaleImageAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-lip-sync`, name: aiLipSyncGuide.ru.title, datePublished: aiLipSyncGuide.ru.publishedAt },
@@ -1330,6 +1332,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/ai-headshot-generator — AI headshot prompt workflow guide.
+  {
+    path: "/blog/ai-headshot-generator",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-headshot-generator`,
+      en: `${SITE_ORIGIN}/en/blog/ai-headshot-generator`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-headshot-generator`,
+    },
+    title: aiHeadshotGeneratorGuide.ru.title,
+    description: aiHeadshotGeneratorGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-headshot-generator`,
+    ogTitle: aiHeadshotGeneratorGuide.ru.title,
+    ogDescription: aiHeadshotGeneratorGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiHeadshotGeneratorGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-headshot-generator`,
+        headline: aiHeadshotGeneratorGuide.ru.title,
+        description: aiHeadshotGeneratorGuide.ru.description,
+        datePublished: aiHeadshotGeneratorGuide.ru.publishedAt,
+        dateModified: aiHeadshotGeneratorGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: aiHeadshotGeneratorGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiHeadshotGeneratorGuide.ru.cover.src}`,
+          width: aiHeadshotGeneratorGuide.ru.cover.width,
+          height: aiHeadshotGeneratorGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-headshot-generator`,
+        url: `${SITE_ORIGIN}/blog/ai-headshot-generator`,
+        name: aiHeadshotGeneratorGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiHeadshotGeneratorGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/ai-headshot-generator`,
+        aiHeadshotGeneratorGuide.ru.title,
+      ),
+      faqPageBlock(aiHeadshotGeneratorGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-headshot-generator`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: aiHeadshotGeneratorGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-headshot-generator` },
+        ],
+        `${SITE_ORIGIN}/blog/ai-headshot-generator`,
       ),
     ],
   },
@@ -2682,6 +2744,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/ai-headshot-generator`, name: aiHeadshotGeneratorGuide.en.title, datePublished: aiHeadshotGeneratorGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`, name: aiUgcForBrandsGuide.en.title, datePublished: aiUgcForBrandsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/upscale-image-ai`, name: upscaleImageAiGuide.en.title, datePublished: upscaleImageAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-lip-sync`, name: aiLipSyncGuide.en.title, datePublished: aiLipSyncGuide.en.publishedAt },
@@ -2716,6 +2779,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/ai-headshot-generator EN sibling.
+  {
+    path: "/en/blog/ai-headshot-generator",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-headshot-generator`,
+      en: `${SITE_ORIGIN}/en/blog/ai-headshot-generator`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-headshot-generator`,
+    },
+    title: aiHeadshotGeneratorGuide.en.title,
+    description: aiHeadshotGeneratorGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-headshot-generator`,
+    ogTitle: aiHeadshotGeneratorGuide.en.title,
+    ogDescription: aiHeadshotGeneratorGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiHeadshotGeneratorGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-headshot-generator`,
+        headline: aiHeadshotGeneratorGuide.en.title,
+        description: aiHeadshotGeneratorGuide.en.description,
+        datePublished: aiHeadshotGeneratorGuide.en.publishedAt,
+        dateModified: aiHeadshotGeneratorGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: aiHeadshotGeneratorGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiHeadshotGeneratorGuide.en.cover.src}`,
+          width: aiHeadshotGeneratorGuide.en.cover.width,
+          height: aiHeadshotGeneratorGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-headshot-generator`,
+        url: `${SITE_ORIGIN}/en/blog/ai-headshot-generator`,
+        name: aiHeadshotGeneratorGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiHeadshotGeneratorGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/ai-headshot-generator`,
+        aiHeadshotGeneratorGuide.en.title,
+      ),
+      faqPageBlock(aiHeadshotGeneratorGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-headshot-generator`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: aiHeadshotGeneratorGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-headshot-generator` },
+        ],
+        `${SITE_ORIGIN}/en/blog/ai-headshot-generator`,
       ),
     ],
   },

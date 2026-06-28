@@ -31,7 +31,7 @@ brief_count: 10
 | 7 | published | `ai-lip-sync` | `BL-technique` | `ai lip sync` | 226 | [07-ai-lip-sync.md](07-ai-lip-sync.md) |
 | 8 | published | `upscale-image-ai` | `BL-technique` | `апскейл фото нейросеть` | 204 | [08-upscale-image-ai.md](08-upscale-image-ai.md) |
 | 9 | published | `ai-ugc-for-brands` | `BL-usecase` | `ai ugc` | 102 | [09-ai-ugc-for-brands.md](09-ai-ugc-for-brands.md) |
-| 10 | pending | `ai-headshot-generator` | `BL-usecase` | `бизнес портрет нейросеть` | 2 | [10-ai-headshot-generator.md](10-ai-headshot-generator.md) |
+| 10 | published | `ai-headshot-generator` | `BL-usecase` | `бизнес портрет нейросеть` | 2 | [10-ai-headshot-generator.md](10-ai-headshot-generator.md) |
 
 ## Notes
 
