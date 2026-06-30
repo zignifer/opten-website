@@ -33,8 +33,8 @@ const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 // pages (62 RU + 62 EN). Daily blog posts bring the floor to 170; public Learn adds 14 lesson routes
 // and Learn Finds adds generated third-party video breakdown routes.
 // /dashboard/*) carry prerender:"none" and are excluded from sitemapRoutes.
-if (sitemapRoutes.length < 198) {
-  throw new Error(`sitemap.mjs: expected at least 198 routes (52 baseline/blog routes + 20 Learn routes + 2 model hubs + 124 model pages), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+if (sitemapRoutes.length < 200) {
+  throw new Error(`sitemap.mjs: expected at least 200 routes (54 baseline/blog routes + 20 Learn routes + 2 model hubs + 124 model pages), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 // Post-2026-05-17 GEO audit ME-12: per-route lastmod via git mtime of the source file driving
@@ -54,6 +54,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/ai-training-beginners":       "src/content/blog/ai-training-beginners.ts",
+  "/en/blog/ai-training-beginners":    "src/content/blog/ai-training-beginners.ts",
   "/blog/ai-headshot-generator":       "src/content/blog/ai-headshot-generator.ts",
   "/en/blog/ai-headshot-generator":    "src/content/blog/ai-headshot-generator.ts",
   "/blog/ai-ugc-for-brands":       "src/content/blog/ai-ugc-for-brands.ts",
