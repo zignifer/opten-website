@@ -2,11 +2,15 @@
 tags: [opten-seo, blog, weekly-briefs]
 kind: weekly-blog-brief-batch
 week: "2026-W23"
-status: ready
+status: completed
 brief_count: 10
+completed_at: 2026-06-28
+published_count: 10
 ---
 
 # Weekly blog briefs — 2026-W23
+
+Status: completed. All 10 topics in this batch are published.
 
 10-topic batch for opten.space blog production. Briefs contain suggested SEO/GEO keyword placement, not final copy.
 

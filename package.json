@@ -19,6 +19,7 @@
     "verify:blog-seo": "node scripts/verify-blog-seo-routes.mjs",
     "verify:seo2-briefs": "node scripts/verify-seo2-briefs.mjs",
     "verify:kinescope-course": "node scripts/verify-kinescope-course.mjs",
+    "verify:prompt-library-favorite": "node scripts/verify-prompt-library-favorite.mjs",
     "verify:seo2-blog": "node scripts/verify-seo2-blog-post.mjs",
     "verify:unified-auth": "node scripts/verify-unified-auth.mjs",
     "verify:space-learn": "node scripts/verify-space-learn.mjs",

@@ -31,6 +31,10 @@ import {
   type PromptLibraryPublicationSummary,
   type PromptRecord,
 } from "../../lib/promptLibraryApi";
+import {
+  PromptLibraryFavoriteError,
+  savePromptFavoriteWithFreshAuth,
+} from "../../lib/promptLibraryFavorite";
 import SiteHeader from "../components/SiteHeader";
 
 const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/opten-%E2%80%94-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
@@ -46,6 +50,9 @@ const PROMPT_LIBRARY_DEMO_SEEN_KEY = "opten_prompt_library_demo_seen_v1";
 type FilterMode = "all" | "favorite" | "recent" | "archive";
 type EditorMode = "view" | "edit";
 type AuthState = "detecting" | "no_extension" | "no_auth" | "ready" | "error";
+type ExtensionAuthTokenResult =
+  | { status: "ready"; token: string; userId: string }
+  | { status: "no_extension" | "no_auth" | "error"; error?: string };
 
 const TEXT = {
   ru: {
@@ -328,6 +335,72 @@ function isDraft(prompt: PromptRecord): boolean {
   return prompt.id.startsWith("draft-");
 }
 
+function requestExtensionAuthToken(): Promise<ExtensionAuthTokenResult> {
+  const chrome = (window as any).chrome;
+  if (!chrome?.runtime?.sendMessage) {
+    return Promise.resolve({ status: "no_extension" });
+  }
+
+  return new Promise((resolve) => {
+    let tried = 0;
+    let resolved = false;
+
+    function finish(result: ExtensionAuthTokenResult) {
+      if (resolved) return;
+      resolved = true;
+      resolve(result);
+    }
+
+    for (const id of EXTENSION_IDS) {
+      try {
+        chrome.runtime.sendMessage(id, { type: "GET_AUTH_TOKEN" }, (response: any) => {
+          tried++;
+          if (resolved) return;
+          if (chrome.runtime.lastError || !response) {
+            if (tried >= EXTENSION_IDS.length) finish({ status: "no_extension" });
+            return;
+          }
+          if (!response.token) {
+            finish({ status: "no_auth" });
+            return;
+          }
+          const nextUserId = parseJwtUserId(response.token);
+          if (!nextUserId) {
+            finish({ status: "error", error: "invalid_token" });
+            return;
+          }
+          finish({ status: "ready", token: response.token, userId: nextUserId });
+        });
+      } catch {
+        tried++;
+        if (tried >= EXTENSION_IDS.length && !resolved) finish({ status: "no_extension" });
+      }
+    }
+  });
+}
+
+async function patchPromptFavoriteWithToken(token: string, promptId: string, favorite: boolean): Promise<PromptRecord> {
+  const res = await fetch(`${SUPABASE_REST_URL}/prompt_library?id=eq.${promptId}&select=${PROMPT_SELECT}`, {
+    method: "PATCH",
+    headers: {
+      ...promptLibraryHeaders(token),
+      Prefer: "return=representation",
+    },
+    body: JSON.stringify({ favorite }),
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    const code = data?.code || data?.message || String(res.status);
+    throw new PromptLibraryFavoriteError(data?.message || code, code, res.status);
+  }
+
+  const saved = Array.isArray(data) ? data[0] ?? null : data;
+  if (!saved?.id) {
+    throw new PromptLibraryFavoriteError("missing saved prompt", "missing_saved_prompt", 500);
+  }
+  return saved;
+}
+
 async function copyText(text: string): Promise<boolean> {
   if (!text.trim()) return false;
   try {
@@ -497,6 +570,7 @@ export default function PromptLibraryPage() {
   const [publication, setPublication] = useState<PromptLibraryPublicationSummary | null>(null);
   const [publishing, setPublishing] = useState(false);
   const [publishMenuOpen, setPublishMenuOpen] = useState(false);
+  const [favoritePendingId, setFavoritePendingId] = useState<string | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const publishMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -705,46 +779,43 @@ export default function PromptLibraryPage() {
   }
 
   async function detectExtension() {
-    const chrome = (window as any).chrome;
-    if (!chrome?.runtime?.sendMessage) {
+    const result = await requestExtensionAuthToken();
+    if (result.status === "no_extension") {
       setAuthState("no_extension");
       return;
     }
-
-    let tried = 0;
-    let resolved = false;
-    for (const id of EXTENSION_IDS) {
-      try {
-        chrome.runtime.sendMessage(id, { type: "GET_AUTH_TOKEN" }, (response: any) => {
-          tried++;
-          if (resolved) return;
-          if (chrome.runtime.lastError || !response) {
-            if (tried >= EXTENSION_IDS.length) setAuthState("no_extension");
-            return;
-          }
-          if (!response.token) {
-            resolved = true;
-            setAuthState("no_auth");
-            return;
-          }
-          const nextUserId = parseJwtUserId(response.token);
-          if (!nextUserId) {
-            resolved = true;
-            setError("invalid_token");
-            setAuthState("error");
-            return;
-          }
-          resolved = true;
-          setToken(response.token);
-          setUserId(nextUserId);
-          setAuthState("ready");
-          void loadPrompts(response.token);
-        });
-      } catch {
-        tried++;
-        if (tried >= EXTENSION_IDS.length && !resolved) setAuthState("no_extension");
-      }
+    if (result.status === "no_auth") {
+      setAuthState("no_auth");
+      return;
     }
+    if (result.status === "error") {
+      setError(result.error || "invalid_token");
+      setAuthState("error");
+      return;
+    }
+
+    setToken(result.token);
+    setUserId(result.userId);
+    setAuthState("ready");
+    void loadPrompts(result.token);
+  }
+
+  async function getFreshPromptLibraryToken(): Promise<string | null> {
+    const result = await requestExtensionAuthToken();
+    if (result.status === "ready") {
+      setToken(result.token);
+      setUserId(result.userId);
+      setAuthState("ready");
+      return result.token;
+    }
+
+    if (result.status === "no_extension") setAuthState("no_extension");
+    else if (result.status === "no_auth") setAuthState("no_auth");
+    else {
+      setError(result.error || "invalid_token");
+      setAuthState("error");
+    }
+    return null;
   }
 
   async function loadPromptCount(authToken: string) {
@@ -899,17 +970,32 @@ export default function PromptLibraryPage() {
   }
 
   async function handleFavorite(prompt: PromptRecord) {
-    patchLocal(prompt.id, { favorite: !prompt.favorite });
-    if (isDraft(prompt)) return;
-    const saved = await mutatePrompt(`/prompt_library?id=eq.${prompt.id}&select=${PROMPT_SELECT}`, {
-      method: "PATCH",
-      body: JSON.stringify({ favorite: !prompt.favorite }),
-    });
-    if (saved) {
+    const nextFavorite = !prompt.favorite;
+    if (isDraft(prompt)) {
+      patchLocal(prompt.id, { favorite: nextFavorite });
+      return;
+    }
+    if (favoritePendingId === prompt.id) return;
+
+    setFavoritePendingId(prompt.id);
+    try {
+      const saved = await savePromptFavoriteWithFreshAuth({
+        promptId: prompt.id,
+        favorite: nextFavorite,
+        getFreshAuthToken: getFreshPromptLibraryToken,
+        patchFavorite: patchPromptFavoriteWithToken,
+        onTokenAccepted: setToken,
+      });
       upsertLocal(saved);
       notifyPromptLibraryCacheRefresh();
+      showToast(nextFavorite ? text.favAdded : text.favRemoved);
+    } catch (err: any) {
+      const code = err?.code || err?.message || "favorite_failed";
+      setError(code);
+      showToast(text.error);
+    } finally {
+      setFavoritePendingId(null);
     }
-    showToast(prompt.favorite ? text.favRemoved : text.favAdded);
   }
 
   async function handleArchiveToggle(prompt: PromptRecord) {
@@ -1299,10 +1385,13 @@ export default function PromptLibraryPage() {
                               event.stopPropagation();
                               void handleFavorite(prompt);
                             }}
+                            disabled={favoritePendingId === prompt.id}
+                            aria-busy={favoritePendingId === prompt.id ? "true" : undefined}
                             aria-label={prompt.favorite ? text.favoriteRemove : text.favoriteAdd}
                             className={cx(
                               "grid size-9 shrink-0 cursor-pointer place-items-center rounded-full border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/60",
                               prompt.favorite ? "border-[#9cfb51]/35 bg-[#9cfb51]/12 text-[#9cfb51]" : "border-white/10 bg-white/[0.04] text-white/45 hover:bg-white/10 hover:text-white",
+                              favoritePendingId === prompt.id && "cursor-wait opacity-60",
                             )}
                           >
                             <Star size={16} fill={prompt.favorite ? "currentColor" : "none"} aria-hidden="true" />
@@ -1377,8 +1466,10 @@ export default function PromptLibraryPage() {
                     <button
                       type="button"
                       onClick={() => void handleFavorite(selectedPrompt)}
+                      disabled={favoritePendingId === selectedPrompt.id}
+                      aria-busy={favoritePendingId === selectedPrompt.id ? "true" : undefined}
                       aria-label={selectedPrompt.favorite ? text.favoriteRemove : text.favoriteAdd}
-                      className={cx("grid size-10 shrink-0 cursor-pointer place-items-center rounded-full border transition focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60", selectedPrompt.favorite ? "border-[#9cfb51]/40 bg-[#9cfb51]/12 text-[#9cfb51]" : "border-white/10 bg-white/[0.04] text-white/55 hover:text-white")}
+                      className={cx("grid size-10 shrink-0 cursor-pointer place-items-center rounded-full border transition focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60", selectedPrompt.favorite ? "border-[#9cfb51]/40 bg-[#9cfb51]/12 text-[#9cfb51]" : "border-white/10 bg-white/[0.04] text-white/55 hover:text-white", favoritePendingId === selectedPrompt.id && "cursor-wait opacity-60")}
                     >
                       <Star size={15} fill={selectedPrompt.favorite ? "currentColor" : "none"} aria-hidden="true" />
                     </button>
