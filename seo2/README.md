@@ -32,7 +32,27 @@ local publisher.
 
 ## Как запускать вручную
 
-Открой Codex в `opten-website` и дай задачу:
+Сначала можно проверить, какая тема следующая:
+
+```bash
+npm run start:seo
+```
+
+Команда делает preflight `verify:seo2-briefs`, выбирает первую доступную тему
+из старейшей недели и печатает `start-seo: next-topic`. Если темы закончились,
+она печатает `start-seo: no-topics` и не запускает написание поста.
+
+В Codex можно писать коротко:
+
+```text
+start SEO
+```
+
+Для агента это означает: запустить `npm run start:seo`; если есть `next-topic`,
+создать один блог-пост по `seo2/blog-post-instruction.md`; если `no-topics`,
+остановиться и сказать, что нужен новый weekly batch в `opten-seo`.
+
+Полная ручная формулировка:
 
 ```text
 Используй seo2/blog-post-instruction.md. Создай следующий блог-пост из seo2/briefs.

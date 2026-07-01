@@ -9,6 +9,12 @@ mode: manual-self-publish
 Веди блог opten.space вручную из основного checkout `opten-website`.
 Один запуск = один пост.
 
+Короткая пользовательская команда `start SEO` означает: сначала запусти
+`npm run start:seo`. Если команда вернула `start-seo: no-topics`, остановись и
+скажи, что темы закончились и нужен новый weekly batch из `opten-seo`. Если
+команда вернула `start-seo: next-topic`, работай только с указанным `slug` и
+`brief`.
+
 Это новая ручная версия прежней Daily Opten blog post automation. Здесь нет
 cron, publisher, mark-ready и workspace-копий. Работай прямо в этом
 репозитории. После успешной проверки сам сделай scoped git add/commit/push.

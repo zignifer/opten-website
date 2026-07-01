@@ -7,6 +7,7 @@
     "build": "node scripts/verify-seo2-briefs.mjs && node scripts/generate-summaries.mjs && node scripts/generate-responsive-images.mjs && vite build && vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache --emptyOutDir && vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta && node scripts/prerender.mjs && node scripts/sitemap.mjs && node scripts/llms.mjs && node scripts/verify-faq-mainentity.mjs && node scripts/verify-fonts.mjs && node scripts/indexnow.mjs",
     "dev": "node scripts/generate-responsive-images.mjs && vite",
     "generate:responsive-images": "node scripts/generate-responsive-images.mjs",
+    "start:seo": "node scripts/start-seo.mjs",
     "gsc:inspect": "node scripts/gsc.mjs inspect",
     "gsc:performance": "node scripts/gsc.mjs performance",
     "gsc:sitemaps": "node scripts/gsc.mjs sitemaps",

@@ -566,7 +566,8 @@ Non-negotiables (the full set lives in `docs/CONTENT-AUTHORING.md`):
 11. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
 12. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
 13. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
-14. New SEO2 weekly blog posts must pass `npm run verify:seo2-blog -- <slug>`
+14. User command `start SEO` means: run `npm run start:seo` first. If it prints `start-seo: no-topics`, do not generate an article; tell the user a new weekly batch must be generated in `opten-seo`. If it prints `start-seo: next-topic`, create exactly one SEO2 post for that slug using `seo2/blog-post-instruction.md`.
+15. New SEO2 weekly blog posts must pass `npm run verify:seo2-blog -- <slug>`
     before commit. This is a blocking editorial/build gate, not an optional
     audit. It checks the SEO2 visual layer (4+ RU inline images, 4+ EN inline
     images, generated image files present, course CTA to
