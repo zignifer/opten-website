@@ -73,11 +73,46 @@ Prompt "make a video ad" is too vague. A prompt engineering approach adds produc
 - `/learn/courses/ai-content-marketing-2026`
 - `/`
 
-## Image Suggestions
+## Visual Production Brief
 
-1. Cover: prompt engineering classroom/workbench, no text.
-2. RU/EN frame: prompt anatomy.
-3. RU/EN frame: weak prompt to strong prompt.
+Pattern: follow the W23 visual pattern and the current SEO2 image rules. This is
+part of the article brief and is a blocker for image generation. Do not start
+from generic image hints or a textless base.
+
+### Hard Rules
+
+- Cover: one shared RU/EN raster at `public/blog/prompt-engineering-course/cover.jpg`, 1600x900,
+  16:9, no in-image text, no logos.
+- Inline images: 4+ RU rasters and 4+ EN rasters. Short text must be generated
+  inside the final image, not added afterward with editor, Canvas, HTML/CSS,
+  Sharp, or any other overlay/post-processing step.
+- Typography for all visible generated text: Bebas Neue only. Attach/use
+  `seo2/Reference/bebas-neue-font-reference.png` as the font reference.
+- Brand color: exact Opten lime `#9CFB51` on deep teal-black `#011417`.
+- Batch ban: do not reuse dark desk + floating UI board + laptop dashboard +
+  lime connector network motifs. Do not reuse composition, camera angle, or
+  object layout from another article in this batch.
+
+### Cover Concept
+
+- Scene family: hands-on learning setup with lesson cards, task sheets, practice checklist, portfolio result, and one strong physical anchor object.
+- Concept: prompt engineering classroom/workbench, no text.
+- Composition: one strong physical or cinematic subject, editorial tech mood,
+  useful crop-safe negative space, no text.
+- Avoid: fake app UI, readable cover words, generic laptop dashboard, floating
+  connector network, course-hype stock imagery, repeated W26 motif.
+
+### Inline Frames
+
+1. RU `ЗАДАЧА` / EN `TASK`: prompt anatomy. Make it a concrete visual explanation of `prompt engineering course`, not a decorative slide.
+2. RU `ПРАКТИКА` / EN `PRACTICE`: weak prompt to strong prompt. Use physical cards, marked objects, cinematic preview frames, or real workflow artifacts instead of a bare UI grid.
+3. RU `PROMPT` / EN `PROMPT`: Practice tasks: text, presentation, image, video, website. Show the prompt/brief layer as part of the scene, with the label rendered by the image generator.
+4. RU `КЕЙС` / EN `CASE`: How to improve prompts by iteration. Show the checked final result or decision point; keep text short and legible.
+
+Inline typography: final generated raster, Bebas Neue only, exact `#9CFB51`,
+large readable label. Attach/use `seo2/Reference/bebas-neue-font-reference.png`.
+No text overlays after generation.
+
 
 ## Avoid
 

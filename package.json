@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "build": "node scripts/generate-summaries.mjs && node scripts/generate-responsive-images.mjs && vite build && vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache --emptyOutDir && vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta && node scripts/prerender.mjs && node scripts/sitemap.mjs && node scripts/llms.mjs && node scripts/verify-faq-mainentity.mjs && node scripts/verify-fonts.mjs && node scripts/indexnow.mjs",
+    "build": "node scripts/verify-seo2-briefs.mjs && node scripts/generate-summaries.mjs && node scripts/generate-responsive-images.mjs && vite build && vite build --ssr scripts/entry-server.tsx --outDir .ssr-cache --emptyOutDir && vite build --ssr scripts/seo-routes.ts --outDir .ssr-meta && node scripts/prerender.mjs && node scripts/sitemap.mjs && node scripts/llms.mjs && node scripts/verify-faq-mainentity.mjs && node scripts/verify-fonts.mjs && node scripts/indexnow.mjs",
     "dev": "node scripts/generate-responsive-images.mjs && vite",
     "generate:responsive-images": "node scripts/generate-responsive-images.mjs",
     "gsc:inspect": "node scripts/gsc.mjs inspect",
@@ -16,6 +16,7 @@
     "sync:agents": "node scripts/sync-agent-docs.mjs",
     "verify:email-only-auth": "node scripts/verify-email-only-auth.mjs",
     "verify:blog-seo": "node scripts/verify-blog-seo-routes.mjs",
+    "verify:seo2-briefs": "node scripts/verify-seo2-briefs.mjs",
     "verify:kinescope-course": "node scripts/verify-kinescope-course.mjs",
     "verify:seo2-blog": "node scripts/verify-seo2-blog-post.mjs",
     "verify:unified-auth": "node scripts/verify-unified-auth.mjs",

@@ -109,6 +109,7 @@ green connector-line setup from other W26 learning posts.
 
 Inline typography: final generated raster, Bebas Neue style only, exact
 `#9CFB51`, large readable label. No text overlays after generation.
+Font reference: `seo2/Reference/bebas-neue-font-reference.png`.
 
 ## Avoid
 

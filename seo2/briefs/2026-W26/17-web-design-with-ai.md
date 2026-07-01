@@ -73,11 +73,46 @@ Beginner asks AI for a landing design and gets random sections. A better prompt 
 - `/blog/build-website-with-ai`
 - `/blog/vibe-coding-freelance`
 
-## Image Suggestions
+## Visual Production Brief
 
-1. Cover: web design board with AI references, no text.
-2. RU/EN frame: website design brief.
-3. RU/EN frame: portfolio case path.
+Pattern: follow the W23 visual pattern and the current SEO2 image rules. This is
+part of the article brief and is a blocker for image generation. Do not start
+from generic image hints or a textless base.
+
+### Hard Rules
+
+- Cover: one shared RU/EN raster at `public/blog/web-design-with-ai/cover.jpg`, 1600x900,
+  16:9, no in-image text, no logos.
+- Inline images: 4+ RU rasters and 4+ EN rasters. Short text must be generated
+  inside the final image, not added afterward with editor, Canvas, HTML/CSS,
+  Sharp, or any other overlay/post-processing step.
+- Typography for all visible generated text: Bebas Neue only. Attach/use
+  `seo2/Reference/bebas-neue-font-reference.png` as the font reference.
+- Brand color: exact Opten lime `#9CFB51` on deep teal-black `#011417`.
+- Batch ban: do not reuse dark desk + floating UI board + laptop dashboard +
+  lime connector network motifs. Do not reuse composition, camera angle, or
+  object layout from another article in this batch.
+
+### Cover Concept
+
+- Scene family: hands-on learning setup with lesson cards, task sheets, practice checklist, portfolio result, and one strong physical anchor object.
+- Concept: web design board with AI references, no text.
+- Composition: one strong physical or cinematic subject, editorial tech mood,
+  useful crop-safe negative space, no text.
+- Avoid: fake app UI, readable cover words, generic laptop dashboard, floating
+  connector network, course-hype stock imagery, repeated W26 motif.
+
+### Inline Frames
+
+1. RU `ЗАДАЧА` / EN `TASK`: website design brief. Make it a concrete visual explanation of `курсы веб дизайна`, not a decorative slide.
+2. RU `ПРАКТИКА` / EN `PRACTICE`: portfolio case path. Use physical cards, marked objects, cinematic preview frames, or real workflow artifacts instead of a bare UI grid.
+3. RU `PROMPT` / EN `PROMPT`: Where AI helps. Show the prompt/brief layer as part of the scene, with the label rendered by the image generator.
+4. RU `КЕЙС` / EN `CASE`: Prompt for landing page design. Show the checked final result or decision point; keep text short and legible.
+
+Inline typography: final generated raster, Bebas Neue only, exact `#9CFB51`,
+large readable label. Attach/use `seo2/Reference/bebas-neue-font-reference.png`.
+No text overlays after generation.
+
 
 ## Avoid
 

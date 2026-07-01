@@ -561,11 +561,12 @@ Non-negotiables (the full set lives in `docs/CONTENT-AUTHORING.md`):
 6. SEO2 inline blog images are locale-specific final rasters: generate RU and EN images with the short text already rendered inside the image. Use **Bebas Neue only** for all visible typography in SEO2 generated images, and attach/use `seo2/Reference/bebas-neue-font-reference.png` as the font reference in generation prompts. The Opten lime accent must be exactly `#9CFB51` in prompts and art direction; do not substitute warmer yellow-green, darker green, or approximate "lime" hues. Do not generate textless bases and add text afterward with editor/Canvas/HTML/CSS/Sharp overlays.
 7. Before generating any SEO2 blog art, the article brief must contain a concrete `Visual Production Brief` in the W23 pattern: one distinct no-text cover concept plus separate RU/EN inline frame concepts. Do not proceed from generic `Image Suggestions` like "learning desk" or "course board". The visual brief must force distinct physical/subject scenes and explicitly ban repeated floating UI boards, laptop dashboards, green connector networks, or reused composition across posts in the same batch.
 8. Course promo banners are the exception to the inline-text rule: they are reusable generated rasters with a clean left-side negative-space zone and a right-side Opten-style visual; the heading, description, and CTA button are rendered as accessible HTML so the same asset can be reused and localized. Save them under `public/blog/_banners/`, use dark SaaS editorial styling (`#011417` + exact `#9CFB51`), and link blog CTAs to `/learn/courses/ai-content-marketing-2026`. Future blog promo CTAs should advertise this course, not the Chrome extension, unless the article is specifically about extension install/use.
-9. Every `<img>` gets explicit `width`/`height` (CLS guard).
-10. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
-11. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
-12. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
-13. New SEO2 weekly blog posts must pass `npm run verify:seo2-blog -- <slug>`
+9. Active SEO2 weekly briefs must pass `npm run verify:seo2-briefs` before article generation. This gate rejects active `pending`/`deferred`/`ready` briefs that still use `## Image Suggestions` or lack generated-in-image visual rules. `npm run build` runs the same gate first.
+10. Every `<img>` gets explicit `width`/`height` (CLS guard).
+11. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
+12. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
+13. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
+14. New SEO2 weekly blog posts must pass `npm run verify:seo2-blog -- <slug>`
     before commit. This is a blocking editorial/build gate, not an optional
     audit. It checks the SEO2 visual layer (4+ RU inline images, 4+ EN inline
     images, generated image files present, course CTA to
