@@ -26,6 +26,13 @@ When adding ANY new page or post:
 5. **Images: `/blog/<slug>/cover.jpg` ≥ 1600×900, no in-image text.** No-text means one asset works for RU + EN + OG + visible `<img>` — keeps everything in sync. Locale-specific SEO2 inline images may include short text, but the text must be generated into the final image, not added afterward as an overlay. Use **Bebas Neue only** for all visible typography in those generated images, with `seo2/Reference/bebas-neue-font-reference.png` attached/used as the font reference. For Opten blog art, the lime accent is locked to `#9CFB51`; do not substitute approximate lime, yellow-green, acid/neon green, or darker green variants.
 6. **Mobile perf is part of SEO.** Every image gets explicit `width`/`height` (no CLS), every `<img>` after the hero gets `loading="lazy"`, every font is `font-display: optional` (see Phase 2.2 / commit `6141a0d`).
 7. **Run `npm run build` before commit.** It runs prerender + sitemap + llms.txt + FaqBlock parity check + IndexNow ping. A failing build means a broken contract — fix, don't bypass.
+8. **SEO2 weekly blog posts have their own blocking gate.** Before commit, run
+   `npm run verify:seo2-blog -- <slug>` and after `npm run build` run
+   `npm run verify:blog-seo -- <slug>`. The first command checks the article
+   source and asset layer: RU/EN parity, 4+ referenced inline images per locale,
+   generated files under `public/blog/<slug>/ru/` and `en/`, cover dimensions,
+   and course CTA hrefs. The second command checks the prerendered HTML/schema
+   for both locale routes. A green build alone is not enough for SEO2 posts.
 
 If anything below contradicts these, the rules above win.
 
@@ -73,7 +80,7 @@ The "6 files in sync" rule above is for **marketing + blog pages**. The 62 `/mod
 - **Content:** one `src/content/models/<slug>.ts` (`ModelContent = { ru, en }`). The Quick-Facts meta comes from the AUTO-GEN `_registry.ts` (parsed from RU `_skills/*.md` by `build-models-registry.mjs`).
 - **EN meta:** the registry's free-text meta (name/platform/duration/resolution) is **Russian** — supply English in `src/content/models/metaEn.ts` (resolved by `metaField(meta, field, lang)`). **No build gate enforces this** — run `node scripts/verify-models-content.mjs` to catch Cyrillic leaking onto `/en/*` (it also checks intro length, FAQ count, RU/EN parity).
 - **Hub visibility:** general/umbrella models (bare-brand name with versioned siblings) go in `HUB_HIDDEN_SLUGS` (`index.ts`) — hidden from the `/models` grid + ItemList schema, but kept live + sitemap'd.
-- **Floors:** models currently contribute 126 prerendered routes (2 hubs + 124 model pages) to the total 202-route SEO surface. Adding/removing models shifts the sitemap/llms route floor.
+- **Floors:** models currently contribute 126 prerendered routes (2 hubs + 124 model pages) to the total 210-route SEO surface. Adding/removing models shifts the sitemap/llms route floor.
 
 Full pipeline diagram: [ARCHITECTURE.md](ARCHITECTURE.md) §"Models content pipeline".
 
@@ -281,7 +288,7 @@ Running `npm run build` invokes (in order):
 3. `vite build` — the SPA bundle.
 4. `vite build --ssr scripts/entry-server.tsx` — the SSR bundle.
 5. `vite build --ssr scripts/seo-routes.ts` — the route manifest.
-6. `node scripts/prerender.mjs` — produces the current 202 prerendered SEO `dist/<route>/index.html` files with per-route `<head>`, JSON-LD, hreflang, `<html lang>`.
+6. `node scripts/prerender.mjs` — produces the current 210 prerendered SEO `dist/<route>/index.html` files with per-route `<head>`, JSON-LD, hreflang, `<html lang>`.
 7. `node scripts/sitemap.mjs` — emits `dist/sitemap.xml` with per-route `<lastmod>` from git mtime. **Floor check** fails if route registration drifts.
 8. `node scripts/llms.mjs` — emits `dist/llms.txt` + `dist/llms-full.txt`. Also has a floor check.
 9. `node scripts/verify-faq-mainentity.mjs` — asserts visible FAQ DOM ≡ FAQPage `mainEntity` for every route emitting one. Fails the build on drift.

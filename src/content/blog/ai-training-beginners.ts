@@ -17,29 +17,29 @@ const COVER_EN = {
 
 const COURSE_URL = "/learn/courses/ai-content-marketing-2026";
 
-const COURSE_BANNER_WORKFLOW_RU = {
-  src: "/blog/_banners/course-workflow.jpg",
+const COURSE_BANNER_LEARNING_RU = {
+  src: "/blog/_banners/course-learning-path.jpg",
   width: 1600,
   height: 560,
-  alt: "Схема курса по созданию контента, видео и сайта через нейросети",
+  alt: "Визуальная схема практического обучения ИИ через проект и промпты",
 };
-const COURSE_BANNER_WORKFLOW_EN = {
-  src: COURSE_BANNER_WORKFLOW_RU.src,
-  width: COURSE_BANNER_WORKFLOW_RU.width,
-  height: COURSE_BANNER_WORKFLOW_RU.height,
-  alt: "Course workflow visual for creating content, video, and a website with AI",
+const COURSE_BANNER_LEARNING_EN = {
+  src: COURSE_BANNER_LEARNING_RU.src,
+  width: COURSE_BANNER_LEARNING_RU.width,
+  height: COURSE_BANNER_LEARNING_RU.height,
+  alt: "Practical AI learning path visual with project work and prompts",
 };
-const COURSE_BANNER_AUTOMATION_RU = {
-  src: "/blog/_banners/course-automation.jpg",
+const COURSE_BANNER_PROJECT_RU = {
+  src: "/blog/_banners/course-project-sprint.jpg",
   width: 1600,
   height: 560,
-  alt: "Схема автоматизации контента через проект, промпты и нейросети",
+  alt: "Визуальная схема проектного спринта от prompt до готового контента",
 };
-const COURSE_BANNER_AUTOMATION_EN = {
-  src: COURSE_BANNER_AUTOMATION_RU.src,
-  width: COURSE_BANNER_AUTOMATION_RU.width,
-  height: COURSE_BANNER_AUTOMATION_RU.height,
-  alt: "Content automation visual with project files, prompts, and AI outputs",
+const COURSE_BANNER_PROJECT_EN = {
+  src: COURSE_BANNER_PROJECT_RU.src,
+  width: COURSE_BANNER_PROJECT_RU.width,
+  height: COURSE_BANNER_PROJECT_RU.height,
+  alt: "Project sprint visual from prompt to finished AI content",
 };
 
 const ru: BlogPostLocale = {
@@ -68,6 +68,7 @@ const ru: BlogPostLocale = {
           "Хочу научиться ИИ. Посмотрю курс, список сервисов и все популярные нейросети.",
         after:
           "Задача на сегодня: за 40 минут сделать черновик презентации для клиента. Результат: структура на 8 слайдов, тезисы, визуальный стиль и список мест, где prompt надо уточнить.",
+        imageSrc: "/blog/ai-training-beginners/ru/step-1.jpg",
       },
       {
         title: "Выберите одну стартовую траекторию",
@@ -77,14 +78,15 @@ const ru: BlogPostLocale = {
           "Сегодня ChatGPT, завтра Midjourney, потом видео, потом таблицы, потом автоматизация.",
         after:
           "Траектория недели: презентации. Каждый день улучшаю один и тот же кейс: brief, структура, слайды, визуальный стиль, финальная проверка.",
+        imageSrc: "/blog/ai-training-beginners/ru/step-2.jpg",
         promoBanner: {
-          eyebrow: "Курс Opten",
-          title: "Соберите систему контента на нейросетях",
+          eyebrow: "Практический курс",
+          title: "Освойте ИИ через один законченный проект",
           body:
-            "В курсе показываю полный цикл: промпты, фото, видео, сайт и рекламные материалы для бренда, а не отдельные случайные генерации.",
-          ctaLabel: "Перейти в курс",
+            "Вместо списка сервисов курс ведет через связку: задача, prompt, визуал, видео, сайт и финальная упаковка результата.",
+          ctaLabel: "Открыть программу",
           href: COURSE_URL,
-          image: COURSE_BANNER_WORKFLOW_RU,
+          image: COURSE_BANNER_LEARNING_RU,
         },
       },
       {
@@ -95,6 +97,7 @@ const ru: BlogPostLocale = {
           "Сделай мне презентацию про курс по ИИ, чтобы было интересно и современно.",
         after:
           "Role: presentation strategist. Task: create an 8-slide outline for a beginner AI course landing webinar. Audience: solo marketers and small business owners. Format: slide title, key message, proof, visual idea. Constraints: no income promises, no generic AI hype, clear practical examples.",
+        imageSrc: "/blog/ai-training-beginners/ru/step-3.jpg",
       },
       {
         title: "Пройдите 7-дневный цикл практики",
@@ -104,6 +107,7 @@ const ru: BlogPostLocale = {
           "Смотрю уроки, сохраняю ссылки, жду момента, когда станет понятно, с чего начать.",
         after:
           "7 дней: задача → prompt → первый результат → правка → вторая версия → оформление → короткий разбор кейса.",
+        imageSrc: "/blog/ai-training-beginners/ru/step-4.jpg",
       },
       {
         title: "Соберите первый кейс для работы или портфолио",
@@ -114,13 +118,13 @@ const ru: BlogPostLocale = {
         after:
           "Кейс: задача клиента, 2 версии prompt, сравнение результатов, финальный материал, выводы и список ограничений, которые улучшили output.",
         promoBanner: {
-          eyebrow: "Практика",
-          title: "Автоматизируйте баннеры, видео и лендинг",
+          eyebrow: "От обучения к кейсу",
+          title: "Соберите результат, который можно показать",
           body:
-            "Внутри курса есть блок про Codex, Higgsfield MCP и повторяемый визуальный стиль, чтобы новые материалы собирались быстрее.",
-          ctaLabel: "Смотреть программу",
+            "Курс помогает пройти полный проектный спринт: от первого prompt до материалов, которые можно положить в портфолио или показать команде.",
+          ctaLabel: "Смотреть курс",
           href: COURSE_URL,
-          image: COURSE_BANNER_AUTOMATION_RU,
+          image: COURSE_BANNER_PROJECT_RU,
         },
       },
     ],
@@ -175,6 +179,7 @@ const en: BlogPostLocale = {
           "I want to learn AI. I'll watch a course, collect tools, and try all the popular models.",
         after:
           "Today's task: create a draft client presentation in 40 minutes. Output: 8-slide structure, key points, visual direction, and a list of prompt gaps to fix.",
+        imageSrc: "/blog/ai-training-beginners/en/step-1.jpg",
       },
       {
         title: "Choose one beginner track",
@@ -184,14 +189,15 @@ const en: BlogPostLocale = {
           "Today ChatGPT, tomorrow image generation, then video, then spreadsheets, then automation.",
         after:
           "Weekly track: presentations. Improve one case every day: brief, structure, slides, visual direction, final review.",
+        imageSrc: "/blog/ai-training-beginners/en/step-2.jpg",
         promoBanner: {
-          eyebrow: "Opten course",
-          title: "Build an AI content system",
+          eyebrow: "Practical course",
+          title: "Learn AI through one finished project",
           body:
-            "The course walks through prompts, images, video, a website, and campaign assets for one brand instead of disconnected one-off generations.",
-          ctaLabel: "Open the course",
+            "Instead of collecting tools, the course walks through task framing, prompts, visuals, video, a website, and final packaging.",
+          ctaLabel: "Open curriculum",
           href: COURSE_URL,
-          image: COURSE_BANNER_WORKFLOW_EN,
+          image: COURSE_BANNER_LEARNING_EN,
         },
       },
       {
@@ -202,6 +208,7 @@ const en: BlogPostLocale = {
           "Make me a presentation about an AI course. It should be interesting and modern.",
         after:
           "Role: presentation strategist. Task: create an 8-slide outline for a beginner AI course landing webinar. Audience: solo marketers and small business owners. Format: slide title, key message, proof, visual idea. Constraints: no income promises, no generic AI hype, clear practical examples.",
+        imageSrc: "/blog/ai-training-beginners/en/step-3.jpg",
       },
       {
         title: "Run a 7-day practice sprint",
@@ -211,6 +218,7 @@ const en: BlogPostLocale = {
           "I keep watching tutorials, saving links, and waiting until I know where to start.",
         after:
           "7 days: task -> prompt -> first output -> revision -> second version -> packaging -> short case note.",
+        imageSrc: "/blog/ai-training-beginners/en/step-4.jpg",
       },
       {
         title: "Turn practice into a proof of work",
@@ -221,13 +229,13 @@ const en: BlogPostLocale = {
         after:
           "Case: client task, two prompt versions, output comparison, final material, lessons learned, and the constraints that improved the result.",
         promoBanner: {
-          eyebrow: "Practice",
-          title: "Automate banners, video, and landing pages",
+          eyebrow: "From learning to proof",
+          title: "Build something you can actually show",
           body:
-            "Inside the course, Codex, Higgsfield MCP, and a locked visual style turn repeated content production into a reusable workflow.",
-          ctaLabel: "View curriculum",
+            "The course turns beginner practice into a project sprint: prompt, output, revision, and a finished piece for work or portfolio review.",
+          ctaLabel: "View course",
           href: COURSE_URL,
-          image: COURSE_BANNER_AUTOMATION_EN,
+          image: COURSE_BANNER_PROJECT_EN,
         },
       },
     ],

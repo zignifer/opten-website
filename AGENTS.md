@@ -156,7 +156,7 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
      │
      └→ main.tsx → <BrowserRouter> → <LangProvider> → <Routes>
             ↓
-        ~39 client route patterns + catch-all 404 → 202 prerendered SEO routes:
+        ~39 client route patterns + catch-all 404 → 210 prerendered SEO routes:
           Marketing/billing RU (9): /, /pay, /welcome, /about, /blog, /blog/:slug,
                   /privacy, /terms, /refund
           Models RU (Phase v2.0): /models hub + /models/:slug (62 model pages)
@@ -173,10 +173,10 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
               + /en/learn(/:slug) + /en/learn/finds/:slug
           Catch-all: <Route path="*"> → NotFound (runtime noindex injection)
 
-  Prerender (postbuild):  scripts/prerender.mjs → 202 dist/<route>/index.html files
-                          (38 blog + 24 Learn + 126 model + marketing/legal/pricing —
+  Prerender (postbuild):  scripts/prerender.mjs → 210 dist/<route>/index.html files
+                          (46 blog + 24 Learn + 126 model + marketing/legal/pricing —
                           with hreflang triplets + baked <html lang>)
-                          + sitemap.xml (202 URL) + llms.txt + IndexNow ping
+                          + sitemap.xml (210 URL) + llms.txt + IndexNow ping
                           + FaqBlock ↔ FAQPage parity assertion
   Site ↔ Extension:       chrome.runtime.sendMessage (externally_connectable, opten.space only)
   Site → Supabase:        fetch to /functions/v1/* and /rest/v1/* — base URL is
@@ -546,8 +546,8 @@ temporary notebooks, raw transcripts, or local suffler settings.
 The site shipped v1.0 (GEO Optimization, 12 → ~72.6 score, 7 phases) and v2.0
 (Programmatic SEO — 62 model pages × RU/EN + 2 hubs = 126 prerendered model
 routes, shipped 2026-05-20) with a JSON-LD entity graph enforced by build-time
-gates. Total prerendered SEO route count is currently 202 after public Learn
-and Learn Finds.
+gates. Total prerendered SEO route count is currently 210 after public Learn,
+Learn Finds, and the W26 learning-cluster blog posts.
 **Adding a marketing/blog page is a coordinated 6-file change** (model pages
 follow the generated flow above), not a one-shot file write.
 
@@ -564,6 +564,14 @@ Non-negotiables (the full set lives in `docs/CONTENT-AUTHORING.md`):
 9. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
 10. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
 11. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
+12. New SEO2 weekly blog posts must pass `npm run verify:seo2-blog -- <slug>`
+    before commit. This is a blocking editorial/build gate, not an optional
+    audit. It checks the SEO2 visual layer (4+ RU inline images, 4+ EN inline
+    images, generated image files present, course CTA to
+    `/learn/courses/ai-content-marketing-2026`) and basic content constraints.
+    After `npm run build`, run `npm run verify:blog-seo -- <slug>` to assert the
+    prerendered DOM/metadata/schema contract for both `/blog/<slug>` and
+    `/en/blog/<slug>`. A normal build is not enough for SEO2 posts.
 
 **The full playbook with route-registration checklist, schema graph rules, image conventions, and a list of optimizations that have already been tried and rejected: [docs/CONTENT-AUTHORING.md](docs/CONTENT-AUTHORING.md).** Open this file alongside `seo-routes.ts` whenever adding a new page.
 

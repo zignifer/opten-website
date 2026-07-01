@@ -13,7 +13,7 @@
 │       │                                                                      │
 │       └─> main.tsx → <BrowserRouter> → <LangProvider> → <Routes>             │
 │                                                                              │
-│   Routes (~39 patterns + catch-all 404; 202 prerendered SEO routes):         │
+│   Routes (~39 patterns + catch-all 404; 210 prerendered SEO routes):         │
 │     RU (9 marketing prerendered, plus SEO content; SPA-only app/account):    │
 │       /                   App.tsx              landing                       │
 │       /login              AppLoginPage.tsx     website auth (SPA-only)       │
@@ -216,7 +216,7 @@ dicts) and the GEO/SEO patterns locked-in during v1.0.
 4. `document.documentElement.lang` is **NOT** mutated at runtime (Phase 3 D-06 — runtime DOM mutation caused hydration mismatch). It is baked per page at prerender time.
 
 **Bilingual URLs (current state):**
-- **202 prerendered SEO HTML files**: 126 model routes (2 hubs + 124 model pages), 38 blog routes, 24 public Learn routes (2 hubs + 12 lessons + 10 Learn Finds), and 14 marketing/legal/pricing/welcome routes.
+- **210 prerendered SEO HTML files**: 126 model routes (2 hubs + 124 model pages), 46 blog routes, 24 public Learn routes (2 hubs + 12 lessons + 10 Learn Finds), and 14 marketing/legal/pricing/welcome routes.
 - Each prerendered `<head>` carries a `<link rel="alternate" hreflang>` triplet (`ru`, `en`, `x-default → unprefixed RU`) reciprocal between siblings.
 - `<html lang>` baked per route at build time by `scripts/prerender.mjs` (`ru` for unprefixed, `en` for `/en/*`).
 - **Hreflang locale code policy:** hreflang annotations use language-only codes (`ru`, `en`, `x-default`) in both `scripts/prerender.mjs#applyHreflang` and `scripts/sitemap.mjs` xhtml:link entries, while schema-level `inLanguage` stays region-specific (`ru-RU`, `en-US`) in `scripts/seo-routes.ts`. Both are valid per Google's documentation; the mix is intentional — language-only hreflang targets the broadest audience (RU readers globally, not just RU-from-Russia), while schema-level region tags give AI systems a precise origin signal for the content. Do not "unify" these — the asymmetry is the policy.

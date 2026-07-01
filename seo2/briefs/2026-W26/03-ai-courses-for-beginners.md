@@ -4,7 +4,7 @@ kind: blog-article-brief
 week: "2026-W26"
 brief_id: "2026-W26-03"
 slug: "ai-courses-for-beginners"
-status: ready
+status: published
 cluster_id: "BL-learn"
 target_repo: opten-website
 source: "manual synthesis: learn-courses + learn-courses-en"
