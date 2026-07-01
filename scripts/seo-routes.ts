@@ -6,6 +6,7 @@
 // intro/steps/faq under `body: { ... }`. URL still /guides/gpt-image-2 until B-07.
 // This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
+import { post as aiTrainingBeginnersGuide } from "../src/content/blog/ai-training-beginners";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
 import { post as aiFaceSwapGuide } from "../src/content/blog/ai-face-swap";
@@ -1297,6 +1298,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/ai-training-beginners`, name: aiTrainingBeginnersGuide.ru.title, datePublished: aiTrainingBeginnersGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-headshot-generator`, name: aiHeadshotGeneratorGuide.ru.title, datePublished: aiHeadshotGeneratorGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-ugc-for-brands`, name: aiUgcForBrandsGuide.ru.title, datePublished: aiUgcForBrandsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/upscale-image-ai`, name: upscaleImageAiGuide.ru.title, datePublished: upscaleImageAiGuide.ru.publishedAt },
@@ -1332,6 +1334,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/ai-training-beginners — beginner AI training workflow guide.
+  {
+    path: "/blog/ai-training-beginners",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-training-beginners`,
+      en: `${SITE_ORIGIN}/en/blog/ai-training-beginners`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-training-beginners`,
+    },
+    title: aiTrainingBeginnersGuide.ru.title,
+    description: aiTrainingBeginnersGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-training-beginners`,
+    ogTitle: aiTrainingBeginnersGuide.ru.title,
+    ogDescription: aiTrainingBeginnersGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiTrainingBeginnersGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-training-beginners`,
+        headline: aiTrainingBeginnersGuide.ru.title,
+        description: aiTrainingBeginnersGuide.ru.description,
+        datePublished: aiTrainingBeginnersGuide.ru.publishedAt,
+        dateModified: aiTrainingBeginnersGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: aiTrainingBeginnersGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiTrainingBeginnersGuide.ru.cover.src}`,
+          width: aiTrainingBeginnersGuide.ru.cover.width,
+          height: aiTrainingBeginnersGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-training-beginners`,
+        url: `${SITE_ORIGIN}/blog/ai-training-beginners`,
+        name: aiTrainingBeginnersGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiTrainingBeginnersGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/ai-training-beginners`,
+        aiTrainingBeginnersGuide.ru.title,
+      ),
+      faqPageBlock(aiTrainingBeginnersGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-training-beginners`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: aiTrainingBeginnersGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-training-beginners` },
+        ],
+        `${SITE_ORIGIN}/blog/ai-training-beginners`,
       ),
     ],
   },
@@ -2744,6 +2806,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/ai-training-beginners`, name: aiTrainingBeginnersGuide.en.title, datePublished: aiTrainingBeginnersGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-headshot-generator`, name: aiHeadshotGeneratorGuide.en.title, datePublished: aiHeadshotGeneratorGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`, name: aiUgcForBrandsGuide.en.title, datePublished: aiUgcForBrandsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/upscale-image-ai`, name: upscaleImageAiGuide.en.title, datePublished: upscaleImageAiGuide.en.publishedAt },
@@ -2779,6 +2842,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/ai-training-beginners EN sibling.
+  {
+    path: "/en/blog/ai-training-beginners",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-training-beginners`,
+      en: `${SITE_ORIGIN}/en/blog/ai-training-beginners`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-training-beginners`,
+    },
+    title: aiTrainingBeginnersGuide.en.title,
+    description: aiTrainingBeginnersGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-training-beginners`,
+    ogTitle: aiTrainingBeginnersGuide.en.title,
+    ogDescription: aiTrainingBeginnersGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiTrainingBeginnersGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-training-beginners`,
+        headline: aiTrainingBeginnersGuide.en.title,
+        description: aiTrainingBeginnersGuide.en.description,
+        datePublished: aiTrainingBeginnersGuide.en.publishedAt,
+        dateModified: aiTrainingBeginnersGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: aiTrainingBeginnersGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiTrainingBeginnersGuide.en.cover.src}`,
+          width: aiTrainingBeginnersGuide.en.cover.width,
+          height: aiTrainingBeginnersGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-training-beginners`,
+        url: `${SITE_ORIGIN}/en/blog/ai-training-beginners`,
+        name: aiTrainingBeginnersGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiTrainingBeginnersGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/ai-training-beginners`,
+        aiTrainingBeginnersGuide.en.title,
+      ),
+      faqPageBlock(aiTrainingBeginnersGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-training-beginners`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: aiTrainingBeginnersGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-training-beginners` },
+        ],
+        `${SITE_ORIGIN}/en/blog/ai-training-beginners`,
       ),
     ],
   },
