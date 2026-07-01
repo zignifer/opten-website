@@ -4,7 +4,7 @@ kind: blog-article-brief
 week: "2026-W26"
 brief_id: "2026-W26-03"
 slug: "ai-courses-for-beginners"
-status: published
+status: ready
 cluster_id: "BL-learn"
 target_repo: opten-website
 source: "manual synthesis: learn-courses + learn-courses-en"
@@ -70,13 +70,40 @@ This is not a listicle with affiliate-style ranking. Build a checklist for selec
 
 - `/learn`
 - `/learn/courses/ai-content-marketing-2026`
-- `/blog/ai-training-beginners`
+- `/blog/prompt-structure`
 
-## Image Suggestions
+## Visual Production Brief
 
-1. Cover: course comparison board, no text.
-2. RU/EN frame: course checklist.
-3. RU/EN frame: project-based learning path.
+Pattern: follow the W23 visual pattern: every article gets a concrete, inspectable
+subject and a distinct scene. This article is about choosing courses, so it needs
+comparison/review imagery, not the same learning-desk or skill-workshop imagery.
+
+### Cover
+
+- Concept: choosing an AI course with sober comparison, not hype.
+- Scene: editorial flat lay of three physical course folders/cards on a dark
+  table, with a checklist clipboard, highlighter, receipt-like price note, and
+  laptop barely visible at the side.
+- Composition: 35-degree flat lay, folders arranged in a triangle, checklist as
+  the visual anchor; no in-image text.
+- Palette: Opten dark `#011417`, off-white paper, muted graphite, exact lime
+  `#9CFB51` checkmarks, a restrained red warning tab on one folder.
+- Avoid: floating UI boards, green connector network, repeated laptop desk,
+  promises/certificates, readable cover words.
+
+### Inline Frames
+
+1. RU `ЧЕК-ЛИСТ` / EN `CHECKLIST`: clipboard with course evaluation criteria,
+   lime checkmarks, pen crossing one weak criterion. Physical object close-up.
+2. RU `ФЛАГИ` / EN `RED FLAGS`: three course promo cards with small red warning
+   tabs and one honest project card in lime. Editorial comparison, not scary.
+3. RU `PROMPT` / EN `PROMPT`: course exercise worksheet where a prompt is judged
+   by rubric boxes: task, context, constraints, review.
+4. RU `ПРОЕКТ` / EN `PROJECT`: finished mini project spread: brief, prompt,
+   output thumbnail, short results note. Portfolio-first composition.
+
+Inline typography: final generated raster, Bebas Neue style only, exact
+`#9CFB51`, large readable label. No text overlays after generation.
 
 ## Avoid
 

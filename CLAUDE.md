@@ -156,7 +156,7 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
      │
      └→ main.tsx → <BrowserRouter> → <LangProvider> → <Routes>
             ↓
-        ~39 client route patterns + catch-all 404 → 210 prerendered SEO routes:
+        ~39 client route patterns + catch-all 404 → 204 prerendered SEO routes:
           Marketing/billing RU (9): /, /pay, /welcome, /about, /blog, /blog/:slug,
                   /privacy, /terms, /refund
           Models RU (Phase v2.0): /models hub + /models/:slug (62 model pages)
@@ -173,10 +173,10 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
               + /en/learn(/:slug) + /en/learn/finds/:slug
           Catch-all: <Route path="*"> → NotFound (runtime noindex injection)
 
-  Prerender (postbuild):  scripts/prerender.mjs → 210 dist/<route>/index.html files
-                          (46 blog + 24 Learn + 126 model + marketing/legal/pricing —
+  Prerender (postbuild):  scripts/prerender.mjs → 204 dist/<route>/index.html files
+                          (40 blog + 24 Learn + 126 model + marketing/legal/pricing —
                           with hreflang triplets + baked <html lang>)
-                          + sitemap.xml (210 URL) + llms.txt + IndexNow ping
+                          + sitemap.xml (204 URL) + llms.txt + IndexNow ping
                           + FaqBlock ↔ FAQPage parity assertion
   Site ↔ Extension:       chrome.runtime.sendMessage (externally_connectable, opten.space only)
   Site → Supabase:        fetch to /functions/v1/* and /rest/v1/* — base URL is
@@ -546,8 +546,8 @@ temporary notebooks, raw transcripts, or local suffler settings.
 The site shipped v1.0 (GEO Optimization, 12 → ~72.6 score, 7 phases) and v2.0
 (Programmatic SEO — 62 model pages × RU/EN + 2 hubs = 126 prerendered model
 routes, shipped 2026-05-20) with a JSON-LD entity graph enforced by build-time
-gates. Total prerendered SEO route count is currently 210 after public Learn,
-Learn Finds, and the W26 learning-cluster blog posts.
+gates. Total prerendered SEO route count is currently 204 after public Learn
+and Learn Finds.
 **Adding a marketing/blog page is a coordinated 6-file change** (model pages
 follow the generated flow above), not a one-shot file write.
 
@@ -559,12 +559,13 @@ Non-negotiables (the full set lives in `docs/CONTENT-AUTHORING.md`):
 4. JSON-LD must mirror the visible DOM — FAQs, dates, prices, person names. `verify-faq-mainentity.mjs` enforces FAQ parity at build time; the others are auditor-detectable.
 5. Cover images: `public/blog/<slug>/cover.jpg`, ≥1600×900, no in-image text (one asset works for RU + EN + OG + visible `<img>`).
 6. SEO2 inline blog images are locale-specific final rasters: generate RU and EN images with the short text already rendered inside the image. Use **Bebas Neue only** for all visible typography in SEO2 generated images, and attach/use `seo2/Reference/bebas-neue-font-reference.png` as the font reference in generation prompts. The Opten lime accent must be exactly `#9CFB51` in prompts and art direction; do not substitute warmer yellow-green, darker green, or approximate "lime" hues. Do not generate textless bases and add text afterward with editor/Canvas/HTML/CSS/Sharp overlays.
-7. Course promo banners are the exception to the inline-text rule: they are reusable generated rasters with a clean left-side negative-space zone and a right-side Opten-style visual; the heading, description, and CTA button are rendered as accessible HTML so the same asset can be reused and localized. Save them under `public/blog/_banners/`, use dark SaaS editorial styling (`#011417` + exact `#9CFB51`), and link blog CTAs to `/learn/courses/ai-content-marketing-2026`. Future blog promo CTAs should advertise this course, not the Chrome extension, unless the article is specifically about extension install/use.
-8. Every `<img>` gets explicit `width`/`height` (CLS guard).
-9. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
-10. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
-11. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
-12. New SEO2 weekly blog posts must pass `npm run verify:seo2-blog -- <slug>`
+7. Before generating any SEO2 blog art, the article brief must contain a concrete `Visual Production Brief` in the W23 pattern: one distinct no-text cover concept plus separate RU/EN inline frame concepts. Do not proceed from generic `Image Suggestions` like "learning desk" or "course board". The visual brief must force distinct physical/subject scenes and explicitly ban repeated floating UI boards, laptop dashboards, green connector networks, or reused composition across posts in the same batch.
+8. Course promo banners are the exception to the inline-text rule: they are reusable generated rasters with a clean left-side negative-space zone and a right-side Opten-style visual; the heading, description, and CTA button are rendered as accessible HTML so the same asset can be reused and localized. Save them under `public/blog/_banners/`, use dark SaaS editorial styling (`#011417` + exact `#9CFB51`), and link blog CTAs to `/learn/courses/ai-content-marketing-2026`. Future blog promo CTAs should advertise this course, not the Chrome extension, unless the article is specifically about extension install/use.
+9. Every `<img>` gets explicit `width`/`height` (CLS guard).
+10. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
+11. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
+12. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
+13. New SEO2 weekly blog posts must pass `npm run verify:seo2-blog -- <slug>`
     before commit. This is a blocking editorial/build gate, not an optional
     audit. It checks the SEO2 visual layer (4+ RU inline images, 4+ EN inline
     images, generated image files present, course CTA to

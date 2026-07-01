@@ -80,7 +80,7 @@ The "6 files in sync" rule above is for **marketing + blog pages**. The 62 `/mod
 - **Content:** one `src/content/models/<slug>.ts` (`ModelContent = { ru, en }`). The Quick-Facts meta comes from the AUTO-GEN `_registry.ts` (parsed from RU `_skills/*.md` by `build-models-registry.mjs`).
 - **EN meta:** the registry's free-text meta (name/platform/duration/resolution) is **Russian** — supply English in `src/content/models/metaEn.ts` (resolved by `metaField(meta, field, lang)`). **No build gate enforces this** — run `node scripts/verify-models-content.mjs` to catch Cyrillic leaking onto `/en/*` (it also checks intro length, FAQ count, RU/EN parity).
 - **Hub visibility:** general/umbrella models (bare-brand name with versioned siblings) go in `HUB_HIDDEN_SLUGS` (`index.ts`) — hidden from the `/models` grid + ItemList schema, but kept live + sitemap'd.
-- **Floors:** models currently contribute 126 prerendered routes (2 hubs + 124 model pages) to the total 210-route SEO surface. Adding/removing models shifts the sitemap/llms route floor.
+- **Floors:** models currently contribute 126 prerendered routes (2 hubs + 124 model pages) to the total 204-route SEO surface. Adding/removing models shifts the sitemap/llms route floor.
 
 Full pipeline diagram: [ARCHITECTURE.md](ARCHITECTURE.md) §"Models content pipeline".
 
@@ -217,6 +217,7 @@ Every blog post is a single TS file in [src/content/blog/](../src/content/blog/)
 - **In-body images** that benefit from compression = WebP (`<Picture>` component handles `srcset` + JPEG fallback automatically — see [src/app/components/Picture.tsx](../src/app/components/Picture.tsx)).
 - **No in-image text on covers.** One asset must work for RU + EN + OG + visible `<img>`. In-image text forces two assets and breaks locale parity.
 - **Inline text is generated, not overlaid.** If a post uses RU/EN in-body images with short labels, generate separate final rasters for each language with the text already rendered into the scene. Do not create a textless base and add typography later with an editor, Canvas, HTML/CSS, or Sharp. If the text is malformed, regenerate with a shorter phrase.
+- **SEO2 art starts from a Visual Production Brief, not a vague image hint.** Before generating, expand the article brief with one concrete cover concept and separate RU/EN inline frame concepts in the W23 pattern. Each post in the same batch needs a distinct subject/scene family. Do not reuse the same dark desk + floating UI panels + lime connector network motif across articles.
 - **Course promo banners are reusable CTA assets, not SEO2 inline explainers.** Save them under `public/blog/_banners/` as wide, shallow generated rasters with a clean left-side negative-space zone and a right-side Opten-style visual. The banner headline, description, and button are rendered in HTML by the blog page, so do not bake CTA text into the image. Use this pattern for blog/course advertising banners, and point blog promo CTAs to `/learn/courses/ai-content-marketing-2026` by default instead of advertising the Chrome extension, unless the article is specifically about extension installation or extension usage.
 - **Opten lime is exact.** When blog art uses lime lines, glow, UI accents, labels, or graphic marks, prompt the accent as `#9CFB51`. Avoid looser color words unless the exact hex is also present.
 - **Founder/Person images** use the 400×400 raster + WebP @1x/@2x pattern. The schema `image` field points at the JPEG; the visible `<picture>` serves WebP variants. See [src/content/about.tsx](../src/content/about.tsx) and the `PERSON_FOUNDER_BLOCK.image` line in [scripts/seo-routes.ts](../scripts/seo-routes.ts).
@@ -288,7 +289,7 @@ Running `npm run build` invokes (in order):
 3. `vite build` — the SPA bundle.
 4. `vite build --ssr scripts/entry-server.tsx` — the SSR bundle.
 5. `vite build --ssr scripts/seo-routes.ts` — the route manifest.
-6. `node scripts/prerender.mjs` — produces the current 210 prerendered SEO `dist/<route>/index.html` files with per-route `<head>`, JSON-LD, hreflang, `<html lang>`.
+6. `node scripts/prerender.mjs` — produces the current 204 prerendered SEO `dist/<route>/index.html` files with per-route `<head>`, JSON-LD, hreflang, `<html lang>`.
 7. `node scripts/sitemap.mjs` — emits `dist/sitemap.xml` with per-route `<lastmod>` from git mtime. **Floor check** fails if route registration drifts.
 8. `node scripts/llms.mjs` — emits `dist/llms.txt` + `dist/llms-full.txt`. Also has a floor check.
 9. `node scripts/verify-faq-mainentity.mjs` — asserts visible FAQ DOM ≡ FAQPage `mainEntity` for every route emitting one. Fails the build on drift.

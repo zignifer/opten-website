@@ -69,7 +69,7 @@ Treat "free" carefully: good for acquisition, weaker for conversion. The article
 
 - `/learn`
 - `/learn/courses/ai-content-marketing-2026`
-- `/blog/neural-networks-from-scratch`
+- `/blog/prompt-structure`
 
 ## Image Suggestions
 

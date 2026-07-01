@@ -15,9 +15,9 @@
 ## Routing
 
 - **React Router 7.17.0** (`react-router` package, not `react-router-dom` — v7 unified API)
-- **~39 client route patterns** declared in [`src/main.tsx`](../../src/main.tsx) + a catch-all 404, expanding to **210 prerendered SEO routes**:
+- **~39 client route patterns** declared in [`src/main.tsx`](../../src/main.tsx) + a catch-all 404, expanding to **204 prerendered SEO routes**:
   - **Marketing/legal/pricing/welcome:** 14 routes across RU + EN.
-  - **Blog:** 46 routes across RU + EN.
+  - **Blog:** 40 routes across RU + EN.
   - **Model pages (Phase v2.0):** `/models` hub + `/models/:slug` (62 models) + `/en/*` mirrors = 2 hubs + 124 model pages, 126 routes total.
   - **Public Learn:** `/learn`, `/learn/:lessonSlug`, `/learn/finds/:findSlug` + `/en/*` mirrors = 24 routes total.
   - **SPA-only/noindex:** `/login`, `/auth/callback`, `/account`, `/success`, `/dashboard/download-skill`, `/prompt-library`, `/p/:slug`, `/app/*`, `/space/*`, `/internal/*`, `/learn/templates/*`, `/learn/courses/*`, `/en/learn/templates/*`.

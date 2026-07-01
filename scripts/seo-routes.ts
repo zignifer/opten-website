@@ -6,9 +6,6 @@
 // intro/steps/faq under `body: { ... }`. URL still /guides/gpt-image-2 until B-07.
 // This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
-import { post as aiTrainingBeginnersGuide } from "../src/content/blog/ai-training-beginners";
-import { post as neuralNetworksFromScratchGuide } from "../src/content/blog/neural-networks-from-scratch";
-import { post as aiCoursesForBeginnersGuide } from "../src/content/blog/ai-courses-for-beginners";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
 import { post as aiFaceSwapGuide } from "../src/content/blog/ai-face-swap";
@@ -27,7 +24,6 @@ import { post as nanoBananaPromptsGuide } from "../src/content/blog/nano-banana-
 import { post as promptStructureGuide } from "../src/content/blog/prompt-structure";
 import { post as sora2VsVeo31Guide } from "../src/content/blog/sora-2-vs-veo-3-1";
 import { post as aiLogoGeneratorPromptGuide } from "../src/content/blog/ai-logo-generator-prompt";
-import type { BlogPost } from "../src/content/blog/types";
 import { landingFaq } from "../src/content/landingFaq";
 // Phase v2.0 MODELS-A-6: programmatic model pages. allModels is the registry +
 // content barrel. Only models with `content !== undefined` produce a route in
@@ -131,11 +127,6 @@ const FOUNDER_TELEGRAM_URL = "https://t.me/v_voronezhtsev";
 const FOUNDER_YOUTUBE_URL = "https://www.youtube.com/@v.voronezhtsev";
 const VIDEO_UPLOAD_TIMEZONE = "+05:00";
 const HIDDEN_LEARN_OVERVIEW_LESSON_SLUGS = new Set<string>(hiddenLearnOverviewLessonSlugs);
-const W26_BLOG_POSTS = [
-  { slug: "ai-courses-for-beginners", post: aiCoursesForBeginnersGuide },
-  { slug: "neural-networks-from-scratch", post: neuralNetworksFromScratchGuide },
-  { slug: "ai-training-beginners", post: aiTrainingBeginnersGuide },
-] as const satisfies readonly { slug: string; post: BlogPost }[];
 
 // Phase 4 D-10: @id reference pointers — used inside schema blocks to cross-link the entity graph
 // without inlining the full block (avoids duplication and gives crawlers a single canonical entity per @id).
@@ -545,77 +536,6 @@ export function blogPostingBlock(opts: {
     articleSection: opts.articleSection,
     keywords: opts.keywords.join(", "),
     ...(opts.wordCount ? { wordCount: opts.wordCount } : {}),
-  };
-}
-
-function buildBlogPostRoute(slug: string, post: BlogPost, lang: "ru" | "en"): RouteMeta {
-  const locale = post[lang];
-  const ruUrl = `${SITE_ORIGIN}/blog/${slug}`;
-  const enUrl = `${SITE_ORIGIN}/en/blog/${slug}`;
-  const pageUrl = lang === "ru" ? ruUrl : enUrl;
-  const blogUrl = lang === "ru" ? `${SITE_ORIGIN}/blog` : `${SITE_ORIGIN}/en/blog`;
-  const homeUrl = lang === "ru" ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}/en/`;
-  const homeName = lang === "ru" ? "Главная" : "Home";
-  const blogName = lang === "ru" ? "Блог" : "Blog";
-  const inLanguage = lang === "ru" ? "ru-RU" : "en-US";
-
-  return {
-    path: lang === "ru" ? `/blog/${slug}` : `/en/blog/${slug}`,
-    htmlLang: lang,
-    hreflangAlternates: {
-      ru: ruUrl,
-      en: enUrl,
-      xDefault: ruUrl,
-    },
-    title: locale.title,
-    description: locale.description,
-    canonical: pageUrl,
-    ogTitle: locale.title,
-    ogDescription: locale.excerpt,
-    ogImage: `${SITE_ORIGIN}${locale.cover.src}`,
-    author: FOUNDER_NAME,
-    prerender: "full",
-    changefreq: "monthly",
-    priority: 0.7,
-    schema: [
-      lang === "ru" ? ORG_BLOCK : ORG_BLOCK_EN,
-      blogPostingBlock({
-        pageId: pageUrl,
-        headline: locale.title,
-        description: locale.description,
-        datePublished: locale.publishedAt,
-        dateModified: locale.updatedAt,
-        inLanguage,
-        articleSection: lang === "ru" ? "Гайд" : "Guide",
-        keywords: locale.tags,
-        image: {
-          url: `${SITE_ORIGIN}${locale.cover.src}`,
-          width: locale.cover.width,
-          height: locale.cover.height,
-        },
-      }),
-      webPageBlock({
-        pageId: pageUrl,
-        url: pageUrl,
-        name: locale.title,
-        inLanguage,
-        cssSelector: ["h1", ".blog-intro", "h2"],
-      }),
-      howToBlock(
-        (locale.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
-        pageUrl,
-        locale.title,
-      ),
-      faqPageBlock(locale.body.faq ?? [], pageUrl),
-      breadcrumbBlock(
-        [
-          { name: homeName, url: homeUrl },
-          { name: blogName, url: blogUrl },
-          { name: locale.title, url: pageUrl },
-        ],
-        pageUrl,
-      ),
-    ],
   };
 }
 
@@ -1377,11 +1297,6 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
-          ...W26_BLOG_POSTS.map(({ slug, post }) => ({
-            url: `${SITE_ORIGIN}/blog/${slug}`,
-            name: post.ru.title,
-            datePublished: post.ru.publishedAt,
-          })),
           { url: `${SITE_ORIGIN}/blog/ai-headshot-generator`, name: aiHeadshotGeneratorGuide.ru.title, datePublished: aiHeadshotGeneratorGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-ugc-for-brands`, name: aiUgcForBrandsGuide.ru.title, datePublished: aiUgcForBrandsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/upscale-image-ai`, name: upscaleImageAiGuide.ru.title, datePublished: upscaleImageAiGuide.ru.publishedAt },
@@ -1420,9 +1335,6 @@ export const routes: RouteMeta[] = [
       ),
     ],
   },
-
-  // seo2 W26 blog automation: beginner learning cluster posts.
-  ...W26_BLOG_POSTS.map(({ slug, post }) => buildBlogPostRoute(slug, post, "ru")),
 
   // seo2 manual blog automation: /blog/ai-headshot-generator — AI headshot prompt workflow guide.
   {
@@ -2832,11 +2744,6 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
-          ...W26_BLOG_POSTS.map(({ slug, post }) => ({
-            url: `${SITE_ORIGIN}/en/blog/${slug}`,
-            name: post.en.title,
-            datePublished: post.en.publishedAt,
-          })),
           { url: `${SITE_ORIGIN}/en/blog/ai-headshot-generator`, name: aiHeadshotGeneratorGuide.en.title, datePublished: aiHeadshotGeneratorGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`, name: aiUgcForBrandsGuide.en.title, datePublished: aiUgcForBrandsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/upscale-image-ai`, name: upscaleImageAiGuide.en.title, datePublished: upscaleImageAiGuide.en.publishedAt },
@@ -2875,9 +2782,6 @@ export const routes: RouteMeta[] = [
       ),
     ],
   },
-
-  // seo2 W26 blog automation: beginner learning cluster EN siblings.
-  ...W26_BLOG_POSTS.map(({ slug, post }) => buildBlogPostRoute(slug, post, "en")),
 
   // seo2 manual blog automation: /en/blog/ai-headshot-generator EN sibling.
   {

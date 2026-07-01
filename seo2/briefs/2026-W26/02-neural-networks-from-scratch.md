@@ -4,7 +4,7 @@ kind: blog-article-brief
 week: "2026-W26"
 brief_id: "2026-W26-02"
 slug: "neural-networks-from-scratch"
-status: published
+status: ready
 cluster_id: "BL-learn"
 target_repo: opten-website
 source: "manual synthesis: learn-courses + blog-ai-work-income"
@@ -72,11 +72,38 @@ Make it practical and non-academic. The article should reduce anxiety: reader do
 - `/learn/courses/ai-content-marketing-2026`
 - `/blog/prompt-structure`
 
-## Image Suggestions
+## Visual Production Brief
 
-1. Cover: beginner AI learning desk with task cards, no text.
-2. RU/EN frame: skill ladder from task to portfolio.
-3. RU/EN frame: prompt as brief.
+Pattern: follow the W23 visual pattern: every article gets a concrete, inspectable
+subject and a distinct scene. This article is about skills, so the visuals must
+feel like a practical workshop, not a course comparison or generic dashboard.
+
+### Cover
+
+- Concept: learning neural networks as hands-on craft.
+- Scene: dark workshop table with four physical skill stations: task brief,
+  prompt card, output review loupe, and portfolio folder. A person's hands are
+  arranging the pieces; no face needed.
+- Composition: medium-wide cinematic tabletop with hands in frame; one clear
+  foreground object, not many equal UI blocks; no in-image text.
+- Palette: Opten dark `#011417`, graphite tools, paper texture, controlled exact
+  lime `#9CFB51` accents on checkmarks and small labels.
+- Avoid: floating panels, network-orb center, laptop-driven dashboard,
+  course/classroom stock imagery, readable cover text.
+
+### Inline Frames
+
+1. RU `НЕ ТЕОРИЯ` / EN `NOT THEORY`: a theory book pushed aside while a real task
+   sheet and pen come into focus. Editorial photo, tactile paper.
+2. RU `ЗАДАЧА` / EN `TASK`: single business task brief pinned on a corkboard with
+   two alternative task cards blurred behind it.
+3. RU `PROMPT` / EN `PROMPT`: prompt anatomy as three real index cards stacked
+   vertically: goal, context, constraints. No floating dashboard.
+4. RU `ПРОВЕРКА` / EN `REVIEW`: printed AI output being inspected with a loupe
+   and red/green annotation marks. Close crop, reviewer hand visible.
+
+Inline typography: final generated raster, Bebas Neue style only, exact
+`#9CFB51`, large readable label. No text overlays after generation.
 
 ## Avoid
 

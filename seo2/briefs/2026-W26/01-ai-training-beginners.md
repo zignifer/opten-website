@@ -4,7 +4,7 @@ kind: blog-article-brief
 week: "2026-W26"
 brief_id: "2026-W26-01"
 slug: "ai-training-beginners"
-status: published
+status: ready
 cluster_id: "BL-learn"
 target_repo: opten-website
 source: "manual synthesis: learn-courses + blog-ai-work-income"
@@ -76,11 +76,39 @@ This is the umbrella education article. Do not make it a generic course catalog.
 - Link to `/blog/prompt-structure` when explaining prompt anatomy.
 - Soft CTA: learn the workflow first, then use Opten to check prompts before generating.
 
-## Image Suggestions
+## Visual Production Brief
 
-1. Cover: dark learning workspace with AI task board, no text.
-2. RU/EN frame: "Задача → Prompt → Результат".
-3. RU/EN frame: 7-day beginner path.
+Pattern: follow the W23 visual pattern: every article gets a concrete, inspectable
+subject and a distinct scene. Do **not** reuse the floating UI board + laptop +
+green connector-line setup from other W26 learning posts.
+
+### Cover
+
+- Concept: real beginner learning sprint, not abstract SaaS dashboard.
+- Scene: overhead editorial photo of a physical 7-day desk plan: paper calendar,
+  notebook, pen, sticky notes, one laptop edge, and one finished portfolio card.
+- Composition: top-down / 35-degree desk view; large dark negative space in one
+  corner for card crop; no in-image text.
+- Palette: Opten dark `#011417`, white paper, subtle exact lime `#9CFB51` ticks
+  and sticky accents. Keep it tactile and photographic.
+- Avoid: floating panels, neon network lines, repeated black table setup,
+  generic AI dashboard, readable words on cover.
+
+### Inline Frames
+
+1. RU `ЗАДАЧА` / EN `TASK`: close-up hand choosing one sticky note from several
+   real task cards. Physical paper cards, shallow depth of field, not a UI wall.
+2. RU `ПУТЬ` / EN `TRACK`: diagonal path of four physical cards across a desk:
+   text, slides, visual, video. Each card has a small icon-like object, not a
+   floating interface.
+3. RU `PROMPT` / EN `PROMPT`: laptop close-up with a prompt-as-brief document and
+   paper annotations beside it. The visible label is the only large text.
+4. RU `7 ДНЕЙ` / EN `7 DAYS`: weekly calendar with seven lime checkmarks and a
+   finished mini-project card at the end. Distinct from the cover by tighter crop
+   and calendar-first composition.
+
+Inline typography: final generated raster, Bebas Neue style only, exact
+`#9CFB51`, large readable label. No text overlays after generation.
 
 ## Avoid
 
