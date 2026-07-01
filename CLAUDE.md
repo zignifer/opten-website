@@ -16,6 +16,26 @@ knowledge belongs here, with detailed specs in `docs/` and `.planning/`.
 **opten.space** — public website for the **Opten** Chrome extension. Vite +
 React 18 + TypeScript + Tailwind 4, SPA, deployed on Vercel.
 
+## Hard command: write SEO article
+
+When the user writes `напиши SEO-статью`, `напиши seo статью`, or asks to write
+the next SEO article in this repo, this is a local SEO2 queue command, not a
+general SEO/GEO audit and not a skill-discovery task. Do not invoke `geo`,
+`geo-audit`, or similar audit skills for this exact command. `start SEO`,
+`start seo`, and `старт SEO` are legacy aliases for the same flow, but the
+preferred user-facing command is `напиши SEO-статью`.
+
+Run:
+
+```powershell
+npm run start:seo
+```
+
+If it prints `start-seo: no-topics`, stop and tell the user the current SEO2
+brief queue is exhausted and a new weekly batch must be generated in
+`C:\Projects\opten-seo`. If it prints `start-seo: next-topic`, create exactly
+one SEO2 blog post for that returned slug using `seo2/blog-post-instruction.md`.
+
 Six jobs: (1) marketing surface (landing in RU/EN), (2) website-first auth and
 billing surface (`/login`, `/auth/callback`, `/pay`, `/account`, `/success` for
 YooKassa RUB + Paddle USD — Pro is the only purchasable tier for AI-operations;
@@ -566,7 +586,7 @@ Non-negotiables (the full set lives in `docs/CONTENT-AUTHORING.md`):
 11. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
 12. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
 13. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
-14. User command `start SEO` means: run `npm run start:seo` first. If it prints `start-seo: no-topics`, do not generate an article; tell the user a new weekly batch must be generated in `opten-seo`. If it prints `start-seo: next-topic`, create exactly one SEO2 post for that slug using `seo2/blog-post-instruction.md`.
+14. User command `напиши SEO-статью` means: run `npm run start:seo` first. Legacy aliases `start SEO`, `start seo`, and `старт SEO` mean the same thing. If it prints `start-seo: no-topics`, do not generate an article; tell the user a new weekly batch must be generated in `opten-seo`. If it prints `start-seo: next-topic`, create exactly one SEO2 post for that slug using `seo2/blog-post-instruction.md`.
 15. New SEO2 weekly blog posts must pass `npm run verify:seo2-blog -- <slug>`
     before commit. This is a blocking editorial/build gate, not an optional
     audit. It checks the SEO2 visual layer (4+ RU inline images, 4+ EN inline
