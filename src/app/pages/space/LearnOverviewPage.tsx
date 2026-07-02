@@ -27,6 +27,7 @@ import {
   type LearnLesson,
   type LearnTopic,
 } from "../../../content/space/learn";
+import { privateCourseCollection } from "../../../content/space/privateCourse";
 import {
   findMatchesQuery,
   getLearnFindDescription,
@@ -94,6 +95,8 @@ const pageCopy = {
     searchPlaceholder: "Поиск уроков...",
     collectionsTitle: "Подборки",
     viewAllCollections: "Смотреть всё",
+    aiTrainingTitle: "Обучение ИИ",
+    viewAllCourse: "Смотреть все",
     allLessonsTitle: "Бесплатные уроки",
     findsTitle: "Находки",
     lessonsTab: "Уроки",
@@ -117,6 +120,8 @@ const pageCopy = {
     searchPlaceholder: "Search lessons...",
     collectionsTitle: "Collections",
     viewAllCollections: "View all",
+    aiTrainingTitle: "AI training",
+    viewAllCourse: "View all",
     allLessonsTitle: "Free lessons",
     findsTitle: "Finds",
     lessonsTab: "Lessons",
@@ -168,6 +173,8 @@ const featuredCoursePromo = {
   },
   href: "/learn/courses/ai-content-marketing-2026",
 } as const;
+
+const featuredCourseLessons = privateCourseCollection.lessons.slice(0, 3);
 
 export default function LearnOverviewPage() {
   const { lang } = useLang();
@@ -393,6 +400,29 @@ export default function LearnOverviewPage() {
         )}
 
         <LessonSection
+          title={copy.aiTrainingTitle}
+          action={
+            <LocalizedLink
+              to={featuredCoursePromo.href}
+              className="inline-flex h-[30px] shrink-0 items-center rounded-full border border-[#9cfb51]/45 px-[12px] text-[12px] font-bold leading-none text-[#9cfb51] no-underline transition hover:bg-[#9cfb51]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/70"
+            >
+              {copy.viewAllCourse}
+            </LocalizedLink>
+          }
+        >
+          <div className="grid grid-cols-3 gap-[17px] max-lg:grid-cols-2 max-sm:grid-cols-1">
+            {featuredCourseLessons.map((lesson) => (
+              <LargeLessonCard
+                key={lesson.slug}
+                lesson={lesson}
+                lang={lang}
+                href={`${featuredCoursePromo.href}/${lesson.slug}`}
+              />
+            ))}
+          </div>
+        </LessonSection>
+
+        <LessonSection
           title={contentTab === "lessons" ? copy.allLessonsTitle : copy.findsTitle}
           action={<LearnContentTabs activeTab={contentTab} onChange={setContentTab} lang={lang} />}
         >
@@ -614,13 +644,13 @@ function CollectionTile({ collection, lang, className = "" }: { collection: Lear
   );
 }
 
-function LargeLessonCard({ lesson, lang }: { lesson: LearnLesson; lang: LearnLang }) {
+function LargeLessonCard({ lesson, lang, href }: { lesson: LearnLesson; lang: LearnLang; href?: string }) {
   const author = getLearnLessonAuthor(lesson);
   const authorName = getLearnAuthorName(author, lang);
 
   return (
     <LocalizedLink
-      to={`/learn/${lesson.slug}`}
+      to={href ?? `/learn/${lesson.slug}`}
       className="group block overflow-hidden rounded-[9px] border border-white/10 bg-[#0e2023] text-left no-underline transition hover:border-[#9cfb51]/45 hover:bg-[#10282c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]"
     >
       <MediaThumb lesson={lesson} />
