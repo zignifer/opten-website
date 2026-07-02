@@ -107,6 +107,26 @@ green connector-line setup from other W26 learning posts.
    finished mini-project card at the end. Distinct from the cover by tighter crop
    and calendar-first composition.
 
+### Information Layer
+
+Every inline frame must follow the strong W23 reference pattern from
+`seo2/Reference/ai-headshot-step-*.jpg` and `seo2/Reference/ai-ugc-step-*.jpg`:
+one large hero label plus 3-4 generated-in-image supporting labels or
+micro-cards. Use icons, checklist rows, score chips, timeline nodes,
+before/after markers, flow arrows, anatomy callouts, or decision-tree cards.
+
+For each RU/EN frame, define before generation:
+
+- hero label from the Inline Frames list;
+- 3-4 supporting labels, each short enough to render cleanly;
+- one visual object/icon for each supporting label;
+- one visible structure: checklist, scorecard, timeline, before/after, matrix,
+  flow, anatomy, or decision tree.
+
+Title-only images are rejected. Decorative icons without readable explanatory
+labels are rejected. The frame must teach one concrete decision from the article
+even if viewed without the surrounding paragraph.
+
 Inline typography: final generated raster, Bebas Neue style only, exact
 `#9CFB51`, large readable label. No text overlays after generation.
 Font reference: `seo2/Reference/bebas-neue-font-reference.png`.

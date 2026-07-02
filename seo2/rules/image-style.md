@@ -19,6 +19,16 @@ HTML/CSS, Sharp или другой постобработкой.
 встроенный в саму генерацию. Лаймовый акцент должен быть ровно `#9CFB51`;
 не используй более желтый, более темный или примерный green/lime оттенок.
 
+Главные референсы для внутристатейных SEO2-картинок:
+
+- `seo2/Reference/ai-headshot-step-*.jpg`
+- `seo2/Reference/ai-ugc-step-*.jpg`
+
+Смотри не только на стиль, но и на смысловую плотность: в этих кадрах есть
+большой заголовок, 3-4 подписи/чек-пункта, иконки, линии, карточки и понятная
+структура. Картинка должна объяснять шаг сама по себе, а не просто быть
+атмосферной иллюстрацией к заголовку.
+
 ## Cover
 
 - `public/blog/<slug>/cover.jpg`
@@ -43,17 +53,21 @@ aesthetic, cinematic, no text, 16:9.
 - Generate the RU image first with the exact Russian text in the prompt, then
   generate the EN sibling with the exact English text while preserving the same
   composition, camera, lighting, object, and color palette.
-- Text: 1-4 large words or one short line, rendered by the image model into the
-  final raster.
-- Visual-first: strong object/result first, small interface accent second.
+- Text: one large hero label plus an information layer: 3-4 short supporting
+  labels, checklist rows, micro-cards, score chips, before/after markers, flow
+  nodes, or anatomy callouts. All text must be rendered by the image model into
+  the final raster.
+- Visual-first: strong object/result first, explanatory labels second. The image
+  must teach one concrete decision from the article even without the paragraph.
 
 Prompt pattern:
 
 ```text
 Cinematic dark SaaS editorial image, deep teal-black background (#011417),
 lime-green (#9CFB51) graphic accents, [topic object/result], short crisp
-in-image text: "[RU or EN text]", text is part of the generated image, clean
-modern tech aesthetic, 16:9.
+in-image hero text: "[RU or EN text]", information layer with 3-4 generated
+supporting labels/cards/checkpoints tied to the article step, text is part of
+the generated image, clean modern tech aesthetic, 16:9.
 ```
 
 Color lock: the lime accent is exactly `#9CFB51`. Repeat that hex in every
@@ -63,6 +77,8 @@ image prompt and avoid vague alternatives like `neon green`, `yellow-green`,
 Avoid:
 
 - dense UI tables;
+- title-only images where the only meaningful text is one big word or headline;
+- decorative icons without readable explanatory labels;
 - paragraphs of text inside images;
 - adding text after generation with an editor, Canvas, HTML/CSS, Sharp, or any
   other overlay/post-processing step;

@@ -82,10 +82,16 @@ function verifyBrief(week, row) {
 
   ok = requirePattern(text, /### Cover|### Cover Concept/i, "cover concept subsection", fileLabel) && ok;
   ok = requirePattern(text, /### Inline Frames/i, "inline frames subsection", fileLabel) && ok;
+  ok = requirePattern(text, /### Information Layer/i, "information layer subsection", fileLabel) && ok;
   ok = requirePattern(text, /\bRU\b[\s\S]{0,80}\bEN\b/i, "paired RU/EN frame labels", fileLabel) && ok;
   ok = requirePattern(text, /Bebas Neue/i, "Bebas Neue typography rule", fileLabel) && ok;
   ok = requirePattern(text, /#9CFB51/i, "exact Opten lime #9CFB51", fileLabel) && ok;
   ok = requirePattern(text, /seo2[\\/]+Reference[\\/]+bebas-neue-font-reference\.png/i, "Bebas Neue font reference path", fileLabel) && ok;
+  ok = requirePattern(text, /ai-headshot|ai-ugc/i, "W23/W26 strong visual reference assets", fileLabel) && ok;
+  ok = requirePattern(text, /supporting labels?|micro-?labels?|micro-?cards?|мини-?подпис|подпис[ьи]/i, "supporting labels/micro-cards rule", fileLabel) && ok;
+  ok = requirePattern(text, /3\s*[-–]\s*4|3\+|three|три|четыр/i, "3-4 supporting visual facts rule", fileLabel) && ok;
+  ok = requirePattern(text, /checklist|scorecard|timeline|before\/after|matrix|flow|anatomy|decision tree|чек|таймлайн|до\/после|схем|карточ/i, "visual structure rule", fileLabel) && ok;
+  ok = requirePattern(text, /title-only|заголов/i, "title-only image rejection rule", fileLabel) && ok;
   ok = requirePattern(text, /generated|сгенерирован/i, "generated-in-image text rule", fileLabel) && ok;
   ok = requirePattern(text, /overlay|overlays|накладыв|сло[йя]|постобработ/i, "no text overlay/post-processing rule", fileLabel) && ok;
   ok = requirePattern(text, /floating UI|floating panels|dashboard|connector|repeated|повтор/i, "batch motif/reuse ban", fileLabel) && ok;
