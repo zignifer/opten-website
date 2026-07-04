@@ -202,7 +202,7 @@ live with these exact paths and the documented behavior.
 | `/dashboard/download-skill` | Pro-only feature in popup → opens new tab | Auth-gated page that calls `/api/download-skill` to fetch `opten.zip`. | [popup Phase 73](../../promptscore/popup/popup.html) |
 | `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Free prompt library UI for any logged-in extension account. Calls `GET_AUTH_TOKEN` through the installed extension, then uses Supabase PostgREST for `prompt_library` CRUD/search without a subscription check. After successful mutations it calls `REFRESH_PROMPT_LIBRARY_CACHE` so native extension menus do not keep stale titles/favorite state. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 94 + Phase 97 |
 | `/p/:slug` | User-shared public Prompt Library link | Read-only random-link snapshot of a user's library at publish/refresh time. Public read uses `prompt_library_get_public_snapshot` without auth; per-prompt save uses website auth (`localStorage.opten_space_session_v1`) and `prompt_library_save_public_prompt`. SPA-only, `noindex,nofollow`, no `/en/*` sibling. No bulk-copy action. | Phase 98 |
-| `/learn/courses/:courseSlug/*` | Direct-link hidden course testing and course checkout | Hidden/noindex standalone paid course surface. It is not a Pro subscription entitlement and is not opened by the extension. Payment starts through `create-course-payment`; access is checked through website auth + `course-access-summary`; Kinescope playback is gated by this site's `/api/kinescope-course-token` and `/api/kinescope-course-auth`. | Site-only |
+| `/learn/courses/:courseSlug/*` | Direct-link hidden course testing and course checkout | Hidden/noindex standalone paid course surface. It is not a Pro subscription entitlement and is not opened by the extension. Payment starts through `create-course-payment`; access is checked through website auth + `course-access-summary`; Kinescope playback is gated by this site's `/api/kinescope-course-token` and `/api/kinescope-course-auth`. The special `/learn/courses/ai-content-marketing-2026/hidden-intro` route is a free Telegram lead-magnet placeholder in v1: no payment, no course entitlement, no website login, no token, and no Telegram user database. | Site-only |
 | `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta app surfaces. `/app/learn*` and `/space/learn*` are compatibility redirects to public `/learn*`; public Learn is no longer indexed inside `/app`. Website auth uses the canonical `/login`; visible login uses Email OTP only while the retained Google OAuth path is hidden. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95/96 |
 
 **Locked route names** (renames are breaking):
@@ -316,6 +316,21 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
 - The Vercel endpoint `POST /api/course-prompt` verifies the website JWT and
   `course-access-summary` before returning a whitelisted private course prompt
   body from `api/_shared/coursePromptBodies.ts`.
+
+Telegram hidden intro for the same course is intentionally outside this paid
+course entitlement model in v1:
+
+- The Telegram bot verifies channel subscription through Bot API
+  `getChatMember`, then sends the secret noindex URL
+  `/learn/courses/ai-content-marketing-2026/hidden-intro`.
+- The website route writes `localStorage.opten_hidden_intro_opened_v1` for that
+  browser and shows a placeholder while the real video is missing.
+- The route must not call `create-course-payment`, `course-access-summary`,
+  `/api/kinescope-course-token`, or `/api/course-prompt` until a later explicit
+  launch decision adds a real video.
+- `hidden-intro` must not be added to `privateCourseCollection.lessons`,
+  `api/_shared/kinescopeCourse.ts`, sitemap, llms.txt, public Learn, or EN
+  sibling maps while the video is absent.
 
 If the Supabase project is ever rotated/migrated, **all listed site files** plus the extension's
 [`config/api.js`](../../promptscore/config/api.js) must be updated in one coordinated commit.

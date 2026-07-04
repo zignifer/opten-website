@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { Navigate, useParams } from "react-router";
-import { CourseIntroLayout, LessonDetailLayout } from "../../components/space/learn/LearnComponents";
+import { CourseIntroLayout, HiddenIntroPlaceholderLayout, LessonDetailLayout } from "../../components/space/learn/LearnComponents";
 import {
   findPrivateCourseLesson,
   getAdjacentPrivateCourseLessons,
   getPrivateCourseCollection,
   privateCourseIntroContent,
 } from "../../../content/space/privateCourse";
+import { HIDDEN_INTRO_SLUG, HIDDEN_INTRO_VIDEO_ENABLED, getHiddenIntroCopy } from "../../../content/space/hiddenIntro";
 import { getLearnLessonTitle } from "../../../content/space/learn";
 import { useLang } from "../../../i18n/LangContext";
 
@@ -15,7 +16,10 @@ export default function PrivateCoursePage() {
   const { lang } = useLang();
   const collection = getPrivateCourseCollection(courseSlug);
   const lesson = findPrivateCourseLesson(courseSlug, lessonSlug);
-  const pageTitle = !lessonSlug
+  const isHiddenIntro = lessonSlug === HIDDEN_INTRO_SLUG;
+  const pageTitle = isHiddenIntro
+    ? `${getHiddenIntroCopy("title", lang)} — Opten course`
+    : !lessonSlug
     ? `${privateCourseIntroContent.title[lang]} — Opten course`
     : lesson
       ? `${getLearnLessonTitle(lesson, lang)} — Opten course`
@@ -29,6 +33,10 @@ export default function PrivateCoursePage() {
 
   if (!lessonSlug) {
     return <CourseIntroLayout collection={collection} intro={privateCourseIntroContent} />;
+  }
+
+  if (isHiddenIntro && !HIDDEN_INTRO_VIDEO_ENABLED) {
+    return <HiddenIntroPlaceholderLayout collection={collection} />;
   }
 
   if (!lesson) {

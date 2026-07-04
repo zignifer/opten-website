@@ -35,6 +35,14 @@ import SiteFooter from "../../SiteFooter";
 import SpaceHeader from "../SpaceHeader";
 import { useSpaceAuth } from "../SpaceAuthProvider";
 import type { PrivateCourseIntroContent } from "../../../../content/space/privateCourse";
+import {
+  HIDDEN_INTRO_ROUTE,
+  HIDDEN_INTRO_SLUG,
+  HIDDEN_INTRO_TELEGRAM_URL,
+  HIDDEN_INTRO_UNLOCK_STORAGE_KEY,
+  HIDDEN_INTRO_WEBSITE_SLOT_ENABLED,
+  getHiddenIntroCopy,
+} from "../../../../content/space/hiddenIntro";
 import type { LearnCollection, LearnCoursePurchase, LearnLesson, LearnMaterial, LearnMissingItem, LearnOverviewSection, LearnPromptBlock, LearnTimestamp } from "../../../../content/space/learn";
 import {
   getLearnCollectionCategoryLabel,
@@ -523,6 +531,59 @@ export function CourseIntroLayout({ collection, intro }: CourseIntroLayoutProps)
             )}
           </aside>
         )}
+      </section>
+    </LearnSectionWrapper>
+  );
+}
+
+type HiddenIntroPlaceholderLayoutProps = {
+  collection: LearnCollection;
+};
+
+export function HiddenIntroPlaceholderLayout({ collection }: HiddenIntroPlaceholderLayoutProps) {
+  const { lang } = useLang();
+  const courseHref = collection.routeBasePath?.[lang] ?? "/learn";
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(HIDDEN_INTRO_UNLOCK_STORAGE_KEY, "1");
+    } catch {
+      // Local storage is only a soft menu-state hint; the placeholder still renders.
+    }
+  }, []);
+
+  return (
+    <LearnSectionWrapper>
+      <nav className="mb-[24px] flex min-w-0 flex-nowrap items-center gap-[9px] overflow-hidden whitespace-nowrap text-[14px] text-white/68 max-md:mb-[26px] max-md:gap-[5px] max-md:text-[12px]" aria-label="Breadcrumb">
+        <LocalizedLink to="/learn" className="shrink-0 text-white/68 no-underline hover:text-white">
+          {lang === "en" ? "Courses" : "Курсы"}
+        </LocalizedLink>
+        <span className="shrink-0 text-white/28">/</span>
+        <LocalizedLink to={courseHref} className="min-w-0 truncate text-white/68 no-underline hover:text-white">
+          {getLearnCollectionTitle(collection, lang)}
+        </LocalizedLink>
+        <span className="shrink-0 text-white/28">/</span>
+        <span className="min-w-0 truncate font-medium text-white">{getHiddenIntroCopy("title", lang)}</span>
+      </nav>
+
+      <section className="grid min-h-[520px] place-items-center rounded-[8px] border border-white/10 bg-[#06191c] px-[28px] py-[56px] text-center shadow-[0_24px_80px_rgba(0,0,0,0.18)]">
+        <div className="max-w-[620px]">
+          <span className="mx-auto grid size-[54px] place-items-center rounded-full bg-[#9cfb51]/12 text-[#9cfb51]">
+            <LockOpen size={24} strokeWidth={2.25} />
+          </span>
+          <h1 className="mt-[22px] text-[34px] font-bold leading-[1.12] tracking-normal text-white max-md:text-[28px]">
+            {getHiddenIntroCopy("title", lang)}
+          </h1>
+          <p className="mx-auto mt-[14px] max-w-[520px] text-[16px] leading-[1.55] text-white/62 max-md:text-[15px]">
+            {getHiddenIntroCopy("placeholderText", lang)}
+          </p>
+          <LocalizedLink
+            to={courseHref}
+            className="mx-auto mt-[26px] inline-flex h-[46px] items-center justify-center rounded-[8px] bg-[#9cfb51] px-[18px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943]"
+          >
+            {getHiddenIntroCopy("backToCourse", lang)}
+          </LocalizedLink>
+        </div>
       </section>
     </LearnSectionWrapper>
   );
@@ -1740,6 +1801,8 @@ type CourseOutlineProps = {
 
 export function CourseOutline({ collection, currentSlug, hasAccess, purchase, className = "" }: CourseOutlineProps) {
   const { lang } = useLang();
+  const hiddenIntroOpened = useHiddenIntroOpened();
+  const showHiddenIntroSlot = HIDDEN_INTRO_WEBSITE_SLOT_ENABLED && collection.id === AI_CONTENT_MARKETING_COURSE_SLUG;
 
   return (
     <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] max-md:max-h-[312px] max-md:space-y-[4px] max-md:p-[12px] ${className}`}>
@@ -1783,8 +1846,55 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
           </LocalizedLink>
         );
       })}
+      {showHiddenIntroSlot ? (
+        hiddenIntroOpened || hasAccess ? (
+          <LocalizedLink
+            to={HIDDEN_INTRO_ROUTE}
+            className="group grid grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] text-white/76 no-underline transition hover:bg-white/[0.045] hover:text-white max-md:grid-cols-[42px_minmax(0,1fr)_28px] max-md:gap-[10px] max-md:px-[12px] max-md:py-[14px]"
+          >
+            <span className="text-center text-[14px] font-bold leading-none text-[#9cfb51] max-md:text-[18px]">+</span>
+            <span className="min-w-0">
+              <span className="block text-[14px] font-bold leading-[1.35] max-md:text-[16px]">{getHiddenIntroCopy("title", lang)}</span>
+              <span className="mt-[4px] block text-[12px] leading-tight text-white/44 max-md:text-[14px]">{getHiddenIntroCopy("lockedMeta", lang)}</span>
+            </span>
+            <span className={`grid size-[22px] place-items-center ${currentSlug === HIDDEN_INTRO_SLUG ? "text-[#9cfb51]" : "text-white/40"}`}>
+              <LockOpen size={16} strokeWidth={2.25} />
+            </span>
+          </LocalizedLink>
+        ) : (
+          <a
+            href={HIDDEN_INTRO_TELEGRAM_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="group grid grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] bg-white/[0.035] px-[10px] py-[11px] text-white/68 no-underline transition hover:bg-white/[0.055] hover:text-white max-md:grid-cols-[42px_minmax(0,1fr)_28px] max-md:gap-[10px] max-md:px-[12px] max-md:py-[14px]"
+          >
+            <span className="text-center text-[14px] font-bold leading-none text-white/48 max-md:text-[18px]">+</span>
+            <span className="min-w-0">
+              <span className="block text-[14px] font-bold leading-[1.35] max-md:text-[16px]">{getHiddenIntroCopy("title", lang)}</span>
+              <span className="mt-[4px] block text-[12px] leading-tight text-[#9cfb51] max-md:text-[14px]">{getHiddenIntroCopy("lockedAction", lang)}</span>
+            </span>
+            <span className="grid size-[22px] place-items-center text-[#788183]">
+              <Lock size={16} strokeWidth={2.25} />
+            </span>
+          </a>
+        )
+      ) : null}
     </div>
   );
+}
+
+function useHiddenIntroOpened() {
+  const [opened, setOpened] = useState(false);
+
+  useEffect(() => {
+    try {
+      setOpened(window.localStorage.getItem(HIDDEN_INTRO_UNLOCK_STORAGE_KEY) === "1");
+    } catch {
+      setOpened(false);
+    }
+  }, []);
+
+  return opened;
 }
 
 type TimestampListProps = {

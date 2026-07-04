@@ -138,6 +138,20 @@ short-lived Kinescope embed URL with `drmauthtoken`. Kinescope calls
 Kinescope API key, auth JWT secret, Supabase service-role key, YooKassa secret,
 Resend key, or raw playback token in the client bundle.
 
+Telegram hidden intro is a separate free lead magnet for this course, not a
+course entitlement, not a Pro feature, and not a paid course lesson while the
+real video is missing. V1 uses a simple secret noindex route
+`/learn/courses/ai-content-marketing-2026/hidden-intro` that the Telegram bot
+sends after channel subscription verification. It intentionally uses no website
+login, no unlock token, and no Telegram user database. Opening the route writes
+`localStorage.opten_hidden_intro_opened_v1` so a future course menu slot can
+change from “Скрытый урок — получить доступ в Telegram” to the normal
+“Скрытый урок” state in that browser. Until the actual hidden intro video is
+available, keep the route as a harmless placeholder and do not add
+`hidden-intro` to `privateCourseCollection.lessons`,
+`api/_shared/kinescopeCourse.ts`, sitemap, llms.txt, public Learn, or EN
+sibling maps.
+
 Hardcoded constants that are duplicated and must be kept in sync:
 - `EXTENSION_IDS` — appears in [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [src/app/pages/DownloadSkillPage.tsx](src/app/pages/DownloadSkillPage.tsx), [src/app/pages/PromptLibraryPage.tsx](src/app/pages/PromptLibraryPage.tsx)
 - `SUPABASE_URL`, `SUPABASE_REST_URL`, and `SUPABASE_ANON_KEY` — appears in [src/lib/optenAuth.ts](src/lib/optenAuth.ts), [src/lib/promptLibraryApi.ts](src/lib/promptLibraryApi.ts), [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [api/download-skill.ts](api/download-skill.ts), plus the extension's `config/api.js`
@@ -465,6 +479,24 @@ Use `node scripts/gsc.mjs sites`, `node scripts/gsc.mjs sitemaps`,
 `node scripts/gsc.mjs inspect https://opten.space/models` for direct GSC API
 checks. If Google returns `invalid_grant`, refresh the OAuth token in the same
 installed-app flow and update `.secrets/gsc-oauth.env`.
+
+Preferred reauthorization flow for agents:
+
+1. Run `npm run gsc:refresh-auth`. It starts a temporary localhost callback and
+   writes `.secrets/gsc-oauth-refresh.status.json` with `authUrl`, `callback`,
+   and current `status`.
+2. Use the Chrome control plugin/skill to open the `authUrl` in the user's real
+   Chrome profile. Do not rely on `Start-Process` from PowerShell as the primary
+   UX; in this desktop setup it may silently fail to surface a browser window.
+3. Leave the Chrome tab as a handoff and tell the user: choose the Google
+   account that owns Search Console for `opten.space`, approve the Webmasters /
+   Search Console scope, then say `готово`.
+4. After the user confirms, read the status file. `status: "complete"` means the
+   helper saved the new `GSC_REFRESH_TOKEN` into both `.secrets/gsc-oauth.env`
+   and `C:\Projects\opten-seo\.env.local`.
+5. Verify immediately with `npm run gsc:sites` and then continue the audit with
+   `npm run gsc:sitemaps`, `npm run gsc:performance -- 28`, and targeted
+   `npm run gsc:inspect -- <url>` checks.
 
 ### Yandex Webmaster local access
 

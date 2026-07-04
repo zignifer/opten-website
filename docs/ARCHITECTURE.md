@@ -300,6 +300,16 @@ POST /api/kinescope-course-auth                ← Kinescope playback authorizat
 changes and `npm run verify:kinescope-course` after any hidden course/Kinescope
 ID/materials/prompt change.
 
+Telegram hidden intro is a separate free lead-magnet placeholder for the same
+course. In v1 the Telegram bot verifies channel subscription and sends the
+secret noindex route
+`/learn/courses/ai-content-marketing-2026/hidden-intro`; opening it stores
+`localStorage.opten_hidden_intro_opened_v1` for future menu state. While the
+real video is missing, this route must stay outside `privateCourseCollection`
+lesson data, Kinescope server whitelist, sitemap, llms.txt, public Learn route
+lists, and EN sibling maps. It must not call paid course payment, entitlement,
+Kinescope token, or course prompt APIs.
+
 ## Models content pipeline (Phase v2.0)
 
 Model pages are **generated**, not hand-curated. The chain:
