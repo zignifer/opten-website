@@ -20,9 +20,9 @@ const prerenderedRoutes = routes.filter((r) => r.prerender !== "none");
 // Floor check: Phase v2.0 MODELS-B-3b bumped 22 → 144 when all 62 model
 // content files landed. Blog posts bring the floor to 170; public Learn adds lessons + finds. SPA-only routes
 // carry prerender:"none" and are excluded.
-if (prerenderedRoutes.length < 206) {
+if (prerenderedRoutes.length < 208) {
   throw new Error(
-    `llms.mjs: expected at least 206 prerendered routes (56 marketing/blog routes + 24 Learn routes + 126 model routes), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
+    `llms.mjs: expected at least 208 prerendered routes (58 marketing/blog routes + 24 Learn routes + 126 model routes), got ${prerenderedRoutes.length}. Manifest mis-loaded or routes missing?`,
   );
 }
 

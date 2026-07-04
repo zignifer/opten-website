@@ -6,6 +6,7 @@
 // intro/steps/faq under `body: { ... }`. URL still /guides/gpt-image-2 until B-07.
 // This compiles cleanly via vite build --ssr; the deep imports resolve at SSR-bundle time.
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
+import { post as neuralNetworksFromScratchGuide } from "../src/content/blog/neural-networks-from-scratch";
 import { post as aiTrainingBeginnersGuide } from "../src/content/blog/ai-training-beginners";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
@@ -1298,6 +1299,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/neural-networks-from-scratch`, name: neuralNetworksFromScratchGuide.ru.title, datePublished: neuralNetworksFromScratchGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-training-beginners`, name: aiTrainingBeginnersGuide.ru.title, datePublished: aiTrainingBeginnersGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-headshot-generator`, name: aiHeadshotGeneratorGuide.ru.title, datePublished: aiHeadshotGeneratorGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-ugc-for-brands`, name: aiUgcForBrandsGuide.ru.title, datePublished: aiUgcForBrandsGuide.ru.publishedAt },
@@ -1334,6 +1336,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/neural-networks-from-scratch — applied neural networks beginner guide.
+  {
+    path: "/blog/neural-networks-from-scratch",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/neural-networks-from-scratch`,
+      en: `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch`,
+      xDefault: `${SITE_ORIGIN}/blog/neural-networks-from-scratch`,
+    },
+    title: neuralNetworksFromScratchGuide.ru.title,
+    description: neuralNetworksFromScratchGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/neural-networks-from-scratch`,
+    ogTitle: neuralNetworksFromScratchGuide.ru.title,
+    ogDescription: neuralNetworksFromScratchGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${neuralNetworksFromScratchGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/neural-networks-from-scratch`,
+        headline: neuralNetworksFromScratchGuide.ru.title,
+        description: neuralNetworksFromScratchGuide.ru.description,
+        datePublished: neuralNetworksFromScratchGuide.ru.publishedAt,
+        dateModified: neuralNetworksFromScratchGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: neuralNetworksFromScratchGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${neuralNetworksFromScratchGuide.ru.cover.src}`,
+          width: neuralNetworksFromScratchGuide.ru.cover.width,
+          height: neuralNetworksFromScratchGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/neural-networks-from-scratch`,
+        url: `${SITE_ORIGIN}/blog/neural-networks-from-scratch`,
+        name: neuralNetworksFromScratchGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (neuralNetworksFromScratchGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/neural-networks-from-scratch`,
+        neuralNetworksFromScratchGuide.ru.title,
+      ),
+      faqPageBlock(neuralNetworksFromScratchGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/neural-networks-from-scratch`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: neuralNetworksFromScratchGuide.ru.title, url: `${SITE_ORIGIN}/blog/neural-networks-from-scratch` },
+        ],
+        `${SITE_ORIGIN}/blog/neural-networks-from-scratch`,
       ),
     ],
   },
@@ -2806,6 +2868,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch`, name: neuralNetworksFromScratchGuide.en.title, datePublished: neuralNetworksFromScratchGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-training-beginners`, name: aiTrainingBeginnersGuide.en.title, datePublished: aiTrainingBeginnersGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-headshot-generator`, name: aiHeadshotGeneratorGuide.en.title, datePublished: aiHeadshotGeneratorGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-ugc-for-brands`, name: aiUgcForBrandsGuide.en.title, datePublished: aiUgcForBrandsGuide.en.publishedAt },
@@ -2842,6 +2905,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/neural-networks-from-scratch EN sibling.
+  {
+    path: "/en/blog/neural-networks-from-scratch",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/neural-networks-from-scratch`,
+      en: `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch`,
+      xDefault: `${SITE_ORIGIN}/blog/neural-networks-from-scratch`,
+    },
+    title: neuralNetworksFromScratchGuide.en.title,
+    description: neuralNetworksFromScratchGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch`,
+    ogTitle: neuralNetworksFromScratchGuide.en.title,
+    ogDescription: neuralNetworksFromScratchGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${neuralNetworksFromScratchGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch`,
+        headline: neuralNetworksFromScratchGuide.en.title,
+        description: neuralNetworksFromScratchGuide.en.description,
+        datePublished: neuralNetworksFromScratchGuide.en.publishedAt,
+        dateModified: neuralNetworksFromScratchGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: neuralNetworksFromScratchGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${neuralNetworksFromScratchGuide.en.cover.src}`,
+          width: neuralNetworksFromScratchGuide.en.cover.width,
+          height: neuralNetworksFromScratchGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch`,
+        url: `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch`,
+        name: neuralNetworksFromScratchGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (neuralNetworksFromScratchGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch`,
+        neuralNetworksFromScratchGuide.en.title,
+      ),
+      faqPageBlock(neuralNetworksFromScratchGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: neuralNetworksFromScratchGuide.en.title, url: `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch` },
+        ],
+        `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch`,
       ),
     ],
   },
