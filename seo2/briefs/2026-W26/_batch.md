@@ -4,7 +4,7 @@ kind: weekly-blog-brief-batch
 week: "2026-W26"
 status: ready
 brief_count: 20
-published_count: 2
+published_count: 3
 focus: "обучение ИИ, нейросети для работы, фриланс, практические AI-навыки"
 ---
 
@@ -43,7 +43,7 @@ Default course CTA for course/learning banners: `/learn/courses/ai-content-marke
 |---:|--------|------|---------|-----------------|-----------:|-------|
 | 1 | published | `ai-training-beginners` | `BL-learn` | `обучение ИИ` | 35902 | [01-ai-training-beginners.md](01-ai-training-beginners.md) |
 | 2 | published | `neural-networks-from-scratch` | `BL-learn` | `обучение нейросетям` | 23989 | [02-neural-networks-from-scratch.md](02-neural-networks-from-scratch.md) |
-| 3 | pending | `ai-courses-for-beginners` | `BL-learn` | `курсы по ИИ` | 9911 | [03-ai-courses-for-beginners.md](03-ai-courses-for-beginners.md) |
+| 3 | published | `ai-courses-for-beginners` | `BL-learn` | `курсы по ИИ` | 9911 | [03-ai-courses-for-beginners.md](03-ai-courses-for-beginners.md) |
 | 4 | pending | `free-ai-courses` | `BL-learn` | `бесплатное обучение нейросетям` | 3575 | [04-free-ai-courses.md](04-free-ai-courses.md) |
 | 5 | pending | `ai-for-work` | `BL-work` | `нейросети для работы` | 32506 | [05-ai-for-work.md](05-ai-for-work.md) |
 | 6 | pending | `ai-presentations` | `BL-work` | `нейросети для презентаций` | 177001 | [06-ai-presentations.md](06-ai-presentations.md) |

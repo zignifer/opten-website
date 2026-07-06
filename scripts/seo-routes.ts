@@ -8,6 +8,7 @@
 import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
 import { post as neuralNetworksFromScratchGuide } from "../src/content/blog/neural-networks-from-scratch";
 import { post as aiTrainingBeginnersGuide } from "../src/content/blog/ai-training-beginners";
+import { post as aiCoursesForBeginnersGuide } from "../src/content/blog/ai-courses-for-beginners";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
 import { post as aiFaceSwapGuide } from "../src/content/blog/ai-face-swap";
@@ -1299,6 +1300,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/ai-courses-for-beginners`, name: aiCoursesForBeginnersGuide.ru.title, datePublished: aiCoursesForBeginnersGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/neural-networks-from-scratch`, name: neuralNetworksFromScratchGuide.ru.title, datePublished: neuralNetworksFromScratchGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-training-beginners`, name: aiTrainingBeginnersGuide.ru.title, datePublished: aiTrainingBeginnersGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-headshot-generator`, name: aiHeadshotGeneratorGuide.ru.title, datePublished: aiHeadshotGeneratorGuide.ru.publishedAt },
@@ -1336,6 +1338,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/ai-courses-for-beginners — AI course selection guide.
+  {
+    path: "/blog/ai-courses-for-beginners",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-courses-for-beginners`,
+      en: `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-courses-for-beginners`,
+    },
+    title: aiCoursesForBeginnersGuide.ru.title,
+    description: aiCoursesForBeginnersGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-courses-for-beginners`,
+    ogTitle: aiCoursesForBeginnersGuide.ru.title,
+    ogDescription: aiCoursesForBeginnersGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiCoursesForBeginnersGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-courses-for-beginners`,
+        headline: aiCoursesForBeginnersGuide.ru.title,
+        description: aiCoursesForBeginnersGuide.ru.description,
+        datePublished: aiCoursesForBeginnersGuide.ru.publishedAt,
+        dateModified: aiCoursesForBeginnersGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: aiCoursesForBeginnersGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiCoursesForBeginnersGuide.ru.cover.src}`,
+          width: aiCoursesForBeginnersGuide.ru.cover.width,
+          height: aiCoursesForBeginnersGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-courses-for-beginners`,
+        url: `${SITE_ORIGIN}/blog/ai-courses-for-beginners`,
+        name: aiCoursesForBeginnersGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiCoursesForBeginnersGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/ai-courses-for-beginners`,
+        aiCoursesForBeginnersGuide.ru.title,
+      ),
+      faqPageBlock(aiCoursesForBeginnersGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-courses-for-beginners`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: aiCoursesForBeginnersGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-courses-for-beginners` },
+        ],
+        `${SITE_ORIGIN}/blog/ai-courses-for-beginners`,
       ),
     ],
   },
@@ -2868,6 +2930,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners`, name: aiCoursesForBeginnersGuide.en.title, datePublished: aiCoursesForBeginnersGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch`, name: neuralNetworksFromScratchGuide.en.title, datePublished: neuralNetworksFromScratchGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-training-beginners`, name: aiTrainingBeginnersGuide.en.title, datePublished: aiTrainingBeginnersGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-headshot-generator`, name: aiHeadshotGeneratorGuide.en.title, datePublished: aiHeadshotGeneratorGuide.en.publishedAt },
@@ -2905,6 +2968,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/ai-courses-for-beginners EN sibling.
+  {
+    path: "/en/blog/ai-courses-for-beginners",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-courses-for-beginners`,
+      en: `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-courses-for-beginners`,
+    },
+    title: aiCoursesForBeginnersGuide.en.title,
+    description: aiCoursesForBeginnersGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners`,
+    ogTitle: aiCoursesForBeginnersGuide.en.title,
+    ogDescription: aiCoursesForBeginnersGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiCoursesForBeginnersGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners`,
+        headline: aiCoursesForBeginnersGuide.en.title,
+        description: aiCoursesForBeginnersGuide.en.description,
+        datePublished: aiCoursesForBeginnersGuide.en.publishedAt,
+        dateModified: aiCoursesForBeginnersGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: aiCoursesForBeginnersGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiCoursesForBeginnersGuide.en.cover.src}`,
+          width: aiCoursesForBeginnersGuide.en.cover.width,
+          height: aiCoursesForBeginnersGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners`,
+        url: `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners`,
+        name: aiCoursesForBeginnersGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiCoursesForBeginnersGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners`,
+        aiCoursesForBeginnersGuide.en.title,
+      ),
+      faqPageBlock(aiCoursesForBeginnersGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: aiCoursesForBeginnersGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners` },
+        ],
+        `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners`,
       ),
     ],
   },
