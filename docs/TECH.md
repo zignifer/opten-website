@@ -32,7 +32,7 @@
 - **`tw-animate-css` 1.3.8** — animation utility classes
 - Style entry point: [`src/styles/`](../../src/styles/) — `index.css`, `tailwind.css`, `theme.css`, `fonts.css`
 - **Self-hosted SUBSET fonts** (`public/fonts/*.woff2`, 2026-05-21): Unbounded (~81 KB) + PT Root UI (~65 KB), weight axis pinned 400–700, subset to the real RU+EN corpus via [`scripts/subset-fonts.py`](../../scripts/subset-fonts.py) and gated by [`scripts/verify-fonts.mjs`](../../scripts/verify-fonts.mjs). Unbounded is preloaded (`<link rel=preload>` in `index.html` — it's the H1 LCP element, `font-display: swap`); PT Root UI uses `font-display: optional` (zero CLS).
-- **iOS-Safari paint budget:** heavy `filter: blur` (hero gradient) and `backdrop-filter` (fixed header on mobile) were trimmed 2026-05-21 — cheap on Chrome but they saturate WebKit's main thread, delaying interactivity + scroll response on iPhone. See [`.planning/research/SAFARI-MOBILE-INTERACTIVITY.md`](../.planning/research/SAFARI-MOBILE-INTERACTIVITY.md).
+- **iOS-Safari paint budget:** heavy `filter: blur` (hero gradient) and `backdrop-filter` (fixed header on mobile) were trimmed 2026-05-21 — cheap on Chrome but they saturate WebKit's main thread, delaying interactivity + scroll response on iPhone.
 
 ## UI libraries
 

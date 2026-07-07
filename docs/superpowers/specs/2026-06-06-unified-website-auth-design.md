@@ -116,7 +116,7 @@ Update:
 
 - `docs/INTEGRATION-CONTRACT.md`
 - `docs/ARCHITECTURE.md`
-- `.planning/PROJECT.md` or active planning docs if needed
+- active project docs if needed
 
 The contract should document `/login`, website-first `/pay` and `/account`, direct website cancellation, and the independent-session rule.
 

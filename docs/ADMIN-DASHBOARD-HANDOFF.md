@@ -38,14 +38,10 @@ Website repo:
 - `docs/INTEGRATION-CONTRACT.md`
 - `docs/ARCHITECTURE.md`
 - `docs/TECH.md`
-- `.planning/PROJECT.md`
-- `.planning/STATE.md`
 
 Backend/extension repo:
 
 - `AGENTS.md`
-- `.planning/PROJECT.md`
-- `.planning/STATE.md`
 - `supabase/functions/telegram-hidden-intro-*`
 - `supabase/functions/_shared/telegram-funnel.ts`
 - `supabase/functions/_shared/course-discount-claims.ts`

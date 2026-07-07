@@ -223,7 +223,7 @@ dicts) and the GEO/SEO patterns locked-in during v1.0.
 - Locked/auth/noindex routes without EN siblings (`/success`, `/login`, `/auth/*`, `/account`, `/dashboard/download-skill`, `/prompt-library`, `/p/*`, `/learn/courses/*`, `/app/*`) stay RU-only by design — they are `Disallow`'d/noindex app, account, hidden-course, or random-link snapshot surfaces, not content/SEO pages (D-03).
 - `<LocalizedLink>` (drop-in replacement for `<Link>`) preserves the `/en/` prefix when navigating internally between EN siblings; on locked no-sibling routes the LangSwitcher flips language in place via storage.
 
-See [SEO-AUDIT.md](SEO-AUDIT.md) for the audit baseline and the v1.0 archive in `.planning/milestones/v1.0-ROADMAP.md` for the trajectory (GEO score 12 → ~72.6, target ~80+ after Phase 4.2 deploy bakes in).
+See [SEO-AUDIT.md](SEO-AUDIT.md) for the audit baseline. The historical GEO trajectory was 12 → ~72.6, with a target of ~80+ after the SEO polish work baked in.
 
 ## Header / Footer
 

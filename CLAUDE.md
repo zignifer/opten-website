@@ -9,7 +9,7 @@ instructions and does not drift.
 
 Do not recreate the old Codex adapter layout (`.codex/config.toml`,
 `.codex/agents/`, `.agents/skills/`) unless explicitly requested. Project
-knowledge belongs here, with detailed specs in `docs/` and `.planning/`.
+knowledge belongs here, with detailed specs in `docs/`.
 
 ## Project
 
@@ -394,23 +394,12 @@ query itself.
 
 ## Workflow
 
-This project uses **GSD (Get Shit Done)** for planning. Live state in
-`.planning/`:
+This repo uses ordinary docs/issues for planning. Keep project context in
+`AGENTS.md`; keep durable specs, audits, and handoffs in `docs/`.
 
-- `.planning/PROJECT.md` — project context, locked decisions (mirrors INTEGRATION-CONTRACT.md)
-- `.planning/ROADMAP.md` — milestone → phases breakdown
-- `.planning/REQUIREMENTS.md` — falsifiable requirements per milestone
-- `.planning/STATE.md` — current phase / progress / blockers
-- `.planning/phases/XX-name/` — per-phase artifacts: `N-SPEC.md`, `N-PLAN.md`, `N-CONTEXT.md`
-- `.planning/intel/` — consolidated context from ingested docs (read-only after bootstrap)
-- `.planning/research/` — audit reports and exploratory analyses (e.g. `GEO-AUDIT.md`)
-
-For non-trivial work use the GSD slash commands (`/gsd-plan-phase`,
-`/gsd-execute-phase`, `/gsd-verify-work`, etc.) — they keep state in
-`.planning/` in sync and respect locked decisions.
-
-For ad-hoc edits this section is non-binding — just keep changes scoped and
-respect the integration contract above.
+For non-trivial work, create ordinary docs or implementation plans in `docs/`
+when needed. For ad-hoc edits, keep changes scoped and respect the integration
+contract above.
 
 ### Browser verification
 
@@ -424,9 +413,8 @@ Project scripts that already use Playwright, such as `scripts/smoke-blog.mjs`,
 can remain Playwright-based unless they are being rewritten.
 
 The Obsidian vault root is the repo root, so every `.md` here also appears
-in the vault graph. Prefer `[[wikilinks]]` over relative markdown links
-inside `.planning/` so backlinks/graph view stay populated. See `_index.md`
-for the navigation hub.
+in the vault graph. Prefer `[[wikilinks]]` in project notes when that improves
+navigation. See `_index.md` for the navigation hub.
 
 ## Deploy & build
 
@@ -663,5 +651,4 @@ Reference documentation lives in `docs/`:
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — routes, flows, state
 - [docs/SEO-AUDIT.md](docs/SEO-AUDIT.md) — SEO baseline + gap analysis (v1.0 input artifact)
 
-Active planning state lives in `.planning/` (managed by GSD slash commands).
 See `_index.md` for the Obsidian-friendly navigation hub.

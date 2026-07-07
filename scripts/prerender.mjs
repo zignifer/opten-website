@@ -306,7 +306,7 @@ function applyHeroPreloadGuard(html, meta) {
   for (const fontPath of REQUIRED_FONT_PRELOADS) {
     const re = new RegExp(`<link\\s+rel="preload"\\s+href="${escapeRegex(fontPath)}"[^>]*as="font"`);
     if (!re.test(html)) {
-      throw new Error(`prerender(${meta.path}): missing font preload ${fontPath} — Phase 2.2 regression. See .planning/phases/04-content-surface/04-LCP-AUDIT.md.`);
+      throw new Error(`prerender(${meta.path}): missing font preload ${fontPath} — Phase 2.2 regression.`);
     }
   }
   return html; // unchanged
