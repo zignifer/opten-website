@@ -192,18 +192,22 @@ type LessonDetailLayoutProps = {
   collection: LearnCollection;
   previousLesson?: LearnLesson;
   nextLesson?: LearnLesson;
+  hiddenIntroRouteUnlocked?: boolean;
 };
 
 type SidebarTab = "lessons" | "timestamps";
 
-export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutProps) {
+export function LessonDetailLayout({ lesson, collection, hiddenIntroRouteUnlocked = false }: LessonDetailLayoutProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const { account, session, status: authStatus } = useSpaceAuth();
   const hasPro = hasProAccess(account);
   const purchase = collection.purchase;
   const courseAccess = useCourseAccess(purchase, session?.access_token ?? null);
-  const lessonAccessGranted = purchase ? courseAccess.hasAccess : hasPro;
+  const hiddenIntroOpened = useHiddenIntroOpened();
+  const hiddenIntroUnlocked = lesson.slug === HIDDEN_INTRO_SLUG && (hiddenIntroOpened || hiddenIntroRouteUnlocked);
+  const courseHasAccess = purchase ? courseAccess.hasAccess : hasPro;
+  const lessonAccessGranted = courseHasAccess || hiddenIntroUnlocked;
   const locked = isLessonLocked(lesson, lessonAccessGranted);
   const isCourse = collection.kind === "course";
   const [activeTab, setActiveTab] = useState<SidebarTab>(isCourse ? "lessons" : "timestamps");
@@ -291,6 +295,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                 purchase={purchase}
                 startSeconds={startSeconds}
                 playRequestId={playRequestId}
+                hiddenIntroUnlocked={hiddenIntroUnlocked}
               />
             </div>
             <LessonIntro
@@ -314,7 +319,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
             <LessonMissingItems items={getLearnLessonMissingItems(displayedLesson, lang)} />
           </div>
           <div className={isCourse ? "max-lg:hidden" : undefined}>
-            <RelatedLessons collection={displayedCollection} currentSlug={lesson.slug} hasAccess={lessonAccessGranted} purchase={purchase} />
+            <RelatedLessons collection={displayedCollection} currentSlug={lesson.slug} hasAccess={courseHasAccess} purchase={purchase} />
           </div>
         </div>
 
@@ -332,7 +337,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                     activeTab={activeTab}
                     onTabChange={setActiveTab}
                     onTimestampSelect={handleTimestampSelect}
-                    hasAccess={lessonAccessGranted}
+                    hasAccess={courseHasAccess}
                     purchase={purchase}
                   />
                 </div>
@@ -356,7 +361,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                     activeTab={activeTab}
                     onTabChange={setActiveTab}
                     onTimestampSelect={handleTimestampSelect}
-                    hasAccess={lessonAccessGranted}
+                    hasAccess={courseHasAccess}
                     purchase={purchase}
                   />
                 </div>
@@ -371,7 +376,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
                 onTimestampSelect={handleTimestampSelect}
-                hasAccess={lessonAccessGranted}
+                hasAccess={courseHasAccess}
                 purchase={purchase}
               />
               <UnlockProCard hasPro={hasPro} />
@@ -733,6 +738,7 @@ type LessonPlayerProps = {
   purchase?: LearnCoursePurchase;
   startSeconds: number;
   playRequestId: number;
+  hiddenIntroUnlocked?: boolean;
 };
 
 type KinescopeTokenResponse = {
@@ -862,7 +868,7 @@ function destroyKinescopePlayer(player: KinescopeIframePlayer) {
   void player.destroy({ keepElement: true }).catch(() => undefined);
 }
 
-function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, playRequestId }: LessonPlayerProps) {
+function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, playRequestId, hiddenIntroUnlocked = false }: LessonPlayerProps) {
   const { pathname } = useLocation();
   const { lang } = useLang();
   const [currency] = useCurrencyPreference();
@@ -925,7 +931,8 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
     if (!isKinescopeVideo || !activated || locked || kinescopeEmbedUrl) return;
 
     const accessToken = session?.access_token;
-    if (!accessToken) {
+    const canUseHiddenIntroUnlock = lesson.slug === HIDDEN_INTRO_SLUG && hiddenIntroUnlocked;
+    if (!accessToken && !canUseHiddenIntroUnlock) {
       setKinescopeError("missing_session");
       return;
     }
@@ -937,12 +944,13 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
     fetch("/api/kinescope-course-token", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         courseSlug: collectionId,
         lessonSlug: lesson.slug,
+        hiddenIntroUnlocked: canUseHiddenIntroUnlock,
       }),
     })
       .then(async (response) => {
@@ -960,7 +968,7 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
     return () => {
       cancelled = true;
     };
-  }, [activated, collectionId, isKinescopeVideo, kinescopeEmbedUrl, lesson.slug, locked, session?.access_token]);
+  }, [activated, collectionId, hiddenIntroUnlocked, isKinescopeVideo, kinescopeEmbedUrl, lesson.slug, locked, session?.access_token]);
 
   useEffect(() => {
     if (!isKinescopeVideo || !activated || !kinescopeEmbedUrl || kinescopeApiFallback) return;
@@ -1808,41 +1816,65 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
     <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] max-md:max-h-[312px] max-md:space-y-[4px] max-md:p-[12px] ${className}`}>
       {collection.lessons.map((outlineLesson, index) => {
         const current = outlineLesson.slug === currentSlug;
-        const locked = isLessonLocked(outlineLesson, hasAccess);
+        const isHiddenIntro = outlineLesson.slug === HIDDEN_INTRO_SLUG;
+        const hiddenIntroAvailable = isHiddenIntro && (hiddenIntroOpened || current);
+        const locked = isLessonLocked(outlineLesson, hasAccess || hiddenIntroAvailable);
         const metaLabel = outlineLesson.duration;
-        return (
-          <LocalizedLink
-            key={outlineLesson.slug}
-            to={getLessonHref(collection, outlineLesson.slug, lang)}
-            aria-current={current ? "page" : undefined}
-            className={`group grid grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition max-md:grid-cols-[42px_minmax(0,1fr)_28px] max-md:gap-[10px] max-md:px-[12px] max-md:py-[14px] ${
-              locked ? "min-h-[62px]" : ""
-            } ${
-              current
-                ? "bg-[#173a22] text-white"
-                : locked
-                  ? "bg-white/[0.035] text-white/68 hover:bg-white/[0.055] hover:text-white"
-                  : "text-white/76 hover:bg-white/[0.045] hover:text-white"
-            }`}
-          >
-            <span className={`text-center text-[14px] font-bold leading-none max-md:text-[18px] ${current ? "text-[#9cfb51]" : "text-white/48"}`}>
-              {index + 1}.
+        const displayNumber = getCourseLessonDisplayNumber(collection, outlineLesson) || String(index + 1);
+        const rowClass = `group grid grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition max-md:grid-cols-[42px_minmax(0,1fr)_28px] max-md:gap-[10px] max-md:px-[12px] max-md:py-[14px] ${
+          locked ? "min-h-[62px]" : ""
+        } ${
+          current
+            ? "bg-[#173a22] text-white"
+            : locked
+              ? "bg-white/[0.035] text-white/68 hover:bg-white/[0.055] hover:text-white"
+              : "text-white/76 hover:bg-white/[0.045] hover:text-white"
+        }`;
+        const rowContent = (
+          <>
+            <span className={`text-center text-[14px] font-bold leading-none max-md:text-[18px] ${current ? "text-[#9cfb51]" : isHiddenIntro ? "text-[#9cfb51]/72" : "text-white/48"}`}>
+              {displayNumber}.
             </span>
             <span className="min-w-0">
               <span className={`block text-[14px] font-bold leading-[1.35] max-md:text-[16px] ${current ? "text-white" : ""}`}>
                 {getLearnLessonTitle(outlineLesson, lang)}
               </span>
-              <span className="mt-[4px] block text-[12px] leading-tight text-white/44 max-md:text-[14px]">
-                {metaLabel}
+              <span className={`mt-[4px] block text-[12px] leading-tight max-md:text-[14px] ${isHiddenIntro && locked ? "text-[#9cfb51]" : "text-white/44"}`}>
+                {isHiddenIntro && locked ? getHiddenIntroCopy("lockedAction", lang) : metaLabel}
               </span>
             </span>
             {locked ? (
-              <span className="grid size-[22px] place-items-center text-[#788183]">
-                <Lock size={16} strokeWidth={2.25} />
+              <span className="grid size-[22px] place-items-center text-[#9cfb51]/72">
+                {isHiddenIntro ? <LinkIcon size={16} strokeWidth={2.25} /> : <Lock size={16} strokeWidth={2.25} />}
               </span>
             ) : (
               <LessonStatusDot lesson={outlineLesson} current={current} />
             )}
+          </>
+        );
+
+        if (isHiddenIntro && locked) {
+          return (
+            <a
+              key={outlineLesson.slug}
+              href={HIDDEN_INTRO_TELEGRAM_URL}
+              target="_blank"
+              rel="noreferrer"
+              className={rowClass}
+            >
+              {rowContent}
+            </a>
+          );
+        }
+
+        return (
+          <LocalizedLink
+            key={outlineLesson.slug}
+            to={getLessonHref(collection, outlineLesson.slug, lang)}
+            aria-current={current ? "page" : undefined}
+            className={rowClass}
+          >
+            {rowContent}
           </LocalizedLink>
         );
       })}
@@ -1884,17 +1916,22 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
 }
 
 function useHiddenIntroOpened() {
-  const [opened, setOpened] = useState(false);
+  const [opened, setOpened] = useState(() => readHiddenIntroOpened());
 
   useEffect(() => {
-    try {
-      setOpened(window.localStorage.getItem(HIDDEN_INTRO_UNLOCK_STORAGE_KEY) === "1");
-    } catch {
-      setOpened(false);
-    }
+    setOpened(readHiddenIntroOpened());
   }, []);
 
   return opened;
+}
+
+function readHiddenIntroOpened() {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(HIDDEN_INTRO_UNLOCK_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
 }
 
 type TimestampListProps = {
@@ -2482,8 +2519,18 @@ function getLessonHref(collection: LearnCollection, slug: string, lang: "ru" | "
 function getNumberedCourseLessonTitle(collection: LearnCollection, lesson: LearnLesson, lang: "ru" | "en") {
   const title = getLearnLessonTitle(lesson, lang);
   if (collection.kind !== "course") return title;
+  const displayNumber = getCourseLessonDisplayNumber(collection, lesson);
+  return displayNumber ? `${displayNumber}. ${title}` : title;
+}
+
+function getCourseLessonDisplayNumber(collection: LearnCollection, lesson: LearnLesson) {
+  if (collection.kind !== "course") return "";
   const index = collection.lessons.findIndex((item) => item.slug === lesson.slug);
-  return index >= 0 ? `${index + 1}. ${title}` : title;
+  if (index < 0) return "";
+  const hasHiddenIntro = collection.id === AI_CONTENT_MARKETING_COURSE_SLUG && collection.lessons.some((item) => item.slug === HIDDEN_INTRO_SLUG);
+  if (!hasHiddenIntro) return String(index + 1);
+  if (lesson.slug === HIDDEN_INTRO_SLUG) return "0";
+  return String(index);
 }
 
 type LessonStatusDotProps = {

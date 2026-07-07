@@ -1,17 +1,19 @@
 import type { LearnLang, LearnMaterial, LearnMissingItem, LearnPromptBlock } from "./learn";
+import { HIDDEN_INTRO_SLUG } from "./hiddenIntro";
 
 type LessonExtras = {
   materials: Partial<Record<LearnLang, LearnMaterial[]>>;
   prompts?: Partial<Record<LearnLang, LearnPromptBlock[]>>;
   missingItems?: Partial<Record<LearnLang, LearnMissingItem[]>>;
+  useSharedRequiredMaterials?: boolean;
 };
 
 function link(title: string, meta: string, href: string, actionLabel = "Перейти"): LearnMaterial {
   return { title, meta, kind: "link", actionLabel, href };
 }
 
-function prompt(id: string, title: string, meta: string, sourceLabel?: string): LearnPromptBlock {
-  return { id, title, meta, sourceLabel, language: "text" };
+function prompt(id: string, title: string, meta: string, sourceLabel?: string, body?: string): LearnPromptBlock {
+  return { id, title, meta, sourceLabel, body, language: "text" };
 }
 
 const links = {
@@ -42,6 +44,20 @@ const modelCheatsheet: LearnMaterial = {
   href: "/assets/space/courses/ai-content-marketing-2026/lesson-4-model-cheatsheet.pdf",
 };
 
+const recommendedVpn = link(
+  "VPN который рекомендую",
+  "Рекомендованный VPN для доступа к зарубежным сервисам",
+  "https://sotavpn.app/?utm_source=f37531d3-c013-45cc-858c-9e1690fa3d43",
+);
+
+const foreignServicesPayment = link(
+  "Сервис для оплаты зарубежных сервисов",
+  "Telegram-бот для оплаты зарубежных сервисов",
+  "https://t.me/zarub_robot?start=ref_xAulfY",
+);
+
+const hiddenIntroStrategyPrompt = `Я хочу сделать аудит своей ниши и короткую маркетинговую стратегию, чтобы потом на основании неё генерировать идеи для контента. Помоги мне сначала собрать нормальный запрос для глубокого исследования. Учитывай, кто я, что продаю, кому продаю, какие боли у аудитории, какие темы могут приводить не просто просмотры, а потенциальных клиентов.`;
+
 const characterReferenceSheet: LearnMaterial = {
   title: "Референс внешности",
   meta: "Лист для сохранения внешности персонажа",
@@ -64,19 +80,34 @@ function withRequiredCourseMaterials(materials: LearnMaterial[] | undefined) {
 }
 
 const privateCourseLessonExtras: Record<string, LessonExtras> = {
+  [HIDDEN_INTRO_SLUG]: {
+    useSharedRequiredMaterials: false,
+    materials: {
+      ru: [
+        links.optenPromptImprover,
+        optenSkill,
+        recommendedVpn,
+        foreignServicesPayment,
+        modelCheatsheet,
+      ],
+    },
+    prompts: {
+      ru: [
+        prompt(
+          "l0-niche-research-strategy",
+          "Запрос для аудита ниши и стратегии",
+          "Промпт из урока для подготовки deep research и контент-идей",
+          "Пример из урока 0",
+          hiddenIntroStrategyPrompt,
+        ),
+      ],
+    },
+  },
   "lesson-1-prompting": {
     materials: {
       ru: [
-        link(
-          "VPN который рекомендую",
-          "Рекомендованный VPN для доступа к зарубежным сервисам",
-          "https://sotavpn.app/?utm_source=f37531d3-c013-45cc-858c-9e1690fa3d43",
-        ),
-        link(
-          "Сервис для оплаты зарубежных сервисов",
-          "Telegram-бот для оплаты зарубежных сервисов",
-          "https://t.me/zarub_robot?start=ref_xAulfY",
-        ),
+        recommendedVpn,
+        foreignServicesPayment,
       ],
     },
     prompts: {
@@ -373,6 +404,7 @@ const privateCourseLessonExtras: Record<string, LessonExtras> = {
 export function getPrivateCourseLessonExtras(slug: string): LessonExtras | undefined {
   const extras = privateCourseLessonExtras[slug];
   if (!extras) return undefined;
+  if (extras.useSharedRequiredMaterials === false) return extras;
 
   return {
     ...extras,

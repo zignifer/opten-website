@@ -4,7 +4,7 @@ export const HIDDEN_INTRO_SLUG = "hidden-intro";
 export const HIDDEN_INTRO_ROUTE = "/learn/courses/ai-content-marketing-2026/hidden-intro";
 export const HIDDEN_INTRO_UNLOCK_STORAGE_KEY = "opten_hidden_intro_opened_v1";
 export const HIDDEN_INTRO_WEBSITE_SLOT_ENABLED = false;
-export const HIDDEN_INTRO_VIDEO_ENABLED = false;
+export const HIDDEN_INTRO_VIDEO_ENABLED = true;
 export const HIDDEN_INTRO_TELEGRAM_URL = "https://t.me/opten_space_bot?start=hidden_intro";
 
 export type HiddenIntroCopy = {
@@ -17,20 +17,20 @@ export type HiddenIntroCopy = {
 
 export const hiddenIntroCopy: HiddenIntroCopy = {
   title: {
-    ru: "Скрытый урок",
-    en: "Hidden lesson",
+    ru: "AI-контент-завод: бесплатный трафик и заявки",
+    en: "AI content factory: free traffic and leads",
   },
   lockedAction: {
-    ru: "Получить доступ в Telegram",
-    en: "Get access in Telegram",
+    ru: "Разблокировать в Telegram",
+    en: "Unlock in Telegram",
   },
   lockedMeta: {
-    ru: "Открывается по ссылке из Telegram",
-    en: "Unlocked through a Telegram link",
+    ru: "Покупателям курса открыт автоматически",
+    en: "Included automatically for course buyers",
   },
   placeholderText: {
-    ru: "Урок скоро появится. Доступ будет открываться по ссылке из Telegram.",
-    en: "This lesson is coming soon. Access will open through a Telegram link.",
+    ru: "Урок открыт покупателям курса автоматически. Гостям доступ выдаёт Telegram-бот после проверки подписки на канал.",
+    en: "Course buyers get this lesson automatically. Guests unlock it through the Telegram bot after channel subscription verification.",
   },
   backToCourse: {
     ru: "Вернуться к курсу",

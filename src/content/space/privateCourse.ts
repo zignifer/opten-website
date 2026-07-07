@@ -1,8 +1,10 @@
 import type { LearnCollection, LearnLang, LearnLesson, LearnMaterial, LearnTimestamp } from "./learn";
 import { futureProtectedVideoDeliveryNote, learnDefaultAuthor } from "./learn";
+import { HIDDEN_INTRO_SLUG } from "./hiddenIntro";
 import { getPrivateCourseLessonExtras } from "./privateCourseExtras";
 
 export const PRIVATE_COURSE_SLUG = "ai-content-marketing-2026";
+export const PRIVATE_COURSE_HIDDEN_INTRO_KINESCOPE_VIDEO_ID = "e0cd3bcd-bf94-4240-ad53-445d1c796f7c";
 export const PRIVATE_COURSE_FIRST_LESSON_SLUG = "lesson-1-prompting";
 export const PRIVATE_COURSE_FIRST_KINESCOPE_VIDEO_ID = "e941e14d-c5bf-40fc-abe5-a41e247777cf";
 export const PRIVATE_COURSE_PRICE_RUB = 2990;
@@ -53,7 +55,7 @@ export const privateCourseIntroContent: PrivateCourseIntroContent = {
 };
 
 const privateCourseUpdatedAt = "2026-06-23";
-const privateCourseTotalLessons = 16;
+const privateCourseTotalLessons = 17;
 const currentAiTools2026Url = "https://disk.yandex.ru/d/HaU7LdU850QLVw";
 const pendingKinescopePosterPath = "/assets/space/learn-v2/ai-design-dashboard.jpg";
 
@@ -137,6 +139,7 @@ const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
 type PrivateCourseLessonConfig = {
   slug: string;
   videoId?: string;
+  videoLinkedAt?: string;
   title: Record<LearnLang, string>;
   description: Record<LearnLang, string>;
   category: LearnLesson["category"];
@@ -191,8 +194,12 @@ function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
     topics: config.topics,
     whatYouWillLearn: config.whatYouWillLearn,
     updatedNote: {
-      ru: config.videoId ? "Kinescope video id привязан 2026-06-21." : "Kinescope video id нужно добавить после получения из кабинета.",
-      en: config.videoId ? "Kinescope video id connected on 2026-06-21." : "Kinescope video id needs to be added from the dashboard.",
+      ru: config.videoId
+        ? `Kinescope video id привязан ${config.videoLinkedAt ?? "2026-06-21"}.`
+        : "Kinescope video id нужно добавить после получения из кабинета.",
+      en: config.videoId
+        ? `Kinescope video id connected on ${config.videoLinkedAt ?? "2026-06-21"}.`
+        : "Kinescope video id needs to be added from the dashboard.",
     },
     timestamps: config.timestamps,
     materials: extras?.materials ?? courseMaterials,
@@ -215,6 +222,76 @@ function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
 }
 
 const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
+  {
+    slug: HIDDEN_INTRO_SLUG,
+    videoId: PRIVATE_COURSE_HIDDEN_INTRO_KINESCOPE_VIDEO_ID,
+    videoLinkedAt: "2026-07-07",
+    title: {
+      ru: "AI-контент-завод: бесплатный трафик и заявки",
+      en: "AI content factory: free traffic and leads",
+    },
+    description: {
+      ru: "Бесплатный нулевой урок курса: показываю, как связать короткий контент, нейросети и простую воронку. Сначала собираем бесплатный трафик, затем прогреваем доверие и переводим подписчиков в заявки на услуги, продукт или курс.",
+      en: "A free lesson zero for the course: how to connect short-form content, AI tools, and a simple funnel. First you earn free traffic, then build trust, then turn followers into leads for a service, product, or course.",
+    },
+    category: "business",
+    duration: "19:58",
+    durationIso: "PT19M58S",
+    topics: {
+      ru: ["AI-контент", "Бесплатный трафик", "Reels", "Воронка", "Контент-завод"],
+      en: ["AI content", "Free traffic", "Reels", "Funnel", "Content factory"],
+    },
+    whatYouWillLearn: {
+      ru: [
+        "Связать просмотры с подписчиками и заявками",
+        "Собрать контекст о нише перед генерацией идей",
+        "Использовать ChatGPT, Claude и Codex как систему для контента",
+      ],
+      en: [
+        "Connect views to followers and leads",
+        "Collect niche context before generating ideas",
+        "Use ChatGPT, Claude, and Codex as a content system",
+      ],
+    },
+    timestamps: {
+      ru: timestamps([
+        ["00:00", "Почему AI-контент нужен сейчас"],
+        ["01:22", "Минимальная воронка и площадки"],
+        ["02:22", "Почему не работает запрос «10 идей»"],
+        ["03:38", "Модель, поиск и Deep Research"],
+        ["04:41", "Голосовой бриф и файлы для стратегии"],
+        ["05:55", "Проект как память контента"],
+        ["07:30", "Итерации инструкции и свои критерии"],
+        ["09:05", "Ограничения веб-версии и коннекторы"],
+        ["11:53", "Реальные примеры и трафик с разных площадок"],
+        ["12:50", "Быстрые форматы вместо сложного монтажа"],
+        ["13:40", "Визуальные хуки и AI-вставки"],
+        ["14:40", "Редактирование видео через AI"],
+        ["15:21", "Новости, актуальные темы и AI-аватары"],
+        ["16:37", "Анимация и сцены, которые нельзя снять"],
+        ["17:27", "Стартовый кадр и обычное видео"],
+        ["18:12", "Что дальше внутри полного курса"],
+      ]),
+      en: timestamps([
+        ["00:00", "Why AI content matters now"],
+        ["01:22", "Minimum funnel and platforms"],
+        ["02:22", "Why ten random ideas do not work"],
+        ["03:38", "Model choice, search, and Deep Research"],
+        ["04:41", "Voice brief and files for strategy"],
+        ["05:55", "Project memory for content"],
+        ["07:30", "Instruction iterations and your criteria"],
+        ["09:05", "Web limits and connectors"],
+        ["11:53", "Real examples and traffic across platforms"],
+        ["12:50", "Fast formats instead of heavy editing"],
+        ["13:40", "Visual hooks and AI inserts"],
+        ["14:40", "AI video editing"],
+        ["15:21", "News, trends, and AI avatars"],
+        ["16:37", "Animation and scenes you cannot film"],
+        ["17:27", "Start frame plus regular video"],
+        ["18:12", "What continues inside the full course"],
+      ]),
+    },
+  },
   {
     slug: PRIVATE_COURSE_FIRST_LESSON_SLUG,
     videoId: PRIVATE_COURSE_FIRST_KINESCOPE_VIDEO_ID,

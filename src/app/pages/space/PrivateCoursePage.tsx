@@ -7,7 +7,7 @@ import {
   getPrivateCourseCollection,
   privateCourseIntroContent,
 } from "../../../content/space/privateCourse";
-import { HIDDEN_INTRO_SLUG, HIDDEN_INTRO_VIDEO_ENABLED, getHiddenIntroCopy } from "../../../content/space/hiddenIntro";
+import { HIDDEN_INTRO_SLUG, HIDDEN_INTRO_UNLOCK_STORAGE_KEY, HIDDEN_INTRO_VIDEO_ENABLED, getHiddenIntroCopy } from "../../../content/space/hiddenIntro";
 import { getLearnLessonTitle } from "../../../content/space/learn";
 import { useLang } from "../../../i18n/LangContext";
 
@@ -26,6 +26,7 @@ export default function PrivateCoursePage() {
       : "Opten private course";
 
   useNoIndexPrivateCourse(pageTitle);
+  useRememberHiddenIntroVisit(isHiddenIntro);
 
   if (!collection) {
     return <Navigate to="/learn" replace />;
@@ -45,7 +46,26 @@ export default function PrivateCoursePage() {
 
   const { previousLesson, nextLesson } = getAdjacentPrivateCourseLessons(courseSlug, lesson.slug);
 
-  return <LessonDetailLayout lesson={lesson} collection={collection} previousLesson={previousLesson} nextLesson={nextLesson} />;
+  return (
+    <LessonDetailLayout
+      lesson={lesson}
+      collection={collection}
+      previousLesson={previousLesson}
+      nextLesson={nextLesson}
+      hiddenIntroRouteUnlocked={isHiddenIntro}
+    />
+  );
+}
+
+function useRememberHiddenIntroVisit(active: boolean) {
+  useEffect(() => {
+    if (!active) return;
+    try {
+      window.localStorage.setItem(HIDDEN_INTRO_UNLOCK_STORAGE_KEY, "1");
+    } catch {
+      // The direct Telegram link still opens the route even when browser storage is unavailable.
+    }
+  }, [active]);
 }
 
 function useNoIndexPrivateCourse(title: string) {

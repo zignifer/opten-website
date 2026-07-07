@@ -139,18 +139,17 @@ Kinescope API key, auth JWT secret, Supabase service-role key, YooKassa secret,
 Resend key, or raw playback token in the client bundle.
 
 Telegram hidden intro is a separate free lead magnet for this course, not a
-course entitlement, not a Pro feature, and not a paid course lesson while the
-real video is missing. V1 uses a simple secret noindex route
+course entitlement and not a Pro feature. V1 uses a simple secret noindex route
 `/learn/courses/ai-content-marketing-2026/hidden-intro` that the Telegram bot
 sends after channel subscription verification. It intentionally uses no website
 login, no unlock token, and no Telegram user database. Opening the route writes
-`localStorage.opten_hidden_intro_opened_v1` so a future course menu slot can
-change from “Скрытый урок — получить доступ в Telegram” to the normal
-“Скрытый урок” state in that browser. Until the actual hidden intro video is
-available, keep the route as a harmless placeholder and do not add
-`hidden-intro` to `privateCourseCollection.lessons`,
-`api/_shared/kinescopeCourse.ts`, sitemap, llms.txt, public Learn, or EN
-sibling maps.
+`localStorage.opten_hidden_intro_opened_v1`; the website then allows only lesson
+0 playback through `/api/kinescope-course-token` with
+`access_mode="telegram-hidden-intro"`. Buyers of the full course get the same
+lesson automatically through normal `course-access-summary` entitlement. The
+lesson is included in `privateCourseCollection.lessons` and
+`api/_shared/kinescopeCourse.ts`, but must stay out of sitemap, llms.txt, public
+Learn, and EN sibling maps.
 
 Hardcoded constants that are duplicated and must be kept in sync:
 - `EXTENSION_IDS` — appears in [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [src/app/pages/DownloadSkillPage.tsx](src/app/pages/DownloadSkillPage.tsx), [src/app/pages/PromptLibraryPage.tsx](src/app/pages/PromptLibraryPage.tsx)

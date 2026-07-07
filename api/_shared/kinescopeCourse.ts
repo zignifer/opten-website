@@ -1,4 +1,5 @@
 export const KINESCOPE_COURSE_SLUG = "ai-content-marketing-2026";
+export const KINESCOPE_HIDDEN_INTRO_LESSON_SLUG = "hidden-intro";
 export const KINESCOPE_PLAYBACK_AUDIENCE = "opten-kinescope-course-playback";
 export const KINESCOPE_PLAYBACK_ISSUER = "https://opten.space";
 export const KINESCOPE_PLAYBACK_TTL_SECONDS = 15 * 60;
@@ -10,6 +11,11 @@ export type KinescopeCourseLesson = {
 };
 
 export const KINESCOPE_COURSE_LESSONS: KinescopeCourseLesson[] = [
+  {
+    courseSlug: KINESCOPE_COURSE_SLUG,
+    lessonSlug: KINESCOPE_HIDDEN_INTRO_LESSON_SLUG,
+    videoId: "e0cd3bcd-bf94-4240-ad53-445d1c796f7c",
+  },
   {
     courseSlug: KINESCOPE_COURSE_SLUG,
     lessonSlug: "lesson-1-prompting",
