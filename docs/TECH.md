@@ -1,7 +1,8 @@
 # Tech Stack — opten.space
 
-> Snapshot taken 2026-05-14, refreshed 2026-06-22 (public Learn, Learn Finds,
-> hidden Kinescope course, course API endpoints, route count update).
+> Snapshot taken 2026-05-14, refreshed 2026-07-07 (public Learn, Learn Finds,
+> hidden Kinescope course, Telegram hidden intro funnel, course API endpoints,
+> route count update).
 > Re-run discovery when `package.json` or build tooling changes meaningfully.
 
 ## Build & runtime
@@ -58,6 +59,7 @@
   - `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"` — **unchanged** across the cutover. Self-hosted GoTrue reuses the same `JWT_SECRET` as the cloud project, so the existing anon key (issuer `ref: vuywydhwkqmihfztpkgl` baked into the JWT payload) is still accepted by self-hosted Kong. No key rotation required.
 - **JWT verification (Phase 88 dual-issuer):** site serverless functions verify user JWTs **locally** with `jose` against the Supabase issuer allowlist and `SUPABASE_JWT_SECRET`; no `/auth/v1/user` session lookup. `api/download-skill.ts` gates Pro skill ZIP by `subscriptions`. `api/kinescope-course-token.ts` and `api/course-prompt.ts` gate hidden course content by `course-access-summary`.
 - **Standalone course checkout/access** is owned by extension-side Supabase Edge Functions: `create-course-payment` (guest email + RUB/YooKassa or USD/Paddle one-time checkout, optional uppercase promo code, optional `quote_only: true` price preview) and `course-access-summary` (claim/read `course_entitlements` by website JWT email/user id). Promo rules live server-side in `course_promo_codes`; the browser receives only the quote/payment response and must not query promo rows directly.
+- **Telegram hidden intro funnel** is also extension-owned: `telegram-hidden-intro-webhook` stores started users and events, checks channel subscription, and issues a 24h `course_discount_claims` token; `telegram-hidden-intro-opened` records lesson opens; `telegram-hidden-intro-stats`, `telegram-hidden-intro-broadcast`, and `telegram-hidden-intro-reminders` are service endpoints protected by `X-Opten-Admin-Secret`. A website admin surface must call them only through server-side `/api/*` proxies after website JWT + owner allowlist checks.
 - **Paddle.js v2** loaded synchronously from `cdn.paddle.com` in [`index.html`](../../index.html). Initialized in [`main.tsx`](../../src/main.tsx) (Phase 67 fix: do not call `Environment.set('production')` — only sandbox).
 
 ## i18n (post-Phase-3)
@@ -78,6 +80,11 @@
   - [`api/kinescope-course-token.ts`](../../api/kinescope-course-token.ts) — validates website JWT, checks `course-access-summary`, signs a short-lived Kinescope `drmauthtoken`, and returns an embed URL.
   - [`api/kinescope-course-auth.ts`](../../api/kinescope-course-auth.ts) — Kinescope server-to-server playback callback; verifies the signed playback token and returns 200/403.
   - [`api/course-prompt.ts`](../../api/course-prompt.ts) — validates website JWT + course access and returns a whitelisted private course prompt body.
+- Future owner/admin endpoints should live here too, using the shared
+  `api/_shared/optenServerAuth.ts` JWT verifier plus a server-side owner
+  allowlist. They may call extension-owned service endpoints with server-only
+  secrets; the browser must receive only aggregated stats or accepted job
+  results.
 - `api/download-skill.ts` bundles the Pro ZIP via `vercel.json` `includeFiles: "api/_assets/**"`.
 - Hidden course downloadable materials under `public/assets/space/courses/**` are static public assets; locked prompt bodies stay server-side in `api/_shared/coursePromptBodies.ts`.
 - JSON CORS is locked to `https://opten.space`.

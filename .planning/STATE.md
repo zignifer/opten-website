@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: "Programmatic SEO — Model Pages"
-status: v2.0 CLOSED (2026-05-20) — Programmatic SEO Model Pages shipped (62 pages × RU/EN + 2 hubs, 144 routes), archived to milestones/v2.0-*. Idle between milestones. 2026-05-21: ad-hoc perf + iOS-Safari hotfixes shipped (no milestone) — see "Post-v2.0 hotfix series" below. Carried-forward item: MODELS-B-6 GSC indexing monitoring (~2026-05-27..06-03). Next: /gsd-new-milestone.
+milestone: none
+milestone_name: "Between formal milestones"
+status: no_active_milestone; Telegram hidden intro + 24h discount claim shipped across website and extension backend. Current planned work: protected general owner admin dashboard for acquisition channels, first module Telegram stats/broadcasts.
 stopped_at: ""
-last_updated: "2026-05-21T13:30:00.000Z"
-last_activity: 2026-05-21
+last_updated: "2026-07-07T00:00:00.000Z"
+last_activity: 2026-07-07
 progress:
   total_phases: 2
   completed_phases: 2
@@ -21,8 +21,8 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-17 with v1.0 shipped state)
 
 **Core value:** Sell, service, and onboard extension users without breaking the shipped integration contract with the Opten Chrome extension.
-**Current focus:** Idle between milestones. v2.0 closed 2026-05-20 (archived to `milestones/v2.0-*`). Next: `/gsd-new-milestone`.
-**Active milestone:** None. v2.0 — Programmatic SEO — Model Pages closed 2026-05-20. Carried forward: MODELS-B-6 GSC indexing monitoring (~2026-05-27..06-03).
+**Current focus:** Protected general owner admin dashboard for acquisition channels. First slice: Telegram hidden intro stats and safe broadcasts.
+**Active milestone:** None. This is ad-hoc cross-repo product work unless promoted into a formal GSD milestone.
 
 ## Current Position
 
@@ -40,8 +40,9 @@ Post-Phase-2 hotfixes (2026-05-20, pushed 6dbc26a):
   - **Hub + blog UI polish (`31cd086`, `dd35ee3`, `c543a6c`)** — хаб `/models` получил центрированный градиентный hero как у блога (видимые хлебные крошки убраны, BreadcrumbList-схема осталась — как на хабе блога); заголовок «Поддерживаемые AI-модели» → «AI-модели» / «AI models»; отступ hero→фильтры на блоге уменьшен (убран `md:min-h-[520px]`, теперь как на хабе). Скрыты **11 общих/umbrella моделей** (flux, gpt-image, imagen, kling, luma-ray, midjourney, nano-banana, seedance, seedream, sora, veo) с сетки хаба + счётчиков + ItemList-схемы через `HUB_HIDDEN_SLUGS` (`src/content/models/index.ts`) — карточки выглядели странно рядом с конкретными версиями. Страницы **остались живыми**: prerendered, в sitemap (144 routes без изменений), линкуются из related-models (не осиротели). Хаб показывает 51 (24 image / 27 video).
 
 Next:
-  1. **Post-deploy v2.0 window** (7-14 дней, ~2026-05-27..06-03): мониторинг GSC «Coverage» по `site:opten.space/models/`. Цель ≥60% URL Indexed (plan 2-07 / MODELS-B-6). Если меньше — diagnostic анализ (тонкий контент, дубликаты, robots.txt) + план корректировок.
-  2. **Stage 2 (v2.1)** — ручная правка контента топ-15 моделей (out of scope для Phase 2).
+  1. Refresh durable project context for the Telegram hidden intro / 24h claim flow across `AGENTS.md`, docs, and `.planning` in both `opten-website` and `promptscore`.
+  2. Brainstorm and approve the protected `/admin/*` design: website auth, server-side owner allowlist, no client secrets, aggregated stats, Telegram broadcast module, and future acquisition-channel extensibility.
+  3. Implement in phases after design approval: security hardening, read-only admin dashboard, then broadcast composer/queue.
 
 Deferred follow-ups (из Codex review Phase 2, 2026-05-20 — non-blocking, защита от будущих регрессий, контент уже корректен 62/62):
   - **[MEDIUM] Встроить `scripts/verify-models-content.mjs` в build-цепочку** (рядом с verify-faq-mainentity.mjs в package.json). Caveat: скрипт делает raw-`.ts` dynamic import → нужен Node ≥22.18 на Vercel. Сначала подтвердить версию Node на Vercel (доступно через Vercel MCP / dashboard), потом вшивать. Пользователь отложил 2026-05-20.

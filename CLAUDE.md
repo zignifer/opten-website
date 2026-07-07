@@ -162,6 +162,16 @@ webhooks mark the claim used only after successful payment; Telegram reminders
 and broadcasts must skip used claims and mark Bot API 403/blocked recipients as
 blocked.
 
+Any future owner/admin dashboard on opten.space must be a general protected
+admin surface, not a Telegram-only one-off. It may show Telegram funnel stats
+and trigger bot broadcasts, but it must authenticate through website Supabase
+auth and a server-side owner allowlist. Never expose `TELEGRAM_ADMIN_SECRET`,
+Telegram bot tokens, Supabase service-role keys, payment secrets, or operational
+provider keys to browser JavaScript, localStorage, route params, or public
+PostgREST calls. Client admin pages call this repo's serverless `/api/*`
+endpoints; those endpoints verify the website JWT and then call extension-owned
+service endpoints with server-only secrets.
+
 Hardcoded constants that are duplicated and must be kept in sync:
 - `EXTENSION_IDS` — appears in [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [src/app/pages/DownloadSkillPage.tsx](src/app/pages/DownloadSkillPage.tsx), [src/app/pages/PromptLibraryPage.tsx](src/app/pages/PromptLibraryPage.tsx)
 - `SUPABASE_URL`, `SUPABASE_REST_URL`, and `SUPABASE_ANON_KEY` — appears in [src/lib/optenAuth.ts](src/lib/optenAuth.ts), [src/lib/promptLibraryApi.ts](src/lib/promptLibraryApi.ts), [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [api/download-skill.ts](api/download-skill.ts), plus the extension's `config/api.js`

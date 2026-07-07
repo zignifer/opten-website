@@ -26,9 +26,9 @@ Shipped in-place between milestones. See [STATE.md](STATE.md) §"Post-v1.0 hotfi
 
 ## Active milestone
 
-**None — idle between milestones (v2.0 closed 2026-05-20).**
+**None — idle between formal milestones.**
 
-Next milestone: `/gsd-new-milestone`. Fresh `REQUIREMENTS.md` is created per milestone (the v2.0 one was archived).
+Current planned work: protected general owner admin dashboard for acquisition/traffic operations. First module: Telegram hidden intro funnel stats + safe broadcast composer. It should be designed as an extensible `/admin/*` surface for future channels, not a Telegram-only one-off.
 
 ## Future milestone candidates (after v2.0)
 
@@ -38,6 +38,7 @@ Next milestone: `/gsd-new-milestone`. Fresh `REQUIREMENTS.md` is created per mil
 2. **v2.2 — SEO Polish** — Image sitemap, AVIF pipeline, Speakable schema, Wikipedia mentions, priceValidUntil, HTML sitemap, RSS, реальный HTTP 404, Bing-токен, build-time h1-check.
 3. **v3.0 — Brand authority** — Product Hunt launch, Wikipedia/Wikidata entry, Reddit + Habr + YouTube seeding, expanded `sameAs` schema.
 4. **Scale-ready content architecture** — refactor route inventory из hand-listed файлов в единую RouteRecord data model. Откладывается до момента когда программатика покажет необходимость абстракции.
+5. **Owner admin / acquisition dashboard** — protected noindex admin surface with website-auth + server-side owner allowlist, aggregated stats, Telegram broadcast tooling, and room for future traffic channels.
 
 Brand authority и scale-ready architecture (из v1.0 deferred-to-v2) остаются picking-material для v3.
 
@@ -52,4 +53,4 @@ Brand authority и scale-ready architecture (из v1.0 deferred-to-v2) оста�
 ---
 
 *Roadmap created: 2026-05-14*
-*v1.0 closed: 2026-05-17 · v2.0 closed: 2026-05-20*
+*v1.0 closed: 2026-05-17 · v2.0 closed: 2026-05-20 · refreshed: 2026-07-07*

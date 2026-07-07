@@ -300,15 +300,28 @@ POST /api/kinescope-course-auth                ← Kinescope playback authorizat
 changes and `npm run verify:kinescope-course` after any hidden course/Kinescope
 ID/materials/prompt change.
 
-Telegram hidden intro is a separate free lead magnet for the same course. In v1
-the Telegram bot verifies channel subscription and sends the secret noindex
-route `/learn/courses/ai-content-marketing-2026/hidden-intro`; opening it stores
-`localStorage.opten_hidden_intro_opened_v1`. The route is lesson 0 in
+Telegram hidden intro is a separate free lead magnet for the same course. The
+extension-owned bot backend stores started users in
+`telegram_hidden_intro_leads`, writes funnel events to
+`telegram_hidden_intro_events`, verifies channel subscription through Telegram
+`getChatMember`, and issues/reuses a random 24h `course_discount_claims` token
+for the same `/learn/courses/ai-content-marketing-2026/hidden-intro` route.
+Opening the route stores `localStorage.opten_hidden_intro_opened_v1` and, when a
+claim token is present, reports `hidden_intro_opened` through
+`telegram-hidden-intro-opened`. The route is lesson 0 in
 `privateCourseCollection.lessons` and the Kinescope server whitelist. Buyers
 open it through normal `course-access-summary` entitlement; guests can request a
 Kinescope token only for `hidden-intro`, signed with
 `access_mode="telegram-hidden-intro"`. The lesson must remain outside sitemap,
 llms.txt, public Learn route lists, and EN sibling maps.
+
+Telegram service tooling currently lives in extension-owned Edge Functions:
+`telegram-hidden-intro-stats`, `telegram-hidden-intro-broadcast`, and
+`telegram-hidden-intro-reminders`. These endpoints require
+`X-Opten-Admin-Secret` and service-role access, so future website admin UI must
+proxy them through this repo's serverless `/api/*` endpoints after verifying a
+website Supabase JWT and a server-side owner allowlist. Browser code must never
+receive `TELEGRAM_ADMIN_SECRET`, the bot token, or a Supabase service-role key.
 
 ## Models content pipeline (Phase v2.0)
 
@@ -481,19 +494,25 @@ it must not update `subscriptions`, `users.plan`, or extension credit usage.
 | Website account summary | Supabase `users`, `subscriptions`, `usage_logs` via `account-summary` | Supabase Auth/webhooks/proxy usage logging | `/pay`, `/account`, `/app/*`, headers via Bearer JWT |
 | Course orders / entitlements | Supabase `course_orders`, `course_entitlements` | `create-course-payment` + YooKassa/Paddle course webhooks | Hidden course page through `course-access-summary`; website API gates through `hasCourseAccess()` |
 | Course promo codes | Supabase `course_promo_codes` | Operators/marketing through service-role SQL or admin tooling; webhooks increment `times_used` after successful course payment | `create-course-payment` service-role validation and quote preview; hidden course UI receives only the effective quote |
+| Telegram hidden intro leads | Supabase `telegram_hidden_intro_leads` | Telegram webhook, reminders, broadcasts, course webhooks | Extension-owned Edge Functions; future website admin only through server-side owner proxy |
+| Telegram hidden intro events | Supabase `telegram_hidden_intro_events` | Telegram webhook, opened endpoint, checkout/payment hooks, broadcasts/reminders | Aggregated stats only; no browser direct table access |
+| Telegram 24h discount claims | Supabase `course_discount_claims` | Telegram webhook issues claims; `create-course-payment` reserves/quotes; provider webhooks mark used | Hidden course UI sends claim token to `create-course-payment`; future admin sees aggregated state only |
 | Learn manual progress | `localStorage.opten_space_learn_progress_v1` | Public/private lesson completion button | Learn lesson UI, course progress widgets |
 | Kinescope playback token | Short-lived HS256 JWT in Kinescope embed URL | `/api/kinescope-course-token` using `KINESCOPE_AUTH_JWT_SECRET` | Kinescope player + `/api/kinescope-course-auth` |
 | Course prompt bodies | `api/_shared/coursePromptBodies.ts` server bundle | Code/content commits | `/api/course-prompt` after course access check |
 | Prompt Library private rows | Supabase `prompt_library` | Extension/site PostgREST with owner JWT | `/prompt-library`, extension context menus |
 | Prompt Library public snapshots | Supabase `prompt_library_publications`, `prompt_library_publication_items` | `/prompt-library` owner publish RPC | `/p/:slug` public read RPC; per-prompt save copies into viewer `prompt_library` |
 
-**The site has no persistent server-side state of its own.** All persistence
-is either in the user's browser (localStorage, extension storage) or in
-Supabase (owned by the extension repo). Website auth stores a client session
-locally, but subscription and credit authority remains in Supabase and
-extension-owned Edge Functions. Website and extension sessions may represent
-different `auth.users.id` values; this is expected, and entitlements do not
-cross accounts unless the user signs into both surfaces as the same account.
+**The site owns no primary application database.** Persistence is either in the
+user's browser (localStorage, extension storage) or in Supabase owned by the
+extension repo. Website auth stores a client session locally, while
+subscription, credits, course entitlements, Telegram funnel data, and discount
+claims remain in Supabase and extension-owned Edge Functions. Site serverless
+APIs are allowed to act as protected server-side proxies for owner/admin
+tooling, but client code must not bypass them or call private Supabase tables
+directly. Website and extension sessions may represent different `auth.users.id`
+values; this is expected, and entitlements do not cross accounts unless the user
+signs into both surfaces as the same account.
 
 ## Build/asset notes
 
