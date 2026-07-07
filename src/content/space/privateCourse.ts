@@ -227,8 +227,8 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
     videoId: PRIVATE_COURSE_HIDDEN_INTRO_KINESCOPE_VIDEO_ID,
     videoLinkedAt: "2026-07-07",
     title: {
-      ru: "AI-контент-завод: бесплатный трафик и заявки",
-      en: "AI content factory: free traffic and leads",
+      ru: "AI контент-завод",
+      en: "AI content factory",
     },
     description: {
       ru: "Бесплатный нулевой урок курса: показываю, как связать короткий контент, нейросети и простую воронку. Сначала собираем бесплатный трафик, затем прогреваем доверие и переводим подписчиков в заявки на услуги, продукт или курс.",

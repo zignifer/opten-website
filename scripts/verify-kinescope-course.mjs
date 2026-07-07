@@ -57,7 +57,7 @@ const expectedKinescopeLessons = [
 ];
 
 const expectedPrivateCourseRuTitles = [
-  "AI-контент-завод: бесплатный трафик и заявки",
+  "AI контент-завод",
   "Работа с ChatGPT и Claude",
   "Обзор Syntx и Higgsfield",
   "Создание логотипа",

@@ -17,8 +17,8 @@ export type HiddenIntroCopy = {
 
 export const hiddenIntroCopy: HiddenIntroCopy = {
   title: {
-    ru: "AI-контент-завод: бесплатный трафик и заявки",
-    en: "AI content factory: free traffic and leads",
+    ru: "AI контент-завод",
+    en: "AI content factory",
   },
   lockedAction: {
     ru: "Разблокировать в Telegram",
