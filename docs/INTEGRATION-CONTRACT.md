@@ -236,7 +236,11 @@ The site only **calls** them; it does not own them.
 |----------|--------|------|-------|
 | `POST /create-payment` | Site (`PayPage` RU path) | Bearer JWT | YooKassa. Body: `{ recurring: boolean }`. Returns `{ confirmation_url }`. `return_url` is hardcoded to `https://opten.space/success`. The JWT may come from website auth or extension fallback. |
 | `POST /create-payment-paddle` | Site (`PayPage` EN path) | Bearer JWT | Paddle. Returns `{ priceId, customerEmail, userId }`. Site then calls `Paddle.Checkout.open(...)`. The JWT may come from website auth or extension fallback. |
-| `POST /create-course-payment` | Hidden Learn course page (`/learn/courses/ai-content-marketing-2026/*`) | Public anon + email | Standalone course checkout, not Pro. Body: `{ course_slug, email, return_url, currency?, promo_code? }`. For promo preview, body may be `{ course_slug, currency?, promo_code, quote_only: true }`; it validates the code and returns `{ provider, amount_value, list_amount_value, discount_percent, promo_discount_percent?, promo_code?, discount_code?, discount_id?, currency }` without creating `course_orders`, provider payments, or incrementing promo usage. Normal `currency="RUB"` checkout returns YooKassa `{ confirmation_url, order_id, amount_value, list_amount_value, discount_percent, promo_discount_percent?, currency }`; `currency="USD"` returns Paddle `{ provider:"paddle", price_id, order_id, customer_email, custom_data, amount_value, list_amount_value, discount_percent, promo_discount_percent?, discount_code?, discount_id?, currency }`. Promo errors are `invalid_promo_code`, `promo_not_active`, `promo_not_configured`, or `promo_lookup_failed`. The checkout email becomes the entitlement email; no website login is required before payment. |
+| `POST /create-course-payment` | Hidden Learn course page (`/learn/courses/ai-content-marketing-2026/*`) | Public anon + email | Standalone course checkout, not Pro. Body: `{ course_slug, email, return_url, currency?, promo_code?, discount_claim_token? }`. For promo/claim preview, body may be `{ course_slug, currency?, promo_code?, discount_claim_token?, quote_only: true }`; it validates the code/claim and returns `{ provider, amount_value, list_amount_value, discount_percent, promo_discount_percent?, promo_code?, discount_code?, discount_id?, discount_claim_active?, discount_claim_expires_at?, claim_discount_percent?, discount_source?, currency }` without creating `course_orders`, provider payments, incrementing promo usage, or marking claims used. `discount_claim_token` has priority over `promo_code` and must not stack. Normal `currency="RUB"` checkout returns YooKassa `{ confirmation_url, order_id, amount_value, list_amount_value, discount_percent, promo_discount_percent?, discount_claim_active?, discount_claim_expires_at?, claim_discount_percent?, discount_source?, currency }`; `currency="USD"` returns Paddle `{ provider:"paddle", price_id, order_id, customer_email, custom_data, amount_value, list_amount_value, discount_percent, promo_discount_percent?, discount_code?, discount_id?, discount_claim_active?, discount_claim_expires_at?, claim_discount_percent?, discount_source?, currency }`. Promo errors are `invalid_promo_code`, `promo_not_active`, `promo_not_configured`, or `promo_lookup_failed`; claim errors are `invalid_discount_claim`, `discount_claim_not_found`, `discount_claim_expired`, `discount_claim_used`, or `discount_claim_lookup_failed`. The checkout email becomes the entitlement email; no website login is required before payment. |
+| `POST /telegram-hidden-intro-opened` | Hidden intro page | Public anon + claim token | Best-effort funnel event. Body: `{ discount_claim_token }`. Validates the claim token, marks `course_discount_claims.lesson_opened_at`, updates `telegram_hidden_intro_leads.hidden_intro_opened_at`, and records `hidden_intro_opened`. It does not grant course access. |
+| `GET/POST /telegram-hidden-intro-stats` | Owner/admin tooling | `X-Opten-Admin-Secret` | Service endpoint returning lead, claim, order, and event counts for the Telegram hidden intro funnel. Uses `TELEGRAM_ADMIN_SECRET` with fallback to `TELEGRAM_WEBHOOK_SECRET`. |
+| `POST /telegram-hidden-intro-broadcast` | Owner/admin tooling | `X-Opten-Admin-Secret` | Manual bot broadcast endpoint. Body supports `{ text, photo_url?, button_text?, button_url?, segment?, limit?, dry_run? }`; segment is `all`, `subscribed`, `access_granted`, or `access_granted_not_paid`. Sends sequentially with a small delay and marks Telegram 403/blocked users as blocked. |
+| `GET/POST /telegram-hidden-intro-reminders` | Cron/admin tooling | `X-Opten-Admin-Secret` | Sends 12h and 1h claim-expiration reminders for unused Telegram claims. Skips blocked leads and buyers, records `reminder_sent`, and marks blocked users on Telegram 403. |
 | `POST /cancel-subscription` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | YooKassa cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
 | `POST /cancel-subscription-paddle` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | Paddle cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
 | `POST /get-subscription` | Site (optional) | Bearer JWT | Reads `subscriptions` table. Used as a fallback if the extension is not installed (rare path). |
@@ -292,6 +296,16 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
   `create-course-payment`. Quote preview must never create a `course_orders`
   row or increment `times_used`; successful YooKassa/Paddle course webhooks
   increment `times_used` once, only when the order was not already succeeded.
+- Telegram claim discounts live in `course_discount_claims`, not in
+  `course_promo_codes`. A claim is a random per-user token issued after
+  Telegram channel subscription verification, normally valid for 24 hours.
+  While a claim is active, the website must hide the manual promo field and
+  send `discount_claim_token` to `create-course-payment`; the backend ignores
+  `promo_code` when a valid claim token is present. Quote preview can show the
+  claim price/timer, but claims are marked used only by successful
+  YooKassa/Paddle course webhooks. USD claim checkout requires a Paddle
+  discount code/id configured server-side; the browser must not set arbitrary
+  checkout amounts.
 - Fixed-price promos require configured RUB and USD fixed amounts. The current
   internal fixed-price path is `FREE` (`100 ₽` / `$1`) and uses the separate
   Paddle `$1` price ID; do not let the browser set arbitrary checkout amounts.
@@ -318,14 +332,25 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
   body from `api/_shared/coursePromptBodies.ts`.
 
 Telegram hidden intro for the same course is intentionally a narrow free
-lead-magnet path in v1:
+lead-magnet funnel:
 
 - The Telegram bot verifies channel subscription through Bot API
   `getChatMember`, then sends the secret noindex URL
-  `/learn/courses/ai-content-marketing-2026/hidden-intro`.
+  `/learn/courses/ai-content-marketing-2026/hidden-intro?claim=...`.
+- The bot stores users who press Start in `telegram_hidden_intro_leads` and
+  writes funnel events to `telegram_hidden_intro_events`. These tables are
+  RLS-enabled with no public policies and are accessed only by service-role
+  Edge Functions.
 - The website route writes `localStorage.opten_hidden_intro_opened_v1` for that
-  browser. This browser hint unlocks only `hidden-intro`; it does not grant a
-  course entitlement, Pro state, credits, or Supabase user state.
+  browser. When `?claim=...` is present, it also best-effort calls
+  `telegram-hidden-intro-opened` so the owner can see hidden lesson openings.
+  This browser hint unlocks only `hidden-intro`; it does not grant a course
+  entitlement, Pro state, credits, or Supabase user state.
+- Owner tooling is intentionally service-endpoint based for MVP:
+  `telegram-hidden-intro-stats` for funnel counts,
+  `telegram-hidden-intro-broadcast` for manual posts, and
+  `telegram-hidden-intro-reminders` for 12h/1h reminders. All use
+  `X-Opten-Admin-Secret`; do not expose these controls in public site bundles.
 - Buyers of the full course open lesson 0 through normal website auth and
   `course-access-summary`. Guests without a course entitlement can request a
   Kinescope token only for `hidden-intro`; `/api/kinescope-course-token` signs

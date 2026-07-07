@@ -24,6 +24,10 @@ export type CoursePaymentResponse = {
   promo_code?: string | null;
   discount_code?: string | null;
   discount_id?: string | null;
+  discount_claim_active?: boolean;
+  discount_claim_expires_at?: string | null;
+  claim_discount_percent?: number | null;
+  discount_source?: "promo_code" | "telegram_hidden_intro" | string | null;
   currency?: Currency;
   error?: string;
 };
@@ -54,6 +58,19 @@ export function isCourseTestPromoCode(value: string): boolean {
 export function isValidCoursePromoCode(value: string): boolean {
   const normalized = normalizeCoursePromoCode(value);
   return /^[A-Z0-9]{1,32}$/.test(normalized);
+}
+
+export function normalizeCourseDiscountClaimToken(value: string | null | undefined): string {
+  return (value ?? "").trim();
+}
+
+export function isValidCourseDiscountClaimToken(value: string | null | undefined): boolean {
+  return /^[A-Za-z0-9_-]{32,160}$/.test(normalizeCourseDiscountClaimToken(value));
+}
+
+export function readCourseDiscountClaimTokenFromSearch(search: string): string | null {
+  const token = normalizeCourseDiscountClaimToken(new URLSearchParams(search).get("claim"));
+  return isValidCourseDiscountClaimToken(token) ? token : null;
 }
 
 export function formatCoursePrice(value: number, currency: Currency): string {
@@ -89,7 +106,9 @@ export async function createCoursePayment(
   returnUrl: string,
   currency: Currency = "RUB",
   promoCode?: string,
+  discountClaimToken?: string,
 ): Promise<CoursePaymentResponse> {
+  const normalizedClaimToken = normalizeCourseDiscountClaimToken(discountClaimToken);
   const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-course-payment`, {
     method: "POST",
     headers: {
@@ -102,7 +121,8 @@ export async function createCoursePayment(
       email: normalizeCourseEmail(email),
       return_url: returnUrl,
       currency,
-      promo_code: promoCode ? normalizeCoursePromoCode(promoCode) : undefined,
+      promo_code: normalizedClaimToken ? undefined : promoCode ? normalizeCoursePromoCode(promoCode) : undefined,
+      discount_claim_token: normalizedClaimToken || undefined,
     }),
   });
   const body = (await response.json().catch(() => ({}))) as CoursePaymentResponse;
@@ -114,7 +134,9 @@ export async function quoteCoursePayment(
   courseSlug: string,
   currency: Currency = "RUB",
   promoCode?: string,
+  discountClaimToken?: string,
 ): Promise<CoursePaymentResponse> {
+  const normalizedClaimToken = normalizeCourseDiscountClaimToken(discountClaimToken);
   const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-course-payment`, {
     method: "POST",
     headers: {
@@ -125,11 +147,29 @@ export async function quoteCoursePayment(
     body: JSON.stringify({
       course_slug: courseSlug,
       currency,
-      promo_code: promoCode ? normalizeCoursePromoCode(promoCode) : undefined,
+      promo_code: normalizedClaimToken ? undefined : promoCode ? normalizeCoursePromoCode(promoCode) : undefined,
+      discount_claim_token: normalizedClaimToken || undefined,
       quote_only: true,
     }),
   });
   const body = (await response.json().catch(() => ({}))) as CoursePaymentResponse;
   if (!response.ok || body.error) throw new Error(body.error || "course_quote_failed");
   return body;
+}
+
+export async function reportTelegramHiddenIntroOpened(discountClaimToken: string): Promise<void> {
+  const normalizedClaimToken = normalizeCourseDiscountClaimToken(discountClaimToken);
+  if (!isValidCourseDiscountClaimToken(normalizedClaimToken)) return;
+
+  await fetch(`${SUPABASE_FUNCTIONS_URL}/telegram-hidden-intro-opened`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      apikey: SUPABASE_ANON_KEY,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ discount_claim_token: normalizedClaimToken }),
+  }).catch(() => {
+    // Best-effort analytics only; the local hidden-intro unlock must not depend on it.
+  });
 }

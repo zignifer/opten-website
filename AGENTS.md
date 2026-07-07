@@ -139,17 +139,28 @@ Kinescope API key, auth JWT secret, Supabase service-role key, YooKassa secret,
 Resend key, or raw playback token in the client bundle.
 
 Telegram hidden intro is a separate free lead magnet for this course, not a
-course entitlement and not a Pro feature. V1 uses a simple secret noindex route
-`/learn/courses/ai-content-marketing-2026/hidden-intro` that the Telegram bot
-sends after channel subscription verification. It intentionally uses no website
-login, no unlock token, and no Telegram user database. Opening the route writes
-`localStorage.opten_hidden_intro_opened_v1`; the website then allows only lesson
-0 playback through `/api/kinescope-course-token` with
-`access_mode="telegram-hidden-intro"`. Buyers of the full course get the same
-lesson automatically through normal `course-access-summary` entitlement. The
-lesson is included in `privateCourseCollection.lessons` and
-`api/_shared/kinescopeCourse.ts`, but must stay out of sitemap, llms.txt, public
-Learn, and EN sibling maps.
+course entitlement and not a Pro feature. The Telegram bot backend lives in the
+extension repo as `supabase/functions/telegram-hidden-intro-webhook` with
+`verify_jwt = false`; it validates `TELEGRAM_WEBHOOK_SECRET`, checks channel
+membership through Bot API `getChatMember`, stores started users in
+`telegram_hidden_intro_leads`, writes funnel events to
+`telegram_hidden_intro_events`, and issues a random per-user
+`course_discount_claims` link for the hidden intro/course checkout. Opening
+`/learn/courses/ai-content-marketing-2026/hidden-intro?claim=...` still writes
+`localStorage.opten_hidden_intro_opened_v1`; the website also reports the open
+to `/functions/v1/telegram-hidden-intro-opened` when a claim token is present.
+The free browser hint allows only lesson 0 playback through
+`/api/kinescope-course-token` with `access_mode="telegram-hidden-intro"`.
+Buyers of the full course get the same lesson automatically through normal
+`course-access-summary` entitlement. The lesson is included in
+`privateCourseCollection.lessons` and `api/_shared/kinescopeCourse.ts`, but must
+stay out of sitemap, llms.txt, public Learn, and EN sibling maps. The 24h
+claim discount has priority over manual promo codes: while active, the website
+hides the promo-code field, sends `discount_claim_token` to
+`create-course-payment`, and must not stack claim and promo discounts. Provider
+webhooks mark the claim used only after successful payment; Telegram reminders
+and broadcasts must skip used claims and mark Bot API 403/blocked recipients as
+blocked.
 
 Hardcoded constants that are duplicated and must be kept in sync:
 - `EXTENSION_IDS` — appears in [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [src/app/pages/DownloadSkillPage.tsx](src/app/pages/DownloadSkillPage.tsx), [src/app/pages/PromptLibraryPage.tsx](src/app/pages/PromptLibraryPage.tsx)

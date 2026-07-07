@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Navigate, useParams } from "react-router";
+import { Navigate, useLocation, useParams } from "react-router";
 import { CourseIntroLayout, HiddenIntroPlaceholderLayout, LessonDetailLayout } from "../../components/space/learn/LearnComponents";
 import {
   findPrivateCourseLesson,
@@ -10,9 +10,11 @@ import {
 import { HIDDEN_INTRO_SLUG, HIDDEN_INTRO_UNLOCK_STORAGE_KEY, HIDDEN_INTRO_VIDEO_ENABLED, getHiddenIntroCopy } from "../../../content/space/hiddenIntro";
 import { getLearnLessonTitle } from "../../../content/space/learn";
 import { useLang } from "../../../i18n/LangContext";
+import { readCourseDiscountClaimTokenFromSearch, reportTelegramHiddenIntroOpened } from "../../../lib/courseAccess";
 
 export default function PrivateCoursePage() {
   const { courseSlug, lessonSlug } = useParams();
+  const location = useLocation();
   const { lang } = useLang();
   const collection = getPrivateCourseCollection(courseSlug);
   const lesson = findPrivateCourseLesson(courseSlug, lessonSlug);
@@ -26,7 +28,7 @@ export default function PrivateCoursePage() {
       : "Opten private course";
 
   useNoIndexPrivateCourse(pageTitle);
-  useRememberHiddenIntroVisit(isHiddenIntro);
+  useRememberHiddenIntroVisit(isHiddenIntro, readCourseDiscountClaimTokenFromSearch(location.search));
 
   if (!collection) {
     return <Navigate to="/learn" replace />;
@@ -57,7 +59,7 @@ export default function PrivateCoursePage() {
   );
 }
 
-function useRememberHiddenIntroVisit(active: boolean) {
+function useRememberHiddenIntroVisit(active: boolean, discountClaimToken: string | null) {
   useEffect(() => {
     if (!active) return;
     try {
@@ -65,7 +67,8 @@ function useRememberHiddenIntroVisit(active: boolean) {
     } catch {
       // The direct Telegram link still opens the route even when browser storage is unavailable.
     }
-  }, [active]);
+    if (discountClaimToken) void reportTelegramHiddenIntroOpened(discountClaimToken);
+  }, [active, discountClaimToken]);
 }
 
 function useNoIndexPrivateCourse(title: string) {
