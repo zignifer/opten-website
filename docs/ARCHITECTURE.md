@@ -30,6 +30,7 @@
 │         download-skill                                                       │
 │       /prompt-library     PromptLibraryPage    SPA-only private library      │
 │       /p/:slug            PublicPromptLibrary  SPA-only public snapshot      │
+│       /admin              AdminDashboardPage   SPA-only owner admin          │
 │       /learn              LearnOverviewPage    public RU video hub           │
 │       /learn/:lessonSlug  LessonDetailPage     public RU lesson              │
 │       /learn/finds/:slug  LearnFindDetailPage  public RU curated find        │
@@ -50,6 +51,9 @@
 │     POST /api/course-prompt   →  course access gate + prompt body            │
 │     POST /api/kinescope-course-token → course access gate + drmauthtoken     │
 │     POST /api/kinescope-course-auth  → Kinescope playback callback           │
+│     GET  /api/admin/telegram-stats   → owner-gated Telegram stats proxy      │
+│     POST /api/admin/telegram-broadcast → owner-gated broadcast proxy         │
+│     GET/POST /api/admin/telegram-broadcasts → history/delete proxy           │
 │                                                                              │
 └──────────────────────────────────────────────────────────────────────────────┘
          │                              │                          │
@@ -100,6 +104,7 @@ hits get a populated `<head>` + body before React mounts.
 | `/dashboard/download-skill` | [`DownloadSkillPage.tsx`](../../src/app/pages/DownloadSkillPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Pro-only skill ZIP download | `GET_AUTH_TOKEN` (Bearer for `/api/download-skill`) | `/api/download-skill` (this site's own serverless) |
 | `/prompt-library` | [`PromptLibraryPage.tsx`](../../src/app/pages/PromptLibraryPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Private Prompt Library CRUD/search; owner publish/refresh/unpublish controls for public snapshots. | `GET_AUTH_TOKEN` + `REFRESH_PROMPT_LIBRARY_CACHE` | `prompt_library`, `prompt_library_mark_used`, public snapshot RPCs |
 | `/p/:slug` | [`PublicPromptLibraryPage.tsx`](../../src/app/pages/PublicPromptLibraryPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Read-only random-link Prompt Library snapshot; viewers save individual prompts into their own library. | No | `prompt_library_get_public_snapshot`; save uses website JWT + `prompt_library_save_public_prompt` |
+| `/admin` | [`AdminDashboardPage.tsx`](../../src/app/pages/admin/AdminDashboardPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Owner admin shell. Shows Telegram hidden intro funnel stats, guarded broadcast controls, and stored broadcast deletion. | No | Website JWT to `/api/admin/telegram-stats`, `/api/admin/telegram-broadcast`, and `/api/admin/telegram-broadcasts`; serverless proxies call extension-owned Edge Functions with `TELEGRAM_ADMIN_SECRET` |
 | `/internal/prompt-library-demo` | `PromptLibraryDemoPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Internal demo surface. | No | No |
 | `/app` | `AppIndexPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Opten Space Beta entry; redirects to the current canonical app surface. | No | No |
 | `/app/login` | `Navigate` | none (SPA-only, `X-Robots-Tag: noindex`) | Compatibility redirect to `/login?next=/learn`. | No | No |
@@ -317,11 +322,21 @@ llms.txt, public Learn route lists, and EN sibling maps.
 
 Telegram service tooling currently lives in extension-owned Edge Functions:
 `telegram-hidden-intro-stats`, `telegram-hidden-intro-broadcast`, and
-`telegram-hidden-intro-reminders`. These endpoints require
-`X-Opten-Admin-Secret` and service-role access, so future website admin UI must
-proxy them through this repo's serverless `/api/*` endpoints after verifying a
-website Supabase JWT and a server-side owner allowlist. Browser code must never
-receive `TELEGRAM_ADMIN_SECRET`, the bot token, or a Supabase service-role key.
+`telegram-hidden-intro-broadcasts`, and `telegram-hidden-intro-reminders`. These endpoints require
+`X-Opten-Admin-Secret` and service-role access, so the website `/admin` shell
+proxies them through this repo's serverless `/api/admin/*` endpoints after
+verifying a website Supabase JWT and a server-side owner allowlist. Broadcasts
+go through `/api/admin/telegram-broadcast`: the browser first requests a dry-run
+recipient preview, then a final send with the confirmed recipient count. The
+serverless proxy repeats the dry-run before sending and rejects stale counts.
+Non-dry-run sends are stored by the extension backend in `telegram_broadcasts`
+and `telegram_broadcast_recipients` with Telegram `message_id` values; the
+admin history/delete UI calls `/api/admin/telegram-broadcasts`, which proxies to
+the extension delete endpoint. Broadcasts sent before `message_id` persistence
+cannot be reliably deleted afterward.
+Image support is currently `photo_url` only; there is no browser upload path.
+Browser code must never receive `TELEGRAM_ADMIN_SECRET`, the bot token, or a
+Supabase service-role key.
 
 ## Models content pipeline (Phase v2.0)
 
@@ -494,9 +509,9 @@ it must not update `subscriptions`, `users.plan`, or extension credit usage.
 | Website account summary | Supabase `users`, `subscriptions`, `usage_logs` via `account-summary` | Supabase Auth/webhooks/proxy usage logging | `/pay`, `/account`, `/app/*`, headers via Bearer JWT |
 | Course orders / entitlements | Supabase `course_orders`, `course_entitlements` | `create-course-payment` + YooKassa/Paddle course webhooks | Hidden course page through `course-access-summary`; website API gates through `hasCourseAccess()` |
 | Course promo codes | Supabase `course_promo_codes` | Operators/marketing through service-role SQL or admin tooling; webhooks increment `times_used` after successful course payment | `create-course-payment` service-role validation and quote preview; hidden course UI receives only the effective quote |
-| Telegram hidden intro leads | Supabase `telegram_hidden_intro_leads` | Telegram webhook, reminders, broadcasts, course webhooks | Extension-owned Edge Functions; future website admin only through server-side owner proxy |
-| Telegram hidden intro events | Supabase `telegram_hidden_intro_events` | Telegram webhook, opened endpoint, checkout/payment hooks, broadcasts/reminders | Aggregated stats only; no browser direct table access |
-| Telegram 24h discount claims | Supabase `course_discount_claims` | Telegram webhook issues claims; `create-course-payment` reserves/quotes; provider webhooks mark used | Hidden course UI sends claim token to `create-course-payment`; future admin sees aggregated state only |
+| Telegram hidden intro leads | Supabase `telegram_hidden_intro_leads` | Telegram webhook, reminders, broadcasts, course webhooks | Extension-owned Edge Functions; website `/admin` reads aggregates and triggers broadcast service calls only through server-side owner proxy |
+| Telegram hidden intro events | Supabase `telegram_hidden_intro_events` | Telegram webhook, opened endpoint, checkout/payment hooks, broadcasts/reminders | Aggregated stats only in browser; broadcast send/fail rows are written by service Edge Functions |
+| Telegram 24h discount claims | Supabase `course_discount_claims` | Telegram webhook issues claims; `create-course-payment` reserves/quotes; provider webhooks mark used | Hidden course UI sends claim token to `create-course-payment`; website `/admin` sees aggregated state and broadcast segments only through service proxy |
 | Learn manual progress | `localStorage.opten_space_learn_progress_v1` | Public/private lesson completion button | Learn lesson UI, course progress widgets |
 | Kinescope playback token | Short-lived HS256 JWT in Kinescope embed URL | `/api/kinescope-course-token` using `KINESCOPE_AUTH_JWT_SECRET` | Kinescope player + `/api/kinescope-course-auth` |
 | Course prompt bodies | `api/_shared/coursePromptBodies.ts` server bundle | Code/content commits | `/api/course-prompt` after course access check |

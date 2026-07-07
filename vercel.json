@@ -31,6 +31,8 @@
     { "source": "/dashboard/download-skill", "destination": "/spa.html" },
     { "source": "/prompt-library", "destination": "/spa.html" },
     { "source": "/p/:slug", "destination": "/spa.html" },
+    { "source": "/admin", "destination": "/spa.html" },
+    { "source": "/admin/:path*", "destination": "/spa.html" },
     { "source": "/learn/templates/:path*", "destination": "/spa.html" },
     { "source": "/learn/courses/:path*", "destination": "/spa.html" },
     { "source": "/en/learn/templates/:path*", "destination": "/spa.html" },
@@ -182,6 +184,18 @@
     },
     {
       "source": "/p/:slug",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/admin",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/admin/:path*",
       "headers": [
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
       ]

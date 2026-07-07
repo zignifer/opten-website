@@ -162,15 +162,28 @@ webhooks mark the claim used only after successful payment; Telegram reminders
 and broadcasts must skip used claims and mark Bot API 403/blocked recipients as
 blocked.
 
-Any future owner/admin dashboard on opten.space must be a general protected
-admin surface, not a Telegram-only one-off. It may show Telegram funnel stats
-and trigger bot broadcasts, but it must authenticate through website Supabase
-auth and a server-side owner allowlist. Never expose `TELEGRAM_ADMIN_SECRET`,
-Telegram bot tokens, Supabase service-role keys, payment secrets, or operational
-provider keys to browser JavaScript, localStorage, route params, or public
-PostgREST calls. Client admin pages call this repo's serverless `/api/*`
-endpoints; those endpoints verify the website JWT and then call extension-owned
-service endpoints with server-only secrets.
+The owner/admin dashboard on opten.space is a general protected admin surface
+under `/admin`, not a Telegram-only one-off. The first module is Telegram
+hidden-intro operations: read funnel stats through `/api/admin/telegram-stats`
+send Telegram broadcasts through `/api/admin/telegram-broadcast`, and review or
+delete stored broadcast history through `/api/admin/telegram-broadcasts`.
+Broadcast send must always run a dry-run recipient preview first and require an
+explicit final confirmation with the exact recipient count; the extension-owned
+backend must persist new broadcast recipient `message_id` values before a post
+can be deleted later. Old broadcasts that were sent before message IDs were
+stored are not reliably deletable. Image support is URL-only until a separate
+private upload path is added. `/admin` authenticates through
+the normal website Supabase session
+(`localStorage.opten_space_session_v1`) and server-side allowlists in this repo's
+serverless functions. Do not add a separate hardcoded admin password to the
+browser bundle. Prefer `OPTEN_ADMIN_USER_IDS` for stable owner authorization;
+`OPTEN_ADMIN_EMAILS` exists as a bootstrap fallback. Never expose
+`TELEGRAM_ADMIN_SECRET`, Telegram bot tokens, Supabase service-role keys,
+payment secrets, or operational provider keys to browser JavaScript,
+localStorage, route params, or public PostgREST calls. Client admin pages call
+this repo's serverless `/api/admin/*` endpoints; those endpoints verify the
+website JWT, check the server-side owner allowlist, and then call
+extension-owned service endpoints with server-only secrets.
 
 Hardcoded constants that are duplicated and must be kept in sync:
 - `EXTENSION_IDS` — appears in [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [src/app/pages/DownloadSkillPage.tsx](src/app/pages/DownloadSkillPage.tsx), [src/app/pages/PromptLibraryPage.tsx](src/app/pages/PromptLibraryPage.tsx)
@@ -436,6 +449,15 @@ Set in Vercel (project settings, not in repo):
 - `SUPABASE_JWT_SECRET` — server-only self-hosted Supabase JWT secret used by
   site API functions to verify website/extension JWTs locally. Must match the
   self-hosted GoTrue `JWT_SECRET`.
+- `OPTEN_ADMIN_USER_IDS` — server-only comma-separated owner `auth.users.id`
+  allowlist for `/api/admin/*`. Prefer this over email for long-term admin
+  authorization. Production currently includes the owner account
+  `zignifer@gmail.com`.
+- `OPTEN_ADMIN_EMAILS` — optional server-only comma-separated owner email
+  allowlist for `/api/admin/*` bootstrap/fallback.
+- `TELEGRAM_ADMIN_SECRET` — server-only secret used by website admin proxy
+  endpoints to call extension-owned Telegram service Edge Functions for stats
+  and broadcasts.
 - Course Paddle one-time price IDs are server-only in the extension-owned
   Supabase Edge Function environment:
   `PADDLE_PRICE_ID_COURSE_AI_CONTENT_MARKETING_2026_{SANDBOX|PRODUCTION}` and

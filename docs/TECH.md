@@ -21,7 +21,7 @@
   - **Blog:** 40 routes across RU + EN.
   - **Model pages (Phase v2.0):** `/models` hub + `/models/:slug` (62 models) + `/en/*` mirrors = 2 hubs + 124 model pages, 126 routes total.
   - **Public Learn:** `/learn`, `/learn/:lessonSlug`, `/learn/finds/:findSlug` + `/en/*` mirrors = 24 routes total.
-  - **SPA-only/noindex:** `/login`, `/auth/callback`, `/account`, `/success`, `/dashboard/download-skill`, `/prompt-library`, `/p/:slug`, `/app/*`, `/space/*`, `/internal/*`, `/learn/templates/*`, `/learn/courses/*`, `/en/learn/templates/*`.
+  - **SPA-only/noindex:** `/login`, `/auth/callback`, `/account`, `/success`, `/dashboard/download-skill`, `/prompt-library`, `/p/:slug`, `/admin`, `/app/*`, `/space/*`, `/internal/*`, `/learn/templates/*`, `/learn/courses/*`, `/en/learn/templates/*`.
   - **Catch-all** `<Route path="*">` → `<NotFound>` (locale-aware, injects `<meta robots=noindex>` at runtime)
 - **Legacy redirects** (`vercel.json` `redirects[]`): `/guides`, `/en/guides`, `/guides/gpt-image-2`, `/en/guides/gpt-image-2` → `/blog`, `/en/blog`, `/blog/gpt-image-2`, `/en/blog/gpt-image-2` (Phase 5 B-07)
 - **`vercel.json` rewrite:** all non-`/api/` paths → `/index.html` (SPA fallback at runtime; the prerendered HTML files in `dist/<route>/index.html` are what AI crawlers and link-unfurl bots see on first byte)
@@ -59,7 +59,7 @@
   - `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"` — **unchanged** across the cutover. Self-hosted GoTrue reuses the same `JWT_SECRET` as the cloud project, so the existing anon key (issuer `ref: vuywydhwkqmihfztpkgl` baked into the JWT payload) is still accepted by self-hosted Kong. No key rotation required.
 - **JWT verification (Phase 88 dual-issuer):** site serverless functions verify user JWTs **locally** with `jose` against the Supabase issuer allowlist and `SUPABASE_JWT_SECRET`; no `/auth/v1/user` session lookup. `api/download-skill.ts` gates Pro skill ZIP by `subscriptions`. `api/kinescope-course-token.ts` and `api/course-prompt.ts` gate hidden course content by `course-access-summary`.
 - **Standalone course checkout/access** is owned by extension-side Supabase Edge Functions: `create-course-payment` (guest email + RUB/YooKassa or USD/Paddle one-time checkout, optional uppercase promo code, optional `quote_only: true` price preview) and `course-access-summary` (claim/read `course_entitlements` by website JWT email/user id). Promo rules live server-side in `course_promo_codes`; the browser receives only the quote/payment response and must not query promo rows directly.
-- **Telegram hidden intro funnel** is also extension-owned: `telegram-hidden-intro-webhook` stores started users and events, checks channel subscription, and issues a 24h `course_discount_claims` token; `telegram-hidden-intro-opened` records lesson opens; `telegram-hidden-intro-stats`, `telegram-hidden-intro-broadcast`, and `telegram-hidden-intro-reminders` are service endpoints protected by `X-Opten-Admin-Secret`. A website admin surface must call them only through server-side `/api/*` proxies after website JWT + owner allowlist checks.
+- **Telegram hidden intro funnel** is also extension-owned: `telegram-hidden-intro-webhook` stores started users and events, checks channel subscription, and issues a 24h `course_discount_claims` token; `telegram-hidden-intro-opened` records lesson opens; `telegram-hidden-intro-stats`, `telegram-hidden-intro-broadcast`, `telegram-hidden-intro-broadcasts`, and `telegram-hidden-intro-reminders` are service endpoints protected by `X-Opten-Admin-Secret`. The website `/admin` surface calls them only through server-side `/api/admin/*` proxies after website JWT + owner allowlist checks. Admin v1 ships stats through `/api/admin/telegram-stats`, guarded broadcast send through `/api/admin/telegram-broadcast`, and broadcast history/delete through `/api/admin/telegram-broadcasts`; the broadcast proxy repeats a dry-run before final send and rejects stale recipient counts. Non-dry-run broadcasts are deletable only when the extension backend has stored Telegram `message_id` values for recipients.
 - **Paddle.js v2** loaded synchronously from `cdn.paddle.com` in [`index.html`](../../index.html). Initialized in [`main.tsx`](../../src/main.tsx) (Phase 67 fix: do not call `Environment.set('production')` — only sandbox).
 
 ## i18n (post-Phase-3)
@@ -80,11 +80,13 @@
   - [`api/kinescope-course-token.ts`](../../api/kinescope-course-token.ts) — validates website JWT, checks `course-access-summary`, signs a short-lived Kinescope `drmauthtoken`, and returns an embed URL.
   - [`api/kinescope-course-auth.ts`](../../api/kinescope-course-auth.ts) — Kinescope server-to-server playback callback; verifies the signed playback token and returns 200/403.
   - [`api/course-prompt.ts`](../../api/course-prompt.ts) — validates website JWT + course access and returns a whitelisted private course prompt body.
-- Future owner/admin endpoints should live here too, using the shared
-  `api/_shared/optenServerAuth.ts` JWT verifier plus a server-side owner
-  allowlist. They may call extension-owned service endpoints with server-only
-  secrets; the browser must receive only aggregated stats or accepted job
-  results.
+  - [`api/admin/telegram-stats.ts`](../../api/admin/telegram-stats.ts) — validates website JWT + server-side owner allowlist, then calls extension-owned `telegram-hidden-intro-stats` with `TELEGRAM_ADMIN_SECRET`.
+  - [`api/admin/telegram-broadcast.ts`](../../api/admin/telegram-broadcast.ts) — validates website JWT + owner allowlist, validates Telegram message/caption/button/photo URL limits, performs dry-run preview, and proxies confirmed sends to `telegram-hidden-intro-broadcast` with `TELEGRAM_ADMIN_SECRET`.
+  - [`api/admin/telegram-broadcasts.ts`](../../api/admin/telegram-broadcasts.ts) — validates website JWT + owner allowlist, lists stored broadcast history, and deletes stored Telegram messages by proxying `telegram-hidden-intro-broadcasts` with `TELEGRAM_ADMIN_SECRET`.
+- Owner/admin endpoints live under `/api/admin/*`, using
+  `api/_shared/optenServerAuth.ts` plus `api/_shared/adminAuth.ts`. They may
+  call extension-owned service endpoints with server-only secrets; the browser
+  must receive only aggregated stats or accepted job results.
 - `api/download-skill.ts` bundles the Pro ZIP via `vercel.json` `includeFiles: "api/_assets/**"`.
 - Hidden course downloadable materials under `public/assets/space/courses/**` are static public assets; locked prompt bodies stay server-side in `api/_shared/coursePromptBodies.ts`.
 - JSON CORS is locked to `https://opten.space`.
@@ -96,6 +98,9 @@
 | `VITE_PADDLE_ENV` | `'sandbox'` \| `'production'` | [`main.tsx:26`](../../src/main.tsx#L26) |
 | `VITE_PADDLE_CLIENT_TOKEN` | Paddle public client token | [`main.tsx:30`](../../src/main.tsx#L30) |
 | `SUPABASE_JWT_SECRET` | Server-side HS256 JWT verification for site API functions | `api/download-skill.ts`, `api/_shared/optenServerAuth.ts` |
+| `OPTEN_ADMIN_USER_IDS` | Preferred comma-separated owner `auth.users.id` allowlist for `/api/admin/*` | `api/_shared/adminAuth.ts` |
+| `OPTEN_ADMIN_EMAILS` | Optional comma-separated owner email bootstrap allowlist for `/api/admin/*` | `api/_shared/adminAuth.ts` |
+| `TELEGRAM_ADMIN_SECRET` | Server-only secret used by website admin proxy to call Telegram service Edge Functions | `api/admin/telegram-stats.ts`, `api/admin/telegram-broadcast.ts` |
 | `KINESCOPE_AUTH_JWT_SECRET` | Server-side HS256 secret for short-lived Kinescope `drmauthtoken` playback tokens | `api/kinescope-course-token.ts`, `api/kinescope-course-auth.ts` |
 | `KINESCOPE_DRM_AUTH_USERNAME` / `KINESCOPE_DRM_AUTH_PASSWORD` | Optional Basic Auth for Kinescope's callback, if enabled in Kinescope settings | `api/kinescope-course-auth.ts` |
 
