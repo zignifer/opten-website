@@ -167,12 +167,17 @@ under `/admin`, not a Telegram-only one-off. The first module is Telegram
 hidden-intro operations: read funnel stats through `/api/admin/telegram-stats`
 send Telegram broadcasts through `/api/admin/telegram-broadcast`, and review or
 delete stored broadcast history through `/api/admin/telegram-broadcasts`.
-Broadcast send must always run a dry-run recipient preview first and require an
-explicit final confirmation with the exact recipient count; the extension-owned
-backend must persist new broadcast recipient `message_id` values before a post
-can be deleted later. Old broadcasts that were sent before message IDs were
-stored are not reliably deletable. Image support is URL-only until a separate
-private upload path is added. `/admin` authenticates through
+Broadcast images are uploaded through `/api/admin/telegram-upload-photo`, which
+checks the website JWT + owner allowlist and then calls the extension-owned
+`telegram-hidden-intro-assets` Edge Function with `TELEGRAM_ADMIN_SECRET`.
+Uploaded images are stored server-side and exposed only as random public HTTPS
+asset URLs for Telegram `sendPhoto`; never put raw image data or operational
+storage/service secrets in browser storage. Broadcast send must always run a
+dry-run recipient preview first and require an explicit final confirmation with
+the exact recipient count; the extension-owned backend must persist new
+broadcast recipient `message_id` values before a post can be deleted later. Old
+broadcasts that were sent before message IDs were stored are not reliably
+deletable. `/admin` authenticates through
 the normal website Supabase session
 (`localStorage.opten_space_session_v1`) and server-side allowlists in this repo's
 serverless functions. Do not add a separate hardcoded admin password to the

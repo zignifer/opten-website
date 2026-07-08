@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -15,6 +15,7 @@ import {
   deleteAdminTelegramBroadcast,
   fetchAdminTelegramBroadcasts,
   sendAdminTelegramBroadcast,
+  uploadAdminTelegramPhoto,
   type AdminTelegramBroadcastRecord,
   type AdminTelegramBroadcastResult,
   type AdminTelegramBroadcastSegment,
@@ -26,6 +27,10 @@ const SEGMENT_OPTIONS: Array<{ value: AdminTelegramBroadcastSegment; label: stri
   { value: "access_granted", label: "Получили доступ" },
   { value: "access_granted_not_paid", label: "Доступ без оплаты" },
 ];
+
+const MAX_UPLOAD_BYTES = 1_572_864;
+const MAX_UPLOAD_EDGE = 1600;
+const VALID_UPLOAD_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export function AdminTelegramBroadcastPanel({
   accessToken,
@@ -44,9 +49,11 @@ export function AdminTelegramBroadcastPanel({
   const [deleteResult, setDeleteResult] = useState<string | null>(null);
   const [history, setHistory] = useState<AdminTelegramBroadcastRecord[]>([]);
   const [state, setState] = useState<"idle" | "previewing" | "sending">("idle");
+  const [uploadState, setUploadState] = useState<"idle" | "uploading">("idle");
   const [historyState, setHistoryState] = useState<"idle" | "loading" | "refreshing">("idle");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const draftKey = useMemo(
     () => JSON.stringify({ segment, text: text.trim(), photoUrl: photoUrl.trim(), buttonText: buttonText.trim(), buttonUrl: buttonUrl.trim() }),
@@ -170,6 +177,29 @@ export function AdminTelegramBroadcastPanel({
     }
   }
 
+  async function handlePhotoFile(file: File | undefined) {
+    if (!file || uploadState !== "idle") return;
+    setUploadState("uploading");
+    setError(null);
+    setDeleteResult(null);
+
+    try {
+      const prepared = await prepareTelegramPhoto(file);
+      const dataBase64 = await blobToBase64(prepared.blob);
+      const response = await uploadAdminTelegramPhoto(accessToken, {
+        file_name: prepared.fileName,
+        content_type: prepared.contentType,
+        data_base64: dataBase64,
+      });
+      updateDraft(() => setPhotoUrl(response.url));
+    } catch (err) {
+      setError(resolveUploadError(err));
+    } finally {
+      setUploadState("idle");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   return (
     <section className="rounded-[8px] border border-[#dce4d9] bg-white p-[16px] shadow-[0_1px_0_rgba(14,23,20,0.04)]">
       <div className="flex flex-col gap-[10px] border-b border-[#eef2eb] pb-[14px] md:flex-row md:items-start md:justify-between">
@@ -211,14 +241,43 @@ export function AdminTelegramBroadcastPanel({
           </label>
 
           <div className="grid gap-[10px] md:grid-cols-2">
-            <IconField icon={<ImageIcon size={15} aria-hidden="true" />} label="Photo HTTPS URL">
-              <input
-                type="url"
-                value={photoUrl}
-                onChange={(event) => updateDraft(() => setPhotoUrl(event.target.value))}
-                placeholder="https://..."
-                className="h-[40px] w-full rounded-[8px] border border-[#cbd6c9] bg-white px-[11px] text-[14px] text-[#101a18] outline-none transition placeholder:text-[#9aa6a1] focus:border-[#75c83f] focus:ring-2 focus:ring-[#9cfb51]/30"
-              />
+            <IconField icon={<ImageIcon size={15} aria-hidden="true" />} label="Фото">
+              <div className="grid gap-[8px]">
+                <div className="flex gap-[8px]">
+                  <input
+                    type="url"
+                    value={photoUrl}
+                    onChange={(event) => updateDraft(() => setPhotoUrl(event.target.value))}
+                    placeholder="https://..."
+                    className="h-[40px] min-w-0 flex-1 rounded-[8px] border border-[#cbd6c9] bg-white px-[11px] text-[14px] text-[#101a18] outline-none transition placeholder:text-[#9aa6a1] focus:border-[#75c83f] focus:ring-2 focus:ring-[#9cfb51]/30"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadState === "uploading"}
+                    className="inline-flex h-[40px] shrink-0 cursor-pointer items-center justify-center gap-[7px] rounded-[8px] border border-[#cbd6c9] bg-white px-[11px] text-[13px] font-semibold text-[#17211f] transition hover:border-[#9bb195] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#75c83f] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {uploadState === "uploading" ? <Loader2 size={15} className="animate-spin" aria-hidden="true" /> : <ImageIcon size={15} aria-hidden="true" />}
+                    Загрузить
+                  </button>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={(event) => {
+                    void handlePhotoFile(event.target.files?.[0]);
+                  }}
+                />
+                {photoUrl ? (
+                  <img
+                    src={photoUrl}
+                    alt=""
+                    className="h-[90px] w-full rounded-[8px] border border-[#e4ebe0] object-cover"
+                  />
+                ) : null}
+              </div>
             </IconField>
 
             <IconField icon={<LinkIcon size={15} aria-hidden="true" />} label="Button URL">
@@ -478,6 +537,99 @@ function resolveBroadcastError(error: unknown): string {
     if (error.code === "telegram_broadcasts_unavailable") return "Telegram broadcast history endpoint сейчас недоступен.";
   }
   return "Не удалось выполнить broadcast.";
+}
+
+function resolveUploadError(error: unknown): string {
+  if (error instanceof AdminApiError) {
+    if (error.status === 403) return "Этот аккаунт не входит в server-side allowlist админки.";
+    if (error.status === 401) return "Сессия истекла. Войди снова через /login.";
+    if (error.code === "missing_telegram_admin_secret") return "В Vercel не задан TELEGRAM_ADMIN_SECRET.";
+    if (error.code === "invalid_content_type") return "Можно загрузить только JPG, PNG или WEBP.";
+    if (error.code === "invalid_image_data") return "Не удалось прочитать файл изображения.";
+    if (error.code === "telegram_upload_failed") return "Backend не смог сохранить фото для Telegram.";
+    if (error.code === "telegram_upload_unavailable") return "Upload endpoint сейчас недоступен.";
+  }
+  if (error instanceof Error) return error.message;
+  return "Не удалось загрузить фото.";
+}
+
+async function prepareTelegramPhoto(file: File): Promise<{
+  blob: Blob;
+  fileName: string;
+  contentType: "image/jpeg" | "image/png" | "image/webp";
+}> {
+  if (!VALID_UPLOAD_TYPES.has(file.type)) throw new Error("Можно загрузить только JPG, PNG или WEBP.");
+  if (file.size <= MAX_UPLOAD_BYTES) {
+    return {
+      blob: file,
+      fileName: file.name || "telegram-photo",
+      contentType: file.type as "image/jpeg" | "image/png" | "image/webp",
+    };
+  }
+
+  const image = await loadImage(file);
+  const scale = Math.min(1, MAX_UPLOAD_EDGE / Math.max(image.naturalWidth || image.width, image.naturalHeight || image.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round((image.naturalWidth || image.width) * scale));
+  canvas.height = Math.max(1, Math.round((image.naturalHeight || image.height) * scale));
+
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Браузер не смог подготовить фото.");
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  let blob = await canvasToBlob(canvas, "image/jpeg", 0.86);
+  if (blob.size > MAX_UPLOAD_BYTES) blob = await canvasToBlob(canvas, "image/jpeg", 0.72);
+  if (blob.size > MAX_UPLOAD_BYTES) blob = await canvasToBlob(canvas, "image/jpeg", 0.58);
+  if (blob.size > MAX_UPLOAD_BYTES) throw new Error("Фото слишком тяжёлое даже после сжатия. Возьми файл поменьше.");
+
+  return {
+    blob,
+    fileName: replaceExtension(file.name || "telegram-photo.jpg", "jpg"),
+    contentType: "image/jpeg",
+  };
+}
+
+function loadImage(file: File): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Не удалось открыть изображение."));
+    };
+    image.src = url;
+  });
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error("Не удалось сжать изображение."));
+    }, type, quality);
+  });
+}
+
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const value = String(reader.result || "");
+      const commaIndex = value.indexOf(",");
+      resolve(commaIndex >= 0 ? value.slice(commaIndex + 1) : value);
+    };
+    reader.onerror = () => reject(new Error("Не удалось прочитать файл."));
+    reader.readAsDataURL(blob);
+  });
+}
+
+function replaceExtension(fileName: string, extension: string): string {
+  const clean = fileName.trim() || `telegram-photo.${extension}`;
+  return clean.includes(".") ? clean.replace(/\.[^.]+$/, `.${extension}`) : `${clean}.${extension}`;
 }
 
 function formatNumber(value: number): string {

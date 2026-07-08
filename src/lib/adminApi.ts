@@ -92,6 +92,14 @@ export type AdminTelegramBroadcastDeleteResult = {
   status: AdminTelegramBroadcastRecord["status"];
 };
 
+export type AdminTelegramPhotoUploadResult = {
+  ok: boolean;
+  url: string;
+  token: string;
+  content_type: "image/jpeg" | "image/png" | "image/webp";
+  size_bytes: number;
+};
+
 export class AdminApiError extends Error {
   status: number;
   code: string;
@@ -182,4 +190,30 @@ export async function deleteAdminTelegramBroadcast(
   }
 
   return body as AdminTelegramBroadcastDeleteResult;
+}
+
+export async function uploadAdminTelegramPhoto(
+  accessToken: string,
+  input: {
+    file_name: string;
+    content_type: "image/jpeg" | "image/png" | "image/webp";
+    data_base64: string;
+  },
+): Promise<AdminTelegramPhotoUploadResult> {
+  const res = await fetch("/api/admin/telegram-upload-photo", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new AdminApiError(res.status, typeof body?.error === "string" ? body.error : "admin_request_failed", body);
+  }
+
+  return body as AdminTelegramPhotoUploadResult;
 }

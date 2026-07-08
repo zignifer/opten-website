@@ -54,6 +54,7 @@
 │     GET  /api/admin/telegram-stats   → owner-gated Telegram stats proxy      │
 │     POST /api/admin/telegram-broadcast → owner-gated broadcast proxy         │
 │     GET/POST /api/admin/telegram-broadcasts → history/delete proxy           │
+│     POST /api/admin/telegram-upload-photo → owner-gated image upload proxy   │
 │                                                                              │
 └──────────────────────────────────────────────────────────────────────────────┘
          │                              │                          │
@@ -104,7 +105,7 @@ hits get a populated `<head>` + body before React mounts.
 | `/dashboard/download-skill` | [`DownloadSkillPage.tsx`](../../src/app/pages/DownloadSkillPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Pro-only skill ZIP download | `GET_AUTH_TOKEN` (Bearer for `/api/download-skill`) | `/api/download-skill` (this site's own serverless) |
 | `/prompt-library` | [`PromptLibraryPage.tsx`](../../src/app/pages/PromptLibraryPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Private Prompt Library CRUD/search; owner publish/refresh/unpublish controls for public snapshots. | `GET_AUTH_TOKEN` + `REFRESH_PROMPT_LIBRARY_CACHE` | `prompt_library`, `prompt_library_mark_used`, public snapshot RPCs |
 | `/p/:slug` | [`PublicPromptLibraryPage.tsx`](../../src/app/pages/PublicPromptLibraryPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Read-only random-link Prompt Library snapshot; viewers save individual prompts into their own library. | No | `prompt_library_get_public_snapshot`; save uses website JWT + `prompt_library_save_public_prompt` |
-| `/admin` | [`AdminDashboardPage.tsx`](../../src/app/pages/admin/AdminDashboardPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Owner admin shell. Shows Telegram hidden intro funnel stats, guarded broadcast controls, and stored broadcast deletion. | No | Website JWT to `/api/admin/telegram-stats`, `/api/admin/telegram-broadcast`, and `/api/admin/telegram-broadcasts`; serverless proxies call extension-owned Edge Functions with `TELEGRAM_ADMIN_SECRET` |
+| `/admin` | [`AdminDashboardPage.tsx`](../../src/app/pages/admin/AdminDashboardPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Owner admin shell. Shows Telegram hidden intro funnel stats, guarded broadcast controls, image upload, and stored broadcast deletion. | No | Website JWT to `/api/admin/telegram-stats`, `/api/admin/telegram-broadcast`, `/api/admin/telegram-broadcasts`, and `/api/admin/telegram-upload-photo`; serverless proxies call extension-owned Edge Functions with `TELEGRAM_ADMIN_SECRET` |
 | `/internal/prompt-library-demo` | `PromptLibraryDemoPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Internal demo surface. | No | No |
 | `/app` | `AppIndexPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Opten Space Beta entry; redirects to the current canonical app surface. | No | No |
 | `/app/login` | `Navigate` | none (SPA-only, `X-Robots-Tag: noindex`) | Compatibility redirect to `/login?next=/learn`. | No | No |
@@ -321,8 +322,9 @@ Kinescope token only for `hidden-intro`, signed with
 llms.txt, public Learn route lists, and EN sibling maps.
 
 Telegram service tooling currently lives in extension-owned Edge Functions:
-`telegram-hidden-intro-stats`, `telegram-hidden-intro-broadcast`, and
-`telegram-hidden-intro-broadcasts`, and `telegram-hidden-intro-reminders`. These endpoints require
+`telegram-hidden-intro-stats`, `telegram-hidden-intro-broadcast`,
+`telegram-hidden-intro-broadcasts`, `telegram-hidden-intro-assets`, and
+`telegram-hidden-intro-reminders`. Mutating endpoints require
 `X-Opten-Admin-Secret` and service-role access, so the website `/admin` shell
 proxies them through this repo's serverless `/api/admin/*` endpoints after
 verifying a website Supabase JWT and a server-side owner allowlist. Broadcasts
@@ -334,7 +336,10 @@ and `telegram_broadcast_recipients` with Telegram `message_id` values; the
 admin history/delete UI calls `/api/admin/telegram-broadcasts`, which proxies to
 the extension delete endpoint. Broadcasts sent before `message_id` persistence
 cannot be reliably deleted afterward.
-Image support is currently `photo_url` only; there is no browser upload path.
+Image upload goes through `/api/admin/telegram-upload-photo`; the browser
+compresses large files, the serverless proxy forwards base64 image data to
+`telegram-hidden-intro-assets`, and the returned random public HTTPS URL is used
+as `photo_url` for Telegram `sendPhoto`.
 Browser code must never receive `TELEGRAM_ADMIN_SECRET`, the bot token, or a
 Supabase service-role key.
 
