@@ -14,7 +14,7 @@ export const KINESCOPE_COURSE_LESSONS: KinescopeCourseLesson[] = [
   {
     courseSlug: KINESCOPE_COURSE_SLUG,
     lessonSlug: KINESCOPE_HIDDEN_INTRO_LESSON_SLUG,
-    videoId: "e0cd3bcd-bf94-4240-ad53-445d1c796f7c",
+    videoId: "a4722357-b131-491f-8ca0-cdd11d927630",
   },
   {
     courseSlug: KINESCOPE_COURSE_SLUG,

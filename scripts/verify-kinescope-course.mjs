@@ -37,7 +37,7 @@ const lessonFourCheatsheetAsset = "public/assets/space/courses/ai-content-market
 const lessonFourResultAsset = "public/assets/space/courses/ai-content-marketing-2026/lesson-4-cofe1-result.jpg";
 
 const expectedKinescopeLessons = [
-  ["hidden-intro", "e0cd3bcd-bf94-4240-ad53-445d1c796f7c"],
+  ["hidden-intro", "a4722357-b131-491f-8ca0-cdd11d927630"],
   ["lesson-1-prompting", "e941e14d-c5bf-40fc-abe5-a41e247777cf"],
   ["lesson-2-ai-services", "c3b06c01-19dd-4a3c-8218-7a216a2ebd67"],
   ["lesson-3-logo-generation", "947a68e0-b570-4a9d-ad0c-ee55cc86b440"],
