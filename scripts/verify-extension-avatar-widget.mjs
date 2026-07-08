@@ -6,7 +6,8 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const componentPath = path.join(rootDir, "src/app/components/ExtensionVideoAvatar.tsx");
 const appPath = path.join(rootDir, "src/app/App.tsx");
 const cssPath = path.join(rootDir, "src/styles/theme.css");
-const videoPath = path.join(rootDir, "public/assets/extension-avatar/opten-extension-avatar.mp4");
+const ruVideoPath = path.join(rootDir, "public/assets/extension-avatar/opten-extension-avatar.mp4");
+const enVideoPath = path.join(rootDir, "public/assets/extension-avatar/opten-extension-avatar-en.mp4");
 
 const failures = [];
 
@@ -24,27 +25,41 @@ const css = readIfExists(cssPath);
 
 assert(component.length > 0, "ExtensionVideoAvatar.tsx must exist");
 assert(
-  existsSync(videoPath) && statSync(videoPath).size > 1_000_000,
+  existsSync(ruVideoPath) && statSync(ruVideoPath).size > 1_000_000,
   "opten-extension-avatar.mp4 must be present as a local public asset",
 );
 assert(
-  component.includes('const EXTENSION_AVATAR_VIDEO_SRC = "/assets/extension-avatar/opten-extension-avatar.mp4";'),
-  "component must use the local extension avatar MP4",
+  existsSync(enVideoPath) && statSync(enVideoPath).size > 1_000_000,
+  "opten-extension-avatar-en.mp4 must be present as a local public asset",
+);
+assert(
+  component.includes('import { useLang } from "../../i18n/LangContext";'),
+  "component must read the active language from LangContext",
+);
+assert(
+  component.includes('ru: "/assets/extension-avatar/opten-extension-avatar.mp4"') &&
+    component.includes('en: "/assets/extension-avatar/opten-extension-avatar-en.mp4"'),
+  "component must define RU and EN local avatar video sources",
+);
+assert(
+  component.includes("const videoSrc = EXTENSION_AVATAR_VIDEO_SOURCES[lang];") &&
+    component.includes('data-video-format={videoFormat}'),
+  "component must switch source and layout format from the active language",
 );
 assert(
   /<video[\s\S]*autoPlay[\s\S]*muted=\{isIdle\}[\s\S]*loop[\s\S]*playsInline/.test(component),
   "video must autoplay muted in idle mode, unmute after click, loop, and use playsInline",
 );
 assert(
-  /useEffect\(\(\) => \{[\s\S]*video\.muted = true;[\s\S]*video\.play\(\)\.catch\(\(\) => \{\}\);[\s\S]*\}, \[\]\);/.test(component),
-  "component must explicitly start the muted preview on mount for autoplay reliability",
+  /useEffect\(\(\) => \{[\s\S]*setMode\("idle"\);[\s\S]*video\.muted = true;[\s\S]*video\.play\(\)\.catch\(\(\) => \{\}\);[\s\S]*\}, \[videoSrc\]\);/.test(component),
+  "component must reset and start the muted preview when the language-specific video changes",
 );
 assert(
   component.includes('setMode("active")') && component.includes('setMode("idle")'),
   "component must support active playback and close back to idle",
 );
 assert(
-  !/booking|lead|form|bubble|onEnded/i.test(component),
+  !/booking|lead|bubble|onEnded/i.test(component),
   "component must not include NOVA booking/form/ended-bubble behavior",
 );
 assert(
@@ -57,6 +72,10 @@ assert(
     /@media \(max-width: 760px\)/.test(css) &&
     /@media \(prefers-reduced-motion: reduce\)/.test(css),
   "theme.css must include desktop, mobile, and reduced-motion widget styles",
+);
+assert(
+  /data-video-format="landscape"/.test(css) && /aspect-ratio: 72 \/ 70/.test(css),
+  "theme.css must include a compact 720x700 landscape layout for the EN video",
 );
 
 if (failures.length > 0) {
