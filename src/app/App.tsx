@@ -10,6 +10,7 @@ import FaqBlock from "./components/FaqBlock";
 import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
 import InstallButton from "./components/InstallButton";
+import ExtensionVideoAvatar from "./components/ExtensionVideoAvatar";
 import { useCurrencyPreference } from "../lib/currency";
 import { landingFaq } from "../content/landingFaq";
 import OptenHeroAnimation from "./components/OptenHeroAnimation";
@@ -531,6 +532,7 @@ export default function App() {
         {/* Phase 4 D-08 / GEO-D-3: landing FAQ block — schema in seo-routes.ts mirrors landingFaq[lang] (V-10). */}
         <FaqBlock items={landingFaq[lang]} />
       </main>
+      <ExtensionVideoAvatar />
       <SiteFooter />
     </div>
   );
