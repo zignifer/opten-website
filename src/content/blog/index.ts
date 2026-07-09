@@ -6,6 +6,7 @@ import { post as gptImage2 } from "./gpt-image-2";
 import { post as neuralNetworksFromScratch } from "./neural-networks-from-scratch";
 import { post as aiTrainingBeginners } from "./ai-training-beginners";
 import { post as aiCoursesForBeginners } from "./ai-courses-for-beginners";
+import { post as freeAiCourses } from "./free-ai-courses";
 import { post as aiHeadshotGenerator } from "./ai-headshot-generator";
 import { post as aiUgcForBrands } from "./ai-ugc-for-brands";
 import { post as aiFaceSwap } from "./ai-face-swap";
@@ -27,6 +28,7 @@ import { post as aiLogoGeneratorPrompt } from "./ai-logo-generator-prompt";
 import type { BlogPost } from "./types";
 
 export const blogPostsBySlug = {
+  "free-ai-courses": freeAiCourses,
   "ai-courses-for-beginners": aiCoursesForBeginners,
   "neural-networks-from-scratch": neuralNetworksFromScratch,
   "ai-training-beginners": aiTrainingBeginners,

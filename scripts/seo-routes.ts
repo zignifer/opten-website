@@ -9,6 +9,7 @@ import { post as gptImage2Guide } from "../src/content/blog/gpt-image-2";
 import { post as neuralNetworksFromScratchGuide } from "../src/content/blog/neural-networks-from-scratch";
 import { post as aiTrainingBeginnersGuide } from "../src/content/blog/ai-training-beginners";
 import { post as aiCoursesForBeginnersGuide } from "../src/content/blog/ai-courses-for-beginners";
+import { post as freeAiCoursesGuide } from "../src/content/blog/free-ai-courses";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
 import { post as aiFaceSwapGuide } from "../src/content/blog/ai-face-swap";
@@ -1300,6 +1301,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/free-ai-courses`, name: freeAiCoursesGuide.ru.title, datePublished: freeAiCoursesGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-courses-for-beginners`, name: aiCoursesForBeginnersGuide.ru.title, datePublished: aiCoursesForBeginnersGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/neural-networks-from-scratch`, name: neuralNetworksFromScratchGuide.ru.title, datePublished: neuralNetworksFromScratchGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-training-beginners`, name: aiTrainingBeginnersGuide.ru.title, datePublished: aiTrainingBeginnersGuide.ru.publishedAt },
@@ -1338,6 +1340,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/free-ai-courses — free AI learning guide.
+  {
+    path: "/blog/free-ai-courses",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/free-ai-courses`,
+      en: `${SITE_ORIGIN}/en/blog/free-ai-courses`,
+      xDefault: `${SITE_ORIGIN}/blog/free-ai-courses`,
+    },
+    title: freeAiCoursesGuide.ru.title,
+    description: freeAiCoursesGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/free-ai-courses`,
+    ogTitle: freeAiCoursesGuide.ru.title,
+    ogDescription: freeAiCoursesGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${freeAiCoursesGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/free-ai-courses`,
+        headline: freeAiCoursesGuide.ru.title,
+        description: freeAiCoursesGuide.ru.description,
+        datePublished: freeAiCoursesGuide.ru.publishedAt,
+        dateModified: freeAiCoursesGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: freeAiCoursesGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${freeAiCoursesGuide.ru.cover.src}`,
+          width: freeAiCoursesGuide.ru.cover.width,
+          height: freeAiCoursesGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/free-ai-courses`,
+        url: `${SITE_ORIGIN}/blog/free-ai-courses`,
+        name: freeAiCoursesGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (freeAiCoursesGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/free-ai-courses`,
+        freeAiCoursesGuide.ru.title,
+      ),
+      faqPageBlock(freeAiCoursesGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/free-ai-courses`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: freeAiCoursesGuide.ru.title, url: `${SITE_ORIGIN}/blog/free-ai-courses` },
+        ],
+        `${SITE_ORIGIN}/blog/free-ai-courses`,
       ),
     ],
   },
@@ -2930,6 +2992,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/free-ai-courses`, name: freeAiCoursesGuide.en.title, datePublished: freeAiCoursesGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners`, name: aiCoursesForBeginnersGuide.en.title, datePublished: aiCoursesForBeginnersGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch`, name: neuralNetworksFromScratchGuide.en.title, datePublished: neuralNetworksFromScratchGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-training-beginners`, name: aiTrainingBeginnersGuide.en.title, datePublished: aiTrainingBeginnersGuide.en.publishedAt },
@@ -2968,6 +3031,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/free-ai-courses EN sibling.
+  {
+    path: "/en/blog/free-ai-courses",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/free-ai-courses`,
+      en: `${SITE_ORIGIN}/en/blog/free-ai-courses`,
+      xDefault: `${SITE_ORIGIN}/blog/free-ai-courses`,
+    },
+    title: freeAiCoursesGuide.en.title,
+    description: freeAiCoursesGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/free-ai-courses`,
+    ogTitle: freeAiCoursesGuide.en.title,
+    ogDescription: freeAiCoursesGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${freeAiCoursesGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/free-ai-courses`,
+        headline: freeAiCoursesGuide.en.title,
+        description: freeAiCoursesGuide.en.description,
+        datePublished: freeAiCoursesGuide.en.publishedAt,
+        dateModified: freeAiCoursesGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: freeAiCoursesGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${freeAiCoursesGuide.en.cover.src}`,
+          width: freeAiCoursesGuide.en.cover.width,
+          height: freeAiCoursesGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/free-ai-courses`,
+        url: `${SITE_ORIGIN}/en/blog/free-ai-courses`,
+        name: freeAiCoursesGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (freeAiCoursesGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/free-ai-courses`,
+        freeAiCoursesGuide.en.title,
+      ),
+      faqPageBlock(freeAiCoursesGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/free-ai-courses`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: freeAiCoursesGuide.en.title, url: `${SITE_ORIGIN}/en/blog/free-ai-courses` },
+        ],
+        `${SITE_ORIGIN}/en/blog/free-ai-courses`,
       ),
     ],
   },

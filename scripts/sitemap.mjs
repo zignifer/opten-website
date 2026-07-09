@@ -33,8 +33,8 @@ const sitemapRoutes = routes.filter(r => r.prerender !== "none");
 // pages (62 RU + 62 EN). Daily blog posts bring the floor to 170; public Learn adds 14 lesson routes
 // and Learn Finds adds generated third-party video breakdown routes.
 // /dashboard/*) carry prerender:"none" and are excluded from sitemapRoutes.
-if (sitemapRoutes.length < 210) {
-  throw new Error(`sitemap.mjs: expected at least 210 routes (60 marketing/blog routes + 24 Learn routes + 126 model routes), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
+if (sitemapRoutes.length < 212) {
+  throw new Error(`sitemap.mjs: expected at least 212 routes (62 marketing/blog routes + 24 Learn routes + 126 model routes), got ${sitemapRoutes.length}. Manifest mis-loaded or entries missing?`);
 }
 
 // Post-2026-05-17 GEO audit ME-12: per-route lastmod via git mtime of the source file driving
@@ -54,6 +54,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/free-ai-courses":       "src/content/blog/free-ai-courses.ts",
+  "/en/blog/free-ai-courses":    "src/content/blog/free-ai-courses.ts",
   "/blog/ai-courses-for-beginners":       "src/content/blog/ai-courses-for-beginners.ts",
   "/en/blog/ai-courses-for-beginners":    "src/content/blog/ai-courses-for-beginners.ts",
   "/blog/neural-networks-from-scratch":       "src/content/blog/neural-networks-from-scratch.ts",
