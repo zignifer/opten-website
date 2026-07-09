@@ -162,6 +162,12 @@ webhooks mark the claim used only after successful payment; Telegram reminders
 and broadcasts must skip used claims and mark Bot API 403/blocked recipients as
 blocked.
 
+The Telegram hidden-intro `/start` welcome image is served from this website at
+`/assets/telegram-hidden-intro-welcome.png` and referenced by the backend through
+`TELEGRAM_WELCOME_PHOTO_URL`. Keep this file in `public/assets/`; do not switch
+the bot back to Telegram `file_id`, because stale `file_id` values can restore
+old cached images after deploys.
+
 The owner/admin dashboard on opten.space is a general protected admin surface
 under `/admin`, not a Telegram-only one-off. The first module is Telegram
 hidden-intro operations: read funnel stats through `/api/admin/telegram-stats`
