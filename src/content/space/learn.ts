@@ -288,7 +288,7 @@ export const learnDefaultAuthor: LearnAuthor = {
     ru: "Уроки обновляются, когда меняются модели, интерфейсы или production-процесс.",
     en: "Lessons are updated when models, interfaces, or the production workflow change.",
   },
-  avatarPath: `${legacyLearnAssetBase}/author-vlad-frame43.jpg`,
+  avatarPath: `${legacyLearnAssetBase}/author-vlad-frame43.png`,
 };
 
 export const learnIntegrationTodos = {
