@@ -118,7 +118,7 @@ export default function AdminDashboardPage() {
 
         {stats ? (
           <>
-            <AdminStatsView stats={stats} refreshing={statsState === "refreshing"} />
+            <AdminStatsView stats={stats} />
             <AdminTelegramBroadcastPanel accessToken={accessToken} onSent={() => loadStats(true)} />
           </>
         ) : statsState === "loading" ? (
@@ -129,7 +129,7 @@ export default function AdminDashboardPage() {
   );
 }
 
-function AdminStatsView({ stats, refreshing }: { stats: AdminTelegramStats; refreshing: boolean }) {
+function AdminStatsView({ stats }: { stats: AdminTelegramStats }) {
   const metrics = useMemo(
     () => [
       { label: "Старт", value: stats.funnel.start, icon: Users, tone: "slate" },
@@ -145,35 +145,11 @@ function AdminStatsView({ stats, refreshing }: { stats: AdminTelegramStats; refr
   );
 
   return (
-    <>
-      <div className="grid gap-[12px] sm:grid-cols-2 lg:grid-cols-4">
-        {metrics.map((metric) => (
-          <MetricCard key={metric.label} metric={metric} />
-        ))}
-      </div>
-
-      <div className="grid gap-[14px] xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
-        <section className="rounded-[8px] border border-[#dce4d9] bg-white p-[16px] shadow-[0_1px_0_rgba(14,23,20,0.04)]">
-          <PanelHeader title="Воронка" meta={formatDateTime(stats.generated_at)} refreshing={refreshing} />
-          <FunnelTable stats={stats} />
-        </section>
-
-        <section className="rounded-[8px] border border-[#dce4d9] bg-white p-[16px] shadow-[0_1px_0_rgba(14,23,20,0.04)]">
-          <PanelHeader title="Claims и оплаты" meta="курс ai-content-marketing-2026" />
-          <div className="mt-[12px] grid grid-cols-2 gap-[10px]">
-            <MiniStat label="Claims всего" value={stats.claims.total} />
-            <MiniStat label="Использованы" value={stats.claims.used} />
-            <MiniStat label="Истекли" value={stats.claims.expired_unused} />
-            <MiniStat label="Paid orders" value={stats.orders.paid} />
-          </div>
-        </section>
-      </div>
-
-      <section className="rounded-[8px] border border-[#dce4d9] bg-white p-[16px] shadow-[0_1px_0_rgba(14,23,20,0.04)]">
-        <PanelHeader title="События" meta="агрегаты из telegram_hidden_intro_events" />
-        <EventsTable events={stats.events} />
-      </section>
-    </>
+    <div className="grid gap-[12px] sm:grid-cols-2 lg:grid-cols-4">
+      {metrics.map((metric) => (
+        <MetricCard key={metric.label} metric={metric} />
+      ))}
+    </div>
   );
 }
 
@@ -221,81 +197,6 @@ function MetricCard({
         </span>
       </div>
     </article>
-  );
-}
-
-function FunnelTable({ stats }: { stats: AdminTelegramStats }) {
-  const rows = [
-    { label: "Старт бота", value: stats.funnel.start },
-    { label: "Подписка подтверждена", value: stats.funnel.subscription_verified },
-    { label: "Доступ выдан", value: stats.funnel.access_granted },
-    { label: "Урок открыт", value: stats.funnel.hidden_intro_opened },
-    { label: "Чекаут создан", value: stats.funnel.checkout_created },
-    { label: "Оплата", value: stats.funnel.paid },
-  ];
-
-  return (
-    <div className="mt-[12px] overflow-x-auto">
-      <table className="w-full min-w-[620px] border-collapse text-left text-[14px]">
-        <thead>
-          <tr className="border-b border-[#e1e7dc] text-[12px] uppercase tracking-[0.06em] text-[#6b7972]">
-            <th className="py-[10px] pr-[12px] font-semibold">Этап</th>
-            <th className="px-[12px] py-[10px] font-semibold">Кол-во</th>
-            <th className="px-[12px] py-[10px] font-semibold">От старта</th>
-            <th className="py-[10px] pl-[12px] font-semibold">От прошлого</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, index) => {
-            const previous = index > 0 ? rows[index - 1].value : row.value;
-            return (
-              <tr key={row.label} className="border-b border-[#eef2eb] last:border-b-0">
-                <td className="py-[11px] pr-[12px] font-medium text-[#14211f]">{row.label}</td>
-                <td className="px-[12px] py-[11px] tabular-nums text-[#14211f]">{formatNumber(row.value)}</td>
-                <td className="px-[12px] py-[11px] tabular-nums text-[#50615b]">{formatPercent(row.value, stats.funnel.start)}</td>
-                <td className="py-[11px] pl-[12px] tabular-nums text-[#50615b]">{formatPercent(row.value, previous)}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function EventsTable({ events }: { events: Record<string, number> }) {
-  const rows = Object.entries(eventLabels).map(([key, label]) => ({ key, label, value: events[key] ?? 0 }));
-
-  return (
-    <div className="mt-[12px] grid gap-[8px] md:grid-cols-2 xl:grid-cols-3">
-      {rows.map((row) => (
-        <div key={row.key} className="flex min-h-[42px] items-center justify-between gap-[12px] rounded-[8px] border border-[#eef2eb] bg-[#fbfcf8] px-[12px] py-[9px]">
-          <span className="min-w-0 truncate text-[13px] font-medium text-[#34423e]">{row.label}</span>
-          <span className="shrink-0 tabular-nums text-[14px] font-semibold text-[#101a18]">{formatNumber(row.value)}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function PanelHeader({ title, meta, refreshing = false }: { title: string; meta: string; refreshing?: boolean }) {
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-[10px]">
-      <h2 className="m-0 text-[18px] font-semibold leading-tight tracking-[0] text-[#101a18]">{title}</h2>
-      <div className="flex items-center gap-[7px] text-[12px] text-[#66756f]">
-        {refreshing ? <RefreshCw size={13} className="animate-spin" aria-hidden="true" /> : null}
-        <span>{meta}</span>
-      </div>
-    </div>
-  );
-}
-
-function MiniStat({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-[8px] border border-[#eef2eb] bg-[#fbfcf8] p-[12px]">
-      <p className="m-0 text-[12px] font-medium text-[#64736d]">{label}</p>
-      <p className="m-0 mt-[6px] tabular-nums text-[24px] font-semibold leading-none text-[#101a18]">{formatNumber(value)}</p>
-    </div>
   );
 }
 
@@ -354,22 +255,6 @@ function formatNumber(value: number): string {
   return new Intl.NumberFormat("ru-RU").format(value || 0);
 }
 
-function formatPercent(value: number, total: number): string {
-  if (!total) return "0%";
-  return `${Math.round((value / total) * 100)}%`;
-}
-
-function formatDateTime(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("ru-RU", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-}
-
 const metricToneClasses: Record<string, string> = {
   slate: "bg-[#eef2f1] text-[#33413e]",
   green: "bg-[#e6f6e5] text-[#24713b]",
@@ -379,19 +264,4 @@ const metricToneClasses: Record<string, string> = {
   emerald: "bg-[#def7ef] text-[#166b50]",
   violet: "bg-[#f0eaff] text-[#6247a6]",
   red: "bg-[#ffe8e2] text-[#b33a26]",
-};
-
-const eventLabels: Record<string, string> = {
-  bot_started: "bot_started",
-  subscription_check_clicked: "subscription_check_clicked",
-  subscription_verified: "subscription_verified",
-  subscription_missing: "subscription_missing",
-  hidden_intro_access_granted: "hidden_intro_access_granted",
-  hidden_intro_opened: "hidden_intro_opened",
-  course_payment_created: "course_payment_created",
-  course_paid: "course_paid",
-  bot_blocked: "bot_blocked",
-  broadcast_sent: "broadcast_sent",
-  broadcast_failed: "broadcast_failed",
-  reminder_sent: "reminder_sent",
 };
