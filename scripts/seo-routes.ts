@@ -10,6 +10,7 @@ import { post as neuralNetworksFromScratchGuide } from "../src/content/blog/neur
 import { post as aiTrainingBeginnersGuide } from "../src/content/blog/ai-training-beginners";
 import { post as aiCoursesForBeginnersGuide } from "../src/content/blog/ai-courses-for-beginners";
 import { post as freeAiCoursesGuide } from "../src/content/blog/free-ai-courses";
+import { post as aiForWorkGuide } from "../src/content/blog/ai-for-work";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
 import { post as aiFaceSwapGuide } from "../src/content/blog/ai-face-swap";
@@ -1301,6 +1302,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/ai-for-work`, name: aiForWorkGuide.ru.title, datePublished: aiForWorkGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/free-ai-courses`, name: freeAiCoursesGuide.ru.title, datePublished: freeAiCoursesGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-courses-for-beginners`, name: aiCoursesForBeginnersGuide.ru.title, datePublished: aiCoursesForBeginnersGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/neural-networks-from-scratch`, name: neuralNetworksFromScratchGuide.ru.title, datePublished: neuralNetworksFromScratchGuide.ru.publishedAt },
@@ -1340,6 +1342,66 @@ export const routes: RouteMeta[] = [
           { name: "Блог", url: `${SITE_ORIGIN}/blog` },
         ],
         `${SITE_ORIGIN}/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/ai-for-work — practical AI work guide.
+  {
+    path: "/blog/ai-for-work",
+    htmlLang: "ru",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-for-work`,
+      en: `${SITE_ORIGIN}/en/blog/ai-for-work`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-for-work`,
+    },
+    title: aiForWorkGuide.ru.title,
+    description: aiForWorkGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-for-work`,
+    ogTitle: aiForWorkGuide.ru.title,
+    ogDescription: aiForWorkGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiForWorkGuide.ru.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-for-work`,
+        headline: aiForWorkGuide.ru.title,
+        description: aiForWorkGuide.ru.description,
+        datePublished: aiForWorkGuide.ru.publishedAt,
+        dateModified: aiForWorkGuide.ru.updatedAt,
+        inLanguage: "ru-RU",
+        articleSection: "Гайд",
+        keywords: aiForWorkGuide.ru.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiForWorkGuide.ru.cover.src}`,
+          width: aiForWorkGuide.ru.cover.width,
+          height: aiForWorkGuide.ru.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/blog/ai-for-work`,
+        url: `${SITE_ORIGIN}/blog/ai-for-work`,
+        name: aiForWorkGuide.ru.title,
+        inLanguage: "ru-RU",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiForWorkGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/blog/ai-for-work`,
+        aiForWorkGuide.ru.title,
+      ),
+      faqPageBlock(aiForWorkGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-for-work`),
+      breadcrumbBlock(
+        [
+          { name: "Главная", url: `${SITE_ORIGIN}/` },
+          { name: "Блог", url: `${SITE_ORIGIN}/blog` },
+          { name: aiForWorkGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-for-work` },
+        ],
+        `${SITE_ORIGIN}/blog/ai-for-work`,
       ),
     ],
   },
@@ -2992,6 +3054,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/ai-for-work`, name: aiForWorkGuide.en.title, datePublished: aiForWorkGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/free-ai-courses`, name: freeAiCoursesGuide.en.title, datePublished: freeAiCoursesGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners`, name: aiCoursesForBeginnersGuide.en.title, datePublished: aiCoursesForBeginnersGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/neural-networks-from-scratch`, name: neuralNetworksFromScratchGuide.en.title, datePublished: neuralNetworksFromScratchGuide.en.publishedAt },
@@ -3031,6 +3094,66 @@ export const routes: RouteMeta[] = [
           { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
         ],
         `${SITE_ORIGIN}/en/blog`,
+      ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/ai-for-work EN sibling.
+  {
+    path: "/en/blog/ai-for-work",
+    htmlLang: "en",
+    hreflangAlternates: {
+      ru: `${SITE_ORIGIN}/blog/ai-for-work`,
+      en: `${SITE_ORIGIN}/en/blog/ai-for-work`,
+      xDefault: `${SITE_ORIGIN}/blog/ai-for-work`,
+    },
+    title: aiForWorkGuide.en.title,
+    description: aiForWorkGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-for-work`,
+    ogTitle: aiForWorkGuide.en.title,
+    ogDescription: aiForWorkGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiForWorkGuide.en.cover.src}`,
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "monthly",
+    priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-for-work`,
+        headline: aiForWorkGuide.en.title,
+        description: aiForWorkGuide.en.description,
+        datePublished: aiForWorkGuide.en.publishedAt,
+        dateModified: aiForWorkGuide.en.updatedAt,
+        inLanguage: "en-US",
+        articleSection: "Guide",
+        keywords: aiForWorkGuide.en.tags,
+        image: {
+          url: `${SITE_ORIGIN}${aiForWorkGuide.en.cover.src}`,
+          width: aiForWorkGuide.en.cover.width,
+          height: aiForWorkGuide.en.cover.height,
+        },
+      }),
+      webPageBlock({
+        pageId: `${SITE_ORIGIN}/en/blog/ai-for-work`,
+        url: `${SITE_ORIGIN}/en/blog/ai-for-work`,
+        name: aiForWorkGuide.en.title,
+        inLanguage: "en-US",
+        cssSelector: ["h1", ".blog-intro", "h2"],
+      }),
+      howToBlock(
+        (aiForWorkGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })),
+        `${SITE_ORIGIN}/en/blog/ai-for-work`,
+        aiForWorkGuide.en.title,
+      ),
+      faqPageBlock(aiForWorkGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-for-work`),
+      breadcrumbBlock(
+        [
+          { name: "Home", url: `${SITE_ORIGIN}/en/` },
+          { name: "Blog", url: `${SITE_ORIGIN}/en/blog` },
+          { name: aiForWorkGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-for-work` },
+        ],
+        `${SITE_ORIGIN}/en/blog/ai-for-work`,
       ),
     ],
   },

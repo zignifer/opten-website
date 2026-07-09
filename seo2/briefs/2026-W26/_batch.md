@@ -45,7 +45,7 @@ Default course CTA for course/learning banners: `/learn/courses/ai-content-marke
 | 2 | published | `neural-networks-from-scratch` | `BL-learn` | `обучение нейросетям` | 23989 | [02-neural-networks-from-scratch.md](02-neural-networks-from-scratch.md) |
 | 3 | published | `ai-courses-for-beginners` | `BL-learn` | `курсы по ИИ` | 9911 | [03-ai-courses-for-beginners.md](03-ai-courses-for-beginners.md) |
 | 4 | published | `free-ai-courses` | `BL-learn` | `бесплатное обучение нейросетям` | 3575 | [04-free-ai-courses.md](04-free-ai-courses.md) |
-| 5 | pending | `ai-for-work` | `BL-work` | `нейросети для работы` | 32506 | [05-ai-for-work.md](05-ai-for-work.md) |
+| 5 | published | `ai-for-work` | `BL-work` | `нейросети для работы` | 32506 | [05-ai-for-work.md](05-ai-for-work.md) |
 | 6 | pending | `ai-presentations` | `BL-work` | `нейросети для презентаций` | 177001 | [06-ai-presentations.md](06-ai-presentations.md) |
 | 7 | pending | `ai-text-for-work` | `BL-work` | `нейросети для текста` | 156546 | [07-ai-text-for-work.md](07-ai-text-for-work.md) |
 | 8 | pending | `ai-video-for-work` | `BL-work` | `нейросети для видео` | 55862 | [08-ai-video-for-work.md](08-ai-video-for-work.md) |
