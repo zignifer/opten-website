@@ -84,7 +84,7 @@ textarea placeholder and empty-reference label mirror the popup (`Промпт �
 20+ символов...`, `Загрузить фото`); inline errors occupy the lower-left status area,
 while the lower-right always shows `Последнее обновление: DD.MM.YYYY`, computed from
 the visitor's current local date and refreshed after midnight. Landing section order
-is Hero/workbench → FeatureCards → Partners → Privacy → Pricing → FAQ. The Hero
+is Hero/workbench → Partners → FeatureCards → Privacy → Pricing → FAQ. The Hero
 upgrade CTA is rendered only after auth resolution and only for signed-out/Free
 visitors; active Pro users must not see a one-frame CTA flash, and the desktop Hero
 minimum height must shrink by the CTA height plus its top margin when the CTA is
@@ -99,9 +99,9 @@ The Hero workbench-to-CTA spacing is 64 px,
 matching the `mt-16` rhythm used for the CTA in FeatureCards. On desktop, Free and
 signed-out visitors see the green `Перейти на Pro—199₽/мес` CTA and the white AI-chat
 CTA in one row at equal widths; on smaller screens they stack. Active Pro visitors
-see only the centered white CTA. The boundary spacing after
-FeatureCards and before Partners is intentionally doubled to 140 px on mobile and
-192 px from the `md` breakpoint. The Hero always shows a white secondary
+see only the centered white CTA. The boundary spacing after Partners and before
+FeatureCards is intentionally doubled to 140 px on mobile and 192 px from the
+`md` breakpoint. The Hero always shows a white secondary
 `Использовать на сайтах: ChatGPT и Claude` CTA styled like the large extension
 install button, with the supplied Claude icon first and ChatGPT icon second. Free
 and signed-out visitors see it below the green `Перейти на Pro` CTA; active Pro

@@ -141,7 +141,7 @@ function Partners() {
   const { lang } = useLang();
   const stepsSrc = lang === "ru" ? stepsInnerRuSrc : stepsInnerEnSrc;
   return (
-    <section id="features" className="w-full overflow-hidden bg-[#011417] px-5 pb-20 md:px-[100px]">
+    <section id="features" className="w-full overflow-hidden bg-[#011417] px-5 pb-[140px] md:px-[100px] md:pb-48">
       <div className="mx-auto flex w-full max-w-[1240px] flex-col items-center gap-20">
         <div className="flex w-full flex-col items-center gap-[54px]">
           <h2 className="text-center font-['Unbounded',sans-serif] text-[34px] font-bold leading-[1.1] text-white sm:text-[46px] md:text-[52px]">
@@ -257,7 +257,7 @@ function FeatureCards() {
   const suffix = lang === "ru" ? "ru" : "en";
 
   return (
-    <section className="bg-[#011417] px-5 pb-[140px] pt-[70px] md:pb-48 md:pt-24">
+    <section className="bg-[#011417] px-5 pb-[70px] pt-0 md:pb-24 md:pt-0">
       <div className="mx-auto max-w-[1240px]">
         <div className="relative mx-auto max-w-[1000px] text-center">
           <SectionTitle>
@@ -430,8 +430,8 @@ export default function App() {
       <SiteHeader />
       <main>
         <Hero />
-        <FeatureCards />
         <Partners />
+        <FeatureCards />
         <Privacy />
         <Pricing />
         {/* Phase 4 D-08 / GEO-D-3: landing FAQ block — schema in seo-routes.ts mirrors landingFaq[lang] (V-10). */}
