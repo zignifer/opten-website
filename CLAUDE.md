@@ -125,9 +125,10 @@ account-based web app surface, but it must share identity, subscription, and
 credits with the extension through `auth.users.id` and extension-owned
 Supabase Edge Functions.
 
-The shared top navigation labels the landing route as `Генератор промптов`
-(`Prompt generator` in EN), not `Расширение`; the route and active-state key
-remain unchanged for compatibility.
+Every top-navigation implementation, including both `SiteHeader` and
+`SpaceHeader`, labels the landing route as `Генератор промптов` (`Prompt
+generator` in EN), not `Расширение`; the route and active-state key remain
+unchanged for compatibility.
 
 Website auth is now canonical for site surfaces: `/login` stores a normal
 Supabase website session in `localStorage.opten_space_session_v1`; `/pay` and
