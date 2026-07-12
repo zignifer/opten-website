@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useLang, useT } from "../i18n/LangContext";
 import {
   Check,
-  CirclePlay,
   Rocket,
 } from "lucide-react";
 import LocalizedLink from "./components/LocalizedLink";
@@ -13,7 +12,9 @@ import InstallButton from "./components/InstallButton";
 import ExtensionVideoAvatar from "./components/ExtensionVideoAvatar";
 import { useCurrencyPreference } from "../lib/currency";
 import { landingFaq } from "../content/landingFaq";
-import OptenHeroAnimation from "./components/OptenHeroAnimation";
+import PromptWorkbench from "./components/PromptWorkbench";
+import AiAccessButton from "./components/AiAccessButton";
+import { useSpaceAuth } from "./components/space/SpaceAuthProvider";
 import { Picture } from "./components/Picture";
 import type { Picture as PictureData } from 'vite-imagetools';
 // Phase 2.1 D-04: Add width/height attrs to every <img> for CLS=0 (aspect-ratio-from-attributes)
@@ -38,26 +39,6 @@ import syntxSrc from '../../public/assets/partners/syntx.png?w=268&format=webp;p
 
 const STORE_URL = "https://chromewebstore.google.com/detail/opten-%E2%80%94-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 const ASSET_ROOT = "/assets/landing-design";
-const SUPADEMO_SCRIPT_SRC = "https://script.supademo.com/supademo.js";
-const SUPADEMO_DEMO_IDS = {
-  ru: "cmpfrrpv03q91qm8qgfunpkzz",
-  en: "cmpwpev5d004iw70jlnbh6psr",
-} as const;
-const SUPADEMO_DEMO_URLS = {
-  ru: "https://app.supademo.com/demo/cmpfrrpv03q91qm8qgfunpkzz?utm_source=link",
-  en: "https://app.supademo.com/demo/cmpwpev5d004iw70jlnbh6psr?utm_source=link",
-} as const;
-
-declare global {
-  interface Window {
-    Supademo?: {
-      open: (id: string, options?: Record<string, unknown>) => void;
-    };
-  }
-}
-
-let supademoScriptPromise: Promise<void> | null = null;
-
 const partnerSrcMap = {
   canva: canvaSrc,
   freepik: freepikSrc,
@@ -67,47 +48,6 @@ const partnerSrcMap = {
 
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
-}
-
-function loadSupademoSdk(): Promise<void> {
-  if (typeof window === "undefined") return Promise.reject(new Error("Supademo SDK is client-only"));
-  if (window.Supademo?.open) return Promise.resolve();
-  if (supademoScriptPromise) return supademoScriptPromise;
-
-  supademoScriptPromise = new Promise((resolve, reject) => {
-    const handleLoad = () => {
-      if (window.Supademo?.open) resolve();
-      else reject(new Error("Supademo SDK loaded without open()"));
-    };
-    const handleError = () => reject(new Error("Failed to load Supademo SDK"));
-    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${SUPADEMO_SCRIPT_SRC}"]`);
-
-    if (existingScript) {
-      existingScript.addEventListener("load", handleLoad, { once: true });
-      existingScript.addEventListener("error", handleError, { once: true });
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = SUPADEMO_SCRIPT_SRC;
-    script.async = true;
-    script.addEventListener("load", handleLoad, { once: true });
-    script.addEventListener("error", handleError, { once: true });
-    document.body.appendChild(script);
-  });
-
-  return supademoScriptPromise;
-}
-
-async function openSupademoDemo(lang: "ru" | "en") {
-  if (typeof window === "undefined") return;
-
-  try {
-    await loadSupademoSdk();
-    window.Supademo?.open(SUPADEMO_DEMO_IDS[lang]);
-  } catch {
-    window.open(SUPADEMO_DEMO_URLS[lang], "_blank", "noopener,noreferrer");
-  }
 }
 
 function titleCaseEn(text: string, lang: string) {
@@ -154,30 +94,42 @@ function BrowserIcons({ size = "lg" }: { size?: "sm" | "lg" }) {
 function Hero() {
   const t = useT();
   const { lang } = useLang();
+  const { account, status } = useSpaceAuth();
+  const showUpgrade = status !== "loading" && (status !== "signed_in" || account?.plan !== "pro");
   const title = t("hero.title");
   const rawAccentTitle = lang === "ru" ? "Не сливай кредиты" : "Stop wasting credits";
   const accentTitle = titleCaseEn(rawAccentTitle, lang);
   const restTitle = titleCaseEn(title.replace(rawAccentTitle, "").trim(), lang);
   return (
-    <section className="relative overflow-hidden bg-[#011417] px-5 pb-24 pt-[131px] md:min-h-[850px] md:pb-28 md:pt-[190px]">
+    <section className="relative overflow-hidden bg-[#011417] px-5 pb-24 pt-[132px] md:min-h-[1219px] md:pb-[150px] md:pt-[189px]">
       <div aria-hidden="true" className="opten-figma-gradient" />
-      <div className="relative z-10 mx-auto flex w-full max-w-[1000px] flex-col items-center text-center">
-        <h1 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.08] text-white sm:text-[54px] md:text-[62px]">
-          <Accent>{accentTitle}</Accent>
-          {restTitle ? <><br />{restTitle}</> : null}
-        </h1>
-        <img alt="" src={`${ASSET_ROOT}/highlight.svg`} width="260" height="28" loading="eager" className="relative mt-1 h-auto w-[260px] md:-left-[50px] md:w-[360px]" />
-        <p className="mt-8 w-full max-w-[800px] font-['PT_Root_UI',sans-serif] text-[16px] leading-[1.6] text-white md:text-[18px]">
-          {t("hero.subtitle1")}
-          <strong>{t("hero.subtitle2")}</strong>
-        </p>
-        <div className="mt-12 hidden w-full justify-center overflow-visible min-[1066px]:flex">
-          <div className="w-[680px] max-w-full overflow-visible">
-            <OptenHeroAnimation />
+      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-col items-center text-center">
+        <div className="flex w-full max-w-[800px] flex-col items-center md:max-w-[1100px]">
+          <div className="relative w-full">
+            <h1 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.08] text-white sm:text-[54px] md:text-[68px]">
+              <Accent><span className="md:whitespace-nowrap">{accentTitle}</span></Accent>
+              {restTitle ? <><br /><span className="md:whitespace-nowrap">{restTitle}</span></> : null}
+            </h1>
+            <img alt="" src={`${ASSET_ROOT}/highlight.svg`} width="295" height="30" loading="eager" className="absolute left-1/2 top-[calc(100%+11px)] h-auto w-[250px] -translate-x-[40%] md:-ml-[118px] md:w-[295px] md:-translate-x-1/2" />
           </div>
+          <p className="mt-14 w-full max-w-[800px] font-['PT_Root_UI',sans-serif] text-[16px] leading-[1.6] text-white md:text-[18px]">
+            {t("hero.subtitle1").trim()}
+          </p>
         </div>
-        <div className="mt-12">
-          <InstallButton />
+        <div className="mt-7 w-full md:mt-7">
+          <PromptWorkbench />
+        </div>
+        <div className="mt-16 flex w-full max-w-[616px] flex-col items-center justify-center gap-3 md:flex-row md:gap-4">
+          {showUpgrade ? (
+            <LocalizedLink
+              to="/pay?source=hero-workbench"
+              className="inline-flex h-16 w-full max-w-[390px] items-center justify-center gap-3 whitespace-nowrap rounded-full bg-[#9cfb51] px-5 font-['PT_Root_UI',sans-serif] text-[17px] font-bold text-[#011417] no-underline transition hover:-translate-y-0.5 hover:bg-[#b5ff76] focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 focus:ring-offset-2 focus:ring-offset-[#011417] sm:text-[18px] md:w-[300px]"
+            >
+              <Rocket aria-hidden="true" size={28} fill="currentColor" />
+              {lang === "ru" ? "Перейти на Pro—199₽/мес" : "Upgrade to Pro"}
+            </LocalizedLink>
+          ) : null}
+          <AiAccessButton />
         </div>
       </div>
     </section>
@@ -187,58 +139,61 @@ function Hero() {
 function Partners() {
   const t = useT();
   const { lang } = useLang();
+  const stepsSrc = lang === "ru" ? stepsInnerRuSrc : stepsInnerEnSrc;
   return (
-    <section className="w-full bg-[#011417]">
-      <div className="flex flex-col items-center justify-center pb-[70px] px-[20px] md:pb-[56px] md:px-[120px]">
-        <div className="flex flex-col gap-[24px] items-center">
-          <p className="font-['PT_Root_UI',sans-serif] leading-[1.6] text-[16px] md:text-[18px] text-[rgba(255,255,255,0.6)] text-center">
-            {t("partners.label")}
-          </p>
-          <div className="hidden md:flex gap-[80px] items-center justify-center">
-            <PartnerLink name="syntx" href="https://syntx.ai/welcome/GlUETIt6" />
-            <PartnerLink name="freepik" href="https://www.freepik.com/" />
-            <PartnerLink name="higgsfield" href="https://higgsfield.ai/" />
-            <PartnerCanva />
-          </div>
-          <div className="flex md:hidden flex-col gap-[40px] items-center w-full max-w-[320px]">
-            <div className="flex items-center justify-between w-full">
+    <section id="features" className="w-full overflow-hidden bg-[#011417] px-5 pb-20 md:px-[100px]">
+      <div className="mx-auto flex w-full max-w-[1240px] flex-col items-center gap-20">
+        <div className="flex w-full flex-col items-center gap-[54px]">
+          <h2 className="text-center font-['Unbounded',sans-serif] text-[34px] font-bold leading-[1.1] text-white sm:text-[46px] md:text-[52px]">
+            <span className="text-[#9cfb51]">{lang === "ru" ? "Установи расширение" : "Install the extension"}</span>
+            <br />
+            {lang === "ru" ? "и используй на сайтах:" : "and use it on these sites:"}
+          </h2>
+          <div className="flex flex-col items-center">
+            <div className="hidden items-center justify-center gap-16 md:flex">
               <PartnerLink name="syntx" href="https://syntx.ai/welcome/GlUETIt6" />
               <PartnerLink name="freepik" href="https://www.freepik.com/" />
+              <PartnerLink name="higgsfield" href="https://higgsfield.ai/" />
+              <PartnerCanva />
             </div>
-            <div className="flex items-center justify-between w-full">
+            <div className="grid w-full max-w-[320px] grid-cols-2 place-items-center gap-x-8 gap-y-8 md:hidden">
+              <PartnerLink name="syntx" href="https://syntx.ai/welcome/GlUETIt6" />
+              <PartnerLink name="freepik" href="https://www.freepik.com/" />
               <PartnerLink name="higgsfield" href="https://higgsfield.ai/" />
               <PartnerCanva />
             </div>
           </div>
-          {/* Post-2026-05-17 GEO audit CR-5: explicit non-affiliation disclaimer for the partner
-              logo bar. Trademark fair-use + AI systems must not interpret Higgsfield/Freepik/Canva
-              as official Opten partnerships. */}
-          <p className="mt-4 max-w-[640px] text-center font-['PT_Root_UI',sans-serif] text-[12px] leading-[1.5] text-white/35">
-            {t("partners.disclaimer")}
-          </p>
-          {/* Phase v2.0 MODELS-A-11: deep link to the new models catalog below the
-              platform-partners bar. The partner logos are PLATFORMS (where Opten works);
-              the "All 62+ models" CTA is the MODELS catalog (what Opten knows). Two
-              orthogonal axes — keep them visually separated. */}
-          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <button
-              type="button"
-              onClick={() => {
-                void openSupademoDemo(lang);
-              }}
-              className="inline-flex h-11 min-w-[168px] cursor-pointer items-center justify-center gap-2 rounded-full bg-[#9cfb51] px-5 font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] transition hover:-translate-y-0.5 hover:bg-[#b5ff76] focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 focus:ring-offset-2 focus:ring-offset-[#011417]"
-            >
-              <CirclePlay size={16} aria-hidden="true" />
-              {t("demo.watchButton")}
-            </button>
-            <LocalizedLink
-              to="/models"
-              className="inline-flex h-11 min-w-[168px] items-center justify-center gap-[8px] rounded-full border border-white/15 bg-white/5 px-[20px] font-['PT_Root_UI',sans-serif] text-[14px] text-white/85 no-underline transition hover:border-white/30 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#9cfb51]/60 focus:ring-offset-2 focus:ring-offset-[#011417]"
-            >
-              {t("models.landing.allButton")} →
-            </LocalizedLink>
+        </div>
+
+        <div className="grid w-full items-stretch gap-12 lg:grid-cols-[minmax(0,1fr)_500px] lg:gap-[72px] xl:gap-[120px]">
+          <div className="flex flex-col gap-14">
+            <Step num="01" title={t("steps.01.title")} desc={t("steps.01.desc")} />
+            <Step
+              num="02"
+              title={<>{t("steps.02.titlePre") + " "}<InlinePlanet />{" " + t("steps.02.titlePost")}</>}
+              desc={t("steps.02.desc")}
+            />
+            <Step
+              num="03"
+              title={<>{t("steps.03.titlePre") + " "}<InlineStars />{" " + t("steps.03.titlePost")}</>}
+              desc={t("steps.03.desc")}
+              nowrapDesktop
+            />
+          </div>
+          <div className="relative flex min-h-[420px] w-full shrink-0 overflow-hidden rounded-[16px] border border-white/10 bg-[#0e2023] lg:min-h-[478px] lg:w-[500px]">
+            <Picture data={stepsSrc} width={813} height={638} alt={t("steps.screenshot.alt")} loading="eager" sizes="(max-width: 768px) 320px, 430px" className="absolute left-1/2 top-1/2 w-[86%] max-w-[430px] -translate-x-1/2 -translate-y-1/2" />
           </div>
         </div>
+
+        <a
+          href={STORE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-3 rounded-full bg-white px-6 py-4 font-['PT_Root_UI',sans-serif] text-[18px] font-bold text-black transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(156,251,81,0.18)]"
+        >
+          <BrowserIcons size="sm" />
+          {t("hero.installBtn")}
+        </a>
       </div>
     </section>
   );
@@ -276,55 +231,6 @@ function PartnerLogo({ name }: { name: "syntx" | "freepik" | "higgsfield" | "can
   return <Picture data={partnerSrcMap[name]} width={268} height={80} alt={name} loading="eager" className="h-full w-full object-contain" />;
 }
 
-function Steps() {
-  const t = useT();
-  const { lang } = useLang();
-  const stepsSrc = lang === "ru" ? stepsInnerRuSrc : stepsInnerEnSrc;
-  return (
-    <section id="features" className="bg-[#011417] px-5 py-[70px] md:px-8 md:py-20">
-      <div className="mx-auto w-full max-w-[1200px]">
-        {/* Phase 2.2: JSX literal whitespace ("} <br />") creates an adjacent text-then-expression
-            pair that React 18 SSR delimits with `<!-- -->` comments; React 18 hydration sometimes
-            fails to reconcile these against the client tree → React #418 + #423 fall through to a
-            full client re-render. Fix is to fold whitespace into the preceding expression so the
-            JSX child list never has two adjacent text nodes. */}
-        <SectionTitle>
-          {titleCaseEn(t("steps.heading1"), lang) + " "}
-          <br />
-          <Accent>{titleCaseEn(t("steps.heading2"), lang)}</Accent>
-        </SectionTitle>
-        <div className="mt-[60px] grid items-stretch gap-12 md:mt-20 lg:grid-cols-[minmax(0,1fr)_500px] lg:gap-[56px] xl:gap-[80px] 2xl:gap-[120px]">
-          <div className="flex flex-col gap-12 md:gap-14">
-            <Step num="01" title={t("steps.01.title")} desc={t("steps.01.desc")} />
-            <Step
-              num="02"
-              title={<>{t("steps.02.titlePre") + " "}<InlinePlanet />{" " + t("steps.02.titlePost")}</>}
-              desc={t("steps.02.desc")}
-            />
-            <Step
-              num="03"
-              title={<>{t("steps.03.titlePre") + " "}<InlineStars />{" " + t("steps.03.titlePost")}</>}
-              desc={t("steps.03.desc")}
-              nowrapDesktop
-            />
-          </div>
-          <div className="relative flex min-h-[420px] w-full shrink-0 overflow-hidden rounded-[16px] border border-white/10 bg-[#0e2023] lg:h-[512px] lg:w-[500px]">
-            {/* Phase 2.2: steps-inner is the first below-fold image users scroll to; lazy
-                made it pop in 1-2s after scroll on mobile 3G. Eager lets the browser start
-                the fetch in parallel with critical resources. sizes tells the browser to
-                pick the 430px variant on mobile (image renders ~318px wide) instead of
-                downloading the 813px desktop variant. */}
-            <Picture data={stepsSrc} width={813} height={638} alt={t("steps.screenshot.alt")} loading="eager" sizes="(max-width: 768px) 320px, 430px" className="absolute left-1/2 top-1/2 w-[86%] max-w-[430px] -translate-x-1/2 -translate-y-1/2" />
-          </div>
-        </div>
-        <div className="mt-16 flex justify-center">
-          <InstallButton />
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function InlinePlanet() {
   return <img alt="" src={`${ASSET_ROOT}/optenicon.svg`} width="28" height="28" loading="lazy" className="inline size-7 align-[-4px]" />;
 }
@@ -335,11 +241,11 @@ function InlineStars() {
 
 function Step({ num, title, desc, nowrapDesktop = false }: { num: string; title: React.ReactNode; desc: string; nowrapDesktop?: boolean }) {
   return (
-    <article className="grid grid-cols-[32px_1fr] gap-1 md:grid-cols-[48px_1fr] md:gap-3">
-      <span className="font-['PT_Root_UI',sans-serif] text-[18px] leading-[1.6] text-white/45">{num}</span>
-      <div>
-        <h3 className={cx("font-['PT_Root_UI',sans-serif] text-[28px] font-medium leading-[1.12] text-white md:text-[36px]", nowrapDesktop && "xl:whitespace-nowrap")}>{title}</h3>
-        <p className="mt-4 max-w-[590px] font-['PT_Root_UI',sans-serif] text-[17px] leading-[1.6] text-white/55 md:text-[18px]">{desc}</p>
+    <article className="flex items-start gap-4 md:gap-6">
+      <span className="shrink-0 font-['PT_Root_UI',sans-serif] text-[16px] leading-[1.6] text-white/45 md:text-[18px]">{num}</span>
+      <div className="min-w-0">
+        <h3 className={cx("font-['PT_Root_UI',sans-serif] text-[28px] font-medium leading-[1.1] tracking-[-0.56px] text-white md:text-[40px] md:tracking-[-0.8px]", nowrapDesktop && "xl:whitespace-nowrap")}>{title}</h3>
+        <p className="mt-3 max-w-[578px] font-['PT_Root_UI',sans-serif] text-[17px] leading-[1.6] text-white/60 md:text-[18px]">{desc}</p>
       </div>
     </article>
   );
@@ -351,7 +257,7 @@ function FeatureCards() {
   const suffix = lang === "ru" ? "ru" : "en";
 
   return (
-    <section className="bg-[#011417] px-5 py-[70px] md:py-24">
+    <section className="bg-[#011417] px-5 pb-[140px] pt-[70px] md:pb-48 md:pt-24">
       <div className="mx-auto max-w-[1240px]">
         <div className="relative mx-auto max-w-[1000px] text-center">
           <SectionTitle>
@@ -521,12 +427,11 @@ export default function App() {
 
   return (
     <div className="w-full max-w-[100vw] overflow-x-hidden bg-[#011417] text-white">
-      <SiteHeader variant="landing" />
+      <SiteHeader />
       <main>
         <Hero />
-        <Partners />
-        <Steps />
         <FeatureCards />
+        <Partners />
         <Privacy />
         <Pricing />
         {/* Phase 4 D-08 / GEO-D-3: landing FAQ block — schema in seo-routes.ts mirrors landingFaq[lang] (V-10). */}

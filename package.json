@@ -16,6 +16,7 @@
     "gsc:submit-sitemap": "node scripts/gsc.mjs submit-sitemap",
     "learn:video-notes": "node scripts/learn-video-notes.mjs",
     "sync:agents": "node scripts/sync-agent-docs.mjs",
+    "sync:prompt-workbench": "node scripts/sync-prompt-workbench-prompts.mjs",
     "verify:email-only-auth": "node scripts/verify-email-only-auth.mjs",
     "verify:blog-seo": "node scripts/verify-blog-seo-routes.mjs",
     "verify:seo2-briefs": "node scripts/verify-seo2-briefs.mjs",

@@ -99,8 +99,10 @@ per-route manual entries:
 - **SEO expansion:** `scripts/seo-routes.ts`, `scripts/sitemap.mjs`, and
   `scripts/llms.mjs` consume those content files. Keep route count and
   `EN_SIBLINGS` in sync through the content slug sources, not ad hoc strings.
-- **Hidden course:** `/learn/courses/*` is noindex and separate from public
-  Learn. Course content lives in `src/content/space/privateCourse.ts`,
+- **Launched paid course:** `/learn/courses/*` is publicly promoted from Learn,
+  blog CTAs, Telegram, and other marketing surfaces. Its SPA routes remain
+  noindex and separate from the indexable Learn catalog under the current
+  routing policy. Course content lives in `src/content/space/privateCourse.ts`,
   `privateCourseExtras.ts`, `api/_shared/kinescopeCourse.ts`, and
   `api/_shared/coursePromptBodies.ts`. Run `npm run verify:kinescope-course`
   after touching it.

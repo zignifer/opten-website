@@ -200,7 +200,7 @@ const headerCopy = {
     language: "Язык",
     openMenu: "Открыть меню",
     signIn: "Войти",
-    nav: { Learn: "Курсы", Extension: "Расширение", Library: "Библиотека" },
+    nav: { Learn: "Курсы", Extension: "Генератор промптов", Library: "Библиотека" },
     usage: (value: string) => `Использовано кредитов: ${value}`,
   },
   en: {
@@ -209,7 +209,7 @@ const headerCopy = {
     language: "Language",
     openMenu: "Open menu",
     signIn: "Sign in",
-    nav: { Learn: "Courses", Extension: "Extension", Library: "Library" },
+    nav: { Learn: "Courses", Extension: "Prompt generator", Library: "Library" },
     usage: (value: string) => `Credit usage: ${value}`,
   },
 } as const;

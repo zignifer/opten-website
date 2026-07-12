@@ -36,10 +36,12 @@ brief queue is exhausted and a new weekly batch must be generated in
 `C:\Projects\opten-seo`. If it prints `start-seo: next-topic`, create exactly
 one SEO2 blog post for that returned slug using `seo2/blog-post-instruction.md`.
 
-Six jobs: (1) marketing surface (landing in RU/EN), (2) website-first auth and
+Seven jobs: (1) marketing surface (landing in RU/EN), (2) website-first auth and
 billing surface (`/login`, `/auth/callback`, `/pay`, `/account`, `/success` for
 YooKassa RUB + Paddle USD — Pro is the only purchasable tier for AI-operations;
-free-аккаунт даёт 0 операций, нужен для логина), (3)
+free-аккаунт даёт 0 операций и нужен для логина; лендинг-редактор является
+Pro-only AI surface и списывает операции из того же лимита, что быстрый режим
+`Улучшить` в popup расширения), (3)
 Pro-only utilities (`/dashboard/download-skill` — streams `opten.zip` Claude
 Skill bundle sourced from the extension repo's `opten/` dir, Phase 73), (4)
 free Prompt Library at `/prompt-library` for any logged-in extension account
@@ -55,14 +57,77 @@ YouTube expert videos enriched with Opten summaries, timestamps, commands,
 prompts, resources, and risks, alongside the Opten Space Beta app shell
 at `/app/*` (SPA-only, noindex) whose
 account/credits state is read from the same self-hosted Supabase backend as the
-extension, plus a hidden/noindex Kinescope-backed course under
-`/learn/courses/*` for direct-link testing of standalone paid Kinescope video
-lessons before the course is linked from public navigation.
+extension, plus the officially launched standalone Kinescope-backed course
+under `/learn/courses/*`. The course is promoted from public Learn, blog CTAs,
+Telegram, and other marketing surfaces. Its SPA routes remain `noindex` under
+the current architecture; this is a crawler policy, not an indication that the
+course is unlaunched, and (7) a public RU/EN prompt workbench in the landing hero:
+the visible landing UI is improvement-only (no prompt score control or score
+tooltip), lets the user select one of the popup quick-Improve model profiles,
+enter a prompt, attach up to 8 ephemeral image references, and invoke improvement.
+It calls this repo's same-origin `POST /api/prompt-workbench`, which is Pro-only and
+mirrors the extension popup's `POPUP_REWRITE_PROMPT` flow: minimum 20 characters,
+prompt-content language detection, the same committed `rewriter.md`, Anthropic
+reference blocks, `max_tokens: 1200`, `count_usage: true`, `source: popup`, and the
+existing promptscore-proxy Claude Haiku/shared operation ledger. Anonymous requests
+return `authentication_required`; authenticated accounts without a live Pro
+subscription return `pro_required`; neither reaches the proxy. The only selectable
+image models are Nano Banana 2, Nano Banana Pro, Chat GPT Image 2, Midjourney 8,
+Midjourney 7, Seedream 5 Lite, Flux 2 Pro, and Z-Image. The only video models are
+Seedance 2.0, Kling 3.0, Kling 2.6, Google Veo 3.1, Google Veo 3.0, and Wan 2.6.
+The reference picker mirrors the extension popup pipeline (10 MB source cap,
+512 px long-edge JPEG compression, quality 0.7, loading/removal states) but follows
+the larger landing-page dimensions from Figma. Reference bytes and previews stay in
+component memory and must never be written to localStorage. The endpoint and landing
+UI accept only the `improve` action; prompt scoring is not part of this surface. The
+textarea placeholder and empty-reference label mirror the popup (`Промпт или идея
+20+ символов...`, `Загрузить фото`); inline errors occupy the lower-left status area,
+while the lower-right always shows `Последнее обновление: DD.MM.YYYY`, computed from
+the visitor's current local date and refreshed after midnight. Landing section order
+is Hero/workbench → FeatureCards → Partners → Privacy → Pricing → FAQ. The Hero
+upgrade CTA is rendered only after auth resolution and only for signed-out/Free
+visitors; active Pro users must not see a one-frame CTA flash, and the desktop Hero
+minimum height must shrink by the CTA height plus its top margin when the CTA is
+absent. `ExtensionVideoAvatar` is fixed in the lower-right and visible immediately
+in the top viewport; do not gate it behind a scroll threshold. The landing H1 keeps
+the responsive sizes of 36/54/68 px. At the `md` breakpoint the RU Hero H1 is
+locked to exactly two lines (`Не сливай кредиты` / `на плохие промпты`); the EN
+equivalent follows the same explicit accent/rest two-line structure, while mobile
+may wrap naturally. Its desktop highlight is positioned under the word `плохие`,
+with a deliberate 118 px leftward offset from the center of the full second line.
+The Hero workbench-to-CTA spacing is 64 px,
+matching the `mt-16` rhythm used for the CTA in FeatureCards. On desktop, Free and
+signed-out visitors see the green `Перейти на Pro—199₽/мес` CTA and the white AI-chat
+CTA in one row at equal widths; on smaller screens they stack. Active Pro visitors
+see only the centered white CTA. The boundary spacing after
+FeatureCards and before Partners is intentionally doubled to 140 px on mobile and
+192 px from the `md` breakpoint. The Hero always shows a white secondary
+`Использовать на сайтах: ChatGPT и Claude` CTA styled like the large extension
+install button, with the supplied Claude icon first and ChatGPT icon second. Free
+and signed-out visitors see it below the green `Перейти на Pro` CTA; active Pro
+visitors see only the white CTA, without an auth-loading flash. It opens a
+site-styled modal with Claude first and ChatGPT second, matching the extension's
+three-step instructions. Claude downloads `opten.zip` through the existing
+`/api/download-skill` endpoint using the website JWT; ChatGPT opens the same public
+Opten GPT URL as the extension. Both actions remain disabled until Pro access is
+resolved. Free/signed-out modal state explains the lock and includes a green
+`Перейти на Pro` link. The modal must also explicitly explain the product reason
+for these chat integrations: Claude and ChatGPT preserve the conversation context
+between messages while applying the same Opten prompt-improvement instructions, so
+users can refine prompts through an ongoing dialogue instead of isolated requests.
+The AI-chat modal heading is centered and locked to two explicit lines:
+`Улучшай промпты` / `в Claude и ChatGPT`; its introductory copy is centered too.
+On desktop only, the RU introductory copy is locked to two explicit lines after
+`ИИ-чату`; mobile keeps natural wrapping.
 
 The extension is still the primary shipped product. Opten Space Beta is an
 account-based web app surface, but it must share identity, subscription, and
 credits with the extension through `auth.users.id` and extension-owned
 Supabase Edge Functions.
+
+The shared top navigation labels the landing route as `Генератор промптов`
+(`Prompt generator` in EN), not `Расширение`; the route and active-state key
+remain unchanged for compatibility.
 
 Website auth is now canonical for site surfaces: `/login` stores a normal
 Supabase website session in `localStorage.opten_space_session_v1`; `/pay` and
@@ -108,12 +173,14 @@ the source YouTube thumbnail URL for cards unless a reviewed local asset is
 added later. The page removes the Opten author/course card and labels the source
 as another author/source instead.
 
-Hidden Kinescope course routes live under `/learn/courses/:courseSlug` and
-`/learn/courses/:courseSlug/:lessonSlug`. They are SPA-only, noindex, and must
-not be added to the public Learn hub, sitemap, llms.txt, or EN sibling map until
-the course is intentionally launched. The hidden course
-`ai-content-marketing-2026` is a standalone one-time course purchase, not a Pro
-entitlement. RUB checkout uses YooKassa; USD checkout uses Paddle with
+The launched Kinescope course routes live under `/learn/courses/:courseSlug`
+and `/learn/courses/:courseSlug/:lessonSlug`. They are SPA-only and `noindex`
+under the current routing policy, but public Learn and marketing pages may link
+to the course root and course previews intentionally. Keep them out of sitemap,
+llms.txt, and the EN sibling map unless a separate SEO routing decision changes
+that policy. The `ai-content-marketing-2026` course is a standalone one-time
+course purchase, not a Pro entitlement. RUB checkout uses YooKassa; USD
+checkout uses Paddle with
 course-specific one-time price IDs returned by
 `/functions/v1/create-course-payment`. Promo preview uses the same endpoint with
 optional `quote_only: true`; this validates the uppercase promo code and returns
@@ -145,7 +212,11 @@ extension repo as `supabase/functions/telegram-hidden-intro-webhook` with
 membership through Bot API `getChatMember`, stores started users in
 `telegram_hidden_intro_leads`, writes funnel events to
 `telegram_hidden_intro_events`, and issues a random per-user
-`course_discount_claims` link for the hidden intro/course checkout. Opening
+`course_discount_claims` link for the hidden intro/course checkout. A Telegram
+lead may receive this 24h claim exactly once: a repeated subscription check
+reuses the same claim while it is active, but an expired or used claim is never
+reissued or extended. Manual admin broadcasts are delivery-only and must never
+create, refresh, or extend `course_discount_claims`. Opening
 `/learn/courses/ai-content-marketing-2026/hidden-intro?claim=...` still writes
 `localStorage.opten_hidden_intro_opened_v1`; the website also reports the open
 to `/functions/v1/telegram-hidden-intro-opened` when a claim token is present.
@@ -153,8 +224,10 @@ The free browser hint allows only lesson 0 playback through
 `/api/kinescope-course-token` with `access_mode="telegram-hidden-intro"`.
 Buyers of the full course get the same lesson automatically through normal
 `course-access-summary` entitlement. The lesson is included in
-`privateCourseCollection.lessons` and `api/_shared/kinescopeCourse.ts`, but must
-stay out of sitemap, llms.txt, public Learn, and EN sibling maps. The 24h
+`privateCourseCollection.lessons` and `api/_shared/kinescopeCourse.ts`. It may
+be advertised from public Learn, but guest playback is available only after the
+Telegram subscription check/claim flow; it remains out of sitemap, llms.txt,
+and EN sibling maps. The 24h
 claim discount has priority over manual promo codes: while active, the website
 hides the promo-code field, sends `discount_claim_token` to
 `create-course-payment`, and must not stack claim and promo discounts. Provider
@@ -240,7 +313,7 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
           Models RU (Phase v2.0): /models hub + /models/:slug (62 model pages)
           Learn RU: /learn hub + /learn/:lessonSlug (public video lessons)
                     + /learn/finds/:slug (curated third-party expert videos)
-          Hidden course SPA-only: /learn/courses/:courseSlug(/:lessonSlug)
+          Launched paid course SPA-only: /learn/courses/:courseSlug(/:lessonSlug)
           RU SPA-only (7, X-Robots-Tag noindex): /success, /login,
                                                   /auth/callback, /account,
                                                   /dashboard/download-skill,
@@ -288,6 +361,10 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           is shown in the email.
   Site → Paddle:          window.Paddle.Checkout.open(...)
   Site own API:           GET /api/download-skill (Vercel serverless, JWT + Pro-gated)
+                          POST /api/prompt-workbench — Pro-only landing workbench;
+                          website JWT + live Pro gate → promptscore-proxy Claude
+                          Haiku quick-Improve path and shared operation ledger;
+                          exact 14-model popup allowlist, input cap, entitlement verification
                           POST /api/course-prompt — website JWT + course entitlement gate;
                           returns whitelisted private course prompt bodies
                           POST /api/kinescope-course-token — website JWT + course entitlement gate;
@@ -299,7 +376,7 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           (Phase 5 B-07; the /guides/* URL space is retired)
 ```
 
-**Locked/auth/noindex routes never get `/en/*` siblings by design** (Phase 3 D-03): `/success` is YooKassa-RUB only; `/login`, `/auth/*`, `/account`, `/dashboard/*`, `/prompt-library`, `/p/*`, `/learn/courses/*`, and `/app/*` are authenticated, app, hidden-course, or random-link snapshot surfaces (Disallow'd/noindex) rather than content/SEO pages. Public Learn is the exception to the old app Learn prototype: canonical Learn routes are `/learn` and `/en/learn`, while `/app/learn*` redirects. On locked/auth routes the LangSwitcher or app-local language switch flips language *in place* (storage + state) instead of navigating.
+**Locked/auth/noindex routes never get `/en/*` siblings by design** (Phase 3 D-03): `/success` is YooKassa-RUB only; `/login`, `/auth/*`, `/account`, `/dashboard/*`, `/prompt-library`, `/p/*`, `/learn/courses/*`, and `/app/*` are authenticated, app, paid-course, or random-link snapshot surfaces (Disallow'd/noindex) rather than content/SEO pages. The course is nevertheless officially launched and publicly promoted; `noindex` is independent of launch status. Public Learn is the exception to the old app Learn prototype: canonical Learn routes are `/learn` and `/en/learn`, while `/app/learn*` redirects. On locked/auth routes the LangSwitcher or app-local language switch flips language *in place* (storage + state) instead of navigating.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routes, billing flows, and i18n details.
 
@@ -310,10 +387,12 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routes, billing flows, and 
 ```
 api/                     — Vercel serverless functions:
                              download-skill.ts — Pro-gated Claude Skill ZIP
+                             prompt-workbench.ts — Pro-only quick-Improve endpoint
+                                                   (legacy score action may remain server-side)
                              course-prompt.ts — course-entitlement-gated prompt body endpoint
                              kinescope-course-token.ts — course-entitlement-gated playback token issuer
                              kinescope-course-auth.ts — Kinescope playback auth callback
-                             _shared/ — server-only auth, course, and Kinescope constants
+                             _shared/ — server-only auth, course, Kinescope, and AI helpers
 public/                  — static assets (favicons, partner logos, welcome screenshots,
                            OG cards, founder image, blog/<slug>/cover.jpg)
 scripts/                 — build pipeline:
@@ -329,14 +408,14 @@ scripts/                 — build pipeline:
                              build-models-registry.mjs — parses _skills/*.md → _registry.ts (62 ModelMeta; AUTO-GEN)
                              verify-models-content.mjs — model content + EN-meta-cyrillic gate (run manually, not in build)
 src/
-├── main.tsx             — entry, route patterns (incl. /models, /learn, /learn/finds, hidden /learn/courses, /prompt-library, /p/:slug, RU+EN siblings) + catch-all, hydrate-vs-mount discriminator
+├── main.tsx             — entry, route patterns (incl. /models, /learn, /learn/finds, launched paid /learn/courses, /prompt-library, /p/:slug, RU+EN siblings) + catch-all, hydrate-vs-mount discriminator
 ├── app/
 │   ├── App.tsx          — landing
 │   ├── components/      — shared UI:
 │   │     SiteHeader, SiteFooter — compact account/header shell + shared footer
 │   │     LocalizedLink, LangSwitcher — i18n-aware nav
 │   │     FaqBlock — semantic <dl>; source-of-truth for FAQPage schema
-│   │     BlogPostCard, Picture, InstallButton, OptenHeroAnimation, RouteLoading
+│   │     BlogPostCard, Picture, InstallButton, PromptWorkbench, RouteLoading
 │   │     layout/, figma/, ui/ — wrappers, fallbacks, Radix-derived primitives
 │   └── pages/           — one file per route (incl. BlogListPage, BlogPostPage, AboutPage,
 │                          ModelsHubPage, ModelPage, PromptLibraryPage,
@@ -352,7 +431,7 @@ src/
 │                          meta name/platform/duration/resolution + metaField helper) +
 │                          index.ts (allModels barrel + HUB_HIDDEN_SLUGS) + slugs.ts
 │                          (light import for paths.ts) + types.ts
-│   └── space/           — public Learn lessons/finds and hidden Kinescope course:
+│   └── space/           — public Learn lessons/finds and launched paid Kinescope course:
 │                          learn.ts, learnSlugs.ts, learnFinds.generated.json,
 │                          learnFinds.ts, privateCourse.ts, privateCourseExtras.ts
 ├── i18n/                — LangContext + ru.json/en.json + paths.ts (EN_SIBLINGS)
@@ -391,6 +470,7 @@ query itself.
 
 - React Context for i18n only
 - `localStorage` for: `opten_lang_v3` (i18n, written by LangSwitcher only), `opten_pay_currency`. Legacy `opten_lang` is read-only for one-shot EN migration — do not write to it.
+- The landing `PromptWorkbench` is visible publicly but its AI action is Pro-only and ephemeral: prompt text, AI results, selected files, compressed reference bytes, and preview URLs stay in component memory and are not written to `localStorage`. The browser calls only same-origin `/api/prompt-workbench`; logged-out clicks show an authentication error, signed-in Free clicks show a Pro-required error, and only a live website Pro session sends its Bearer JWT to the endpoint. The server independently verifies the JWT and live subscription, enforces the extension popup's exact 14-model quick-Improve allowlist and 20-character minimum, then calls the existing `promptscore-proxy` Claude Haiku rewrite endpoint with the popup-equivalent request and `count_usage: true`. Uploaded references are capped at 8 files, 10 MB per source, compressed client-side to JPEG with a 512 px maximum long edge, and must be revoked/cleared when removed or unmounted. During `npm run dev`, `vite.config.ts` mounts the same Node handler as dev-only middleware so localhost exercises the production handler contract. The reference-strip add button uses an inset focus ring: the strip scrolls horizontally, so an external ring would be clipped by its overflow boundary after the native file picker closes. Copying is local and does not consume usage: desktop shows a secondary `Скопировать` action beside `Улучшить`, while mobile shows the extension-matching outline copy icon in the workbench header. Both copy the current prompt and cross-fade to the extension's filled icon for 500 ms after success.
 - Extension-coupled auth and subscription state lives in the **extension's** `chrome.storage.local` (`ps_*` keys) — legacy site surfaces read via `chrome.runtime.sendMessage(...)`.
 - `/login`, `/pay`, `/account`, and Opten Space `/app/*` share the website Supabase session in `localStorage.opten_space_session_v1` and refresh it through public GoTrue endpoints. Visible auth uses Email OTP/manual email entry only; Google OAuth helpers may remain in code but must not render a login button unless explicitly re-enabled. Credits/subscription state still comes from the shared backend by calling `/functions/v1/account-summary` with the user's Bearer JWT. `/pay` and `/account` use extension messages only as fallback compatibility. Do not put service-role keys, JWT secrets, payment secrets, or proxy API keys in the website bundle.
 - `/account` website logout clears only `localStorage.opten_space_session_v1` and calls public Supabase logout for that website JWT. It must not send extension logout messages or mutate extension-owned `ps_*` keys.
@@ -477,7 +557,7 @@ Set in Vercel (project settings, not in repo):
   `pri_01kvk9vzec7cwgq7zgs9azw2re`, `$1` FREE test =
   `pri_01kvk9x5mcnadfj0beymk23ze5`.
 - `KINESCOPE_AUTH_JWT_SECRET` — server-only HS256 secret used to sign and
-  verify short-lived Kinescope `drmauthtoken` playback tokens for hidden course
+  verify short-lived Kinescope `drmauthtoken` playback tokens for paid course
   lessons. Must be long random text and must match both Kinescope course API
   endpoints.
 - `KINESCOPE_DRM_AUTH_USERNAME` / `KINESCOPE_DRM_AUTH_PASSWORD` — optional
@@ -567,7 +647,7 @@ public search results.
 
 ### Kinescope local API access
 
-Kinescope operational API access for the hidden course is local-only and
+Kinescope operational API access for the paid course is local-only and
 gitignored in `.secrets/kinescope.env`:
 
 - `KINESCOPE_API_KEY`
@@ -586,11 +666,12 @@ Learn course/lesson pages embed public YouTube videos in the SPA and store
 ready-to-render timestamps in `src/content/space/learn.ts`. Do not call
 NotebookLM, YouTube Data API, or any provider key from browser code.
 
-Hidden course videos use Kinescope and are defined in
+Paid course videos use Kinescope and are defined in
 `src/content/space/privateCourse.ts`. The `ai-content-marketing-2026` course has
 16 connected Kinescope lesson videos, all whitelisted in
-`api/_shared/kinescopeCourse.ts`. Keep this route out of public navigation until
-launch. The gated lesson project has project encryption enabled, strict DRM auth
+`api/_shared/kinescopeCourse.ts`. The course is launched and intentionally
+linked from public Learn and marketing content. The gated lesson project has
+project encryption enabled, strict DRM auth
 configured to `https://opten.space/api/kinescope-course-auth`, domain
 restrictions for `opten.space` and `www.opten.space`, subtitle display enabled,
 and course chapters. The course root intro video is the exception: it lives in
@@ -635,6 +716,21 @@ tracked changes, and it must never commit NotebookLM auth files, API keys,
 temporary notebooks, raw transcripts, or local suffler settings.
 
 ## Content & SEO — read before adding pages, posts, or images
+
+### Canonical SEO growth plan
+
+For SEO prioritization and implementation order, use
+[docs/seo/SEO-GROWTH-PLAN.md](docs/seo/SEO-GROWTH-PLAN.md) as the canonical
+working plan. It consolidates the July 2026 search-console audit, GEO/AI
+research, external-authority strategy, and implementation backlog. Files under
+`docs/seo/research/` are historical starting research only: do not implement a
+recommendation from them unless it is retained in the canonical plan.
+
+Product and integration constraints in this `AGENTS.md` and
+[docs/INTEGRATION-CONTRACT.md](docs/INTEGRATION-CONTRACT.md) always take
+precedence over SEO ideas. In particular, do not expose or index paid
+Kinescope course lessons, weaken course entitlement checks, promise unsupported
+extension integrations, or introduce free AI operations solely for SEO.
 
 The site shipped v1.0 (GEO Optimization, 12 → ~72.6 score, 7 phases) and v2.0
 (Programmatic SEO — 62 model pages × RU/EN + 2 hubs = 126 prerendered model
@@ -682,6 +778,7 @@ Reference documentation lives in `docs/`:
 - [docs/YANDEX-WEBMASTER.md](docs/YANDEX-WEBMASTER.md) — local Yandex Webmaster OAuth access and CLI commands
 - [docs/TECH.md](docs/TECH.md) — stack snapshot
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — routes, flows, state
-- [docs/SEO-AUDIT.md](docs/SEO-AUDIT.md) — SEO baseline + gap analysis (v1.0 input artifact)
+- [docs/seo/SEO-GROWTH-PLAN.md](docs/seo/SEO-GROWTH-PLAN.md) — **canonical SEO/GEO priorities and implementation plan**
+- [docs/seo/README.md](docs/seo/README.md) — SEO documentation index; historical audits live under `docs/seo/research/`
 
 See `_index.md` for the Obsidian-friendly navigation hub.

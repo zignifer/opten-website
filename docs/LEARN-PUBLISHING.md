@@ -109,9 +109,11 @@ and timestamp seeking.
 - Manual completion is stored in `localStorage.opten_space_learn_progress_v1`
   and must always be reversible.
 
-## Hidden Kinescope Course
+## Launched Paid Kinescope Course
 
-The direct-link paid course lives outside the public SEO Learn catalog:
+The paid course is officially launched and promoted from public Learn, blog
+CTAs, Telegram, and other marketing surfaces. Its lessons remain outside the
+indexable SEO Learn catalog under the current routing policy:
 
 - Course route: `/learn/courses/ai-content-marketing-2026`
 - First lesson route:
@@ -133,8 +135,9 @@ The direct-link paid course lives outside the public SEO Learn catalog:
 - Course checkout Edge Function: `POST /functions/v1/create-course-payment`
 - Course access Edge Function: `POST /functions/v1/course-access-summary`
 
-Keep `/learn/courses/*` noindex and out of sitemap, llms.txt, header nav, and
-`EN_SIBLINGS` until launch. Do not store Kinescope API keys or playback secrets
+Keep `/learn/courses/*` noindex and out of sitemap, llms.txt, and `EN_SIBLINGS`
+under the current routing policy. Public Learn and marketing content may link to
+the course intentionally. Do not store Kinescope API keys or playback secrets
 in browser code. The client requests a short-lived Kinescope embed URL with the
 website Supabase JWT; the server verifies the standalone course entitlement
 before signing `drmauthtoken`. Player display settings stay in Kinescope
@@ -142,7 +145,7 @@ operational config; the website should not pass viewer identity as a visible
 player overlay. Kinescope then calls the auth callback during playback and gets
 200 or 403.
 
-The hidden course `ai-content-marketing-2026` is not unlocked by Pro. It uses a
+The paid course `ai-content-marketing-2026` is not unlocked by Pro. It uses a
 separate one-time course purchase:
 
 - RUB base price `2 990 ₽`

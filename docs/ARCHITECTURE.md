@@ -34,7 +34,7 @@
 │       /learn              LearnOverviewPage    public RU video hub           │
 │       /learn/:lessonSlug  LessonDetailPage     public RU lesson              │
 │       /learn/finds/:slug  LearnFindDetailPage  public RU curated find        │
-│       /learn/courses/*    PrivateCoursePage    hidden course, SPA-only       │
+│       /learn/courses/*    PrivateCoursePage    launched paid course, SPA     │
 │       /app/*              Opten Space Beta     SPA-only / redirects          │
 │     Models (Phase v2.0): /models hub + /models/:slug (62) + /en/* mirrors    │
 │     EN siblings (marketing/blog/models/Learn/Learn Finds):                   │
@@ -48,6 +48,7 @@
 │                                                                              │
 │   API (Vercel serverless):                                                   │
 │     GET /api/download-skill   →  validates JWT + Pro, streams opten.zip      │
+│     POST /api/prompt-workbench → Pro-only popup-parity quick Improve         │
 │     POST /api/course-prompt   →  course access gate + prompt body            │
 │     POST /api/kinescope-course-token → course access gate + drmauthtoken     │
 │     POST /api/kinescope-course-auth  → Kinescope playback callback           │
@@ -96,7 +97,7 @@ hits get a populated `<head>` + body before React mounts.
 | `/learn/:lessonSlug` | [`LessonDetailPage.tsx`](../../src/app/pages/space/LessonDetailPage.tsx) | full (per public lesson) | Public Opten video lesson with timestamps, lesson materials, and prompts. | No | No |
 | `/learn/finds/:findSlug` | [`LearnFindDetailPage.tsx`](../../src/app/pages/space/LearnFindDetailPage.tsx) | full (per find) | Curated third-party YouTube expert video enriched with Opten summary, timestamps, commands, prompts, resources, and risks. | No | No |
 | `/learn/templates/:templateKind(/:templateLessonSlug)` | [`LearnTemplatePage.tsx`](../../src/app/pages/space/LearnTemplatePage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Design/dev template routes for future course states; never indexed. | No | No |
-| `/learn/courses/:courseSlug(/:lessonSlug)` | [`PrivateCoursePage.tsx`](../../src/app/pages/space/PrivateCoursePage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Hidden standalone paid Kinescope course, direct-link only before launch. | No | `create-course-payment`, `course-access-summary`, `/api/kinescope-course-token`, `/api/course-prompt` |
+| `/learn/courses/:courseSlug(/:lessonSlug)` | [`PrivateCoursePage.tsx`](../../src/app/pages/space/PrivateCoursePage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Officially launched standalone paid Kinescope course, publicly promoted from Learn, blog CTAs, Telegram, and other marketing surfaces. | No | `create-course-payment`, `course-access-summary`, `/api/kinescope-course-token`, `/api/course-prompt` |
 | `/privacy` | [`PrivacyPage.tsx`](../../src/app/pages/PrivacyPage.tsx) | full | Legal | No | No |
 | `/terms` | [`TermsPage.tsx`](../../src/app/pages/TermsPage.tsx) | full | Legal | No | No |
 | `/refund` | [`RefundPage.tsx`](../../src/app/pages/RefundPage.tsx) | full | Legal | No | No |
@@ -157,7 +158,7 @@ src/
 │       ├── ModelsHubPage.tsx, ModelPage.tsx      — Phase v2.0 model surfaces
 │       ├── space/LearnOverviewPage.tsx, LessonDetailPage.tsx,
 │       │   LearnFindDetailPage.tsx, LearnTemplatePage.tsx,
-│       │   PrivateCoursePage.tsx                 — public Learn + hidden course
+│       │   PrivateCoursePage.tsx                 — public Learn + paid course
 │       ├── PrivacyPage.tsx, TermsPage.tsx, RefundPage.tsx
 │       └── NotFound.tsx           — catch-all, locale-aware, injects runtime noindex
 ├── content/                       — humans edit here; consumed by pages + SEO manifest
@@ -175,7 +176,7 @@ src/
 │       ├── index.ts               — allModels barrel + HUB_HIDDEN_SLUGS
 │       ├── slugs.ts               — MODEL_SLUGS_WITH_CONTENT (light import for paths.ts)
 │       └── <slug>.ts              — one file per model (ModelContent = { ru, en })
-│   └── space/                     — Learn content and hidden course data
+│   └── space/                     — Learn content and paid course data
 │       ├── learn.ts               — public lessons, template collections, overview sections
 │       ├── learnSlugs.ts          — lightweight public lesson slugs for routes/i18n
 │       ├── learnFinds.generated.json — generated curated third-party video data
@@ -197,6 +198,8 @@ src/
 
 api/
 ├── download-skill.ts              — Pro-gated opten.zip stream
+├── prompt-workbench.ts            — Pro-only landing quick Improve;
+│                                     website JWT + Pro gate → proxy Haiku
 ├── course-prompt.ts               — course-entitlement-gated prompt body fetch
 ├── kinescope-course-token.ts      — course-entitlement-gated Kinescope embed URL
 ├── kinescope-course-auth.ts       — Kinescope server-to-server playback callback
@@ -226,10 +229,10 @@ dicts) and the GEO/SEO patterns locked-in during v1.0.
 - Each prerendered `<head>` carries a `<link rel="alternate" hreflang>` triplet (`ru`, `en`, `x-default → unprefixed RU`) reciprocal between siblings.
 - `<html lang>` baked per route at build time by `scripts/prerender.mjs` (`ru` for unprefixed, `en` for `/en/*`).
 - **Hreflang locale code policy:** hreflang annotations use language-only codes (`ru`, `en`, `x-default`) in both `scripts/prerender.mjs#applyHreflang` and `scripts/sitemap.mjs` xhtml:link entries, while schema-level `inLanguage` stays region-specific (`ru-RU`, `en-US`) in `scripts/seo-routes.ts`. Both are valid per Google's documentation; the mix is intentional — language-only hreflang targets the broadest audience (RU readers globally, not just RU-from-Russia), while schema-level region tags give AI systems a precise origin signal for the content. Do not "unify" these — the asymmetry is the policy.
-- Locked/auth/noindex routes without EN siblings (`/success`, `/login`, `/auth/*`, `/account`, `/dashboard/download-skill`, `/prompt-library`, `/p/*`, `/learn/courses/*`, `/app/*`) stay RU-only by design — they are `Disallow`'d/noindex app, account, hidden-course, or random-link snapshot surfaces, not content/SEO pages (D-03).
+- Locked/auth/noindex routes without EN siblings (`/success`, `/login`, `/auth/*`, `/account`, `/dashboard/download-skill`, `/prompt-library`, `/p/*`, `/learn/courses/*`, `/app/*`) stay RU-only by design — they are `Disallow`'d/noindex app, account, paid-course, or random-link snapshot surfaces, not content/SEO pages (D-03). The paid course is nevertheless launched and publicly promoted; `noindex` is a routing policy, not a launch-status marker.
 - `<LocalizedLink>` (drop-in replacement for `<Link>`) preserves the `/en/` prefix when navigating internally between EN siblings; on locked no-sibling routes the LangSwitcher flips language in place via storage.
 
-See [SEO-AUDIT.md](SEO-AUDIT.md) for the audit baseline. The historical GEO trajectory was 12 → ~72.6, with a target of ~80+ after the SEO polish work baked in.
+Use [seo/SEO-GROWTH-PLAN.md](seo/SEO-GROWTH-PLAN.md) for current SEO/GEO priorities. The historical pre-v1.0 baseline is archived at [seo/research/2026-05-14-seo-baseline.md](seo/research/2026-05-14-seo-baseline.md); the historical GEO trajectory was 12 → ~72.6.
 
 ## Header / Footer
 
@@ -265,7 +268,7 @@ Cover image lives at `public/blog/<slug>/cover.jpg` (≥1600×900, no in-image t
 
 ## Learn content pipeline
 
-Public Learn has two indexable content types plus a hidden paid-course surface:
+Public Learn has two indexable content types plus a launched paid-course surface:
 
 ```
 src/content/space/learn.ts                    ← public Opten lessons + template fixtures
@@ -282,7 +285,8 @@ LearnFindDetailPage                             ↑ lesson/find metadata + schem
                                                verify-space-learn.mjs guards static rules
 ```
 
-Hidden Kinescope course data stays out of the public SEO catalog:
+Paid Kinescope lesson data stays out of the public SEO catalog even though the
+course itself is publicly promoted:
 
 ```
 src/content/space/privateCourse.ts             ← 16-lesson course content
@@ -301,9 +305,10 @@ POST /api/kinescope-course-auth                ← Kinescope playback authorizat
 ```
 
 `/learn/courses/*` and `/learn/templates/*` are SPA-only/noindex rewrites in
-`vercel.json`. They must stay out of sitemap, llms.txt, public navigation, and
-`EN_SIBLINGS` until launch. Run `npm run verify:space-learn` after public Learn
-changes and `npm run verify:kinescope-course` after any hidden course/Kinescope
+`vercel.json`. Course links and previews may appear in public Learn and marketing
+content intentionally; the routes remain out of sitemap, llms.txt, and
+`EN_SIBLINGS` under the current routing policy. Run `npm run verify:space-learn`
+after public Learn changes and `npm run verify:kinescope-course` after any paid course/Kinescope
 ID/materials/prompt change.
 
 Telegram hidden intro is a separate free lead magnet for the same course. The
@@ -497,7 +502,7 @@ Authenticated lesson page
               └─> verifies course access and returns only the requested prompt body
 ```
 
-Course access is separate from Pro subscription state. The hidden course writes
+Course access is separate from Pro subscription state. The paid course writes
 `course_orders` / `course_entitlements` in the extension-owned Supabase backend;
 it must not update `subscriptions`, `users.plan`, or extension credit usage.
 
@@ -512,11 +517,11 @@ it must not update `subscriptions`, `users.plan`, or extension credit usage.
 | Plan / quota | Extension `chrome.storage.local.ps_*` | Extension (synced from Supabase) | Site via `GET_SUBSCRIPTION` |
 | Website Supabase session | `localStorage.opten_space_session_v1` | `/login` and `/auth/callback` (`/app/*` compatibility callback supported) | `/pay`, `/account`, `/app/*`, `SiteHeader`, `SpaceHeader` |
 | Website account summary | Supabase `users`, `subscriptions`, `usage_logs` via `account-summary` | Supabase Auth/webhooks/proxy usage logging | `/pay`, `/account`, `/app/*`, headers via Bearer JWT |
-| Course orders / entitlements | Supabase `course_orders`, `course_entitlements` | `create-course-payment` + YooKassa/Paddle course webhooks | Hidden course page through `course-access-summary`; website API gates through `hasCourseAccess()` |
-| Course promo codes | Supabase `course_promo_codes` | Operators/marketing through service-role SQL or admin tooling; webhooks increment `times_used` after successful course payment | `create-course-payment` service-role validation and quote preview; hidden course UI receives only the effective quote |
+| Course orders / entitlements | Supabase `course_orders`, `course_entitlements` | `create-course-payment` + YooKassa/Paddle course webhooks | Paid course page through `course-access-summary`; website API gates through `hasCourseAccess()` |
+| Course promo codes | Supabase `course_promo_codes` | Operators/marketing through service-role SQL or admin tooling; webhooks increment `times_used` after successful course payment | `create-course-payment` service-role validation and quote preview; paid course UI receives only the effective quote |
 | Telegram hidden intro leads | Supabase `telegram_hidden_intro_leads` | Telegram webhook, reminders, broadcasts, course webhooks | Extension-owned Edge Functions; website `/admin` reads aggregates and triggers broadcast service calls only through server-side owner proxy |
 | Telegram hidden intro events | Supabase `telegram_hidden_intro_events` | Telegram webhook, opened endpoint, checkout/payment hooks, broadcasts/reminders | Aggregated stats only in browser; broadcast send/fail rows are written by service Edge Functions |
-| Telegram 24h discount claims | Supabase `course_discount_claims` | Telegram webhook issues claims; `create-course-payment` reserves/quotes; provider webhooks mark used | Hidden course UI sends claim token to `create-course-payment`; website `/admin` sees aggregated state and broadcast segments only through service proxy |
+| Telegram 24h discount claims | Supabase `course_discount_claims` | Telegram webhook issues claims; `create-course-payment` reserves/quotes; provider webhooks mark used | Paid course UI sends claim token to `create-course-payment`; website `/admin` sees aggregated state and broadcast segments only through service proxy |
 | Learn manual progress | `localStorage.opten_space_learn_progress_v1` | Public/private lesson completion button | Learn lesson UI, course progress widgets |
 | Kinescope playback token | Short-lived HS256 JWT in Kinescope embed URL | `/api/kinescope-course-token` using `KINESCOPE_AUTH_JWT_SECRET` | Kinescope player + `/api/kinescope-course-auth` |
 | Course prompt bodies | `api/_shared/coursePromptBodies.ts` server bundle | Code/content commits | `/api/course-prompt` after course access check |
@@ -537,7 +542,7 @@ signs into both surfaces as the same account.
 ## Build/asset notes
 
 - [`api/_assets/opten.zip`](../../api/_assets/) — the Pro skill bundle. Bundled with the serverless function via `vercel.json` `includeFiles`. Update via `chore: refresh opten.zip` commits (see `12b3f17`).
-- [`public/assets/space/courses/ai-content-marketing-2026/opten-skill.zip`](../../public/assets/space/courses/ai-content-marketing-2026/) — downloadable Claude skill archive used by the hidden course lesson materials.
+- [`public/assets/space/courses/ai-content-marketing-2026/opten-skill.zip`](../../public/assets/space/courses/ai-content-marketing-2026/) — downloadable Claude skill archive used by the paid course lesson materials.
 - [`public/favicon-*.png`](../../public/) — 14 favicon sizes. Excessive — modern browsers need only a handful. Cleanup candidate.
 - [`public/assets/welcome-{ru,en}-*.png`](../../public/assets/) — onboarding screenshots, one set per language.
 - [`src/imports/`](../../src/imports/) — Figma-Make-generated SVG path dumps. Auto-generated; manual edits there get clobbered if the page is re-imported from Figma.

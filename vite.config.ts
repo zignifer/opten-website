@@ -1,11 +1,33 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { imagetools } from 'vite-imagetools'
+import promptWorkbenchHandler from './api/prompt-workbench'
 
-export default defineConfig(({ isSsrBuild }) => ({
+function promptWorkbenchDevApi(): Plugin {
+  return {
+    name: 'opten-prompt-workbench-dev-api',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/api/prompt-workbench', (req, res) => {
+        void promptWorkbenchHandler(req, res).catch((error: unknown) => {
+          console.error('[prompt-workbench] local handler failed', error)
+          if (!res.headersSent) {
+            res.statusCode = 500
+            res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          }
+          if (!res.writableEnded) res.end(JSON.stringify({ error: 'local_handler_failed' }))
+        })
+      })
+    },
+  }
+}
+
+export default defineConfig(({ isSsrBuild }) => {
+  return ({
   plugins: [
+    promptWorkbenchDevApi(),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them
     react(),
@@ -69,5 +91,6 @@ export default defineConfig(({ isSsrBuild }) => ({
     strictPort: true,
     historyApiFallback: true,
   },
-}))
+  })
+})
 

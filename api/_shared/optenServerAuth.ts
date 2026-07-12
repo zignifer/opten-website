@@ -49,6 +49,29 @@ export async function verifySupabaseJwt(token: string): Promise<VerifiedSupabase
   };
 }
 
+// Local Vite development does not always have SUPABASE_JWT_SECRET. In that case,
+// verify the bearer token against the canonical self-hosted GoTrue user endpoint.
+// Production keeps the faster local HS256 verification whenever the secret exists.
+export async function verifySupabaseUser(token: string): Promise<VerifiedSupabaseUser> {
+  if (process.env.SUPABASE_JWT_SECRET) return verifySupabaseJwt(token);
+
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      apikey: SUPABASE_ANON_KEY,
+      Accept: "application/json",
+    },
+  });
+  if (!response.ok) throw new Error("invalid_supabase_token");
+
+  const body = await response.json() as { id?: unknown; email?: unknown };
+  if (typeof body.id !== "string" || !body.id) throw new Error("invalid_supabase_token");
+  return {
+    userId: body.id,
+    email: typeof body.email === "string" ? body.email : null,
+  };
+}
+
 export async function hasLiveProSubscription(token: string, userId: string): Promise<boolean> {
   const subRes = await fetch(
     `${SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${encodeURIComponent(userId)}&plan=eq.pro&status=in.(active,cancelled)&select=plan,status,expires_at&order=created_at.desc&limit=10`,

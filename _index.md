@@ -15,7 +15,8 @@ Public site for the Opten Chrome extension. This note is the map of content for 
 - [[docs/CONTENT-AUTHORING]] — **GEO+SEO playbook for new pages, blog posts, images** (read before any content change)
 - [[docs/TECH]] — stack snapshot
 - [[docs/ARCHITECTURE]] — routes, billing flows, i18n
-- [[docs/SEO-AUDIT]] — SEO baseline + gap analysis
+- [[docs/seo/SEO-GROWTH-PLAN]] — **канонический SEO/GEO-план и приоритеты**
+- [[docs/seo/README]] — SEO-раздел и архив стартового ресёрча
 
 ## Project Notes
 
@@ -34,7 +35,8 @@ GEO score 12/100 → ~72.6 (target ~80+ after deploy bakes in). 7 phases shipped
 
 ### Next milestone (v2.1+) — TBD
 
-No active milestone. Track future milestones in ordinary docs or issues.
+SEO/GEO priorities are tracked in [[docs/seo/SEO-GROWTH-PLAN]]. Product
+milestones still use ordinary docs or issues.
 
 ## Project instructions
 

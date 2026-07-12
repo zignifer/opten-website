@@ -1,5 +1,10 @@
 # SEO Audit — opten.space
 
+> [!warning] Статус: стартовый исторический ресёрч
+> Снимок от 14 мая 2026 года сохранён для истории. Многие перечисленные здесь
+> пробелы уже устранены; документ не является текущим backlog. Рабочие
+> приоритеты определяет [[../SEO-GROWTH-PLAN|канонический SEO Growth Plan]].
+
 > Baseline audit at planning init (2026-05-14). Use as input for any future
 > SEO/marketing milestone. **This is a "what exists / what's missing"
 > snapshot** — not a roadmap. Prioritization happens when a milestone opens.
@@ -14,7 +19,7 @@ URLs is the most expensive single gap.
 
 ## What exists today
 
-### `index.html` static tags ([`index.html`](../../index.html))
+### `index.html` static tags ([`index.html`](../../../index.html))
 
 | Tag | Value | Adequate? |
 |-----|-------|-----------|
@@ -29,7 +34,7 @@ URLs is the most expensive single gap.
 | `<html lang="ru">` | Hardcoded RU | EN users get RU `lang` on first paint, then JS flips it. Bad for SEO of EN audience. |
 | Paddle.js script | Synchronous `<script src="cdn.paddle.com/...">` | Functional necessity (see INTEGRATION-CONTRACT §6). Has perf cost — blocks parser. Mitigation: `preconnect` to `cdn.paddle.com`. |
 
-### `vercel.json` ([`vercel.json`](../../vercel.json))
+### `vercel.json` ([`vercel.json`](../../../vercel.json))
 
 - SPA rewrite present.
 - No cache headers, no security headers, no `cleanUrls`, no `trailingSlash`. **Default Vercel behavior applies** (e.g. no `Cache-Control` for HTML).
@@ -92,17 +97,17 @@ When a SEO milestone is opened, a reasonable phase split:
 - **Phase C — Performance:** Paddle preconnect, image optimization, font-display audit, bundle analysis, Lighthouse pass.
 - **Phase D — Measurement:** Vercel Analytics or Plausible (privacy-friendly, no banner needed), Search Console verification, optional Sentry.
 
-The hard prerequisite for phases A–B is deciding the **per-language URL strategy**. That decision lives in the [INTEGRATION-CONTRACT.md](../INTEGRATION-CONTRACT.md) territory only if it affects the `/welcome`, `/pay`, `/success` routes the extension navigates to — those routes must keep responding at their existing paths regardless of new lang-prefixed paths (e.g. `/pay` continues to work; `/ru/pay` and `/en/pay` are additions, not replacements).
+The hard prerequisite for phases A–B is deciding the **per-language URL strategy**. That decision lives in the [INTEGRATION-CONTRACT.md](../../INTEGRATION-CONTRACT.md) territory only if it affects the `/welcome`, `/pay`, `/success` routes the extension navigates to — those routes must keep responding at their existing paths regardless of new lang-prefixed paths (e.g. `/pay` continues to work; `/ru/pay` and `/en/pay` are additions, not replacements).
 
 ## Files where SEO logic will land
 
 When implemented, expect changes in:
 
-- [`index.html`](../../index.html) — base meta, OG, preconnect, canonical (or removal of static OG in favor of per-route)
-- [`src/main.tsx`](../../src/main.tsx) — possibly add a `<HelmetProvider>` or equivalent
+- [`index.html`](../../../index.html) — base meta, OG, preconnect, canonical (or removal of static OG in favor of per-route)
+- [`src/main.tsx`](../../../src/main.tsx) — possibly add a `<HelmetProvider>` or equivalent
 - New: `public/sitemap.xml`, `public/robots.txt`
 - New: `src/components/SEO.tsx` (or similar) — per-route head management
-- [`vercel.json`](../../vercel.json) — headers (caching, security), possibly redirects for legacy URLs
+- [`vercel.json`](../../../vercel.json) — headers (caching, security), possibly redirects for legacy URLs
 - New per-language route components or a shared layout — TBD by URL strategy decision
 
 ## Files that should NOT be touched

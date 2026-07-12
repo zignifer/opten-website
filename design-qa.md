@@ -26,3 +26,50 @@ full-view comparison evidence: `C:\Projects\opten-website\tmp\design-qa\learn-v2
 focused region comparison evidence: top section metrics were checked in the in-app browser: title cell `552px`, hero video `552px`, title overflow `false`, title font `Unbounded 55px`, H1 line overlay loaded from `/assets/space/learn-v2/title-line.png` at natural `531x59` and rendered as `460x30` with vertical scale, author card `261x412`, author/video bottom delta `0px`, author box-shadow `none`, lesson title matches author title at `21px`/`700`/`26.25px`, lesson description matches author description at `14px`/`400`/`21.7px`, root/background color `rgb(1,20,23)`, card/control color `rgb(14,32,35)`, top gradient positioned to the right, compact footer present with links `О проекте`, `Блог`, `Модели`, `Конфиденциальность`, `Оферта`, `Возврат`, `Связаться`, footer has no `.opten-footer-gradient`, page has a bottom `gradient-blob-shape.svg` layer using the same `1720x982`/`blur(140px)` scale as the landing hero and anchored below the page bottom, card-to-footer gap is `80px`, and no marketing CTA/install block.
 patches made since previous QA pass: constrained the H1 to the video column, tuned its desktop size to fill the video width without clipping, added the provided title line overlay, shifted the featured lesson text block left by `18px`, matched the featured lesson typography to the author card typography, bottom-aligned the author card with the hero video, removed the author-card shadow, switched Learn v2 to landing background/card tokens, added a top-right landing gradient, added a compact footer with header-like bottom blob gradient, updated collection/filter labels, narrowed the author card, removed its detail button, and rebuilt the desktop grid to remove the extra right-side slack inside the content area.
 final result: passed
+
+---
+
+# Prompt Workbench — Design QA
+
+Scope: landing hero replacement, RU/EN copy, desktop and mobile layouts, model
+selection, scoring tooltip, improvement action, success/error states, and the
+public Cloudflare-backed request path.
+
+## Visual comparison
+
+- Source screenshot was used only for the score-control interaction language:
+  planet icon, compact numeric pill, and a nearby score explanation.
+- The implementation intentionally uses opten.space surfaces, green brand color,
+  PT Root UI typography, existing radius scale, existing model metadata, and the
+  committed Opten planet assets. The Syntx orange editor frame was not copied.
+- Desktop at 1440×1100: the workbench aligns to the site's 1200 px content grid,
+  has no horizontal overflow, and the complete editor/actions remain legible.
+- Mobile at 390×844: the workbench resolves to a 335 px card, controls keep 40–44
+  px tap targets, the model selector and actions stack without collision, and the
+  score tooltip remains inside the viewport (`x=20`, `right=348`, no overflow).
+
+## Interaction and accessibility
+
+- Model selection is a labelled native select with all committed image/video
+  model profiles grouped by type.
+- Score and Improve are separate labelled buttons. The score tooltip contains
+  evaluation only; it has no hidden improvement CTA.
+- Empty/loading/result/error/success/undo/copy states were exercised in browser.
+- Keyboard labels, focus rings, disabled states, semantic status colors, alt text,
+  and minimum mobile control heights are present.
+- The floating extension video is hidden while the hero is in view and becomes
+  available only after scrolling, so it cannot obstruct the workbench actions.
+
+## Runtime verification
+
+- Production build passes.
+- Local Vercel runtime serves the landing and `/api/prompt-workbench`.
+- Real Seedance 2.0 scoring returns a structured score and issues through
+  Cloudflare Workers AI.
+- Real improvement replaces the prompt and exposes restore/copy controls.
+- The authenticated Pro branch is server-gated by website JWT + live subscription
+  before reusing the existing Claude Haiku proxy; anonymous tests remained on the
+  Free Cloudflare branch.
+- No Vite overlay, console errors, or horizontal page overflow were detected.
+
+final result: passed
