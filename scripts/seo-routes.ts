@@ -11,6 +11,7 @@ import { post as aiTrainingBeginnersGuide } from "../src/content/blog/ai-trainin
 import { post as aiCoursesForBeginnersGuide } from "../src/content/blog/ai-courses-for-beginners";
 import { post as freeAiCoursesGuide } from "../src/content/blog/free-ai-courses";
 import { post as aiForWorkGuide } from "../src/content/blog/ai-for-work";
+import { post as aiPresentationsGuide } from "../src/content/blog/ai-presentations";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
 import { post as aiFaceSwapGuide } from "../src/content/blog/ai-face-swap";
@@ -1302,6 +1303,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/ai-presentations`, name: aiPresentationsGuide.ru.title, datePublished: aiPresentationsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-for-work`, name: aiForWorkGuide.ru.title, datePublished: aiForWorkGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/free-ai-courses`, name: freeAiCoursesGuide.ru.title, datePublished: freeAiCoursesGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-courses-for-beginners`, name: aiCoursesForBeginnersGuide.ru.title, datePublished: aiCoursesForBeginnersGuide.ru.publishedAt },
@@ -1343,6 +1345,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/ai-presentations.
+  {
+    path: "/blog/ai-presentations",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/ai-presentations`, en: `${SITE_ORIGIN}/en/blog/ai-presentations`, xDefault: `${SITE_ORIGIN}/blog/ai-presentations` },
+    title: aiPresentationsGuide.ru.title,
+    description: aiPresentationsGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-presentations`,
+    ogTitle: aiPresentationsGuide.ru.title,
+    ogDescription: aiPresentationsGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiPresentationsGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/ai-presentations`, headline: aiPresentationsGuide.ru.title, description: aiPresentationsGuide.ru.description, datePublished: aiPresentationsGuide.ru.publishedAt, dateModified: aiPresentationsGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: aiPresentationsGuide.ru.tags, image: { url: `${SITE_ORIGIN}${aiPresentationsGuide.ru.cover.src}`, width: aiPresentationsGuide.ru.cover.width, height: aiPresentationsGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/ai-presentations`, url: `${SITE_ORIGIN}/blog/ai-presentations`, name: aiPresentationsGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((aiPresentationsGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/ai-presentations`, aiPresentationsGuide.ru.title),
+      faqPageBlock(aiPresentationsGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-presentations`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: aiPresentationsGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-presentations` }], `${SITE_ORIGIN}/blog/ai-presentations`),
     ],
   },
 
@@ -3054,6 +3078,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/ai-presentations`, name: aiPresentationsGuide.en.title, datePublished: aiPresentationsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-for-work`, name: aiForWorkGuide.en.title, datePublished: aiForWorkGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/free-ai-courses`, name: freeAiCoursesGuide.en.title, datePublished: freeAiCoursesGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-courses-for-beginners`, name: aiCoursesForBeginnersGuide.en.title, datePublished: aiCoursesForBeginnersGuide.en.publishedAt },
@@ -3095,6 +3120,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/ai-presentations EN sibling.
+  {
+    path: "/en/blog/ai-presentations",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/ai-presentations`, en: `${SITE_ORIGIN}/en/blog/ai-presentations`, xDefault: `${SITE_ORIGIN}/blog/ai-presentations` },
+    title: aiPresentationsGuide.en.title,
+    description: aiPresentationsGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-presentations`,
+    ogTitle: aiPresentationsGuide.en.title,
+    ogDescription: aiPresentationsGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiPresentationsGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/ai-presentations`, headline: aiPresentationsGuide.en.title, description: aiPresentationsGuide.en.description, datePublished: aiPresentationsGuide.en.publishedAt, dateModified: aiPresentationsGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: aiPresentationsGuide.en.tags, image: { url: `${SITE_ORIGIN}${aiPresentationsGuide.en.cover.src}`, width: aiPresentationsGuide.en.cover.width, height: aiPresentationsGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/ai-presentations`, url: `${SITE_ORIGIN}/en/blog/ai-presentations`, name: aiPresentationsGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((aiPresentationsGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/ai-presentations`, aiPresentationsGuide.en.title),
+      faqPageBlock(aiPresentationsGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-presentations`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: aiPresentationsGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-presentations` }], `${SITE_ORIGIN}/en/blog/ai-presentations`),
     ],
   },
 
