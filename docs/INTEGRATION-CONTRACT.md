@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-07-13 against extension `manifest.json` version **1.4.2** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench now mirrors the extension popup's authenticated quick-Improve model list and promptscore-proxy Claude Haiku transport; new Free accounts receive 3 one-time signup credits from `users.free_signup_credits` while existing Free accounts remain unchanged; hidden standalone course checkout/access, Kinescope course playback, Telegram hidden intro funnel, one-time-per-lead Telegram 24h discount claims, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
+> **Last sync:** 2026-07-13 against extension `manifest.json` version **1.4.2** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench now mirrors the extension popup's authenticated quick-Improve model list and promptscore-proxy Claude Haiku transport; new Free accounts receive 3 one-time signup credits from `users.free_signup_credits` while existing Free accounts remain unchanged; score/rewrite accounting now uses service-role-only atomic reserve/release RPCs and never trusts client billing flags; hidden standalone course checkout/access, Kinescope course playback, Telegram hidden intro funnel, one-time-per-lead Telegram 24h discount claims, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -431,9 +431,12 @@ The visible landing hero exposes improvement only and calls
 any visitor, but its AI action requires a signed-in website account. The browser
 sends the normal website Bearer JWT only for a signed-in account; the endpoint
 independently verifies the JWT before forwarding to promptscore-proxy. The proxy
-then enforces the shared operation ledger: new Free accounts may spend their
-one-time signup credits, exhausted/old Free accounts receive a limit error, and
-Pro accounts spend the normal 300-operation monthly cycle.
+atomically reserves from the shared operation ledger before calling Anthropic:
+new Free accounts may spend their one-time signup credits, exhausted/old Free
+accounts receive a limit error, and Pro accounts spend the normal 300-operation
+monthly cycle. Concurrent requests for one user are serialized in PostgreSQL; a
+provider failure releases only its exact reservation, and a repeated DB attempt
+reuses the same idempotency key.
 
 - Accepted action: `improve` only. Prompt scoring is not part of this endpoint.
 - Allowed image models, in popup order: `nano-banana-2`, `nano-banana-pro`,
@@ -453,8 +456,9 @@ Pro accounts spend the normal 300-operation monthly cycle.
 - Transport mirrors `POPUP_REWRITE_PROMPT`: prompt must contain at least 20
   trimmed characters; response language is detected from prompt text; the server
   loads the same committed `rewriter.md`; the proxy body uses `model_name`,
-  `is_video`, `max_tokens: 1200`, `count_usage: true`, and `source: popup`.
-  The proxy uses Claude Haiku, loads the matching skill, and charges the shared
+  `is_video`, `max_tokens: 1200`, legacy-compatible `count_usage: true`, and
+  `source: popup`. The proxy ignores client billing flags, uses Claude Haiku,
+  loads the matching skill, and charges every rewrite against the shared
   operation ledger. The website server never receives the Anthropic API key and
   never decides usage entitlement locally beyond JWT verification.
 - The canonical quick-Improve rewriter prompt remains extension-owned at
@@ -739,6 +743,7 @@ If you switch envs, you must also flip the corresponding Paddle priceIds in the 
 | Paddle env-var flip without priceId sync | Real users get sandbox prices (or vice versa) | Treat Paddle env switch as a coordinated deploy across site + Edge Function. |
 | Adding a new site route the extension navigates to | Site must exist before extension ships referring code | Site first, then extension. |
 | Allowing anonymous landing requests to reach promptscore-proxy | Unmetered Claude usage and shared-ledger abuse | Verify the website JWT in `/api/prompt-workbench` before every proxy request; let the proxy enforce Free signup credits and Pro usage. |
+| Trusting `count_usage` or any other client field to decide billing | An authenticated caller can bypass credits by changing the request body | Treat every score/rewrite as billable in promptscore-proxy; reserve atomically before Anthropic and release only the exact failed-provider reservation. |
 | Marketing a named Pro model that is not actually used | Misleading paid-product claim and loss of user trust | Describe the product tier (`Opten Pro`) or name the real model; do not advertise a fabricated provider/model name. |
 | Letting the landing model list drift from `PS_CHAT_TOP_MODELS` | Website and extension produce different quick-mode behavior or expose unsupported skills | Keep the exact 14 slugs, labels, order, and image/video grouping synchronized with `C:\Projects\promptscore\popup\popup.js`. |
 
