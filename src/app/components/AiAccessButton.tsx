@@ -172,7 +172,7 @@ export default function AiAccessButton() {
         <button
           type="button"
           data-ai-access-trigger
-          className="group inline-flex w-full max-w-[390px] items-center justify-center gap-2 rounded-full bg-white px-[10px] py-[10px] pr-4 text-[#011417] shadow-[0_1px_0_rgba(255,255,255,0.2)_inset] transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(156,251,81,0.18)] focus:outline-none focus:ring-2 focus:ring-white/60 focus:ring-offset-2 focus:ring-offset-[#011417] sm:gap-3 sm:pr-6 md:w-[300px]"
+          className="group inline-flex w-auto max-w-[calc(100vw-40px)] items-center justify-center gap-2 rounded-full bg-white px-[14px] py-[10px] text-[#011417] shadow-[0_1px_0_rgba(255,255,255,0.2)_inset] transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(156,251,81,0.18)] focus:outline-none focus:ring-2 focus:ring-white/60 focus:ring-offset-2 focus:ring-offset-[#011417] sm:max-w-[390px] sm:gap-3 sm:pl-[10px] sm:pr-6 md:w-[300px]"
         >
           <PlatformIcons />
           <span className="flex min-w-0 flex-col text-left font-['PT_Root_UI',sans-serif] leading-[1.25]">

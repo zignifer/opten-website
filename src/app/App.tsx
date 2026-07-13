@@ -189,9 +189,9 @@ function Partners() {
           href={STORE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-3 rounded-full bg-white px-6 py-4 font-['PT_Root_UI',sans-serif] text-[18px] font-bold text-black transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(156,251,81,0.18)]"
+          className="inline-flex items-center justify-center gap-3 rounded-full bg-white px-[14px] py-4 font-['PT_Root_UI',sans-serif] text-[18px] font-bold text-black transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(156,251,81,0.18)] sm:px-6"
         >
-          <BrowserIcons size="sm" />
+          <BrowserIcons size="lg" />
           {t("hero.installBtn")}
         </a>
       </div>

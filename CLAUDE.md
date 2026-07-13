@@ -119,6 +119,11 @@ The AI-chat modal heading is centered and locked to two explicit lines:
 `Улучшай промпты` / `в Claude и ChatGPT`; its introductory copy is centered too.
 On desktop only, the RU introductory copy is locked to two explicit lines after
 `ИИ-чату`; mobile keeps natural wrapping.
+On mobile, both paired-icon white CTA variants (Claude/ChatGPT and
+Chrome/Yandex Browser) hug their contents instead of stretching to the viewport;
+each uses exactly 14 px of horizontal padding. Across mobile and desktop, every
+paired-icon CTA renders both platform icons at the same 40 x 40 px size. Desktop
+button sizing otherwise remains unchanged.
 
 The extension is still the primary shipped product. Opten Space Beta is an
 account-based web app surface, but it must share identity, subscription, and

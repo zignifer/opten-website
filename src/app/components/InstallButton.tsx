@@ -35,7 +35,7 @@ export default function InstallButton({ compact = false, label }: InstallButtonP
       rel="noopener noreferrer"
       className={cx(
         "group inline-flex items-center justify-center rounded-full bg-white text-[#011417] shadow-[0_1px_0_rgba(255,255,255,0.2)_inset] transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(156,251,81,0.18)]",
-        compact ? "gap-2 px-3 py-2 text-[13px] font-bold" : "w-[calc(100vw-32px)] max-w-[390px] gap-2 px-[10px] py-[10px] pr-4 sm:w-auto sm:max-w-none sm:gap-3 sm:pr-6"
+        compact ? "gap-2 px-3 py-2 text-[13px] font-bold" : "w-auto max-w-[calc(100vw-40px)] gap-2 px-[14px] py-[10px] sm:max-w-none sm:gap-3 sm:pl-[10px] sm:pr-6"
       )}
     >
       <BrowserIcons size={compact ? "sm" : "lg"} />
