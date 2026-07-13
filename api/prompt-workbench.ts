@@ -1,15 +1,14 @@
-// Pro-only landing Prompt Workbench.
+// Authenticated landing Prompt Workbench.
 // Mirrors the extension popup's POPUP_REWRITE_PROMPT quick-Improve transport.
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { PROMPT_WORKBENCH_MODELS, type PromptWorkbenchType } from "../src/content/promptWorkbenchModels";
+import { PROMPT_WORKBENCH_MODELS, type PromptWorkbenchType } from "../src/content/promptWorkbenchModels.js";
 import {
   bearerTokenFromHeader,
-  hasLiveProSubscription,
   verifySupabaseUser,
-} from "./_shared/optenServerAuth";
+} from "./_shared/optenServerAuth.js";
 
 const PROXY_URL = "https://promptscore-proxy.vercel.app";
 const MIN_PROMPT_CHARS = 20;
@@ -32,10 +31,9 @@ interface ReferenceImage {
   mediaType: "image/jpeg";
 }
 
-type ProAccess =
+type WorkbenchAccess =
   | { status: "ready"; token: string }
   | { status: "authentication_required" }
-  | { status: "pro_required" }
   | { status: "entitlement_unavailable" };
 
 type ProxyPayload = {
@@ -158,25 +156,17 @@ function readServerAsset(...segments: string[]) {
   return readFileSync(join(process.cwd(), ...segments), "utf8");
 }
 
-async function resolveProAccess(req: IncomingMessage): Promise<ProAccess> {
+async function resolveWorkbenchAccess(req: IncomingMessage): Promise<WorkbenchAccess> {
   const token = bearerTokenFromHeader(req.headers.authorization);
   if (!token) return { status: "authentication_required" };
 
-  let userId: string;
   try {
-    const user = await verifySupabaseUser(token);
-    userId = user.userId;
+    await verifySupabaseUser(token);
   } catch (error) {
     return { status: "authentication_required" };
   }
 
-  try {
-    return await hasLiveProSubscription(token, userId)
-      ? { status: "ready", token }
-      : { status: "pro_required" };
-  } catch {
-    return { status: "entitlement_unavailable" };
-  }
+  return { status: "ready", token };
 }
 
 async function callQuickImproveProxy(
@@ -276,9 +266,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return json(res, 400, { error: "invalid_references" });
   }
 
-  const access = await resolveProAccess(req);
+  const access = await resolveWorkbenchAccess(req);
   if (access.status === "authentication_required") return json(res, 401, { error: access.status });
-  if (access.status === "pro_required") return json(res, 403, { error: access.status });
   if (access.status === "entitlement_unavailable") return json(res, 503, { error: access.status });
 
   try {
@@ -286,8 +275,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return json(res, 200, {
       action: "improve",
       result: { prompt: result.prompt },
-      provider_model: "Opten Pro",
-      tier: "pro",
+      provider_model: "Opten",
+      tier: result.usage.plan || "free",
       ...result.usage,
     });
   } catch (error) {

@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-07-12 against extension `manifest.json` version **1.4.2** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench now mirrors the extension popup's Pro-only quick-Improve model list and promptscore-proxy Claude Haiku transport; hidden standalone course checkout/access, Kinescope course playback, Telegram hidden intro funnel, one-time-per-lead Telegram 24h discount claims, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
+> **Last sync:** 2026-07-13 against extension `manifest.json` version **1.4.2** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench now mirrors the extension popup's authenticated quick-Improve model list and promptscore-proxy Claude Haiku transport; new Free accounts receive 3 one-time signup credits from `users.free_signup_credits` while existing Free accounts remain unchanged; hidden standalone course checkout/access, Kinescope course playback, Telegram hidden intro funnel, one-time-per-lead Telegram 24h discount claims, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -131,7 +131,7 @@ chrome.runtime.sendMessage(id, { type: "GET_SUBSCRIPTION" }, (response) => {
   //   card_last4: null,
   //   card_type: null,
   //   has_card: false,
-  //   limit: 300,          // L3C-01 (260428): free-аккаунт displays 0/300 — free даёт 0 операций, Pro даёт 300
+  //   limit: 300,          // Pro target display limit; Free remaining may be 3..0 signup credits
   //   remaining: number,
   // }
   //
@@ -141,7 +141,7 @@ chrome.runtime.sendMessage(id, { type: "GET_SUBSCRIPTION" }, (response) => {
 
 **Field-level notes:**
 - `plan === 'cancelled'` means the user cancelled but is still inside the paid period. **Treat it as Pro for access purposes only while `expires_at` is absent or in the future** (download skill, no upgrade nag). Once `expires_at` is in the past, clients must treat the user as Free even if the daily `expire-subscriptions` cleanup has not relabeled the row yet. This mirrors the Pro gate in [`api/download-skill.ts`](../api/download-skill.ts).
-- `limit: 300` for Free is the L3C-01 product positioning (free-аккаунт даёт 0 операций; popup shows `0/300` так как 300 — это Pro-лимит, на который нацелен апгрейд). Server-side proxy enforces `FREE_LIMIT=0` (Phase 88 go-live — flipped on Vercel production to match the popup `0/300` display; free = 0 операций, Pro required).
+- `limit: 300` for Free is the product positioning: the denominator is the Pro target limit. Since 2026-07-13, newly created Free accounts get `remaining: 3` from `public.users.free_signup_credits`, then count down to `0/300` with no monthly refill. Existing Free accounts keep `0/300`. Server-side proxy keeps production `FREE_LIMIT=0` only as a legacy fallback; canonical Free entitlement is the user-row grant.
 - Forward-compatibility rule: **the site MUST NOT assume the response is exhaustive.** Future fields may be added.
 
 #### `CANCEL_SUBSCRIPTION`
@@ -248,7 +248,7 @@ The site only **calls** them; it does not own them.
 | `POST /cancel-subscription` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | YooKassa cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
 | `POST /cancel-subscription-paddle` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | Paddle cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
 | `POST /get-subscription` | Site (optional) | Bearer JWT | Reads `subscriptions` table. Used as a fallback if the extension is not installed (rare path). |
-| `POST /account-summary` | Site `/login` consumers, `/pay`, `/account`, `/app/*` | Bearer JWT | Reads the verified user's account, latest subscription, and `usage_logs` count using service role, then returns a single account/credit summary. No payment mutation. Response is the canonical website source for `email`, `plan`, `status`, `limit`, `used`, `remaining`, `expires_at`, `provider`, `currency`, and card metadata. |
+| `POST /account-summary` | Site `/login` consumers, `/pay`, `/account`, `/app/*`, extension popup cache refresh | Bearer JWT | Reads the verified user's account, `users.free_signup_credits`, latest subscription, and `usage_logs` count using service role, then returns a single account/credit summary. No payment mutation. Response is the canonical source for `email`, `plan`, `status`, `limit`, `used`, `remaining`, `expires_at`, `provider`, `currency`, and card metadata. |
 | `POST /course-access-summary` | Hidden Learn course page + `/api/kinescope-course-token` | Bearer website JWT | Reads/claims a standalone course entitlement for the verified user. If an active entitlement exists for the JWT email and has no `user_id`, the function binds it to `auth.users.id`. Returns `{ course_slug, has_access, status, email, granted_at }`. |
 | `POST /webhook` | YooKassa | IP-whitelist | Provider-only. Updates `subscriptions` table with `provider='yookassa'`. |
 | `POST /webhook-paddle` | Paddle | HMAC-SHA256 | Provider-only. Updates `subscriptions` table with `provider='paddle'`. |
@@ -428,9 +428,12 @@ Security rule:
 
 The visible landing hero exposes improvement only and calls
 `POST /api/prompt-workbench` on the website origin. The workbench can be viewed by
-any visitor, but its AI action is Pro-only. The browser sends the normal website
-Bearer JWT only for a signed-in account; the endpoint independently verifies the
-JWT and live Pro subscription before forwarding anything to promptscore-proxy.
+any visitor, but its AI action requires a signed-in website account. The browser
+sends the normal website Bearer JWT only for a signed-in account; the endpoint
+independently verifies the JWT before forwarding to promptscore-proxy. The proxy
+then enforces the shared operation ledger: new Free accounts may spend their
+one-time signup credits, exhausted/old Free accounts receive a limit error, and
+Pro accounts spend the normal 300-operation monthly cycle.
 
 - Accepted action: `improve` only. Prompt scoring is not part of this endpoint.
 - Allowed image models, in popup order: `nano-banana-2`, `nano-banana-pro`,
@@ -444,28 +447,28 @@ JWT and live Pro subscription before forwarding anything to promptscore-proxy.
   bytes, previews, and prompt results are ephemeral component state; they are not
   written to localStorage or Supabase. Reference images use the same Anthropic
   multimodal content-block shape as the extension popup.
-- Access errors are explicit and occur before proxy use: no/invalid website JWT
-  returns `401 authentication_required`; a valid signed-in account without live
-  Pro returns `403 pro_required`; an entitlement-service failure returns
-  `503 entitlement_unavailable`.
+- Access errors are explicit: no/invalid website JWT returns
+  `401 authentication_required` before proxy use; exhausted Free or over-limit
+  Pro returns `429 pro_limit_reached` from the proxy-backed shared ledger.
 - Transport mirrors `POPUP_REWRITE_PROMPT`: prompt must contain at least 20
   trimmed characters; response language is detected from prompt text; the server
   loads the same committed `rewriter.md`; the proxy body uses `model_name`,
   `is_video`, `max_tokens: 1200`, `count_usage: true`, and `source: popup`.
   The proxy uses Claude Haiku, loads the matching skill, and charges the shared
-  operation ledger. The website server never receives the Anthropic API key.
+  operation ledger. The website server never receives the Anthropic API key and
+  never decides usage entitlement locally beyond JWT verification.
 - The canonical quick-Improve rewriter prompt remains extension-owned at
   `C:\Projects\promptscore\config\`. Run `npm run sync:prompt-workbench` to
   refresh the committed server-only copies in `api/_assets/prompt-workbench/`.
 - The extension's paid score/improve transport remains unchanged. The website
-  reuses the popup rewrite path server-to-server only after its own entitlement check. The website
-  must not claim a different named model than the one actually used. Pro
-  marketing may use the product label `Opten Pro` without publishing provider
-  internals.
+  reuses the popup rewrite path server-to-server after JWT verification and
+  relies on the proxy for Free-signup/Pro usage enforcement. The website must not
+  claim a different named model than the one actually used. Marketing may use the
+  product label `Opten`/`Opten Pro` without publishing provider internals.
 - Prompt text/results/reference previews are ephemeral browser state; the website
   does not persist them in localStorage or Supabase. The endpoint applies a strict
   body cap, 20–6,000-character prompt bounds, exact popup model allowlist,
-  entitlement verification, and proxy timeout/retry policy.
+  JWT verification, and proxy timeout/retry policy.
 
 ### 4.1 Prompt Library PostgREST surface (Phase 91, extension save/insert added Phase 92/93)
 
@@ -652,8 +655,8 @@ Renaming a key on the extension side requires updating the response field too.
 | `ps_refresh_token` | Extension | — | Internal, PKCE refresh. |
 | `ps_user_email` | Extension | `GET_AUTH_TOKEN.email` | |
 | `ps_plan` | Extension (synced from Supabase) | `GET_SUBSCRIPTION.plan` | `'free' \| 'pro' \| 'cancelled'`. |
-| `ps_remaining` | Extension (proxy increments) | `GET_SUBSCRIPTION.remaining` | |
-| `ps_limit` | Extension | `GET_SUBSCRIPTION.limit` | `300` for both Free (display) and Pro. |
+| `ps_remaining` | Extension (`account-summary` + proxy updates) | `GET_SUBSCRIPTION.remaining` | New Free starts at 3, old/spent Free can be 0, Pro counts down from 300. |
+| `ps_limit` | Extension (`account-summary`) | `GET_SUBSCRIPTION.limit` | `300` for both Free display and Pro. |
 | `ps_sub_status` | Extension | `GET_SUBSCRIPTION.status` | `'active' \| 'cancelled' \| null`. |
 | `ps_sub_expires` | Extension | `GET_SUBSCRIPTION.expires_at` | ISO8601. |
 | `ps_sub_card_last4` | Extension | `GET_SUBSCRIPTION.card_last4` | |
@@ -735,7 +738,7 @@ If you switch envs, you must also flip the corresponding Paddle priceIds in the 
 | Treating `plan === 'cancelled'` as always Free or always Pro in site UI | Cancelled-but-not-expired users lose access prematurely, or expired users cannot pay again before cron cleanup | Mirror [`api/download-skill.ts`](../api/download-skill.ts): `'cancelled'` with a future `expires_at` is still Pro; past `expires_at` is Free for payment/UI purposes. |
 | Paddle env-var flip without priceId sync | Real users get sandbox prices (or vice versa) | Treat Paddle env switch as a coordinated deploy across site + Edge Function. |
 | Adding a new site route the extension navigates to | Site must exist before extension ships referring code | Site first, then extension. |
-| Allowing anonymous/Free landing requests to reach promptscore-proxy | Unpaid Claude usage and shared-ledger abuse | Verify the website JWT and live Pro subscription in `/api/prompt-workbench` before every proxy request; the proxy remains a second enforcement layer. |
+| Allowing anonymous landing requests to reach promptscore-proxy | Unmetered Claude usage and shared-ledger abuse | Verify the website JWT in `/api/prompt-workbench` before every proxy request; let the proxy enforce Free signup credits and Pro usage. |
 | Marketing a named Pro model that is not actually used | Misleading paid-product claim and loss of user trust | Describe the product tier (`Opten Pro`) or name the real model; do not advertise a fabricated provider/model name. |
 | Letting the landing model list drift from `PS_CHAT_TOP_MODELS` | Website and extension produce different quick-mode behavior or expose unsupported skills | Keep the exact 14 slugs, labels, order, and image/video grouping synchronized with `C:\Projects\promptscore\popup\popup.js`. |
 
@@ -753,6 +756,6 @@ Update this file **before** merging a change to either repo if it touches:
 - Any of the `ps_*` storage keys in section 5
 - The `EXTENSION_IDS` array in the site
 - `SUPABASE_URL` / `SUPABASE_ANON_KEY` constants
-- The Pro-only Prompt Workbench auth/action/model/request contract
+- The authenticated Prompt Workbench auth/action/model/request/usage contract
 
 Then bump the "Last sync" date and the extension version reference at the top.

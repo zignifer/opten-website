@@ -61,9 +61,9 @@ const copy = {
     refUnsupported: "Не удалось обработать изображение",
     unavailable: "Модель временно не ответила. Попробуйте ещё раз.",
     genericError: "Не удалось улучшить промпт. Попробуйте ещё раз.",
-    proLimit: "Лимит Pro-операций закончился. Проверьте аккаунт.",
+    proLimit: "Кредиты закончились. Проверьте аккаунт.",
     authRequired: "Войдите в аккаунт, чтобы улучшить промпт.",
-    proRequired: "Улучшение доступно только с подпиской Pro.",
+    proRequired: "Кредиты доступны после входа или оплаты Pro.",
     authChecking: "Проверяем аккаунт. Попробуйте ещё раз.",
     entitlementUnavailable: "Не удалось проверить подписку. Попробуйте ещё раз.",
   },
@@ -92,9 +92,9 @@ const copy = {
     refUnsupported: "The image could not be processed",
     unavailable: "The model did not respond. Please try again.",
     genericError: "We could not improve the prompt. Please try again.",
-    proLimit: "Your Pro operation limit has been reached. Check your account.",
+    proLimit: "Your credits are out. Check your account.",
     authRequired: "Sign in to improve the prompt.",
-    proRequired: "Prompt improvement requires a Pro subscription.",
+    proRequired: "Credits are available after sign-in or Pro payment.",
     authChecking: "Checking your account. Please try again.",
     entitlementUnavailable: "We could not verify your subscription. Please try again.",
   },
@@ -197,9 +197,8 @@ function formatLocalDate(date: Date) {
 
 export default function PromptWorkbench() {
   const { lang } = useLang();
-  const { account, refresh, session, status } = useSpaceAuth();
+  const { refresh, session, status } = useSpaceAuth();
   const text = copy[lang];
-  const isPro = status === "signed_in" && account?.plan === "pro";
   const [prompt, setPrompt] = useState("");
   const [type, setType] = useState<PromptWorkbenchType>("image");
   const [model, setModel] = useState(DEFAULT_MODEL_BY_TYPE.image);
@@ -317,11 +316,6 @@ export default function PromptWorkbench() {
       setError(text.authRequired);
       return;
     }
-    if (!isPro) {
-      setError(text.proRequired);
-      return;
-    }
-
     setBusy(true);
     setError(null);
     try {

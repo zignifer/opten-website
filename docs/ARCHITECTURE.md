@@ -48,7 +48,7 @@
 │                                                                              │
 │   API (Vercel serverless):                                                   │
 │     GET /api/download-skill   →  validates JWT + Pro, streams opten.zip      │
-│     POST /api/prompt-workbench → Pro-only popup-parity quick Improve         │
+│     POST /api/prompt-workbench → authenticated popup-parity quick Improve    │
 │     POST /api/course-prompt   →  course access gate + prompt body            │
 │     POST /api/kinescope-course-token → course access gate + drmauthtoken     │
 │     POST /api/kinescope-course-auth  → Kinescope playback callback           │
@@ -198,8 +198,8 @@ src/
 
 api/
 ├── download-skill.ts              — Pro-gated opten.zip stream
-├── prompt-workbench.ts            — Pro-only landing quick Improve;
-│                                     website JWT + Pro gate → proxy Haiku
+├── prompt-workbench.ts            — authenticated landing quick Improve;
+│                                     website JWT → proxy Haiku + shared ledger
 ├── course-prompt.ts               — course-entitlement-gated prompt body fetch
 ├── kinescope-course-token.ts      — course-entitlement-gated Kinescope embed URL
 ├── kinescope-course-auth.ts       — Kinescope server-to-server playback callback

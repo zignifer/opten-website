@@ -39,9 +39,10 @@ one SEO2 blog post for that returned slug using `seo2/blog-post-instruction.md`.
 Seven jobs: (1) marketing surface (landing in RU/EN), (2) website-first auth and
 billing surface (`/login`, `/auth/callback`, `/pay`, `/account`, `/success` for
 YooKassa RUB + Paddle USD — Pro is the only purchasable tier for AI-operations;
-free-аккаунт даёт 0 операций и нужен для логина; лендинг-редактор является
-Pro-only AI surface и списывает операции из того же лимита, что быстрый режим
-`Улучшить` в popup расширения), (3)
+new Free accounts get 3 one-time signup credits while existing Free accounts may
+remain at `0/300`; лендинг-редактор is an authenticated AI surface that spends
+credits from the same shared ledger as быстрый режим `Улучшить` в popup
+расширения), (3)
 Pro-only utilities (`/dashboard/download-skill` — streams `opten.zip` Claude
 Skill bundle sourced from the extension repo's `opten/` dir, Phase 73), (4)
 free Prompt Library at `/prompt-library` for any logged-in extension account
@@ -65,13 +66,15 @@ course is unlaunched, and (7) a public RU/EN prompt workbench in the landing her
 the visible landing UI is improvement-only (no prompt score control or score
 tooltip), lets the user select one of the popup quick-Improve model profiles,
 enter a prompt, attach up to 8 ephemeral image references, and invoke improvement.
-It calls this repo's same-origin `POST /api/prompt-workbench`, which is Pro-only and
-mirrors the extension popup's `POPUP_REWRITE_PROMPT` flow: minimum 20 characters,
-prompt-content language detection, the same committed `rewriter.md`, Anthropic
-reference blocks, `max_tokens: 1200`, `count_usage: true`, `source: popup`, and the
-existing promptscore-proxy Claude Haiku/shared operation ledger. Anonymous requests
-return `authentication_required`; authenticated accounts without a live Pro
-subscription return `pro_required`; neither reaches the proxy. The only selectable
+It calls this repo's same-origin `POST /api/prompt-workbench`, which verifies a
+website JWT and mirrors the extension popup's `POPUP_REWRITE_PROMPT` flow:
+minimum 20 characters, prompt-content language detection, the same committed
+`rewriter.md`, Anthropic reference blocks, `max_tokens: 1200`,
+`count_usage: true`, `source: popup`, and the existing promptscore-proxy Claude
+Haiku/shared operation ledger. Anonymous requests return
+`authentication_required`; signed-in Free users may spend their one-time signup
+credits; exhausted Free users receive the proxy limit error; live Pro users spend
+from the normal 300-operation monthly cycle. The only selectable
 image models are Nano Banana 2, Nano Banana Pro, Chat GPT Image 2, Midjourney 8,
 Midjourney 7, Seedream 5 Lite, Flux 2 Pro, and Z-Image. The only video models are
 Seedance 2.0, Kling 3.0, Kling 2.6, Google Veo 3.1, Google Veo 3.0, and Wan 2.6.
@@ -304,7 +307,7 @@ See [docs/TECH.md](docs/TECH.md) for full picture.
 |------|------|------|
 | opten-website (this) | `C:\Projects\opten-website` | Public site |
 | promptscore (private) | `C:\Projects\promptscore` | Chrome extension (Opten v1.4.1, MV3, post-v2.8 milestone shipped 2026-05-28) + Supabase Edge Functions + migrations + Paddle/YooKassa webhooks. Extension works on 4 platforms: syntx.ai, higgsfield.ai, freepik.com, magnific.com. Extension's Supabase moved cloud → self-hosted (`https://supabase.opten.space`) on 2026-05-25 (Phase 88 cutover); the cloud URL was removed from `host_permissions` in v1.3.7. Popup has **4 tabs** (ИИ-агрегаторы / Скилл / ChatGPT / Улучшить); the ChatGPT tab is a Pro-only «Открыть» CTA that opens a public OpenAI GPT — Pro-gating is UX-only by design. |
-| opten-proxy (private) | `C:\Projects\promptscore-proxy` | Vercel proxy for the extension's AI requests + 63 model-specific skill files in `skills/*.md` (61 model + 2 fallback). Not used by the site directly, but the same skill files are bundled into the Pro-only `opten.zip` Claude Skill served via this repo's `/api/download-skill` |
+| opten-proxy (private) | `C:\Projects\promptscore-proxy` | Vercel proxy for extension AI requests and the website `PromptWorkbench`, plus 63 model-specific skill files in `skills/*.md` (61 model + 2 fallback). The same skill files are bundled into the Pro-only `opten.zip` Claude Skill served via this repo's `/api/download-skill` |
 
 The extension repo owns the Supabase project — all Edge Functions and
 migrations are deployed from there, not from this repo.
@@ -370,10 +373,10 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
                           is shown in the email.
   Site → Paddle:          window.Paddle.Checkout.open(...)
   Site own API:           GET /api/download-skill (Vercel serverless, JWT + Pro-gated)
-                          POST /api/prompt-workbench — Pro-only landing workbench;
-                          website JWT + live Pro gate → promptscore-proxy Claude
-                          Haiku quick-Improve path and shared operation ledger;
-                          exact 14-model popup allowlist, input cap, entitlement verification
+                          POST /api/prompt-workbench — authenticated landing workbench;
+                          website JWT → promptscore-proxy Claude Haiku quick-Improve path
+                          and shared operation ledger; exact 14-model popup allowlist,
+                          input cap, proxy-enforced Free signup/Pro limits
                           POST /api/course-prompt — website JWT + course entitlement gate;
                           returns whitelisted private course prompt bodies
                           POST /api/kinescope-course-token — website JWT + course entitlement gate;
@@ -396,7 +399,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routes, billing flows, and 
 ```
 api/                     — Vercel serverless functions:
                              download-skill.ts — Pro-gated Claude Skill ZIP
-                             prompt-workbench.ts — Pro-only quick-Improve endpoint
+                             prompt-workbench.ts — authenticated quick-Improve endpoint
                                                    (legacy score action may remain server-side)
                              course-prompt.ts — course-entitlement-gated prompt body endpoint
                              kinescope-course-token.ts — course-entitlement-gated playback token issuer
@@ -479,7 +482,7 @@ query itself.
 
 - React Context for i18n only
 - `localStorage` for: `opten_lang_v3` (i18n, written by LangSwitcher only), `opten_pay_currency`. Legacy `opten_lang` is read-only for one-shot EN migration — do not write to it.
-- The landing `PromptWorkbench` is visible publicly but its AI action is Pro-only and ephemeral: prompt text, AI results, selected files, compressed reference bytes, and preview URLs stay in component memory and are not written to `localStorage`. The browser calls only same-origin `/api/prompt-workbench`; logged-out clicks show an authentication error, signed-in Free clicks show a Pro-required error, and only a live website Pro session sends its Bearer JWT to the endpoint. The server independently verifies the JWT and live subscription, enforces the extension popup's exact 14-model quick-Improve allowlist and 20-character minimum, then calls the existing `promptscore-proxy` Claude Haiku rewrite endpoint with the popup-equivalent request and `count_usage: true`. Uploaded references are capped at 8 files, 10 MB per source, compressed client-side to JPEG with a 512 px maximum long edge, and must be revoked/cleared when removed or unmounted. During `npm run dev`, `vite.config.ts` mounts the same Node handler as dev-only middleware so localhost exercises the production handler contract. The reference-strip add button uses an inset focus ring: the strip scrolls horizontally, so an external ring would be clipped by its overflow boundary after the native file picker closes. Copying is local and does not consume usage: desktop shows a secondary `Скопировать` action beside `Улучшить`, while mobile shows the extension-matching outline copy icon in the workbench header. Both copy the current prompt and cross-fade to the extension's filled icon for 500 ms after success.
+- The landing `PromptWorkbench` is visible publicly but its AI action requires a signed-in website session and is otherwise ephemeral: prompt text, AI results, selected files, compressed reference bytes, and preview URLs stay in component memory and are not written to `localStorage`. The browser calls only same-origin `/api/prompt-workbench`; logged-out clicks show an authentication error, signed-in Free clicks may spend one-time signup credits, exhausted Free users receive the proxy limit error, and live Pro sessions spend the normal 300-operation monthly cycle. The server verifies the JWT, enforces the extension popup's exact 14-model quick-Improve allowlist and 20-character minimum, then calls the existing `promptscore-proxy` Claude Haiku rewrite endpoint with the popup-equivalent request and `count_usage: true`; the proxy is the final usage gate. Uploaded references are capped at 8 files, 10 MB per source, compressed client-side to JPEG with a 512 px maximum long edge, and must be revoked/cleared when removed or unmounted. During `npm run dev`, `vite.config.ts` mounts the same Node handler as dev-only middleware so localhost exercises the production handler contract. The reference-strip add button uses an inset focus ring: the strip scrolls horizontally, so an external ring would be clipped by its overflow boundary after the native file picker closes. Copying is local and does not consume usage: desktop shows a secondary `Скопировать` action beside `Улучшить`, while mobile shows the extension-matching outline copy icon in the workbench header. Both copy the current prompt and cross-fade to the extension's filled icon for 500 ms after success.
 - Extension-coupled auth and subscription state lives in the **extension's** `chrome.storage.local` (`ps_*` keys) — legacy site surfaces read via `chrome.runtime.sendMessage(...)`.
 - `/login`, `/pay`, `/account`, and Opten Space `/app/*` share the website Supabase session in `localStorage.opten_space_session_v1` and refresh it through public GoTrue endpoints. Visible auth uses Email OTP/manual email entry only; Google OAuth helpers may remain in code but must not render a login button unless explicitly re-enabled. Credits/subscription state still comes from the shared backend by calling `/functions/v1/account-summary` with the user's Bearer JWT. `/pay` and `/account` use extension messages only as fallback compatibility. Do not put service-role keys, JWT secrets, payment secrets, or proxy API keys in the website bundle.
 - `/account` website logout clears only `localStorage.opten_space_session_v1` and calls public Supabase logout for that website JWT. It must not send extension logout messages or mutate extension-owned `ps_*` keys.
