@@ -37,7 +37,6 @@ import freepikSrc from '../../public/assets/partners/freepik.png?w=268&format=we
 import higgsfieldSrc from '../../public/assets/partners/higgsfield.png?w=268&format=webp;png&as=picture'
 import syntxSrc from '../../public/assets/partners/syntx.png?w=268&format=webp;png&as=picture'
 
-const STORE_URL = "https://chromewebstore.google.com/detail/opten-%E2%80%94-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
 const ASSET_ROOT = "/assets/landing-design";
 const partnerSrcMap = {
   canva: canvaSrc,
@@ -67,22 +66,6 @@ function Accent({ children }: { children: React.ReactNode }) {
 
 function Logo() {
   return <img alt="Opten" src="/logo.svg" width="62" height="20" loading="eager" className="h-[18px] w-auto md:h-[20px]" />;
-}
-
-function BrowserIcons({ size = "lg" }: { size?: "sm" | "lg" }) {
-  const iconSize = size === "lg" ? "size-[40px]" : "size-[28px]";
-  const srcSuffix = size === "lg" ? "lg" : "sm";
-  const px = size === "lg" ? 40 : 28;
-  // Phase 2.2: fetchPriority dropped — React 18.3 doesn't normalize the camelCase JSX prop,
-  // so SSR emits `fetchPriority="high"` verbatim and hydration sees a mismatch → React #418
-  // + #423 fall through to a full client re-render (the actual cause of "buttons unresponsive
-  // for 1-3 s on mobile"). Re-add as `fetchpriority` (lowercase) after upgrading to React 19.
-  return (
-    <span className="flex items-center">
-      <img alt="Chrome" src={`/assets/landing-design/chrome-${srcSuffix}.svg`} width={px} height={px} loading="eager" className={cx(iconSize, "relative z-10")} />
-      <img alt="Yandex Browser" src={`/assets/landing-design/yandex-${srcSuffix}.svg`} width={px} height={px} loading="eager" className={cx(iconSize, "-ml-[8px]")} />
-    </span>
-  );
 }
 
 // Phase 5 follow-up: InstallButton extracted to src/app/components/InstallButton.tsx
@@ -185,15 +168,7 @@ function Partners() {
           </div>
         </div>
 
-        <a
-          href={STORE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-3 rounded-full bg-white px-[14px] py-4 font-['PT_Root_UI',sans-serif] text-[18px] font-bold text-black transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(156,251,81,0.18)] sm:px-6"
-        >
-          <BrowserIcons size="lg" />
-          {t("hero.installBtn")}
-        </a>
+        <InstallButton />
       </div>
     </section>
   );

@@ -124,6 +124,9 @@ Chrome/Yandex Browser) hug their contents instead of stretching to the viewport;
 each uses exactly 14 px of horizontal padding. Across mobile and desktop, every
 paired-icon CTA renders both platform icons at the same 40 x 40 px size. Desktop
 button sizing otherwise remains unchanged.
+The Chrome/Yandex Browser CTAs beneath Partners and FeatureCards both reuse the
+shared `InstallButton`; on desktop their pill dimensions, two-line typography,
+icon overlap, spacing, and platform-icon sizes must remain identical.
 
 The extension is still the primary shipped product. Opten Space Beta is an
 account-based web app surface, but it must share identity, subscription, and
