@@ -152,7 +152,7 @@ const courseAuthor = {
     },
     {
       value: { ru: "9 лет", en: "9 years" },
-      label: { ru: "в дизайне", en: "in design" },
+      label: { ru: "в digital", en: "in design" },
     },
   ],
 } as const;

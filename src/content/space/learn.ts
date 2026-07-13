@@ -277,7 +277,7 @@ export const learnDefaultAuthor: LearnAuthor = {
   },
   initials: "ВВ",
   role: {
-    ru: "Веб-дизайнер, AI-креатор",
+    ru: "9 лет в интернет-маркетинге",
     en: "Web designer, AI creator",
   },
   intro: {
