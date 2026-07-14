@@ -2153,7 +2153,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   const salePrice = formatCoursePrice(effectiveSaleValue, currency);
   const crossedPrice = formatCoursePrice(baseSaleValue, currency);
   const claimRemaining = activeDiscountClaim ? formatCourseClaimRemaining(claimExpiresAtMs - claimNow) : "";
-  const claimDiscountPercent = discountClaimQuote?.claim_discount_percent ?? 40;
+  const claimDiscountPercent = discountClaimQuote?.claim_discount_percent ?? 20;
   const courseLessonsCount = collection.progress?.total || collection.lessons.length;
   const formMessage = error
     ? { tone: "error" as const, text: error }

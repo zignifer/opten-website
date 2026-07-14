@@ -239,8 +239,8 @@ Buyers of the full course get the same lesson automatically through normal
 `privateCourseCollection.lessons` and `api/_shared/kinescopeCourse.ts`. It may
 be advertised from public Learn, but guest playback is available only after the
 Telegram subscription check/claim flow; it remains out of sitemap, llms.txt,
-and EN sibling maps. The 24h
-claim discount has priority over manual promo codes: while active, the website
+and EN sibling maps. The 24h 20% claim discount has priority over manual promo
+codes: while active, the website
 hides the promo-code field, sends `discount_claim_token` to
 `create-course-payment`, and must not stack claim and promo discounts. Provider
 webhooks mark the claim used only after successful payment; Telegram reminders
