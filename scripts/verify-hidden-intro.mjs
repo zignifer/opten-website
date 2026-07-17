@@ -64,14 +64,17 @@ assert.match(tokenApi, /hasTelegramCoursePreviewAccess/, "Kinescope token reques
 assert.match(tokenApi, /accessMode:\s*"course-entitlement"\s*\|\s*"telegram-course-preview"/, "Preview playback token must have a distinct access mode");
 assert.doesNotMatch(tokenApi, /hiddenIntroUnlocked|BrowserUnlock/, "Kinescope access must not trust the removed browser boolean");
 assert.match(serverAuth, /validate_only:\s*true/, "Server claim check must use the read-only validation mode");
+const previewAccessValidator = serverAuth.match(/export async function hasTelegramCoursePreviewAccess[\s\S]*?\n\}/)?.[0] ?? "";
+assert.doesNotMatch(previewAccessValidator, /expires_at|used_at/, "Preview playback validation must not expire with the checkout discount");
 
-assert.match(components, /Генераторы промптов Opten/, "Lesson UI must expose a separate Opten generator section");
+assert.match(components, /Генератор промптов Opten/, "Lesson UI must expose a separate Opten generator section");
 assert.equal([...components.matchAll(/<OptenPromptGeneratorsSection/g)].length, 2, "Opten generators must render on both the course root and every lesson page");
 assert.match(components, /<OptenPromptGeneratorsSection[\s\S]*?<LessonMaterials[\s\S]*?<LessonPrompts/, "Lesson generators must stay in the compact left-column flow before materials and prompts");
 assert.match(components, /<OptenPromptGeneratorsSection[\s\S]*?<CourseIntroShowcase/, "Course-root generators must stay in the compact left-column flow before the intro showcase");
 assert.match(components, /const hasAccess = courseAccess \|\| proAccess/, "Opten generators must open for either a course buyer or an active Pro user");
 assert.match(components, /!loading\s*&&\s*!hasAccess[\s\S]*optenPromptGeneratorsDescription/, "Generator sales description must be hidden after access opens");
-assert.match(components, /href="#course-purchase"[\s\S]*to="\/pay"/, "Locked generators must offer both the course checkout and the Pro payment page");
+assert.match(components, /optenPromptGeneratorsLockedTitle[\s\S]*to="\/pay"/, "Locked generators must offer the compact Pro subscription action");
+assert.doesNotMatch(components, /optenPromptGeneratorsCourseCta/, "The compact generator banner must not duplicate the course checkout CTA");
 assert.match(components, /data-access-state=\{loading \? "loading" : hasAccess \? "open" : "locked"\}/, "Generator section must expose stable loading, open, and locked states");
 assert.match(components, /telegramPreviewClaim:\s*telegramPreviewClaim\s*\|\|\s*undefined/, "Player must pass the claim token to the server");
 assert.match(components, /telegramPreviewUnlockAvailable[\s\S]*TELEGRAM_COURSE_PREVIEW_BOT_URL/, "The first three locked lessons must offer the Telegram unlock CTA before a claim exists");

@@ -234,24 +234,31 @@ The browser stores the claim token in
 `localStorage.opten_course_preview_claim_v1`, reports the initial open to the
 legacy-named `/functions/v1/telegram-hidden-intro-opened` endpoint, and sends
 the token to the playback endpoint for server-side validation. Never trust a
-client boolean as preview authorization. The preview does not unlock private
-course prompts or the separate `Генераторы промптов Opten` section. That
+client boolean as preview authorization. Once issued after a verified Telegram
+subscription, that token unlocks lessons 1–3 permanently: playback validation
+must ignore the discount claim's `expires_at` and `used_at`. The 24-hour window
+applies only to the 40% checkout discount. Repeated bot checks may return the
+same permanent lesson link after the discount expires, but must never create,
+refresh, or extend the discount. The preview does not unlock private
+course prompts or the separate `Генератор промптов Opten` section. That
 collection-level generator block must remain visible on the course root and
 every lesson page. On desktop it stays compact inside the left lesson-content
 column and appears before lesson materials/course showcase and prompts, never
 as a full-width block below the course sidebar. Its explanatory description is
 shown only while access is locked; a course buyer or active Pro user sees the
-heading, open-access badge, and working ChatGPT and Claude/Codex links without
-the sales description. Everyone else sees the same two
-generators in a locked conversion state with separate CTAs to the course
-checkout and `/pay`.
-A Telegram lead may receive the 24h discount claim exactly
-once: repeated checks reuse the same active claim, while an expired or used
-claim is never reissued or extended. Manual admin broadcasts are delivery-only
-and must never create, refresh, or extend `course_discount_claims`. The 24h 40%
-claim discount has priority over manual promo codes and must not stack. Provider
-webhooks mark it used only after successful payment; reminders and broadcasts
-skip used claims and mark Bot API 403/blocked recipients as blocked.
+heading and working ChatGPT and Claude/Codex links without the sales
+description. Everyone else sees the same two generators in a locked conversion
+state with one outlined `Открыть по подписке` CTA to `/pay`; the banner copy
+may also mention the full course, but the course checkout CTA stays in the
+dedicated purchase surface instead of this compact generator block.
+A Telegram lead may receive the 24h discount claim exactly once: repeated
+checks reuse the same claim token for permanent preview access, while an
+expired or used discount is never reissued or extended. Manual admin broadcasts
+are delivery-only and must never create, refresh, or extend
+`course_discount_claims`. The 24h 40% claim discount has priority over manual
+promo codes and must not stack. Provider webhooks mark it used only after
+successful payment; reminders and broadcasts skip used claims and mark Bot API
+403/blocked recipients as blocked.
 
 For future `/start` updates only, the Telegram bot sends the public course intro
 as a video message first, then a separate HTML-formatted text message with the

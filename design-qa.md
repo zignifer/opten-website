@@ -73,3 +73,36 @@ public Cloudflare-backed request path.
 - No Vite overlay, console errors, or horizontal page overflow were detected.
 
 final result: passed
+
+---
+
+# Course Opten Generator Block — Design QA
+
+**Findings**
+- No actionable P0/P1/P2 findings remain.
+
+**Open Questions**
+- None. The implementation keeps the real course left-column width, so the live block is wider than the isolated reference crop while preserving the same compact proportions.
+
+**Implementation Checklist**
+- Removed the decorative heading icon and open-access badge.
+- Matched the singular heading, locked description, two generator rows, and disabled purchase states.
+- Reduced the desktop row height and action width to the compact reference density.
+- Replaced the two-button upsell with one outlined `Открыть по подписке` action to `/pay`.
+- Matched the reference banner wrap, emphasis, button height, borders, radii, and dark green surface treatment.
+- Confirmed the generator section remains above lesson materials and stays inside the desktop lesson-content column.
+
+**Follow-up Polish**
+- No P3 follow-up is needed for the requested desktop state.
+
+source visual truth path: `C:\Users\01EC~1\AppData\Local\Temp\codex-clipboard-f6ff83de-ae66-4983-a1cf-1fa9546b0a0c.png`
+implementation screenshot path: `C:\Users\КОМП\AppData\Local\Temp\opten-generator-page-implementation-final.png`
+viewport: `2048x1024`
+state: signed-out, locked desktop `/learn/courses/ai-content-marketing-2026/lesson-1-prompting`
+full-view comparison evidence: full browser-rendered course page at `C:\Users\КОМП\AppData\Local\Temp\opten-generator-page-implementation-final.png`; the block rendered at `752x302.34px` inside the left lesson column.
+focused region comparison evidence: normalized side-by-side source/implementation comparison at `C:\Users\КОМП\AppData\Local\Temp\opten-generator-comparison-normalized.png`; focused implementation crop at `C:\Users\КОМП\AppData\Local\Temp\opten-generator-implementation-final.png`.
+required fidelity surfaces: typography uses the existing Opten course font at matched weights and hierarchy; spacing and row rhythm match the compact reference; colors reuse the course dark-green and lime tokens; no raster image assets were present or substituted; all app-specific copy and emphasis match the supplied reference.
+primary interactions tested: the single subscription CTA was unique and navigated to `http://127.0.0.1:4173/pay`; locked generator actions remained non-interactive.
+console errors checked: no console errors were present in the final browser state.
+comparison history: pass 1 found a P2 density mismatch in the conversion row—the CTA was 44px high and the sentence wrapped too late. The row was constrained, the CTA reduced to 40px, and the desktop line break matched to the reference. Pass 2 used the final normalized comparison and found no remaining P0/P1/P2 differences.
+final result: passed

@@ -1406,29 +1406,16 @@ function OptenPromptGeneratorsSection({ materials, courseAccess, proAccess, load
       data-testid="opten-prompt-generators"
       data-access-state={loading ? "loading" : hasAccess ? "open" : "locked"}
     >
-      <div className="flex items-start justify-between gap-[18px] max-sm:flex-col max-sm:gap-[12px]">
-        <div className="max-w-[720px]">
-          <div className="flex items-center gap-[9px]">
-            <span className="grid size-[32px] shrink-0 place-items-center rounded-[8px] border border-[#9cfb51]/26 bg-[#9cfb51]/10 text-[#9cfb51]">
-              <Crown size={17} strokeWidth={2.1} />
-            </span>
-            <h2 className="text-[22px] font-bold leading-tight text-white max-sm:text-[20px]">{copy.optenPromptGenerators}</h2>
-          </div>
-          {!loading && !hasAccess && (
-            <p className="mt-[8px] max-w-[720px] text-[14px] leading-[1.5] text-white/58">
-              {copy.optenPromptGeneratorsDescription}
-            </p>
-          )}
-        </div>
-        {!loading && hasAccess && (
-          <span className="inline-flex min-h-[32px] shrink-0 items-center gap-[7px] rounded-full border border-[#9cfb51]/30 bg-[#9cfb51]/10 px-[11px] text-[12px] font-bold text-[#9cfb51]">
-            <LockOpen size={14} strokeWidth={2.25} />
-            {copy.optenPromptGeneratorsOpenBadge}
-          </span>
+      <div className="max-w-[720px]">
+        <h2 className="text-[20px] font-bold leading-tight text-white">{copy.optenPromptGenerators}</h2>
+        {!loading && !hasAccess && (
+          <p className="mt-[8px] text-[13px] leading-[1.45] text-white/48">
+            {copy.optenPromptGeneratorsDescription}
+          </p>
         )}
       </div>
 
-      <div className="mt-[14px] overflow-hidden rounded-[8px] border border-[#9cfb51]/24 bg-[linear-gradient(135deg,rgba(14,38,34,0.98),rgba(14,32,35,0.98))] max-md:mt-[18px]">
+      <div className="mt-[14px] overflow-hidden rounded-[8px] border border-[#9cfb51]/24 bg-[linear-gradient(135deg,rgba(14,38,34,0.98),rgba(14,32,35,0.98))]">
         {materials.map((material) => (
           <OptenPromptGeneratorCard
             key={material.title}
@@ -1445,28 +1432,19 @@ function OptenPromptGeneratorsSection({ materials, courseAccess, proAccess, load
           {copy.optenPromptGeneratorsChecking}
         </div>
       ) : !hasAccess ? (
-        <div className="mt-[12px] grid grid-cols-[minmax(0,1fr)_320px] items-center gap-[18px] rounded-[10px] border border-[#9cfb51]/30 bg-[linear-gradient(110deg,rgba(11,45,30,0.92),rgba(6,27,29,0.96))] px-[16px] py-[14px] max-lg:grid-cols-1 max-lg:gap-[14px] max-sm:px-[15px]">
-          <div>
-            <h3 className="text-[16px] font-bold leading-[1.3] text-white">{copy.optenPromptGeneratorsLockedTitle}</h3>
-            <p className="mt-[5px] max-w-[650px] text-[13px] leading-[1.45] text-white/62">
+        <div className="mt-[12px] grid grid-cols-[minmax(0,1fr)_160px] items-center gap-[18px] rounded-[10px] border border-[#9cfb51]/30 bg-[linear-gradient(110deg,rgba(11,45,30,0.92),rgba(6,27,29,0.96))] px-[16px] py-[18px] max-lg:grid-cols-1 max-lg:gap-[14px] max-sm:px-[15px]">
+          <div className="max-w-[440px]">
+            <h3 className="text-[15px] font-bold leading-[1.3] text-white">{copy.optenPromptGeneratorsLockedTitle}</h3>
+            <p className="mt-[5px] max-w-[650px] text-[12px] leading-[1.5] text-white/58">
               {copy.optenPromptGeneratorsLockedDescription(proPrice)}
             </p>
           </div>
-          <div className="flex gap-[8px] max-sm:flex-col">
-            <a
-              href="#course-purchase"
-              className="flex min-h-[44px] flex-1 items-center justify-center gap-[7px] rounded-[8px] bg-[#9cfb51] px-[14px] text-center text-[13px] font-bold text-[#062013] no-underline transition duration-200 hover:bg-[#8ee943] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#061b1d]"
-            >
-              <CreditCard size={16} strokeWidth={2.2} />
-              {copy.optenPromptGeneratorsCourseCta}
-            </a>
-            <LocalizedLink
-              to="/pay"
-              className="flex min-h-[44px] flex-1 items-center justify-center rounded-[8px] border border-[#9cfb51]/58 bg-[#9cfb51]/[0.06] px-[14px] text-center text-[13px] font-bold text-[#9cfb51] no-underline transition duration-200 hover:bg-[#9cfb51]/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/70"
-            >
-              {copy.optenPromptGeneratorsProCta(proPrice)}
-            </LocalizedLink>
-          </div>
+          <LocalizedLink
+            to="/pay"
+            className="flex h-[40px] items-center justify-center rounded-[8px] border border-[#9cfb51]/58 bg-[#9cfb51]/[0.035] px-[14px] text-center text-[12px] font-bold text-[#9cfb51] no-underline transition duration-200 hover:bg-[#9cfb51]/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/70"
+          >
+            {copy.optenPromptGeneratorsProCta}
+          </LocalizedLink>
         </div>
       ) : null}
     </section>
@@ -1488,15 +1466,15 @@ function OptenPromptGeneratorCard({ material, hasAccess, courseAccess, loading }
   const href = !courseAccess && hasAccess && isCourseSkillDownload ? "/dashboard/download-skill" : material.href;
   const external = href.startsWith("http");
   const staticAsset = href.startsWith("/assets/");
-  const cardClass = "grid min-h-[70px] grid-cols-[34px_minmax(0,1fr)_148px] items-center gap-[12px] border-b border-white/8 px-[16px] py-[10px] last:border-b-0 max-sm:grid-cols-[32px_minmax(0,1fr)] max-sm:gap-[14px] max-sm:px-[18px] max-sm:py-[16px]";
+  const cardClass = "grid min-h-[62px] grid-cols-[30px_minmax(0,1fr)_132px] items-center gap-[10px] border-b border-white/8 px-[15px] py-[8px] last:border-b-0 max-sm:grid-cols-[32px_minmax(0,1fr)] max-sm:gap-[14px] max-sm:px-[18px] max-sm:py-[16px]";
   const content = (
     <>
-      <span className="grid size-[30px] place-items-center rounded-full bg-[#9cfb51]/10 text-[#9cfb51]">
-        <Icon size={17} strokeWidth={2} />
+      <span className="grid size-[28px] place-items-center rounded-full bg-[#9cfb51]/10 text-[#9cfb51]">
+        <Icon size={16} strokeWidth={2} />
       </span>
       <span className="min-w-0">
-        <span className="block truncate text-[14px] font-medium leading-tight text-white">{material.title}</span>
-        <span className="mt-[4px] block text-[12px] leading-tight text-white/44">{material.meta}</span>
+        <span className="block truncate text-[13px] font-medium leading-tight text-white">{material.title}</span>
+        <span className="mt-[3px] block text-[11px] leading-tight text-white/40">{material.meta}</span>
       </span>
     </>
   );
@@ -2870,16 +2848,14 @@ const detailCopy = {
     lessonsTab: "Уроки",
     timestampsTab: "Тайм-коды",
     lessonMaterials: "Материалы урока",
-    optenPromptGenerators: "Генераторы промптов Opten",
-    optenPromptGeneratorsDescription: "Превращайте короткую идею в готовый промпт для ChatGPT, Claude и Codex — блок доступен с любой страницы курса.",
-    optenPromptGeneratorsOpenBadge: "Доступ открыт",
+    optenPromptGenerators: "Генератор промптов Opten",
+    optenPromptGeneratorsDescription: "Превращайте короткую идею в готовый промпт — доступен после оплаты курса",
     optenPromptGeneratorsChecking: "Проверяем доступ к генераторам...",
     optenPromptGeneratorsCheckingShort: "Проверяем",
     optenPromptGeneratorsLockedBadge: "После покупки",
-    optenPromptGeneratorsLockedTitle: "Откройте генераторы удобным способом",
-    optenPromptGeneratorsLockedDescription: (proPrice: string) => `Купите полный курс вместе со всеми 16 уроками и материалами или откройте генераторы отдельно с Opten Pro за ${proPrice}.`,
-    optenPromptGeneratorsCourseCta: "Открыть с курсом",
-    optenPromptGeneratorsProCta: (proPrice: string) => `Opten Pro — ${proPrice}`,
+    optenPromptGeneratorsLockedTitle: "Откройте генератор удобным способом",
+    optenPromptGeneratorsLockedDescription: (proPrice: string) => <>Купите полный курс вместе со всеми 16 уроками или<br className="max-lg:hidden" /> откройте генераторы отдельно с <strong className="font-bold text-white/86">Opten Pro за {proPrice}.</strong></>,
+    optenPromptGeneratorsProCta: "Открыть по подписке",
     lessonPrompts: "Промпты урока",
     openPrompt: "Открыть",
     copyPrompt: "Скопировать",
@@ -2938,7 +2914,7 @@ const detailCopy = {
     courseClaimLabel: "Скидка по ссылке",
     courseClaimChecking: "Проверяем персональную скидку...",
     courseClaimActive: (percent: number, remaining: string) => `Скидка ${percent}% еще ${remaining}`,
-    courseClaimExpired: "Скидка по ссылке истекла.",
+    courseClaimExpired: "Скидка по ссылке истекла. Доступ к трём бесплатным урокам остаётся.",
     courseEmailLabel: "Email для доступа",
     courseEmailPlaceholder: "Ваш Email",
     courseInvalidEmail: "Введите корректный email.",
@@ -2964,16 +2940,14 @@ const detailCopy = {
     lessonsTab: "Lessons",
     timestampsTab: "Timestamps",
     lessonMaterials: "Lesson materials",
-    optenPromptGenerators: "Opten prompt generators",
-    optenPromptGeneratorsDescription: "Turn a short idea into a ready prompt for ChatGPT, Claude, and Codex — available from every course page.",
-    optenPromptGeneratorsOpenBadge: "Access open",
+    optenPromptGenerators: "Opten prompt generator",
+    optenPromptGeneratorsDescription: "Turn a short idea into a ready prompt — available after purchasing the course",
     optenPromptGeneratorsChecking: "Checking generator access...",
     optenPromptGeneratorsCheckingShort: "Checking",
     optenPromptGeneratorsLockedBadge: "Unlock to use",
-    optenPromptGeneratorsLockedTitle: "Choose how to unlock the generators",
-    optenPromptGeneratorsLockedDescription: (proPrice: string) => `Buy the full course with all 16 lessons and materials, or unlock the generators separately with Opten Pro for ${proPrice}.`,
-    optenPromptGeneratorsCourseCta: "Unlock with the course",
-    optenPromptGeneratorsProCta: (proPrice: string) => `Opten Pro — ${proPrice}`,
+    optenPromptGeneratorsLockedTitle: "Choose how to unlock the generator",
+    optenPromptGeneratorsLockedDescription: (proPrice: string) => <>Buy the full course with all 16 lessons, or unlock the generators separately with <strong className="font-bold text-white/86">Opten Pro for {proPrice}.</strong></>,
+    optenPromptGeneratorsProCta: "Unlock with a subscription",
     lessonPrompts: "Lesson prompts",
     openPrompt: "Open",
     copyPrompt: "Copy",
@@ -3032,7 +3006,7 @@ const detailCopy = {
     courseClaimLabel: "Link discount",
     courseClaimChecking: "Checking personal discount...",
     courseClaimActive: (percent: number, remaining: string) => `${percent}% discount: ${remaining} left`,
-    courseClaimExpired: "The link discount has expired.",
+    courseClaimExpired: "The link discount has expired. Your three free lessons remain available.",
     courseEmailLabel: "Access email",
     courseEmailPlaceholder: "you@example.com",
     courseInvalidEmail: "Enter a valid email.",

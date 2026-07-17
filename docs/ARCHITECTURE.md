@@ -324,10 +324,12 @@ initial open through the legacy-named `telegram-hidden-intro-opened`. Guests can
 request Kinescope tokens only for regular lessons 1–3 after that endpoint
 validates the claim server-to-server; the signed playback JWT uses
 `access_mode="telegram-course-preview"`. Private lesson prompts remain
-buyer-only. The collection-level `Генераторы промптов Opten` block appears on
+buyer-only. The collection-level `Генератор промптов Opten` block appears on
 the course root and every lesson before materials/showcase; its links open for
 a course buyer or active Pro user without the sales description, while other
-visitors see locked previews with course and `/pay` CTAs. Before a claim is
+visitors see locked previews with one compact `/pay` subscription CTA. A
+Telegram claim token keeps lessons 1–3 available permanently; its 24-hour
+expiry affects only the checkout discount. Before a claim is
 stored, lessons 1–3 are labelled `Бесплатно через Telegram`; their locked
 players show a bot deep-link CTA, while authorization still depends on the
 server-validated claim.

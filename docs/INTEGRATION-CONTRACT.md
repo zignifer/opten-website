@@ -239,7 +239,7 @@ The site only **calls** them; it does not own them.
 | `POST /create-payment` | Site (`PayPage` RU path) | Bearer JWT | YooKassa. Body: `{ recurring: boolean }`. Returns `{ confirmation_url }`. `return_url` is hardcoded to `https://opten.space/success`. The JWT may come from website auth or extension fallback. |
 | `POST /create-payment-paddle` | Site (`PayPage` EN path) | Bearer JWT | Paddle. Returns `{ priceId, customerEmail, userId }`. Site then calls `Paddle.Checkout.open(...)`. The JWT may come from website auth or extension fallback. |
 | `POST /create-course-payment` | Hidden Learn course page (`/learn/courses/ai-content-marketing-2026/*`) | Public anon + email | Standalone course checkout, not Pro. Body: `{ course_slug, email, return_url, currency?, promo_code?, discount_claim_token? }`. For promo/claim preview, body may be `{ course_slug, currency?, promo_code?, discount_claim_token?, quote_only: true }`; it validates the code/claim and returns `{ provider, amount_value, list_amount_value, discount_percent, promo_discount_percent?, promo_code?, discount_code?, discount_id?, discount_claim_active?, discount_claim_expires_at?, claim_discount_percent?, discount_source?, currency }` without creating `course_orders`, provider payments, incrementing promo usage, or marking claims used. `discount_claim_token` has priority over `promo_code` and must not stack. Normal `currency="RUB"` checkout returns YooKassa `{ confirmation_url, order_id, amount_value, list_amount_value, discount_percent, promo_discount_percent?, discount_claim_active?, discount_claim_expires_at?, claim_discount_percent?, discount_source?, currency }`; `currency="USD"` returns Paddle `{ provider:"paddle", price_id, order_id, customer_email, custom_data, amount_value, list_amount_value, discount_percent, promo_discount_percent?, discount_code?, discount_id?, discount_claim_active?, discount_claim_expires_at?, claim_discount_percent?, discount_source?, currency }`. Promo errors are `invalid_promo_code`, `promo_not_active`, `promo_not_configured`, or `promo_lookup_failed`; claim errors are `invalid_discount_claim`, `discount_claim_not_found`, `discount_claim_expired`, `discount_claim_used`, or `discount_claim_lookup_failed`. The checkout email becomes the entitlement email; no website login is required before payment. |
-| `POST /telegram-hidden-intro-opened` | Telegram course preview page + playback validator | Public anon + claim token | Legacy-named endpoint retained for deployment compatibility. Body: `{ discount_claim_token, validate_only? }`. It validates that the token belongs to the Telegram course funnel. With `validate_only:true`, it returns preview authorization without writing events and is used server-to-server by `/api/kinescope-course-token`. Otherwise it marks the first preview open in the existing claim/lead fields and records the legacy `hidden_intro_opened` event. It does not grant a course entitlement, Pro state, private prompt access, or paid Opten generator access. |
+| `POST /telegram-hidden-intro-opened` | Telegram course preview page + playback validator | Public anon + claim token | Legacy-named endpoint retained for deployment compatibility. Body: `{ discount_claim_token, validate_only? }`. It validates that the token belongs to the Telegram course funnel and returns `{ preview_access:true, discount_active:boolean }`. Preview authorization is permanent and intentionally ignores claim `expires_at`/`used_at`; those fields affect only `discount_active` and checkout pricing. With `validate_only:true`, it does not write events and is used server-to-server by `/api/kinescope-course-token`. Otherwise it marks the first preview open in the existing claim/lead fields and records the legacy `hidden_intro_opened` event. It does not grant a course entitlement, Pro state, private prompt access, or paid Opten generator access. |
 | `GET/POST /telegram-hidden-intro-stats` | Owner/admin tooling | `X-Opten-Admin-Secret` | Service endpoint returning lead, claim, order, and event counts for the Telegram hidden intro funnel. Uses `TELEGRAM_ADMIN_SECRET` with fallback to `TELEGRAM_WEBHOOK_SECRET`. |
 | `POST /telegram-hidden-intro-broadcast` | Owner/admin tooling | `X-Opten-Admin-Secret` | Manual bot broadcast endpoint. Body supports `{ text, photo_url?, button_text?, button_url?, segment?, limit?, dry_run? }`; segment is `all`, `subscribed`, `access_granted`, or `access_granted_not_paid`. Sends sequentially with a small delay, persists a `telegram_broadcasts` row plus per-recipient `message_id` values for non-dry-run sends, and marks Telegram 403/blocked users as blocked. Broadcasts are delivery-only: they never create, refresh, or extend `course_discount_claims`. Returns `{ broadcast_id, recipients, sent, blocked, failed }` for real sends. |
 | `GET/POST /telegram-hidden-intro-broadcasts` | Owner/admin tooling | `X-Opten-Admin-Secret` | Broadcast history and delete endpoint. `GET` returns recent stored broadcast rows. `POST` with `{ action:"delete", broadcast_id }` calls Telegram `deleteMessage` for stored recipient `chat_id` + `message_id` pairs and updates recipient/broadcast delete counters. Only broadcasts sent after message ID persistence was added are reliably deletable, and Telegram's own message deletion limits still apply. |
@@ -302,13 +302,14 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
   increment `times_used` once, only when the order was not already succeeded.
 - Telegram claim discounts live in `course_discount_claims`, not in
   `course_promo_codes`. A claim is a random per-user token issued after
-  Telegram channel subscription verification, normally valid for 24 hours.
+  Telegram channel subscription verification. The token permanently unlocks
+  the first three lessons, while its checkout discount is valid for 24 hours.
   New claims use a 40% discount. Already-issued claims keep their stored
   percentage until expiry so a previously promised 20% offer is still honored.
   It is issued exactly once per Telegram lead: repeated subscription checks
-  reuse the same claim while it is active, but an expired or used claim is
-  never reissued or extended. A database invariant must enforce this even for
-  concurrent or retried Telegram callbacks.
+  always reuse the same token for preview access, while an expired or used
+  discount is never reissued or extended. A database invariant must enforce
+  this even for concurrent or retried Telegram callbacks.
   While a claim is active, the website must hide the manual promo field and
   send `discount_claim_token` to `create-course-payment`; the backend ignores
   `promo_code` when a valid claim token is present. Quote preview can show the
@@ -378,16 +379,17 @@ lead-magnet funnel:
   the course outline. Opening one shows a `Разблокировать через Telegram` CTA
   to `https://t.me/opten_space_bot?start=course_preview`. The CTA is discovery
   only and must never replace server-side claim validation.
-- The bot sends «первые три урока открыты» and records `access_granted_at` only
-  after claim creation or active-claim reuse succeeds. An expired/used prior
-  claim receives a non-renewal message; lookup/create failures receive a retry
-  message and must not expose a plain lesson URL as if access were active.
+- The bot sends «первые три урока открыты» and records `access_granted_at` after
+  claim creation or reuse succeeds. An expired/used prior claim returns the
+  same permanent lesson link with an honest note that only the discount is no
+  longer active. Lookup/create failures receive a retry message and must not
+  expose a plain lesson URL as if access were active.
 - Private course prompts remain course-entitlement-gated. Telegram preview
   access must not enable Opten for ChatGPT or the Opten Claude/Codex download.
-  The collection-level `Генераторы промптов Opten` block stays visible before
+  The collection-level `Генератор промптов Opten` block stays visible before
   materials/showcase on the course root and every lesson, but its links open
   only for a course buyer or active Pro user; everyone else gets locked
-  previews with course and `/pay` conversion actions. Once access opens, the
+  previews with one compact `/pay` subscription action. Once access opens, the
   sales description under the generator heading is hidden.
 - The removed `hidden-intro`/lesson-0 content must not be present in
   `privateCourseCollection.lessons` or `api/_shared/kinescopeCourse.ts`. Its
