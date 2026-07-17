@@ -10,7 +10,6 @@ import {
   LockOpen,
   Mail,
   Play,
-  Send,
   Tag,
   Video,
 } from "lucide-react";
@@ -29,7 +28,7 @@ import {
   normalizeCoursePromoCode,
   quoteCoursePayment,
   readCourseDiscountClaimTokenFromSearch,
-  readTelegramCoursePreviewClaim,
+  readStoredCourseDiscountClaim,
 } from "../../../../lib/courseAccess";
 import { useCurrencyPreference } from "../../../../lib/currency";
 import { ensurePaddle } from "../../../../lib/paddle";
@@ -39,7 +38,6 @@ import SiteFooter from "../../SiteFooter";
 import SpaceHeader from "../SpaceHeader";
 import { useSpaceAuth } from "../SpaceAuthProvider";
 import type { PrivateCourseIntroContent } from "../../../../content/space/privateCourse";
-import { isTelegramCoursePreviewLesson, TELEGRAM_COURSE_PREVIEW_BOT_URL } from "../../../../content/space/telegramCoursePreview";
 import type { LearnCollection, LearnCoursePurchase, LearnLesson, LearnMaterial, LearnMissingItem, LearnOverviewSection, LearnPromptBlock, LearnTimestamp } from "../../../../content/space/learn";
 import {
   getLearnCollectionCategoryLabel,
@@ -199,14 +197,8 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
   const hasPro = hasProAccess(account);
   const purchase = collection.purchase;
   const courseAccess = useCourseAccess(purchase, session?.access_token ?? null);
-  const telegramPreviewClaim = useTelegramCoursePreviewClaim();
   const courseHasAccess = purchase ? courseAccess.hasAccess : hasPro;
-  const telegramPreviewUnlocked = Boolean(telegramPreviewClaim && isTelegramCoursePreviewLesson(lesson.slug));
-  const telegramPreviewUnlockAvailable = Boolean(
-    purchase && !courseHasAccess && !telegramPreviewClaim && isTelegramCoursePreviewLesson(lesson.slug),
-  );
-  const lessonAccessGranted = courseHasAccess || telegramPreviewUnlocked;
-  const locked = isLessonLocked(lesson, lessonAccessGranted);
+  const locked = isLessonLocked(lesson, courseHasAccess);
   const isCourse = collection.kind === "course";
   const [activeTab, setActiveTab] = useState<SidebarTab>(isCourse ? "lessons" : "timestamps");
   const [startSeconds, setStartSeconds] = useState(0);
@@ -293,15 +285,12 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                 purchase={purchase}
                 startSeconds={startSeconds}
                 playRequestId={playRequestId}
-                telegramPreviewClaim={telegramPreviewUnlocked ? telegramPreviewClaim : null}
-                telegramPreviewUnlockAvailable={telegramPreviewUnlockAvailable}
               />
             </div>
             <LessonIntro
               lesson={displayedLesson}
               collection={displayedCollection}
               locked={locked}
-              telegramPreview={telegramPreviewUnlocked && !courseHasAccess}
               completed={lessonCompleted}
               onCompletionChange={handleLessonCompletionChange}
             />
@@ -688,8 +677,6 @@ type LessonPlayerProps = {
   purchase?: LearnCoursePurchase;
   startSeconds: number;
   playRequestId: number;
-  telegramPreviewClaim?: string | null;
-  telegramPreviewUnlockAvailable?: boolean;
 };
 
 type KinescopeTokenResponse = {
@@ -826,8 +813,6 @@ function LessonPlayer({
   purchase,
   startSeconds,
   playRequestId,
-  telegramPreviewClaim = null,
-  telegramPreviewUnlockAvailable = false,
 }: LessonPlayerProps) {
   const { pathname } = useLocation();
   const { lang } = useLang();
@@ -891,7 +876,7 @@ function LessonPlayer({
     if (!isKinescopeVideo || !activated || locked || kinescopeEmbedUrl) return;
 
     const accessToken = session?.access_token;
-    if (!accessToken && !telegramPreviewClaim) {
+    if (!accessToken) {
       setKinescopeError("missing_session");
       return;
     }
@@ -909,7 +894,6 @@ function LessonPlayer({
       body: JSON.stringify({
         courseSlug: collectionId,
         lessonSlug: lesson.slug,
-        telegramPreviewClaim: telegramPreviewClaim || undefined,
       }),
     })
       .then(async (response) => {
@@ -927,7 +911,7 @@ function LessonPlayer({
     return () => {
       cancelled = true;
     };
-  }, [activated, collectionId, isKinescopeVideo, kinescopeEmbedUrl, lesson.slug, locked, session?.access_token, telegramPreviewClaim]);
+  }, [activated, collectionId, isKinescopeVideo, kinescopeEmbedUrl, lesson.slug, locked, session?.access_token]);
 
   useEffect(() => {
     if (!isKinescopeVideo || !activated || !kinescopeEmbedUrl || kinescopeApiFallback) return;
@@ -1001,37 +985,16 @@ function LessonPlayer({
             />
             <div className="absolute inset-0 bg-[#011417]/58" />
             <div className="absolute inset-0 grid place-items-center px-[18px]">
-              {telegramPreviewUnlockAvailable ? (
-                <div className="w-full max-w-[430px] rounded-[14px] border border-[#9cfb51]/38 bg-[#071f20]/94 px-[22px] py-[19px] text-center shadow-[0_22px_70px_rgba(0,0,0,0.5)] backdrop-blur-md max-sm:px-[14px] max-sm:py-[12px]">
-                  <h2 className="text-[18px] font-bold leading-tight text-white max-sm:text-[15px]">{copy.telegramPreviewUnlockTitle}</h2>
-                  <p className="mt-[6px] text-[13px] leading-[1.4] text-white/68 max-sm:hidden">{copy.telegramPreviewUnlockDescription}</p>
-                  <a
-                    href={TELEGRAM_COURSE_PREVIEW_BOT_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-[13px] flex min-h-[44px] w-full items-center justify-center gap-[8px] rounded-[8px] bg-[#9cfb51] px-[16px] text-center text-[14px] font-bold leading-tight text-[#062013] no-underline shadow-[0_14px_38px_rgba(156,251,81,0.2)] transition hover:bg-[#8ee943] max-sm:mt-[9px] max-sm:min-h-[40px] max-sm:text-[13px]"
-                  >
-                    <Send size={17} strokeWidth={2.2} />
-                    <span>{copy.telegramPreviewUnlockCta}</span>
-                  </a>
-                  <a href="#course-purchase" className="mt-[9px] inline-flex text-[12px] font-bold text-white/68 underline decoration-white/25 underline-offset-4 transition hover:text-white max-sm:mt-[7px]">
-                    {copy.telegramPreviewBuyCourse(purchasePrice)}
-                  </a>
-                </div>
-              ) : (
-                <>
-                  <span className="hidden size-[104px] place-items-center rounded-full bg-white/10 text-white/72 md:grid">
-                    <Lock size={42} />
-                  </span>
-                  <a
-                    href="#course-purchase"
-                    className="flex h-[52px] max-w-full items-center justify-center gap-[8px] rounded-[8px] bg-[#9cfb51] px-[22px] text-center text-[15px] font-bold leading-none text-[#062013] no-underline shadow-[0_18px_50px_rgba(156,251,81,0.22)] transition hover:bg-[#8ee943] md:hidden"
-                  >
-                    <CreditCard size={17} strokeWidth={2.2} />
-                    <span>{copy.buyCourseShort(purchasePrice)}</span>
-                  </a>
-                </>
-              )}
+              <span className="hidden size-[104px] place-items-center rounded-full bg-white/10 text-white/72 md:grid">
+                <Lock size={42} />
+              </span>
+              <a
+                href="#course-purchase"
+                className="flex h-[52px] max-w-full items-center justify-center gap-[8px] rounded-[8px] bg-[#9cfb51] px-[22px] text-center text-[15px] font-bold leading-none text-[#062013] no-underline shadow-[0_18px_50px_rgba(156,251,81,0.22)] transition hover:bg-[#8ee943] md:hidden"
+              >
+                <CreditCard size={17} strokeWidth={2.2} />
+                <span>{copy.buyCourseShort(purchasePrice)}</span>
+              </a>
             </div>
           </>
         ) : locked || !activated ? (
@@ -1190,12 +1153,11 @@ type LessonIntroProps = {
   lesson: LearnLesson;
   collection: LearnCollection;
   locked: boolean;
-  telegramPreview?: boolean;
   completed: boolean;
   onCompletionChange: (completed: boolean) => void;
 };
 
-function LessonIntro({ lesson, collection, locked, telegramPreview = false, completed, onCompletionChange }: LessonIntroProps) {
+function LessonIntro({ lesson, collection, locked, completed, onCompletionChange }: LessonIntroProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const position = getLessonPosition(lesson.slug, lang);
@@ -1217,9 +1179,9 @@ function LessonIntro({ lesson, collection, locked, telegramPreview = false, comp
             </span>
           )}
           {collection.purchase ? (
-            <span className={`inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51] ${locked || telegramPreview ? "" : "max-md:hidden"}`}>
+            <span className={`inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51] ${locked ? "" : "max-md:hidden"}`}>
               {locked ? <Lock size={13} /> : <LockOpen size={13} />}
-              {locked ? copy.unlocksAfterPurchase : telegramPreview ? copy.telegramPreviewOpen : copy.courseOpenBadge}
+              {locked ? copy.unlocksAfterPurchase : copy.courseOpenBadge}
             </span>
           ) : locked ? (
             <span className="inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
@@ -1915,7 +1877,7 @@ function LessonSidebar({
       </div>
 
       {activeTab === "lessons" && isCourse ? (
-        <CourseOutline collection={collection} currentSlug={currentSlug ?? lesson.slug} hasAccess={hasAccess} purchase={purchase} />
+        <CourseOutline collection={collection} currentSlug={currentSlug ?? lesson.slug} hasAccess={hasAccess} />
       ) : (
         <TimestampList timestamps={getLearnLessonTimestamps(lesson, lang)} onSelect={onTimestampSelect} />
       )}
@@ -1927,30 +1889,17 @@ type CourseOutlineProps = {
   collection: LearnCollection;
   currentSlug: string;
   hasAccess: boolean;
-  purchase?: LearnCoursePurchase;
   className?: string;
 };
 
-export function CourseOutline({ collection, currentSlug, hasAccess, purchase, className = "" }: CourseOutlineProps) {
+export function CourseOutline({ collection, currentSlug, hasAccess, className = "" }: CourseOutlineProps) {
   const { lang } = useLang();
-  const copy = detailCopy[lang];
-  const telegramPreviewClaim = useTelegramCoursePreviewClaim();
 
   return (
     <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] max-md:max-h-[312px] max-md:space-y-[4px] max-md:p-[12px] ${className}`}>
       {collection.lessons.map((outlineLesson, index) => {
         const current = outlineLesson.slug === currentSlug;
-        const telegramPreviewAvailable = Boolean(telegramPreviewClaim && isTelegramCoursePreviewLesson(outlineLesson.slug));
-        const telegramPreviewUnlockAvailable = Boolean(
-          purchase && !hasAccess && !telegramPreviewClaim && isTelegramCoursePreviewLesson(outlineLesson.slug),
-        );
-        const telegramPreviewHighlighted = (telegramPreviewAvailable || telegramPreviewUnlockAvailable) && !hasAccess;
-        const locked = isLessonLocked(outlineLesson, hasAccess || telegramPreviewAvailable);
-        const metaLabel = telegramPreviewAvailable && !hasAccess
-          ? copy.telegramPreviewOpen
-          : telegramPreviewUnlockAvailable
-            ? copy.telegramPreviewFree
-            : outlineLesson.duration;
+        const locked = isLessonLocked(outlineLesson, hasAccess);
         const displayNumber = getCourseLessonDisplayNumber(collection, outlineLesson) || String(index + 1);
         const rowClass = `group grid grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition max-md:grid-cols-[42px_minmax(0,1fr)_28px] max-md:gap-[10px] max-md:px-[12px] max-md:py-[14px] ${
           locked ? "min-h-[62px]" : ""
@@ -1970,8 +1919,8 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
               <span className={`block text-[14px] font-bold leading-[1.35] max-md:text-[16px] ${current ? "text-white" : ""}`}>
                 {getLearnLessonTitle(outlineLesson, lang)}
               </span>
-              <span className={`mt-[4px] block text-[12px] leading-tight max-md:text-[14px] ${telegramPreviewHighlighted ? "font-bold text-[#9cfb51]" : "text-white/44"}`}>
-                {metaLabel}
+              <span className="mt-[4px] block text-[12px] leading-tight text-white/44 max-md:text-[14px]">
+                {outlineLesson.duration}
               </span>
             </span>
             {locked ? (
@@ -1997,18 +1946,6 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
       })}
     </div>
   );
-}
-
-function useTelegramCoursePreviewClaim() {
-  const { search } = useLocation();
-  const claimFromSearch = readCourseDiscountClaimTokenFromSearch(search);
-  const [claim, setClaim] = useState<string | null>(() => claimFromSearch ?? readTelegramCoursePreviewClaim());
-
-  useEffect(() => {
-    setClaim(claimFromSearch ?? readTelegramCoursePreviewClaim());
-  }, [claimFromSearch]);
-
-  return claim;
 }
 
 type TimestampListProps = {
@@ -2138,7 +2075,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   const [currency] = useCurrencyPreference();
   const copy = detailCopy[lang];
   const discountClaimToken = useMemo(
-    () => readCourseDiscountClaimTokenFromSearch(location.search) ?? readTelegramCoursePreviewClaim(),
+    () => readCourseDiscountClaimTokenFromSearch(location.search) ?? readStoredCourseDiscountClaim(),
     [location.search],
   );
   const [email, setEmail] = useState(initialEmail);
@@ -2231,7 +2168,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   const salePrice = formatCoursePrice(effectiveSaleValue, currency);
   const crossedPrice = formatCoursePrice(baseSaleValue, currency);
   const claimRemaining = activeDiscountClaim ? formatCourseClaimRemaining(claimExpiresAtMs - claimNow) : "";
-  const claimDiscountPercent = discountClaimQuote?.claim_discount_percent ?? 40;
+  const claimDiscountPercent = discountClaimQuote?.claim_discount_percent ?? 20;
   const courseLessonsCount = collection.progress?.total || collection.lessons.length;
   const formMessage = error
     ? { tone: "error" as const, text: error }
@@ -2631,7 +2568,6 @@ type RelatedLessonsProps = {
 function RelatedLessons({ collection, currentSlug, hasAccess, purchase }: RelatedLessonsProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
-  const telegramPreviewClaim = useTelegramCoursePreviewClaim();
   const lessons = useMemo(
     () => collection.lessons.filter((item) => item.slug !== currentSlug).slice(0, 2),
     [collection.lessons, currentSlug],
@@ -2644,8 +2580,7 @@ function RelatedLessons({ collection, currentSlug, hasAccess, purchase }: Relate
       <h2 className="text-[24px] font-bold leading-tight text-white">{copy.allLessons}</h2>
       <div className="mt-[16px] grid grid-cols-2 gap-[16px] max-sm:grid-cols-1">
         {lessons.map((item) => {
-          const telegramPreviewAvailable = Boolean(telegramPreviewClaim && isTelegramCoursePreviewLesson(item.slug));
-          const locked = isLessonLocked(item, hasAccess || telegramPreviewAvailable);
+          const locked = isLessonLocked(item, hasAccess);
           const showCourseLockVisual = Boolean(purchase && locked);
           return (
             <LocalizedLink
@@ -2688,7 +2623,7 @@ function RelatedLessons({ collection, currentSlug, hasAccess, purchase }: Relate
                   {getNumberedCourseLessonTitle(collection, item, lang)}
                 </h3>
                 <p className="mt-[14px] text-[13px] font-medium text-[#9cfb51]">
-                  {telegramPreviewAvailable && !hasAccess ? copy.telegramPreviewOpen : purchase && locked ? copy.unlocksAfterPurchase : locked ? copy.unlocksOnPro : copy.watchLesson}
+                  {purchase && locked ? copy.unlocksAfterPurchase : locked ? copy.unlocksOnPro : copy.watchLesson}
                 </p>
               </div>
             </LocalizedLink>
@@ -2887,12 +2822,6 @@ const detailCopy = {
     progressCount: (completed: number, total: number) => `${completed} из ${total} уроков пройдено`,
     unlocksOnPro: "Разблокируется на Pro",
     unlocksAfterPurchase: "Доступ после покупки",
-    telegramPreviewOpen: "Открыто через Telegram",
-    telegramPreviewFree: "Бесплатно через Telegram",
-    telegramPreviewUnlockTitle: "Первые 3 урока — бесплатно",
-    telegramPreviewUnlockDescription: "Подпишитесь на Telegram-канал, проверьте подписку в боте и получите персональную ссылку на уроки.",
-    telegramPreviewUnlockCta: "Разблокировать через Telegram",
-    telegramPreviewBuyCourse: (price: string) => `Или открыть весь курс за ${price}`,
     paidCourseBadge: "Курс",
     courseOpenBadge: "Курс открыт",
     courseAccessOpen: "Доступ открыт",
@@ -2914,7 +2843,7 @@ const detailCopy = {
     courseClaimLabel: "Скидка по ссылке",
     courseClaimChecking: "Проверяем персональную скидку...",
     courseClaimActive: (percent: number, remaining: string) => `Скидка ${percent}% еще ${remaining}`,
-    courseClaimExpired: "Скидка по ссылке истекла. Доступ к трём бесплатным урокам остаётся.",
+    courseClaimExpired: "Скидка по ссылке истекла. Курс доступен по обычной цене.",
     courseEmailLabel: "Email для доступа",
     courseEmailPlaceholder: "Ваш Email",
     courseInvalidEmail: "Введите корректный email.",
@@ -2979,12 +2908,6 @@ const detailCopy = {
     progressCount: (completed: number, total: number) => `${completed} of ${total} lessons completed`,
     unlocksOnPro: "Unlocks on Pro",
     unlocksAfterPurchase: "Access after purchase",
-    telegramPreviewOpen: "Open via Telegram",
-    telegramPreviewFree: "Free via Telegram",
-    telegramPreviewUnlockTitle: "Get the first 3 lessons free",
-    telegramPreviewUnlockDescription: "Subscribe to the Telegram channel, verify your subscription in the bot, and get your personal lesson link.",
-    telegramPreviewUnlockCta: "Unlock via Telegram",
-    telegramPreviewBuyCourse: (price: string) => `Or unlock the full course for ${price}`,
     paidCourseBadge: "Course",
     courseOpenBadge: "Course open",
     courseAccessOpen: "Access open",
@@ -3006,7 +2929,7 @@ const detailCopy = {
     courseClaimLabel: "Link discount",
     courseClaimChecking: "Checking personal discount...",
     courseClaimActive: (percent: number, remaining: string) => `${percent}% discount: ${remaining} left`,
-    courseClaimExpired: "The link discount has expired. Your three free lessons remain available.",
+    courseClaimExpired: "The link discount has expired. The course is available at the regular price.",
     courseEmailLabel: "Access email",
     courseEmailPlaceholder: "you@example.com",
     courseInvalidEmail: "Enter a valid email.",

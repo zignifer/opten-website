@@ -8,13 +8,13 @@ import {
   getPrivateCourseCollection,
   privateCourseIntroContent,
 } from "../../../content/space/privateCourse";
-import { LEGACY_HIDDEN_INTRO_SLUG } from "../../../content/space/telegramCoursePreview";
+import { LEGACY_HIDDEN_INTRO_SLUG } from "../../../content/space/courseDiscountClaim";
 import { getLearnLessonTitle } from "../../../content/space/learn";
 import { useLang } from "../../../i18n/LangContext";
 import {
   readCourseDiscountClaimTokenFromSearch,
-  rememberTelegramCoursePreviewClaim,
-  reportTelegramCoursePreviewOpened,
+  rememberCourseDiscountClaim,
+  reportCourseDiscountClaimOpened,
 } from "../../../lib/courseAccess";
 
 export default function PrivateCoursePage() {
@@ -32,7 +32,7 @@ export default function PrivateCoursePage() {
   const discountClaimToken = readCourseDiscountClaimTokenFromSearch(location.search);
 
   useNoIndexPrivateCourse(pageTitle);
-  useRememberTelegramCoursePreviewClaim(Boolean(collection), discountClaimToken);
+  useRememberCourseDiscountClaim(Boolean(collection), discountClaimToken);
 
   if (!collection) {
     return <Navigate to="/learn" replace />;
@@ -63,11 +63,11 @@ export default function PrivateCoursePage() {
   );
 }
 
-function useRememberTelegramCoursePreviewClaim(active: boolean, discountClaimToken: string | null) {
+function useRememberCourseDiscountClaim(active: boolean, discountClaimToken: string | null) {
   useEffect(() => {
     if (!active || !discountClaimToken) return;
-    rememberTelegramCoursePreviewClaim(discountClaimToken);
-    void reportTelegramCoursePreviewOpened(discountClaimToken);
+    rememberCourseDiscountClaim(discountClaimToken);
+    void reportCourseDiscountClaimOpened(discountClaimToken);
   }, [active, discountClaimToken]);
 }
 

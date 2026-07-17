@@ -6,12 +6,10 @@ import {
   KINESCOPE_PLAYBACK_TTL_SECONDS,
   buildKinescopeEmbedUrl,
   findKinescopeCourseLesson,
-  isKinescopeTelegramPreviewLesson,
 } from "./_shared/kinescopeCourse.js";
 import {
   bearerTokenFromHeader,
   hasCourseAccess,
-  hasTelegramCoursePreviewAccess,
   jsonResponse,
   setJsonCors,
   verifySupabaseJwt,
@@ -20,7 +18,6 @@ import {
 type TokenRequestBody = {
   courseSlug?: string;
   lessonSlug?: string;
-  telegramPreviewClaim?: string;
 };
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
@@ -48,11 +45,9 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return jsonResponse(res, 404, { error: "lesson_not_found" });
   }
 
-  const telegramPreviewClaim = typeof body.telegramPreviewClaim === "string" ? body.telegramPreviewClaim.trim() : "";
-  const canTryTelegramPreview = isKinescopeTelegramPreviewLesson(lesson) && /^[A-Za-z0-9_-]{32,160}$/.test(telegramPreviewClaim);
   const authToken = bearerTokenFromHeader(req.headers.authorization as string | undefined);
   let userId = "";
-  let accessMode: "course-entitlement" | "telegram-course-preview" | null = null;
+  let accessMode: "course-entitlement" | null = null;
   let authError: "invalid_token" | "course_access_query_failed" | null = null;
 
   if (authToken) {
@@ -72,17 +67,6 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     }
   }
 
-  if (!accessMode && canTryTelegramPreview) {
-    try {
-      if (await hasTelegramCoursePreviewAccess(telegramPreviewClaim)) {
-        userId = `telegram-course-preview:${lesson.courseSlug}`;
-        accessMode = "telegram-course-preview";
-      }
-    } catch {
-      return jsonResponse(res, 502, { error: "telegram_preview_access_query_failed" });
-    }
-  }
-
   if (!accessMode && authError === "course_access_query_failed") {
     return jsonResponse(res, 502, { error: authError });
   }
@@ -90,9 +74,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return jsonResponse(res, 401, { error: authError });
   }
   if (!accessMode && !authToken) {
-    return jsonResponse(res, canTryTelegramPreview ? 403 : 401, {
-      error: canTryTelegramPreview ? "telegram_preview_access_required" : "missing_token",
-    });
+    return jsonResponse(res, 401, { error: "missing_token" });
   }
   if (!accessMode) {
     return jsonResponse(res, 403, {

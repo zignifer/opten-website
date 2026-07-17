@@ -217,30 +217,28 @@ short-lived Kinescope embed URL with `drmauthtoken`. Kinescope calls
 Kinescope API key, auth JWT secret, Supabase service-role key, YooKassa secret,
 Resend key, or raw playback token in the client bundle.
 
-The Telegram course preview is a separate free lead magnet for this course, not
-a course entitlement and not a Pro feature. The Telegram bot backend retains the
+The Telegram course offer is a separate sales funnel for this course, not a
+course entitlement and not a Pro feature. The Telegram bot backend retains the
 legacy service name `supabase/functions/telegram-hidden-intro-webhook` for
 deployment compatibility and has `verify_jwt = false`; it validates
-`TELEGRAM_WEBHOOK_SECRET`, checks channel membership through Bot API
-`getChatMember`, stores started users in `telegram_hidden_intro_leads`, writes
+`TELEGRAM_WEBHOOK_SECRET`, stores started users in
+`telegram_hidden_intro_leads`, writes
 funnel events to `telegram_hidden_intro_events`, and issues a random per-user
-`course_discount_claims` link to lesson 1/course checkout. A verified Telegram
-lead may play only the first three regular lessons through
-`/api/kinescope-course-token` with `access_mode="telegram-course-preview"`.
+`course_discount_claims` link to the course checkout. A Telegram claim is a
+discount transport only and must never authorize lesson playback; all 16
+lessons require a normal course entitlement through `course-access-summary`.
 The removed `hidden-intro`/lesson-0 content must not appear in
 `privateCourseCollection.lessons` or `api/_shared/kinescopeCourse.ts`; the
 legacy URL may only redirect to lesson 1 while preserving the claim query.
 The browser stores the claim token in
 `localStorage.opten_course_preview_claim_v1`, reports the initial open to the
-legacy-named `/functions/v1/telegram-hidden-intro-opened` endpoint, and sends
-the token to the playback endpoint for server-side validation. Never trust a
-client boolean as preview authorization. Once issued after a verified Telegram
-subscription, that token unlocks lessons 1–3 permanently: playback validation
-must ignore the discount claim's `expires_at` and `used_at`. The 24-hour window
-applies only to the 40% checkout discount. Repeated bot checks may return the
-same permanent lesson link after the discount expires, but must never create,
-refresh, or extend the discount. The preview does not unlock private
-course prompts or the separate `Генератор промптов Opten` section. That
+legacy-named `/functions/v1/telegram-hidden-intro-opened` endpoint for funnel
+analytics, and uses it only when quoting or creating checkout. The 24-hour
+window applies to the 20% checkout discount. Repeated bot requests reuse the
+same claim and must never create, refresh, or extend the discount. Already
+issued claims retain their stored percentage until expiry, but they no longer
+unlock lessons. The claim does not unlock private course prompts or the
+separate `Генератор промптов Opten` section. That
 collection-level generator block must remain visible on the course root and
 every lesson page. On desktop it stays compact inside the left lesson-content
 column and appears before lesson materials/course showcase and prompts, never
@@ -252,24 +250,26 @@ state with one outlined `Открыть по подписке` CTA to `/pay`; th
 may also mention the full course, but the course checkout CTA stays in the
 dedicated purchase surface instead of this compact generator block.
 A Telegram lead may receive the 24h discount claim exactly once: repeated
-checks reuse the same claim token for permanent preview access, while an
-expired or used discount is never reissued or extended. Manual admin broadcasts
+course requests reuse the same claim token, while an expired or used discount
+is never reissued or extended. Manual admin broadcasts
 are delivery-only and must never create, refresh, or extend
-`course_discount_claims`. The 24h 40% claim discount has priority over manual
+`course_discount_claims`. The 24h 20% claim discount has priority over manual
 promo codes and must not stack. Provider webhooks mark it used only after
-successful payment; reminders and broadcasts skip used claims and mark Bot API
-403/blocked recipients as blocked.
+successful payment, notify the Telegram lead once, and mark the lead paid;
+reminders and broadcasts skip used claims and mark Bot API 403/blocked
+recipients as blocked.
 
-For future `/start` updates only, the Telegram bot sends the public course intro
-as a video message first, then a separate HTML-formatted text message with the
-subscription buttons. The text offers the first three lessons as a calm course
-preview and positions the practical result as a complete brand package worth at
-least 100,000 RUB on the market. It must not promise subscriber/client growth.
+For future `/start` updates only, the Telegram bot sends a two-button menu:
+`Перейти в Telegram` first and `Получить доступ к курсу` second. The Telegram
+button opens the public channel directly. The course button creates/reuses the
+discount claim, then sends the public course intro video followed by the
+HTML-formatted course offer and one `Открыть курс` button. The course copy
+positions the practical result as a complete brand package worth at least
+100,000 RUB on the market and must not promise subscriber/client growth.
 Changing `/start` must never trigger a broadcast or any message to existing
-leads. Before a claim exists, the first three locked lesson rows advertise
-`Бесплатно через Telegram`; opening one of them shows a prominent
-`Разблокировать через Telegram` CTA that deep-links to the bot. This discovery
-UI is not authorization: playback still requires the server-validated claim.
+leads. The website must not advertise free Telegram lessons or deep-link to the
+bot from locked lesson players; all locked lessons point to the normal course
+purchase surface.
 The video must use a stable public HTTPS URL; the backend keeps the
 reviewed 360p Kinescope CDN asset as its default and
 `TELEGRAM_INTRO_VIDEO_URL` may override it. Do not use a Telegram `file_id`,
@@ -308,6 +308,23 @@ Hardcoded constants that are duplicated and must be kept in sync:
 - `SUPABASE_URL`, `SUPABASE_REST_URL`, and `SUPABASE_ANON_KEY` — appears in [src/lib/optenAuth.ts](src/lib/optenAuth.ts), [src/lib/promptLibraryApi.ts](src/lib/promptLibraryApi.ts), [src/app/pages/PayPage.tsx](src/app/pages/PayPage.tsx), [src/app/pages/AccountPage.tsx](src/app/pages/AccountPage.tsx), [api/download-skill.ts](api/download-skill.ts), plus the extension's `config/api.js`
 
 ## Tech stack
+
+### Global PageSpeed audits
+
+Google PageSpeed Insights is configured globally for this Windows user. Run
+`pagespeed <public-url>` from any project; add `-Strategy both` for mobile and
+desktop or `-Category all` for all Lighthouse categories. This one-shot command
+reads the user-level `PAGESPEED_API_KEY` and exits after the Google response.
+The global `pagespeed` MCP must remain disabled by default because it can keep
+PowerShell/npx/Node processes in memory. Enable it only for an MCP-specific task
+with `pagespeed-mcp on`, restart the client, then run `pagespeed-mcp off` and
+restart again immediately after the task. Never copy the key into this
+repository or create a project-local MCP duplicate. Keep Lighthouse lab metrics
+separate from CrUX field metrics. Full usage and the portable `AGENTS.md` block are in
+[docs/PAGESPEED-GLOBAL.md](docs/PAGESPEED-GLOBAL.md).
+Live keyed mobile, desktop, Accessibility, and four-category calls were verified
+on 2026-07-17. The command retries one transient PageSpeed `429`; inspect Google
+Cloud quota settings only if the retry also fails.
 
 - **Vite 6** + **React 18.3** + **React Router 7** + **TypeScript** + **Tailwind 4**
 - **UI:** Radix UI primitives + MUI 7 icons + Lucide + `motion` for animation

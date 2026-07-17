@@ -62,7 +62,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     });
 
     const lesson = findKinescopeCourseLesson(String(payload.course_slug || ""), String(payload.lesson_slug || ""));
-    if (!lesson || lesson.videoId !== body.id || payload.video_id !== body.id) {
+    if (!lesson || lesson.videoId !== body.id || payload.video_id !== body.id || payload.access_mode !== "course-entitlement") {
       res.statusCode = 403;
       res.end();
       return;

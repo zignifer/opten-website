@@ -192,8 +192,8 @@ function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
     publishedAt: privateCourseUpdatedAt,
     updatedAt: privateCourseUpdatedAt,
     releaseNote: {
-      ru: "Закрытый урок курса. Видео хранится в Kinescope и открывается через серверную проверку покупки или Telegram-превью.",
-      en: "Private course lesson. Video is hosted on Kinescope and opened through the server-side purchase or Telegram preview gate.",
+      ru: "Закрытый урок курса. Видео хранится в Kinescope и открывается только после серверной проверки покупки.",
+      en: "Private course lesson. Video is hosted on Kinescope and opens only after a server-side purchase check.",
     },
     filters: ["Standalone", "Course"],
     topics: config.topics,

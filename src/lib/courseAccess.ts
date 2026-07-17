@@ -1,6 +1,6 @@
 import { SUPABASE_ANON_KEY, SUPABASE_FUNCTIONS_URL } from "./optenAuth";
 import type { Currency } from "./currency";
-import { TELEGRAM_COURSE_PREVIEW_STORAGE_KEY } from "../content/space/telegramCoursePreview";
+import { COURSE_DISCOUNT_CLAIM_STORAGE_KEY } from "../content/space/courseDiscountClaim";
 
 export type CourseAccessSummary = {
   course_slug: string;
@@ -74,21 +74,21 @@ export function readCourseDiscountClaimTokenFromSearch(search: string): string |
   return isValidCourseDiscountClaimToken(token) ? token : null;
 }
 
-export function readTelegramCoursePreviewClaim(): string | null {
+export function readStoredCourseDiscountClaim(): string | null {
   if (typeof window === "undefined") return null;
   try {
-    const token = normalizeCourseDiscountClaimToken(window.localStorage.getItem(TELEGRAM_COURSE_PREVIEW_STORAGE_KEY));
+    const token = normalizeCourseDiscountClaimToken(window.localStorage.getItem(COURSE_DISCOUNT_CLAIM_STORAGE_KEY));
     return isValidCourseDiscountClaimToken(token) ? token : null;
   } catch {
     return null;
   }
 }
 
-export function rememberTelegramCoursePreviewClaim(value: string): string | null {
+export function rememberCourseDiscountClaim(value: string): string | null {
   const token = normalizeCourseDiscountClaimToken(value);
   if (!isValidCourseDiscountClaimToken(token)) return null;
   try {
-    window.localStorage.setItem(TELEGRAM_COURSE_PREVIEW_STORAGE_KEY, token);
+    window.localStorage.setItem(COURSE_DISCOUNT_CLAIM_STORAGE_KEY, token);
   } catch {
     // The claim can still be used from the current URL when storage is unavailable.
   }
@@ -179,7 +179,7 @@ export async function quoteCoursePayment(
   return body;
 }
 
-export async function reportTelegramCoursePreviewOpened(discountClaimToken: string): Promise<void> {
+export async function reportCourseDiscountClaimOpened(discountClaimToken: string): Promise<void> {
   const normalizedClaimToken = normalizeCourseDiscountClaimToken(discountClaimToken);
   if (!isValidCourseDiscountClaimToken(normalizedClaimToken)) return;
 
@@ -192,6 +192,6 @@ export async function reportTelegramCoursePreviewOpened(discountClaimToken: stri
     },
     body: JSON.stringify({ discount_claim_token: normalizedClaimToken }),
   }).catch(() => {
-    // Best-effort analytics only; playback authorization is validated separately by the server.
+    // Best-effort funnel analytics only. The claim never authorizes lesson playback.
   });
 }

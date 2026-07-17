@@ -311,28 +311,24 @@ content intentionally; the routes remain out of sitemap, llms.txt, and
 after public Learn changes and `npm run verify:kinescope-course` after any paid course/Kinescope
 ID/materials/prompt change.
 
-Telegram course preview is a separate free lead magnet for the same course. The
+Telegram course offer is a separate discount-only funnel for the same course. The
 extension-owned bot backend stores started users in
 `telegram_hidden_intro_leads`, writes funnel events to
-`telegram_hidden_intro_events`, verifies channel subscription through Telegram
-`getChatMember`, and issues/reuses a random 24h `course_discount_claims` token
-for the lesson-1 course route. Future `/start` updates send the public course
-intro video first and a separate HTML text with subscription buttons second;
-this handler never broadcasts to historical leads. Opening a claim-bearing
+`telegram_hidden_intro_events`, and issues/reuses a random 24h 20%
+`course_discount_claims` token for the course root. `/start` sends a choice
+between the public Telegram channel and course access. Only the course action
+sends the intro video followed by the HTML course offer; this handler never
+broadcasts to historical leads. Opening a claim-bearing
 course URL stores `localStorage.opten_course_preview_claim_v1` and reports the
-initial open through the legacy-named `telegram-hidden-intro-opened`. Guests can
-request Kinescope tokens only for regular lessons 1–3 after that endpoint
-validates the claim server-to-server; the signed playback JWT uses
-`access_mode="telegram-course-preview"`. Private lesson prompts remain
-buyer-only. The collection-level `Генератор промптов Opten` block appears on
+initial offer open through the legacy-named `telegram-hidden-intro-opened`.
+The claim is only a checkout discount transport and never authorizes playback:
+all 16 Kinescope lessons and private lesson prompts require the standalone
+course entitlement. The collection-level `Генератор промптов Opten` block appears on
 the course root and every lesson before materials/showcase; its links open for
 a course buyer or active Pro user without the sales description, while other
-visitors see locked previews with one compact `/pay` subscription CTA. A
-Telegram claim token keeps lessons 1–3 available permanently; its 24-hour
-expiry affects only the checkout discount. Before a claim is
-stored, lessons 1–3 are labelled `Бесплатно через Telegram`; their locked
-players show a bot deep-link CTA, while authorization still depends on the
-server-validated claim.
+visitors see locked previews with one compact `/pay` subscription CTA. Every
+locked lesson uses the same course-purchase UI and the website has no free
+Telegram lesson labels or bot deep-link CTA.
 The removed lesson 0 is
 absent from `privateCourseCollection.lessons` and the Kinescope whitelist; its
 legacy `/hidden-intro` URL only redirects to lesson 1 while preserving the claim
@@ -532,8 +528,8 @@ it must not update `subscriptions`, `users.plan`, or extension credit usage.
 | Website account summary | Supabase `users`, `subscriptions`, `usage_logs` via `account-summary` | Supabase Auth/webhooks/proxy usage logging | `/pay`, `/account`, `/app/*`, headers via Bearer JWT |
 | Course orders / entitlements | Supabase `course_orders`, `course_entitlements` | `create-course-payment` + YooKassa/Paddle course webhooks | Paid course page through `course-access-summary`; website API gates through `hasCourseAccess()` |
 | Course promo codes | Supabase `course_promo_codes` | Operators/marketing through service-role SQL or admin tooling; webhooks increment `times_used` after successful course payment | `create-course-payment` service-role validation and quote preview; paid course UI receives only the effective quote |
-| Telegram course preview leads | Supabase `telegram_hidden_intro_leads` (legacy table name) | Telegram webhook, reminders, broadcasts, course webhooks | Extension-owned Edge Functions; website `/admin` reads aggregates and triggers broadcast service calls only through server-side owner proxy |
-| Telegram course preview events | Supabase `telegram_hidden_intro_events` (legacy table name) | Telegram webhook, opened endpoint, checkout/payment hooks, broadcasts/reminders | Aggregated stats only in browser; broadcast send/fail rows are written by service Edge Functions |
+| Telegram course offer leads | Supabase `telegram_hidden_intro_leads` (legacy table name) | Telegram webhook, reminders, broadcasts, course webhooks | Extension-owned Edge Functions; website `/admin` reads aggregates and triggers broadcast service calls only through server-side owner proxy |
+| Telegram course offer events | Supabase `telegram_hidden_intro_events` (legacy table name) | Telegram webhook, opened endpoint, checkout/payment hooks, broadcasts/reminders | Aggregated stats only in browser; broadcast send/fail rows are written by service Edge Functions |
 | Telegram 24h discount claims | Supabase `course_discount_claims` | Telegram webhook issues claims; `create-course-payment` reserves/quotes; provider webhooks mark used | Paid course UI sends claim token to `create-course-payment`; website `/admin` sees aggregated state and broadcast segments only through service proxy |
 | Learn manual progress | `localStorage.opten_space_learn_progress_v1` | Public/private lesson completion button | Learn lesson UI, course progress widgets |
 | Kinescope playback token | Short-lived HS256 JWT in Kinescope embed URL | `/api/kinescope-course-token` using `KINESCOPE_AUTH_JWT_SECRET` | Kinescope player + `/api/kinescope-course-auth` |
