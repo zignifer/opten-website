@@ -10,6 +10,7 @@ import {
   LockOpen,
   Mail,
   Play,
+  Send,
   Tag,
   Video,
 } from "lucide-react";
@@ -38,7 +39,7 @@ import SiteFooter from "../../SiteFooter";
 import SpaceHeader from "../SpaceHeader";
 import { useSpaceAuth } from "../SpaceAuthProvider";
 import type { PrivateCourseIntroContent } from "../../../../content/space/privateCourse";
-import { isTelegramCoursePreviewLesson } from "../../../../content/space/telegramCoursePreview";
+import { isTelegramCoursePreviewLesson, TELEGRAM_COURSE_PREVIEW_BOT_URL } from "../../../../content/space/telegramCoursePreview";
 import type { LearnCollection, LearnCoursePurchase, LearnLesson, LearnMaterial, LearnMissingItem, LearnOverviewSection, LearnPromptBlock, LearnTimestamp } from "../../../../content/space/learn";
 import {
   getLearnCollectionCategoryLabel,
@@ -201,6 +202,9 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
   const telegramPreviewClaim = useTelegramCoursePreviewClaim();
   const courseHasAccess = purchase ? courseAccess.hasAccess : hasPro;
   const telegramPreviewUnlocked = Boolean(telegramPreviewClaim && isTelegramCoursePreviewLesson(lesson.slug));
+  const telegramPreviewUnlockAvailable = Boolean(
+    purchase && !courseHasAccess && !telegramPreviewClaim && isTelegramCoursePreviewLesson(lesson.slug),
+  );
   const lessonAccessGranted = courseHasAccess || telegramPreviewUnlocked;
   const locked = isLessonLocked(lesson, lessonAccessGranted);
   const isCourse = collection.kind === "course";
@@ -290,6 +294,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                 startSeconds={startSeconds}
                 playRequestId={playRequestId}
                 telegramPreviewClaim={telegramPreviewUnlocked ? telegramPreviewClaim : null}
+                telegramPreviewUnlockAvailable={telegramPreviewUnlockAvailable}
               />
             </div>
             <LessonIntro
@@ -302,7 +307,6 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
             />
           </div>
           <div className={courseMobileOrder(4)}>
-            <LessonMaterials materials={getLearnLessonMaterials(displayedLesson, lang)} locked={locked} purchase={purchase} />
             <OptenPromptGeneratorsSection
               materials={getLearnCollectionPromptGenerators(displayedCollection, lang)}
               courseAccess={courseHasAccess}
@@ -310,6 +314,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
               loading={authStatus === "loading" || (courseAccess.loading && !hasPro)}
               purchase={purchase}
             />
+            <LessonMaterials materials={getLearnLessonMaterials(displayedLesson, lang)} locked={locked} purchase={purchase} />
             <LessonPrompts
               prompts={getLearnLessonPrompts(displayedLesson, lang)}
               locked={!courseHasAccess}
@@ -466,7 +471,6 @@ export function CourseIntroLayout({ collection, intro }: CourseIntroLayoutProps)
             <CourseIntroHeader intro={intro} />
           </div>
           <div className={courseMobileOrder(4)}>
-            <CourseIntroShowcase intro={intro} />
             <OptenPromptGeneratorsSection
               materials={getLearnCollectionPromptGenerators(displayedCollection, lang)}
               courseAccess={courseAccess.hasAccess}
@@ -474,6 +478,7 @@ export function CourseIntroLayout({ collection, intro }: CourseIntroLayoutProps)
               loading={authStatus === "loading" || (courseAccess.loading && !hasPro)}
               purchase={purchase}
             />
+            <CourseIntroShowcase intro={intro} />
           </div>
         </div>
 
@@ -684,6 +689,7 @@ type LessonPlayerProps = {
   startSeconds: number;
   playRequestId: number;
   telegramPreviewClaim?: string | null;
+  telegramPreviewUnlockAvailable?: boolean;
 };
 
 type KinescopeTokenResponse = {
@@ -813,7 +819,16 @@ function destroyKinescopePlayer(player: KinescopeIframePlayer) {
   void player.destroy({ keepElement: true }).catch(() => undefined);
 }
 
-function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, playRequestId, telegramPreviewClaim = null }: LessonPlayerProps) {
+function LessonPlayer({
+  lesson,
+  collectionId,
+  locked,
+  purchase,
+  startSeconds,
+  playRequestId,
+  telegramPreviewClaim = null,
+  telegramPreviewUnlockAvailable = false,
+}: LessonPlayerProps) {
   const { pathname } = useLocation();
   const { lang } = useLang();
   const [currency] = useCurrencyPreference();
@@ -986,16 +1001,37 @@ function LessonPlayer({ lesson, collectionId, locked, purchase, startSeconds, pl
             />
             <div className="absolute inset-0 bg-[#011417]/58" />
             <div className="absolute inset-0 grid place-items-center px-[18px]">
-              <span className="hidden size-[104px] place-items-center rounded-full bg-white/10 text-white/72 md:grid">
-                <Lock size={42} />
-              </span>
-              <a
-                href="#course-purchase"
-                className="flex h-[52px] max-w-full items-center justify-center gap-[8px] rounded-[8px] bg-[#9cfb51] px-[22px] text-center text-[15px] font-bold leading-none text-[#062013] no-underline shadow-[0_18px_50px_rgba(156,251,81,0.22)] transition hover:bg-[#8ee943] md:hidden"
-              >
-                <CreditCard size={17} strokeWidth={2.2} />
-                <span>{copy.buyCourseShort(purchasePrice)}</span>
-              </a>
+              {telegramPreviewUnlockAvailable ? (
+                <div className="w-full max-w-[430px] rounded-[14px] border border-[#9cfb51]/38 bg-[#071f20]/94 px-[22px] py-[19px] text-center shadow-[0_22px_70px_rgba(0,0,0,0.5)] backdrop-blur-md max-sm:px-[14px] max-sm:py-[12px]">
+                  <h2 className="text-[18px] font-bold leading-tight text-white max-sm:text-[15px]">{copy.telegramPreviewUnlockTitle}</h2>
+                  <p className="mt-[6px] text-[13px] leading-[1.4] text-white/68 max-sm:hidden">{copy.telegramPreviewUnlockDescription}</p>
+                  <a
+                    href={TELEGRAM_COURSE_PREVIEW_BOT_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-[13px] flex min-h-[44px] w-full items-center justify-center gap-[8px] rounded-[8px] bg-[#9cfb51] px-[16px] text-center text-[14px] font-bold leading-tight text-[#062013] no-underline shadow-[0_14px_38px_rgba(156,251,81,0.2)] transition hover:bg-[#8ee943] max-sm:mt-[9px] max-sm:min-h-[40px] max-sm:text-[13px]"
+                  >
+                    <Send size={17} strokeWidth={2.2} />
+                    <span>{copy.telegramPreviewUnlockCta}</span>
+                  </a>
+                  <a href="#course-purchase" className="mt-[9px] inline-flex text-[12px] font-bold text-white/68 underline decoration-white/25 underline-offset-4 transition hover:text-white max-sm:mt-[7px]">
+                    {copy.telegramPreviewBuyCourse(purchasePrice)}
+                  </a>
+                </div>
+              ) : (
+                <>
+                  <span className="hidden size-[104px] place-items-center rounded-full bg-white/10 text-white/72 md:grid">
+                    <Lock size={42} />
+                  </span>
+                  <a
+                    href="#course-purchase"
+                    className="flex h-[52px] max-w-full items-center justify-center gap-[8px] rounded-[8px] bg-[#9cfb51] px-[22px] text-center text-[15px] font-bold leading-none text-[#062013] no-underline shadow-[0_18px_50px_rgba(156,251,81,0.22)] transition hover:bg-[#8ee943] md:hidden"
+                  >
+                    <CreditCard size={17} strokeWidth={2.2} />
+                    <span>{copy.buyCourseShort(purchasePrice)}</span>
+                  </a>
+                </>
+              )}
             </div>
           </>
         ) : locked || !activated ? (
@@ -1378,9 +1414,11 @@ function OptenPromptGeneratorsSection({ materials, courseAccess, proAccess, load
             </span>
             <h2 className="text-[22px] font-bold leading-tight text-white max-sm:text-[20px]">{copy.optenPromptGenerators}</h2>
           </div>
-          <p className="mt-[8px] max-w-[720px] text-[14px] leading-[1.5] text-white/58">
-            {copy.optenPromptGeneratorsDescription}
-          </p>
+          {!loading && !hasAccess && (
+            <p className="mt-[8px] max-w-[720px] text-[14px] leading-[1.5] text-white/58">
+              {copy.optenPromptGeneratorsDescription}
+            </p>
+          )}
         </div>
         {!loading && hasAccess && (
           <span className="inline-flex min-h-[32px] shrink-0 items-center gap-[7px] rounded-full border border-[#9cfb51]/30 bg-[#9cfb51]/10 px-[11px] text-[12px] font-bold text-[#9cfb51]">
@@ -1925,8 +1963,16 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
       {collection.lessons.map((outlineLesson, index) => {
         const current = outlineLesson.slug === currentSlug;
         const telegramPreviewAvailable = Boolean(telegramPreviewClaim && isTelegramCoursePreviewLesson(outlineLesson.slug));
+        const telegramPreviewUnlockAvailable = Boolean(
+          purchase && !hasAccess && !telegramPreviewClaim && isTelegramCoursePreviewLesson(outlineLesson.slug),
+        );
+        const telegramPreviewHighlighted = (telegramPreviewAvailable || telegramPreviewUnlockAvailable) && !hasAccess;
         const locked = isLessonLocked(outlineLesson, hasAccess || telegramPreviewAvailable);
-        const metaLabel = telegramPreviewAvailable && !hasAccess ? copy.telegramPreviewOpen : outlineLesson.duration;
+        const metaLabel = telegramPreviewAvailable && !hasAccess
+          ? copy.telegramPreviewOpen
+          : telegramPreviewUnlockAvailable
+            ? copy.telegramPreviewFree
+            : outlineLesson.duration;
         const displayNumber = getCourseLessonDisplayNumber(collection, outlineLesson) || String(index + 1);
         const rowClass = `group grid grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition max-md:grid-cols-[42px_minmax(0,1fr)_28px] max-md:gap-[10px] max-md:px-[12px] max-md:py-[14px] ${
           locked ? "min-h-[62px]" : ""
@@ -1946,7 +1992,7 @@ export function CourseOutline({ collection, currentSlug, hasAccess, purchase, cl
               <span className={`block text-[14px] font-bold leading-[1.35] max-md:text-[16px] ${current ? "text-white" : ""}`}>
                 {getLearnLessonTitle(outlineLesson, lang)}
               </span>
-              <span className={`mt-[4px] block text-[12px] leading-tight max-md:text-[14px] ${telegramPreviewAvailable && !hasAccess ? "text-[#9cfb51]" : "text-white/44"}`}>
+              <span className={`mt-[4px] block text-[12px] leading-tight max-md:text-[14px] ${telegramPreviewHighlighted ? "font-bold text-[#9cfb51]" : "text-white/44"}`}>
                 {metaLabel}
               </span>
             </span>
@@ -2866,6 +2912,11 @@ const detailCopy = {
     unlocksOnPro: "Разблокируется на Pro",
     unlocksAfterPurchase: "Доступ после покупки",
     telegramPreviewOpen: "Открыто через Telegram",
+    telegramPreviewFree: "Бесплатно через Telegram",
+    telegramPreviewUnlockTitle: "Первые 3 урока — бесплатно",
+    telegramPreviewUnlockDescription: "Подпишитесь на Telegram-канал, проверьте подписку в боте и получите персональную ссылку на уроки.",
+    telegramPreviewUnlockCta: "Разблокировать через Telegram",
+    telegramPreviewBuyCourse: (price: string) => `Или открыть весь курс за ${price}`,
     paidCourseBadge: "Курс",
     courseOpenBadge: "Курс открыт",
     courseAccessOpen: "Доступ открыт",
@@ -2955,6 +3006,11 @@ const detailCopy = {
     unlocksOnPro: "Unlocks on Pro",
     unlocksAfterPurchase: "Access after purchase",
     telegramPreviewOpen: "Open via Telegram",
+    telegramPreviewFree: "Free via Telegram",
+    telegramPreviewUnlockTitle: "Get the first 3 lessons free",
+    telegramPreviewUnlockDescription: "Subscribe to the Telegram channel, verify your subscription in the bot, and get your personal lesson link.",
+    telegramPreviewUnlockCta: "Unlock via Telegram",
+    telegramPreviewBuyCourse: (price: string) => `Or unlock the full course for ${price}`,
     paidCourseBadge: "Course",
     courseOpenBadge: "Course open",
     courseAccessOpen: "Access open",

@@ -46,6 +46,7 @@ const vercel = read("vercel.json");
 
 assert.match(preview, /LEGACY_HIDDEN_INTRO_SLUG\s*=\s*"hidden-intro"/, "Legacy hidden route slug must stay redirectable");
 assert.match(preview, /TELEGRAM_COURSE_PREVIEW_STORAGE_KEY\s*=\s*"opten_course_preview_claim_v1"/, "Preview must store the claim token, not a boolean unlock");
+assert.match(preview, /TELEGRAM_COURSE_PREVIEW_BOT_URL\s*=\s*"https:\/\/t\.me\/opten_space_bot\?start=course_preview"/, "Preview discovery CTA must deep-link to the Telegram bot");
 for (const slug of ["lesson-1-prompting", "lesson-2-ai-services", "lesson-3-logo-generation"]) {
   assert.match(preview, new RegExp(slug), `Client preview allowlist must include ${slug}`);
   assert.match(serverCourse, new RegExp(slug), `Server preview allowlist must include ${slug}`);
@@ -66,12 +67,16 @@ assert.match(serverAuth, /validate_only:\s*true/, "Server claim check must use t
 
 assert.match(components, /Генераторы промптов Opten/, "Lesson UI must expose a separate Opten generator section");
 assert.equal([...components.matchAll(/<OptenPromptGeneratorsSection/g)].length, 2, "Opten generators must render on both the course root and every lesson page");
-assert.match(components, /<LessonMaterials[\s\S]*?<OptenPromptGeneratorsSection[\s\S]*?<LessonPrompts/, "Lesson generators must stay in the compact left-column flow between materials and prompts");
-assert.match(components, /<CourseIntroShowcase[\s\S]*?<OptenPromptGeneratorsSection/, "Course-root generators must stay in the compact left-column flow after the intro showcase");
+assert.match(components, /<OptenPromptGeneratorsSection[\s\S]*?<LessonMaterials[\s\S]*?<LessonPrompts/, "Lesson generators must stay in the compact left-column flow before materials and prompts");
+assert.match(components, /<OptenPromptGeneratorsSection[\s\S]*?<CourseIntroShowcase/, "Course-root generators must stay in the compact left-column flow before the intro showcase");
 assert.match(components, /const hasAccess = courseAccess \|\| proAccess/, "Opten generators must open for either a course buyer or an active Pro user");
+assert.match(components, /!loading\s*&&\s*!hasAccess[\s\S]*optenPromptGeneratorsDescription/, "Generator sales description must be hidden after access opens");
 assert.match(components, /href="#course-purchase"[\s\S]*to="\/pay"/, "Locked generators must offer both the course checkout and the Pro payment page");
 assert.match(components, /data-access-state=\{loading \? "loading" : hasAccess \? "open" : "locked"\}/, "Generator section must expose stable loading, open, and locked states");
 assert.match(components, /telegramPreviewClaim:\s*telegramPreviewClaim\s*\|\|\s*undefined/, "Player must pass the claim token to the server");
+assert.match(components, /telegramPreviewUnlockAvailable[\s\S]*TELEGRAM_COURSE_PREVIEW_BOT_URL/, "The first three locked lessons must offer the Telegram unlock CTA before a claim exists");
+assert.match(components, /Бесплатно через Telegram/, "Course outline must advertise the Telegram preview on the first three lessons");
+assert.match(components, /Разблокировать через Telegram/, "Locked preview lessons must show an explicit Telegram unlock action");
 assert.match(components, /<LessonPrompts[\s\S]*?locked=\{!courseHasAccess\}/, "Private lesson prompts must remain buyer-only");
 
 assert.doesNotMatch(seoRoutes, /hidden-intro/, "Legacy redirect must not be added to prerendered SEO routes");

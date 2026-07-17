@@ -202,7 +202,7 @@ live with these exact paths and the documented behavior.
 | `/dashboard/download-skill` | Pro-only feature in popup → opens new tab | Auth-gated page that calls `/api/download-skill` to fetch `opten.zip`. | [popup Phase 73](../../promptscore/popup/popup.html) |
 | `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Free prompt library UI for any logged-in extension account. Calls `GET_AUTH_TOKEN` through the installed extension, then uses Supabase PostgREST for `prompt_library` CRUD/search without a subscription check. After successful mutations it calls `REFRESH_PROMPT_LIBRARY_CACHE` so native extension menus do not keep stale titles/favorite state. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 94 + Phase 97 |
 | `/p/:slug` | User-shared public Prompt Library link | Read-only random-link snapshot of a user's library at publish/refresh time. Public read uses `prompt_library_get_public_snapshot` without auth; per-prompt save uses website auth (`localStorage.opten_space_session_v1`) and `prompt_library_save_public_prompt`. SPA-only, `noindex,nofollow`, no `/en/*` sibling. No bulk-copy action. | Phase 98 |
-| `/learn/courses/:courseSlug/*` | Public course marketing, checkout, and gated lessons | Officially launched standalone paid course surface. It is promoted from public Learn, blog CTAs, Telegram, and other marketing surfaces, while its SPA routes remain `noindex` under the current policy. It is not a Pro subscription entitlement and is not opened by the extension. Payment starts through `create-course-payment`; access is checked through website auth + `course-access-summary`; Kinescope playback is gated by this site's `/api/kinescope-course-token` and `/api/kinescope-course-auth`. After the Telegram subscription/claim flow, guests can play only regular lessons 1–3. Private prompts remain buyer-only. The separate Opten ChatGPT + Claude/Codex generator block is visible on the course root and every lesson: its links open for a course buyer or active Pro user, while other visitors see locked generator previews plus course and `/pay` CTAs. The removed legacy `/hidden-intro` route may only redirect to lesson 1 while preserving the claim query. | Site-only |
+| `/learn/courses/:courseSlug/*` | Public course marketing, checkout, and gated lessons | Officially launched standalone paid course surface. It is promoted from public Learn, blog CTAs, Telegram, and other marketing surfaces, while its SPA routes remain `noindex` under the current policy. It is not a Pro subscription entitlement and is not opened by the extension. Payment starts through `create-course-payment`; access is checked through website auth + `course-access-summary`; Kinescope playback is gated by this site's `/api/kinescope-course-token` and `/api/kinescope-course-auth`. Before a claim exists, regular lessons 1–3 are labelled as free via Telegram and their locked players deep-link to the bot; after the Telegram subscription/claim flow, guests can play only those lessons. Private prompts remain buyer-only. The separate Opten ChatGPT + Claude/Codex generator block is visible before materials/showcase on the course root and every lesson: its links open for a course buyer or active Pro user, while other visitors see locked generator previews plus course and `/pay` CTAs. The explanatory generator description is hidden once access opens. The removed legacy `/hidden-intro` route may only redirect to lesson 1 while preserving the claim query. | Site-only |
 | `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta app surfaces. `/app/learn*` and `/space/learn*` are compatibility redirects to public `/learn*`; public Learn is no longer indexed inside `/app`. Website auth uses the canonical `/login`; visible login uses Email OTP only while the retained Google OAuth path is hidden. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95/96 |
 
 **Locked route names** (renames are breaking):
@@ -374,12 +374,17 @@ lead-magnet funnel:
   `/api/kinescope-course-token` signs those playback tokens with
   `access_mode = "telegram-course-preview"`. All later lessons still require
   normal website auth + `course-access-summary`.
+- Before a claim exists, lessons 1–3 advertise `Бесплатно через Telegram` in
+  the course outline. Opening one shows a `Разблокировать через Telegram` CTA
+  to `https://t.me/opten_space_bot?start=course_preview`. The CTA is discovery
+  only and must never replace server-side claim validation.
 - Private course prompts remain course-entitlement-gated. Telegram preview
   access must not enable Opten for ChatGPT or the Opten Claude/Codex download.
-  The collection-level `Генераторы промптов Opten` block stays visible on the
-  course root and every lesson, but its links open only for a course buyer or
-  active Pro user; everyone else gets locked previews with course and `/pay`
-  conversion actions.
+  The collection-level `Генераторы промптов Opten` block stays visible before
+  materials/showcase on the course root and every lesson, but its links open
+  only for a course buyer or active Pro user; everyone else gets locked
+  previews with course and `/pay` conversion actions. Once access opens, the
+  sales description under the generator heading is hidden.
 - The removed `hidden-intro`/lesson-0 content must not be present in
   `privateCourseCollection.lessons` or `api/_shared/kinescopeCourse.ts`. Its
   legacy URL may only redirect to lesson 1 while preserving the query string;

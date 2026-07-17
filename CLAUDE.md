@@ -238,9 +238,11 @@ client boolean as preview authorization. The preview does not unlock private
 course prompts or the separate `Генераторы промптов Opten` section. That
 collection-level generator block must remain visible on the course root and
 every lesson page. On desktop it stays compact inside the left lesson-content
-column (between lesson materials/showcase and prompts), never as a full-width
-block below the course sidebar. A course buyer or active Pro user gets the
-working ChatGPT and Claude/Codex links, while everyone else sees the same two
+column and appears before lesson materials/course showcase and prompts, never
+as a full-width block below the course sidebar. Its explanatory description is
+shown only while access is locked; a course buyer or active Pro user sees the
+heading, open-access badge, and working ChatGPT and Claude/Codex links without
+the sales description. Everyone else sees the same two
 generators in a locked conversion state with separate CTAs to the course
 checkout and `/pay`.
 A Telegram lead may receive the 24h discount claim exactly
@@ -257,7 +259,11 @@ subscription buttons. The text offers the first three lessons as a calm course
 preview and positions the practical result as a complete brand package worth at
 least 100,000 RUB on the market. It must not promise subscriber/client growth.
 Changing `/start` must never trigger a broadcast or any message to existing
-leads. The video must use a stable public HTTPS URL; the backend keeps the
+leads. Before a claim exists, the first three locked lesson rows advertise
+`Бесплатно через Telegram`; opening one of them shows a prominent
+`Разблокировать через Telegram` CTA that deep-links to the bot. This discovery
+UI is not authorization: playback still requires the server-validated claim.
+The video must use a stable public HTTPS URL; the backend keeps the
 reviewed 360p Kinescope CDN asset as its default and
 `TELEGRAM_INTRO_VIDEO_URL` may override it. Do not use a Telegram `file_id`,
 because a stale ID can silently restore cached media after deploys.
