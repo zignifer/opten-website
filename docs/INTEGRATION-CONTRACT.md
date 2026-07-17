@@ -378,6 +378,10 @@ lead-magnet funnel:
   the course outline. Opening one shows a `Разблокировать через Telegram` CTA
   to `https://t.me/opten_space_bot?start=course_preview`. The CTA is discovery
   only and must never replace server-side claim validation.
+- The bot sends «первые три урока открыты» and records `access_granted_at` only
+  after claim creation or active-claim reuse succeeds. An expired/used prior
+  claim receives a non-renewal message; lookup/create failures receive a retry
+  message and must not expose a plain lesson URL as if access were active.
 - Private course prompts remain course-entitlement-gated. Telegram preview
   access must not enable Opten for ChatGPT or the Opten Claude/Codex download.
   The collection-level `Генераторы промптов Opten` block stays visible before
