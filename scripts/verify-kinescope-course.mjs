@@ -170,7 +170,8 @@ assert.match(content, /https:\/\/higgsfield\.ai\//, "Lesson materials must link 
 assert.match(content, /https:\/\/disk\.yandex\.ru\/d\/HaU7LdU850QLVw/, "Every private course lesson must expose the current AI tools 2026 material");
 assert.match(content, /const courseMaterials:/, "Private course must define one shared material set");
 assert.match(content, /materials:\s*extras\?\.materials\s*\?\?\s*courseMaterials/, "Private course lessons must use lesson extras with the shared material fallback");
-assert.match(content, /promptGenerators:\s*coursePromptGenerators/, "Every private course lesson must expose the separate Opten generator section");
+assert.equal([...content.matchAll(/promptGenerators:\s*coursePromptGenerators/g)].length, 1, "Private course must expose one collection-level Opten generator section");
+assert.match(content, /purchase:\s*{[\s\S]*promptGenerators:\s*coursePromptGenerators[\s\S]*progress:/, "Opten generators must belong to the course collection, not individual lessons");
 assert.doesNotMatch(content, /materials\?:/, "Private course lesson config must not allow per-lesson material overrides");
 assert.doesNotMatch(content, /materials:\s*firstLessonSpecificMaterials/, "Private course lessons must not keep first-lesson-only material overrides");
 assert.match(content, /provider:\s*"kinescope"/, "Private lesson must use the Kinescope video provider");

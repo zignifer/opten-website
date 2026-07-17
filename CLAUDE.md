@@ -235,9 +235,15 @@ The browser stores the claim token in
 legacy-named `/functions/v1/telegram-hidden-intro-opened` endpoint, and sends
 the token to the playback endpoint for server-side validation. Never trust a
 client boolean as preview authorization. The preview does not unlock private
-course prompts or the separate `Генераторы промптов Opten` section; Opten for
-ChatGPT and the Opten Claude/Codex download remain available only after a paid
-course entitlement. A Telegram lead may receive the 24h discount claim exactly
+course prompts or the separate `Генераторы промптов Opten` section. That
+collection-level generator block must remain visible on the course root and
+every lesson page. On desktop it stays compact inside the left lesson-content
+column (between lesson materials/showcase and prompts), never as a full-width
+block below the course sidebar. A course buyer or active Pro user gets the
+working ChatGPT and Claude/Codex links, while everyone else sees the same two
+generators in a locked conversion state with separate CTAs to the course
+checkout and `/pay`.
+A Telegram lead may receive the 24h discount claim exactly
 once: repeated checks reuse the same active claim, while an expired or used
 claim is never reissued or extended. Manual admin broadcasts are delivery-only
 and must never create, refresh, or extend `course_discount_claims`. The 24h 40%

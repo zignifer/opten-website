@@ -323,8 +323,11 @@ course URL stores `localStorage.opten_course_preview_claim_v1` and reports the
 initial open through the legacy-named `telegram-hidden-intro-opened`. Guests can
 request Kinescope tokens only for regular lessons 1–3 after that endpoint
 validates the claim server-to-server; the signed playback JWT uses
-`access_mode="telegram-course-preview"`. Private lesson prompts and the separate
-`Генераторы промптов Opten` section remain buyer-only. The removed lesson 0 is
+`access_mode="telegram-course-preview"`. Private lesson prompts remain
+buyer-only. The collection-level `Генераторы промптов Opten` block appears on
+the course root and every lesson; its links open for a course buyer or active
+Pro user, while other visitors see locked previews with course and `/pay` CTAs.
+The removed lesson 0 is
 absent from `privateCourseCollection.lessons` and the Kinescope whitelist; its
 legacy `/hidden-intro` URL only redirects to lesson 1 while preserving the claim
 query and remains outside sitemap, llms.txt, public Learn route lists, and EN

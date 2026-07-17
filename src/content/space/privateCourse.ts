@@ -208,7 +208,6 @@ function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
     },
     timestamps: config.timestamps,
     materials: extras?.materials ?? courseMaterials,
-    promptGenerators: coursePromptGenerators,
     prompts: extras?.prompts,
     missingItems: extras?.missingItems,
   };
@@ -991,6 +990,7 @@ export const privateCourseCollection: LearnCollection = {
     discountPercent: PRIVATE_COURSE_DISCOUNT_PERCENT,
     saleEndsAt: PRIVATE_COURSE_SALE_ENDS_AT,
   },
+  promptGenerators: coursePromptGenerators,
   progress: {
     completed: 0,
     total: privateCourseTotalLessons,
