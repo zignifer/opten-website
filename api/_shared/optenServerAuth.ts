@@ -112,6 +112,28 @@ export async function hasCourseAccess(token: string, courseSlug: string): Promis
   return body.has_access === true;
 }
 
+export async function hasTelegramCoursePreviewAccess(discountClaimToken: string): Promise<boolean> {
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/telegram-hidden-intro-opened`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      apikey: SUPABASE_ANON_KEY,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      discount_claim_token: discountClaimToken,
+      validate_only: true,
+    }),
+  });
+
+  if (response.status === 400 || response.status === 404) return false;
+  if (!response.ok) throw new Error(`telegram_preview_access_failed:${response.status}`);
+
+  const body = await response.json() as { preview_access?: boolean };
+  return body.preview_access === true;
+}
+
 export function isSubscriptionPeriodLive(expiresAt: string | null): boolean {
   if (!expiresAt) return true;
   const expiresMs = Date.parse(expiresAt);

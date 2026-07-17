@@ -217,41 +217,44 @@ short-lived Kinescope embed URL with `drmauthtoken`. Kinescope calls
 Kinescope API key, auth JWT secret, Supabase service-role key, YooKassa secret,
 Resend key, or raw playback token in the client bundle.
 
-Telegram hidden intro is a separate free lead magnet for this course, not a
-course entitlement and not a Pro feature. The Telegram bot backend lives in the
-extension repo as `supabase/functions/telegram-hidden-intro-webhook` with
-`verify_jwt = false`; it validates `TELEGRAM_WEBHOOK_SECRET`, checks channel
-membership through Bot API `getChatMember`, stores started users in
-`telegram_hidden_intro_leads`, writes funnel events to
-`telegram_hidden_intro_events`, and issues a random per-user
-`course_discount_claims` link for the hidden intro/course checkout. A Telegram
-lead may receive this 24h claim exactly once: a repeated subscription check
-reuses the same claim while it is active, but an expired or used claim is never
-reissued or extended. Manual admin broadcasts are delivery-only and must never
-create, refresh, or extend `course_discount_claims`. Opening
-`/learn/courses/ai-content-marketing-2026/hidden-intro?claim=...` still writes
-`localStorage.opten_hidden_intro_opened_v1`; the website also reports the open
-to `/functions/v1/telegram-hidden-intro-opened` when a claim token is present.
-The free browser hint allows only lesson 0 playback through
-`/api/kinescope-course-token` with `access_mode="telegram-hidden-intro"`.
-Buyers of the full course get the same lesson automatically through normal
-`course-access-summary` entitlement. The lesson is included in
-`privateCourseCollection.lessons` and `api/_shared/kinescopeCourse.ts`. It may
-be advertised from public Learn, but guest playback is available only after the
-Telegram subscription check/claim flow; it remains out of sitemap, llms.txt,
-and EN sibling maps. The 24h 20% claim discount has priority over manual promo
-codes: while active, the website
-hides the promo-code field, sends `discount_claim_token` to
-`create-course-payment`, and must not stack claim and promo discounts. Provider
-webhooks mark the claim used only after successful payment; Telegram reminders
-and broadcasts must skip used claims and mark Bot API 403/blocked recipients as
-blocked.
+The Telegram course preview is a separate free lead magnet for this course, not
+a course entitlement and not a Pro feature. The Telegram bot backend retains the
+legacy service name `supabase/functions/telegram-hidden-intro-webhook` for
+deployment compatibility and has `verify_jwt = false`; it validates
+`TELEGRAM_WEBHOOK_SECRET`, checks channel membership through Bot API
+`getChatMember`, stores started users in `telegram_hidden_intro_leads`, writes
+funnel events to `telegram_hidden_intro_events`, and issues a random per-user
+`course_discount_claims` link to lesson 1/course checkout. A verified Telegram
+lead may play only the first three regular lessons through
+`/api/kinescope-course-token` with `access_mode="telegram-course-preview"`.
+The removed `hidden-intro`/lesson-0 content must not appear in
+`privateCourseCollection.lessons` or `api/_shared/kinescopeCourse.ts`; the
+legacy URL may only redirect to lesson 1 while preserving the claim query.
+The browser stores the claim token in
+`localStorage.opten_course_preview_claim_v1`, reports the initial open to the
+legacy-named `/functions/v1/telegram-hidden-intro-opened` endpoint, and sends
+the token to the playback endpoint for server-side validation. Never trust a
+client boolean as preview authorization. The preview does not unlock private
+course prompts or the separate `Генераторы промптов Opten` section; Opten for
+ChatGPT and the Opten Claude/Codex download remain available only after a paid
+course entitlement. A Telegram lead may receive the 24h discount claim exactly
+once: repeated checks reuse the same active claim, while an expired or used
+claim is never reissued or extended. Manual admin broadcasts are delivery-only
+and must never create, refresh, or extend `course_discount_claims`. The 24h 40%
+claim discount has priority over manual promo codes and must not stack. Provider
+webhooks mark it used only after successful payment; reminders and broadcasts
+skip used claims and mark Bot API 403/blocked recipients as blocked.
 
-The Telegram hidden-intro `/start` welcome image is served from this website at
-`/assets/telegram-hidden-intro-welcome.png` and referenced by the backend through
-`TELEGRAM_WELCOME_PHOTO_URL`. Keep this file in `public/assets/`; do not switch
-the bot back to Telegram `file_id`, because stale `file_id` values can restore
-old cached images after deploys.
+For future `/start` updates only, the Telegram bot sends the public course intro
+as a video message first, then a separate HTML-formatted text message with the
+subscription buttons. The text offers the first three lessons as a calm course
+preview and positions the practical result as a complete brand package worth at
+least 100,000 RUB on the market. It must not promise subscriber/client growth.
+Changing `/start` must never trigger a broadcast or any message to existing
+leads. The video must use a stable public HTTPS URL; the backend keeps the
+reviewed 360p Kinescope CDN asset as its default and
+`TELEGRAM_INTRO_VIDEO_URL` may override it. Do not use a Telegram `file_id`,
+because a stale ID can silently restore cached media after deploys.
 
 The owner/admin dashboard on opten.space is a general protected admin surface
 under `/admin`, not a Telegram-only one-off. The first module is Telegram

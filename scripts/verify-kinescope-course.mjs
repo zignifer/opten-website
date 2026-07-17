@@ -37,7 +37,6 @@ const lessonFourCheatsheetAsset = "public/assets/space/courses/ai-content-market
 const lessonFourResultAsset = "public/assets/space/courses/ai-content-marketing-2026/lesson-4-cofe1-result.jpg";
 
 const expectedKinescopeLessons = [
-  ["hidden-intro", "a4722357-b131-491f-8ca0-cdd11d927630"],
   ["lesson-1-prompting", "e941e14d-c5bf-40fc-abe5-a41e247777cf"],
   ["lesson-2-ai-services", "c3b06c01-19dd-4a3c-8218-7a216a2ebd67"],
   ["lesson-3-logo-generation", "947a68e0-b570-4a9d-ad0c-ee55cc86b440"],
@@ -57,7 +56,6 @@ const expectedKinescopeLessons = [
 ];
 
 const expectedPrivateCourseRuTitles = [
-  "AI контент-завод",
   "Работа с ChatGPT и Claude",
   "Обзор Syntx и Higgsfield",
   "Создание логотипа",
@@ -87,8 +85,7 @@ assert.match(content, /PRIVATE_COURSE_DISCOUNT_PERCENT\s*=\s*0/, "Private course
 assert.match(content, /PRIVATE_COURSE_SALE_ENDS_AT/, "Private course must define a sale countdown deadline");
 assert.match(content, /purchase:\s*{[\s\S]*priceRub:\s*PRIVATE_COURSE_PRICE_RUB[\s\S]*priceUsd:\s*PRIVATE_COURSE_PRICE_USD[\s\S]*discountPercent:\s*PRIVATE_COURSE_DISCOUNT_PERCENT/, "Private course collection must expose RUB and USD purchase metadata");
 for (const [lessonSlug, videoId] of expectedKinescopeLessons) {
-  const contentSlugPattern = lessonSlug === "hidden-intro" ? /HIDDEN_INTRO_SLUG/ : new RegExp(lessonSlug);
-  assert.match(content, contentSlugPattern, `Private course content must include ${lessonSlug}`);
+  assert.match(content, new RegExp(lessonSlug), `Private course content must include ${lessonSlug}`);
   assert.match(content, new RegExp(videoId), `Private course content must include Kinescope video ${videoId}`);
   assert.match(serverCourseContent, new RegExp(lessonSlug), `Server Kinescope whitelist must include ${lessonSlug}`);
   assert.match(serverCourseContent, new RegExp(videoId), `Server Kinescope whitelist must include Kinescope video ${videoId}`);
@@ -107,32 +104,38 @@ const lessonSixExtrasStart = extrasContent.indexOf('"lesson-6-image-editing"', l
 const lessonSevenExtrasStart = extrasContent.indexOf('"lesson-7-ai-video"', lessonSixExtrasStart);
 assert.ok(lessonOneExtrasStart >= 0 && lessonTwoExtrasStart > lessonOneExtrasStart, "Private course extras must include lesson 1 and lesson 2 blocks");
 const lessonOneExtras = extrasContent.slice(lessonOneExtrasStart, lessonTwoExtrasStart);
+const lessonOneContentStart = content.indexOf("slug: PRIVATE_COURSE_FIRST_LESSON_SLUG");
+const lessonOneContentEnd = content.indexOf('slug: "lesson-2-ai-services"', lessonOneContentStart);
+assert.ok(lessonOneContentStart >= 0 && lessonOneContentEnd > lessonOneContentStart, "Private course content must include lesson 1 before lesson 2");
+const lessonOneContent = content.slice(lessonOneContentStart, lessonOneContentEnd);
 assert.ok(lessonThreeExtrasStart > lessonTwoExtrasStart, "Private course extras must include lesson 3 after lesson 2");
 const lessonTwoExtras = extrasContent.slice(lessonTwoExtrasStart, lessonThreeExtrasStart);
 assert.ok(lessonFourExtrasStart >= 0 && lessonFiveExtrasStart > lessonFourExtrasStart, "Private course extras must include lesson 4 and lesson 5 blocks");
 const lessonFourExtras = extrasContent.slice(lessonFourExtrasStart, lessonFiveExtrasStart);
 assert.ok(lessonSixExtrasStart > lessonFiveExtrasStart && lessonSevenExtrasStart > lessonSixExtrasStart, "Private course extras must include lesson 6 and lesson 7 blocks");
 const lessonSixExtras = extrasContent.slice(lessonSixExtrasStart, lessonSevenExtrasStart);
-assert.match(extrasContent, /const requiredCourseMaterials = \[links\.syntx, links\.optenPromptImprover, optenSkill\]/, "Paid course lessons must start with Syntx, Opten ChatGPT prompt generator, and Claude skill");
+assert.match(extrasContent, /const requiredCourseMaterials = \[links\.syntx\]/, "Paid course lesson materials must keep Syntx in the shared prefix");
 assert.match(extrasContent, /ru:\s*withRequiredCourseMaterials\(extras\.materials\.ru\)/, "Private course extras must apply the shared required material prefix to paid lessons");
-assert.match(extrasContent, /useSharedRequiredMaterials:\s*false[\s\S]*l0-niche-research-strategy/, "Hidden intro must keep its own free lesson materials and inline prompt");
-assert.match(extrasContent, /const optenSkill:[\s\S]*Opten \(Claude и Codex\)/, "Shared course materials must define the Claude/Codex skill archive");
-assert.match(extrasContent, /Opten \(ChatGPT\)/, "ChatGPT prompt generator material must use the current RU title");
+assert.doesNotMatch(`${content}\n${extrasContent}`, /AI контент-завод|l0-niche-research-strategy|HIDDEN_INTRO_SLUG/, "Removed lesson 0 must not remain in private course content");
+assert.match(content, /const coursePromptGenerators:[\s\S]*Opten \(ChatGPT\)[\s\S]*Opten \(Claude и Codex\)/, "Paid course must define the separate Opten prompt generator section");
 assert.match(content, /title:\s*"Opten \(ChatGPT\)"/, "Shared ChatGPT prompt generator fallback must use the current RU title");
-assert.match(content, /title:\s*"Syntx"[\s\S]*title:\s*"Opten \(ChatGPT\)"[\s\S]*title:\s*"Opten \(Claude и Codex\)"/, "Shared course material fallback must use Syntx, Opten ChatGPT prompt generator, then Claude/Codex skill");
+const courseMaterialsBlock = content.slice(content.indexOf("const courseMaterials:"), content.indexOf("const coursePromptGenerators:"));
+const coursePromptGeneratorsBlock = content.slice(content.indexOf("const coursePromptGenerators:"), content.indexOf("type PrivateCourseLessonConfig"));
+assert.doesNotMatch(courseMaterialsBlock, /Opten \(ChatGPT\)|Opten \(Claude и Codex\)/, "Opten generators must not remain in general lesson materials");
+assert.match(coursePromptGeneratorsBlock, /Opten \(ChatGPT\)[\s\S]*Opten \(Claude и Codex\)/, "Separate generator section must keep ChatGPT before Claude/Codex");
 assert.doesNotMatch(`${content}\n${extrasContent}`, /Генератор промптов в ChatGPT|Opten Prompt Improver"|Opten генератор промптов/, "Private course materials must not use old ChatGPT prompt generator titles");
-assert.match(extrasContent, /optenPromptImprover:[\s\S]*"Перейти"/, "Prompt improver material button must say Перейти");
+assert.match(coursePromptGeneratorsBlock, /Opten \(ChatGPT\)[\s\S]*actionLabel:\s*"Перейти"/, "Prompt generator button must say Перейти");
 const invalidMaterialActionLabels = [...`${content}\n${extrasContent}`.matchAll(/actionLabel:\s*"([^"]+)"/g)]
   .map((match) => match[1])
   .filter((label) => label !== "Перейти" && label !== "Скачать");
 assert.deepEqual(invalidMaterialActionLabels, [], "Private course material action labels must only be Перейти or Скачать");
 assert.doesNotMatch(extrasContent, /function pending|promptPending|missing\(/, "Private course extras must not expose pending lesson placeholders");
-assert.match(extrasContent, /Opten \(Claude и Codex\)/, "Course materials must label the Claude/Codex skill archive in RU");
-assert.match(extrasContent, /Скилл для генерации промптов в Claude и Codex/, "Course Claude/Codex skill material must show user-facing download copy");
+assert.match(coursePromptGeneratorsBlock, /Opten \(Claude и Codex\)/, "Generator section must label the Claude/Codex skill archive in RU");
+assert.match(coursePromptGeneratorsBlock, /Скилл для генерации промптов в Claude и Codex/, "Course Claude/Codex generator must show user-facing download copy");
 assert.doesNotMatch(lessonOneExtras, /Скилл для загрузки на рабочем столе\./, "Lesson 1 Claude skill material must not expose internal desktop note");
-assert.doesNotMatch(extrasContent, /Скилл для загрузки на рабочем столе\./, "Private course extras must not expose internal desktop notes");
-assert.match(extrasContent, /actionLabel:\s*"Скачать"/, "Course Claude skill material button must say Скачать");
-assert.match(extrasContent, /\/assets\/space\/courses\/ai-content-marketing-2026\/opten-skill\.zip/, "Course Claude skill material must link the downloadable ZIP asset");
+assert.doesNotMatch(coursePromptGeneratorsBlock, /Скилл для загрузки на рабочем столе\./, "Generator section must not expose internal desktop notes");
+assert.match(coursePromptGeneratorsBlock, /actionLabel:\s*"Скачать"/, "Course Claude skill material button must say Скачать");
+assert.match(coursePromptGeneratorsBlock, /\/assets\/space\/courses\/ai-content-marketing-2026\/opten-skill\.zip/, "Course Claude skill material must link the downloadable ZIP asset");
 assert.ok(existsSync(join(root, lessonOneSkillAsset)), `Lesson 1 Claude skill ZIP must exist: ${lessonOneSkillAsset}`);
 assert.ok(statSync(join(root, lessonOneSkillAsset)).size > 0, "Lesson 1 Claude skill ZIP must not be empty");
 assert.match(lessonFourExtras, /lesson-4-model-cheatsheet\.pdf/, "Lesson 4 must link the downloadable model cheat sheet");
@@ -148,10 +151,12 @@ assert.ok(statSync(join(root, lessonFourResultAsset)).size > 0, "Lesson 4 Cofe1 
 assert.doesNotMatch(extrasContent, /links\.opten\b|opten:\s*link\("Opten"/, "Private course materials must not include the generic Opten site link");
 assert.doesNotMatch(extrasContent, /chatgpt:\s*link\("ChatGPT"|claude:\s*link\("Claude"/, "Private course materials must not include generic ChatGPT or Claude links");
 assert.doesNotMatch(lessonOneExtras, /Шпаргалка: формула промпта/, "Lesson 1 materials must not include the obsolete prompt formula cheat sheet");
-assert.match(lessonOneExtras, /recommendedVpn/, "Lesson 1 materials must include the recommended VPN link");
-assert.match(extrasContent, /VPN который рекомендую[\s\S]*https:\/\/sotavpn\.app\/\?utm_source=f37531d3-c013-45cc-858c-9e1690fa3d43/, "Recommended VPN material must keep the live referral link");
-assert.match(lessonOneExtras, /foreignServicesPayment/, "Lesson 1 materials must include the foreign services payment link");
-assert.match(extrasContent, /Сервис для оплаты зарубежных сервисов[\s\S]*https:\/\/t\.me\/zarub_robot\?start=ref_xAulfY/, "Foreign services payment material must keep the live bot link");
+assert.doesNotMatch(lessonOneExtras, /recommendedVpn/, "Lesson 1 materials must not include the VPN link removed with the shortened ending");
+assert.doesNotMatch(lessonOneExtras, /foreignServicesPayment/, "Lesson 1 materials must not include the payment link removed with the shortened ending");
+assert.match(lessonOneContent, /duration:\s*"08:09"/, "Lesson 1 duration must match the shortened Kinescope video");
+assert.match(lessonOneContent, /durationIso:\s*"PT8M9S"/, "Lesson 1 ISO duration must match the shortened Kinescope video");
+assert.match(lessonOneContent, /\["07:32", "Что дальше в курсе"\]/, "Lesson 1 timestamps must include the new closing chapter");
+assert.doesNotMatch(lessonOneContent, /08:35|09:40|Доступ и оплата сервисов/, "Lesson 1 timestamps must not reference removed footage");
 assert.doesNotMatch(lessonTwoExtras, /Шпаргалка по Syntx/, "Lesson 2 materials must not include the Syntx cheat sheet");
 assert.match(lessonOneExtras, /l1-nova-formula-image/, "Lesson 1 prompts must expose the single NOVA formula example");
 assert.doesNotMatch(lessonOneExtras, /l1-business-name|l1-opten-image-prompt|l1-skill-explanation/, "Lesson 1 prompts must not expose obsolete prompt examples");
@@ -165,6 +170,7 @@ assert.match(content, /https:\/\/higgsfield\.ai\//, "Lesson materials must link 
 assert.match(content, /https:\/\/disk\.yandex\.ru\/d\/HaU7LdU850QLVw/, "Every private course lesson must expose the current AI tools 2026 material");
 assert.match(content, /const courseMaterials:/, "Private course must define one shared material set");
 assert.match(content, /materials:\s*extras\?\.materials\s*\?\?\s*courseMaterials/, "Private course lessons must use lesson extras with the shared material fallback");
+assert.match(content, /promptGenerators:\s*coursePromptGenerators/, "Every private course lesson must expose the separate Opten generator section");
 assert.doesNotMatch(content, /materials\?:/, "Private course lesson config must not allow per-lesson material overrides");
 assert.doesNotMatch(content, /materials:\s*firstLessonSpecificMaterials/, "Private course lessons must not keep first-lesson-only material overrides");
 assert.match(content, /provider:\s*"kinescope"/, "Private lesson must use the Kinescope video provider");
@@ -254,7 +260,9 @@ const serverAuth = read("api/_shared/optenServerAuth.ts");
 const serverCourse = serverCourseContent;
 assert.match(tokenApi, /KINESCOPE_AUTH_JWT_SECRET/, "Token API must sign playback tokens with a server env secret");
 assert.match(tokenApi, /hasCourseAccess/, "Token API must enforce standalone course access server-side");
-assert.match(tokenApi, /telegram-hidden-intro/, "Token API must allow the Telegram-unlocked hidden intro without granting the rest of the course");
+assert.match(tokenApi, /telegram-course-preview/, "Token API must use a distinct Telegram three-lesson preview access mode");
+assert.match(tokenApi, /hasTelegramCoursePreviewAccess/, "Token API must validate Telegram preview claims server-side");
+assert.doesNotMatch(tokenApi, /hiddenIntroUnlocked/, "Token API must not trust the removed browser boolean unlock");
 assert.doesNotMatch(tokenApi, /hasLiveProSubscription|not_pro/, "Kinescope token API must not unlock the private course through Pro");
 assert.match(serverAuth, /course-access-summary/, "Server auth helper must call course-access-summary for course entitlements");
 assert.match(tokenApi, /buildKinescopeEmbedUrl/, "Token API must return Kinescope embed URLs through the shared builder");

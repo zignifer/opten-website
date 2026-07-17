@@ -1,5 +1,6 @@
 import { SUPABASE_ANON_KEY, SUPABASE_FUNCTIONS_URL } from "./optenAuth";
 import type { Currency } from "./currency";
+import { TELEGRAM_COURSE_PREVIEW_STORAGE_KEY } from "../content/space/telegramCoursePreview";
 
 export type CourseAccessSummary = {
   course_slug: string;
@@ -71,6 +72,27 @@ export function isValidCourseDiscountClaimToken(value: string | null | undefined
 export function readCourseDiscountClaimTokenFromSearch(search: string): string | null {
   const token = normalizeCourseDiscountClaimToken(new URLSearchParams(search).get("claim"));
   return isValidCourseDiscountClaimToken(token) ? token : null;
+}
+
+export function readTelegramCoursePreviewClaim(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const token = normalizeCourseDiscountClaimToken(window.localStorage.getItem(TELEGRAM_COURSE_PREVIEW_STORAGE_KEY));
+    return isValidCourseDiscountClaimToken(token) ? token : null;
+  } catch {
+    return null;
+  }
+}
+
+export function rememberTelegramCoursePreviewClaim(value: string): string | null {
+  const token = normalizeCourseDiscountClaimToken(value);
+  if (!isValidCourseDiscountClaimToken(token)) return null;
+  try {
+    window.localStorage.setItem(TELEGRAM_COURSE_PREVIEW_STORAGE_KEY, token);
+  } catch {
+    // The claim can still be used from the current URL when storage is unavailable.
+  }
+  return token;
 }
 
 export function formatCoursePrice(value: number, currency: Currency): string {
@@ -157,7 +179,7 @@ export async function quoteCoursePayment(
   return body;
 }
 
-export async function reportTelegramHiddenIntroOpened(discountClaimToken: string): Promise<void> {
+export async function reportTelegramCoursePreviewOpened(discountClaimToken: string): Promise<void> {
   const normalizedClaimToken = normalizeCourseDiscountClaimToken(discountClaimToken);
   if (!isValidCourseDiscountClaimToken(normalizedClaimToken)) return;
 
@@ -170,6 +192,6 @@ export async function reportTelegramHiddenIntroOpened(discountClaimToken: string
     },
     body: JSON.stringify({ discount_claim_token: normalizedClaimToken }),
   }).catch(() => {
-    // Best-effort analytics only; the local hidden-intro unlock must not depend on it.
+    // Best-effort analytics only; playback authorization is validated separately by the server.
   });
 }

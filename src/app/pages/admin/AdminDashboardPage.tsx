@@ -86,7 +86,7 @@ export default function AdminDashboardPage() {
               Owner dashboard
             </p>
             <h1 className="m-0 mt-[6px] font-['Unbounded',sans-serif] text-[28px] font-semibold leading-[1.12] tracking-[0] text-[#091413] md:text-[34px]">
-              Telegram hidden intro
+              Telegram-превью курса
             </h1>
           </div>
           <div className="flex flex-wrap items-center gap-[10px]">

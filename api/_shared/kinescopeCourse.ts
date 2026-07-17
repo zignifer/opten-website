@@ -1,5 +1,9 @@
 export const KINESCOPE_COURSE_SLUG = "ai-content-marketing-2026";
-export const KINESCOPE_HIDDEN_INTRO_LESSON_SLUG = "hidden-intro";
+export const KINESCOPE_TELEGRAM_PREVIEW_LESSON_SLUGS = [
+  "lesson-1-prompting",
+  "lesson-2-ai-services",
+  "lesson-3-logo-generation",
+] as const;
 export const KINESCOPE_PLAYBACK_AUDIENCE = "opten-kinescope-course-playback";
 export const KINESCOPE_PLAYBACK_ISSUER = "https://opten.space";
 export const KINESCOPE_PLAYBACK_TTL_SECONDS = 15 * 60;
@@ -11,11 +15,6 @@ export type KinescopeCourseLesson = {
 };
 
 export const KINESCOPE_COURSE_LESSONS: KinescopeCourseLesson[] = [
-  {
-    courseSlug: KINESCOPE_COURSE_SLUG,
-    lessonSlug: KINESCOPE_HIDDEN_INTRO_LESSON_SLUG,
-    videoId: "a4722357-b131-491f-8ca0-cdd11d927630",
-  },
   {
     courseSlug: KINESCOPE_COURSE_SLUG,
     lessonSlug: "lesson-1-prompting",
@@ -97,6 +96,11 @@ export const KINESCOPE_COURSE_LESSONS: KinescopeCourseLesson[] = [
     videoId: "34992868-3dc1-416c-8438-d25ced15833a",
   },
 ];
+
+export function isKinescopeTelegramPreviewLesson(lesson: KinescopeCourseLesson): boolean {
+  return lesson.courseSlug === KINESCOPE_COURSE_SLUG
+    && KINESCOPE_TELEGRAM_PREVIEW_LESSON_SLUGS.includes(lesson.lessonSlug as (typeof KINESCOPE_TELEGRAM_PREVIEW_LESSON_SLUGS)[number]);
+}
 
 export function findKinescopeCourseLesson(courseSlug: string | undefined, lessonSlug: string | undefined) {
   if (!courseSlug || !lessonSlug) return undefined;

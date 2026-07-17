@@ -1,10 +1,8 @@
 import type { LearnCollection, LearnLang, LearnLesson, LearnMaterial, LearnTimestamp } from "./learn";
 import { futureProtectedVideoDeliveryNote, learnDefaultAuthor } from "./learn";
-import { HIDDEN_INTRO_SLUG } from "./hiddenIntro";
 import { getPrivateCourseLessonExtras } from "./privateCourseExtras";
 
 export const PRIVATE_COURSE_SLUG = "ai-content-marketing-2026";
-export const PRIVATE_COURSE_HIDDEN_INTRO_KINESCOPE_VIDEO_ID = "a4722357-b131-491f-8ca0-cdd11d927630";
 export const PRIVATE_COURSE_FIRST_LESSON_SLUG = "lesson-1-prompting";
 export const PRIVATE_COURSE_FIRST_KINESCOPE_VIDEO_ID = "e941e14d-c5bf-40fc-abe5-a41e247777cf";
 export const PRIVATE_COURSE_PRICE_RUB = 2990;
@@ -55,7 +53,7 @@ export const privateCourseIntroContent: PrivateCourseIntroContent = {
 };
 
 const privateCourseUpdatedAt = "2026-06-23";
-const privateCourseTotalLessons = 17;
+const privateCourseTotalLessons = 16;
 const currentAiTools2026Url = "https://disk.yandex.ru/d/HaU7LdU850QLVw";
 const pendingKinescopePosterPath = "/assets/space/learn-v2/ai-design-dashboard.jpg";
 
@@ -67,20 +65,6 @@ const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
       kind: "link",
       actionLabel: "Перейти",
       href: "https://syntx.ai/welcome/GlUETIt6",
-    },
-    {
-      title: "Opten (ChatGPT)",
-      meta: "Сервис для генерации промптов в ChatGPT",
-      kind: "link",
-      actionLabel: "Перейти",
-      href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
-    },
-    {
-      title: "Opten (Claude и Codex)",
-      meta: "Скилл для генерации промптов в Claude и Codex",
-      kind: "pdf",
-      actionLabel: "Скачать",
-      href: "/assets/space/courses/ai-content-marketing-2026/opten-skill.zip",
     },
     {
       title: "Higgsfield",
@@ -106,20 +90,6 @@ const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
       href: "https://syntx.ai/welcome/GlUETIt6",
     },
     {
-      title: "Opten (ChatGPT)",
-      meta: "Prompt generation service in ChatGPT",
-      kind: "link",
-      actionLabel: "Перейти",
-      href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
-    },
-    {
-      title: "Opten (Claude and Codex)",
-      meta: "Prompt generation skill for Claude and Codex",
-      kind: "pdf",
-      actionLabel: "Скачать",
-      href: "/assets/space/courses/ai-content-marketing-2026/opten-skill.zip",
-    },
-    {
       title: "Higgsfield",
       meta: "Platform for video generation and control",
       kind: "link",
@@ -132,6 +102,41 @@ const courseMaterials: Record<LearnLang, LearnMaterial[]> = {
       kind: "link",
       actionLabel: "Скачать",
       href: currentAiTools2026Url,
+    },
+  ],
+};
+
+const coursePromptGenerators: Record<LearnLang, LearnMaterial[]> = {
+  ru: [
+    {
+      title: "Opten (ChatGPT)",
+      meta: "Сервис для генерации промптов в ChatGPT",
+      kind: "link",
+      actionLabel: "Перейти",
+      href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
+    },
+    {
+      title: "Opten (Claude и Codex)",
+      meta: "Скилл для генерации промптов в Claude и Codex",
+      kind: "pdf",
+      actionLabel: "Скачать",
+      href: "/assets/space/courses/ai-content-marketing-2026/opten-skill.zip",
+    },
+  ],
+  en: [
+    {
+      title: "Opten (ChatGPT)",
+      meta: "Prompt generation service in ChatGPT",
+      kind: "link",
+      actionLabel: "Перейти",
+      href: "https://chatgpt.com/g/g-6a149d78a8688191b5a7aaa2fc0ba540-opten-prompt-improver-image-generator",
+    },
+    {
+      title: "Opten (Claude and Codex)",
+      meta: "Prompt generation skill for Claude and Codex",
+      kind: "pdf",
+      actionLabel: "Скачать",
+      href: "/assets/space/courses/ai-content-marketing-2026/opten-skill.zip",
     },
   ],
 };
@@ -187,8 +192,8 @@ function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
     publishedAt: privateCourseUpdatedAt,
     updatedAt: privateCourseUpdatedAt,
     releaseNote: {
-      ru: "Закрытый урок курса. Видео хранится в Kinescope и открывается через серверный course-entitlement gate.",
-      en: "Private course lesson. Video is hosted on Kinescope and opened through the server-side course entitlement gate.",
+      ru: "Закрытый урок курса. Видео хранится в Kinescope и открывается через серверную проверку покупки или Telegram-превью.",
+      en: "Private course lesson. Video is hosted on Kinescope and opened through the server-side purchase or Telegram preview gate.",
     },
     filters: ["Standalone", "Course"],
     topics: config.topics,
@@ -203,6 +208,7 @@ function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
     },
     timestamps: config.timestamps,
     materials: extras?.materials ?? courseMaterials,
+    promptGenerators: coursePromptGenerators,
     prompts: extras?.prompts,
     missingItems: extras?.missingItems,
   };
@@ -223,74 +229,6 @@ function privateCourseLesson(config: PrivateCourseLessonConfig): LearnLesson {
 
 const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
   {
-    slug: HIDDEN_INTRO_SLUG,
-    videoId: PRIVATE_COURSE_HIDDEN_INTRO_KINESCOPE_VIDEO_ID,
-    videoLinkedAt: "2026-07-09",
-    title: {
-      ru: "AI контент-завод",
-      en: "AI content factory",
-    },
-    description: {
-      ru: "Бесплатный нулевой урок курса: показываю, как связать короткий контент, нейросети и простую воронку. Сначала собираем бесплатный трафик, затем прогреваем доверие и переводим подписчиков в заявки на услуги, продукт или курс.",
-      en: "A free lesson zero for the course: how to connect short-form content, AI tools, and a simple funnel. First you earn free traffic, then build trust, then turn followers into leads for a service, product, or course.",
-    },
-    category: "business",
-    duration: "06:08",
-    durationIso: "PT6M8S",
-    topics: {
-      ru: ["AI-контент", "Бесплатный трафик", "Reels", "Воронка", "Контент-завод"],
-      en: ["AI content", "Free traffic", "Reels", "Funnel", "Content factory"],
-    },
-    whatYouWillLearn: {
-      ru: [
-        "Связать просмотры с подписчиками и заявками",
-        "Собрать контекст о нише перед генерацией идей",
-        "Использовать ChatGPT, Claude и Codex как систему для контента",
-      ],
-      en: [
-        "Connect views to followers and leads",
-        "Collect niche context before generating ideas",
-        "Use ChatGPT, Claude, and Codex as a content system",
-      ],
-    },
-    timestamps: {
-      ru: timestamps([
-        ["00:00", "30 тысяч подписчиков через нейросети"],
-        ["00:30", "Контент-завод под ваш проект"],
-        ["00:47", "Стратегия вместо случайных Reels-идей"],
-        ["01:09", "Сначала собираем сильный запрос"],
-        ["01:31", "Голосовой бриф о себе и продукте"],
-        ["01:54", "Новый чат и сильная модель"],
-        ["02:18", "Deep Research и исследование ниши"],
-        ["02:38", "Markdown-стратегия как основа"],
-        ["02:47", "Проект с памятью о стратегии"],
-        ["03:09", "Обратная связь и инструкция проекта"],
-        ["03:46", "Зачем нужен Codex на компьютере"],
-        ["04:17", "Папка проекта и рабочие материалы"],
-        ["04:39", "Коннекторы, API и браузер"],
-        ["05:17", "Daily Content Radar и пайплайн"],
-        ["05:39", "Что дальше в полном курсе"],
-      ]),
-      en: timestamps([
-        ["00:00", "30K followers with AI tools"],
-        ["00:30", "Content factory for your project"],
-        ["00:47", "Strategy before random Reels ideas"],
-        ["01:09", "First build a stronger request"],
-        ["01:31", "Voice brief about you and the product"],
-        ["01:54", "New chat and a stronger model"],
-        ["02:18", "Deep Research for the niche"],
-        ["02:38", "Markdown strategy as the base"],
-        ["02:47", "Project memory from the strategy"],
-        ["03:09", "Feedback and project instructions"],
-        ["03:46", "Why desktop Codex is needed"],
-        ["04:17", "Project folder and working assets"],
-        ["04:39", "Connectors, APIs, and browser access"],
-        ["05:17", "Daily Content Radar pipeline"],
-        ["05:39", "What continues in the full course"],
-      ]),
-    },
-  },
-  {
     slug: PRIVATE_COURSE_FIRST_LESSON_SLUG,
     videoId: PRIVATE_COURSE_FIRST_KINESCOPE_VIDEO_ID,
     title: { ru: "Работа с ChatGPT и Claude", en: "Working with ChatGPT and Claude" },
@@ -299,8 +237,8 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
       en: "This lesson shows why the course uses ChatGPT, Claude, and other language models: writing prompts as clear briefs, splitting tasks into separate chats, and using a simple request formula.",
     },
     category: "ai-video",
-    duration: "11:26",
-    durationIso: "PT11M26S",
+    duration: "08:09",
+    durationIso: "PT8M9S",
     topics: {
       ru: ["LLM", "Промптинг", "ChatGPT", "Claude", "Opten"],
       en: ["LLM", "Prompting", "ChatGPT", "Claude", "Opten"],
@@ -311,26 +249,32 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
     },
     timestamps: {
       ru: timestamps([
-        ["00:00", "План курса и нейросети"],
+        ["00:00", "План курса и языковые модели"],
         ["00:52", "Что такое промпт"],
-        ["01:45", "Контекст и отдельные чаты"],
-        ["03:10", "Формула промпта"],
-        ["04:15", "Opten для промптов"],
-        ["05:15", "Инструкции в ChatGPT и Claude"],
-        ["07:10", "Актуальные модели"],
-        ["08:35", "Syntx и тарифы"],
-        ["09:40", "Доступ и оплата сервисов"],
+        ["01:37", "Голосовой ввод запросов"],
+        ["02:20", "Главная ошибка новичков"],
+        ["02:45", "Контекст и отдельные чаты"],
+        ["03:37", "Память между чатами"],
+        ["04:57", "Формула промпта"],
+        ["05:37", "Правила разных моделей"],
+        ["05:52", "Opten для промптов"],
+        ["06:52", "Opten в Claude"],
+        ["07:22", "Opten в ChatGPT"],
+        ["07:32", "Что дальше в курсе"],
       ]),
       en: timestamps([
-        ["00:00", "Course plan and AI models"],
+        ["00:00", "Course plan and language models"],
         ["00:52", "What a prompt is"],
-        ["01:45", "Context and separate chats"],
-        ["03:10", "Prompt formula"],
-        ["04:15", "Opten for prompts"],
-        ["05:15", "Instructions in ChatGPT and Claude"],
-        ["07:10", "Current models"],
-        ["08:35", "Syntx and plans"],
-        ["09:40", "Access and payments"],
+        ["01:37", "Voice input for requests"],
+        ["02:20", "The main beginner mistake"],
+        ["02:45", "Context and separate chats"],
+        ["03:37", "Memory across chats"],
+        ["04:57", "Prompt formula"],
+        ["05:37", "Rules for different models"],
+        ["05:52", "Opten for prompts"],
+        ["06:52", "Opten in Claude"],
+        ["07:22", "Opten in ChatGPT"],
+        ["07:32", "What's next in the course"],
       ]),
     },
   },

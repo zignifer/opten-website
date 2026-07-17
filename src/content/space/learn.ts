@@ -116,6 +116,7 @@ export type LearnLesson = {
   localVideo?: LearnLocalVideo;
   timestamps: Record<LearnLang, LearnTimestamp[]>;
   materials: Partial<Record<LearnLang, LearnMaterial[]>>;
+  promptGenerators?: Partial<Record<LearnLang, LearnMaterial[]>>;
   prompts?: Partial<Record<LearnLang, LearnPromptBlock[]>>;
   missingItems?: Partial<Record<LearnLang, LearnMissingItem[]>>;
   videoProvider?: LearnVideoProviderMetadata;
@@ -1144,6 +1145,10 @@ export function getLearnLessonTimestamps(item: LearnLesson, lang: LearnLang) {
 
 export function getLearnLessonMaterials(item: LearnLesson, lang: LearnLang) {
   return item.materials[lang] ?? item.materials.ru ?? [];
+}
+
+export function getLearnLessonPromptGenerators(item: LearnLesson, lang: LearnLang) {
+  return item.promptGenerators?.[lang] ?? item.promptGenerators?.ru ?? [];
 }
 
 export function getLearnLessonPrompts(item: LearnLesson, lang: LearnLang) {

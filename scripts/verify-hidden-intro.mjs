@@ -9,10 +9,13 @@ function read(file) {
 }
 
 const requiredFiles = [
-  "src/content/space/hiddenIntro.ts",
+  "src/content/space/telegramCoursePreview.ts",
   "src/app/pages/space/PrivateCoursePage.tsx",
   "src/app/components/space/learn/LearnComponents.tsx",
+  "src/lib/courseAccess.ts",
+  "api/kinescope-course-token.ts",
   "api/_shared/kinescopeCourse.ts",
+  "api/_shared/optenServerAuth.ts",
   "src/content/space/privateCourse.ts",
   "scripts/seo-routes.ts",
   "src/content/space/learnSlugs.ts",
@@ -22,51 +25,55 @@ const requiredFiles = [
 ];
 
 for (const file of requiredFiles) {
-  assert.ok(existsSync(join(root, file)), `Missing hidden intro guardrail input: ${file}`);
+  assert.ok(existsSync(join(root, file)), `Missing Telegram course preview guardrail input: ${file}`);
 }
 
-const hiddenIntro = read("src/content/space/hiddenIntro.ts");
+assert.equal(existsSync(join(root, "src/content/space/hiddenIntro.ts")), false, "Removed hidden-intro content module must not return");
+
+const preview = read("src/content/space/telegramCoursePreview.ts");
 const privateCourse = read("src/content/space/privateCourse.ts");
 const privateCoursePage = read("src/app/pages/space/PrivateCoursePage.tsx");
 const components = read("src/app/components/space/learn/LearnComponents.tsx");
-const kinescopeCourse = read("api/_shared/kinescopeCourse.ts");
+const courseAccess = read("src/lib/courseAccess.ts");
+const tokenApi = read("api/kinescope-course-token.ts");
+const serverCourse = read("api/_shared/kinescopeCourse.ts");
+const serverAuth = read("api/_shared/optenServerAuth.ts");
 const seoRoutes = read("scripts/seo-routes.ts");
 const learnSlugs = read("src/content/space/learnSlugs.ts");
 const sitemap = read("scripts/sitemap.mjs");
 const llms = read("scripts/llms.mjs");
 const vercel = read("vercel.json");
 
-assert.match(hiddenIntro, /HIDDEN_INTRO_SLUG\s*=\s*"hidden-intro"/, "Hidden intro slug must stay stable");
-assert.match(
-  hiddenIntro,
-  /HIDDEN_INTRO_ROUTE\s*=\s*"\/learn\/courses\/ai-content-marketing-2026\/hidden-intro"/,
-  "Hidden intro route must stay under the noindex course namespace",
-);
-assert.match(
-  hiddenIntro,
-  /HIDDEN_INTRO_UNLOCK_STORAGE_KEY\s*=\s*"opten_hidden_intro_opened_v1"/,
-  "Hidden intro localStorage key must stay stable",
-);
-assert.match(hiddenIntro, /HIDDEN_INTRO_WEBSITE_SLOT_ENABLED\s*=\s*false/, "Hidden intro synthetic menu slot must stay disabled because lesson 0 is now a real course lesson");
-assert.match(hiddenIntro, /HIDDEN_INTRO_VIDEO_ENABLED\s*=\s*true/, "Hidden intro video must stay enabled now that lesson 0 exists");
-assert.match(hiddenIntro, /Разблокировать в Telegram/, "Hidden intro must keep the Telegram access CTA copy");
+assert.match(preview, /LEGACY_HIDDEN_INTRO_SLUG\s*=\s*"hidden-intro"/, "Legacy hidden route slug must stay redirectable");
+assert.match(preview, /TELEGRAM_COURSE_PREVIEW_STORAGE_KEY\s*=\s*"opten_course_preview_claim_v1"/, "Preview must store the claim token, not a boolean unlock");
+for (const slug of ["lesson-1-prompting", "lesson-2-ai-services", "lesson-3-logo-generation"]) {
+  assert.match(preview, new RegExp(slug), `Client preview allowlist must include ${slug}`);
+  assert.match(serverCourse, new RegExp(slug), `Server preview allowlist must include ${slug}`);
+}
 
-assert.match(privateCourse, /slug:\s*HIDDEN_INTRO_SLUG/, "Hidden intro must be present in privateCourseLessonConfigs");
-assert.match(privateCourse, /PRIVATE_COURSE_HIDDEN_INTRO_KINESCOPE_VIDEO_ID/, "Hidden intro must use the dedicated Kinescope video id constant");
-assert.match(kinescopeCourse, /hidden-intro/, "Hidden intro must be present in the Kinescope server whitelist");
-assert.doesNotMatch(seoRoutes, /hidden-intro/, "Hidden intro must not be added to prerendered SEO routes");
-assert.doesNotMatch(learnSlugs, /hidden-intro/, "Hidden intro must not be added to Learn slug siblings");
-assert.doesNotMatch(sitemap, /hidden-intro/, "Hidden intro must not be added to sitemap generation");
-assert.doesNotMatch(llms, /hidden-intro/, "Hidden intro must not be added to llms generation");
+assert.doesNotMatch(privateCourse, /AI контент-завод|AI content factory|PRIVATE_COURSE_HIDDEN_INTRO/, "Lesson 0/content factory must be removed from course content");
+assert.doesNotMatch(serverCourse, /a4722357-b131-491f-8ca0-cdd11d927630|lessonSlug:\s*"hidden-intro"/, "Removed lesson 0 must not be in the Kinescope whitelist");
+assert.match(privateCoursePage, /isLegacyHiddenIntro[\s\S]*PRIVATE_COURSE_FIRST_LESSON_SLUG[\s\S]*location\.search/, "Legacy hidden URL must redirect to lesson 1 and preserve the claim query");
+assert.match(privateCoursePage, /rememberTelegramCoursePreviewClaim/, "Course page must persist a claim token from the URL");
+assert.match(courseAccess, /TELEGRAM_COURSE_PREVIEW_STORAGE_KEY/, "Course access helpers must use the new claim storage key");
+assert.doesNotMatch(courseAccess, /opten_hidden_intro_opened_v1/, "Boolean hidden-intro storage must be removed");
 
-assert.match(privateCoursePage, /lessonSlug === HIDDEN_INTRO_SLUG/, "PrivateCoursePage must special-case hidden intro route");
-assert.match(privateCoursePage, /localStorage\.setItem\(HIDDEN_INTRO_UNLOCK_STORAGE_KEY,\s*"1"\)/, "Hidden intro route must store the local browser unlock hint");
-assert.match(privateCoursePage, /hiddenIntroRouteUnlocked=\{isHiddenIntro\}/, "Hidden intro route must unlock the current lesson immediately");
-assert.match(components, /HIDDEN_INTRO_WEBSITE_SLOT_ENABLED && collection\.id === AI_CONTENT_MARKETING_COURSE_SLUG/, "Course outline hidden-intro slot must stay behind the feature flag");
-assert.match(components, /hiddenIntroUnlocked:\s*canUseHiddenIntroUnlock/, "Kinescope token request must pass the browser unlock only for hidden intro");
-assert.match(components, /href=\{HIDDEN_INTRO_TELEGRAM_URL\}/, "Locked hidden intro outline row must send guests to Telegram");
+assert.match(tokenApi, /telegramPreviewClaim/, "Kinescope token requests must accept the claim token");
+assert.match(tokenApi, /hasTelegramCoursePreviewAccess/, "Kinescope token requests must validate preview claims server-side");
+assert.match(tokenApi, /accessMode:\s*"course-entitlement"\s*\|\s*"telegram-course-preview"/, "Preview playback token must have a distinct access mode");
+assert.doesNotMatch(tokenApi, /hiddenIntroUnlocked|BrowserUnlock/, "Kinescope access must not trust the removed browser boolean");
+assert.match(serverAuth, /validate_only:\s*true/, "Server claim check must use the read-only validation mode");
 
-assert.match(vercel, /"source": "\/learn\/courses\/:path\*"[\s\S]*"destination": "\/spa\.html"/, "Hidden intro route must be covered by the noindex SPA course rewrite");
-assert.match(vercel, /"source": "\/learn\/courses\/:path\*"[\s\S]*"X-Robots-Tag"[\s\S]*"noindex, nofollow"/, "Hidden intro route must be covered by noindex headers");
+assert.match(components, /Генераторы промптов Opten/, "Lesson UI must expose a separate Opten generator section");
+assert.match(components, /locked=\{!courseHasAccess\}[\s\S]*heading=\{copy\.optenPromptGenerators\}/, "Opten generators must remain paid-entitlement-only");
+assert.match(components, /telegramPreviewClaim:\s*telegramPreviewClaim\s*\|\|\s*undefined/, "Player must pass the claim token to the server");
+assert.match(components, /locked=\{!courseHasAccess\}[\s\S]*getLearnLessonPrompts/, "Private lesson prompts must remain buyer-only");
 
-console.log("Hidden intro guardrails passed.");
+assert.doesNotMatch(seoRoutes, /hidden-intro/, "Legacy redirect must not be added to prerendered SEO routes");
+assert.doesNotMatch(learnSlugs, /hidden-intro/, "Legacy redirect must not be added to Learn slug siblings");
+assert.doesNotMatch(sitemap, /hidden-intro/, "Legacy redirect must not be added to sitemap generation");
+assert.doesNotMatch(llms, /hidden-intro/, "Legacy redirect must not be added to llms generation");
+assert.match(vercel, /"source": "\/learn\/courses\/:path\*"[\s\S]*"destination": "\/spa\.html"/, "Course preview routes must remain SPA routes");
+assert.match(vercel, /"source": "\/learn\/courses\/:path\*"[\s\S]*"X-Robots-Tag"[\s\S]*"noindex, nofollow"/, "Course preview routes must remain noindex");
+
+console.log("Telegram course preview guardrails passed.");

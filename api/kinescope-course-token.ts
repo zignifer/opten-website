@@ -4,13 +4,14 @@ import {
   KINESCOPE_PLAYBACK_AUDIENCE,
   KINESCOPE_PLAYBACK_ISSUER,
   KINESCOPE_PLAYBACK_TTL_SECONDS,
-  KINESCOPE_HIDDEN_INTRO_LESSON_SLUG,
   buildKinescopeEmbedUrl,
   findKinescopeCourseLesson,
+  isKinescopeTelegramPreviewLesson,
 } from "./_shared/kinescopeCourse.js";
 import {
   bearerTokenFromHeader,
   hasCourseAccess,
+  hasTelegramCoursePreviewAccess,
   jsonResponse,
   setJsonCors,
   verifySupabaseJwt,
@@ -19,7 +20,7 @@ import {
 type TokenRequestBody = {
   courseSlug?: string;
   lessonSlug?: string;
-  hiddenIntroUnlocked?: boolean;
+  telegramPreviewClaim?: string;
 };
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
@@ -47,11 +48,12 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return jsonResponse(res, 404, { error: "lesson_not_found" });
   }
 
-  const hiddenIntroBrowserUnlock =
-    lesson.lessonSlug === KINESCOPE_HIDDEN_INTRO_LESSON_SLUG && body.hiddenIntroUnlocked === true;
+  const telegramPreviewClaim = typeof body.telegramPreviewClaim === "string" ? body.telegramPreviewClaim.trim() : "";
+  const canTryTelegramPreview = isKinescopeTelegramPreviewLesson(lesson) && /^[A-Za-z0-9_-]{32,160}$/.test(telegramPreviewClaim);
   const authToken = bearerTokenFromHeader(req.headers.authorization as string | undefined);
   let userId = "";
-  let accessMode: "course-entitlement" | "telegram-hidden-intro" | null = null;
+  let accessMode: "course-entitlement" | "telegram-course-preview" | null = null;
+  let authError: "invalid_token" | "course_access_query_failed" | null = null;
 
   if (authToken) {
     try {
@@ -63,29 +65,40 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
           accessMode = "course-entitlement";
         }
       } catch {
-        if (!hiddenIntroBrowserUnlock) {
-          return jsonResponse(res, 502, { error: "course_access_query_failed" });
-        }
+        authError = "course_access_query_failed";
       }
     } catch {
-      if (!hiddenIntroBrowserUnlock) {
-        return jsonResponse(res, 401, { error: "invalid_token" });
-      }
+      authError = "invalid_token";
     }
   }
 
-  if (!accessMode) {
-    if (hiddenIntroBrowserUnlock) {
-      userId = `telegram-hidden-intro:${lesson.courseSlug}`;
-      accessMode = "telegram-hidden-intro";
-    } else if (!authToken) {
-      return jsonResponse(res, 401, { error: "missing_token" });
-    } else {
-      return jsonResponse(res, 403, {
-        error: "course_access_required",
-        purchase_url: `/learn/courses/${lesson.courseSlug}/${lesson.lessonSlug}`,
-      });
+  if (!accessMode && canTryTelegramPreview) {
+    try {
+      if (await hasTelegramCoursePreviewAccess(telegramPreviewClaim)) {
+        userId = `telegram-course-preview:${lesson.courseSlug}`;
+        accessMode = "telegram-course-preview";
+      }
+    } catch {
+      return jsonResponse(res, 502, { error: "telegram_preview_access_query_failed" });
     }
+  }
+
+  if (!accessMode && authError === "course_access_query_failed") {
+    return jsonResponse(res, 502, { error: authError });
+  }
+  if (!accessMode && authError === "invalid_token") {
+    return jsonResponse(res, 401, { error: authError });
+  }
+  if (!accessMode && !authToken) {
+    return jsonResponse(res, canTryTelegramPreview ? 403 : 401, {
+      error: canTryTelegramPreview ? "telegram_preview_access_required" : "missing_token",
+    });
+  }
+  if (!accessMode) {
+    return jsonResponse(res, 403, {
+      error: "course_access_required",
+      purchase_url: `/learn/courses/${lesson.courseSlug}/${lesson.lessonSlug}`,
+    });
   }
 
   const playbackSecret = process.env.KINESCOPE_AUTH_JWT_SECRET;
