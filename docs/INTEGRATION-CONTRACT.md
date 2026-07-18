@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-07-18 against extension `manifest.json` version **1.4.2** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench now mirrors the extension popup's authenticated quick-Improve model list and promptscore-proxy Claude Haiku transport; new Free accounts receive 3 one-time signup credits from `users.free_signup_credits` while existing Free accounts remain unchanged; score/rewrite accounting now uses service-role-only atomic reserve/release RPCs and never trusts client billing flags; standalone course checkout/access, Kinescope course playback, Telegram discount-only course funnel, one-time-per-lead Telegram 24h 20% discount claims, course-or-Pro Opten generators, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
+> **Last sync:** 2026-07-19 against extension `manifest.json` version **1.4.2** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench now mirrors the extension popup's authenticated quick-Improve model list and promptscore-proxy Claude Haiku transport; new Free accounts receive 3 one-time signup credits from `users.free_signup_credits` while existing Free accounts remain unchanged; score/rewrite accounting now uses service-role-only atomic reserve/release RPCs and never trusts client billing flags; standalone course checkout/access, Kinescope course playback, Telegram discount-only course funnel with direct `/start` offer delivery, one-time-per-lead Telegram 24h 20% discount claims, course-or-Pro Opten generators, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads documented). Backend fully on self-hosted `supabase.opten.space`; manifest carries `https://supabase.opten.space/*` in `host_permissions` and the cloud `*.supabase.co` host was **removed** in v1.3.7. Dual-issuer local JWT verification handles cloud **ES256/JWKS** + self-hosted **HS256**.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -202,7 +202,7 @@ live with these exact paths and the documented behavior.
 | `/dashboard/download-skill` | Pro-only feature in popup → opens new tab | Auth-gated page that calls `/api/download-skill` to fetch `opten.zip`. | [popup Phase 73](../../promptscore/popup/popup.html) |
 | `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Free prompt library UI for any logged-in extension account. Calls `GET_AUTH_TOKEN` through the installed extension, then uses Supabase PostgREST for `prompt_library` CRUD/search without a subscription check. After successful mutations it calls `REFRESH_PROMPT_LIBRARY_CACHE` so native extension menus do not keep stale titles/favorite state. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 94 + Phase 97 |
 | `/p/:slug` | User-shared public Prompt Library link | Read-only random-link snapshot of a user's library at publish/refresh time. Public read uses `prompt_library_get_public_snapshot` without auth; per-prompt save uses website auth (`localStorage.opten_space_session_v1`) and `prompt_library_save_public_prompt`. SPA-only, `noindex,nofollow`, no `/en/*` sibling. No bulk-copy action. | Phase 98 |
-| `/learn/courses/:courseSlug/*` | Public course marketing, checkout, and gated lessons | Officially launched standalone paid course surface. It is promoted from public Learn, blog CTAs, Telegram, and other marketing surfaces, while its SPA routes remain `noindex` under the current policy. It is not a Pro subscription entitlement and is not opened by the extension. Payment starts through `create-course-payment`; access is checked through website auth + `course-access-summary`; Kinescope playback is gated by this site's `/api/kinescope-course-token` and `/api/kinescope-course-auth`. Before a claim exists, regular lessons 1–3 are labelled as free via Telegram and their locked players deep-link to the bot; after the Telegram subscription/claim flow, guests can play only those lessons. Private prompts remain buyer-only. The separate Opten ChatGPT + Claude/Codex generator block is visible before materials/showcase on the course root and every lesson: its links open for a course buyer or active Pro user, while other visitors see locked generator previews plus course and `/pay` CTAs. The explanatory generator description is hidden once access opens. The removed legacy `/hidden-intro` route may only redirect to lesson 1 while preserving the claim query. | Site-only |
+| `/learn/courses/:courseSlug/*` | Public course marketing, checkout, and gated lessons | Officially launched standalone paid course surface. It is promoted from public Learn, blog CTAs, Telegram, and other marketing surfaces, while its SPA routes remain `noindex` under the current policy. It is not a Pro subscription entitlement and is not opened by the extension. Payment starts through `create-course-payment`; access is checked through website auth + `course-access-summary`; Kinescope playback is gated by this site's `/api/kinescope-course-token` and `/api/kinescope-course-auth`. All 16 lessons require a normal course entitlement; a Telegram claim carries only the 24-hour checkout discount and never unlocks playback. Private prompts remain buyer-only. The separate Opten ChatGPT + Claude/Codex generator block is visible before materials/showcase on the course root and every lesson: its links open for a course buyer or active Pro user, while other visitors see locked generator previews plus course and `/pay` CTAs. The explanatory generator description is hidden once access opens. The removed legacy `/hidden-intro` route may only redirect to lesson 1 while preserving the claim query. | Site-only |
 | `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta app surfaces. `/app/learn*` and `/space/learn*` are compatibility redirects to public `/learn*`; public Learn is no longer indexed inside `/app`. Website auth uses the canonical `/login`; visible login uses Email OTP only while the retained Google OAuth path is hidden. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95/96 |
 
 **Locked route names** (renames are breaking):
@@ -314,7 +314,9 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
   send `discount_claim_token` to `create-course-payment`; the backend ignores
   `promo_code` when a valid claim token is present. Quote preview can show the
   claim price/timer, but claims are marked used only by successful
-  YooKassa/Paddle course webhooks. USD claim checkout requires a Paddle
+  YooKassa/Paddle course webhooks. Successful course webhooks mark the related
+  lead paid but do not send a Telegram payment-success message; access is
+  delivered by email. USD claim checkout requires a Paddle
   discount code/id configured server-side; the browser must not set arbitrary
   checkout amounts. The canonical Paddle claim env keys are
   `PADDLE_DISCOUNT_CODE_COURSE_AI_CONTENT_MARKETING_2026_TELEGRAM20_{PRODUCTION|SANDBOX}`
@@ -349,13 +351,16 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
 Telegram course offer for the same course is intentionally a narrow sales
 funnel:
 
-- `/start` sends only a short choice message with `Перейти в Telegram` first
-  and `Получить доступ к курсу` second. The first button links to the public
-  Telegram channel. The second creates or reuses the claim without requiring
-  channel subscription, sends the public course introduction through Bot API
+- `/start` immediately creates or reuses the claim without requiring channel
+  subscription, sends the public course introduction through Bot API
   `sendVideo`, then sends the separate HTML-formatted course offer with an
-  `Открыть курс` button. This handler change is not a broadcast and must never
-  push the new sequence to existing leads.
+  `Открыть курс` button and the public Telegram channel link in the message
+  text. Legacy callback actions remain accepted for buttons already present in
+  old chats. This handler change is not a broadcast and must never push the new
+  sequence to existing leads.
+- The Bot API long description is `Привет! Здесь можно получить доступ в мой
+  Telegram-канал с промптами и полезными инструкциями или посмотреть курс по
+  ИИ.\n\nЖми /Start 👇`; the `/start` command description is `Открыть курс`.
 - The bot stores users who press Start in `telegram_hidden_intro_leads` and
   writes funnel events to `telegram_hidden_intro_events`. These tables are
   RLS-enabled with no public policies and are accessed only by service-role
@@ -376,10 +381,11 @@ funnel:
 - All 16 lessons use the same locked course-purchase UI before entitlement.
   The website does not advertise free Telegram lessons and locked players do
   not deep-link to the bot.
-- The bot sends the course offer only after the course button is pressed. An
-  active reused claim returns the same discounted course link. An expired or
-  used claim returns the ordinary course link and honestly states that the
-  personal discount has ended. Lookup/create failures receive a retry message.
+- The bot sends the course offer directly after `/start`. An active reused
+  claim returns the same discounted course link. An expired or used claim
+  returns the ordinary course link and honestly states that the personal
+  discount has ended. Lookup/create failures show `Открыть курс` first and
+  `Перейти в Telegram` second.
 - Private course prompts remain course-entitlement-gated. Telegram preview
   access must not enable Opten for ChatGPT or the Opten Claude/Codex download.
   The collection-level `Генератор промптов Opten` block stays visible before

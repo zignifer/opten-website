@@ -255,21 +255,28 @@ is never reissued or extended. Manual admin broadcasts
 are delivery-only and must never create, refresh, or extend
 `course_discount_claims`. The 24h 20% claim discount has priority over manual
 promo codes and must not stack. Provider webhooks mark it used only after
-successful payment, notify the Telegram lead once, and mark the lead paid;
+successful payment and mark the lead paid, but do not send a Telegram
+payment-success message; course access is delivered by email;
 reminders and broadcasts skip used claims and mark Bot API 403/blocked
 recipients as blocked.
 
-For future `/start` updates only, the Telegram bot sends a two-button menu:
-`Перейти в Telegram` first and `Получить доступ к курсу` second. The Telegram
-button opens the public channel directly. The course button creates/reuses the
-discount claim, then sends the public course intro video followed by the
-HTML-formatted course offer and one `Открыть курс` button. The course copy
+For future `/start` updates only, the Telegram bot immediately creates/reuses
+the discount claim, sends the public course intro video, then sends the
+HTML-formatted course offer with one `Открыть курс` button and the public
+Telegram channel link in the message text. Legacy course callbacks remain
+accepted so buttons already present in old chats continue to work. The course
+copy
 positions the practical result as a complete brand package worth at least
 100,000 RUB on the market and must not promise subscriber/client growth.
 Changing `/start` must never trigger a broadcast or any message to existing
 leads. The website must not advertise free Telegram lessons or deep-link to the
 bot from locked lesson players; all locked lessons point to the normal course
 purchase surface.
+The Bot API long description is `Привет! Здесь можно получить доступ в мой
+Telegram-канал с промптами и полезными инструкциями или посмотреть курс по
+ИИ.\n\nЖми /Start 👇`, and the `/start` command description is `Открыть курс`.
+If claim creation fails, the bot shows `Открыть курс` first and `Перейти в
+Telegram` second.
 The video must use a stable public HTTPS URL; the backend keeps the
 reviewed 360p Kinescope CDN asset as its default and
 `TELEGRAM_INTRO_VIDEO_URL` may override it. Do not use a Telegram `file_id`,
