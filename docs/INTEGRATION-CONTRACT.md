@@ -396,6 +396,10 @@ funnel:
   returns the ordinary course link and honestly states that the personal
   discount has ended. Lookup/create failures show `Открыть курс` first and
   `Перейти в Telegram` second.
+- Expired or used legacy 40% claims remain inactive and unchanged for checkout
+  and audit purposes. Their expired-state Telegram copy uses the current 20%
+  campaign percentage rather than the stored historical percentage, so the
+  retired 40% wording cannot reappear after `/start`.
 - Private course prompts remain course-entitlement-gated. Telegram preview
   access must not enable Opten for ChatGPT or the Opten Claude/Codex download.
   The collection-level `Генератор промптов Opten` block stays visible before

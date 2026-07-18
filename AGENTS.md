@@ -259,6 +259,10 @@ successful payment and mark the lead paid, but do not send a Telegram
 payment-success message; course access is delivered by email;
 reminders and broadcasts skip used claims and mark Bot API 403/blocked
 recipients as blocked.
+Expired or used legacy 40% claims remain inactive and unchanged for checkout
+and audit purposes. The bot's expired-state copy always shows the current 20%
+campaign wording instead of the stored historical percentage, so `/start`
+cannot surface the retired 40% message.
 
 For future `/start` updates only, the Telegram bot immediately creates/reuses
 the discount claim, sends the public course intro video, then sends the
