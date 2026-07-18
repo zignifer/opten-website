@@ -272,7 +272,10 @@ Changing `/start` must never trigger a broadcast or any message to existing
 leads. The website must not advertise free Telegram lessons or deep-link to the
 bot from locked lesson players; all locked lessons point to the normal course
 purchase surface.
-The Bot API long description is `Привет! Здесь можно получить доступ в мой
+The locked Bot API name is `Влад Воронежцев | Уроки и промпты`, and the locked
+short description is `Доступ к урокам и каналу с промптами.`; future bot
+updates must not change either value unless the owner explicitly asks. The Bot
+API long description remains `Привет! Здесь можно получить доступ в мой
 Telegram-канал с промптами и полезными инструкциями или посмотреть курс по
 ИИ.\n\nЖми /Start 👇`, and the `/start` command description is `Открыть курс`.
 If claim creation fails, the bot shows `Открыть курс` first and `Перейти в

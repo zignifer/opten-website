@@ -362,7 +362,10 @@ funnel:
   `https://opten.space/assets/telegram/ai-content-marketing-2026-intro-v2.mp4`.
   It stays below Telegram's 20 MB remote-URL limit and may be overridden only
   through the server-side `TELEGRAM_INTRO_VIDEO_URL` environment variable.
-- The Bot API long description is `Привет! Здесь можно получить доступ в мой
+- The locked Bot API name is `Влад Воронежцев | Уроки и промпты`, and the
+  locked short description is `Доступ к урокам и каналу с промптами.`. Future
+  bot updates must not change either value unless the owner explicitly asks.
+  The long description remains `Привет! Здесь можно получить доступ в мой
   Telegram-канал с промптами и полезными инструкциями или посмотреть курс по
   ИИ.\n\nЖми /Start 👇`; the `/start` command description is `Открыть курс`.
 - The bot stores users who press Start in `telegram_hidden_intro_leads` and
