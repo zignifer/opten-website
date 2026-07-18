@@ -358,6 +358,10 @@ funnel:
   text. Legacy callback actions remain accepted for buttons already present in
   old chats. This handler change is not a broadcast and must never push the new
   sequence to existing leads.
+- The default `sendVideo` source is the source-controlled 720p H.264/AAC file
+  `https://opten.space/assets/telegram/ai-content-marketing-2026-intro-v2.mp4`.
+  It stays below Telegram's 20 MB remote-URL limit and may be overridden only
+  through the server-side `TELEGRAM_INTRO_VIDEO_URL` environment variable.
 - The Bot API long description is `Привет! Здесь можно получить доступ в мой
   Telegram-канал с промптами и полезными инструкциями или посмотреть курс по
   ИИ.\n\nЖми /Start 👇`; the `/start` command description is `Открыть курс`.

@@ -277,10 +277,12 @@ Telegram-канал с промптами и полезными инструкц
 ИИ.\n\nЖми /Start 👇`, and the `/start` command description is `Открыть курс`.
 If claim creation fails, the bot shows `Открыть курс` first and `Перейти в
 Telegram` second.
-The video must use a stable public HTTPS URL; the backend keeps the
-reviewed 360p Kinescope CDN asset as its default and
-`TELEGRAM_INTRO_VIDEO_URL` may override it. Do not use a Telegram `file_id`,
-because a stale ID can silently restore cached media after deploys.
+The video must use a stable public HTTPS URL. The reviewed default is the
+source-controlled 720p H.264/AAC asset at
+`/assets/telegram/ai-content-marketing-2026-intro-v2.mp4` (17.5 MB, below
+Telegram's 20 MB remote-URL limit); `TELEGRAM_INTRO_VIDEO_URL` may override it.
+Do not use a Telegram `file_id`, because a stale ID can silently restore cached
+media after deploys.
 
 The owner/admin dashboard on opten.space is a general protected admin surface
 under `/admin`, not a Telegram-only one-off. The first module is Telegram
