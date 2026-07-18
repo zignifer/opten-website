@@ -278,6 +278,9 @@ updates must not change either value unless the owner explicitly asks. The Bot
 API long description remains `Привет! Здесь можно получить доступ в мой
 Telegram-канал с промптами и полезными инструкциями или посмотреть курс по
 ИИ.\n\nЖми /Start 👇`, and the `/start` command description is `Открыть курс`.
+These exact name, short description, long description, and command values must
+be set and verified in both the default Bot API scope and the `ru` language
+scope, because Telegram clients may prefer the localized RU profile.
 If claim creation fails, the bot shows `Открыть курс` first and `Перейти в
 Telegram` second.
 The video must use a stable public HTTPS URL. The reviewed default is the

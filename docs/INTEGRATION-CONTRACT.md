@@ -368,6 +368,9 @@ funnel:
   The long description remains `Привет! Здесь можно получить доступ в мой
   Telegram-канал с промптами и полезными инструкциями или посмотреть курс по
   ИИ.\n\nЖми /Start 👇`; the `/start` command description is `Открыть курс`.
+  These exact profile and command values must be set and verified in both the
+  default Bot API scope and the `ru` language scope; Telegram clients may use
+  the localized RU profile instead of the default values.
 - The bot stores users who press Start in `telegram_hidden_intro_leads` and
   writes funnel events to `telegram_hidden_intro_events`. These tables are
   RLS-enabled with no public policies and are accessed only by service-role
