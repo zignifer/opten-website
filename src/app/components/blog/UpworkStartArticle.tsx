@@ -215,24 +215,6 @@ const ru = {
       "16 уроков ведут от идеи и промптов до полной упаковки проекта. В финале у вас остаётся связный кейс с визуальной системой, сайтом и контентом для портфолио.",
     cta: "Открыть программу курса",
   },
-  metricsTitle: "Смотрите, на каком шаге ломается путь до контракта",
-  metricsIntro:
-    "Не переписывайте весь профиль после одного отказа. После каждых десяти осмысленных откликов найдите конкретный слабый участок.",
-  metricRows: [
-    ["Отклики почти не открывают", "Выбор задач или первые строки"],
-    ["Открывают, но не отвечают", "Совпадение, доказательство, результат"],
-    ["Отвечают, но нет контракта", "Вопросы, scope, цена, этапы"],
-    ["Профиль смотрят, но не приглашают", "Заголовок и портфолио не складываются в услугу"],
-    ["Catalog смотрят, но не покупают", "Непонятны объём, результат, цена или примеры"],
-  ],
-  finalChecklistTitle: "Чек-лист перед каждым откликом",
-  finalGroups: [
-    ["Клиент", ["история без явных флагов", "бюджет не спорит с описанием", "нет бесплатной тестовой", "понятен принимающий решение"]],
-    ["Задача", ["понятен результат", "есть релевантный навык", "есть близкий кейс", "можно оценить первый этап"]],
-    ["Отклик", ["первая строка уникальна", "описан результат", "один пример", "один конкретный вопрос", "нет гарантий и внешних контактов"]],
-    ["После ответа", ["уточнить цель", "зафиксировать scope", "назвать исключения", "разбить большой проект на этапы"]],
-    ["После выполнения", ["понятно передать результат", "закрыть правки", "попросить честный отзыв", "добавить кейс только с разрешения"]],
-  ] as [string, string[]][],
   mistakesTitle: "10 ошибок, которые тормозят старт",
   mistakes: [
     "Откликаться на всё подряд.",
@@ -399,24 +381,6 @@ const en: typeof ru = {
       "Sixteen lessons take one idea from prompts to a complete project package. You finish with a connected case that includes a visual system, website, and content.",
     cta: "Open the course program",
   },
-  metricsTitle: "Find the exact step where the contract path breaks",
-  metricsIntro:
-    "Do not rebuild the whole profile after one rejection. Review every ten thoughtful proposals and diagnose one weak stage.",
-  metricRows: [
-    ["Proposals are barely opened", "Job selection or opening lines"],
-    ["Opened but no reply", "Fit, proof, or unclear outcome"],
-    ["Replies but no contract", "Questions, scope, price, or milestones"],
-    ["Profile views but no invitations", "Headline and portfolio do not form one service"],
-    ["Catalog views but no purchase", "Scope, outcome, price, or examples are unclear"],
-  ],
-  finalChecklistTitle: "Checklist before every proposal",
-  finalGroups: [
-    ["Client", ["reasonable history", "budget matches the brief", "no free test", "decision-maker is clear"]],
-    ["Job", ["outcome is clear", "skill is relevant", "there is a close case", "first stage can be estimated"]],
-    ["Proposal", ["opening is specific", "deliverable is clear", "one example", "one question", "no guarantees or contacts"]],
-    ["After reply", ["clarify the goal", "lock the scope", "name exclusions", "split a large project into stages"]],
-    ["After delivery", ["hand off clearly", "close revisions", "ask for an honest review", "publish only with permission"]],
-  ],
   mistakesTitle: "10 mistakes that slow down the start",
   mistakes: [
     "Apply to everything.",
@@ -743,29 +707,6 @@ export default function UpworkStartArticle({ lang }: { lang: Lang }) {
           ))}
         </div>
         <div className="mt-[22px]"><CourseBanner copy={c.courseTwo} image="/blog/_banners/course-workflow.jpg" /></div>
-      </section>
-
-      <section>
-        <SectionTitle title={c.metricsTitle} body={c.metricsIntro} />
-        <div className="overflow-hidden rounded-[16px] border border-white/10">
-          {c.metricRows.map(([signal, diagnosis], i) => (
-            <div key={signal} className={`grid gap-[6px] px-[16px] py-[15px] sm:grid-cols-[0.95fr_1.05fr] sm:gap-[18px] ${i ? "border-t border-white/8" : ""}`}><span className="text-[13px] font-medium text-white">{signal}</span><span className="text-[13px] leading-[1.5] text-white/52">{diagnosis}</span></div>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <SectionTitle title={c.finalChecklistTitle} />
-        <div className="grid gap-[10px] md:grid-cols-2">
-          {c.finalGroups.map(([title, items], i) => (
-            <details key={title} open={i === 0} className={`group rounded-[14px] border border-white/10 bg-white/[0.025] ${i === c.finalGroups.length - 1 ? "md:col-span-2" : ""}`}>
-              <summary className="flex cursor-pointer list-none items-center justify-between px-[16px] py-[14px] text-[14px] font-bold text-white"><span>{title}</span><span className="text-[#9cfb51] transition group-open:rotate-45">+</span></summary>
-              <div className="border-t border-white/8 px-[16px] py-[14px]">
-                {items.map((item) => <p key={item} className="mb-[8px] flex items-start gap-[8px] text-[12px] leading-[1.45] text-white/56 last:mb-0"><Check className="mt-[1px] h-[13px] w-[13px] shrink-0 text-[#9cfb51]" />{item}</p>)}
-              </div>
-            </details>
-          ))}
-        </div>
       </section>
 
       <section>
