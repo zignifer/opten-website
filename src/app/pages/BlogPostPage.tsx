@@ -18,6 +18,7 @@ import SiteFooter from "../components/SiteFooter";
 import BlogPostCard from "../components/BlogPostCard";
 import FaqBlock from "../components/FaqBlock";
 import ResponsiveImage from "../components/ResponsiveImage";
+import UpworkStartArticle from "../components/blog/UpworkStartArticle";
 import { blogPostsBySlug, allBlogPosts, type BlogSlug } from "../../content/blog";
 import type { BlogPromoBanner } from "../../content/blog/types";
 
@@ -170,8 +171,10 @@ export default function BlogPostPage() {
           {data.body.intro}
         </p>
 
+        {data.editorialLayout === "upwork-start" && <UpworkStartArticle lang={lang} />}
+
         {/* Optional ordered steps (HowTo source) */}
-        {steps.length > 0 && (
+        {data.editorialLayout !== "upwork-start" && steps.length > 0 && (
           <ol className="mt-[40px] flex flex-col gap-[40px]">
             {steps.map((step, i) => (
               <li key={i} className="border-t border-white/10 pt-[28px]">
@@ -219,7 +222,7 @@ export default function BlogPostPage() {
         )}
 
         {/* Optional prose sections (essay-style posts) */}
-        {sections.length > 0 && (
+        {data.editorialLayout !== "upwork-start" && sections.length > 0 && (
           <div className="mt-[40px] flex flex-col gap-[32px]">
             {sections.map((sec, i) => (
               <section key={i} className="border-t border-white/10 pt-[24px]">

@@ -54,6 +54,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/upwork-start-2026-checklist":    "src/content/blog/upwork-start-2026-checklist.ts",
+  "/en/blog/upwork-start-2026-checklist": "src/content/blog/upwork-start-2026-checklist.ts",
   "/blog/ai-presentations":       "src/content/blog/ai-presentations.ts",
   "/en/blog/ai-presentations":    "src/content/blog/ai-presentations.ts",
   "/blog/ai-for-work":       "src/content/blog/ai-for-work.ts",
