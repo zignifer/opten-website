@@ -40,7 +40,6 @@ const ru = {
     ["02", "Первые проекты", "Не сливать Connects"],
     ["03", "Отклики", "Показывать решение, а не биографию"],
     ["04", "Три канала", "Upwork, LinkedIn и каталог"],
-    ["05", "14 дней", "Запустить систему и посмотреть цифры"],
   ],
   channelEyebrow: "Не один источник заявок",
   channelTitle: "Три канала складываются в одну историю доверия",
@@ -226,15 +225,6 @@ const ru = {
     ["Профиль смотрят, но не приглашают", "Заголовок и портфолио не складываются в услугу"],
     ["Catalog смотрят, но не покупают", "Непонятны объём, результат, цена или примеры"],
   ],
-  planTitle: "План запуска профиля на 14 дней",
-  planIntro: "Не 100 откликов за ночь. Одна рабочая система за две недели.",
-  plan: [
-    ["Дни 1-2", "Услуга и позиционирование", ["один клиент", "один результат", "заголовок", "первые 250 символов"]],
-    ["Дни 3-6", "Профиль и кейсы", ["2-3 концепта", "честные подписи", "профиль 100%", "проверка английского"]],
-    ["Дни 7-10", "Поиск и отклики", ["3-5 запросов", "два шаблона", "точечные отклики", "один вопрос"]],
-    ["Дни 11-13", "LinkedIn и каталог", ["кейсы в профиле", "20 компаний для изучения", "3 услуги", "пакеты и теги"]],
-    ["День 14", "Цифры и корректировка", ["открытия", "ответы", "частые вопросы", "слабый шаг воронки"]],
-  ] as [string, string, string[]][],
   finalChecklistTitle: "Чек-лист перед каждым откликом",
   finalGroups: [
     ["Клиент", ["история без явных флагов", "бюджет не спорит с описанием", "нет бесплатной тестовой", "понятен принимающий решение"]],
@@ -290,7 +280,6 @@ const en: typeof ru = {
     ["02", "First projects", "Protect your Connects"],
     ["03", "Proposals", "Show a solution, not a biography"],
     ["04", "Three channels", "Upwork, LinkedIn, and Catalog"],
-    ["05", "14 days", "Launch the system and read the numbers"],
   ],
   channelEyebrow: "More than one source of work",
   channelTitle: "Three channels build one trust history",
@@ -419,15 +408,6 @@ const en: typeof ru = {
     ["Replies but no contract", "Questions, scope, price, or milestones"],
     ["Profile views but no invitations", "Headline and portfolio do not form one service"],
     ["Catalog views but no purchase", "Scope, outcome, price, or examples are unclear"],
-  ],
-  planTitle: "A 14-day profile launch plan",
-  planIntro: "Not 100 proposals overnight. One working system in two weeks.",
-  plan: [
-    ["Days 1-2", "Service and positioning", ["one client", "one result", "headline", "first 250 characters"]],
-    ["Days 3-6", "Profile and cases", ["2-3 concepts", "honest labels", "100% profile", "English check"]],
-    ["Days 7-10", "Search and proposals", ["3-5 searches", "two frameworks", "focused proposals", "one question"]],
-    ["Days 11-13", "LinkedIn and Catalog", ["cases in profile", "20 companies to study", "3 services", "packages and tags"]],
-    ["Day 14", "Numbers and correction", ["opens", "replies", "repeated questions", "weak funnel stage"]],
   ],
   finalChecklistTitle: "Checklist before every proposal",
   finalGroups: [
@@ -578,7 +558,7 @@ export default function UpworkStartArticle({ lang }: { lang: Lang }) {
 
       <nav aria-label={c.routeLabel} className="rounded-[18px] border border-white/10 bg-[#071b1e] p-[18px] md:p-[22px]">
         <p className="mb-[14px] text-[11px] font-bold uppercase tracking-[1.4px] text-white/40">{c.routeLabel}</p>
-        <div className="grid gap-[8px] sm:grid-cols-5">
+        <div className="grid gap-[8px] sm:grid-cols-4">
           {c.routeItems.map(([n, title, body]) => (
             <div key={n} className="rounded-[12px] border border-white/8 bg-white/[0.025] p-[12px]">
               <span className="font-['Unbounded',sans-serif] text-[12px] font-bold text-[#9cfb51]">{n}</span>
@@ -770,33 +750,6 @@ export default function UpworkStartArticle({ lang }: { lang: Lang }) {
         <div className="overflow-hidden rounded-[16px] border border-white/10">
           {c.metricRows.map(([signal, diagnosis], i) => (
             <div key={signal} className={`grid gap-[6px] px-[16px] py-[15px] sm:grid-cols-[0.95fr_1.05fr] sm:gap-[18px] ${i ? "border-t border-white/8" : ""}`}><span className="text-[13px] font-medium text-white">{signal}</span><span className="text-[13px] leading-[1.5] text-white/52">{diagnosis}</span></div>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <SectionTitle title={c.planTitle} body={c.planIntro} />
-        <figure className="mb-[16px] overflow-hidden rounded-[18px] border border-white/10 bg-[#05191c]">
-          <ResponsiveImage
-            src={`/blog/upwork-start-2026-checklist/${lang}/step-5.jpg`}
-            alt={lang === "ru" ? "План запуска на 14 дней: услуга, профиль, отклики и цифры" : "A 14-day launch plan: service, profile, proposals, and numbers"}
-            width={1600}
-            height={900}
-            loading="lazy"
-            widths={[480, 800]}
-            sizes="(max-width: 840px) calc(100vw - 40px), 800px"
-            className="block w-full"
-          />
-        </figure>
-        <div className="relative grid gap-[10px] md:grid-cols-5">
-          <div className="absolute left-[7%] right-[7%] top-[25px] hidden h-px bg-gradient-to-r from-transparent via-[#9cfb51]/45 to-transparent md:block" />
-          {c.plan.map(([days, title, items], i) => (
-            <article key={days} className="relative rounded-[14px] border border-white/10 bg-[#0b2023] p-[14px]">
-              <span className="relative z-10 flex h-[22px] w-[22px] items-center justify-center rounded-full bg-[#9cfb51] font-['Unbounded',sans-serif] text-[9px] font-bold text-[#011417]">{i + 1}</span>
-              <p className="mt-[15px] text-[10px] font-bold uppercase tracking-[1px] text-[#9cfb51]">{days}</p>
-              <h3 className="mt-[7px] text-[14px] font-bold leading-[1.35] text-white">{title}</h3>
-              <ul className="mt-[11px] space-y-[6px]">{items.map((item) => <li key={item} className="flex gap-[6px] text-[11px] leading-[1.35] text-white/48"><Check className="mt-[1px] h-[11px] w-[11px] shrink-0 text-[#9cfb51]" />{item}</li>)}</ul>
-            </article>
           ))}
         </div>
       </section>

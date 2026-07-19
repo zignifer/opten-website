@@ -36,7 +36,7 @@ const ru: BlogPostLocale = {
   excerpt:
     "Как собрать профиль Upwork, выбрать первые проекты, не сливать Connects, писать точечные отклики и привести клиентов через LinkedIn и Project Catalog.",
   description:
-    "Как начать на Upwork с нуля: профиль, портфолио, первые проекты, Connects, отклики, LinkedIn, Project Catalog и практический план на 14 дней для старта.",
+    "Как начать на Upwork с нуля: профиль, портфолио, первые проекты, Connects, отклики, LinkedIn, Project Catalog и понятная система поиска первых клиентов.",
   category: "guide",
   tags: ["workflow"],
   cover: COVER_RU,
@@ -72,7 +72,6 @@ const ru: BlogPostLocale = {
         title: "Пишите отклик под конкретный проект",
         body:
           "Первые строки должны относиться к задаче клиента. Объясните, что сделаете, какой результат передадите, приложите один близкий кейс и закончите одним конкретным вопросом.",
-        imageSrc: "/blog/upwork-start-2026-checklist/ru/step-5.jpg",
       },
       {
         title: "Подключите LinkedIn и Project Catalog",
@@ -120,7 +119,7 @@ const en: BlogPostLocale = {
   excerpt:
     "Build an Upwork profile, choose early projects, protect your Connects, write focused proposals, and bring clients through LinkedIn and Project Catalog.",
   description:
-    "How to start on Upwork from scratch: profile, portfolio, first projects, Connects, proposals, LinkedIn, Project Catalog, and a practical 14-day plan.",
+    "How to start on Upwork from scratch: profile, portfolio, first projects, Connects, proposals, LinkedIn, Project Catalog, and a practical client-search system.",
   category: "guide",
   tags: ru.tags,
   cover: COVER_EN,
@@ -156,7 +155,6 @@ const en: BlogPostLocale = {
         title: "Write a proposal for the specific job",
         body:
           "Open with the client's task. Explain what you will do, what you will deliver, attach one closely related case, and finish with one concrete question.",
-        imageSrc: "/blog/upwork-start-2026-checklist/en/step-5.jpg",
       },
       {
         title: "Add LinkedIn and Project Catalog",
