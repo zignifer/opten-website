@@ -66,6 +66,7 @@ export interface BlogPostLocale {
   category: BlogCategory;     // visible blog label/filter: guide or news
   tags: BlogTag[];            // 2-4 technical SEO keywords, not visible filters
   cover: BlogImage;           // ≥1200px wide for Rich Results carousel; ideally 1600×900
+  articleHero?: BlogImage;    // optional in-article visual; cover remains the card/OG image
   readingTimeMin: number;
   publishedAt: string;        // ISO yyyy-mm-dd
   updatedAt: string;

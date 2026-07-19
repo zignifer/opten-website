@@ -101,6 +101,7 @@ export default function BlogPostPage() {
   const steps = data.body.steps ?? [];
   const sections = data.body.sections ?? [];
   const faq = data.body.faq ?? [];
+  const articleHero = data.articleHero ?? data.cover;
 
   // Related posts: explicit `related[]` if defined, else other recent posts.
   const explicitRelated = (data.related ?? [])
@@ -152,13 +153,13 @@ export default function BlogPostPage() {
           {data.readingTimeMin} {t("blog.readingTime")}
         </p>
 
-        {/* Cover image — 16:9, ≥1200px wide for Rich Results carousel */}
+        {/* The card/OG cover may use a dedicated in-article hero for editorial layouts. */}
         <figure className="mt-[28px] overflow-hidden rounded-[12px] border border-white/10 bg-[#0e2023]">
           <ResponsiveImage
-            src={data.cover.src}
-            alt={data.cover.alt}
-            width={data.cover.width}
-            height={data.cover.height}
+            src={articleHero.src}
+            alt={articleHero.alt}
+            width={articleHero.width}
+            height={articleHero.height}
             loading="eager"
             widths={[480, 800, 1200, 1600]}
             sizes="(max-width: 840px) calc(100vw - 40px), 800px"

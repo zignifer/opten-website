@@ -16,6 +16,20 @@ const COVER_EN = {
   alt: "An open portfolio case with a website, mobile screen, and project materials for starting on Upwork",
 };
 
+const ARTICLE_HERO_RU = {
+  src: `/blog/${SLUG}/ru/article-hero.jpg`,
+  width: 1600,
+  height: 1600,
+  alt: "Чек-лист старта на Upwork: отклики, профиль, LinkedIn, каталог и отзывы",
+};
+
+const ARTICLE_HERO_EN = {
+  src: `/blog/${SLUG}/en/article-hero.jpg`,
+  width: 1600,
+  height: 1600,
+  alt: "Upwork launch checklist covering proposals, profile, LinkedIn, catalog, and reviews",
+};
+
 const ru: BlogPostLocale = {
   slug: SLUG,
   title: "Как начать работать на Upwork с нуля в 2026 году: подробный чек-лист",
@@ -26,6 +40,7 @@ const ru: BlogPostLocale = {
   category: "guide",
   tags: ["workflow"],
   cover: COVER_RU,
+  articleHero: ARTICLE_HERO_RU,
   readingTimeMin: 18,
   publishedAt: PUBLISHED,
   updatedAt: PUBLISHED,
@@ -109,6 +124,7 @@ const en: BlogPostLocale = {
   category: "guide",
   tags: ru.tags,
   cover: COVER_EN,
+  articleHero: ARTICLE_HERO_EN,
   readingTimeMin: 18,
   publishedAt: PUBLISHED,
   updatedAt: PUBLISHED,
