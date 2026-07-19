@@ -8,12 +8,12 @@ const COVER_RU = {
   src: `/blog/${SLUG}/cover.jpg`,
   width: 1600,
   height: 900,
-  alt: "Влад Воронежцев за ноутбуком собирает систему профиля, портфолио и откликов для Upwork",
+  alt: "Открытый портфолио-кейс с сайтом, мобильным экраном и материалами проекта для старта на Upwork",
 };
 
 const COVER_EN = {
   ...COVER_RU,
-  alt: "Vlad Voronezhtsev building an Upwork profile, portfolio, and proposal system at his laptop",
+  alt: "An open portfolio case with a website, mobile screen, and project materials for starting on Upwork",
 };
 
 const ru: BlogPostLocale = {
