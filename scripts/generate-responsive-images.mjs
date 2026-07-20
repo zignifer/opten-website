@@ -40,7 +40,7 @@ function widthsFor(relativePath) {
   const file = path.split("/").pop() ?? "";
 
   if (path.startsWith("blog/")) {
-    return file === "cover.jpg" || file === "cover.png"
+    return file === "cover.jpg" || file === "cover.png" || file === "article-hero.jpg"
       ? [480, 800, 1200, 1600]
       : [480, 800];
   }
