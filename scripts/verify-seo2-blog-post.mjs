@@ -14,6 +14,7 @@ import sharp from "sharp";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const COURSE_URL = "/learn/courses/ai-content-marketing-2026";
+const VISUAL_PLAN_REQUIRED_FROM = "2026-07-25";
 
 const slugs = process.argv.slice(2);
 if (slugs.length === 0) {
@@ -83,6 +84,55 @@ async function verifySlug(slug) {
   if (!source) {
     fail(`${slug}: missing source file ${sourcePath}`);
     return;
+  }
+
+  const publishedAt = source.match(/const PUBLISHED = "(\d{4}-\d{2}-\d{2})"/)?.[1] ?? "";
+  if (publishedAt >= VISUAL_PLAN_REQUIRED_FROM) {
+    const visualPlanPath = resolve(ROOT, "seo2", "visual-plans", `${slug}.md`);
+    if (!existsSync(visualPlanPath)) {
+      fail(`${slug}: missing visual production plan ${visualPlanPath}`);
+    } else {
+      const visualPlan = readFileSync(visualPlanPath, "utf8");
+      const frameCount = allMatches(visualPlan, /^## Frame \d+\b/gm).length;
+      const visualProofCount = allMatches(visualPlan, /^- Visual proof:\s*\S.+$/gmi).length;
+      const continuityCount = allMatches(visualPlan, /^- Style continuity:\s*\S.+$/gmi).length;
+      const compositions = allMatches(visualPlan, /^- Composition:\s*(\S.+)$/gmi).map((match) => match[1].trim().toLowerCase());
+      const textModes = allMatches(visualPlan, /^- Text mode:\s*(headline-only|contrast-pair|sequence|annotated-explainer)\s*$/gmi).map((match) => match[1].toLowerCase());
+      const uniqueCompositions = new Set(compositions);
+      const uniqueTextModes = new Set(textModes);
+      const cardGridFrames = Number(visualPlan.match(/^- Card\/grid frames:\s*(\d+)\s*$/mi)?.[1] ?? Number.NaN);
+      const flatTypography = /^- Typography treatment:\s*flat\b.*$/mi.test(visualPlan);
+
+      if (frameCount < 4) fail(`${slug}: visual plan needs at least 4 Frame sections, got ${frameCount}`);
+      else pass(`${slug}: visual plan has ${frameCount} frames`);
+
+      if (visualProofCount < frameCount) fail(`${slug}: every frame needs a Visual proof`);
+      else pass(`${slug}: visual proofs declared`);
+
+      if (continuityCount < frameCount) fail(`${slug}: every frame needs Style continuity`);
+      else pass(`${slug}: style continuity declared per frame`);
+
+      if (compositions.length < frameCount || uniqueCompositions.size < 3) {
+        fail(`${slug}: visual plan needs at least 3 distinct composition archetypes across ${frameCount} frames`);
+      } else {
+        pass(`${slug}: ${uniqueCompositions.size} distinct composition archetypes`);
+      }
+
+      if (textModes.length < frameCount || uniqueTextModes.size < 2) {
+        fail(`${slug}: visual plan needs at least 2 text modes across ${frameCount} frames`);
+      } else {
+        pass(`${slug}: ${uniqueTextModes.size} text modes`);
+      }
+
+      if (!Number.isFinite(cardGridFrames) || cardGridFrames > 1) {
+        fail(`${slug}: Card/grid frames must be declared and be 0 or 1`);
+      } else {
+        pass(`${slug}: card/grid frame count ${cardGridFrames}`);
+      }
+
+      if (!flatTypography) fail(`${slug}: visual plan must declare flat Typography treatment`);
+      else pass(`${slug}: flat typography treatment declared`);
+    }
   }
 
   const coverPath = resolve(ROOT, "public", "blog", slug, "cover.jpg");

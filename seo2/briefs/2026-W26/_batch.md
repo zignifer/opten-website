@@ -47,7 +47,7 @@ Default course CTA for course/learning banners: `/learn/courses/ai-content-marke
 | 4 | published | `free-ai-courses` | `BL-learn` | `бесплатное обучение нейросетям` | 3575 | [04-free-ai-courses.md](04-free-ai-courses.md) |
 | 5 | published | `ai-for-work` | `BL-work` | `нейросети для работы` | 32506 | [05-ai-for-work.md](05-ai-for-work.md) |
 | 6 | published | `ai-presentations` | `BL-work` | `нейросети для презентаций` | 177001 | [06-ai-presentations.md](06-ai-presentations.md) |
-| 7 | pending | `ai-text-for-work` | `BL-work` | `нейросети для текста` | 156546 | [07-ai-text-for-work.md](07-ai-text-for-work.md) |
+| 7 | published | `ai-text-for-work` | `BL-work` | `нейросети для текста` | 156546 | [07-ai-text-for-work.md](07-ai-text-for-work.md) |
 | 8 | pending | `ai-video-for-work` | `BL-work` | `нейросети для видео` | 55862 | [08-ai-video-for-work.md](08-ai-video-for-work.md) |
 | 9 | pending | `vibe-coding-freelance` | `BL-sites` | `вайб кодинг` | 13438 | [09-vibe-coding-freelance.md](09-vibe-coding-freelance.md) |
 | 10 | pending | `build-website-with-ai` | `BL-sites` | `нейросеть создание сайтов` | 3561 | [10-build-website-with-ai.md](10-build-website-with-ai.md) |
