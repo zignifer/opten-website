@@ -22,6 +22,7 @@ const STATIC_EN_SIBLINGS: readonly string[] = [
   "/about", // Phase 4.1 B-03
   "/blog", // Phase 5 B-04
   "/blog/upwork-start-2026-checklist", // editorial longform guide
+  "/blog/ai-video-for-work", // seo2 manual blog automation
   "/blog/ai-text-for-work", // seo2 manual blog automation
   "/blog/ai-presentations", // seo2 manual blog automation
   "/blog/ai-for-work", // seo2 manual blog automation

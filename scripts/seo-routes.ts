@@ -13,6 +13,7 @@ import { post as freeAiCoursesGuide } from "../src/content/blog/free-ai-courses"
 import { post as aiForWorkGuide } from "../src/content/blog/ai-for-work";
 import { post as aiPresentationsGuide } from "../src/content/blog/ai-presentations";
 import { post as aiTextForWorkGuide } from "../src/content/blog/ai-text-for-work";
+import { post as aiVideoForWorkGuide } from "../src/content/blog/ai-video-for-work";
 import { post as upworkStart2026Guide } from "../src/content/blog/upwork-start-2026-checklist";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
@@ -1305,6 +1306,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/ai-video-for-work`, name: aiVideoForWorkGuide.ru.title, datePublished: aiVideoForWorkGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-text-for-work`, name: aiTextForWorkGuide.ru.title, datePublished: aiTextForWorkGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/upwork-start-2026-checklist`, name: upworkStart2026Guide.ru.title, datePublished: upworkStart2026Guide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-presentations`, name: aiPresentationsGuide.ru.title, datePublished: aiPresentationsGuide.ru.publishedAt },
@@ -1349,6 +1351,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/ai-video-for-work.
+  {
+    path: "/blog/ai-video-for-work",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/ai-video-for-work`, en: `${SITE_ORIGIN}/en/blog/ai-video-for-work`, xDefault: `${SITE_ORIGIN}/blog/ai-video-for-work` },
+    title: aiVideoForWorkGuide.ru.title,
+    description: aiVideoForWorkGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-video-for-work`,
+    ogTitle: aiVideoForWorkGuide.ru.title,
+    ogDescription: aiVideoForWorkGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiVideoForWorkGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/ai-video-for-work`, headline: aiVideoForWorkGuide.ru.title, description: aiVideoForWorkGuide.ru.description, datePublished: aiVideoForWorkGuide.ru.publishedAt, dateModified: aiVideoForWorkGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: aiVideoForWorkGuide.ru.tags, image: { url: `${SITE_ORIGIN}${aiVideoForWorkGuide.ru.cover.src}`, width: aiVideoForWorkGuide.ru.cover.width, height: aiVideoForWorkGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/ai-video-for-work`, url: `${SITE_ORIGIN}/blog/ai-video-for-work`, name: aiVideoForWorkGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((aiVideoForWorkGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/ai-video-for-work`, aiVideoForWorkGuide.ru.title),
+      faqPageBlock(aiVideoForWorkGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-video-for-work`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: aiVideoForWorkGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-video-for-work` }], `${SITE_ORIGIN}/blog/ai-video-for-work`),
     ],
   },
 
@@ -3164,6 +3188,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/ai-video-for-work`, name: aiVideoForWorkGuide.en.title, datePublished: aiVideoForWorkGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-text-for-work`, name: aiTextForWorkGuide.en.title, datePublished: aiTextForWorkGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/upwork-start-2026-checklist`, name: upworkStart2026Guide.en.title, datePublished: upworkStart2026Guide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-presentations`, name: aiPresentationsGuide.en.title, datePublished: aiPresentationsGuide.en.publishedAt },
@@ -3208,6 +3233,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/ai-video-for-work EN sibling.
+  {
+    path: "/en/blog/ai-video-for-work",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/ai-video-for-work`, en: `${SITE_ORIGIN}/en/blog/ai-video-for-work`, xDefault: `${SITE_ORIGIN}/blog/ai-video-for-work` },
+    title: aiVideoForWorkGuide.en.title,
+    description: aiVideoForWorkGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-video-for-work`,
+    ogTitle: aiVideoForWorkGuide.en.title,
+    ogDescription: aiVideoForWorkGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiVideoForWorkGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/ai-video-for-work`, headline: aiVideoForWorkGuide.en.title, description: aiVideoForWorkGuide.en.description, datePublished: aiVideoForWorkGuide.en.publishedAt, dateModified: aiVideoForWorkGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: aiVideoForWorkGuide.en.tags, image: { url: `${SITE_ORIGIN}${aiVideoForWorkGuide.en.cover.src}`, width: aiVideoForWorkGuide.en.cover.width, height: aiVideoForWorkGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/ai-video-for-work`, url: `${SITE_ORIGIN}/en/blog/ai-video-for-work`, name: aiVideoForWorkGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((aiVideoForWorkGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/ai-video-for-work`, aiVideoForWorkGuide.en.title),
+      faqPageBlock(aiVideoForWorkGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-video-for-work`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: aiVideoForWorkGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-video-for-work` }], `${SITE_ORIGIN}/en/blog/ai-video-for-work`),
     ],
   },
 

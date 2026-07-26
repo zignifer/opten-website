@@ -42,13 +42,13 @@ slug: ai-text-for-work
 - Style continuity: same flat type, teal-black grade, lime proofing line, red pencil, paper and glass materials.
 - Semantic job: turn role, goal, and output into one visible sequence instead of disconnected noun cards.
 
-## Frame 3 — PROMPT
+## Frame 3 — PROMPT / ПРОМПТ
 
 - Story beat: “write a Telegram post” becomes useful when it centers on one concrete work situation.
 - Visual proof: a pile of repetitive generic draft strips falls out of focus while one sharp scene card shows a promise trapped in chat and missing from the task plan.
 - Composition: cinematic focus shift
 - Text mode: contrast-pair
-- RU text: `PROMPT`, `ОБЩИЕ СЛОВА`, `ОДНА СИТУАЦИЯ`.
+- RU text: `ПРОМПТ`, `ОБЩИЕ СЛОВА`, `ОДНА СИТУАЦИЯ`.
 - EN text: `PROMPT`, `GENERIC COPY`, `ONE SITUATION`.
 - Style continuity: same flat type and lime rules, paper artifacts, red pencil, editorial lighting and grain.
 - Semantic job: visualize the article's named ChatGPT case rather than enumerate prompt components.

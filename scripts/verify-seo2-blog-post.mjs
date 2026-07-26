@@ -15,6 +15,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const COURSE_URL = "/learn/courses/ai-content-marketing-2026";
 const VISUAL_PLAN_REQUIRED_FROM = "2026-07-25";
+const AVOIDABLE_ENGLISH_IN_RU =
+  /\b(prompt|prompts|brief|workflow|preflight|production prompt|visual brief|visual direction|deck|draft|review)\b/gi;
 
 const slugs = process.argv.slice(2);
 if (slugs.length === 0) {
@@ -52,6 +54,12 @@ function sectionForLocale(source, locale) {
 function captureString(section, field) {
   const match = section.match(new RegExp(`${field}:\\s*"([^"]+)"`));
   return match?.[1] ?? "";
+}
+
+function visibleStringLiterals(section) {
+  return allMatches(section, /"((?:\\.|[^"\\])*)"/g)
+    .map((match) => match[1])
+    .filter((value) => !/^\/|^[a-z0-9][a-z0-9/_-]*(?:\.jpg)?$/i.test(value));
 }
 
 async function imageInfo(path) {
@@ -152,6 +160,17 @@ async function verifySlug(slug) {
     const imageRefs = allMatches(section, new RegExp(`imageSrc:\\s*"(/blog/${slug}/${locale}/[^"]+\\.jpg)"`, "g")).map((m) => m[1]);
     const promoCount = allMatches(section, /promoBanner:\s*{/g).length;
     const courseHrefCount = allMatches(section, new RegExp(`href:\\s*COURSE_URL|href:\\s*"${COURSE_URL.replace(/\//g, "\\/")}"`, "g")).length;
+
+    if (locale === "ru") {
+      const avoidableTerms = new Set(
+        visibleStringLiterals(section).flatMap((value) => value.match(AVOIDABLE_ENGLISH_IN_RU) ?? []).map((value) => value.toLowerCase()),
+      );
+      if (avoidableTerms.size > 0) {
+        fail(`${slug} ru: translate avoidable English terms: ${Array.from(avoidableTerms).join(", ")}`);
+      } else {
+        pass(`${slug} ru: no avoidable English terms`);
+      }
+    }
 
     if (title.length < 20 || title.length > 70) fail(`${slug} ${locale}: title length ${title.length}, expected 20..70`);
     else pass(`${slug} ${locale}: title length ${title.length}`);
