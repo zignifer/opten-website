@@ -14,6 +14,7 @@ import { post as aiForWorkGuide } from "../src/content/blog/ai-for-work";
 import { post as aiPresentationsGuide } from "../src/content/blog/ai-presentations";
 import { post as aiTextForWorkGuide } from "../src/content/blog/ai-text-for-work";
 import { post as aiVideoForWorkGuide } from "../src/content/blog/ai-video-for-work";
+import { post as vibeCodingFreelanceGuide } from "../src/content/blog/vibe-coding-freelance";
 import { post as upworkStart2026Guide } from "../src/content/blog/upwork-start-2026-checklist";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
@@ -1306,6 +1307,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/vibe-coding-freelance`, name: vibeCodingFreelanceGuide.ru.title, datePublished: vibeCodingFreelanceGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-video-for-work`, name: aiVideoForWorkGuide.ru.title, datePublished: aiVideoForWorkGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-text-for-work`, name: aiTextForWorkGuide.ru.title, datePublished: aiTextForWorkGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/upwork-start-2026-checklist`, name: upworkStart2026Guide.ru.title, datePublished: upworkStart2026Guide.ru.publishedAt },
@@ -1351,6 +1353,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/vibe-coding-freelance.
+  {
+    path: "/blog/vibe-coding-freelance",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/vibe-coding-freelance`, en: `${SITE_ORIGIN}/en/blog/vibe-coding-freelance`, xDefault: `${SITE_ORIGIN}/blog/vibe-coding-freelance` },
+    title: vibeCodingFreelanceGuide.ru.title,
+    description: vibeCodingFreelanceGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/vibe-coding-freelance`,
+    ogTitle: vibeCodingFreelanceGuide.ru.title,
+    ogDescription: vibeCodingFreelanceGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${vibeCodingFreelanceGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/vibe-coding-freelance`, headline: vibeCodingFreelanceGuide.ru.title, description: vibeCodingFreelanceGuide.ru.description, datePublished: vibeCodingFreelanceGuide.ru.publishedAt, dateModified: vibeCodingFreelanceGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: vibeCodingFreelanceGuide.ru.tags, image: { url: `${SITE_ORIGIN}${vibeCodingFreelanceGuide.ru.cover.src}`, width: vibeCodingFreelanceGuide.ru.cover.width, height: vibeCodingFreelanceGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/vibe-coding-freelance`, url: `${SITE_ORIGIN}/blog/vibe-coding-freelance`, name: vibeCodingFreelanceGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((vibeCodingFreelanceGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/vibe-coding-freelance`, vibeCodingFreelanceGuide.ru.title),
+      faqPageBlock(vibeCodingFreelanceGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/vibe-coding-freelance`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: vibeCodingFreelanceGuide.ru.title, url: `${SITE_ORIGIN}/blog/vibe-coding-freelance` }], `${SITE_ORIGIN}/blog/vibe-coding-freelance`),
     ],
   },
 
@@ -3188,6 +3212,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/vibe-coding-freelance`, name: vibeCodingFreelanceGuide.en.title, datePublished: vibeCodingFreelanceGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-video-for-work`, name: aiVideoForWorkGuide.en.title, datePublished: aiVideoForWorkGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-text-for-work`, name: aiTextForWorkGuide.en.title, datePublished: aiTextForWorkGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/upwork-start-2026-checklist`, name: upworkStart2026Guide.en.title, datePublished: upworkStart2026Guide.en.publishedAt },
@@ -3233,6 +3258,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/vibe-coding-freelance EN sibling.
+  {
+    path: "/en/blog/vibe-coding-freelance",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/vibe-coding-freelance`, en: `${SITE_ORIGIN}/en/blog/vibe-coding-freelance`, xDefault: `${SITE_ORIGIN}/blog/vibe-coding-freelance` },
+    title: vibeCodingFreelanceGuide.en.title,
+    description: vibeCodingFreelanceGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/vibe-coding-freelance`,
+    ogTitle: vibeCodingFreelanceGuide.en.title,
+    ogDescription: vibeCodingFreelanceGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${vibeCodingFreelanceGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/vibe-coding-freelance`, headline: vibeCodingFreelanceGuide.en.title, description: vibeCodingFreelanceGuide.en.description, datePublished: vibeCodingFreelanceGuide.en.publishedAt, dateModified: vibeCodingFreelanceGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: vibeCodingFreelanceGuide.en.tags, image: { url: `${SITE_ORIGIN}${vibeCodingFreelanceGuide.en.cover.src}`, width: vibeCodingFreelanceGuide.en.cover.width, height: vibeCodingFreelanceGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/vibe-coding-freelance`, url: `${SITE_ORIGIN}/en/blog/vibe-coding-freelance`, name: vibeCodingFreelanceGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((vibeCodingFreelanceGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/vibe-coding-freelance`, vibeCodingFreelanceGuide.en.title),
+      faqPageBlock(vibeCodingFreelanceGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/vibe-coding-freelance`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: vibeCodingFreelanceGuide.en.title, url: `${SITE_ORIGIN}/en/blog/vibe-coding-freelance` }], `${SITE_ORIGIN}/en/blog/vibe-coding-freelance`),
     ],
   },
 

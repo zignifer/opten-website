@@ -11,6 +11,7 @@ import { post as aiForWork } from "./ai-for-work";
 import { post as aiPresentations } from "./ai-presentations";
 import { post as aiTextForWork } from "./ai-text-for-work";
 import { post as aiVideoForWork } from "./ai-video-for-work";
+import { post as vibeCodingFreelance } from "./vibe-coding-freelance";
 import { post as upworkStart2026Checklist } from "./upwork-start-2026-checklist";
 import { post as aiHeadshotGenerator } from "./ai-headshot-generator";
 import { post as aiUgcForBrands } from "./ai-ugc-for-brands";
@@ -33,6 +34,7 @@ import { post as aiLogoGeneratorPrompt } from "./ai-logo-generator-prompt";
 import type { BlogPost } from "./types";
 
 export const blogPostsBySlug = {
+  "vibe-coding-freelance": vibeCodingFreelance,
   "ai-video-for-work": aiVideoForWork,
   "ai-text-for-work": aiTextForWork,
   "upwork-start-2026-checklist": upworkStart2026Checklist,
