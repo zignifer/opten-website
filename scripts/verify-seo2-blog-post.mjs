@@ -13,6 +13,7 @@ import sharp from "sharp";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
+const BRIEFS_DIR = resolve(ROOT, "seo2", "briefs");
 const COURSE_URL = "/learn/courses/ai-content-marketing-2026";
 const VISUAL_PLAN_REQUIRED_FROM = "2026-07-25";
 const AVOIDABLE_ENGLISH_IN_RU =
@@ -85,6 +86,23 @@ async function verifyImageFile(path, label, minWidth = 1200, minHeight = 675) {
   pass(`${label}: ${width}x${height}`);
 }
 
+async function findQueueStatus(slug) {
+  if (!existsSync(BRIEFS_DIR)) return "";
+  const weekDirs = await readdir(BRIEFS_DIR, { withFileTypes: true });
+  for (const weekDir of weekDirs) {
+    if (!weekDir.isDirectory()) continue;
+    const batchPath = resolve(BRIEFS_DIR, weekDir.name, "_batch.md");
+    if (!existsSync(batchPath)) continue;
+    const rows = readFileSync(batchPath, "utf8").split(/\r?\n/);
+    for (const row of rows) {
+      if (!row.includes(`\`${slug}\``)) continue;
+      const cells = row.split("|").map((cell) => cell.trim());
+      return cells[2] ?? "";
+    }
+  }
+  return "";
+}
+
 async function verifySlug(slug) {
   console.log(`\n=== SEO2 source gate: ${slug} ===`);
   const sourcePath = resolve(ROOT, "src", "content", "blog", `${slug}.ts`);
@@ -95,6 +113,7 @@ async function verifySlug(slug) {
   }
 
   const publishedAt = source.match(/const PUBLISHED = "(\d{4}-\d{2}-\d{2})"/)?.[1] ?? "";
+  const queueStatus = await findQueueStatus(slug);
   if (publishedAt >= VISUAL_PLAN_REQUIRED_FROM) {
     const visualPlanPath = resolve(ROOT, "seo2", "visual-plans", `${slug}.md`);
     if (!existsSync(visualPlanPath)) {
@@ -110,6 +129,15 @@ async function verifySlug(slug) {
       const uniqueTextModes = new Set(textModes);
       const cardGridFrames = Number(visualPlan.match(/^- Card\/grid frames:\s*(\d+)\s*$/mi)?.[1] ?? Number.NaN);
       const flatTypography = /^- Typography treatment:\s*flat\b.*$/mi.test(visualPlan);
+      const visualStyleGate = visualPlan.match(/^visual_style_gate:\s*["']?([^"'\r\n]+)["']?\s*$/mi)?.[1]?.trim() ?? "";
+      const northStarInput = visualPlan.match(/^- North-star style input:\s*(\S.+)$/mi)?.[1]?.trim() ?? "";
+      const flatLayFrames = Number(visualPlan.match(/^- Flat-lay frames:\s*(\d+)\s*$/mi)?.[1] ?? Number.NaN);
+      const documentDominantFrames = Number(visualPlan.match(/^- Document-dominant frames:\s*(\d+)\s*$/mi)?.[1] ?? Number.NaN);
+      const handDominantFrames = Number(visualPlan.match(/^- Hand-dominant frames:\s*(\d+)\s*$/mi)?.[1] ?? Number.NaN);
+      const strongDepthFrames = Number(visualPlan.match(/^- Strong-depth frames:\s*(\d+)\s*$/mi)?.[1] ?? Number.NaN);
+      const opticalSignalFrames = Number(visualPlan.match(/^- Optical-signal frames:\s*(\d+)\s*$/mi)?.[1] ?? Number.NaN);
+      const heroLabelOnDocumentFrames = Number(visualPlan.match(/^- Hero-label-on-document frames:\s*(\d+)\s*$/mi)?.[1] ?? Number.NaN);
+      const negativeReferenceCheck = visualPlan.match(/^- Negative-reference check:\s*(\S.+)$/mi)?.[1]?.trim() ?? "";
 
       if (frameCount < 4) fail(`${slug}: visual plan needs at least 4 Frame sections, got ${frameCount}`);
       else pass(`${slug}: visual plan has ${frameCount} frames`);
@@ -140,6 +168,51 @@ async function verifySlug(slug) {
 
       if (!flatTypography) fail(`${slug}: visual plan must declare flat Typography treatment`);
       else pass(`${slug}: flat typography treatment declared`);
+
+      // New queue items must declare the cinematic optical style gate before
+      // image generation. Published legacy plans remain verifiable.
+      if (queueStatus && queueStatus !== "published") {
+        if (visualStyleGate !== "cinematic-optical-v2") {
+          fail(`${slug}: active visual plan must set visual_style_gate: cinematic-optical-v2`);
+        } else {
+          pass(`${slug}: cinematic optical visual gate declared`);
+        }
+
+        if (!/ai-video-for-work\/ru\/step-[1-4]\.jpg/i.test(northStarInput)) {
+          fail(`${slug}: North-star style input must name 1-2 ai-video-for-work RU frames`);
+        } else {
+          pass(`${slug}: north-star style input declared`);
+        }
+
+        const boundedCounts = [
+          ["Flat-lay frames", flatLayFrames],
+          ["Document-dominant frames", documentDominantFrames],
+          ["Hand-dominant frames", handDominantFrames],
+          ["Hero-label-on-document frames", heroLabelOnDocumentFrames],
+        ];
+        for (const [label, value] of boundedCounts) {
+          if (!Number.isFinite(value) || value > 1) fail(`${slug}: ${label} must be declared and be 0 or 1`);
+          else pass(`${slug}: ${label.toLowerCase()} ${value}`);
+        }
+
+        if (!Number.isFinite(strongDepthFrames) || strongDepthFrames < 3) {
+          fail(`${slug}: Strong-depth frames must be declared and be at least 3`);
+        } else {
+          pass(`${slug}: strong-depth frame count ${strongDepthFrames}`);
+        }
+
+        if (!Number.isFinite(opticalSignalFrames) || opticalSignalFrames < 3) {
+          fail(`${slug}: Optical-signal frames must be declared and be at least 3`);
+        } else {
+          pass(`${slug}: optical-signal frame count ${opticalSignalFrames}`);
+        }
+
+        if (!negativeReferenceCheck) {
+          fail(`${slug}: visual plan must declare a Negative-reference check`);
+        } else {
+          pass(`${slug}: negative-reference check declared`);
+        }
+      }
     }
   }
 

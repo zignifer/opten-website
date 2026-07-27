@@ -14,11 +14,13 @@ HTML/CSS, Sharp или другой постобработкой.
 
 ## Visual north star
 
-Предпочтительное направление — **cinematic scene first**: дорогая
-кинематографичная предметная или сюжетная фотография, в которую аккуратно
-встроен плоский редакционный графический слой. Фотографическая сцена, главный
-объект, действие или результат несут смысл первыми; текст, линия и стрелка лишь
-помогают прочитать этот смысл.
+Предпочтительное направление — **Opten cinematic optical editorial**. Это
+темная постановочная сцена или студийная диорама с выраженной глубиной,
+скульптурным главным объектом, черным металлом/стеклом, контролируемыми
+отражениями, оптическим светом и встроенным редакционным слоем. Она может
+выглядеть как дорогая предметная съемка, polished CGI или их гибрид; требование
+`real practical set` не должно сводить изображение к буквальному столу,
+бумажкам и рукам.
 
 Внутренний quality north star — серия
 `public/blog/ai-video-for-work/ru/step-*.jpg`. Она работает не из-за пленки,
@@ -35,37 +37,74 @@ HTML/CSS, Sharp или другой постобработкой.
 - композиции заметно разные: diptych, hero shot, sequence, decision point —
   без повторения одной доски, сетки или набора карточек.
 
-Это **калибровка качества, а не набор постоянных генераторных референсов**.
-Не прикладывай JPG из `ai-video-for-work` к генератору и не переноси в новую
-статью пленку, объективы, камеры, оптические рамки, красную лампу или волну
-движения, если тема сама их не требует. Для каждой статьи придумывай свой
-предметный мир, материалы, главный объект и повторяющийся мотив.
+Прошлый запрет прикладывать эту серию оказался слишком слабой фиксацией:
+словесное описание допускает generic editorial flat lay. Поэтому для **первого
+RU style-anchor кадра каждой новой статьи** обязательно выбери 1-2 изображения
+из `public/blog/ai-video-for-work/ru/step-*.jpg` и передай их генератору только
+как `style/quality reference`. В промпте прямо напиши:
+
+```text
+Use the attached image(s) only for cinematic depth, black-metal and smoked-glass
+material language, optical lighting, controlled reflections, lime signal
+integration, typography scale, contrast and color grading. Do not copy their
+subject, film/camera objects, layout, camera angle or composition.
+```
+
+Не прикладывай north-star JPG ко всем остальным кадрам: после утверждения
+первого RU кадра он сам становится style anchor серии. Так стиль фиксируется,
+но композиция и предметный мир не размножаются.
+
+Не переноси в новую статью пленку, объективы, камеры, оптические рамки, красную
+лампу или конкретную волну движения, если тема сама их не требует. Переноси
+глубину, материалы, свет, контраст, типографический масштаб и способ интеграции
+сигнала.
 
 `seo2/Reference/ai-headshot-step-*.jpg` и
 `seo2/Reference/ai-ugc-step-*.jpg` остаются банком композиционных решений и
 примером читаемой смысловой плотности, но не обязательным стилевым входом.
-В генератор обязательно прикладывается только
-`seo2/Reference/bebas-neue-font-reference.png`.
+В генератор каждого кадра обязательно прикладывается
+`seo2/Reference/bebas-neue-font-reference.png`; к первому RU style anchor
+добавляется 1-2 north-star JPG по правилу выше.
+
+Отрицательный пример — `public/blog/ai-freelance-services/ru/step-*.jpg`.
+Это чистая и аккуратная серия, но **не нужное направление**: editorial
+scrapbook/desk flat lay, бумажные документы и руки стали главным визуальным
+языком, глубина почти исчезла, лайм работает как печатная плашка/стрелка, а
+крупный текст оказался на физических листах. Если новый style anchor визуально
+похож на эту серию, его нужно отклонить и перегенерировать до создания EN-пары.
 
 Лаймовый акцент должен быть ровно `#9CFB51`; не используй более желтый, более
 темный или примерный green/lime оттенок.
 
 ## Locked visual grammar
 
-- Базовый medium: cinematic editorial photograph of a real practical set.
-  Даже если сет миниатюрный или сконструированный, он должен ощущаться
-  физическим, освещенным и снятым камерой, а не отрендеренной схемой.
+- Базовый medium: cinematic optical editorial scene / sculptural studio
+  diorama / polished product-film still. Допустим фотореалистичный CGI-гибрид,
+  если он дает больше глубины, света и визуальной режиссуры, чем буквальная
+  съемка рабочего стола.
 - Выбирай материалы из темы статьи: продукт, человек, среда, инструмент,
-  фактура или реальный рабочий артефакт. Не используй бумагу, акрил, подвесные
-  карточки, конвейер или макет интерфейса как универсальный ответ на любую тему.
-- Держи low-key свет, глубокий teal-black фон `#011417`, контролируемые блики,
-  объем, фактуру и легкое кинематографичное зерно.
-- Плоская графика занимает вторичную роль. Она может связать объекты, отметить
-  движение, выделить выбор или показать причинность, но не должна превращать
-  кадр в dashboard, схему или презентационный слайд.
+  фактура, метафорический механизм или реальный рабочий артефакт. Смысл нужно
+  переводить в сцену и визуальную метафору, а не буквально раскладывать brief,
+  invoice, карточки и результаты на столе.
+- Строй минимум три плана: foreground, hero midground, atmospheric background.
+  Используй three-quarter, eye-level, low-angle, portal, tunnel, curved sequence
+  или deep-stage camera. Top-down/high-oblique desk view допустим максимум в
+  одном кадре серии.
+- Держи low-key свет, глубокий teal-black фон `#011417`, черный металл, smoked
+  glass, узкие specular highlights, контролируемые отражения, объемную дымку или
+  light spill и легкое кинематографичное зерно.
+- `#9CFB51` должен жить в пространстве как optical signal: световая траектория,
+  ribbon, луч, contour path или энергетическая связь с мягким spill на соседних
+  материалах. Плоская стрелка или зеленая бумажная плашка сама по себе не дает
+  нужного стиля.
+- Плоская графика занимает вторичную роль. Она может уточнить траекторию,
+  контраст или решение, но главный смысл несут сцена, объект, свет и действие.
 - Используй один повторяющийся мотив на серию и, при необходимости, один
   сдержанный функциональный цвет кроме `#9CFB51` — например красный только для
   брака, ошибки или записи.
+- Большой Bebas Neue обычно ставь в чистое темное negative space или на
+  прозрачную/дымчатую оптическую плоскость. Не печатай hero label на листе,
+  карточке, бирке, папке или конверте больше чем в одном кадре серии.
 - Большой заголовок сохраняет общую айдентику, но supporting labels не являются
   квотой. Допустимо 0-4 коротких подписи. Если физическая сцена уже доказывает
   мысль, лучше оставить headline-only, чем заполнять кадр карточками.
@@ -78,6 +117,24 @@ HTML/CSS, Sharp или другой постобработкой.
   конструкцию и composition archetype, сохраняя medium, свет, цвет, типографику
   и line language.
 
+## Hard release gate
+
+Серия блокируется и перегенерируется до EN-локализации, если выполняется хотя
+бы одно условие:
+
+- два и более RU-кадра являются desk flat lay / scrapbook / papers-on-table;
+- документы, листы, карточки, папки или руки — главный герой более чем одного
+  кадра;
+- три и более кадра сняты сверху или с одинакового высокого oblique-ракурса;
+- в трех и более кадрах нет отчетливых foreground / midground / background;
+- лайм существует только как плоский текст, стрелка, билет или бумажная плашка,
+  без optical glow/path и взаимодействия со сценой;
+- hero label напечатан на физическом документе/карточке в двух и более кадрах;
+- все кадры можно описать как «предметы разложены на одном темном столе»;
+- серия ближе к negative example
+  `public/blog/ai-freelance-services/ru/step-*.jpg`, чем к north star
+  `public/blog/ai-video-for-work/ru/step-*.jpg`.
+
 ## Cover
 
 - `public/blog/<slug>/cover.jpg`
@@ -88,11 +145,13 @@ HTML/CSS, Sharp или другой постобработкой.
 Prompt base:
 
 ```text
-Cinematic editorial photograph of a real practical set, deep teal-black
-background (#011417), one dominant [topic object/action/result], exact #9CFB51
-as a restrained accent, low-key directional light, tactile materials,
-controlled reflections, subtle film grain, crop-safe composition, no text,
-no logos, no dashboard, 16:9.
+Opten cinematic optical editorial scene, sculptural studio diorama or polished
+product-film still, deep teal-black background (#011417), strong foreground /
+hero midground / atmospheric background, one dominant [topic
+object/action/result], black metal and smoked glass, exact #9CFB51 optical
+signal path with light spill, low-key directional light, controlled
+reflections, subtle film grain, crop-safe composition, no text, no logos,
+no dashboard, not a desk flat lay, 16:9.
 ```
 
 ## In-Article Images
@@ -116,14 +175,18 @@ no logos, no dashboard, 16:9.
 Prompt pattern:
 
 ```text
-Cinematic editorial photograph of a real practical set on a deep teal-black
-background (#011417). One dominant [topic subject/action/result] carries the
-meaning through physical objects, depth, texture and low-key directional light.
-Use exact #9CFB51 only as a restrained flat editorial path/marker/accent.
-Integrate short in-image hero text "[RU or EN text]" in flat Bebas Neue.
-Add only the labels required to explain [contrast/sequence/decision]; graphics
-remain subordinate to the photographic scene. Controlled reflections, subtle
-film grain, no dashboard, no generic card grid, 16:9.
+Opten cinematic optical editorial scene on deep teal-black #011417, designed as
+a sculptural studio diorama or polished product-film still, not a desk flat
+lay. Use foreground, hero midground and atmospheric background. One dominant
+[topic subject/action/result or visual metaphor] carries the meaning through
+black metal, smoked glass, depth, texture, controlled reflections and low-key
+directional light. Exact #9CFB51 appears as an optical signal
+path/ribbon/beam/contour with subtle light spill into the scene, not only as a
+flat arrow or paper label. Integrate hero text "[RU or EN text]" in large flat
+Bebas Neue inside dark negative space or on a transparent optical plane. Add
+only labels required for [contrast/sequence/decision]. No dashboard, no generic
+card grid, no scrapbook, no papers-on-table composition, subtle film grain,
+16:9.
 ```
 
 Color lock: the lime accent is exactly `#9CFB51`. Repeat that hex in every
@@ -138,12 +201,17 @@ Avoid:
 - paragraphs of text inside images;
 - prompts led by `infographic`, `dashboard`, `SaaS UI` or `card grid` as the
   primary medium;
+- `freelance desk`, `creative desk`, `editorial workbench`, `documents spread
+  on table`, `hands sorting papers`, scrapbook, stationery flat lay or portfolio
+  collage as the scene family;
 - paper maquettes, acrylic interface modules, hanging cards, conveyor rigs and
   schematic boards used as a default visual language for unrelated topics;
 - a frame where labels, cards or a diagram are visually stronger than the
   subject, action or result;
-- copying the lenses, cameras, film strips, motion ribbon, red recording light
-  or object layouts from `ai-video-for-work`;
+- copying the lenses, cameras, film strips, red recording light, subjects,
+  camera angles or object layouts from `ai-video-for-work`; an abstract optical
+  lime signal/path is part of the style grammar, but its shape and job must be
+  article-specific;
 - adding text after generation with an editor, Canvas, HTML/CSS, Sharp, or any
   other overlay/post-processing step;
 - Opten UI / score / PromptScore / extension sales panels;
