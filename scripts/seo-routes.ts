@@ -16,6 +16,7 @@ import { post as aiTextForWorkGuide } from "../src/content/blog/ai-text-for-work
 import { post as aiVideoForWorkGuide } from "../src/content/blog/ai-video-for-work";
 import { post as buildWebsiteWithAiGuide } from "../src/content/blog/build-website-with-ai";
 import { post as vibeCodingFreelanceGuide } from "../src/content/blog/vibe-coding-freelance";
+import { post as aiFreelanceServicesGuide } from "../src/content/blog/ai-freelance-services";
 import { post as upworkStart2026Guide } from "../src/content/blog/upwork-start-2026-checklist";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
@@ -1308,6 +1309,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/ai-freelance-services`, name: aiFreelanceServicesGuide.ru.title, datePublished: aiFreelanceServicesGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/build-website-with-ai`, name: buildWebsiteWithAiGuide.ru.title, datePublished: buildWebsiteWithAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/vibe-coding-freelance`, name: vibeCodingFreelanceGuide.ru.title, datePublished: vibeCodingFreelanceGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-video-for-work`, name: aiVideoForWorkGuide.ru.title, datePublished: aiVideoForWorkGuide.ru.publishedAt },
@@ -1355,6 +1357,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/ai-freelance-services.
+  {
+    path: "/blog/ai-freelance-services",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/ai-freelance-services`, en: `${SITE_ORIGIN}/en/blog/ai-freelance-services`, xDefault: `${SITE_ORIGIN}/blog/ai-freelance-services` },
+    title: aiFreelanceServicesGuide.ru.title,
+    description: aiFreelanceServicesGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-freelance-services`,
+    ogTitle: aiFreelanceServicesGuide.ru.title,
+    ogDescription: aiFreelanceServicesGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiFreelanceServicesGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/ai-freelance-services`, headline: aiFreelanceServicesGuide.ru.title, description: aiFreelanceServicesGuide.ru.description, datePublished: aiFreelanceServicesGuide.ru.publishedAt, dateModified: aiFreelanceServicesGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: aiFreelanceServicesGuide.ru.tags, image: { url: `${SITE_ORIGIN}${aiFreelanceServicesGuide.ru.cover.src}`, width: aiFreelanceServicesGuide.ru.cover.width, height: aiFreelanceServicesGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/ai-freelance-services`, url: `${SITE_ORIGIN}/blog/ai-freelance-services`, name: aiFreelanceServicesGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((aiFreelanceServicesGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/ai-freelance-services`, aiFreelanceServicesGuide.ru.title),
+      faqPageBlock(aiFreelanceServicesGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-freelance-services`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: aiFreelanceServicesGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-freelance-services` }], `${SITE_ORIGIN}/blog/ai-freelance-services`),
     ],
   },
 
@@ -3236,6 +3260,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/ai-freelance-services`, name: aiFreelanceServicesGuide.en.title, datePublished: aiFreelanceServicesGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/build-website-with-ai`, name: buildWebsiteWithAiGuide.en.title, datePublished: buildWebsiteWithAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/vibe-coding-freelance`, name: vibeCodingFreelanceGuide.en.title, datePublished: vibeCodingFreelanceGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-video-for-work`, name: aiVideoForWorkGuide.en.title, datePublished: aiVideoForWorkGuide.en.publishedAt },
@@ -3283,6 +3308,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/ai-freelance-services EN sibling.
+  {
+    path: "/en/blog/ai-freelance-services",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/ai-freelance-services`, en: `${SITE_ORIGIN}/en/blog/ai-freelance-services`, xDefault: `${SITE_ORIGIN}/blog/ai-freelance-services` },
+    title: aiFreelanceServicesGuide.en.title,
+    description: aiFreelanceServicesGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-freelance-services`,
+    ogTitle: aiFreelanceServicesGuide.en.title,
+    ogDescription: aiFreelanceServicesGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiFreelanceServicesGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/ai-freelance-services`, headline: aiFreelanceServicesGuide.en.title, description: aiFreelanceServicesGuide.en.description, datePublished: aiFreelanceServicesGuide.en.publishedAt, dateModified: aiFreelanceServicesGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: aiFreelanceServicesGuide.en.tags, image: { url: `${SITE_ORIGIN}${aiFreelanceServicesGuide.en.cover.src}`, width: aiFreelanceServicesGuide.en.cover.width, height: aiFreelanceServicesGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/ai-freelance-services`, url: `${SITE_ORIGIN}/en/blog/ai-freelance-services`, name: aiFreelanceServicesGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((aiFreelanceServicesGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/ai-freelance-services`, aiFreelanceServicesGuide.en.title),
+      faqPageBlock(aiFreelanceServicesGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-freelance-services`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: aiFreelanceServicesGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-freelance-services` }], `${SITE_ORIGIN}/en/blog/ai-freelance-services`),
     ],
   },
 

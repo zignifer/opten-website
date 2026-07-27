@@ -56,6 +56,8 @@ const PATH_TO_SOURCE = {
   "/en/blog":                "src/content/blog/index.ts",
   "/blog/upwork-start-2026-checklist":    "src/content/blog/upwork-start-2026-checklist.ts",
   "/en/blog/upwork-start-2026-checklist": "src/content/blog/upwork-start-2026-checklist.ts",
+  "/blog/ai-freelance-services":       "src/content/blog/ai-freelance-services.ts",
+  "/en/blog/ai-freelance-services":    "src/content/blog/ai-freelance-services.ts",
   "/blog/build-website-with-ai":       "src/content/blog/build-website-with-ai.ts",
   "/en/blog/build-website-with-ai":    "src/content/blog/build-website-with-ai.ts",
   "/blog/vibe-coding-freelance":       "src/content/blog/vibe-coding-freelance.ts",
