@@ -50,7 +50,7 @@ Default course CTA for course/learning banners: `/learn/courses/ai-content-marke
 | 7 | published | `ai-text-for-work` | `BL-work` | `нейросети для текста` | 156546 | [07-ai-text-for-work.md](07-ai-text-for-work.md) |
 | 8 | published | `ai-video-for-work` | `BL-work` | `нейросети для видео` | 55862 | [08-ai-video-for-work.md](08-ai-video-for-work.md) |
 | 9 | published | `vibe-coding-freelance` | `BL-sites` | `вайб кодинг` | 13438 | [09-vibe-coding-freelance.md](09-vibe-coding-freelance.md) |
-| 10 | pending | `build-website-with-ai` | `BL-sites` | `нейросеть создание сайтов` | 3561 | [10-build-website-with-ai.md](10-build-website-with-ai.md) |
+| 10 | published | `build-website-with-ai` | `BL-sites` | `нейросеть создание сайтов` | 3561 | [10-build-website-with-ai.md](10-build-website-with-ai.md) |
 | 11 | pending | `ai-freelance-services` | `BL-income` | `работа с нейросетями` | 23464 | [11-ai-freelance-services.md](11-ai-freelance-services.md) |
 | 12 | pending | `make-money-with-ai` | `BL-income` | `как заработать на нейросетях` | 1275 | [12-make-money-with-ai.md](12-make-money-with-ai.md) |
 | 13 | pending | `where-to-find-ai-clients` | `BL-freelance` | `где брать заказы` | 7185 | [13-where-to-find-ai-clients.md](13-where-to-find-ai-clients.md) |

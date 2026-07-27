@@ -14,6 +14,7 @@ import { post as aiForWorkGuide } from "../src/content/blog/ai-for-work";
 import { post as aiPresentationsGuide } from "../src/content/blog/ai-presentations";
 import { post as aiTextForWorkGuide } from "../src/content/blog/ai-text-for-work";
 import { post as aiVideoForWorkGuide } from "../src/content/blog/ai-video-for-work";
+import { post as buildWebsiteWithAiGuide } from "../src/content/blog/build-website-with-ai";
 import { post as vibeCodingFreelanceGuide } from "../src/content/blog/vibe-coding-freelance";
 import { post as upworkStart2026Guide } from "../src/content/blog/upwork-start-2026-checklist";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
@@ -1307,6 +1308,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/build-website-with-ai`, name: buildWebsiteWithAiGuide.ru.title, datePublished: buildWebsiteWithAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/vibe-coding-freelance`, name: vibeCodingFreelanceGuide.ru.title, datePublished: vibeCodingFreelanceGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-video-for-work`, name: aiVideoForWorkGuide.ru.title, datePublished: aiVideoForWorkGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-text-for-work`, name: aiTextForWorkGuide.ru.title, datePublished: aiTextForWorkGuide.ru.publishedAt },
@@ -1353,6 +1355,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/build-website-with-ai.
+  {
+    path: "/blog/build-website-with-ai",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/build-website-with-ai`, en: `${SITE_ORIGIN}/en/blog/build-website-with-ai`, xDefault: `${SITE_ORIGIN}/blog/build-website-with-ai` },
+    title: buildWebsiteWithAiGuide.ru.title,
+    description: buildWebsiteWithAiGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/build-website-with-ai`,
+    ogTitle: buildWebsiteWithAiGuide.ru.title,
+    ogDescription: buildWebsiteWithAiGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${buildWebsiteWithAiGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/build-website-with-ai`, headline: buildWebsiteWithAiGuide.ru.title, description: buildWebsiteWithAiGuide.ru.description, datePublished: buildWebsiteWithAiGuide.ru.publishedAt, dateModified: buildWebsiteWithAiGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: buildWebsiteWithAiGuide.ru.tags, image: { url: `${SITE_ORIGIN}${buildWebsiteWithAiGuide.ru.cover.src}`, width: buildWebsiteWithAiGuide.ru.cover.width, height: buildWebsiteWithAiGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/build-website-with-ai`, url: `${SITE_ORIGIN}/blog/build-website-with-ai`, name: buildWebsiteWithAiGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((buildWebsiteWithAiGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/build-website-with-ai`, buildWebsiteWithAiGuide.ru.title),
+      faqPageBlock(buildWebsiteWithAiGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/build-website-with-ai`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: buildWebsiteWithAiGuide.ru.title, url: `${SITE_ORIGIN}/blog/build-website-with-ai` }], `${SITE_ORIGIN}/blog/build-website-with-ai`),
     ],
   },
 
@@ -3212,6 +3236,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/build-website-with-ai`, name: buildWebsiteWithAiGuide.en.title, datePublished: buildWebsiteWithAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/vibe-coding-freelance`, name: vibeCodingFreelanceGuide.en.title, datePublished: vibeCodingFreelanceGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-video-for-work`, name: aiVideoForWorkGuide.en.title, datePublished: aiVideoForWorkGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-text-for-work`, name: aiTextForWorkGuide.en.title, datePublished: aiTextForWorkGuide.en.publishedAt },
@@ -3258,6 +3283,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/build-website-with-ai EN sibling.
+  {
+    path: "/en/blog/build-website-with-ai",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/build-website-with-ai`, en: `${SITE_ORIGIN}/en/blog/build-website-with-ai`, xDefault: `${SITE_ORIGIN}/blog/build-website-with-ai` },
+    title: buildWebsiteWithAiGuide.en.title,
+    description: buildWebsiteWithAiGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/build-website-with-ai`,
+    ogTitle: buildWebsiteWithAiGuide.en.title,
+    ogDescription: buildWebsiteWithAiGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${buildWebsiteWithAiGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/build-website-with-ai`, headline: buildWebsiteWithAiGuide.en.title, description: buildWebsiteWithAiGuide.en.description, datePublished: buildWebsiteWithAiGuide.en.publishedAt, dateModified: buildWebsiteWithAiGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: buildWebsiteWithAiGuide.en.tags, image: { url: `${SITE_ORIGIN}${buildWebsiteWithAiGuide.en.cover.src}`, width: buildWebsiteWithAiGuide.en.cover.width, height: buildWebsiteWithAiGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/build-website-with-ai`, url: `${SITE_ORIGIN}/en/blog/build-website-with-ai`, name: buildWebsiteWithAiGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((buildWebsiteWithAiGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/build-website-with-ai`, buildWebsiteWithAiGuide.en.title),
+      faqPageBlock(buildWebsiteWithAiGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/build-website-with-ai`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: buildWebsiteWithAiGuide.en.title, url: `${SITE_ORIGIN}/en/blog/build-website-with-ai` }], `${SITE_ORIGIN}/en/blog/build-website-with-ai`),
     ],
   },
 
