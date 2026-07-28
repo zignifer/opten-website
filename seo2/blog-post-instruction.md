@@ -149,26 +149,19 @@ Humanizer не должен вырезать ключи. Он убирает И�
 
 Движок — встроенный генератор изображений Codex.
 
-Главное стилевое правило — `Opten cinematic optical editorial`: low-key
-постановочная сцена, скульптурная studio diorama или polished product-film
-still с foreground / hero midground / atmospheric background. Один сильный
-объект, действие или визуальная метафора несет смысл; крупный текст и
-`#9CFB51` optical signal помогают прочитать сцену. Это может быть
-фотореалистичный CGI-гибрид. Не своди `practical set` к буквальному столу,
-бумагам и рукам.
+Главное стилевое правило — `cinematic scene first`: реальная на вид low-key
+editorial-съемка предметного или сюжетного practical set, где один сильный
+объект, действие или результат несет смысл, а плоские лаймовые линии и короткий
+текст только помогают его прочитать. Не начинай промпт с `infographic`,
+`dashboard`, `SaaS UI` или `card grid`: это быстро превращает кадр в схему.
 
-Quality north star подробно зафиксирован в `seo2/rules/image-style.md`. Для
-первого RU style-anchor кадра обязательно выбери 1-2 изображения из
-`public/blog/ai-video-for-work/ru/step-*.jpg` и передай их как **style/quality
-reference only** вместе с font reference. Запрети копировать subject, камеры,
-пленку, линзы, layout, angle и composition. После утверждения первого кадра
-используй уже его как style anchor остальных кадров; north-star JPG повторно не
-прикладывай.
-
-Negative reference — `public/blog/ai-freelance-services/ru/step-*.jpg`. Это
-нормальная серия, но не нужный стиль: literal freelance desk, scrapbook,
-papers-on-table, руки и печатные плашки заменили сценическую глубину и
-оптический сигнал. Новая серия, похожая на нее, не проходит release gate.
+Quality north star подробно зафиксирован в `seo2/rules/image-style.md`. Серия
+`public/blog/ai-video-for-work/ru/step-*.jpg` показывает нужную иерархию
+фотографии и графики, но не является постоянным input reference. Не прикладывай
+эти JPG к генератору и не копируй оттуда пленку, камеры, линзы, красную лампу,
+motion ribbon, композиции или объекты. Переноси только визуальную грамматику:
+фото первым, графика второй, общий color grade, свет, материалы, зерно и line
+language при разных композициях.
 
 Лаймовый акцент фиксированный: `#9CFB51`. В промптах для обложки и
 внутристатейных картинок указывать именно этот hex и не заменять его примерным
@@ -184,41 +177,16 @@ before/after, одна сцена с callout, последовательност
 ### Сначала система статьи, потом отдельные кадры
 
 До первой генерации создай `seo2/visual-plans/<slug>.md`. Это production sheet,
-а не новый article brief. Для новой активной темы добавь во frontmatter
-`visual_style_gate: cinematic-optical-v2`. В art-direction блоке используй
-следующие точные машинно-проверяемые строки:
-
-- `North-star style input: public/blog/ai-video-for-work/ru/step-N.jpg` — можно
-  перечислить максимум два файла;
-- `Flat-lay frames: 0` или `1`;
-- `Document-dominant frames: 0` или `1`;
-- `Hand-dominant frames: 0` или `1`;
-- `Strong-depth frames: 3` или больше;
-- `Optical-signal frames: 3` или больше;
-- `Hero-label-on-document frames: 0` или `1`;
-- `Negative-reference check: ...` — чем серия отличается от
-  `public/blog/ai-freelance-services/ru/step-*.jpg`.
-
-Кроме этих gate-полей зафиксируй:
+а не новый article brief. В нем зафиксируй:
 
 - одну art direction на всю статью: medium/materials, фон, свет, grain,
   палитру, плоскую обработку текста, толщину линий и повторяющийся motif;
 - article-native practical set: какой физический мир, герой, действие и
   фактура выражают именно эту тему без универсальных бумажных макетов,
   подвесных карточек, acrylic UI modules или conveyor rigs;
-- style-only north-star input: какие 1-2 `ai-video-for-work/ru/step-*.jpg`
-  будут приложены только к первому RU кадру и какая композиция им прямо
-  запрещена к копированию;
 - photo-first hierarchy: как каждый кадр остается убедительной
   кинематографичной сценой до чтения текста и почему графика остается
   вторичной;
-- depth staging: foreground / hero midground / atmospheric background каждого
-  кадра;
-- flat-lay budget: максимум один top-down/high-oblique desk frame на серию;
-- document/hand budget: документы или руки могут быть главным героем максимум
-  одного кадра;
-- lime signal: как `#9CFB51` живет в пространстве каждого кадра как optical
-  path/ribbon/beam/contour с light spill, а не просто плоская стрелка или бирка;
 - отдельный story beat и visual proof для каждого кадра;
 - text mode каждого кадра;
 - минимум три разных composition archetype на четыре inline-кадра;
@@ -226,13 +194,11 @@ before/after, одна сцена с callout, последовательност
 - style continuity: какие признаки должны остаться одинаковыми при смене
   композиции.
 
-Первый RU inline-кадр — style anchor серии. Генерируй его с 1-2 north-star
-style-only references и Bebas Neue reference. Сравни его с north star и
-negative reference: если он похож на editorial desk/scrapbook, не продолжай.
-После утверждения передавай его следующим кадрам только как reference для
-medium, color grading, optical signal, типографики, материалов и света. Прямо
-запрещай копировать его layout, камеру и объектную композицию. EN-пару делай
-localization-edit утвержденного RU-кадра.
+Первый RU inline-кадр — style anchor серии. После визуальной проверки передавай
+его следующим кадрам только как reference для medium, color grading,
+типографической обработки, линий и света. Прямо запрещай копировать его layout,
+камеру и объектную композицию. EN-пару делай localization-edit утвержденного
+RU-кадра.
 
 Единый стиль не означает один шаблон. В одной статье нельзя четыре раза
 повторять «большой заголовок + ряд карточек» или менять визуальный язык между
@@ -277,9 +243,6 @@ display sans-serif, tall narrow letters, clean poster typography. Не испо�
 - cinematic proof: почему кадр выглядит как снятая practical-set сцена с
   объемом, светом и фактурой, а не как 3D-инфографика или презентационный
   слайд;
-- depth staging: что находится в foreground, hero midground и atmospheric
-  background;
-- optical signal: как `#9CFB51` проходит через пространство и дает light spill;
 - composition archetype: split-screen, sequence, hero visual, before/after,
   moodboard, anatomy, timeline, decision point и так далее;
 - text mode:
@@ -348,23 +311,13 @@ explainer image, а reusable баннер для курса. Делай широ
      line language, light/grain;
    - cinematic scene first: один сильный герой, действие или результат
      читается раньше графического слоя;
-   - кадры выглядят как Opten cinematic optical editorial, а не как editorial
-     desk, scrapbook, papers-on-table, dashboard или презентационный слайд;
+   - кадры выглядят как low-key editorial photography of a real practical set,
+     а не как 3D-инфографика, dashboard или презентационный слайд;
    - линии, стрелки и подписи помогают прочитать сцену, но не становятся
      визуально сильнее объекта;
    - предметный мир относится к теме статьи и не повторяет без причины бумажные
      макеты, acrylic UI modules, подвесные карточки, conveyor rigs или конкретные
      мотивы `ai-video-for-work`;
-   - минимум три кадра имеют foreground / hero midground / atmospheric
-     background и не сняты сверху;
-   - максимум один кадр является desk flat lay или делает документы/руки главным
-     визуальным языком;
-   - минимум три кадра используют `#9CFB51` как optical path/ribbon/beam/contour
-     с light spill, а не только как плоский текст, стрелку, билет или плашку;
-   - hero label напечатан на физическом листе/карточке/папке максимум в одном
-     кадре;
-   - серия визуально ближе к `ai-video-for-work`, чем к negative reference
-     `ai-freelance-services`;
    - минимум три разных composition archetype;
    - не больше одного grid/checklist/card-matrix кадра;
    - нет disconnected noun labels «слова ради слов»;
@@ -372,8 +325,6 @@ explainer image, а reusable баннер для курса. Делай широ
    - плоская типографика не превращается в 3D/embossed буквы от кадра к кадру.
    Затем открой все EN-пары и проверь, что меняется только язык, а не идея,
    камера или композиция.
-   Если любой пункт hard release gate из `seo2/rules/image-style.md` нарушен,
-   не запускай build и не коммить: перегенерируй RU-кадры, затем их EN-пары.
 8. Проверь, что prerendered RU/EN HTML содержит:
    - correct `lang`;
    - canonical;
