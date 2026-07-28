@@ -17,6 +17,7 @@ import { post as aiVideoForWorkGuide } from "../src/content/blog/ai-video-for-wo
 import { post as buildWebsiteWithAiGuide } from "../src/content/blog/build-website-with-ai";
 import { post as vibeCodingFreelanceGuide } from "../src/content/blog/vibe-coding-freelance";
 import { post as aiFreelanceServicesGuide } from "../src/content/blog/ai-freelance-services";
+import { post as makeMoneyWithAiGuide } from "../src/content/blog/make-money-with-ai";
 import { post as upworkStart2026Guide } from "../src/content/blog/upwork-start-2026-checklist";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
@@ -1309,6 +1310,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/make-money-with-ai`, name: makeMoneyWithAiGuide.ru.title, datePublished: makeMoneyWithAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-freelance-services`, name: aiFreelanceServicesGuide.ru.title, datePublished: aiFreelanceServicesGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/build-website-with-ai`, name: buildWebsiteWithAiGuide.ru.title, datePublished: buildWebsiteWithAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/vibe-coding-freelance`, name: vibeCodingFreelanceGuide.ru.title, datePublished: vibeCodingFreelanceGuide.ru.publishedAt },
@@ -1357,6 +1359,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/make-money-with-ai.
+  {
+    path: "/blog/make-money-with-ai",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/make-money-with-ai`, en: `${SITE_ORIGIN}/en/blog/make-money-with-ai`, xDefault: `${SITE_ORIGIN}/blog/make-money-with-ai` },
+    title: makeMoneyWithAiGuide.ru.title,
+    description: makeMoneyWithAiGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/make-money-with-ai`,
+    ogTitle: makeMoneyWithAiGuide.ru.title,
+    ogDescription: makeMoneyWithAiGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${makeMoneyWithAiGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/make-money-with-ai`, headline: makeMoneyWithAiGuide.ru.title, description: makeMoneyWithAiGuide.ru.description, datePublished: makeMoneyWithAiGuide.ru.publishedAt, dateModified: makeMoneyWithAiGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: makeMoneyWithAiGuide.ru.tags, image: { url: `${SITE_ORIGIN}${makeMoneyWithAiGuide.ru.cover.src}`, width: makeMoneyWithAiGuide.ru.cover.width, height: makeMoneyWithAiGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/make-money-with-ai`, url: `${SITE_ORIGIN}/blog/make-money-with-ai`, name: makeMoneyWithAiGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((makeMoneyWithAiGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/make-money-with-ai`, makeMoneyWithAiGuide.ru.title),
+      faqPageBlock(makeMoneyWithAiGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/make-money-with-ai`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: makeMoneyWithAiGuide.ru.title, url: `${SITE_ORIGIN}/blog/make-money-with-ai` }], `${SITE_ORIGIN}/blog/make-money-with-ai`),
     ],
   },
 
@@ -3260,6 +3284,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/make-money-with-ai`, name: makeMoneyWithAiGuide.en.title, datePublished: makeMoneyWithAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-freelance-services`, name: aiFreelanceServicesGuide.en.title, datePublished: aiFreelanceServicesGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/build-website-with-ai`, name: buildWebsiteWithAiGuide.en.title, datePublished: buildWebsiteWithAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/vibe-coding-freelance`, name: vibeCodingFreelanceGuide.en.title, datePublished: vibeCodingFreelanceGuide.en.publishedAt },
@@ -3308,6 +3333,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/make-money-with-ai EN sibling.
+  {
+    path: "/en/blog/make-money-with-ai",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/make-money-with-ai`, en: `${SITE_ORIGIN}/en/blog/make-money-with-ai`, xDefault: `${SITE_ORIGIN}/blog/make-money-with-ai` },
+    title: makeMoneyWithAiGuide.en.title,
+    description: makeMoneyWithAiGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/make-money-with-ai`,
+    ogTitle: makeMoneyWithAiGuide.en.title,
+    ogDescription: makeMoneyWithAiGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${makeMoneyWithAiGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/make-money-with-ai`, headline: makeMoneyWithAiGuide.en.title, description: makeMoneyWithAiGuide.en.description, datePublished: makeMoneyWithAiGuide.en.publishedAt, dateModified: makeMoneyWithAiGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: makeMoneyWithAiGuide.en.tags, image: { url: `${SITE_ORIGIN}${makeMoneyWithAiGuide.en.cover.src}`, width: makeMoneyWithAiGuide.en.cover.width, height: makeMoneyWithAiGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/make-money-with-ai`, url: `${SITE_ORIGIN}/en/blog/make-money-with-ai`, name: makeMoneyWithAiGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((makeMoneyWithAiGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/make-money-with-ai`, makeMoneyWithAiGuide.en.title),
+      faqPageBlock(makeMoneyWithAiGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/make-money-with-ai`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: makeMoneyWithAiGuide.en.title, url: `${SITE_ORIGIN}/en/blog/make-money-with-ai` }], `${SITE_ORIGIN}/en/blog/make-money-with-ai`),
     ],
   },
 
