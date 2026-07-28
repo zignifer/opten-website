@@ -39,7 +39,6 @@ import ResponsiveImage from "../../ResponsiveImage";
 import SiteFooter from "../../SiteFooter";
 import SpaceHeader from "../SpaceHeader";
 import { useSpaceAuth } from "../SpaceAuthProvider";
-import type { PrivateCourseIntroContent } from "../../../../content/space/privateCourse";
 import type { LearnCollection, LearnCoursePurchase, LearnLesson, LearnMaterial, LearnMissingItem, LearnOverviewSection, LearnPromptBlock, LearnTimestamp } from "../../../../content/space/learn";
 import {
   getLearnCollectionCategoryLabel,
@@ -59,6 +58,11 @@ import {
   getLessonPosition,
   getLearnAuthorName,
 } from "../../../../content/space/learn";
+import { HIDDEN_INTRO_SLUG } from "../../../../content/space/courseDiscountClaim";
+import {
+  privateCourseHiddenIntroLesson,
+  type PrivateCourseIntroContent,
+} from "../../../../content/space/privateCourse";
 
 const LEARN_PROGRESS_STORAGE_KEY = "opten_space_learn_progress_v1";
 const AI_CONTENT_MARKETING_COURSE_SLUG = "ai-content-marketing-2026";
@@ -350,6 +354,7 @@ export function LessonDetailLayout({ lesson, collection, telegramHiddenIntro }: 
                     onTabChange={setActiveTab}
                     onTimestampSelect={handleTimestampSelect}
                     hasAccess={courseHasAccess}
+                    hiddenIntroHasAccess={telegramAccess.hasAccess}
                     purchase={purchase}
                   />
                 </div>
@@ -374,6 +379,7 @@ export function LessonDetailLayout({ lesson, collection, telegramHiddenIntro }: 
                     onTabChange={setActiveTab}
                     onTimestampSelect={handleTimestampSelect}
                     hasAccess={courseHasAccess}
+                    hiddenIntroHasAccess={telegramAccess.hasAccess}
                     purchase={purchase}
                   />
                 </div>
@@ -389,6 +395,7 @@ export function LessonDetailLayout({ lesson, collection, telegramHiddenIntro }: 
                 onTabChange={setActiveTab}
                 onTimestampSelect={handleTimestampSelect}
                 hasAccess={courseHasAccess}
+                hiddenIntroHasAccess={telegramAccess.hasAccess}
                 purchase={purchase}
               />
               <UnlockProCard hasPro={hasPro} />
@@ -1207,6 +1214,7 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
   const position = getLessonPosition(lesson.slug, lang);
   const description = getLearnLessonDescription(lesson, lang);
   const title = getNumberedCourseLessonTitle(collection, lesson, lang);
+  const isHiddenIntro = collection.id === AI_CONTENT_MARKETING_COURSE_SLUG && lesson.slug === HIDDEN_INTRO_SLUG;
 
   return (
     <section className="mt-[26px] max-md:mt-[22px]">
@@ -1225,7 +1233,13 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
           {collection.purchase ? (
             <span className={`inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51] ${locked ? "" : "max-md:hidden"}`}>
               {locked ? <Lock size={13} /> : <LockOpen size={13} />}
-              {locked ? copy.unlocksAfterPurchase : copy.courseOpenBadge}
+              {isHiddenIntro
+                ? locked
+                  ? copy.hiddenIntroSubscriptionBadge
+                  : copy.courseAccessOpen
+                : locked
+                  ? copy.unlocksAfterPurchase
+                  : copy.courseOpenBadge}
             </span>
           ) : locked ? (
             <span className="inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
@@ -1855,6 +1869,7 @@ type LessonSidebarProps = {
   onTabChange: (tab: SidebarTab) => void;
   onTimestampSelect: (seconds: number) => void;
   hasAccess: boolean;
+  hiddenIntroHasAccess?: boolean;
   purchase?: LearnCoursePurchase;
   currentSlug?: string;
   mobileTimestampsTabOverride?: {
@@ -1870,6 +1885,7 @@ function LessonSidebar({
   onTabChange,
   onTimestampSelect,
   hasAccess,
+  hiddenIntroHasAccess,
   purchase,
   currentSlug,
   mobileTimestampsTabOverride,
@@ -1921,7 +1937,12 @@ function LessonSidebar({
       </div>
 
       {activeTab === "lessons" && isCourse ? (
-        <CourseOutline collection={collection} currentSlug={currentSlug ?? lesson.slug} hasAccess={hasAccess} />
+        <CourseOutline
+          collection={collection}
+          currentSlug={currentSlug ?? lesson.slug}
+          hasAccess={hasAccess}
+          hiddenIntroHasAccess={hiddenIntroHasAccess}
+        />
       ) : (
         <TimestampList timestamps={getLearnLessonTimestamps(lesson, lang)} onSelect={onTimestampSelect} />
       )}
@@ -1933,17 +1954,28 @@ type CourseOutlineProps = {
   collection: LearnCollection;
   currentSlug: string;
   hasAccess: boolean;
+  hiddenIntroHasAccess?: boolean;
   className?: string;
 };
 
-export function CourseOutline({ collection, currentSlug, hasAccess, className = "" }: CourseOutlineProps) {
+export function CourseOutline({
+  collection,
+  currentSlug,
+  hasAccess,
+  hiddenIntroHasAccess = false,
+  className = "",
+}: CourseOutlineProps) {
   const { lang } = useLang();
+  const outlineLessons = collection.id === AI_CONTENT_MARKETING_COURSE_SLUG
+    ? [privateCourseHiddenIntroLesson, ...collection.lessons]
+    : collection.lessons;
 
   return (
     <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] max-md:max-h-[312px] max-md:space-y-[4px] max-md:p-[12px] ${className}`}>
-      {collection.lessons.map((outlineLesson, index) => {
+      {outlineLessons.map((outlineLesson, index) => {
+        const isHiddenIntro = outlineLesson.slug === HIDDEN_INTRO_SLUG;
         const current = outlineLesson.slug === currentSlug;
-        const locked = isLessonLocked(outlineLesson, hasAccess);
+        const locked = isLessonLocked(outlineLesson, hasAccess || (isHiddenIntro && hiddenIntroHasAccess));
         const displayNumber = getCourseLessonDisplayNumber(collection, outlineLesson) || String(index + 1);
         const rowClass = `group grid grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition max-md:grid-cols-[42px_minmax(0,1fr)_28px] max-md:gap-[10px] max-md:px-[12px] max-md:py-[14px] ${
           locked ? "min-h-[62px]" : ""
@@ -1964,7 +1996,9 @@ export function CourseOutline({ collection, currentSlug, hasAccess, className = 
                 {getLearnLessonTitle(outlineLesson, lang)}
               </span>
               <span className="mt-[4px] block text-[12px] leading-tight text-white/44 max-md:text-[14px]">
-                {outlineLesson.duration}
+                {isHiddenIntro
+                  ? `${lang === "ru" ? "Бесплатный урок" : "Free lesson"} · ${outlineLesson.duration}`
+                  : outlineLesson.duration}
               </span>
             </span>
             {locked ? (
@@ -2725,6 +2759,7 @@ function getNumberedCourseLessonTitle(collection: LearnCollection, lesson: Learn
 
 function getCourseLessonDisplayNumber(collection: LearnCollection, lesson: LearnLesson) {
   if (collection.kind !== "course") return "";
+  if (collection.id === AI_CONTENT_MARKETING_COURSE_SLUG && lesson.slug === HIDDEN_INTRO_SLUG) return "0";
   const index = collection.lessons.findIndex((item) => item.slug === lesson.slug);
   if (index < 0) return "";
   return String(index + 1);
@@ -2899,6 +2934,7 @@ const detailCopy = {
     progressCount: (completed: number, total: number) => `${completed} из ${total} уроков пройдено`,
     unlocksOnPro: "Разблокируется на Pro",
     unlocksAfterPurchase: "Доступ после покупки",
+    hiddenIntroSubscriptionBadge: "Бесплатно после подписки",
     paidCourseBadge: "Курс",
     courseOpenBadge: "Курс открыт",
     courseAccessOpen: "Доступ открыт",
@@ -2985,6 +3021,7 @@ const detailCopy = {
     progressCount: (completed: number, total: number) => `${completed} of ${total} lessons completed`,
     unlocksOnPro: "Unlocks on Pro",
     unlocksAfterPurchase: "Access after purchase",
+    hiddenIntroSubscriptionBadge: "Free after subscribing",
     paidCourseBadge: "Course",
     courseOpenBadge: "Course open",
     courseAccessOpen: "Access open",

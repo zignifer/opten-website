@@ -232,6 +232,10 @@ checkout discount for its first 24 hours. It is not a course entitlement: all
 outside `privateCourseCollection.lessons` so course progress and navigation
 stay at 16, while its reviewed Kinescope id
 `a4722357-b131-491f-8ca0-cdd11d927630` remains in the server playback whitelist.
+The course lesson sidebar still shows lesson zero as a separate `0. AI
+контент-завод` row above the 16 paid lessons. That visible row is an entry into
+the Telegram-gated player only; it must not be added to course progress,
+completion totals, paid lesson navigation, or the paid lesson collection.
 The browser stores the claim token in
 `localStorage.opten_course_preview_claim_v1`; both the page and
 `/api/kinescope-course-token` validate it through the legacy-named

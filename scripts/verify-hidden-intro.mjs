@@ -66,6 +66,10 @@ assert.match(components, /const hasAccess = courseAccess \|\| proAccess/, "Gener
 assert.match(components, /<LessonPrompts[\s\S]*?locked=\{!courseHasAccess\}/, "Private prompts must remain buyer-only");
 assert.doesNotMatch(components, /courseAccess=\{lessonHasAccess\}/, "Telegram lesson access must never flow into the generator");
 assert.match(components, /discountClaimToken:\s*previewClaimToken/, "The playback request must send the claim for server validation");
+assert.match(components, /outlineLessons[\s\S]*privateCourseHiddenIntroLesson[\s\S]*collection\.lessons/, "Lesson zero must be visible above the paid course outline");
+assert.match(components, /lesson\.slug === HIDDEN_INTRO_SLUG\) return "0"/, "The visible free lesson must keep number zero");
+assert.match(components, /hasAccess \|\| \(isHiddenIntro && hiddenIntroHasAccess\)/, "Telegram claim access may unlock only the lesson-zero outline row");
+assert.match(components, /hiddenIntroSubscriptionBadge:\s*"Бесплатно после подписки"/, "Locked lesson zero must describe its Telegram subscription gate");
 
 assert.doesNotMatch(seoRoutes, /hidden-intro/, "Hidden lesson must not be prerendered as an SEO route");
 assert.doesNotMatch(learnSlugs, /hidden-intro/, "Hidden lesson must not get an EN sibling");
