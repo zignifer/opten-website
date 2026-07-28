@@ -224,21 +224,25 @@ deployment compatibility and has `verify_jwt = false`; it validates
 `TELEGRAM_WEBHOOK_SECRET`, stores started users in
 `telegram_hidden_intro_leads`, writes
 funnel events to `telegram_hidden_intro_events`, and issues a random per-user
-`course_discount_claims` link to the course checkout. A Telegram claim is a
-discount transport only and must never authorize lesson playback; all 16
-lessons require a normal course entitlement through `course-access-summary`.
-The removed `hidden-intro`/lesson-0 content must not appear in
-`privateCourseCollection.lessons` or `api/_shared/kinescopeCourse.ts`; the
-legacy URL may only redirect to lesson 1 while preserving the claim query.
+`course_discount_claims` link only after Telegram confirms channel membership.
+The claim permanently unlocks exactly one separate free lesson zero at
+`/learn/courses/ai-content-marketing-2026/hidden-intro` and transports a 20%
+checkout discount for its first 24 hours. It is not a course entitlement: all
+16 paid lessons still require `course-access-summary`. Lesson zero must remain
+outside `privateCourseCollection.lessons` so course progress and navigation
+stay at 16, while its reviewed Kinescope id
+`a4722357-b131-491f-8ca0-cdd11d927630` remains in the server playback whitelist.
 The browser stores the claim token in
-`localStorage.opten_course_preview_claim_v1`, reports the initial open to the
-legacy-named `/functions/v1/telegram-hidden-intro-opened` endpoint for funnel
-analytics, and uses it only when quoting or creating checkout. The 24-hour
-window applies to the 20% checkout discount. Repeated bot requests reuse the
-same claim and must never create, refresh, or extend the discount. Already
-issued claims retain their stored percentage until expiry, but they no longer
-unlock lessons. The claim does not unlock private course prompts or the
-separate `Генератор промптов Opten` section. That
+`localStorage.opten_course_preview_claim_v1`; both the page and
+`/api/kinescope-course-token` validate it through the legacy-named
+`/functions/v1/telegram-hidden-intro-opened` endpoint. That endpoint returns
+`preview_access:true` only for a claim whose lead has
+`subscription_verified_at`; never trust a browser boolean. The 24-hour window
+applies only to the 20% checkout discount. Repeated bot requests reuse the same
+claim and must never create, refresh, or extend the discount. Expired or used
+claims keep lesson-zero access but lose the discount. The claim never unlocks
+private course prompts, lesson materials, the 16 paid lessons, or the separate
+`Генератор промптов Opten` section. That
 collection-level generator block must remain visible on the course root and
 every lesson page. On desktop it stays compact inside the left lesson-content
 column and appears before lesson materials/course showcase and prompts, never
@@ -264,18 +268,17 @@ and audit purposes. The bot's expired-state copy always shows the current 20%
 campaign wording instead of the stored historical percentage, so `/start`
 cannot surface the retired 40% message.
 
-For future `/start` updates only, the Telegram bot immediately creates/reuses
-the discount claim, sends the public course intro video, then sends the
-HTML-formatted course offer with one `Открыть курс` button and the public
-Telegram channel link in the message text. Legacy course callbacks remain
-accepted so buttons already present in old chats continue to work. The course
-copy
-positions the practical result as a complete brand package worth at least
-100,000 RUB on the market and must not promise subscriber/client growth.
+For future `/start` updates only, the Telegram bot sends the reviewed welcome
+photo plus HTML welcome copy and the `Подписаться на канал` /
+`Проверить подписку` buttons. It must not create a claim until
+`getChatMember` confirms subscription. Both `check_subscription` and the
+legacy `get_course_access` callback remain accepted so buttons already present
+in old chats continue to work. The access message opens only lesson zero,
+states that lesson access is permanent, and explains that the generator and
+the remaining course are paid separately.
 Changing `/start` must never trigger a broadcast or any message to existing
-leads. The website must not advertise free Telegram lessons or deep-link to the
-bot from locked lesson players; all locked lessons point to the normal course
-purchase surface.
+leads. Only the locked lesson-zero player may deep-link to the bot; every paid
+lesson continues to point to the normal course purchase surface.
 The locked Bot API name is `Влад Воронежцев | Уроки и промпты`, and the locked
 short description is `Доступ к урокам и каналу с промптами.`; future bot
 updates must not change either value unless the owner explicitly asks. The Bot
@@ -296,9 +299,17 @@ media after deploys.
 
 The owner/admin dashboard on opten.space is a general protected admin surface
 under `/admin`, not a Telegram-only one-off. The first module is Telegram
-hidden-intro operations: read funnel stats through `/api/admin/telegram-stats`
+course-funnel operations: read funnel stats through `/api/admin/telegram-stats`,
 send Telegram broadcasts through `/api/admin/telegram-broadcast`, and review or
-delete stored broadcast history through `/api/admin/telegram-broadcasts`.
+delete stored broadcast history through `/api/admin/telegram-broadcasts`. The
+active dashboard follows the current `/start` resource-menu flow and shows unique
+bot starts, verified subscriptions, lesson-zero links delivered, lesson opens, checkout orders,
+successful payments, active discounts, and blocked chats. Do not surface the
+retired direct-offer interpretation or call a generic course-root open a lesson
+open.
+Payment counts come only from Telegram-attributed `course_orders` with
+`status='succeeded'`; the legacy `hidden-intro` endpoint, table, column, and
+event names remain internal compatibility identifiers.
 Broadcast images are uploaded through `/api/admin/telegram-upload-photo`, which
 checks the website JWT + owner allowlist and then calls the extension-owned
 `telegram-hidden-intro-assets` Edge Function with `TELEGRAM_ADMIN_SECRET`.

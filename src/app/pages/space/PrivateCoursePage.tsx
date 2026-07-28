@@ -2,19 +2,22 @@ import { useEffect } from "react";
 import { Navigate, useLocation, useParams } from "react-router";
 import { CourseIntroLayout, LessonDetailLayout } from "../../components/space/learn/LearnComponents";
 import {
-  PRIVATE_COURSE_FIRST_LESSON_SLUG,
   findPrivateCourseLesson,
   getAdjacentPrivateCourseLessons,
   getPrivateCourseCollection,
+  privateCourseHiddenIntroLesson,
   privateCourseIntroContent,
 } from "../../../content/space/privateCourse";
-import { LEGACY_HIDDEN_INTRO_SLUG } from "../../../content/space/courseDiscountClaim";
+import {
+  HIDDEN_INTRO_SLUG,
+  HIDDEN_INTRO_TELEGRAM_URL,
+} from "../../../content/space/courseDiscountClaim";
 import { getLearnLessonTitle } from "../../../content/space/learn";
 import { useLang } from "../../../i18n/LangContext";
 import {
   readCourseDiscountClaimTokenFromSearch,
+  readStoredCourseDiscountClaim,
   rememberCourseDiscountClaim,
-  reportCourseDiscountClaimOpened,
 } from "../../../lib/courseAccess";
 
 export default function PrivateCoursePage() {
@@ -22,25 +25,24 @@ export default function PrivateCoursePage() {
   const location = useLocation();
   const { lang } = useLang();
   const collection = getPrivateCourseCollection(courseSlug);
-  const lesson = findPrivateCourseLesson(courseSlug, lessonSlug);
-  const isLegacyHiddenIntro = lessonSlug === LEGACY_HIDDEN_INTRO_SLUG;
-  const pageTitle = !lessonSlug || isLegacyHiddenIntro
+  const isHiddenIntro = lessonSlug === HIDDEN_INTRO_SLUG;
+  const lesson = isHiddenIntro
+    ? privateCourseHiddenIntroLesson
+    : findPrivateCourseLesson(courseSlug, lessonSlug);
+  const pageTitle = !lessonSlug
     ? `${privateCourseIntroContent.title[lang]} — Opten course`
     : lesson
       ? `${getLearnLessonTitle(lesson, lang)} — Opten course`
       : "Opten private course";
-  const discountClaimToken = readCourseDiscountClaimTokenFromSearch(location.search);
+  const discountClaimToken =
+    readCourseDiscountClaimTokenFromSearch(location.search)
+    ?? readStoredCourseDiscountClaim();
 
   useNoIndexPrivateCourse(pageTitle);
   useRememberCourseDiscountClaim(Boolean(collection), discountClaimToken);
 
   if (!collection) {
     return <Navigate to="/learn" replace />;
-  }
-
-  if (isLegacyHiddenIntro) {
-    const routeBase = collection.routeBasePath?.[lang] ?? `/learn/courses/${collection.id}`;
-    return <Navigate to={`${routeBase}/${PRIVATE_COURSE_FIRST_LESSON_SLUG}${location.search}`} replace />;
   }
 
   if (!lessonSlug) {
@@ -59,6 +61,10 @@ export default function PrivateCoursePage() {
       collection={collection}
       previousLesson={previousLesson}
       nextLesson={nextLesson}
+      telegramHiddenIntro={isHiddenIntro ? {
+        claimToken: discountClaimToken,
+        unlockUrl: HIDDEN_INTRO_TELEGRAM_URL,
+      } : undefined}
     />
   );
 }
@@ -67,7 +73,6 @@ function useRememberCourseDiscountClaim(active: boolean, discountClaimToken: str
   useEffect(() => {
     if (!active || !discountClaimToken) return;
     rememberCourseDiscountClaim(discountClaimToken);
-    void reportCourseDiscountClaimOpened(discountClaimToken);
   }, [active, discountClaimToken]);
 }
 

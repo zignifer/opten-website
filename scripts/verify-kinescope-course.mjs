@@ -116,7 +116,9 @@ assert.ok(lessonSixExtrasStart > lessonFiveExtrasStart && lessonSevenExtrasStart
 const lessonSixExtras = extrasContent.slice(lessonSixExtrasStart, lessonSevenExtrasStart);
 assert.match(extrasContent, /const requiredCourseMaterials = \[links\.syntx\]/, "Paid course lesson materials must keep Syntx in the shared prefix");
 assert.match(extrasContent, /ru:\s*withRequiredCourseMaterials\(extras\.materials\.ru\)/, "Private course extras must apply the shared required material prefix to paid lessons");
-assert.doesNotMatch(`${content}\n${extrasContent}`, /AI контент-завод|l0-niche-research-strategy|HIDDEN_INTRO_SLUG/, "Removed lesson 0 must not remain in private course content");
+assert.match(content, /privateCourseHiddenIntroLesson[\s\S]*materials:\s*\[\][\s\S]*prompts:\s*\[\]/, "Telegram lesson zero must remain separate from paid lesson materials and prompts");
+const paidLessonConfigs = content.slice(content.indexOf("const privateCourseLessonConfigs:"), content.indexOf("export const privateCourseLessons:"));
+assert.doesNotMatch(paidLessonConfigs, /HIDDEN_INTRO_SLUG|AI контент-завод/, "Telegram lesson zero must not count as one of the 16 paid course lessons");
 assert.match(content, /const coursePromptGenerators:[\s\S]*Opten \(ChatGPT\)[\s\S]*Opten \(Claude и Codex\)/, "Paid course must define the separate Opten prompt generator section");
 assert.match(content, /title:\s*"Opten \(ChatGPT\)"/, "Shared ChatGPT prompt generator fallback must use the current RU title");
 const courseMaterialsBlock = content.slice(content.indexOf("const courseMaterials:"), content.indexOf("const coursePromptGenerators:"));

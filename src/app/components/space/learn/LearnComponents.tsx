@@ -21,6 +21,7 @@ import {
   type CoursePaymentResponse,
   createCoursePayment,
   fetchCourseAccessSummary,
+  fetchTelegramHiddenIntroAccess,
   formatCoursePrice,
   isValidCourseEmail,
   isValidCoursePromoCode,
@@ -30,6 +31,7 @@ import {
   readCourseDiscountClaimTokenFromSearch,
   readStoredCourseDiscountClaim,
 } from "../../../../lib/courseAccess";
+import { getHiddenIntroCopy } from "../../../../content/space/hiddenIntro";
 import { useCurrencyPreference } from "../../../../lib/currency";
 import { ensurePaddle } from "../../../../lib/paddle";
 import LocalizedLink from "../../LocalizedLink";
@@ -186,11 +188,15 @@ type LessonDetailLayoutProps = {
   collection: LearnCollection;
   previousLesson?: LearnLesson;
   nextLesson?: LearnLesson;
+  telegramHiddenIntro?: {
+    claimToken: string | null;
+    unlockUrl: string;
+  };
 };
 
 type SidebarTab = "lessons" | "timestamps";
 
-export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutProps) {
+export function LessonDetailLayout({ lesson, collection, telegramHiddenIntro }: LessonDetailLayoutProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const { account, session, status: authStatus } = useSpaceAuth();
@@ -198,7 +204,12 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
   const purchase = collection.purchase;
   const courseAccess = useCourseAccess(purchase, session?.access_token ?? null);
   const courseHasAccess = purchase ? courseAccess.hasAccess : hasPro;
-  const locked = isLessonLocked(lesson, courseHasAccess);
+  const telegramAccess = useTelegramHiddenIntroAccess(
+    Boolean(telegramHiddenIntro && !courseHasAccess),
+    telegramHiddenIntro?.claimToken ?? null,
+  );
+  const lessonHasAccess = courseHasAccess || telegramAccess.hasAccess;
+  const locked = isLessonLocked(lesson, lessonHasAccess);
   const isCourse = collection.kind === "course";
   const [activeTab, setActiveTab] = useState<SidebarTab>(isCourse ? "lessons" : "timestamps");
   const [startSeconds, setStartSeconds] = useState(0);
@@ -285,6 +296,11 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                 purchase={purchase}
                 startSeconds={startSeconds}
                 playRequestId={playRequestId}
+                telegramHiddenIntro={telegramHiddenIntro ? {
+                  ...telegramHiddenIntro,
+                  accessLoading: telegramAccess.loading,
+                  hasAccess: telegramAccess.hasAccess,
+                } : undefined}
               />
             </div>
             <LessonIntro
@@ -677,6 +693,12 @@ type LessonPlayerProps = {
   purchase?: LearnCoursePurchase;
   startSeconds: number;
   playRequestId: number;
+  telegramHiddenIntro?: {
+    claimToken: string | null;
+    unlockUrl: string;
+    accessLoading: boolean;
+    hasAccess: boolean;
+  };
 };
 
 type KinescopeTokenResponse = {
@@ -813,6 +835,7 @@ function LessonPlayer({
   purchase,
   startSeconds,
   playRequestId,
+  telegramHiddenIntro,
 }: LessonPlayerProps) {
   const { pathname } = useLocation();
   const { lang } = useLang();
@@ -876,7 +899,8 @@ function LessonPlayer({
     if (!isKinescopeVideo || !activated || locked || kinescopeEmbedUrl) return;
 
     const accessToken = session?.access_token;
-    if (!accessToken) {
+    const previewClaimToken = telegramHiddenIntro?.hasAccess ? telegramHiddenIntro.claimToken : null;
+    if (!accessToken && !previewClaimToken) {
       setKinescopeError("missing_session");
       return;
     }
@@ -894,6 +918,7 @@ function LessonPlayer({
       body: JSON.stringify({
         courseSlug: collectionId,
         lessonSlug: lesson.slug,
+        discountClaimToken: previewClaimToken || undefined,
       }),
     })
       .then(async (response) => {
@@ -911,7 +936,7 @@ function LessonPlayer({
     return () => {
       cancelled = true;
     };
-  }, [activated, collectionId, isKinescopeVideo, kinescopeEmbedUrl, lesson.slug, locked, session?.access_token]);
+  }, [activated, collectionId, isKinescopeVideo, kinescopeEmbedUrl, lesson.slug, locked, session?.access_token, telegramHiddenIntro?.claimToken, telegramHiddenIntro?.hasAccess]);
 
   useEffect(() => {
     if (!isKinescopeVideo || !activated || !kinescopeEmbedUrl || kinescopeApiFallback) return;
@@ -971,7 +996,7 @@ function LessonPlayer({
       data-playback-policy={provider.playbackPolicy}
     >
       <div className="relative aspect-video overflow-hidden bg-[#06191c]">
-        {locked && purchase ? (
+        {locked && purchase && !telegramHiddenIntro ? (
           <>
             <ResponsiveImage
               src={provider.posterPath}
@@ -1016,12 +1041,29 @@ function LessonPlayer({
                   <span className="mx-auto grid size-[48px] place-items-center rounded-full border border-[#9cfb51]/45 bg-[#9cfb51]/10 text-[#9cfb51]">
                     <Lock size={22} />
                   </span>
-                  <h2 className="mt-[16px] text-[18px] font-bold leading-tight text-white">{copy.lockedLesson}</h2>
+                  <h2 className="mt-[16px] text-[18px] font-bold leading-tight text-white">
+                    {telegramHiddenIntro ? getHiddenIntroCopy("lockedTitle", lang) : copy.lockedLesson}
+                  </h2>
                   <p className="mt-[8px] text-[13px] leading-[1.45] text-white/68">
-                    {purchase ? copy.courseLockedDescription : copy.lockedDescription}
+                    {telegramHiddenIntro
+                      ? telegramHiddenIntro.accessLoading
+                        ? copy.courseAccessLoading
+                        : getHiddenIntroCopy("lockedDescription", lang)
+                      : purchase
+                        ? copy.courseLockedDescription
+                        : copy.lockedDescription}
                   </p>
                   <div className="mt-[18px] flex gap-[8px] max-sm:flex-col">
-                    {purchase ? (
+                    {telegramHiddenIntro ? (
+                      <a
+                        href={telegramHiddenIntro.unlockUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] bg-[#9cfb51] px-[14px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943]"
+                      >
+                        {getHiddenIntroCopy("lockedAction", lang)}
+                      </a>
+                    ) : purchase ? (
                       <a
                         href="#course-purchase"
                         className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] bg-[#9cfb51] px-[14px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943]"
@@ -1036,12 +1078,14 @@ function LessonPlayer({
                         {copy.openPro}
                       </LocalizedLink>
                     )}
-                    <LocalizedLink
-                      to={`/login?next=${encodeURIComponent(pathname)}`}
-                      className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] border border-[#9cfb51]/65 px-[14px] text-[14px] font-bold text-[#9cfb51] no-underline transition hover:bg-[#9cfb51]/10"
-                    >
-                      {purchase ? copy.signInPurchased : copy.signIn}
-                    </LocalizedLink>
+                    {!telegramHiddenIntro && (
+                      <LocalizedLink
+                        to={`/login?next=${encodeURIComponent(pathname)}`}
+                        className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] border border-[#9cfb51]/65 px-[14px] text-[14px] font-bold text-[#9cfb51] no-underline transition hover:bg-[#9cfb51]/10"
+                      >
+                        {purchase ? copy.signInPurchased : copy.signIn}
+                      </LocalizedLink>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1983,6 +2027,39 @@ type CourseAccessState = {
   loading: boolean;
   error: string | null;
 };
+
+function useTelegramHiddenIntroAccess(active: boolean, claimToken: string | null): CourseAccessState {
+  const [state, setState] = useState<CourseAccessState>({ hasAccess: false, loading: false, error: null });
+
+  useEffect(() => {
+    if (!active || !claimToken) {
+      setState({ hasAccess: false, loading: false, error: null });
+      return;
+    }
+
+    let cancelled = false;
+    setState({ hasAccess: false, loading: true, error: null });
+    fetchTelegramHiddenIntroAccess(claimToken)
+      .then((access) => {
+        if (!cancelled) setState({ hasAccess: access.preview_access === true, loading: false, error: null });
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          setState({
+            hasAccess: false,
+            loading: false,
+            error: error instanceof Error ? error.message : "telegram_hidden_intro_access_failed",
+          });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [active, claimToken]);
+
+  return state;
+}
 
 function useCourseAccess(purchase: LearnCoursePurchase | undefined, accessToken: string | null): CourseAccessState {
   const [state, setState] = useState<CourseAccessState>({ hasAccess: false, loading: false, error: null });

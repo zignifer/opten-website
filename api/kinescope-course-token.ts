@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { SignJWT } from "jose";
 import {
   KINESCOPE_PLAYBACK_AUDIENCE,
+  KINESCOPE_HIDDEN_INTRO_SLUG,
   KINESCOPE_PLAYBACK_ISSUER,
   KINESCOPE_PLAYBACK_TTL_SECONDS,
   buildKinescopeEmbedUrl,
@@ -10,6 +11,7 @@ import {
 import {
   bearerTokenFromHeader,
   hasCourseAccess,
+  hasTelegramHiddenIntroAccess,
   jsonResponse,
   setJsonCors,
   verifySupabaseJwt,
@@ -18,6 +20,7 @@ import {
 type TokenRequestBody = {
   courseSlug?: string;
   lessonSlug?: string;
+  discountClaimToken?: string;
 };
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
@@ -47,7 +50,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
   const authToken = bearerTokenFromHeader(req.headers.authorization as string | undefined);
   let userId = "";
-  let accessMode: "course-entitlement" | null = null;
+  let accessMode: "course-entitlement" | "telegram-hidden-intro" | null = null;
   let authError: "invalid_token" | "course_access_query_failed" | null = null;
 
   if (authToken) {
@@ -67,13 +70,22 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     }
   }
 
+  if (!accessMode && lesson.lessonSlug === KINESCOPE_HIDDEN_INTRO_SLUG && body.discountClaimToken) {
+    const allowed = await hasTelegramHiddenIntroAccess(body.discountClaimToken).catch(() => false);
+    if (allowed) {
+      userId = "telegram-hidden-intro";
+      accessMode = "telegram-hidden-intro";
+      authError = null;
+    }
+  }
+
   if (!accessMode && authError === "course_access_query_failed") {
     return jsonResponse(res, 502, { error: authError });
   }
   if (!accessMode && authError === "invalid_token") {
     return jsonResponse(res, 401, { error: authError });
   }
-  if (!accessMode && !authToken) {
+  if (!accessMode && !authToken && !body.discountClaimToken) {
     return jsonResponse(res, 401, { error: "missing_token" });
   }
   if (!accessMode) {

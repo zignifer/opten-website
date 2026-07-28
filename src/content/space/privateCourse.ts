@@ -1,8 +1,10 @@
 import type { LearnCollection, LearnLang, LearnLesson, LearnMaterial, LearnTimestamp } from "./learn";
 import { futureProtectedVideoDeliveryNote, learnDefaultAuthor } from "./learn";
+import { HIDDEN_INTRO_SLUG } from "./courseDiscountClaim";
 import { getPrivateCourseLessonExtras } from "./privateCourseExtras";
 
 export const PRIVATE_COURSE_SLUG = "ai-content-marketing-2026";
+export const PRIVATE_COURSE_HIDDEN_INTRO_KINESCOPE_VIDEO_ID = "a4722357-b131-491f-8ca0-cdd11d927630";
 export const PRIVATE_COURSE_FIRST_LESSON_SLUG = "lesson-1-prompting";
 export const PRIVATE_COURSE_FIRST_KINESCOPE_VIDEO_ID = "e941e14d-c5bf-40fc-abe5-a41e247777cf";
 export const PRIVATE_COURSE_PRICE_RUB = 2990;
@@ -960,6 +962,87 @@ const privateCourseLessonConfigs: PrivateCourseLessonConfig[] = [
 ];
 
 export const privateCourseLessons: LearnLesson[] = privateCourseLessonConfigs.map(privateCourseLesson);
+
+const privateCourseHiddenIntroConfig: PrivateCourseLessonConfig = {
+  slug: HIDDEN_INTRO_SLUG,
+  videoId: PRIVATE_COURSE_HIDDEN_INTRO_KINESCOPE_VIDEO_ID,
+  videoLinkedAt: "2026-07-09",
+  title: {
+    ru: "AI контент-завод",
+    en: "AI content factory",
+  },
+  description: {
+    ru: "Бесплатный нулевой урок курса: показываю, как связать короткий контент, нейросети и простую воронку. Сначала собираем бесплатный трафик, затем прогреваем доверие и переводим подписчиков в заявки на услуги, продукт или курс.",
+    en: "A free lesson zero for the course: how to connect short-form content, AI tools, and a simple funnel. First you earn free traffic, then build trust, then turn followers into leads for a service, product, or course.",
+  },
+  category: "business",
+  duration: "06:08",
+  durationIso: "PT6M8S",
+  topics: {
+    ru: ["AI-контент", "Бесплатный трафик", "Reels", "Воронка", "Контент-завод"],
+    en: ["AI content", "Free traffic", "Reels", "Funnel", "Content factory"],
+  },
+  whatYouWillLearn: {
+    ru: [
+      "Связать просмотры с подписчиками и заявками",
+      "Собрать контекст о нише перед генерацией идей",
+      "Использовать ChatGPT, Claude и Codex как систему для контента",
+    ],
+    en: [
+      "Connect views to followers and leads",
+      "Collect niche context before generating ideas",
+      "Use ChatGPT, Claude, and Codex as a content system",
+    ],
+  },
+  timestamps: {
+    ru: timestamps([
+      ["00:00", "30 тысяч подписчиков через нейросети"],
+      ["00:30", "Контент-завод под ваш проект"],
+      ["00:47", "Стратегия вместо случайных Reels-идей"],
+      ["01:09", "Сначала собираем сильный запрос"],
+      ["01:31", "Голосовой бриф о себе и продукте"],
+      ["01:54", "Новый чат и сильная модель"],
+      ["02:18", "Deep Research и исследование ниши"],
+      ["02:38", "Markdown-стратегия как основа"],
+      ["02:47", "Проект с памятью о стратегии"],
+      ["03:09", "Обратная связь и инструкция проекта"],
+      ["03:46", "Зачем нужен Codex на компьютере"],
+      ["04:17", "Папка проекта и рабочие материалы"],
+      ["04:39", "Коннекторы, API и браузер"],
+      ["05:17", "Daily Content Radar и пайплайн"],
+      ["05:39", "Что дальше в полном курсе"],
+    ]),
+    en: timestamps([
+      ["00:00", "30K followers with AI tools"],
+      ["00:30", "Content factory for your project"],
+      ["00:47", "Strategy before random Reels ideas"],
+      ["01:09", "First build a stronger request"],
+      ["01:31", "Voice brief about you and the product"],
+      ["01:54", "New chat and a stronger model"],
+      ["02:18", "Deep Research for the niche"],
+      ["02:38", "Markdown strategy as the base"],
+      ["02:47", "Project memory from the strategy"],
+      ["03:09", "Feedback and project instructions"],
+      ["03:46", "Why desktop Codex is needed"],
+      ["04:17", "Project folder and working assets"],
+      ["04:39", "Connectors, APIs, and browser access"],
+      ["05:17", "Daily Content Radar pipeline"],
+      ["05:39", "What continues in the full course"],
+    ]),
+  },
+};
+
+const hiddenIntroLessonBase = privateCourseLesson(privateCourseHiddenIntroConfig);
+export const privateCourseHiddenIntroLesson: LearnLesson = {
+  ...hiddenIntroLessonBase,
+  releaseNote: {
+    ru: "Бесплатный нулевой урок. Видео открывается по Telegram-claim после серверной проверки подписки или после покупки курса.",
+    en: "Free lesson zero. Video opens through a server-verified Telegram claim or a normal course purchase.",
+  },
+  materials: [],
+  prompts: [],
+  missingItems: [],
+};
 
 export const privateCourseCollection: LearnCollection = {
   id: PRIVATE_COURSE_SLUG,

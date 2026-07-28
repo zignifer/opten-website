@@ -106,7 +106,7 @@ hits get a populated `<head>` + body before React mounts.
 | `/dashboard/download-skill` | [`DownloadSkillPage.tsx`](../../src/app/pages/DownloadSkillPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Pro-only skill ZIP download | `GET_AUTH_TOKEN` (Bearer for `/api/download-skill`) | `/api/download-skill` (this site's own serverless) |
 | `/prompt-library` | [`PromptLibraryPage.tsx`](../../src/app/pages/PromptLibraryPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Private Prompt Library CRUD/search; owner publish/refresh/unpublish controls for public snapshots. | `GET_AUTH_TOKEN` + `REFRESH_PROMPT_LIBRARY_CACHE` | `prompt_library`, `prompt_library_mark_used`, public snapshot RPCs |
 | `/p/:slug` | [`PublicPromptLibraryPage.tsx`](../../src/app/pages/PublicPromptLibraryPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Read-only random-link Prompt Library snapshot; viewers save individual prompts into their own library. | No | `prompt_library_get_public_snapshot`; save uses website JWT + `prompt_library_save_public_prompt` |
-| `/admin` | [`AdminDashboardPage.tsx`](../../src/app/pages/admin/AdminDashboardPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Owner admin shell. Shows Telegram course-preview funnel stats, guarded broadcast controls, image upload, and stored broadcast deletion. | No | Website JWT to `/api/admin/telegram-stats`, `/api/admin/telegram-broadcast`, `/api/admin/telegram-broadcasts`, and `/api/admin/telegram-upload-photo`; serverless proxies call extension-owned Edge Functions with `TELEGRAM_ADMIN_SECRET` |
+| `/admin` | [`AdminDashboardPage.tsx`](../../src/app/pages/admin/AdminDashboardPage.tsx) | none (SPA-only, `X-Robots-Tag: noindex`) | Owner admin shell. Shows the current resource-menu Telegram course funnel (bot starts → course links → course opens → orders → successful payments), guarded broadcast controls, image upload, and stored broadcast deletion. | No | Website JWT to `/api/admin/telegram-stats`, `/api/admin/telegram-broadcast`, `/api/admin/telegram-broadcasts`, and `/api/admin/telegram-upload-photo`; serverless proxies call extension-owned Edge Functions with `TELEGRAM_ADMIN_SECRET` |
 | `/internal/prompt-library-demo` | `PromptLibraryDemoPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Internal demo surface. | No | No |
 | `/app` | `AppIndexPage.tsx` | none (SPA-only, `X-Robots-Tag: noindex`) | Opten Space Beta entry; redirects to the current canonical app surface. | No | No |
 | `/app/login` | `Navigate` | none (SPA-only, `X-Robots-Tag: noindex`) | Compatibility redirect to `/login?next=/learn`. | No | No |
@@ -311,28 +311,23 @@ content intentionally; the routes remain out of sitemap, llms.txt, and
 after public Learn changes and `npm run verify:kinescope-course` after any paid course/Kinescope
 ID/materials/prompt change.
 
-Telegram course offer is a separate discount-only funnel for the same course. The
-extension-owned bot backend stores started users in
-`telegram_hidden_intro_leads`, writes funnel events to
-`telegram_hidden_intro_events`, and issues/reuses a random 24h 20%
-`course_discount_claims` token for the course root. `/start` sends a choice
-between the public Telegram channel and course access. Only the course action
-sends the intro video followed by the HTML course offer; this handler never
-broadcasts to historical leads. Opening a claim-bearing
-course URL stores `localStorage.opten_course_preview_claim_v1` and reports the
-initial offer open through the legacy-named `telegram-hidden-intro-opened`.
-The claim is only a checkout discount transport and never authorizes playback:
-all 16 Kinescope lessons and private lesson prompts require the standalone
-course entitlement. The collection-level `Генератор промптов Opten` block appears on
+Telegram course acquisition is a separate funnel for the same course. `/start`
+sends the reviewed welcome photo and subscription buttons; the extension-owned
+backend creates/reuses a random claim only after `getChatMember` verifies
+channel membership. The claim permanently opens the separate Kinescope lesson
+zero at `/hidden-intro` and carries a 20% checkout discount for its first 24
+hours. The site stores it in `localStorage.opten_course_preview_claim_v1`, while
+both the page and token API validate it through
+`telegram-hidden-intro-opened`. All 16 paid lessons, their materials, and
+private prompts still require the standalone course entitlement. The
+collection-level `Генератор промптов Opten` block appears on
 the course root and every lesson before materials/showcase; its links open for
 a course buyer or active Pro user without the sales description, while other
 visitors see locked previews with one compact `/pay` subscription CTA. Every
-locked lesson uses the same course-purchase UI and the website has no free
-Telegram lesson labels or bot deep-link CTA.
-The removed lesson 0 is
-absent from `privateCourseCollection.lessons` and the Kinescope whitelist; its
-legacy `/hidden-intro` URL only redirects to lesson 1 while preserving the claim
-query and remains outside sitemap, llms.txt, public Learn route lists, and EN
+paid lesson uses the same course-purchase UI; only lesson zero deep-links to
+the bot. Lesson zero remains outside `privateCourseCollection.lessons` so
+progress stays 16, but its reviewed video id is present in the server whitelist.
+The route remains outside sitemap, llms.txt, public Learn route lists, and EN
 sibling maps.
 
 Telegram service tooling currently lives in extension-owned Edge Functions:
