@@ -15,6 +15,7 @@ import { post as buildWebsiteWithAi } from "./build-website-with-ai";
 import { post as vibeCodingFreelance } from "./vibe-coding-freelance";
 import { post as aiFreelanceServices } from "./ai-freelance-services";
 import { post as makeMoneyWithAi } from "./make-money-with-ai";
+import { post as whereToFindAiClients } from "./where-to-find-ai-clients";
 import { post as upworkStart2026Checklist } from "./upwork-start-2026-checklist";
 import { post as aiHeadshotGenerator } from "./ai-headshot-generator";
 import { post as aiUgcForBrands } from "./ai-ugc-for-brands";
@@ -37,6 +38,7 @@ import { post as aiLogoGeneratorPrompt } from "./ai-logo-generator-prompt";
 import type { BlogPost } from "./types";
 
 export const blogPostsBySlug = {
+  "where-to-find-ai-clients": whereToFindAiClients,
   "make-money-with-ai": makeMoneyWithAi,
   "ai-freelance-services": aiFreelanceServices,
   "build-website-with-ai": buildWebsiteWithAi,

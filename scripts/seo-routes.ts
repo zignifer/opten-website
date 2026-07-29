@@ -18,6 +18,7 @@ import { post as buildWebsiteWithAiGuide } from "../src/content/blog/build-websi
 import { post as vibeCodingFreelanceGuide } from "../src/content/blog/vibe-coding-freelance";
 import { post as aiFreelanceServicesGuide } from "../src/content/blog/ai-freelance-services";
 import { post as makeMoneyWithAiGuide } from "../src/content/blog/make-money-with-ai";
+import { post as whereToFindAiClientsGuide } from "../src/content/blog/where-to-find-ai-clients";
 import { post as upworkStart2026Guide } from "../src/content/blog/upwork-start-2026-checklist";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
@@ -1310,6 +1311,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/where-to-find-ai-clients`, name: whereToFindAiClientsGuide.ru.title, datePublished: whereToFindAiClientsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/make-money-with-ai`, name: makeMoneyWithAiGuide.ru.title, datePublished: makeMoneyWithAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-freelance-services`, name: aiFreelanceServicesGuide.ru.title, datePublished: aiFreelanceServicesGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/build-website-with-ai`, name: buildWebsiteWithAiGuide.ru.title, datePublished: buildWebsiteWithAiGuide.ru.publishedAt },
@@ -1359,6 +1361,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/where-to-find-ai-clients.
+  {
+    path: "/blog/where-to-find-ai-clients",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/where-to-find-ai-clients`, en: `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients`, xDefault: `${SITE_ORIGIN}/blog/where-to-find-ai-clients` },
+    title: whereToFindAiClientsGuide.ru.title,
+    description: whereToFindAiClientsGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/where-to-find-ai-clients`,
+    ogTitle: whereToFindAiClientsGuide.ru.title,
+    ogDescription: whereToFindAiClientsGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${whereToFindAiClientsGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/where-to-find-ai-clients`, headline: whereToFindAiClientsGuide.ru.title, description: whereToFindAiClientsGuide.ru.description, datePublished: whereToFindAiClientsGuide.ru.publishedAt, dateModified: whereToFindAiClientsGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: whereToFindAiClientsGuide.ru.tags, image: { url: `${SITE_ORIGIN}${whereToFindAiClientsGuide.ru.cover.src}`, width: whereToFindAiClientsGuide.ru.cover.width, height: whereToFindAiClientsGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/where-to-find-ai-clients`, url: `${SITE_ORIGIN}/blog/where-to-find-ai-clients`, name: whereToFindAiClientsGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((whereToFindAiClientsGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/where-to-find-ai-clients`, whereToFindAiClientsGuide.ru.title),
+      faqPageBlock(whereToFindAiClientsGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/where-to-find-ai-clients`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: whereToFindAiClientsGuide.ru.title, url: `${SITE_ORIGIN}/blog/where-to-find-ai-clients` }], `${SITE_ORIGIN}/blog/where-to-find-ai-clients`),
     ],
   },
 
@@ -3284,6 +3308,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients`, name: whereToFindAiClientsGuide.en.title, datePublished: whereToFindAiClientsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/make-money-with-ai`, name: makeMoneyWithAiGuide.en.title, datePublished: makeMoneyWithAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-freelance-services`, name: aiFreelanceServicesGuide.en.title, datePublished: aiFreelanceServicesGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/build-website-with-ai`, name: buildWebsiteWithAiGuide.en.title, datePublished: buildWebsiteWithAiGuide.en.publishedAt },
@@ -3333,6 +3358,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/where-to-find-ai-clients EN sibling.
+  {
+    path: "/en/blog/where-to-find-ai-clients",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/where-to-find-ai-clients`, en: `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients`, xDefault: `${SITE_ORIGIN}/blog/where-to-find-ai-clients` },
+    title: whereToFindAiClientsGuide.en.title,
+    description: whereToFindAiClientsGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients`,
+    ogTitle: whereToFindAiClientsGuide.en.title,
+    ogDescription: whereToFindAiClientsGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${whereToFindAiClientsGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients`, headline: whereToFindAiClientsGuide.en.title, description: whereToFindAiClientsGuide.en.description, datePublished: whereToFindAiClientsGuide.en.publishedAt, dateModified: whereToFindAiClientsGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: whereToFindAiClientsGuide.en.tags, image: { url: `${SITE_ORIGIN}${whereToFindAiClientsGuide.en.cover.src}`, width: whereToFindAiClientsGuide.en.cover.width, height: whereToFindAiClientsGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients`, url: `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients`, name: whereToFindAiClientsGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((whereToFindAiClientsGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients`, whereToFindAiClientsGuide.en.title),
+      faqPageBlock(whereToFindAiClientsGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: whereToFindAiClientsGuide.en.title, url: `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients` }], `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients`),
     ],
   },
 
