@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-07-30 against extension `manifest.json` version **1.4.2** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench mirrors the extension popup's authenticated quick-Improve model list; standalone course checkout/access, Kinescope course playback, the restored Telegram channel-subscription funnel with one server-validated free lesson zero and one-time-per-lead 24h 20% claims, course-or-Pro Opten generators, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads are documented). Backend fully on self-hosted `supabase.opten.space`.
+> **Last sync:** 2026-07-30 against extension `manifest.json` version **1.4.2** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench mirrors the extension popup's authenticated quick-Improve model list; standalone course checkout/access, Kinescope course playback, the Telegram `/start` resource menu with a direct 24h 20% course offer and a separate channel-gated free lesson zero, course-or-Pro Opten generators, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads are documented). Backend fully on self-hosted `supabase.opten.space`.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -301,11 +301,14 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
   row or increment `times_used`; successful YooKassa/Paddle course webhooks
   increment `times_used` once, only when the order was not already succeeded.
 - Telegram claims live in `course_discount_claims`, not in
-  `course_promo_codes`. A claim is issued only after `getChatMember` verifies
-  channel membership. It permanently unlocks the separate `hidden-intro`
-  lesson zero and carries a checkout discount for its first 24 hours. It is
-  never a course entitlement and cannot unlock the 16 paid lessons, prompts,
-  materials, or Opten generators.
+  `course_promo_codes`. One claim may be issued immediately from the explicit
+  direct-course menu branch, or after `getChatMember` verifies membership in the
+  free-lesson branch. The direct-course branch uses the token only for the
+  checkout discount and does not unlock lesson zero. The same claim permanently
+  unlocks the separate `hidden-intro` lesson zero only after its lead receives
+  `subscription_verified_at`. It carries a checkout discount for its first
+  24 hours and is never a course entitlement; it cannot unlock the 16 paid
+  lessons, prompts, materials, or Opten generators.
   New claims use a 20% discount. Already-issued claims keep their stored
   percentage until expiry so a previously promised offer is still honored.
   It is issued exactly once per Telegram lead: repeated course requests always
@@ -353,13 +356,18 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
 Telegram course offer for the same course is intentionally a narrow sales
 funnel:
 
-- `/start` immediately creates or reuses the claim without requiring channel
-  subscription, sends the public course introduction through Bot API
-  `sendVideo`, then sends the separate HTML-formatted course offer with an
-  `Открыть курс` button and the public Telegram channel link in the message
-  text. Legacy callback actions remain accepted for buttons already present in
-  old chats. This handler change is not a broadcast and must never push the new
-  sequence to existing leads.
+- `/start` sends one `Что тебе сейчас интереснее?` navigation message with
+  three rows in this order: `Перейти в Telegram`, `Получить доступ к курсу по
+  ИИ`, and `Посмотреть бесплатный нулевой урок`. The Telegram row opens the
+  public channel. The direct-course callback immediately creates or reuses the
+  one-time claim without checking channel membership, sends the public course
+  introduction through Bot API `sendVideo`, then sends the separate
+  HTML-formatted course offer with an `Открыть курс` button to the claim-bearing
+  course root. The free-lesson callback sends the existing welcome photo/copy
+  and subscription buttons; only its subsequent subscription check can unlock
+  lesson zero. Legacy `get_course_access` / `check_subscription` callbacks
+  remain accepted for buttons already present in old chats. This handler change
+  is not a broadcast and must never push the sequence to existing leads.
 - The default `sendVideo` source is the source-controlled 720p H.264/AAC file
   `https://opten.space/assets/telegram/ai-content-marketing-2026-intro-v2.mp4`.
   It stays below Telegram's 20 MB remote-URL limit and may be overridden only
@@ -377,6 +385,10 @@ funnel:
   writes funnel events to `telegram_hidden_intro_events`. These tables are
   RLS-enabled with no public policies and are accessed only by service-role
   Edge Functions.
+- Direct course clicks use `course_access_clicked`; free-lesson menu clicks use
+  `free_lesson_clicked`. A direct course click never writes
+  `access_granted_at` or `hidden_intro_access_granted`, because those fields
+  remain reserved for delivery of the server-validated lesson-zero link.
 - The website stores the claim token in
   `localStorage.opten_course_preview_claim_v1`. The lesson-zero page validates
   it through `telegram-hidden-intro-opened`, records the first real lesson
@@ -387,6 +399,10 @@ funnel:
   `telegram-hidden-intro-broadcast` for manual posts, and
   `telegram-hidden-intro-reminders` for 12h/1h reminders. All use
   `X-Opten-Admin-Secret`; do not expose these controls in public site bundles.
+- Reminder copy and links depend on the lead state: a verified free-lesson lead
+  may be told that lesson-zero access remains and receives a hidden-intro link;
+  a direct-course-only lead receives a course-root link and must not be told
+  that lesson zero is already open.
 - The owner dashboard displays unique bot starts, verified subscriptions,
   lesson-zero links delivered, first lesson opens, Telegram checkout orders,
   successful payments, active claims, and blocked chats. The event-type database
@@ -397,9 +413,11 @@ funnel:
   `telegram-hidden-intro` playback mode, and only after server claim validation.
 - All 16 paid lessons use the same locked course-purchase UI. Only the locked
   lesson-zero player deep-links to the bot.
-- `/start` sends the welcome/photo and subscription buttons. A claim is created
-  or reused only after Telegram verifies membership. Expired/used claims keep
-  lesson-zero access while the message honestly states the discount ended.
+- The free-lesson branch sends the welcome/photo and subscription buttons. A
+  claim created earlier by the direct-course branch is reused after Telegram
+  verifies membership; verification adds permanent lesson-zero access without
+  restarting the discount. Expired/used claims keep lesson-zero access after
+  verification while the message honestly states that the discount ended.
 - Expired or used legacy 40% claims remain inactive and unchanged for checkout
   and audit purposes. Their expired-state Telegram copy uses the current 20%
   campaign percentage rather than the stored historical percentage, so the

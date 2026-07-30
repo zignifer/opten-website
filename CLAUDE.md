@@ -223,11 +223,16 @@ legacy service name `supabase/functions/telegram-hidden-intro-webhook` for
 deployment compatibility and has `verify_jwt = false`; it validates
 `TELEGRAM_WEBHOOK_SECRET`, stores started users in
 `telegram_hidden_intro_leads`, writes
-funnel events to `telegram_hidden_intro_events`, and issues a random per-user
-`course_discount_claims` link only after Telegram confirms channel membership.
-The claim permanently unlocks exactly one separate free lesson zero at
-`/learn/courses/ai-content-marketing-2026/hidden-intro` and transports a 20%
-checkout discount for its first 24 hours. It is not a course entitlement: all
+funnel events to `telegram_hidden_intro_events`, and issues one random per-user
+`course_discount_claims` token through either explicit menu branch. The direct
+course branch creates or reuses the claim immediately and opens the course root
+with a 20% checkout discount for its first 24 hours, without granting lesson-zero
+access. The free-lesson branch creates or reuses the same claim only after
+Telegram confirms channel membership. Once membership is verified, that claim
+permanently unlocks exactly one separate free lesson zero at
+`/learn/courses/ai-content-marketing-2026/hidden-intro`; the discount timer is
+never restarted or extended if the claim already exists. The claim is not a
+course entitlement: all
 16 paid lessons still require `course-access-summary`. Lesson zero must remain
 outside `privateCourseCollection.lessons` so course progress and navigation
 stay at 16, while its reviewed Kinescope id
@@ -272,14 +277,24 @@ and audit purposes. The bot's expired-state copy always shows the current 20%
 campaign wording instead of the stored historical percentage, so `/start`
 cannot surface the retired 40% message.
 
-For future `/start` updates only, the Telegram bot sends the reviewed welcome
-photo plus HTML welcome copy and the `Подписаться на канал` /
-`Проверить подписку` buttons. It must not create a claim until
-`getChatMember` confirms subscription. Both `check_subscription` and the
+For future `/start` updates only, the Telegram bot first sends one navigation
+message, `Что тебе сейчас интереснее?`, with three rows in this order:
+`Перейти в Telegram`, `Получить доступ к курсу по ИИ`, and
+`Посмотреть бесплатный нулевой урок`. The Telegram row opens the public channel.
+The course row immediately creates or reuses the one-time claim, sends the
+reviewed course intro video, and sends the HTML course offer with an `Открыть
+курс` button to the claim-bearing course root. It does not verify membership,
+open lesson zero, or grant the generator; the generator opens only after course
+purchase or through active Opten Pro. The free-lesson row sends the existing
+reviewed welcome photo plus HTML copy and the `Подписаться на канал` /
+`Проверить подписку` buttons. Only that branch requires `getChatMember`
+confirmation before lesson-zero access opens. Both `check_subscription` and the
 legacy `get_course_access` callback remain accepted so buttons already present
-in old chats continue to work. The access message opens only lesson zero,
-states that lesson access is permanent, and explains that the generator and
-the remaining course are paid separately.
+in old chats continue to work. The free-lesson access message states that lesson
+access is permanent and that the generator and the remaining course are paid
+separately. Both branches reuse the same claim and never refresh its 24-hour
+discount window. Reminder links open the course root for direct-course leads and
+the hidden-intro page only for leads whose channel subscription was verified.
 Changing `/start` must never trigger a broadcast or any message to existing
 leads. Only the locked lesson-zero player may deep-link to the bot; every paid
 lesson continues to point to the normal course purchase surface.
@@ -308,9 +323,10 @@ send Telegram broadcasts through `/api/admin/telegram-broadcast`, and review or
 delete stored broadcast history through `/api/admin/telegram-broadcasts`. The
 active dashboard follows the current `/start` resource-menu flow and shows unique
 bot starts, verified subscriptions, lesson-zero links delivered, lesson opens, checkout orders,
-successful payments, active discounts, and blocked chats. Do not surface the
-retired direct-offer interpretation or call a generic course-root open a lesson
-open.
+successful payments, active discounts, and blocked chats. Direct course-offer
+clicks are tracked separately from free-lesson clicks and must never count as a
+lesson-zero link delivery or lesson open. Do not call a generic course-root open
+a lesson open.
 Payment counts come only from Telegram-attributed `course_orders` with
 `status='succeeded'`; the legacy `hidden-intro` endpoint, table, column, and
 event names remain internal compatibility identifiers.
