@@ -358,7 +358,7 @@ funnel:
 
 - `/start` sends one `Что тебе сейчас интереснее?` navigation message with
   three rows in this order: `Перейти в Telegram`, `Получить доступ к курсу по
-  ИИ`, and `Посмотреть бесплатный нулевой урок`. The Telegram row opens the
+  ИИ`, and `Посмотреть урок про поиск идей`. The Telegram row opens the
   public channel. The direct-course callback immediately creates or reuses the
   one-time claim without checking channel membership, sends the public course
   introduction through Bot API `sendVideo`, then sends the separate
@@ -377,7 +377,7 @@ funnel:
   bot updates must not change either value unless the owner explicitly asks.
   The long description remains `Привет! Здесь можно получить доступ в мой
   Telegram-канал с промптами и полезными инструкциями или посмотреть курс по
-  ИИ.\n\nЖми /Start 👇`; the `/start` command description is `Открыть курс`.
+  ИИ.\n\nЖми /Start 👇`; the `/start` command description is `Открыть навигацию`.
   These exact profile and command values must be set and verified in both the
   default Bot API scope and the `ru` language scope; Telegram clients may use
   the localized RU profile instead of the default values.

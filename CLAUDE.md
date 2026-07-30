@@ -280,7 +280,7 @@ cannot surface the retired 40% message.
 For future `/start` updates only, the Telegram bot first sends one navigation
 message, `Что тебе сейчас интереснее?`, with three rows in this order:
 `Перейти в Telegram`, `Получить доступ к курсу по ИИ`, and
-`Посмотреть бесплатный нулевой урок`. The Telegram row opens the public channel.
+`Посмотреть урок про поиск идей`. The Telegram row opens the public channel.
 The course row immediately creates or reuses the one-time claim, sends the
 reviewed course intro video, and sends the HTML course offer with an `Открыть
 курс` button to the claim-bearing course root. It does not verify membership,
@@ -303,7 +303,7 @@ short description is `Доступ к урокам и каналу с промп
 updates must not change either value unless the owner explicitly asks. The Bot
 API long description remains `Привет! Здесь можно получить доступ в мой
 Telegram-канал с промптами и полезными инструкциями или посмотреть курс по
-ИИ.\n\nЖми /Start 👇`, and the `/start` command description is `Открыть курс`.
+ИИ.\n\nЖми /Start 👇`, and the `/start` command description is `Открыть навигацию`.
 These exact name, short description, long description, and command values must
 be set and verified in both the default Bot API scope and the `ru` language
 scope, because Telegram clients may prefer the localized RU profile.
