@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -20,21 +20,24 @@ import {
   type AdminTelegramStats,
 } from "../../../lib/adminApi";
 import { AdminTelegramBroadcastPanel } from "./AdminTelegramBroadcastPanel";
+import { AdminContentMachine } from "./AdminContentMachine";
 
 const REFRESH_INTERVAL_MS = 45_000;
 
 export default function AdminDashboardPage() {
+  const location = useLocation();
   const { status, session, account, refresh } = useSpaceAuth();
   const [stats, setStats] = useState<AdminTelegramStats | null>(null);
   const [statsState, setStatsState] = useState<"idle" | "loading" | "refreshing" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
 
   const accessToken = session?.access_token || "";
+  const activeView = new URLSearchParams(location.search).get("view") === "content" ? "content" : "admin";
 
   const loadStats = useCallback(
     async (background = false) => {
       if (!accessToken) return;
-      setStatsState(background && stats ? "refreshing" : "loading");
+      setStatsState(background ? "refreshing" : "loading");
       setError(null);
 
       try {
@@ -46,19 +49,19 @@ export default function AdminDashboardPage() {
         setError(resolveAdminError(err));
       }
     },
-    [accessToken, stats],
+    [accessToken],
   );
 
   useEffect(() => {
-    if (status !== "signed_in" || !accessToken) return;
+    if (activeView !== "admin" || status !== "signed_in" || !accessToken) return;
     void loadStats(false);
     const timer = window.setInterval(() => void loadStats(true), REFRESH_INTERVAL_MS);
     return () => window.clearInterval(timer);
-  }, [accessToken, loadStats, status]);
+  }, [accessToken, activeView, loadStats, status]);
 
   if (status === "loading") {
     return (
-      <AdminShell accountEmail={account?.email ?? session?.user.email ?? null}>
+      <AdminShell accountEmail={account?.email ?? session?.user.email ?? null} activeView={activeView}>
         <CenteredState icon={<RefreshCw className="animate-spin" size={22} />} title="Проверяем сессию" />
       </AdminShell>
     );
@@ -66,19 +69,27 @@ export default function AdminDashboardPage() {
 
   if (status === "signed_out" || !session) {
     return (
-      <AdminShell accountEmail={null}>
+      <AdminShell accountEmail={null} activeView={activeView}>
         <CenteredState
           icon={<Lock size={22} />}
           title="Нужен вход в owner-аккаунт"
           description="Админка открывается через обычную website-сессию Opten Space."
-          action={<LinkButton to="/login?next=/admin">Войти через Email OTP</LinkButton>}
+          action={<LinkButton to={`/login?next=${encodeURIComponent(`${location.pathname}${location.search}`)}`}>Войти через Email OTP</LinkButton>}
         />
       </AdminShell>
     );
   }
 
+  if (activeView === "content") {
+    return (
+      <AdminShell accountEmail={account?.email ?? session.user.email} activeView={activeView}>
+        <AdminContentMachine accessToken={accessToken} />
+      </AdminShell>
+    );
+  }
+
   return (
-    <AdminShell accountEmail={account?.email ?? session.user.email}>
+    <AdminShell accountEmail={account?.email ?? session.user.email} activeView={activeView}>
       <section className="flex flex-col gap-[18px]">
         <div className="flex flex-col gap-[14px] border-b border-[#dbe2d5] pb-[18px] md:flex-row md:items-end md:justify-between">
           <div>
@@ -86,7 +97,7 @@ export default function AdminDashboardPage() {
               Owner dashboard
             </p>
             <h1 className="m-0 mt-[6px] font-['Unbounded',sans-serif] text-[28px] font-semibold leading-[1.12] tracking-[0] text-[#091413] md:text-[34px]">
-              Telegram-превью курса
+              Telegram-воронка курса
             </h1>
           </div>
           <div className="flex flex-wrap items-center gap-[10px]">
@@ -130,40 +141,70 @@ export default function AdminDashboardPage() {
 }
 
 function AdminStatsView({ stats }: { stats: AdminTelegramStats }) {
+  const paidOrders = stats.orders.succeeded ?? stats.orders.paid;
   const metrics = useMemo(
     () => [
-      { label: "Старт", value: stats.funnel.start, icon: Users, tone: "slate" },
-      { label: "Подписались", value: stats.funnel.subscription_verified, icon: UserCheck, tone: "green" },
-      { label: "Доступ", value: stats.funnel.access_granted, icon: KeyRound, tone: "lime" },
-      { label: "Открыли урок", value: stats.funnel.hidden_intro_opened, icon: CheckCircle2, tone: "blue" },
-      { label: "Чекауты", value: stats.funnel.checkout_created, icon: ShoppingCart, tone: "amber" },
-      { label: "Оплаты", value: stats.funnel.paid, icon: ShieldCheck, tone: "emerald" },
-      { label: "Активные claims", value: stats.claims.active, icon: Clock3, tone: "violet" },
-      { label: "Блокировки", value: stats.funnel.blocked, icon: AlertTriangle, tone: "red" },
+      { label: "Запустили бота", value: stats.funnel.start, icon: Users, tone: "slate" },
+      { label: "Подтвердили подписку", value: stats.funnel.subscription_verified, icon: CheckCircle2, tone: "blue" },
+      { label: "Получили нулевой урок", value: stats.funnel.access_granted, icon: KeyRound, tone: "lime" },
+      { label: "Открыли нулевой урок", value: stats.funnel.hidden_intro_opened, icon: CheckCircle2, tone: "blue" },
+      { label: "Создали заказ", value: stats.orders.created, icon: ShoppingCart, tone: "amber" },
+      { label: "Оплатили", value: paidOrders, icon: ShieldCheck, tone: "emerald" },
+      { label: "Скидка действует", value: stats.claims.active, icon: Clock3, tone: "violet" },
+      { label: "Заблокировали бота", value: stats.funnel.blocked, icon: AlertTriangle, tone: "red" },
     ],
-    [stats],
+    [paidOrders, stats],
   );
 
   return (
-    <div className="grid gap-[12px] sm:grid-cols-2 lg:grid-cols-4">
-      {metrics.map((metric) => (
-        <MetricCard key={metric.label} metric={metric} />
-      ))}
-    </div>
+    <section className="grid gap-[10px]">
+      <p className="m-0 text-right text-[12px] text-[#66756f]">
+        Данные на <time dateTime={stats.generated_at}>{formatDateTime(stats.generated_at)}</time>
+      </p>
+      <div className="grid gap-[12px] sm:grid-cols-2 lg:grid-cols-4">
+        {metrics.map((metric) => (
+          <MetricCard key={metric.label} metric={metric} />
+        ))}
+      </div>
+    </section>
   );
 }
 
-function AdminShell({ accountEmail, children }: { accountEmail: string | null; children: ReactNode }) {
+function AdminShell({
+  accountEmail,
+  activeView,
+  children,
+}: {
+  accountEmail: string | null;
+  activeView: "admin" | "content";
+  children: ReactNode;
+}) {
   return (
     <div className="min-h-screen bg-[#f5f7f1] text-[#0c1514]" style={{ fontFamily: "'PT Root UI', sans-serif" }}>
       <header className="border-b border-[#0d211f] bg-[#061514] text-white">
-        <div className="mx-auto flex min-h-[62px] max-w-[1180px] items-center justify-between gap-[14px] px-[16px] sm:px-[24px]">
+        <div className="mx-auto flex min-h-[70px] max-w-[1180px] flex-wrap items-center justify-between gap-[10px] px-[16px] py-[8px] sm:px-[24px]">
           <Link to="/" className="flex items-center gap-[10px] text-white no-underline">
             <span className="grid h-[30px] w-[30px] place-items-center rounded-[8px] bg-[#9cfb51] text-[#061514]">
               <ShieldCheck size={17} aria-hidden="true" />
             </span>
             <span className="font-['Unbounded',sans-serif] text-[16px] font-semibold tracking-[0]">Opten Admin</span>
           </Link>
+          <nav aria-label="Режим админки" className="order-3 flex w-full rounded-[8px] border border-white/10 bg-white/[0.04] p-[3px] sm:order-none sm:w-auto">
+            <Link
+              to="/admin"
+              aria-current={activeView === "admin" ? "page" : undefined}
+              className={`inline-flex h-[38px] flex-1 items-center justify-center rounded-[6px] px-[13px] text-[13px] font-semibold no-underline transition sm:flex-none ${activeView === "admin" ? "bg-[#9cfb51] text-[#071513]" : "text-white/68 hover:bg-white/8 hover:text-white"}`}
+            >
+              Админка
+            </Link>
+            <Link
+              to="/admin?view=content"
+              aria-current={activeView === "content" ? "page" : undefined}
+              className={`inline-flex h-[38px] flex-1 items-center justify-center rounded-[6px] px-[13px] text-[13px] font-semibold no-underline transition sm:flex-none ${activeView === "content" ? "bg-[#9cfb51] text-[#071513]" : "text-white/68 hover:bg-white/8 hover:text-white"}`}
+            >
+              Контент-машина
+            </Link>
+          </nav>
           <div className="flex min-w-0 items-center gap-[8px] text-[13px] text-white/72">
             <span className="hidden h-[8px] w-[8px] rounded-full bg-[#9cfb51] sm:block" aria-hidden="true" />
             <span className="max-w-[190px] truncate">{accountEmail || "signed out"}</span>
@@ -253,6 +294,18 @@ function resolveAdminError(error: unknown): string {
 
 function formatNumber(value: number): string {
   return new Intl.NumberFormat("ru-RU").format(value || 0);
+}
+
+function formatDateTime(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
 }
 
 const metricToneClasses: Record<string, string> = {
