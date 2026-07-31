@@ -201,7 +201,7 @@ Guest checkout is initiated with an email address, selected currency, and
 optional uppercase promo code. Provider webhooks grant a course entitlement and
 send a direct website auth link to the same email. The internal test promo
 `FREE` maps to `100 ₽` or `$1` and requires a separate Paddle `$1` price ID.
-The public RUB base price is `9 990 ₽`; public discounts are not hard-coded in
+The public base price is `4 990 ₽` / `$69`; public discounts are not hard-coded in
 the website and must be represented by server-side promo codes (planned common
 campaigns: `-20%` and `-40%`). Marketing/partner course promo codes live in the extension-owned
 `course_promo_codes` table (RLS on, no public policies) with `discount_kind` =
@@ -654,7 +654,7 @@ Set in Vercel (project settings, not in repo):
   Supabase Edge Function environment:
   `PADDLE_PRICE_ID_COURSE_AI_CONTENT_MARKETING_2026_{SANDBOX|PRODUCTION}` and
   `PADDLE_PRICE_ID_COURSE_AI_CONTENT_MARKETING_2026_FREE_{SANDBOX|PRODUCTION}`.
-  Current live production price IDs: `$139` =
+  Current live production price IDs: `$69` =
   `pri_01kvk9vzec7cwgq7zgs9azw2re`, `$1` FREE test =
   `pri_01kvk9x5mcnadfj0beymk23ze5`.
 - `KINESCOPE_AUTH_JWT_SECRET` — server-only HS256 secret used to sign and
