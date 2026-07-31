@@ -360,8 +360,8 @@ Telegram course offer for the same course is intentionally a narrow sales
 funnel:
 
 - `/start` sends one `Что тебе сейчас интереснее?` navigation message with
-  three rows in this order: `Перейти в Telegram`, `Получить доступ к курсу по
-  ИИ`, and `Посмотреть урок про поиск идей`. The Telegram row opens the
+  three rows in this order: `Мой Telegram с промтами`, `Доступ к курсу по
+  ИИ`, and `Урок про поиск идей`. The Telegram row opens the
   public channel. The direct-course callback immediately creates or reuses the
   one-time claim without checking channel membership, sends the public course
   introduction through Bot API `sendVideo`, then sends the separate

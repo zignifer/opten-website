@@ -279,8 +279,8 @@ cannot surface the retired 40% message.
 
 For future `/start` updates only, the Telegram bot first sends one navigation
 message, `Что тебе сейчас интереснее?`, with three rows in this order:
-`Перейти в Telegram`, `Получить доступ к курсу по ИИ`, and
-`Посмотреть урок про поиск идей`. The Telegram row opens the public channel.
+`Мой Telegram с промтами`, `Доступ к курсу по ИИ`, and
+`Урок про поиск идей`. The Telegram row opens the public channel.
 The course row immediately creates or reuses the one-time claim, sends the
 reviewed course intro video, and sends the HTML course offer with an `Открыть
 курс` button to the claim-bearing course root. It does not verify membership,
@@ -307,8 +307,8 @@ Telegram-канал с промптами и полезными инструкц
 These exact name, short description, long description, and command values must
 be set and verified in both the default Bot API scope and the `ru` language
 scope, because Telegram clients may prefer the localized RU profile.
-If claim creation fails, the bot shows `Открыть курс` first and `Перейти в
-Telegram` second.
+If claim creation fails, the bot shows `Открыть курс` first and `Мой Telegram
+с промтами` second.
 The video must use a stable public HTTPS URL. The reviewed default is the
 source-controlled 720p H.264/AAC asset at
 `/assets/telegram/ai-content-marketing-2026-intro-v2.mp4` (17.5 MB, below
