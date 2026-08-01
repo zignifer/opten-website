@@ -16,6 +16,8 @@ const requiredFiles = [
   "src/app/pages/space/AppLoginPage.tsx",
   "src/app/pages/space/AppAuthCallbackPage.tsx",
   "src/app/pages/space/LearnOverviewPage.tsx",
+  "src/app/pages/space/LearnLessonsPage.tsx",
+  "src/app/components/space/learn/LearnLessonCard.tsx",
   "src/app/pages/space/LearnFindDetailPage.tsx",
   "src/app/pages/space/LessonDetailPage.tsx",
   "src/app/pages/space/LearnTemplatePage.tsx",
@@ -27,6 +29,8 @@ const requiredFiles = [
   "public/assets/learn/video/actual-ai-tools-2026.mp4",
   "public/assets/learn/video/actual-ai-tools-2026-poster.jpg",
   "public/assets/learn/og/actual-ai-tools-2026.jpg",
+  "public/assets/learn/thumbs/figma-to-codex-website.jpg",
+  "public/assets/learn/og/figma-to-codex-website.jpg",
 ];
 
 for (const file of requiredFiles) {
@@ -38,12 +42,15 @@ assert.match(main, /\/app"/, "Main router must register /app");
 assert.match(main, /\/app\/login"/, "Main router must register /app/login");
 assert.match(main, /\/app\/auth\/callback"/, "Main router must register /app/auth/callback");
 assert.match(main, /\/learn"/, "Main router must register public /learn");
+assert.match(main, /\/learn\/lessons"/, "Main router must register the complete free-lesson catalog");
 assert.match(main, /\/learn\/templates\/:templateKind"/, "Main router must register noindex Learn template routes");
 assert.match(main, /\/learn\/templates\/:templateKind\/:templateLessonSlug"/, "Main router must register noindex Learn template lesson routes");
 assert.match(main, /\/learn\/finds\/:findSlug"/, "Main router must register public Learn Finds routes");
 assert.ok(main.indexOf('/learn/finds/:findSlug') < main.indexOf('/learn/:lessonSlug'), "Learn Finds route must be registered before generic /learn/:lessonSlug");
+assert.ok(main.indexOf('/learn/lessons') < main.indexOf('/learn/:lessonSlug'), "Learn catalog route must be registered before generic /learn/:lessonSlug");
 assert.match(main, /\/learn\/:lessonSlug"/, "Main router must register public /learn/:lessonSlug");
 assert.match(main, /\/en\/learn"/, "Main router must register public /en/learn");
+assert.match(main, /\/en\/learn\/lessons"/, "Main router must register the EN free-lesson catalog");
 assert.match(main, /\/en\/learn\/templates\/:templateKind"/, "Main router must register EN noindex Learn template routes");
 assert.match(main, /\/en\/learn\/finds\/:findSlug"/, "Main router must register EN Learn Finds routes");
 assert.match(main, /\/en\/learn\/:lessonSlug"/, "Main router must register public /en/learn/:lessonSlug");
@@ -73,6 +80,9 @@ assert.match(content, /junior-designer-1100-order/, "Learn catalog must include 
 assert.match(content, /client-website-navigation-hero/, "Learn catalog must include the client website lesson");
 assert.match(content, /ai-marketplace-product-cards/, "Learn catalog must include the AI marketplace cards lesson");
 assert.match(content, /web-design-references/, "Learn catalog must include the web design references lesson");
+assert.match(content, /figma-to-codex-website/, "Learn catalog must include the Figma-to-Codex lesson");
+assert.match(content, /youtubeId: "XRVo8ZU6Nis"/, "Figma-to-Codex lesson must use the requested YouTube video");
+assert.match(content, /time: "23:13", seconds: 1393/, "Figma-to-Codex lesson must keep all original YouTube chapters");
 assert.match(content, /https:\/\/higgsfield\.ai\//, "Actual AI tools lesson must include the Higgsfield material");
 assert.match(content, /https:\/\/freepik\.com\//, "Actual AI tools lesson must include the Freepik / Magnific material");
 assert.match(content, /https:\/\/syntx\.ai\/welcome\/GlUETIt6/, "Actual AI tools lesson must include the Syntx material");
@@ -91,9 +101,11 @@ assert.match(content, /routeBasePath/, "Template collections must keep internal 
 const paths = readFileSync(join(root, "src/i18n/paths.ts"), "utf8");
 assert.match(paths, /LEARN_LESSON_SLUGS/, "LocalizedLink must know public Learn lesson siblings");
 assert.match(paths, /LEARN_FIND_SLUGS/, "LocalizedLink must know public Learn Finds siblings");
+assert.match(paths, /\/learn\/lessons/, "LocalizedLink must know the free-lesson catalog sibling");
 
 const seoRoutes = readFileSync(join(root, "scripts/seo-routes.ts"), "utf8");
 assert.match(seoRoutes, /learnHubRoute/, "SEO manifest must register the public Learn hub");
+assert.match(seoRoutes, /learnLessonsCatalogRoute/, "SEO manifest must register the complete free-lesson catalog");
 assert.match(seoRoutes, /buildLearnLessonRoute/, "SEO manifest must register public Learn lesson pages");
 assert.match(seoRoutes, /buildLearnFindRoute/, "SEO manifest must register public Learn Finds pages");
 assert.match(seoRoutes, /LearningResource/, "Learn lesson schema must expose LearningResource");

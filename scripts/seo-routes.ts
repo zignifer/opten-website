@@ -806,6 +806,79 @@ function learnHubRoute(lang: LearnLang): RouteMeta {
   };
 }
 
+function learnLessonsCatalogRoute(lang: LearnLang): RouteMeta {
+  const path = lang === "ru" ? "/learn/lessons" : "/en/learn/lessons";
+  const ruUrl = `${SITE_ORIGIN}/learn/lessons`;
+  const enUrl = `${SITE_ORIGIN}/en/learn/lessons`;
+  const pageUrl = lang === "ru" ? ruUrl : enUrl;
+  const inLanguage = lang === "ru" ? "ru-RU" : "en-US";
+  const title = lang === "ru"
+    ? "Бесплатные уроки по нейросетям и вайб-кодингу | Opten"
+    : "Free AI and Vibe Coding Video Lessons | Opten";
+  const description = lang === "ru"
+    ? "Все бесплатные уроки Opten по нейросетям, генерации видео, веб-дизайну в Figma и вайб-кодингу. Фильтры по темам и поиск по каталогу."
+    : "Browse every free Opten lesson on AI, video generation, Figma web design, and vibe coding, with topic filters and catalog search.";
+  const homeName = lang === "ru" ? "Главная" : "Home";
+  const learnName = lang === "ru" ? "Курсы" : "Courses";
+  const catalogName = lang === "ru" ? "Бесплатные уроки" : "Free lessons";
+  const catalogCover = publicLearnLessons.find((lesson) => lesson.slug === "figma-to-codex-website") ?? featuredLearnLesson;
+
+  return {
+    path,
+    htmlLang: lang,
+    hreflangAlternates: {
+      ru: ruUrl,
+      en: enUrl,
+      xDefault: ruUrl,
+    },
+    title,
+    description,
+    canonical: pageUrl,
+    ogTitle: title,
+    ogDescription: description,
+    ogImage: learnOgImageUrl(catalogCover),
+    author: FOUNDER_NAME,
+    prerender: "full",
+    changefreq: "weekly",
+    priority: 0.8,
+    schema: [
+      lang === "en" ? ORG_BLOCK_EN : ORG_BLOCK,
+      WEBSITE_BLOCK,
+      collectionPageBlock({
+        pageId: pageUrl,
+        url: pageUrl,
+        name: title,
+        description,
+        inLanguage,
+      }),
+      itemListBlock(
+        publicLearnLessons.map((lesson) => ({
+          url: lang === "ru" ? `${SITE_ORIGIN}/learn/${lesson.slug}` : `${SITE_ORIGIN}/en/learn/${lesson.slug}`,
+          name: getLearnLessonTitle(lesson, lang),
+          datePublished: lesson.publishedAt,
+        })),
+        pageUrl,
+      ),
+      webPageBlock({
+        pageId: pageUrl,
+        url: pageUrl,
+        name: title,
+        inLanguage,
+        cssSelector: ["h1", ".learn-lessons-intro"],
+        about: SOFTWARE_APP_REF,
+      }),
+      breadcrumbBlock(
+        [
+          { name: homeName, url: lang === "ru" ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}/en/` },
+          { name: learnName, url: lang === "ru" ? `${SITE_ORIGIN}/learn` : `${SITE_ORIGIN}/en/learn` },
+          { name: catalogName, url: pageUrl },
+        ],
+        pageUrl,
+      ),
+    ],
+  };
+}
+
 function learnFindLearningResourceBlock(find: LearnFind, lang: LearnLang, pageUrl: string, inLanguage: "ru-RU" | "en-US"): SchemaBlock {
   return {
     "@context": "https://schema.org",
@@ -1029,6 +1102,8 @@ function buildLearnLessonRoute(lesson: LearnLesson, lang: LearnLang): RouteMeta 
 const learnRouteEntries: RouteMeta[] = [
   learnHubRoute("ru"),
   learnHubRoute("en"),
+  learnLessonsCatalogRoute("ru"),
+  learnLessonsCatalogRoute("en"),
   ...publicLearnLessons.flatMap((lesson) => [
     buildLearnLessonRoute(lesson, "ru"),
     buildLearnLessonRoute(lesson, "en"),

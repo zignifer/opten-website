@@ -360,10 +360,11 @@ Telegram course offer for the same course is intentionally a narrow sales
 funnel:
 
 - `/start` sends one `Что тебе сейчас интереснее?` navigation message with
-  three rows in this order: `Мой Telegram с промтами`, `Доступ к курсу по
-  ИИ`, and `Урок про поиск идей`. The Telegram row opens the
-  public channel. The direct-course callback immediately creates or reuses the
-  one-time claim without checking channel membership, sends the public course
+  four rows in this order: `Мой Telegram с промтами`, `Доступ к курсу по
+  ИИ`, `Урок про поиск идей`, and `Все бесплатные уроки`. The Telegram row
+  opens the public channel, while the final row opens
+  `https://opten.space/learn/lessons`. The direct-course callback immediately
+  creates or reuses the one-time claim without checking channel membership, sends the public course
   introduction through Bot API `sendVideo`, then sends the separate
   HTML-formatted course offer with an `Открыть курс` button to the claim-bearing
   course root. The free-lesson callback sends the existing welcome photo/copy

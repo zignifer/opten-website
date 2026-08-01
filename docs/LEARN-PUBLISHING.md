@@ -7,9 +7,11 @@ compatibility redirects only.
 ## Routes
 
 - RU hub: `/learn`
+- RU free-lesson catalog: `/learn/lessons`
 - RU lesson: `/learn/:lessonSlug`
 - RU find: `/learn/finds/:findSlug`
 - EN hub: `/en/learn`
+- EN free-lesson catalog: `/en/learn/lessons`
 - EN lesson: `/en/learn/:lessonSlug`
 - EN find: `/en/learn/finds/:findSlug`
 
@@ -23,6 +25,8 @@ or EN-only lesson.
 - Learn Finds typed helpers: `src/content/space/learnFinds.ts`
 - Lightweight i18n slug allow-list: `src/content/space/learnSlugs.ts`
 - Overview page: `src/app/pages/space/LearnOverviewPage.tsx`
+- Complete free-lesson catalog: `src/app/pages/space/LearnLessonsPage.tsx`
+- Shared lesson card: `src/app/components/space/learn/LearnLessonCard.tsx`
 - Lesson page UI/player: `src/app/components/space/learn/LearnComponents.tsx`
 - Learn Find detail page: `src/app/pages/space/LearnFindDetailPage.tsx`
 - Runtime routes: `src/main.tsx`

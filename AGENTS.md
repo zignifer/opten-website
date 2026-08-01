@@ -51,7 +51,8 @@ Prompt Library has no AI/proxy/usage cost), (5) public read-only Prompt Library
 snapshots at `/p/:slug` (random-link, noindex MVP; viewers save individual
 prompts into their own private library through website auth), (6) public Learn
 pages at `/learn`
-and `/en/learn` (indexed RU/EN video lessons with schema, sitemap, llms.txt, and
+and `/en/learn`, plus the complete free-lesson catalogs at `/learn/lessons` and
+`/en/learn/lessons` (indexed RU/EN video lessons with schema, sitemap, llms.txt, and
 legacy redirects from `/app/learn*`), plus Learn Finds at
 `/learn/finds/:slug` and `/en/learn/finds/:slug` for curated third-party
 YouTube expert videos enriched with Opten summaries, timestamps, commands,
@@ -278,9 +279,10 @@ campaign wording instead of the stored historical percentage, so `/start`
 cannot surface the retired 40% message.
 
 For future `/start` updates only, the Telegram bot first sends one navigation
-message, `Что тебе сейчас интереснее?`, with three rows in this order:
-`Мой Telegram с промтами`, `Доступ к курсу по ИИ`, and
-`Урок про поиск идей`. The Telegram row opens the public channel.
+message, `Что тебе сейчас интереснее?`, with four rows in this order:
+`Мой Telegram с промтами`, `Доступ к курсу по ИИ`,
+`Урок про поиск идей`, and `Все бесплатные уроки`. The Telegram row opens the
+public channel, while the final row opens the public `/learn/lessons` catalog.
 The course row immediately creates or reuses the one-time claim, sends the
 reviewed course intro video, and sends the HTML course offer with an `Открыть
 курс` button to the claim-bearing course root. It does not verify membership,
@@ -430,7 +432,7 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
           Marketing/billing RU (9): /, /pay, /welcome, /about, /blog, /blog/:slug,
                   /privacy, /terms, /refund
           Models RU (Phase v2.0): /models hub + /models/:slug (62 model pages)
-          Learn RU: /learn hub + /learn/:lessonSlug (public video lessons)
+          Learn RU: /learn hub + /learn/lessons catalog + /learn/:lessonSlug (public video lessons)
                     + /learn/finds/:slug (curated third-party expert videos)
           Launched paid course SPA-only: /learn/courses/:courseSlug(/:lessonSlug)
           RU SPA-only (7, X-Robots-Tag noindex): /success, /login,
@@ -440,7 +442,7 @@ index.html  ─sync→  Paddle.js CDN  (only in dist/pay/, dist/en/pay/ — Phas
           App SPA-only (X-Robots-Tag noindex): /app, /app/login,
                   /app/auth/callback; /app/learn* redirects to /learn*
           EN: /en/ sibling for each prerendered RU route + /en/models(/:slug)
-              + /en/learn(/:slug) + /en/learn/finds/:slug
+              + /en/learn(/lessons|/:slug) + /en/learn/finds/:slug
           Catch-all: <Route path="*"> → NotFound (runtime noindex injection)
 
   Prerender (postbuild):  scripts/prerender.mjs → 204 dist/<route>/index.html files

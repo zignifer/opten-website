@@ -39,6 +39,7 @@
   const AppLoginPage = lazy(() => import("./app/pages/space/AppLoginPage.tsx"));
   const AppAuthCallbackPage = lazy(() => import("./app/pages/space/AppAuthCallbackPage.tsx"));
   const LearnOverviewPage = lazy(() => import("./app/pages/space/LearnOverviewPage.tsx"));
+  const LearnLessonsPage = lazy(() => import("./app/pages/space/LearnLessonsPage.tsx"));
   const LessonDetailPage = lazy(() => import("./app/pages/space/LessonDetailPage.tsx"));
   const LearnFindDetailPage = lazy(() => import("./app/pages/space/LearnFindDetailPage.tsx"));
   const LearnTemplatePage = lazy(() => import("./app/pages/space/LearnTemplatePage.tsx"));
@@ -200,6 +201,7 @@
               <Route path="/login" element={<AppLoginPage />} />
               <Route path="/auth/callback" element={<AppAuthCallbackPage />} />
               <Route path="/learn" element={<LearnOverviewPage />} />
+              <Route path="/learn/lessons" element={<LearnLessonsPage />} />
               <Route path="/learn/templates/:templateKind" element={<LearnTemplatePage />} />
               <Route path="/learn/templates/:templateKind/:templateLessonSlug" element={<LearnTemplatePage />} />
               <Route path="/learn/courses/:courseSlug" element={<PrivateCoursePage />} />
@@ -227,6 +229,7 @@
               <Route path="/en/models" element={<ModelsHubPage />} />
               <Route path="/en/models/:slug" element={<ModelPage />} />
               <Route path="/en/learn" element={<LearnOverviewPage />} />
+              <Route path="/en/learn/lessons" element={<LearnLessonsPage />} />
               <Route path="/en/learn/templates/:templateKind" element={<LearnTemplatePage />} />
               <Route path="/en/learn/templates/:templateKind/:templateLessonSlug" element={<LearnTemplatePage />} />
               <Route path="/en/learn/finds/:findSlug" element={<LearnFindDetailPage />} />

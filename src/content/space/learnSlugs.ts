@@ -5,6 +5,7 @@ export const LEARN_LESSON_SLUGS = [
   "client-website-navigation-hero",
   "ai-marketplace-product-cards",
   "web-design-references",
+  "figma-to-codex-website",
 ] as const;
 
 export const LEARN_FIND_SLUGS = [
