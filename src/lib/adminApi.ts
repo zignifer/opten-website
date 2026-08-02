@@ -2,6 +2,8 @@ export type AdminTelegramStats = {
   generated_at: string;
   funnel: {
     start: number;
+    course_link_sent?: number;
+    course_opened?: number;
     subscription_verified: number;
     access_granted: number;
     hidden_intro_opened: number;
@@ -11,6 +13,8 @@ export type AdminTelegramStats = {
   };
   leads: {
     total: number;
+    course_link_sent?: number;
+    course_opened?: number;
     subscribed: number;
     access_granted: number;
     hidden_intro_opened: number;
@@ -26,6 +30,10 @@ export type AdminTelegramStats = {
   orders: {
     created: number;
     paid: number;
+    pending?: number;
+    succeeded?: number;
+    canceled?: number;
+    failed?: number;
   };
   events: Record<string, number>;
 };

@@ -1,5 +1,11 @@
 # Admin Dashboard Handoff - 2026-07-07
 
+> Historical implementation handoff from 2026-07-07. Do not treat the embedded
+> product copy, prices, funnel labels, or workspace paths as current. Current
+> rules are in `AGENTS.md`, `docs/ARCHITECTURE.md`, and
+> `docs/INTEGRATION-CONTRACT.md`; legacy function/table names remain for
+> deployment compatibility.
+
 ## Goal
 
 Build a small protected owner admin surface on `opten.space` for acquisition and traffic-channel operations.

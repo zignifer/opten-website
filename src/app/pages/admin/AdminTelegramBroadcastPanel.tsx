@@ -21,11 +21,18 @@ import {
   type AdminTelegramBroadcastSegment,
 } from "../../../lib/adminApi";
 
+const SEGMENT_LABELS: Record<AdminTelegramBroadcastSegment, string> = {
+  all: "Все активные чаты",
+  subscribed: "Подтвердили подписку",
+  access_granted: "Получили нулевой урок",
+  access_granted_not_paid: "Получили нулевой урок, не оплатили",
+};
+
 const SEGMENT_OPTIONS: Array<{ value: AdminTelegramBroadcastSegment; label: string }> = [
-  { value: "all", label: "Все" },
-  { value: "subscribed", label: "Подписались" },
-  { value: "access_granted", label: "Получили доступ" },
-  { value: "access_granted_not_paid", label: "Доступ без оплаты" },
+  { value: "all", label: SEGMENT_LABELS.all },
+  { value: "subscribed", label: SEGMENT_LABELS.subscribed },
+  { value: "access_granted", label: SEGMENT_LABELS.access_granted },
+  { value: "access_granted_not_paid", label: SEGMENT_LABELS.access_granted_not_paid },
 ];
 
 const MAX_UPLOAD_BYTES = 1_572_864;
@@ -126,7 +133,7 @@ export function AdminTelegramBroadcastPanel({
 
   async function handleSend() {
     if (!canSend || !preview) return;
-    const confirmed = window.confirm(`Отправить Telegram broadcast для ${formatNumber(preview.recipients)} получателей?`);
+    const confirmed = window.confirm(`Отправить Telegram-рассылку для ${formatNumber(preview.recipients)} получателей?`);
     if (!confirmed) return;
 
     setState("sending");
@@ -158,7 +165,7 @@ export function AdminTelegramBroadcastPanel({
 
   async function handleDelete(record: AdminTelegramBroadcastRecord) {
     if (!canDeleteBroadcast(record) || deletingId) return;
-    const confirmed = window.confirm(`Удалить broadcast ${formatShortId(record.id)} из Telegram для ${formatNumber(record.sent - record.deleted)} сообщений?`);
+    const confirmed = window.confirm(`Удалить рассылку ${formatShortId(record.id)} из Telegram для ${formatNumber(record.sent - record.deleted)} сообщений?`);
     if (!confirmed) return;
 
     setDeletingId(record.id);
@@ -167,7 +174,7 @@ export function AdminTelegramBroadcastPanel({
 
     try {
       const response = await deleteAdminTelegramBroadcast(accessToken, record.id);
-      setDeleteResult(`Удалено: ${formatNumber(response.deleted)}, failed: ${formatNumber(response.failed)}`);
+      setDeleteResult(`Удалено: ${formatNumber(response.deleted)}, ошибки: ${formatNumber(response.failed)}`);
       await loadHistory(true);
       onSent();
     } catch (err) {
@@ -204,14 +211,14 @@ export function AdminTelegramBroadcastPanel({
     <section className="rounded-[8px] border border-[#dce4d9] bg-white p-[16px] shadow-[0_1px_0_rgba(14,23,20,0.04)]">
       <div className="flex flex-col gap-[10px] border-b border-[#eef2eb] pb-[14px] md:flex-row md:items-start md:justify-between">
         <div>
-          <h2 className="m-0 text-[18px] font-semibold leading-tight tracking-[0] text-[#101a18]">Broadcast</h2>
+          <h2 className="m-0 text-[18px] font-semibold leading-tight tracking-[0] text-[#101a18]">Рассылка</h2>
           <p className="m-0 mt-[5px] max-w-[620px] text-[13px] leading-[1.45] text-[#66756f]">
-            Реальная отправка доступна только после dry-run preview. Фото отправляется через Telegram sendPhoto по HTTPS URL.
+            Сначала админка посчитает получателей. Отправка откроется только после проверки и подтверждения точного числа.
           </p>
         </div>
         <span className="inline-flex h-[28px] items-center gap-[6px] self-start rounded-[8px] bg-[#edf4e7] px-[9px] text-[12px] font-semibold text-[#315d24]">
           <CheckCircle2 size={14} aria-hidden="true" />
-          owner-gated
+          Только владелец
         </span>
       </div>
 
@@ -280,7 +287,7 @@ export function AdminTelegramBroadcastPanel({
               </div>
             </IconField>
 
-            <IconField icon={<LinkIcon size={15} aria-hidden="true" />} label="Button URL">
+            <IconField icon={<LinkIcon size={15} aria-hidden="true" />} label="Ссылка кнопки">
               <input
                 type="url"
                 value={buttonUrl}
@@ -292,7 +299,7 @@ export function AdminTelegramBroadcastPanel({
           </div>
 
           <label className="grid gap-[6px] text-[13px] font-semibold text-[#34423e]">
-            Button text
+            Текст кнопки
             <input
               type="text"
               value={buttonText}
@@ -313,12 +320,12 @@ export function AdminTelegramBroadcastPanel({
           <div className="mt-[12px] grid gap-[8px] text-[13px] text-[#50615b]">
             <StatusRow ok={!emptyMessage} label="Есть текст или фото" />
             <StatusRow ok={!invalidButton} label="Кнопка заполнена парой" />
-            <StatusRow ok={!tooLong} label={hasPhoto ? "Caption до 1024 символов" : "Message до 4096 символов"} />
+            <StatusRow ok={!tooLong} label={hasPhoto ? "Подпись до 1024 символов" : "Сообщение до 4096 символов"} />
           </div>
 
           {preview ? (
             <div className="mt-[14px] rounded-[8px] border border-[#d6e8cf] bg-[#f2faee] p-[11px]">
-              <p className="m-0 text-[12px] font-semibold uppercase tracking-[0.06em] text-[#497160]">Preview</p>
+              <p className="m-0 text-[12px] font-semibold uppercase tracking-[0.06em] text-[#497160]">Получатели</p>
               <p className="m-0 mt-[5px] tabular-nums text-[26px] font-semibold leading-none text-[#101a18]">
                 {formatNumber(preview.recipients)}
               </p>
@@ -328,7 +335,7 @@ export function AdminTelegramBroadcastPanel({
 
           {result ? (
             <div className="mt-[14px] rounded-[8px] border border-[#d6e8cf] bg-[#f2faee] p-[11px] text-[13px] text-[#315d24]">
-              Отправлено: {formatNumber(result.sent ?? 0)}, blocked: {formatNumber(result.blocked ?? 0)}, failed: {formatNumber(result.failed ?? 0)}
+              Отправлено: {formatNumber(result.sent ?? 0)}, заблокировали бота: {formatNumber(result.blocked ?? 0)}, ошибки: {formatNumber(result.failed ?? 0)}
             </div>
           ) : null}
 
@@ -348,7 +355,7 @@ export function AdminTelegramBroadcastPanel({
               className="inline-flex h-[40px] cursor-pointer items-center justify-center gap-[8px] rounded-[8px] border border-[#cbd6c9] bg-white px-[13px] text-[14px] font-semibold text-[#17211f] transition hover:border-[#9bb195] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#75c83f] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {state === "previewing" ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Eye size={16} aria-hidden="true" />}
-              Preview
+              Проверить получателей
             </button>
             <button
               type="button"
@@ -365,7 +372,7 @@ export function AdminTelegramBroadcastPanel({
 
       <div className="mt-[16px] border-t border-[#eef2eb] pt-[14px]">
         <div className="flex flex-wrap items-center justify-between gap-[10px]">
-          <h3 className="m-0 text-[16px] font-semibold leading-tight tracking-[0] text-[#101a18]">История broadcast</h3>
+          <h3 className="m-0 text-[16px] font-semibold leading-tight tracking-[0] text-[#101a18]">История рассылок</h3>
           <button
             type="button"
             onClick={() => loadHistory(false)}
@@ -405,7 +412,7 @@ function BroadcastHistoryTable({
   if (!history.length) {
     return (
       <div className="mt-[12px] rounded-[8px] border border-[#eef2eb] bg-[#fbfcf8] px-[12px] py-[16px] text-[13px] text-[#66756f]">
-        Пока нет сохранённых broadcast.
+        Пока нет сохранённых рассылок.
       </div>
     );
   }
@@ -437,7 +444,7 @@ function BroadcastHistoryTable({
                 </td>
                 <td className="whitespace-nowrap px-[10px] py-[10px] text-[#50615b]">{statusLabel(record.status)}</td>
                 <td className="whitespace-nowrap px-[10px] py-[10px] tabular-nums text-[#50615b]">
-                  {formatNumber(record.sent)} sent, {formatNumber(record.deleted)} del, {formatNumber(record.failed + record.blocked)} err
+                  Отправлено: {formatNumber(record.sent)}, удалено: {formatNumber(record.deleted)}, ошибки: {formatNumber(record.failed + record.blocked)}
                 </td>
                 <td className="py-[10px] pl-[10px]">
                   <button
@@ -495,22 +502,22 @@ function canDeleteBroadcast(record: AdminTelegramBroadcastRecord): boolean {
 function broadcastTitle(record: AdminTelegramBroadcastRecord): string {
   const text = record.text?.trim();
   if (text) return text;
-  return record.photo_url ? "Photo broadcast" : "Broadcast";
+  return record.photo_url ? "Рассылка с фото" : "Рассылка";
 }
 
 function segmentLabel(segment: AdminTelegramBroadcastSegment): string {
-  return SEGMENT_OPTIONS.find((option) => option.value === segment)?.label ?? segment;
+  return SEGMENT_LABELS[segment] ?? segment;
 }
 
 function statusLabel(status: AdminTelegramBroadcastRecord["status"]): string {
   const labels: Record<AdminTelegramBroadcastRecord["status"], string> = {
-    sending: "sending",
-    sent: "sent",
-    partial: "partial",
-    failed: "failed",
-    deleting: "deleting",
-    deleted: "deleted",
-    delete_partial: "delete partial",
+    sending: "отправляется",
+    sent: "отправлено",
+    partial: "частично",
+    failed: "ошибка",
+    deleting: "удаляется",
+    deleted: "удалено",
+    delete_partial: "удалено частично",
   };
   return labels[status] ?? status;
 }
@@ -520,23 +527,23 @@ function resolveBroadcastError(error: unknown): string {
     if (error.status === 403) return "Этот аккаунт не входит в server-side allowlist админки.";
     if (error.status === 401) return "Сессия истекла. Войди снова через /login.";
     if (error.code === "missing_telegram_admin_secret") return "В Vercel не задан TELEGRAM_ADMIN_SECRET.";
-    if (error.code === "empty_message") return "Добавь текст или Photo URL.";
-    if (error.code === "invalid_button") return "Для кнопки нужны и Button text, и Button URL.";
-    if (error.code === "invalid_photo_url") return "Photo URL должен быть HTTPS и не вести на SVG/HTML.";
-    if (error.code === "invalid_button_url") return "Button URL должен быть http или https.";
+    if (error.code === "empty_message") return "Добавь текст или ссылку на фото.";
+    if (error.code === "invalid_button") return "Для кнопки нужны текст и ссылка.";
+    if (error.code === "invalid_photo_url") return "Ссылка на фото должна быть HTTPS и не вести на SVG/HTML.";
+    if (error.code === "invalid_button_url") return "Ссылка кнопки должна начинаться с http или https.";
     if (error.code === "caption_too_long") return "Для фото Telegram caption ограничен 1024 символами.";
     if (error.code === "message_too_long") return "Текст Telegram message ограничен 4096 символами.";
-    if (error.code === "recipient_count_changed") return "Количество получателей изменилось. Сделай Preview ещё раз.";
+    if (error.code === "recipient_count_changed") return "Количество получателей изменилось. Проверь получателей ещё раз.";
     if (error.code === "empty_recipients") return "В этом сегменте сейчас нет получателей.";
-    if (error.code === "broadcast_history_unavailable") return "Backend не смог сохранить историю broadcast, отправка остановлена.";
-    if (error.code === "broadcast_not_found") return "Broadcast не найден в истории.";
-    if (error.code === "invalid_broadcast_id") return "Некорректный broadcast id.";
-    if (error.code === "telegram_broadcast_failed") return "Telegram broadcast endpoint отклонил запрос или вернул ошибку.";
-    if (error.code === "telegram_broadcast_unavailable") return "Telegram broadcast endpoint сейчас недоступен.";
-    if (error.code === "telegram_broadcasts_failed") return "Telegram broadcast history endpoint отклонил запрос или вернул ошибку.";
-    if (error.code === "telegram_broadcasts_unavailable") return "Telegram broadcast history endpoint сейчас недоступен.";
+    if (error.code === "broadcast_history_unavailable") return "Сервер не смог сохранить историю рассылки, отправка остановлена.";
+    if (error.code === "broadcast_not_found") return "Рассылка не найдена в истории.";
+    if (error.code === "invalid_broadcast_id") return "Некорректный идентификатор рассылки.";
+    if (error.code === "telegram_broadcast_failed") return "Telegram отклонил рассылку или вернул ошибку.";
+    if (error.code === "telegram_broadcast_unavailable") return "Сервис Telegram-рассылок сейчас недоступен.";
+    if (error.code === "telegram_broadcasts_failed") return "Не удалось получить историю рассылок.";
+    if (error.code === "telegram_broadcasts_unavailable") return "История рассылок сейчас недоступна.";
   }
-  return "Не удалось выполнить broadcast.";
+  return "Не удалось выполнить рассылку.";
 }
 
 function resolveUploadError(error: unknown): string {

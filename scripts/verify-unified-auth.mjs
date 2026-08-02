@@ -38,7 +38,7 @@ assert.match(siteHeader, /to="\/account"|to=\{["'`]\/account["'`]\}/, "Signed-in
 assert.match(siteHeader, /\/login\?next=/, "Signed-out SiteHeader action must link to /login with next");
 assert.match(siteHeader, /label: "Learn"[\s\S]*to: "\/learn"[\s\S]*label: "Extension"[\s\S]*to: "\/"[\s\S]*label: "Library"[\s\S]*to: "\/prompt-library"/, "SiteHeader must advertise public Learn before Extension and Library");
 assert.match(siteHeader, /pathname\.startsWith\("\/learn"\)|pathname\.startsWith\("\/en\/learn"\)/, "SiteHeader must mark Learn active on RU and EN Learn routes");
-assert.doesNotMatch(siteHeader, /\bMenu\b|\bX\b|site-header-menu|role="menu"/, "SiteHeader must not render hamburger marketing navigation");
+assert.match(siteHeader, /HeaderMobileMenu[\s\S]*mobileMenuOpen/, "SiteHeader must render the shared mobile navigation");
 assert.doesNotMatch(siteHeader, /nav\.pricing|nav\.blog|nav\.models|nav\.faq|nav\.about/, "SiteHeader must not include marketing nav labels");
 assert.match(siteHeader, /<LocalizedLink[\s\S]*to="\/pay"[\s\S]*aria-label=\{copy\.usage\(creditLabel\)\}/, "SiteHeader credits pill must link to /pay");
 
