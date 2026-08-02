@@ -2,9 +2,9 @@
 
 The site repo has a local Search Console CLI for direct indexing checks.
 
-Credentials are stored in `.secrets/gsc-oauth.env` and are not committed. The
-file is copied from `C:\Projects\opten-seo\.env.local` and contains the OAuth
-installed-app client plus refresh token for the owner Google account.
+Credentials are stored only in `.secrets/gsc-oauth.env` and are not committed.
+The file contains the OAuth installed-app client plus refresh token for the
+owner Google account.
 
 Service Account access is intentionally not used: Search Console rejected the
 service account email with `email not found` when adding it as a user.
@@ -17,6 +17,7 @@ npm run gsc:sitemaps
 npm run gsc:submit-sitemap
 npm run gsc:inspect -- https://opten.space/models/gpt-image-2
 npm run gsc:performance -- 90
+npm run gsc:queries -- 90
 ```
 
 If a command fails with `invalid_grant`, the refresh token was revoked or
@@ -54,5 +55,4 @@ npm run gsc:sites
 ```
 
 When the status is `complete`, the helper has saved the new
-`GSC_REFRESH_TOKEN` into both `.secrets/gsc-oauth.env` and
-`C:\Projects\opten-seo\.env.local`.
+`GSC_REFRESH_TOKEN` into `.secrets/gsc-oauth.env`.

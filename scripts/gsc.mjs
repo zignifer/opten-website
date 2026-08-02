@@ -140,6 +140,26 @@ async function performance(token, config, daysArg = "90") {
   }, null, 2));
 }
 
+async function queries(token, config, daysArg = "90") {
+  const days = Number(daysArg);
+  if (!Number.isFinite(days) || days <= 0) throw new Error("queries days must be a positive number");
+  const end = new Date();
+  const start = new Date(Date.now() - days * 864e5);
+  const iso = (date) => date.toISOString().slice(0, 10);
+  const url = `https://searchconsole.googleapis.com/webmasters/v3/sites/${sitePath(config.siteUrl)}/searchAnalytics/query`;
+  const { body } = await googleJson(url, token, {
+    method: "POST",
+    body: JSON.stringify({
+      startDate: iso(start),
+      endDate: iso(end),
+      dimensions: ["query", "page"],
+      dimensionFilterGroups: [{ filters: [{ dimension: "page", operator: "contains", expression: "/blog/" }] }],
+      rowLimit: 500,
+    }),
+  });
+  console.log(JSON.stringify({ siteUrl: config.siteUrl, days, rows: body.rows || [] }, null, 2));
+}
+
 async function main() {
   const [command = "help", arg] = process.argv.slice(2);
   if (command === "help" || command === "--help" || command === "-h") {
@@ -150,6 +170,7 @@ async function main() {
       "  node scripts/gsc.mjs submit-sitemap [sitemapUrl]",
       "  node scripts/gsc.mjs inspect https://opten.space/path",
       "  node scripts/gsc.mjs performance [days]",
+      "  node scripts/gsc.mjs queries [days]",
     ].join("\n"));
     return;
   }
@@ -162,10 +183,11 @@ async function main() {
   if (command === "submit-sitemap") return submitSitemap(token, config, arg);
   if (command === "inspect") return inspect(token, config, arg);
   if (command === "performance") return performance(token, config, arg);
+  if (command === "queries") return queries(token, config, arg);
   throw new Error(`Unknown command: ${command}`);
 }
 
 main().catch((error) => {
   console.error(error.message);
-  process.exit(1);
+  process.exitCode = 1;
 });

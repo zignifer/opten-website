@@ -31,10 +31,14 @@ Run:
 npm run start:seo
 ```
 
-If it prints `start-seo: no-topics`, stop and tell the user the current SEO2
-brief queue is exhausted and a new weekly batch must be generated in
-`C:\Projects\opten-seo`. If it prints `start-seo: next-topic`, create exactly
-one SEO2 blog post for that returned slug using `seo2/blog-post-instruction.md`.
+If it prints `start-seo: research-needed`, do not stop or ask for a separate
+weekly batch. Follow `seo2/TOPIC-PIPELINE.md` inside this repo, manually collect
+and validate a bounded set of new keyword-backed topics, append them to the
+single `seo2/topic-registry.json`, rerun `npm run start:seo`, and then create
+exactly one post. If it prints `start-seo: next-topic`, create exactly one SEO2
+blog post for that returned slug using `seo2/blog-post-instruction.md`. Never
+depend on `C:\Projects\opten-seo`, create weekly brief folders, or import text/
+image-generation rules from the retired keyword workspace.
 
 Seven jobs: (1) marketing surface (landing in RU/EN), (2) website-first auth and
 billing surface (`/login`, `/auth/callback`, `/pay`, `/account`, `/success` for
@@ -568,7 +572,7 @@ src/
 
 **Adding a new page or blog post touches 6 files in sync** (route, manifest, EN siblings, sitemap, llms.txt, dicts) plus optional content/blog files. The full checklist + GEO/SEO patterns are in [docs/CONTENT-AUTHORING.md](docs/CONTENT-AUTHORING.md) — read that before touching content.
 
-SEO briefs contain search intent, not literal copy. Do not paste raw,
+The SEO topic registry contains search intent, not literal copy. Do not paste raw,
 ungrammatical keyword strings into visible text, titles, descriptions, FAQ,
 or examples just to preserve exact match. Inflect and rewrite keys naturally
 (`бизнес портрет нейросеть` → `бизнес-портрет через нейросеть`,
@@ -715,7 +719,7 @@ Local credentials live only in `.secrets/gsc-oauth.env` (gitignored) with:
 - `GSC_REFRESH_TOKEN`
 - `GSC_SITE_URL=sc-domain:opten.space`
 
-The same credentials are mirrored from `C:\Projects\opten-seo\.env.local`.
+This ignored file is the only local source of truth for website GSC access.
 Use `node scripts/gsc.mjs sites`, `node scripts/gsc.mjs sitemaps`,
 `node scripts/gsc.mjs submit-sitemap`, and
 `node scripts/gsc.mjs inspect https://opten.space/models` for direct GSC API
@@ -734,8 +738,7 @@ Preferred reauthorization flow for agents:
    account that owns Search Console for `opten.space`, approve the Webmasters /
    Search Console scope, then say `готово`.
 4. After the user confirms, read the status file. `status: "complete"` means the
-   helper saved the new `GSC_REFRESH_TOKEN` into both `.secrets/gsc-oauth.env`
-   and `C:\Projects\opten-seo\.env.local`.
+   helper saved the new `GSC_REFRESH_TOKEN` into `.secrets/gsc-oauth.env`.
 5. Verify immediately with `npm run gsc:sites` and then continue the audit with
    `npm run gsc:sitemaps`, `npm run gsc:performance -- 28`, and targeted
    `npm run gsc:inspect -- <url>` checks.
@@ -743,8 +746,8 @@ Preferred reauthorization flow for agents:
 ### Yandex Webmaster local access
 
 Yandex Webmaster API access uses a direct OAuth token, not the Yandex Cloud
-Wordstat API key. The legacy Wordstat OAuth token in `C:\Projects\opten-seo`
-does not work for Webmaster (`ACCESS_FORBIDDEN`, missing scopes).
+Wordstat API key. Wordstat credentials must never be reused for Webmaster
+(`ACCESS_FORBIDDEN`, missing scopes).
 
 Local credentials belong in `.secrets/yandex-webmaster.env` (gitignored):
 
@@ -869,15 +872,15 @@ Non-negotiables (the full set lives in `docs/CONTENT-AUTHORING.md`):
 4. JSON-LD must mirror the visible DOM — FAQs, dates, prices, person names. `verify-faq-mainentity.mjs` enforces FAQ parity at build time; the others are auditor-detectable.
 5. Cover images: `public/blog/<slug>/cover.jpg`, ≥1600×900, no in-image text (one asset works for RU + EN + OG + visible `<img>`).
 6. SEO2 inline blog images are locale-specific final rasters: generate RU and EN images with the short text already rendered inside the image. Use **Bebas Neue only** for all visible typography in SEO2 generated images, and attach/use `seo2/Reference/bebas-neue-font-reference.png` as the font reference in generation prompts. The Opten lime accent must be exactly `#9CFB51` in prompts and art direction; do not substitute warmer yellow-green, darker green, or approximate "lime" hues. Do not generate textless bases and add text afterward with editor/Canvas/HTML/CSS/Sharp overlays.
-7. Before generating any SEO2 blog art, the article brief must contain a concrete `Visual Production Brief` in the W23 pattern: one distinct no-text cover concept plus separate RU/EN inline frame concepts. Do not proceed from generic `Image Suggestions` like "learning desk" or "course board". The visual brief must force distinct physical/subject scenes and explicitly ban repeated floating UI boards, laptop dashboards, green connector networks, or reused composition across posts in the same batch.
+7. Before generating any SEO2 blog art, create the article production sheet at `seo2/visual-plans/<slug>.md` from the selected topic and current image rules: one distinct no-text cover concept plus separate RU/EN inline frame concepts. Do not store visual briefs in `topic-registry.json` and do not proceed from generic hints like "learning desk" or "course board". The production sheet must force distinct physical/subject scenes and explicitly ban repeated floating UI boards, laptop dashboards, green connector networks, or reused composition across posts.
 8. Course promo banners are the exception to the inline-text rule: they are reusable generated rasters with a clean left-side negative-space zone and a right-side Opten-style visual; the heading, description, and CTA button are rendered as accessible HTML so the same asset can be reused and localized. Save them under `public/blog/_banners/`, use dark SaaS editorial styling (`#011417` + exact `#9CFB51`), and link blog CTAs to `/learn/courses/ai-content-marketing-2026`. Future blog promo CTAs should advertise this course, not the Chrome extension, unless the article is specifically about extension install/use.
-9. Active SEO2 weekly briefs must pass `npm run verify:seo2-briefs` before article generation. This gate rejects active `pending`/`deferred`/`ready` briefs that still use `## Image Suggestions` or lack generated-in-image visual rules. `npm run build` runs the same gate first.
+9. The single SEO topic registry must pass `npm run verify:seo-topics` before article generation. The gate checks schema, statuses, keyword evidence, RU/EN coverage, deduplication, and parity with published blog slugs. `npm run build` runs the same gate first.
 10. Every `<img>` gets explicit `width`/`height` (CLS guard).
 11. `<html lang>` is baked at prerender, NEVER mutated at runtime (Phase 3 D-06).
 12. Locale-neutral slugs — `/blog/foo` is the same slug in RU and EN.
 13. `npm run build` must pass locally — the sitemap + llms floor checks fail loudly when routes are forgotten.
-14. User command `напиши SEO-статью` means: run `npm run start:seo` first. Legacy aliases `start SEO`, `start seo`, and `старт SEO` mean the same thing. If it prints `start-seo: no-topics`, do not generate an article; tell the user a new weekly batch must be generated in `opten-seo`. If it prints `start-seo: next-topic`, create exactly one SEO2 post for that slug using `seo2/blog-post-instruction.md`.
-15. New SEO2 weekly blog posts must pass `npm run verify:seo2-blog -- <slug>`
+14. User command `напиши SEO-статью` means: run `npm run start:seo` first. Legacy aliases `start SEO`, `start seo`, and `старт SEO` mean the same thing. If it prints `start-seo: research-needed`, follow `seo2/TOPIC-PIPELINE.md`, append a bounded reviewed set to the single `seo2/topic-registry.json`, validate it, rerun `start:seo`, and continue with exactly one post. If it prints `start-seo: next-topic`, create exactly one SEO2 post for that slug using `seo2/blog-post-instruction.md`.
+15. New SEO2 blog posts must pass `npm run verify:seo2-blog -- <slug>`
     before commit. This is a blocking editorial/build gate, not an optional
     audit. It checks the SEO2 visual layer (4+ RU inline images, 4+ EN inline
     images, generated image files present, course CTA to

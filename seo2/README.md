@@ -1,99 +1,51 @@
 ---
-tags: [opten, blog, seo2, manual-automation]
+tags: [opten, blog, seo2, manual-workflow]
 kind: index
 ---
 
-# seo2 — ручная blog automation
+# SEO2 — единая ручная система
 
-`seo2/` — новая самодостаточная папка для ручного создания блог-постов
-opten.space. Она заменяет старую ежедневную схему `seo/` + scheduled Codex +
-local publisher.
+`seo2/` содержит один контур тем и действующие правила производства статей.
+Отдельных недельных batch-брифов, cron, publisher, workspace-копий и внешнего
+SEO-репозитория в рабочем цикле больше нет.
 
-## Чем отличается от старой automation
-
-- Нет cron/scheduled task.
-- Нет `preflight.ps1`, `mark-ready`, `run-publisher`, workspace-копий.
-- Один запуск Codex в основном checkout `opten-website` создает один пост.
-- После успешного build/SEO-проверок Codex сам делает scoped `git add`,
-  `git commit`, `git push`.
-
-## Файлы
+## Источники истины
 
 | Путь | Роль |
-|------|------|
-| `blog-post-instruction.md` | Главная инструкция для Codex: как взять следующий brief и создать один пост. |
-| `briefs/YYYY-Www/_batch.md` | Очередь тем недели со статусами `pending` / `deferred` / `published`. |
-| `briefs/YYYY-Www/NN-slug.md` | Отдельные article briefs с RU/EN keywords. |
-| `rules/blog-post-seo-rules.md` | SEO/GEO правила поста. |
-| `rules/humanizer-ru.md` | Humanizer-pass для русского текста. |
-| `rules/humanizer-en.md` | Humanizer-pass для английского текста. |
-| `rules/image-style.md` | Сжатые правила генерации изображений. |
-| `Reference/` | Визуальные референсы для картинок статьи. |
+|---|---|
+| `topic-registry.json` | Единая пополняемая очередь и история тем. |
+| `TOPIC-PIPELINE.md` | Ручной сбор Suggest, Wordstat, Bing и GSC-сигналов. |
+| `blog-post-instruction.md` | Создание и публикация ровно одной статьи. |
+| `rules/blog-post-seo-rules.md` | SEO/GEO требования к статье. |
+| `rules/humanizer-ru.md`, `humanizer-en.md` | Редакторский проход RU/EN. |
+| `rules/image-style.md` | Действующие правила изображений. |
+| `Reference/` | Утверждённые визуальные референсы. |
+| `visual-plans/<slug>.md` | Production sheet конкретной статьи, не новый brief. |
 
-## Visual quality bar
+## Команды
 
-Внутристатейные SEO2-картинки должны быть mini-explainers, а не title cards.
-Референс — `Reference/ai-headshot-step-*.jpg` и `Reference/ai-ugc-step-*.jpg`:
-большой hero label + 3-4 короткие подписи/чек-пункта/карточки + иконки/линии.
-Кадр должен объяснять мысль статьи сам по себе. Один крупный заголовок на
-темном фоне, даже с декоративными иконками, считается провалом visual QA.
-
-## Как запускать вручную
-
-Сначала можно проверить, какая тема следующая:
-
-```bash
+```powershell
 npm run start:seo
+npm run verify:seo-topics
+npm run seo:keywords -- --dry-run
 ```
 
-Команда делает preflight `verify:seo2-briefs`, выбирает первую доступную тему
-из старейшей недели и печатает `start-seo: next-topic`. Если темы закончились,
-она печатает `start-seo: no-topics` и не запускает написание поста.
+`start:seo` выбирает первую `queued` тему, затем `deferred`. Если очередь
+закончилась, команда возвращает `start-seo: research-needed`: агент вручную
+следует `TOPIC-PIPELINE.md`, дополняет тот же реестр и повторяет выбор.
 
-В Codex основная пользовательская фраза:
+Пользовательская команда для одной публикации остаётся прежней:
 
 ```text
 напиши SEO-статью
 ```
 
-Для агента это означает: запустить `npm run start:seo`; если есть `next-topic`,
-создать один блог-пост по `seo2/blog-post-instruction.md`; если `no-topics`,
-остановиться и сказать, что нужен новый weekly batch в `opten-seo`.
+После успешного build и SEO-проверок агент меняет статус записи на
+`published`, указывает `/blog/<slug>` и включает реестр в тот же scoped commit.
 
-`start SEO` остается legacy-алиасом, но лучше использовать длинную русскую
-фразу: она меньше похожа на общий SEO/GEO-аудит.
+## Visual quality bar
 
-Полная ручная формулировка:
-
-```text
-Используй seo2/blog-post-instruction.md. Создай следующий блог-пост из seo2/briefs.
-```
-
-После завершения Codex должен показать commit hash, pushed branch и список
-измененных файлов. Если build не прошел, Codex не должен коммитить и пушить.
-
-```bash
-git status
-```
-
-## Источник тем
-
-Темы и ключи приходят из `opten-seo` weekly batch, но во время написания поста
-Codex не должен идти в `opten-seo`. Если нужен новый batch, его готовят отдельно
-в `opten-seo`, затем копируют сюда.
-
-## Правило очереди
-
-Codex должен смотреть все папки `seo2/briefs/YYYY-Www/` от старой недели к
-новой. Если в старой неделе остались `pending` или `deferred` темы, новая
-неделя не начинается.
-
-Статусы:
-
-- `pending` — обычная тема в очереди.
-- `deferred` — тема временно отложена, но не пропущена. Она добирается после
-  остальных `pending` тем этой же недели и до перехода к новой неделе.
-- `published` — пост уже опубликован.
-
-После успешной публикации Codex меняет статус выбранной темы в `_batch.md` на
-`published` и включает это изменение в коммит поста.
+Внутристатейные изображения остаются mini-explainers, а не title cards.
+Используются текущие `Reference/`, единая art direction статьи, четыре RU/EN
+пары и существующая проверка `verify:seo2-blog`. Перенос keyword pipeline не
+изменяет эти правила.

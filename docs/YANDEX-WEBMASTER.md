@@ -12,9 +12,8 @@ YANDEX_WEBMASTER_HOST_URL=https://opten.space/
 ```
 
 The Yandex Cloud Wordstat key is a separate API and does not grant Webmaster
-access. The old Wordstat OAuth token from `C:\Projects\opten-seo` was tested
-against `https://api.webmaster.yandex.net/v4/user` and failed with
-`ACCESS_FORBIDDEN` because the app has no Webmaster scopes.
+access. Wordstat credentials fail against the Webmaster API with
+`ACCESS_FORBIDDEN` because they do not include Webmaster scopes.
 
 ## Getting a Token
 

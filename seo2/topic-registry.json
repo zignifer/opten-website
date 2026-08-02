@@ -1,0 +1,2695 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-02",
+  "selectionPolicy": "queued-by-queueOrder-then-deferred",
+  "research": {
+    "rule": "Synthetic seeds discover wording; only Suggest, Wordstat, Bing, GSC, or reviewed manual evidence can create a queued topic.",
+    "familyTerms": {
+      "en": [
+        "kling",
+        "veo",
+        "seedance",
+        "sora",
+        "flux",
+        "midjourney",
+        "nano banana",
+        "gpt image",
+        "seedream",
+        "wan"
+      ],
+      "ru": [
+        "kling",
+        "veo",
+        "seedance",
+        "sora",
+        "flux",
+        "midjourney",
+        "nano banana",
+        "gpt image",
+        "seedream",
+        "wan"
+      ]
+    },
+    "familyTemplates": {
+      "en": [
+        "{model} prompts",
+        "{model} prompt examples",
+        "improve {model} prompts",
+        "{model} prompt not working",
+        "{model} vs"
+      ],
+      "ru": [
+        "{model} промпты",
+        "{model} пример промпта",
+        "улучшить промпт {model}",
+        "{model} не понимает промпт",
+        "{model} сравнение"
+      ]
+    },
+    "seedGroups": [
+      {
+        "name": "product",
+        "includeTerms": [
+          "prompt",
+          "промпт",
+          "optimizer",
+          "оптимиз",
+          "generator",
+          "генератор",
+          "extension",
+          "расширени"
+        ],
+        "seeds": {
+          "en": [
+            "prompt generator",
+            "prompt optimizer",
+            "improve ai prompts",
+            "prompt extension",
+            "ai prompt helper"
+          ],
+          "ru": [
+            "генератор промптов",
+            "оптимизация промптов",
+            "улучшить промпт",
+            "расширение для промптов",
+            "помощник для промптов"
+          ]
+        }
+      },
+      {
+        "name": "pain",
+        "includeTerms": [
+          "prompt",
+          "промпт",
+          "image",
+          "изображени",
+          "video",
+          "видео",
+          "quality",
+          "качеств",
+          "result",
+          "результат"
+        ],
+        "seeds": {
+          "en": [
+            "ai not following prompt",
+            "why are my ai images bad",
+            "how to get better ai images",
+            "ai video wrong result"
+          ],
+          "ru": [
+            "нейросеть не понимает запрос",
+            "почему нейросеть рисует не то",
+            "как улучшить изображение нейросети",
+            "плохой результат генерации видео"
+          ]
+        }
+      },
+      {
+        "name": "workflow",
+        "includeTerms": [
+          "ai",
+          "ии",
+          "нейросет",
+          "work",
+          "работ",
+          "business",
+          "бизнес",
+          "design",
+          "дизайн",
+          "content",
+          "контент"
+        ],
+        "seeds": {
+          "en": [
+            "ai tools for work",
+            "ai for business",
+            "ai for designers",
+            "ai content workflow",
+            "ai freelance services"
+          ],
+          "ru": [
+            "нейросети для работы",
+            "ии для бизнеса",
+            "нейросети для дизайнеров",
+            "нейросети для контента",
+            "услуги с нейросетями"
+          ]
+        }
+      },
+      {
+        "name": "technique",
+        "includeTerms": [
+          "ai",
+          "нейросет",
+          "image",
+          "изображени",
+          "video",
+          "видео",
+          "photo",
+          "фото",
+          "avatar",
+          "аватар",
+          "prompt",
+          "промпт"
+        ],
+        "seeds": {
+          "en": [
+            "consistent character ai",
+            "image to video ai",
+            "ai product photography",
+            "ai face swap",
+            "ai lip sync",
+            "upscale image ai"
+          ],
+          "ru": [
+            "консистентный персонаж нейросеть",
+            "видео из фото нейросеть",
+            "нейросеть для предметного фото",
+            "замена лица нейросеть",
+            "липсинк нейросеть",
+            "апскейл фото нейросеть"
+          ]
+        }
+      },
+      {
+        "name": "model-news",
+        "includeTerms": [
+          "kling",
+          "veo",
+          "seedance",
+          "sora",
+          "flux",
+          "midjourney",
+          "nano banana",
+          "gpt image",
+          "нейросет",
+          "ai"
+        ],
+        "seeds": {
+          "en": [
+            "best ai video generator",
+            "best ai image generator",
+            "sora vs veo",
+            "kling vs sora",
+            "midjourney alternative"
+          ],
+          "ru": [
+            "лучшая нейросеть для видео",
+            "лучшая нейросеть для изображений",
+            "сравнение нейросетей",
+            "kling промпт",
+            "veo промпт"
+          ]
+        }
+      },
+      {
+        "name": "prompting",
+        "includeTerms": [
+          "prompt",
+          "промпт",
+          "negative",
+          "негатив",
+          "example",
+          "пример",
+          "structure",
+          "структур"
+        ],
+        "seeds": {
+          "en": [
+            "prompt examples",
+            "prompt structure",
+            "how to write a good prompt",
+            "negative prompt",
+            "image prompt ideas"
+          ],
+          "ru": [
+            "примеры промптов",
+            "структура промпта",
+            "как составить промпт",
+            "негативный промпт",
+            "идеи промптов"
+          ]
+        }
+      }
+    ]
+  },
+  "topics": [
+    {
+      "queueOrder": 1,
+      "slug": "ai-face-swap",
+      "status": "published",
+      "titleHint": "AI face swap: как сделать аккуратно и без артефактов",
+      "clusterId": "BL-technique",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "замена лица нейросеть",
+          "role": "primary",
+          "broadVolume": 7974,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть замена лица",
+          "role": "secondary",
+          "broadVolume": 7974,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "en",
+          "phrase": "ai face swap",
+          "role": "secondary",
+          "broadVolume": 7242,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "ru",
+          "phrase": "замена лица нейросеть онлайн",
+          "role": "secondary",
+          "broadVolume": 4056,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть замена лица онлайн",
+          "role": "secondary",
+          "broadVolume": 4056,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "замена лица онлайн нейросеть",
+          "role": "secondary",
+          "broadVolume": 4056,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "замена лица фото нейросеть",
+          "role": "secondary",
+          "broadVolume": 3806,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "замена лица фото нейросеть онлайн",
+          "role": "secondary",
+          "broadVolume": 3021,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "legacy-import"
+        ],
+        "note": "local scripts/.cache/04-volume-blog.json fallback",
+        "lastCheckedAt": "2026-05-31"
+      },
+      "targetUrl": "/blog/ai-face-swap",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 2,
+      "slug": "seedance-2-0-prompts",
+      "status": "published",
+      "titleHint": "Seedance 2.0 prompts: структура для видео-сцен",
+      "clusterId": "BL-news",
+      "intentType": "info",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "en",
+          "phrase": "seedance 2.0",
+          "role": "primary",
+          "broadVolume": 10742,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "seedance 2.0 промпты",
+          "role": "secondary",
+          "broadVolume": 108,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "en",
+          "phrase": "seedance 2.0 ai",
+          "role": "secondary",
+          "broadVolume": 90,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "ru",
+          "phrase": "промпты для seedance 2.0",
+          "role": "secondary",
+          "broadVolume": 75,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "en",
+          "phrase": "seedance 2.0 api",
+          "role": "secondary",
+          "broadVolume": 47,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "готовые промпты для seedance 2.0",
+          "role": "secondary",
+          "broadVolume": 1,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "сиданс 2.0 промпт",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "seedance 2.0 обзор",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "legacy-import"
+        ],
+        "note": "local scripts/.cache/04-volume-blog.json fallback",
+        "lastCheckedAt": "2026-05-31"
+      },
+      "targetUrl": "/blog/seedance-2-0-prompts",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 3,
+      "slug": "prompt-examples",
+      "status": "published",
+      "titleHint": "Prompt examples: как разбирать и улучшать примеры",
+      "clusterId": "BL-prompting",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "примеры промптов",
+          "role": "primary",
+          "broadVolume": 2736,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "примеры промптов для нейросети",
+          "role": "secondary",
+          "broadVolume": 391,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "en",
+          "phrase": "prompt examples",
+          "role": "secondary",
+          "broadVolume": 259,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "ru",
+          "phrase": "промпт инжиниринг примеры промптов",
+          "role": "secondary",
+          "broadVolume": 207,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "примеры промптов для фото",
+          "role": "secondary",
+          "broadVolume": 135,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "примеры промптов для генерации изображений",
+          "role": "secondary",
+          "broadVolume": 101,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "примеры промптов для картинок",
+          "role": "secondary",
+          "broadVolume": 54,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "примеры промптов chatgpt",
+          "role": "secondary",
+          "broadVolume": 43,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "legacy-import"
+        ],
+        "note": "local scripts/.cache/04-volume-blog.json fallback",
+        "lastCheckedAt": "2026-05-31"
+      },
+      "targetUrl": "/blog/prompt-examples",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 4,
+      "slug": "kling-3-prompts",
+      "status": "published",
+      "titleHint": "Kling 3 prompts: как получить управляемое видео",
+      "clusterId": "BL-news",
+      "intentType": "info",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "en",
+          "phrase": "kling 3.0",
+          "role": "primary",
+          "broadVolume": 2388,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "en",
+          "phrase": "kling 3",
+          "role": "secondary",
+          "broadVolume": 181,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "en",
+          "phrase": "kling 3.0 ai",
+          "role": "secondary",
+          "broadVolume": 91,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "en",
+          "phrase": "kling 3.0 omni",
+          "role": "secondary",
+          "broadVolume": 81,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "клинг 3",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "клинг 3.0",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "kling 3.0 это",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "kling 3.0 цена",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "legacy-import"
+        ],
+        "note": "local scripts/.cache/04-volume-blog.json fallback",
+        "lastCheckedAt": "2026-05-31"
+      },
+      "targetUrl": "/blog/kling-3-prompts",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 5,
+      "slug": "flux-2-prompts",
+      "status": "published",
+      "titleHint": "Flux 2 prompts: примеры и структура",
+      "clusterId": "BL-news",
+      "intentType": "info",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "en",
+          "phrase": "flux 2",
+          "role": "primary",
+          "broadVolume": 541,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "en",
+          "phrase": "flux 2 klein",
+          "role": "secondary",
+          "broadVolume": 149,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "en",
+          "phrase": "flux 2 pro",
+          "role": "secondary",
+          "broadVolume": 96,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "en",
+          "phrase": "flux 2 klein 9b",
+          "role": "secondary",
+          "broadVolume": 35,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "en",
+          "phrase": "flux 2.0",
+          "role": "secondary",
+          "broadVolume": 31,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "en",
+          "phrase": "flux 2 klein 4b",
+          "role": "secondary",
+          "broadVolume": 31,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "en",
+          "phrase": "flux 2 dev",
+          "role": "secondary",
+          "broadVolume": 21,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "en",
+          "phrase": "flux 2 max",
+          "role": "secondary",
+          "broadVolume": 15,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "legacy-import"
+        ],
+        "note": "local scripts/.cache/04-volume-blog.json fallback",
+        "lastCheckedAt": "2026-05-31"
+      },
+      "targetUrl": "/blog/flux-2-prompts",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 6,
+      "slug": "ai-influencer",
+      "status": "published",
+      "titleHint": "AI influencer: как создать консистентного персонажа",
+      "clusterId": "BL-usecase",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "keywords": [
+        {
+          "language": "en",
+          "phrase": "ai influencer",
+          "role": "primary",
+          "broadVolume": 554,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "en",
+          "phrase": "ai influencer higgsfield",
+          "role": "secondary",
+          "broadVolume": 3,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "ru",
+          "phrase": "ai influencer higgsfield",
+          "role": "secondary",
+          "broadVolume": 3,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "ru",
+          "phrase": "ии инфлюенсер",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "ии инфлюенсер это",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "ии инфлюенсер курс",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "ии инфлюенсер создать",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "ии инфлюенсер инстаграм",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "legacy-import"
+        ],
+        "note": "local scripts/.cache/04-volume-blog.json fallback",
+        "lastCheckedAt": "2026-05-31"
+      },
+      "targetUrl": "/blog/ai-influencer",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 7,
+      "slug": "ai-lip-sync",
+      "status": "published",
+      "titleHint": "AI lip sync: как синхронизировать речь и видео",
+      "clusterId": "BL-technique",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "en",
+          "phrase": "ai lip sync",
+          "role": "primary",
+          "broadVolume": 226,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "синхронизация губ нейросеть",
+          "role": "secondary",
+          "broadVolume": 113,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для синхронизации губ",
+          "role": "secondary",
+          "broadVolume": 23,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "ru",
+          "phrase": "ai lip sync на русском",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "липсинк нейросеть",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "озвучка видео нейросеть",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "озвучка видео нейросеть тг",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "озвучка видео нейросеть ютуб",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "legacy-import"
+        ],
+        "note": "local scripts/.cache/04-volume-blog.json fallback",
+        "lastCheckedAt": "2026-05-31"
+      },
+      "targetUrl": "/blog/ai-lip-sync",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 8,
+      "slug": "upscale-image-ai",
+      "status": "published",
+      "titleHint": "Upscale image AI: как улучшить картинку без потери деталей",
+      "clusterId": "BL-technique",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "апскейл фото нейросеть",
+          "role": "primary",
+          "broadVolume": 204,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "апскейл изображения нейросеть",
+          "role": "secondary",
+          "broadVolume": 72,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "ru",
+          "phrase": "апскейл фото нейросеть онлайн",
+          "role": "secondary",
+          "broadVolume": 71,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для апскейла изображений",
+          "role": "secondary",
+          "broadVolume": 50,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "апскейл фото высокая детализация нейросетью",
+          "role": "secondary",
+          "broadVolume": 5,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "увеличить изображение нейросетью",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "апскейл изображения нейросеть онлайн",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "улучшить качество картинки нейросеть",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "legacy-import"
+        ],
+        "note": "local scripts/.cache/04-volume-blog.json fallback",
+        "lastCheckedAt": "2026-05-31"
+      },
+      "targetUrl": "/blog/upscale-image-ai",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 9,
+      "slug": "ai-ugc-for-brands",
+      "status": "published",
+      "titleHint": "AI UGC для брендов: промпты для рекламных видео",
+      "clusterId": "BL-usecase",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "keywords": [
+        {
+          "language": "en",
+          "phrase": "ai ugc",
+          "role": "primary",
+          "broadVolume": 102,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "ai ugc это",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "ru",
+          "phrase": "ai ugc на русском",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для ugc",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "ugc видео нейросеть",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для рекламы",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для видео рекламы",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть текст для рекламы",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "legacy-import"
+        ],
+        "note": "local scripts/.cache/04-volume-blog.json fallback",
+        "lastCheckedAt": "2026-05-31"
+      },
+      "targetUrl": "/blog/ai-ugc-for-brands",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 10,
+      "slug": "ai-headshot-generator",
+      "status": "published",
+      "titleHint": "AI headshot generator: как получить деловой портрет",
+      "clusterId": "BL-usecase",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "бизнес портрет нейросеть",
+          "role": "primary",
+          "broadVolume": 2,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "ai headshot generator на русском",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "ru",
+          "phrase": "деловой портрет нейросеть",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half of article"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для делового фото",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "en",
+          "phrase": "ai headshot generator",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "en",
+          "phrase": "ai headshot generator app",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "en",
+          "phrase": "ai headshot generator best",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        },
+        {
+          "language": "en",
+          "phrase": "ai headshot generator kiwi",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body/FAQ/image alt"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "legacy-import"
+        ],
+        "note": "local scripts/.cache/04-volume-blog.json fallback",
+        "lastCheckedAt": "2026-05-31"
+      },
+      "targetUrl": "/blog/ai-headshot-generator",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 11,
+      "slug": "ai-training-beginners",
+      "status": "published",
+      "titleHint": "Обучение ИИ с нуля: с чего начать и как быстро перейти к практике",
+      "clusterId": "BL-learn",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "обучение ИИ",
+          "role": "primary",
+          "broadVolume": 35902,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "обучение нейросетям",
+          "role": "secondary",
+          "broadVolume": 23989,
+          "exactLikeVolume": null,
+          "placement": "meta/excerpt or first half"
+        },
+        {
+          "language": "ru",
+          "phrase": "обучение искусственному интеллекту",
+          "role": "secondary",
+          "broadVolume": 19287,
+          "exactLikeVolume": null,
+          "placement": "body/H2"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети с нуля",
+          "role": "secondary",
+          "broadVolume": 4091,
+          "exactLikeVolume": null,
+          "placement": "H2/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "курсы по ИИ",
+          "role": "secondary",
+          "broadVolume": 9911,
+          "exactLikeVolume": null,
+          "placement": "body/internal link to `/learn`"
+        },
+        {
+          "language": "en",
+          "phrase": "learn ai",
+          "role": "secondary",
+          "broadVolume": 10238,
+          "exactLikeVolume": null,
+          "placement": "EN title/intro"
+        },
+        {
+          "language": "en",
+          "phrase": "ai training",
+          "role": "secondary",
+          "broadVolume": 9799,
+          "exactLikeVolume": null,
+          "placement": "EN description/body"
+        },
+        {
+          "language": "en",
+          "phrase": "ai course",
+          "role": "secondary",
+          "broadVolume": 27041,
+          "exactLikeVolume": null,
+          "placement": "EN body/course bridge"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "bing",
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU and Bing EN evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": "/blog/ai-training-beginners",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 12,
+      "slug": "neural-networks-from-scratch",
+      "status": "published",
+      "titleHint": "Нейросети с нуля: какие навыки учить, чтобы применять ИИ в работе",
+      "clusterId": "BL-learn",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "обучение нейросетям",
+          "role": "primary",
+          "broadVolume": 23989,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети с нуля",
+          "role": "secondary",
+          "broadVolume": 4091,
+          "exactLikeVolume": null,
+          "placement": "title/body/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "курсы по нейросетям",
+          "role": "secondary",
+          "broadVolume": 7544,
+          "exactLikeVolume": null,
+          "placement": "excerpt/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "курсы по нейросетям для начинающих",
+          "role": "secondary",
+          "broadVolume": 598,
+          "exactLikeVolume": null,
+          "placement": "FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "бесплатные курсы по нейросетям",
+          "role": "secondary",
+          "broadVolume": 1273,
+          "exactLikeVolume": null,
+          "placement": "body/course CTA"
+        },
+        {
+          "language": "en",
+          "phrase": "ai for beginners",
+          "role": "secondary",
+          "broadVolume": 2417,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        },
+        {
+          "language": "en",
+          "phrase": "learn ai for beginners",
+          "role": "secondary",
+          "broadVolume": 933,
+          "exactLikeVolume": null,
+          "placement": "EN FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "ai tutorial for beginners",
+          "role": "secondary",
+          "broadVolume": 671,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "bing",
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU and Bing EN evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": "/blog/neural-networks-from-scratch",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 13,
+      "slug": "ai-courses-for-beginners",
+      "status": "published",
+      "titleHint": "Курсы по ИИ для начинающих: как выбрать обучение без лишних обещаний",
+      "clusterId": "BL-learn",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "курсы по ИИ",
+          "role": "primary",
+          "broadVolume": 9911,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "курсы по нейросетям",
+          "role": "secondary",
+          "broadVolume": 7544,
+          "exactLikeVolume": null,
+          "placement": "title/excerpt/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "курсы ИИ для начинающих",
+          "role": "secondary",
+          "broadVolume": 1153,
+          "exactLikeVolume": null,
+          "placement": "H2/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "курсы по ИИ и нейросетям",
+          "role": "secondary",
+          "broadVolume": 1121,
+          "exactLikeVolume": null,
+          "placement": "body"
+        },
+        {
+          "language": "ru",
+          "phrase": "лучшие курсы по нейросетям",
+          "role": "secondary",
+          "broadVolume": 463,
+          "exactLikeVolume": null,
+          "placement": "comparison section"
+        },
+        {
+          "language": "en",
+          "phrase": "ai course",
+          "role": "secondary",
+          "broadVolume": 27041,
+          "exactLikeVolume": null,
+          "placement": "EN title/body"
+        },
+        {
+          "language": "en",
+          "phrase": "ai courses",
+          "role": "secondary",
+          "broadVolume": 18115,
+          "exactLikeVolume": null,
+          "placement": "EN title/body"
+        },
+        {
+          "language": "en",
+          "phrase": "ai courses online",
+          "role": "secondary",
+          "broadVolume": 2277,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "bing",
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU and Bing EN evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": "/blog/ai-courses-for-beginners",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 14,
+      "slug": "free-ai-courses",
+      "status": "published",
+      "titleHint": "Бесплатное обучение нейросетям: что можно освоить без платного курса",
+      "clusterId": "BL-learn",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "бесплатное обучение нейросетям",
+          "role": "primary",
+          "broadVolume": 3575,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "бесплатные курсы по ИИ",
+          "role": "secondary",
+          "broadVolume": 1277,
+          "exactLikeVolume": null,
+          "placement": "body/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "бесплатные курсы по нейросетям",
+          "role": "secondary",
+          "broadVolume": 1273,
+          "exactLikeVolume": null,
+          "placement": "excerpt/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "обучение ИИ",
+          "role": "secondary",
+          "broadVolume": 35902,
+          "exactLikeVolume": null,
+          "placement": "intro/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети с нуля",
+          "role": "secondary",
+          "broadVolume": 4091,
+          "exactLikeVolume": null,
+          "placement": "H2"
+        },
+        {
+          "language": "en",
+          "phrase": "free ai courses",
+          "role": "secondary",
+          "broadVolume": 3188,
+          "exactLikeVolume": null,
+          "placement": "EN title/body"
+        },
+        {
+          "language": "en",
+          "phrase": "ai courses online free",
+          "role": "secondary",
+          "broadVolume": 1290,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        },
+        {
+          "language": "en",
+          "phrase": "learn ai for beginners",
+          "role": "secondary",
+          "broadVolume": 933,
+          "exactLikeVolume": null,
+          "placement": "EN FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "bing",
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU and Bing EN evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": "/blog/free-ai-courses",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 15,
+      "slug": "ai-for-work",
+      "status": "published",
+      "titleHint": "Нейросети для работы: 10 задач, которые можно ускорить уже сегодня",
+      "clusterId": "BL-work",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросети для работы",
+          "role": "primary",
+          "broadVolume": 32506,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "работа с нейросетями",
+          "role": "secondary",
+          "broadVolume": 23464,
+          "exactLikeVolume": null,
+          "placement": "excerpt/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "обучение ИИ",
+          "role": "secondary",
+          "broadVolume": 35249,
+          "exactLikeVolume": null,
+          "placement": "course bridge"
+        },
+        {
+          "language": "ru",
+          "phrase": "ИИ для работы",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для презентаций",
+          "role": "secondary",
+          "broadVolume": 177001,
+          "exactLikeVolume": null,
+          "placement": "task section"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для текста",
+          "role": "secondary",
+          "broadVolume": 156546,
+          "exactLikeVolume": null,
+          "placement": "task section"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для видео",
+          "role": "secondary",
+          "broadVolume": 51667,
+          "exactLikeVolume": null,
+          "placement": "task section"
+        },
+        {
+          "language": "en",
+          "phrase": "ai for work",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/body"
+        },
+        {
+          "language": "en",
+          "phrase": "ai training",
+          "role": "secondary",
+          "broadVolume": 9799,
+          "exactLikeVolume": null,
+          "placement": "EN course bridge"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": "/blog/ai-for-work",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 16,
+      "slug": "ai-presentations",
+      "status": "published",
+      "titleHint": "Нейросети для презентаций: как сделать структуру, текст и дизайн",
+      "clusterId": "BL-work",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросети для презентаций",
+          "role": "primary",
+          "broadVolume": 177001,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "ИИ для презентаций",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "excerpt/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для создания презентаций",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "body/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "сделать презентацию нейросеть",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для презентаций бесплатно",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "ai presentation maker",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        },
+        {
+          "language": "en",
+          "phrase": "ai presentation generator",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": "/blog/ai-presentations",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 17,
+      "slug": "ai-text-for-work",
+      "status": "published",
+      "titleHint": "Нейросети для текста: как писать быстрее и не получать шаблонный мусор",
+      "clusterId": "BL-work",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросети для текста",
+          "role": "primary",
+          "broadVolume": 156546,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для написания текста",
+          "role": "secondary",
+          "broadVolume": 15943,
+          "exactLikeVolume": null,
+          "placement": "excerpt/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для генерации текста",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для контента",
+          "role": "secondary",
+          "broadVolume": 2427,
+          "exactLikeVolume": null,
+          "placement": "H2/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "работа с нейросетями",
+          "role": "secondary",
+          "broadVolume": 23464,
+          "exactLikeVolume": null,
+          "placement": "course/work bridge"
+        },
+        {
+          "language": "en",
+          "phrase": "ai writing tool",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        },
+        {
+          "language": "en",
+          "phrase": "ai text generator",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": "/blog/ai-text-for-work",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 18,
+      "slug": "ai-video-for-work",
+      "status": "published",
+      "titleHint": "Нейросети для видео: как делать ролики для работы, рекламы и контента",
+      "clusterId": "BL-work",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросети для видео",
+          "role": "primary",
+          "broadVolume": 55862,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "как сделать ИИ-видео",
+          "role": "secondary",
+          "broadVolume": 9929,
+          "exactLikeVolume": null,
+          "placement": "excerpt/body/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для создания видео",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для видео из фото",
+          "role": "secondary",
+          "broadVolume": 3837,
+          "exactLikeVolume": null,
+          "placement": "H2/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "лучшая нейросеть для видео",
+          "role": "secondary",
+          "broadVolume": 2676,
+          "exactLikeVolume": null,
+          "placement": "comparison caveat"
+        },
+        {
+          "language": "en",
+          "phrase": "image to video ai",
+          "role": "secondary",
+          "broadVolume": 9897,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        },
+        {
+          "language": "en",
+          "phrase": "text to video ai",
+          "role": "secondary",
+          "broadVolume": 4466,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": "/blog/ai-video-for-work",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 19,
+      "slug": "vibe-coding-freelance",
+      "status": "published",
+      "titleHint": "Вайб-кодинг: как создавать сайты с ИИ и брать первые задачи",
+      "clusterId": "BL-sites",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "вайб кодинг",
+          "role": "primary",
+          "broadVolume": 13438,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "вайбкодинг",
+          "role": "secondary",
+          "broadVolume": 16762,
+          "exactLikeVolume": null,
+          "placement": "body natural variant"
+        },
+        {
+          "language": "ru",
+          "phrase": "вайб кодинг курсы",
+          "role": "secondary",
+          "broadVolume": 623,
+          "exactLikeVolume": null,
+          "placement": "course bridge"
+        },
+        {
+          "language": "ru",
+          "phrase": "вайб кодинг обучение",
+          "role": "secondary",
+          "broadVolume": 206,
+          "exactLikeVolume": null,
+          "placement": "FAQ/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "создать сайт с нейросетью",
+          "role": "secondary",
+          "broadVolume": 719,
+          "exactLikeVolume": null,
+          "placement": "H2/body"
+        },
+        {
+          "language": "en",
+          "phrase": "vibe coding",
+          "role": "secondary",
+          "broadVolume": 29232,
+          "exactLikeVolume": null,
+          "placement": "EN title/body"
+        },
+        {
+          "language": "en",
+          "phrase": "what is vibe coding",
+          "role": "secondary",
+          "broadVolume": 6021,
+          "exactLikeVolume": null,
+          "placement": "EN FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "vibe coding tools",
+          "role": "secondary",
+          "broadVolume": 621,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "bing",
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU and Bing EN evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": "/blog/vibe-coding-freelance",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 20,
+      "slug": "build-website-with-ai",
+      "status": "published",
+      "titleHint": "Как создать сайт с нейросетью: путь от идеи до лендинга",
+      "clusterId": "BL-sites",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросеть создание сайтов",
+          "role": "primary",
+          "broadVolume": 3561,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "создать сайт с нейросетью",
+          "role": "secondary",
+          "broadVolume": 719,
+          "exactLikeVolume": null,
+          "placement": "title/body/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "создать сайт с помощью нейросети",
+          "role": "secondary",
+          "broadVolume": 466,
+          "exactLikeVolume": null,
+          "placement": "body"
+        },
+        {
+          "language": "ru",
+          "phrase": "создание сайтов",
+          "role": "secondary",
+          "broadVolume": 135783,
+          "exactLikeVolume": null,
+          "placement": "broad context, not main title"
+        },
+        {
+          "language": "ru",
+          "phrase": "вайб кодинг сайты",
+          "role": "secondary",
+          "broadVolume": 150,
+          "exactLikeVolume": null,
+          "placement": "H2/body"
+        },
+        {
+          "language": "en",
+          "phrase": "build website with ai",
+          "role": "secondary",
+          "broadVolume": 127,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        },
+        {
+          "language": "en",
+          "phrase": "build app with ai",
+          "role": "secondary",
+          "broadVolume": 122,
+          "exactLikeVolume": null,
+          "placement": "EN contrast"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "bing",
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU and Bing EN evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": "/blog/build-website-with-ai",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 21,
+      "slug": "ai-freelance-services",
+      "status": "published",
+      "titleHint": "Работа с нейросетями: какие услуги можно продавать новичку",
+      "clusterId": "BL-income",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "работа с нейросетями",
+          "role": "primary",
+          "broadVolume": 23464,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "дополнительный доход",
+          "role": "secondary",
+          "broadVolume": 18053,
+          "exactLikeVolume": null,
+          "placement": "body/money bridge"
+        },
+        {
+          "language": "ru",
+          "phrase": "как начать зарабатывать",
+          "role": "secondary",
+          "broadVolume": 13848,
+          "exactLikeVolume": null,
+          "placement": "body with caution"
+        },
+        {
+          "language": "ru",
+          "phrase": "фриланс для новичков",
+          "role": "secondary",
+          "broadVolume": 3338,
+          "exactLikeVolume": null,
+          "placement": "H2/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети заработок",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "FAQ with caution"
+        },
+        {
+          "language": "ru",
+          "phrase": "где брать заказы",
+          "role": "secondary",
+          "broadVolume": 7185,
+          "exactLikeVolume": null,
+          "placement": "internal link to clients article"
+        },
+        {
+          "language": "en",
+          "phrase": "ai freelance services",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": "/blog/ai-freelance-services",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 22,
+      "slug": "make-money-with-ai",
+      "status": "published",
+      "titleHint": "Как заработать на нейросетях без инфобиза: 7 реальных направлений",
+      "clusterId": "BL-income",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "как заработать на нейросетях",
+          "role": "primary",
+          "broadVolume": 1275,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "ИИ заработок",
+          "role": "secondary",
+          "broadVolume": 2524,
+          "exactLikeVolume": null,
+          "placement": "body/FAQ with caution"
+        },
+        {
+          "language": "ru",
+          "phrase": "дополнительный доход",
+          "role": "secondary",
+          "broadVolume": 18053,
+          "exactLikeVolume": null,
+          "placement": "intro/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "дополнительный заработок",
+          "role": "secondary",
+          "broadVolume": 8043,
+          "exactLikeVolume": null,
+          "placement": "body"
+        },
+        {
+          "language": "ru",
+          "phrase": "как начать зарабатывать",
+          "role": "secondary",
+          "broadVolume": 13848,
+          "exactLikeVolume": null,
+          "placement": "H2/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "работа с нейросетями",
+          "role": "secondary",
+          "broadVolume": 23464,
+          "exactLikeVolume": null,
+          "placement": "internal link/body"
+        },
+        {
+          "language": "en",
+          "phrase": "make money with ai",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/body with caution"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": "/blog/make-money-with-ai",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 23,
+      "slug": "where-to-find-ai-clients",
+      "status": "published",
+      "titleHint": "Где брать заказы, если ты делаешь сайты, презентации и контент с ИИ",
+      "clusterId": "BL-freelance",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "где брать заказы",
+          "role": "primary",
+          "broadVolume": 7185,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "поиск клиентов",
+          "role": "secondary",
+          "broadVolume": 12130,
+          "exactLikeVolume": null,
+          "placement": "body/H2"
+        },
+        {
+          "language": "ru",
+          "phrase": "как найти клиентов",
+          "role": "secondary",
+          "broadVolume": 8431,
+          "exactLikeVolume": null,
+          "placement": "FAQ/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "как найти заказчиков",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "заказы на дизайн",
+          "role": "secondary",
+          "broadVolume": 6112,
+          "exactLikeVolume": null,
+          "placement": "body/example"
+        },
+        {
+          "language": "ru",
+          "phrase": "клиенты для бизнеса",
+          "role": "secondary",
+          "broadVolume": 7968,
+          "exactLikeVolume": null,
+          "placement": "business angle"
+        },
+        {
+          "language": "en",
+          "phrase": "how to find freelance clients",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": "/blog/where-to-find-ai-clients",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 24,
+      "slug": "ai-marketplace-cards",
+      "status": "queued",
+      "titleHint": "Нейросети для маркетплейсов: карточки товаров, описания и визуалы",
+      "clusterId": "BL-commerce",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросети для маркетплейсов",
+          "role": "primary",
+          "broadVolume": 5128,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для карточек товаров",
+          "role": "secondary",
+          "broadVolume": 3008,
+          "exactLikeVolume": null,
+          "placement": "excerpt/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для карточек маркетплейса",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "H2/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для рекламы",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для бизнеса",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "business bridge"
+        },
+        {
+          "language": "en",
+          "phrase": "ai product photography",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        },
+        {
+          "language": "en",
+          "phrase": "ai product cards",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": null,
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 25,
+      "slug": "ai-for-business",
+      "status": "queued",
+      "titleHint": "ИИ для бизнеса: какие задачи реально ускоряют продажи и контент",
+      "clusterId": "BL-commerce",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "ИИ для бизнеса",
+          "role": "primary",
+          "broadVolume": 5892,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для бизнеса",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "excerpt/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "клиенты для бизнеса",
+          "role": "secondary",
+          "broadVolume": 7968,
+          "exactLikeVolume": null,
+          "placement": "business objective section"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для маркетплейсов",
+          "role": "secondary",
+          "broadVolume": 5128,
+          "exactLikeVolume": null,
+          "placement": "internal link/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для контента",
+          "role": "secondary",
+          "broadVolume": 2427,
+          "exactLikeVolume": null,
+          "placement": "H2/body"
+        },
+        {
+          "language": "en",
+          "phrase": "ai for business",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/body"
+        },
+        {
+          "language": "en",
+          "phrase": "ai business tools",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": null,
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 26,
+      "slug": "ai-for-designers",
+      "status": "queued",
+      "titleHint": "Нейросети для дизайнеров: как ускорить визуал, идеи и клиентские задачи",
+      "clusterId": "BL-design",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросети для дизайнеров",
+          "role": "primary",
+          "broadVolume": 1857,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для дизайнеров курс",
+          "role": "secondary",
+          "broadVolume": 226,
+          "exactLikeVolume": null,
+          "placement": "course bridge"
+        },
+        {
+          "language": "ru",
+          "phrase": "AI креатор курс",
+          "role": "secondary",
+          "broadVolume": 220,
+          "exactLikeVolume": null,
+          "placement": "body/course bridge"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для работы дизайнера",
+          "role": "secondary",
+          "broadVolume": 143,
+          "exactLikeVolume": null,
+          "placement": "H2/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для графических дизайнеров",
+          "role": "secondary",
+          "broadVolume": 104,
+          "exactLikeVolume": null,
+          "placement": "body"
+        },
+        {
+          "language": "ru",
+          "phrase": "лучшие нейросети для дизайнеров",
+          "role": "secondary",
+          "broadVolume": 100,
+          "exactLikeVolume": null,
+          "placement": "tool section"
+        },
+        {
+          "language": "en",
+          "phrase": "ai tools for designers",
+          "role": "secondary",
+          "broadVolume": 42,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        },
+        {
+          "language": "en",
+          "phrase": "ai design tools",
+          "role": "secondary",
+          "broadVolume": 167,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": null,
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 27,
+      "slug": "web-design-with-ai",
+      "status": "queued",
+      "titleHint": "Курсы веб-дизайна и ИИ: как учиться дизайну сайтов на практике",
+      "clusterId": "BL-design",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "курсы веб дизайна",
+          "role": "primary",
+          "broadVolume": 2297,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "веб дизайн обучение",
+          "role": "secondary",
+          "broadVolume": 1107,
+          "exactLikeVolume": null,
+          "placement": "excerpt/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "веб дизайн с нуля",
+          "role": "secondary",
+          "broadVolume": 1024,
+          "exactLikeVolume": null,
+          "placement": "H2/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "веб дизайнер курсы",
+          "role": "secondary",
+          "broadVolume": 680,
+          "exactLikeVolume": null,
+          "placement": "body"
+        },
+        {
+          "language": "ru",
+          "phrase": "дизайн сайтов курс",
+          "role": "secondary",
+          "broadVolume": 325,
+          "exactLikeVolume": null,
+          "placement": "body"
+        },
+        {
+          "language": "ru",
+          "phrase": "дизайн сайта в Figma",
+          "role": "secondary",
+          "broadVolume": 177,
+          "exactLikeVolume": null,
+          "placement": "internal link/body"
+        },
+        {
+          "language": "en",
+          "phrase": "learn web design",
+          "role": "secondary",
+          "broadVolume": 45,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        },
+        {
+          "language": "en",
+          "phrase": "web design courses",
+          "role": "secondary",
+          "broadVolume": 18,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": null,
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 28,
+      "slug": "figma-course-beginners",
+      "status": "queued",
+      "titleHint": "Figma с нуля: как учиться интерфейсам и использовать ИИ в дизайне",
+      "clusterId": "BL-design",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "Figma курс",
+          "role": "primary",
+          "broadVolume": 830,
+          "exactLikeVolume": null,
+          "placement": "title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "Figma обучение",
+          "role": "secondary",
+          "broadVolume": 554,
+          "exactLikeVolume": null,
+          "placement": "excerpt/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "Figma с нуля",
+          "role": "secondary",
+          "broadVolume": 312,
+          "exactLikeVolume": null,
+          "placement": "title/body/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "Figma уроки",
+          "role": "secondary",
+          "broadVolume": 255,
+          "exactLikeVolume": null,
+          "placement": "body"
+        },
+        {
+          "language": "ru",
+          "phrase": "дизайн сайта в Figma",
+          "role": "secondary",
+          "broadVolume": 177,
+          "exactLikeVolume": null,
+          "placement": "H2/body"
+        },
+        {
+          "language": "en",
+          "phrase": "figma tutorial",
+          "role": "secondary",
+          "broadVolume": 503,
+          "exactLikeVolume": null,
+          "placement": "EN title/body"
+        },
+        {
+          "language": "en",
+          "phrase": "figma tutorial for beginners",
+          "role": "secondary",
+          "broadVolume": 130,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        },
+        {
+          "language": "en",
+          "phrase": "figma course",
+          "role": "secondary",
+          "broadVolume": 104,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "bing",
+          "wordstat"
+        ],
+        "note": "Imported Yandex Wordstat RU and Bing EN evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": null,
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 29,
+      "slug": "prompt-engineering-course",
+      "status": "queued",
+      "titleHint": "Prompt engineering course: как учиться промптам через практические задачи",
+      "clusterId": "BL-prompting",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "en",
+          "phrase": "prompt engineering course",
+          "role": "primary",
+          "broadVolume": 804,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "en",
+          "phrase": "prompt engineering courses",
+          "role": "secondary",
+          "broadVolume": 515,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        },
+        {
+          "language": "en",
+          "phrase": "prompt examples",
+          "role": "secondary",
+          "broadVolume": 302,
+          "exactLikeVolume": null,
+          "placement": "EN/RU body"
+        },
+        {
+          "language": "en",
+          "phrase": "how to write ai prompts",
+          "role": "secondary",
+          "broadVolume": 49,
+          "exactLikeVolume": null,
+          "placement": "EN FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "как составить промпт",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU body/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "примеры промптов",
+          "role": "secondary",
+          "broadVolume": 2736,
+          "exactLikeVolume": null,
+          "placement": "RU body/internal link"
+        },
+        {
+          "language": "ru",
+          "phrase": "промптинг что это",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU intro/FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "bing"
+        ],
+        "note": "Imported Bing EN and prompt keyword evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": null,
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 30,
+      "slug": "best-ai-tools-for-work",
+      "status": "queued",
+      "titleHint": "Лучшие нейросети для работы: как выбрать AI-инструмент под задачу",
+      "clusterId": "BL-work",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "keywords": [
+        {
+          "language": "en",
+          "phrase": "best ai tools",
+          "role": "primary",
+          "broadVolume": 6152,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "лучшие нейросети для работы",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU title/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для работы",
+          "role": "secondary",
+          "broadVolume": 32506,
+          "exactLikeVolume": null,
+          "placement": "RU intro/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "работа с нейросетями",
+          "role": "secondary",
+          "broadVolume": 23464,
+          "exactLikeVolume": null,
+          "placement": "body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для дизайнеров",
+          "role": "secondary",
+          "broadVolume": 1857,
+          "exactLikeVolume": null,
+          "placement": "design section"
+        },
+        {
+          "language": "en",
+          "phrase": "ai tools for work",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        },
+        {
+          "language": "en",
+          "phrase": "ai design tools",
+          "role": "secondary",
+          "broadVolume": 167,
+          "exactLikeVolume": null,
+          "placement": "EN design section"
+        },
+        {
+          "language": "en",
+          "phrase": "ai tools for designers",
+          "role": "secondary",
+          "broadVolume": 42,
+          "exactLikeVolume": null,
+          "placement": "EN body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "bing",
+          "wordstat"
+        ],
+        "note": "Imported Bing EN and Yandex Wordstat RU evidence",
+        "lastCheckedAt": "2026-06-28"
+      },
+      "targetUrl": null,
+      "publishedAt": null
+    }
+  ]
+}

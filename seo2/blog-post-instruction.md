@@ -1,5 +1,5 @@
 ---
-tags: [opten, blog, seo2, automation, instruction]
+tags: [opten, blog, seo2, manual-workflow, instruction]
 kind: blog-post-instruction
 mode: manual-self-publish
 ---
@@ -11,13 +11,13 @@ mode: manual-self-publish
 
 Пользовательская команда `напиши SEO-статью` означает: сначала запусти
 `npm run start:seo`. Legacy-алиасы `start SEO`, `start seo` и `старт SEO`
-запускают тот же поток. Если команда вернула `start-seo: no-topics`,
-остановись и скажи, что темы закончились и нужен новый weekly batch из
-`opten-seo`. Если команда вернула `start-seo: next-topic`, работай только с
-указанным `slug` и `brief`.
+запускают тот же поток. Если команда вернула `start-seo: research-needed`,
+сам выполни ручной сбор по `seo2/TOPIC-PIPELINE.md`, добавь проверенные темы в
+единый реестр и повтори команду. Если команда вернула `start-seo: next-topic`,
+работай только с указанным `slug` и его записью.
 
-Это новая ручная версия прежней Daily Opten blog post automation. Здесь нет
-cron, publisher, mark-ready и workspace-копий. Работай прямо в этом
+Это полностью ручной контур. Здесь нет cron, publisher, mark-ready и
+workspace-копий. Работай прямо в этом
 репозитории. После успешной проверки сам сделай scoped git add/commit/push.
 
 ## Важно
@@ -26,16 +26,16 @@ cron, publisher, mark-ready и workspace-копий. Работай прямо �
   `git add`, `git commit`, `git push`.
 - Не запускай `git pull`, `git fetch`, `gh`, не создавай PR.
 - Не создавай ветки и PR.
-- Не трогай старую папку `seo/`.
-- Не заходи в `opten-seo` во время написания поста: все нужное лежит в `seo2/`.
+- Не создавай отдельные weekly batches или article brief-файлы.
+- Не заходи в `opten-seo`: все нужное лежит в `seo2/`.
 - Один пост за запуск.
 - Если пользователь попросил только подготовить/настроить автоматизацию, не
   создавай пост.
 
 ## Где лежат входные данные
 
-- Очереди недель: `seo2/briefs/YYYY-Www/_batch.md`
-- Отдельные брифы: `seo2/briefs/YYYY-Www/NN-slug.md`
+- Единая очередь и keyword lock: `seo2/topic-registry.json`
+- Ручное пополнение тем: `seo2/TOPIC-PIPELINE.md`
 - SEO/GEO правила: `seo2/rules/blog-post-seo-rules.md`
 - Humanizer RU: `seo2/rules/humanizer-ru.md`
 - Humanizer EN: `seo2/rules/humanizer-en.md`
@@ -45,45 +45,24 @@ cron, publisher, mark-ready и workspace-копий. Работай прямо �
 
 ## 1. Выбор темы
 
-1. Найди все недельные папки `seo2/briefs/YYYY-Www/`, где есть `_batch.md`.
-2. Отсортируй недели по имени от старой к новой: `2026-W23`, `2026-W24`,
-   `2026-W25` и так далее.
-3. Проверь `src/content/blog/index.ts`.
-4. Иди по неделям в этом порядке. Внутри первой недели, где есть открытые темы,
-   бери первый `pending` slug из `_batch.md`, которого еще нет в
-   `blogPostsBySlug`.
-5. Если в этой неделе нет `pending`, но есть `deferred`, бери первый
-   `deferred` slug, которого еще нет в `blogPostsBySlug`.
-6. `published` темы пропускай.
-7. Не перепрыгивай на новую неделю, пока в более старой неделе есть `pending`
-   или `deferred` slug, которого еще нет в `blogPostsBySlug`.
-8. Открой соответствующий `seo2/briefs/YYYY-Www/NN-slug.md` и работай строго по
-   нему.
-9. Перед генерацией текста или изображений запусти `npm run verify:seo2-briefs`.
-   Если выбранный активный бриф не содержит `## Visual Production Brief` или
-   всё ещё содержит `## Image Suggestions`, остановись. Не сочиняй визуал из
-   общих hints и не редактируй article brief в рамках поста; сначала нужен
-   отдельный фикс брифа/очереди.
-10. Если во всех неделях все темы уже опубликованы, остановись и скажи
-   `no-topics`.
+1. Запусти `npm run verify:seo-topics`.
+2. Запусти `npm run start:seo` и используй только выданную запись.
+3. `queued` выбирается по минимальному `queueOrder`; после них выбираются
+   `deferred`. `published`, `parked` и `rejected` пропускаются.
+4. Проверь, что slug ещё отсутствует в `src/content/blog/index.ts`.
+5. Используй `keywords` записи как keyword lock. Не добавляй outline, готовую
+   копию или visual brief обратно в реестр.
+6. Если получен `research-needed`, следуй `TOPIC-PIPELINE.md`, пополни этот же
+   JSON и повтори выбор без создания недельной папки.
 
-Не выбирай тему из удалённой старой automation. Новый источник тем — только
-`seo2/briefs/**`.
-
-Если пользователь вручную не запускал публикации несколько дней или недель,
-старые `pending` темы остаются в очереди. Их нельзя считать пропущенными только
-потому, что появилась новая недельная папка.
-
-Если пользователь прямо просит не брать конкретную тему сейчас, можно заменить
-ее статус с `pending` на `deferred` и выбрать следующую `pending` тему той же
-недели. `deferred` — это не пропуск навсегда: такие темы добираются до перехода
-на следующую неделю.
+Если пользователь просит отложить тему, поменяй её `status` с `queued` на
+`deferred`. Запись остаётся в общей истории и не теряется.
 
 ## 2. Контент
 
 Прочитай перед написанием:
 
-1. выбранный article brief;
+1. выбранную запись из `seo2/topic-registry.json`;
 2. `seo2/rules/blog-post-seo-rules.md`;
 3. `seo2/rules/humanizer-ru.md`;
 4. `seo2/rules/humanizer-en.md`;
@@ -102,7 +81,7 @@ cron, publisher, mark-ready и workspace-копий. Работай прямо �
   синтаксиса и дословных примерах, которые действительно нельзя перевести.
   Если термин режима нужен для поиска, сначала объясни его по-русски:
   `image-to-video — видео из изображения`.
-- Сохрани keyword lock из брифа:
+- Сохрани keyword lock из реестра:
   - primary keyword в title/H1-zone и intro;
   - primary + 1 secondary в excerpt/description;
   - secondary phrases в H2/body/FAQ/image alt;
@@ -114,7 +93,7 @@ cron, publisher, mark-ready и workspace-копий. Работай прямо �
   `бизнес-портрет через нейросеть`, `деловой портрет в нейросети`,
   `апскейл фото через нейросеть`. Точная raw-строка допустима только в кавычках,
   если текст явно обсуждает сам поисковый запрос.
-- Формулировки из брифа — suggested phrasing, не финальный текст. Можно
+- Формулировки из реестра — semantic targets, не финальный текст. Можно
   humanize, но нельзя выкинуть semantic coverage.
 - `body.intro`: 40-60 слов, прямой answer-block.
 - FAQ: 3-5 Q&A.
@@ -125,9 +104,8 @@ cron, publisher, mark-ready и workspace-копий. Работай прямо �
   исправление prompt, результат.
 - Видимая рубрика поста — это `category`, и она должна быть ровно одной из
   двух: `guide` или `news`. По-русски это только «Гайды» или «Новости».
-  `deep-dive`, `comparison`, `release-notes` и другие значения из старых
-  брифов нельзя ставить в `category`; если brief предлагает такое значение,
-  нормализуй его в `guide`, кроме настоящих новостей продукта/релиза.
+  `deep-dive`, `comparison`, `release-notes` и другие значения нельзя ставить
+  в `category`; используй `guide`, кроме настоящих новостей продукта/релиза.
 - `tags` остаются техническими SEO-keywords из enum в
   `src/content/blog/types.ts`; они не должны использоваться как видимые
   рубрики или фильтры.
@@ -273,7 +251,7 @@ explainer image, а reusable баннер для курса. Делай широ
 
 Перед коммитом:
 
-1. Запусти `npm run verify:seo2-briefs`.
+1. Запусти `npm run verify:seo-topics`.
 2. Запусти `npm run verify:seo2-blog -- <slug>`.
 3. Запусти `npm run build`.
 4. После build запусти `npm run verify:blog-seo -- <slug>`.
@@ -305,12 +283,13 @@ explainer image, а reusable баннер для курса. Делай широ
 
 Если build и проверки прошли:
 
-1. Обнови строку опубликованной темы в ее `_batch.md`: замени `pending` или
-   `deferred` на `published` в колонке `status`.
+1. В `seo2/topic-registry.json` замени статус темы `queued` или `deferred` на
+   `published`, укажи `targetUrl: "/blog/<slug>"`, `publishedAt` и обнови
+   корневой `updatedAt`.
 2. Добавь только файлы, созданные или измененные в рамках текущего поста:
    `src/content/blog/<slug>.ts`, `seo2/visual-plans/<slug>.md`, связанные
    registry/config файлы, sitemap/llms изменения, `public/blog/<slug>/**` и
-   `_batch.md` недели, где обновлен status.
+   `seo2/topic-registry.json`.
 3. Не добавляй чужие pending changes вроде `.mcp.json`, `.DS_Store`, старые
    папки `seo-new/` или любые файлы, которые не относятся к текущему посту.
 4. Сделай коммит:
@@ -327,8 +306,6 @@ explainer image, а reusable баннер для курса. Делай широ
 
 - Не запускать publisher.
 - Не создавать workspace в `.codex/automations`.
-- Не редактировать отдельные article briefs в `seo2/briefs/**/NN-slug.md` как
-  часть поста. Разрешено менять только `status` выбранной темы в `_batch.md`
-  после успешной проверки.
-- Не редактировать старую папку `seo/`.
+- Не создавать отдельные article briefs или weekly batches.
+- Не добавлять outline, final copy или visual brief в реестр тем.
 - Не публиковать два поста за один запуск.

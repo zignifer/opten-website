@@ -1,6 +1,7 @@
 node_modules
 dist
 .vite
+.tmp/
 .ssr-cache
 .ssr-meta
 public/generated/

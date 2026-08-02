@@ -13,7 +13,6 @@ const OUT_PATH = resolve(ROOT, ".secrets", "gsc-oauth-refresh.out.log");
 const ERR_PATH = resolve(ROOT, ".secrets", "gsc-oauth-refresh.err.log");
 const ENV_PATHS = [
   resolve(ROOT, ".secrets", "gsc-oauth.env"),
-  "C:/Projects/opten-seo/.env.local",
 ].filter((path, index, list) => existsSync(path) && list.indexOf(path) === index);
 
 function parseEnv(raw) {

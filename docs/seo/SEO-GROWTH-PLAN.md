@@ -213,8 +213,8 @@ proxy/credits contract. Перед реализацией нужен discovery �
 
 Пока SEO-00…04 не закрыты, не создавать новые model pages и не масштабировать
 одинаковый шаблон на новые модели. Очередь SEO2 не меняется автоматически:
-команда `напиши SEO-статью` продолжает работать по `AGENTS.md`, но новый
-weekly batch не следует генерировать без product relevance и source review.
+команда `напиши SEO-статью` продолжает работать по `AGENTS.md`, но новые темы
+не следует добавлять в единый реестр без product relevance и source review.
 
 ### Wave 1 — crawl, performance и measurement, дни 5–14
 
