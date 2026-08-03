@@ -109,7 +109,7 @@ function Hero() {
             {t("hero.subtitle1").trim()}
           </p>
         </div>
-        <div className="mt-7 w-full md:mt-7">
+        <div className="mt-[50px] w-full">
           <PromptWorkbench />
         </div>
         <div className="mt-16 flex w-full max-w-[616px] flex-col items-center justify-center gap-3 md:flex-row md:gap-4">
