@@ -143,12 +143,12 @@ const courseAuthor = {
 const featuredCoursePromo = {
   coverPath: "/assets/learn/video/actual-ai-tools-2026-poster.jpg",
   title: {
-    ru: "Нейросети в визуале",
-    en: "AI for Visuals",
+    ru: "Нейросети\nв веб-дизайне",
+    en: "AI in web design",
   },
   description: {
-    ru: "Всё, что нужно знать для создания упаковки бренда, не имея навыков в дизайне и монтаже. За 15 коротких уроков мы создадим логотип, фото и видео в соцсети, запустим сайт и всё это с помощью ИИ!",
-    en: "The most honest AI course. In under an hour, I will cover everything you need to know to create a brand package without design or editing skills. Across 15 short lessons, we will create a logo, photos and social videos, launch a website, and do it all with AI.",
+    ru: "Всё, что нужно знать для\nсоздания упаковки бренда,\nне имея навыков в дизайне\nи разработке. За 15 коротких\nуроков мы создадим логотип,\nфото и видео, запустим сайт\nи всё это с помощью ИИ!",
+    en: "Everything you need to create a brand package without design or development skills. Across 15 short lessons, we will create a logo, photos and videos, launch a website, and do it all with AI.",
   },
   cta: {
     ru: "Перейти",
@@ -235,10 +235,10 @@ export default function LearnOverviewPage() {
 
           <HeroVideoCard lang={lang} className="mt-[51px] max-[1119px]:max-w-[552px] max-md:mt-[30px] min-[1120px]:col-start-1 min-[1120px]:row-start-2" />
           <article className="mt-[51px] flex min-h-[310px] flex-col justify-center max-[1119px]:max-w-[552px] max-md:mt-[20px] max-md:min-h-0 max-md:items-stretch max-md:text-left min-[1120px]:col-start-2 min-[1120px]:row-start-2 min-[1120px]:w-[215px] min-[1120px]:max-w-[215px] min-[1120px]:-ml-[18px]">
-            <h2 className="text-[21px] font-bold leading-tight text-white max-md:text-[24px]">
+            <h2 className="text-[21px] font-bold leading-tight text-white max-md:text-[24px] min-[1120px]:whitespace-pre-line">
               {featuredCoursePromo.title[lang]}
             </h2>
-            <p className="mt-[15px] text-[14px] leading-[1.55] text-white/55">
+            <p className="mt-[15px] text-[14px] leading-[1.55] text-white/55 min-[1120px]:whitespace-pre-line">
               {featuredCoursePromo.description[lang]}
             </p>
             <LocalizedLink

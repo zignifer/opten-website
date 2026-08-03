@@ -1,3 +1,35 @@
+## Learn Featured Course Copy — Design QA
+
+**Findings**
+- No actionable P0/P1/P2 findings remain.
+
+**Open Questions**
+- None. The existing Learn grid, course image, Opten color tokens, and CTA geometry were intentionally preserved; the requested change is the featured-course copy and its desktop line wrapping.
+
+**Implementation Checklist**
+- Updated the RU title to `Нейросети` / `в веб-дизайне`.
+- Matched the reference description copy and locked it to the same seven desktop lines.
+- Kept tablet/mobile wrapping natural instead of carrying the narrow desktop line lengths into the full-width layout.
+- Updated the EN title and description to remain semantically aligned.
+- Confirmed the course CTA remains unique and navigates to the existing course route.
+
+**Follow-up Polish**
+- No P3 follow-up is needed for the requested state.
+
+source visual truth path: `C:\Users\КОМП\AppData\Local\Temp\codex-clipboard-69a8efb8-8078-4269-ab70-7a1a33c1f8e9.png`
+implementation screenshot path: `C:\Users\КОМП\AppData\Local\Temp\opten-learn-feature-after.png`
+viewport: desktop browser override `1440x1000`; rendered screenshot `1425x990`; mobile browser override `390x844` with `375px` document width
+state: default RU `/learn`, signed out
+full-view comparison evidence: `C:\Users\КОМП\AppData\Local\Temp\opten-learn-feature-after.png`
+focused region comparison evidence: normalized source/implementation comparison at `C:\Users\КОМП\AppData\Local\Temp\opten-learn-feature-comparison.png`; the implementation crop was normalized to the source scale (`475x457` implementation against `475x459` source).
+required fidelity surfaces: typography keeps the existing PT Root UI family and the reference hierarchy; desktop title is exactly two lines and description exactly seven lines; existing spacing, 215px column, 43px CTA, colors, border radii, and image asset were preserved; no image or icon was substituted; RU copy matches the supplied reference and EN copy remains aligned.
+primary interactions tested: the unique `Перейти` CTA navigated to `/learn/courses/ai-content-marketing-2026`; mobile layout used natural wrapping and had no horizontal document overflow.
+console errors checked: no console errors were present in the final Learn state.
+comparison history: the first normalized post-change comparison found no actionable P0/P1/P2 mismatch in the requested copy, wrapping, typography, or geometry, so no additional visual-fix iteration was required.
+final result: passed
+
+---
+
 **Findings**
 - No actionable P0/P1/P2 findings remain.
 
