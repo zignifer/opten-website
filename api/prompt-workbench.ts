@@ -6,6 +6,7 @@ import { createHash, createHmac } from "node:crypto";
 import { join } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { PROMPT_WORKBENCH_MODELS, type PromptWorkbenchType } from "../src/content/promptWorkbenchModels.js";
+import { promptLooksLikeVibecoding } from "../src/lib/promptWorkbenchIntent.js";
 import {
   bearerTokenFromHeader,
   verifySupabaseUser,
@@ -336,6 +337,9 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   const access = await resolveWorkbenchAccess(req);
   if (access.status === "authentication_required") return json(res, 401, { error: access.status });
   if (access.status === "entitlement_unavailable") return json(res, 503, { error: access.status });
+  if (modelType !== "vibecoding" && promptLooksLikeVibecoding(prompt)) {
+    return json(res, 409, { error: "vibecoding_mode_required", suggested_model: "codex" });
+  }
 
   try {
     const result = await callQuickImproveProxy(access.token, prompt, modelSlug, modelType, images);

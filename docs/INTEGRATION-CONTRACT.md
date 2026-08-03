@@ -509,6 +509,14 @@ calling the finalizer directly in a unit test is not sufficient billing coverage
   `gemini`. They map server-side to the proxy's non-public `_coding-*` adapters;
   underscore-prefixed adapters are excluded from and blocked by the public
   `/api/skill` surface. Every other slug returns `invalid_model` before proxy use.
+- The selected type/model is a non-sensitive per-tab preference stored under
+  `sessionStorage.opten_prompt_workbench_preferences_v1`; prompt text, results, and
+  reference data are never stored with it. A reload restores the preference instead
+  of silently resetting Vibe Coding to Image. The browser conservatively detects
+  explicit coding-workflow markers under an Image/Video selection, switches to
+  `Вайбкодинг / Codex`, and requires a second click. The endpoint repeats the check
+  after website authentication but before proxy use and returns
+  `409 vibecoding_mode_required`, so this mismatch cannot reserve or spend usage.
 - Optional references: up to 8 image files. The browser rejects sources larger
   than 10 MB, decodes them locally, resizes the long edge to at most 512 px, and
   converts them to JPEG at quality 0.7 before request construction. Reference

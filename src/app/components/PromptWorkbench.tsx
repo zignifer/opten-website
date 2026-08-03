@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { PROMPT_WORKBENCH_MODELS, type PromptWorkbenchType } from "../../content/promptWorkbenchModels";
 import { useLang } from "../../i18n/LangContext";
+import { promptLooksLikeVibecoding } from "../../lib/promptWorkbenchIntent";
 import { useSpaceAuth } from "./space/SpaceAuthProvider";
 
 interface ReferenceImage {
@@ -31,6 +32,7 @@ const MAX_REFERENCES = 8;
 const MAX_REFERENCE_BYTES = 10 * 1024 * 1024;
 const REFERENCE_MAX_EDGE = 512;
 const REFERENCE_JPEG_QUALITY = 0.7;
+const PREFERENCES_STORAGE_KEY = "opten_prompt_workbench_preferences_v1";
 const DEFAULT_MODEL_BY_TYPE = {
   image: "nano-banana-2",
   video: "seedance-2.0",
@@ -70,6 +72,7 @@ const copy = {
     authChecking: "Проверяем аккаунт. Попробуйте ещё раз.",
     entitlementUnavailable: "Не удалось проверить подписку. Попробуйте ещё раз.",
     noImprovement: "Промпт не изменился — кредит возвращён. Уточните запрос и попробуйте ещё раз.",
+    vibecodingModeSuggested: "Похоже, это запрос для кодинг-агента. Режим переключён на «Вайбкодинг / Codex». Проверьте выбор и нажмите «Улучшить» ещё раз — кредит не списан.",
   },
   en: {
     title: "Opten prompt generator",
@@ -103,6 +106,7 @@ const copy = {
     authChecking: "Checking your account. Please try again.",
     entitlementUnavailable: "We could not verify your subscription. Please try again.",
     noImprovement: "The prompt did not change, so your credit was returned. Add more detail and try again.",
+    vibecodingModeSuggested: "This looks like a coding-agent request. The mode was switched to Vibe coding / Codex. Check the selection and click Improve again — no credit was used.",
   },
 } as const;
 
@@ -115,6 +119,7 @@ function errorMessage(error: string | undefined, lang: "ru" | "en") {
   if (error === "prompt_too_short") return text.tooShort;
   if (error === "prompt_too_long") return text.tooLong;
   if (error === "no_improvement") return text.noImprovement;
+  if (error === "vibecoding_mode_required") return text.vibecodingModeSuggested;
   if (error === "provider_unavailable" || error === "provider_timeout" || error === "AbortError" || error === "provider_failed") return text.unavailable;
   return text.genericError;
 }
@@ -202,6 +207,25 @@ function formatLocalDate(date: Date) {
   return `${day}.${month}.${date.getFullYear()}`;
 }
 
+function storePreferences(type: PromptWorkbenchType, model: string) {
+  try {
+    sessionStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify({ type, model }));
+  } catch {
+    // Preference persistence is best-effort; prompt content is never stored.
+  }
+}
+
+function readPreferences(): { type: PromptWorkbenchType; model: string } | null {
+  try {
+    const value = JSON.parse(sessionStorage.getItem(PREFERENCES_STORAGE_KEY) || "null") as { type?: unknown; model?: unknown } | null;
+    if (!value || (value.type !== "image" && value.type !== "video" && value.type !== "vibecoding") || typeof value.model !== "string") return null;
+    if (!PROMPT_WORKBENCH_MODELS[value.type].some((item) => item.slug === value.model)) return null;
+    return { type: value.type, model: value.model };
+  } catch {
+    return null;
+  }
+}
+
 export default function PromptWorkbench() {
   const { lang } = useLang();
   const { refresh, session, status } = useSpaceAuth();
@@ -224,6 +248,13 @@ export default function PromptWorkbench() {
   const promptReady = prompt.trim().length >= MIN_PROMPT_CHARS
     && prompt.length <= MAX_PROMPT_CHARS
     && !references.some((reference) => reference.status === "loading");
+  useEffect(() => {
+    const preferences = readPreferences();
+    if (!preferences) return;
+    setType(preferences.type);
+    setModel(preferences.model);
+  }, []);
+
   useEffect(() => () => {
     mountedRef.current = false;
     if (copyResetTimer.current !== null) window.clearTimeout(copyResetTimer.current);
@@ -244,14 +275,22 @@ export default function PromptWorkbench() {
   }, []);
 
   function changeType(nextType: PromptWorkbenchType) {
+    const nextModel = DEFAULT_MODEL_BY_TYPE[nextType];
     setType(nextType);
-    setModel(DEFAULT_MODEL_BY_TYPE[nextType]);
+    setModel(nextModel);
+    storePreferences(nextType, nextModel);
     setError(null);
     setCopied(false);
     if (copyResetTimer.current !== null) {
       window.clearTimeout(copyResetTimer.current);
       copyResetTimer.current = null;
     }
+  }
+
+  function changeModel(nextModel: string) {
+    if (!PROMPT_WORKBENCH_MODELS[type].some((item) => item.slug === nextModel)) return;
+    setModel(nextModel);
+    storePreferences(type, nextModel);
   }
 
   async function copyPrompt() {
@@ -318,6 +357,11 @@ export default function PromptWorkbench() {
     }
     if (prompt.length > MAX_PROMPT_CHARS) {
       setError(text.tooLong);
+      return;
+    }
+    if (type !== "vibecoding" && promptLooksLikeVibecoding(prompt)) {
+      changeType("vibecoding");
+      setError(text.vibecodingModeSuggested);
       return;
     }
     if (status === "loading") {
@@ -396,7 +440,7 @@ export default function PromptWorkbench() {
               <select
                 aria-label={text.modelLabel}
                 value={model}
-                onChange={(event) => setModel(event.target.value)}
+                onChange={(event) => changeModel(event.target.value)}
                 className="h-10 w-full appearance-none rounded-full border border-white/10 bg-white/[0.06] pl-4 pr-10 text-[14px] text-white outline-none transition hover:border-white/20 focus:border-[#9cfb51]/45 focus:ring-2 focus:ring-[#9cfb51]/10"
               >
                 {models.map((item) => <option key={item.slug} value={item.slug} className="bg-[#102528]">{item.label}</option>)}

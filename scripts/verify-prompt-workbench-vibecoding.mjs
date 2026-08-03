@@ -10,15 +10,26 @@ import { SignJWT } from "jose";
 const ROOT = process.cwd();
 const FIXTURE_PATH = join(ROOT, "scripts", "fixtures", "prompt-workbench-vibecoding.json");
 const GUARDRAIL_PATH = join(ROOT, "api", "_shared", "promptWorkbenchVibecoding.ts");
+const INTENT_PATH = join(ROOT, "src", "lib", "promptWorkbenchIntent.ts");
 
 const tempDir = await mkdtemp(join(tmpdir(), "opten-vibecoding-"));
 const bundledGuardrails = join(tempDir, "guardrails.mjs");
 const bundledHandler = join(tempDir, "prompt-workbench.mjs");
+const bundledIntent = join(tempDir, "prompt-workbench-intent.mjs");
 
 try {
   await build({
     entryPoints: [GUARDRAIL_PATH],
     outfile: bundledGuardrails,
+    bundle: true,
+    format: "esm",
+    platform: "node",
+    target: "node18",
+    logLevel: "silent",
+  });
+  await build({
+    entryPoints: [INTENT_PATH],
+    outfile: bundledIntent,
     bundle: true,
     format: "esm",
     platform: "node",
@@ -41,6 +52,7 @@ try {
     validateVibecodingCandidate,
     vibecodingPromptReferencesImages,
   } = await import(`${pathToFileURL(bundledGuardrails).href}?v=${Date.now()}`);
+  const { promptLooksLikeVibecoding } = await import(`${pathToFileURL(bundledIntent).href}?v=${Date.now()}`);
 
   const fixtures = JSON.parse(await readFile(FIXTURE_PATH, "utf8"));
   assert.ok(Array.isArray(fixtures), "golden fixture must be an array");
@@ -118,6 +130,11 @@ try {
   assert.equal(vibecodingPromptReferencesImages("По скриншоту выровняй кнопку"), true);
   assert.equal(vibecodingPromptReferencesImages("Align the button in the attached image"), true);
   assert.equal(vibecodingPromptReferencesImages("Выровняй кнопку с полем"), false);
+  assert.equal(promptLooksLikeVibecoding("Реализуй функционал через Super Powers по этапам."), true);
+  assert.equal(promptLooksLikeVibecoding("Работай в ветке Main и реализуй функционал."), true);
+  assert.equal(promptLooksLikeVibecoding("Закомить и запушь готовые изменения."), true);
+  assert.equal(promptLooksLikeVibecoding("Создай изображение интерфейса сайта в зелёных тонах."), false);
+  assert.equal(promptLooksLikeVibecoding("Сделай видео о планировании рабочего дня."), false);
 
   const [models, component, api, cleaner] = await Promise.all([
     readFile(join(ROOT, "src", "content", "promptWorkbenchModels.ts"), "utf8"),
@@ -131,6 +148,8 @@ try {
   assert.match(component, /vibecoding:\s*"Вайбкодинг"/);
   assert.match(component, /vibecoding:\s*"Vibe coding"/);
   assert.match(component, /<option value="vibecoding"/);
+  assert.match(component, /opten_prompt_workbench_preferences_v1/);
+  assert.match(component, /promptLooksLikeVibecoding\(prompt\)/);
   assert.match(api, /codex:\s*"_coding-codex"[\s\S]*claude:\s*"_coding-claude"[\s\S]*gemini:\s*"_coding-gemini"/);
   assert.match(api, /source:\s*isVibecoding \? "website_vibecoding" : "popup"/);
   assert.doesNotMatch(api, /validateVibecodingCandidate\(prompt,/, "website must not silently replace a billed proxy result after proxy finalization");
@@ -218,6 +237,19 @@ try {
     assert.equal(proxyRequests[0].source, "website_vibecoding");
     assert.equal(typeof proxyRequests[0].messages[0].content, "string", "unreferenced image bytes must not reach the coding model");
     assert.match(proxyRequests[0].system_prompt, /closed-world editing task/i);
+
+    const wrongModePrompt = "Перепроверь правила, разбей реализацию на этапы через SuperPowers и сохрани контекст между сжатиями.";
+    const requestCountBeforeMismatch = proxyRequests.length;
+    const wrongMode = await callHandler({
+      action: "improve",
+      prompt: wrongModePrompt,
+      model: "nano-banana-2",
+      images: [],
+    });
+    assert.equal(wrongMode.statusCode, 409);
+    assert.equal(wrongMode.body.error, "vibecoding_mode_required");
+    assert.equal(wrongMode.body.suggested_model, "codex");
+    assert.equal(proxyRequests.length, requestCountBeforeMismatch, "wrong-mode coding request must stop before proxy billing");
 
     const screenshotPrompt = "По приложенному скриншоту выровняй кнопку с полем ввода, больше ничего не меняй.";
     nextProxyStatus = 422;
