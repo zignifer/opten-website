@@ -1,7 +1,6 @@
 import {
   BookOpen,
   ChevronDown,
-  Play,
   Search,
   SlidersHorizontal,
 } from "lucide-react";
@@ -28,16 +27,6 @@ import {
   type LearnTopic,
 } from "../../../content/space/learn";
 import { privateCourseCollection } from "../../../content/space/privateCourse";
-import {
-  findMatchesQuery,
-  getLearnFindDescription,
-  getLearnFindRoute,
-  getLearnFindSourceLabel,
-  getLearnFindTitle,
-  getYoutubeThumbnailUrl,
-  learnFinds,
-  type LearnFind,
-} from "../../../content/space/learnFinds";
 import LocalizedLink from "../../components/LocalizedLink";
 import ResponsiveImage from "../../components/ResponsiveImage";
 import SiteFooter from "../../components/SiteFooter";
@@ -48,7 +37,6 @@ const assetBase = "/assets/space/learn-v2";
 
 type TopicFilter = "all" | "ai-image" | "ai-video" | "vibe-coding" | "vibe-design";
 type SortKey = "new" | "duration";
-type ContentTab = "lessons" | "finds";
 
 const SHOW_LEARN_COLLECTIONS = false;
 const HIDDEN_LEARN_LESSON_SLUGS = new Set<string>(hiddenLearnOverviewLessonSlugs);
@@ -99,11 +87,7 @@ const pageCopy = {
     aiTrainingTitle: "Обучение ИИ",
     viewAllCourse: "Смотреть все",
     allLessonsTitle: "Бесплатные уроки",
-    viewAllLessons: "Смотреть все уроки",
-    findsTitle: "Находки",
-    lessonsTab: "Уроки",
-    findsTab: "Находки",
-    findBadge: "Из сториз",
+    viewAllLessons: "Смотреть все",
     noResultsTitle: "Ничего не найдено",
     noResultsText: "Попробуйте изменить тему или поисковый запрос.",
     soon: "Скоро",
@@ -125,11 +109,7 @@ const pageCopy = {
     aiTrainingTitle: "AI training",
     viewAllCourse: "View all",
     allLessonsTitle: "Free lessons",
-    viewAllLessons: "View all lessons",
-    findsTitle: "Finds",
-    lessonsTab: "Lessons",
-    findsTab: "Finds",
-    findBadge: "From stories",
+    viewAllLessons: "View all",
     noResultsTitle: "Nothing found",
     noResultsText: "Try changing the topic or search query.",
     soon: "Soon",
@@ -155,7 +135,7 @@ const courseAuthor = {
     },
     {
       value: { ru: "9 лет", en: "9 years" },
-      label: { ru: "в digital", en: "in design" },
+      label: { ru: "в дизайне", en: "in design" },
     },
   ],
 } as const;
@@ -163,8 +143,8 @@ const courseAuthor = {
 const featuredCoursePromo = {
   coverPath: "/assets/learn/video/actual-ai-tools-2026-poster.jpg",
   title: {
-    ru: "Нейросети для контента и маркетинга 2026",
-    en: "AI for Content and Marketing 2026",
+    ru: "Нейросети в визуале",
+    en: "AI for Visuals",
   },
   description: {
     ru: "Всё, что нужно знать для создания упаковки бренда, не имея навыков в дизайне и монтаже. За 15 коротких уроков мы создадим логотип, фото и видео в соцсети, запустим сайт и всё это с помощью ИИ!",
@@ -186,7 +166,6 @@ export default function LearnOverviewPage() {
   const [sortKey, setSortKey] = useState<SortKey>("new");
   const [query, setQuery] = useState("");
   const [showAllCollections, setShowAllCollections] = useState(false);
-  const [contentTab, setContentTab] = useState<ContentTab>("lessons");
 
   const normalizedQuery = query.trim().toLowerCase();
 
@@ -231,18 +210,6 @@ export default function LearnOverviewPage() {
     });
   }, [activeTopic, normalizedQuery, sortKey, lang]);
 
-  const filteredFinds = useMemo(() => {
-    const finds = learnFinds.filter((find) => {
-      const topicMatch = activeTopic === "all" || find.topic === activeTopic;
-      return topicMatch && findMatchesQuery(find, lang, normalizedQuery);
-    });
-
-    return [...finds].sort((a, b) => {
-      if (sortKey === "duration") return durationToSeconds(b.duration) - durationToSeconds(a.duration);
-      return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
-    });
-  }, [activeTopic, normalizedQuery, sortKey, lang]);
-
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#011417] font-['PT_Root_UI',sans-serif] text-white">
       <SpaceHeader variant="learnOnly" />
@@ -267,8 +234,8 @@ export default function LearnOverviewPage() {
           <AuthorCard lang={lang} />
 
           <HeroVideoCard lang={lang} className="mt-[51px] max-[1119px]:max-w-[552px] max-md:mt-[30px] min-[1120px]:col-start-1 min-[1120px]:row-start-2" />
-          <article className="mt-[51px] flex min-h-[310px] flex-col justify-center max-[1119px]:max-w-[552px] max-md:mt-[20px] max-md:min-h-0 max-md:items-center max-md:text-center min-[1120px]:col-start-2 min-[1120px]:row-start-2 min-[1120px]:w-[215px] min-[1120px]:max-w-[215px] min-[1120px]:-ml-[18px]">
-            <h2 className="text-[21px] font-bold leading-tight text-white">
+          <article className="mt-[51px] flex min-h-[310px] flex-col justify-center max-[1119px]:max-w-[552px] max-md:mt-[20px] max-md:min-h-0 max-md:items-stretch max-md:text-left min-[1120px]:col-start-2 min-[1120px]:row-start-2 min-[1120px]:w-[215px] min-[1120px]:max-w-[215px] min-[1120px]:-ml-[18px]">
+            <h2 className="text-[21px] font-bold leading-tight text-white max-md:text-[24px]">
               {featuredCoursePromo.title[lang]}
             </h2>
             <p className="mt-[15px] text-[14px] leading-[1.55] text-white/55">
@@ -404,6 +371,7 @@ export default function LearnOverviewPage() {
 
         <LessonSection
           title={copy.aiTrainingTitle}
+          titleClassName="max-md:text-[20px]"
           action={
             <LocalizedLink
               to={featuredCoursePromo.href}
@@ -426,38 +394,25 @@ export default function LearnOverviewPage() {
         </LessonSection>
 
         <LessonSection
-          title={contentTab === "lessons" ? copy.allLessonsTitle : copy.findsTitle}
-          action={<LearnContentTabs activeTab={contentTab} onChange={setContentTab} lang={lang} />}
+          title={copy.allLessonsTitle}
+          action={
+            <LocalizedLink
+              to="/learn/lessons"
+              className="inline-flex h-[30px] shrink-0 items-center rounded-full border border-[#9cfb51]/45 px-[12px] text-[12px] font-bold leading-none text-[#9cfb51] no-underline transition hover:bg-[#9cfb51]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/70"
+            >
+              {copy.viewAllLessons}
+            </LocalizedLink>
+          }
         >
-          {contentTab === "lessons" ? (
-            <>
-              <div className="grid grid-cols-3 gap-[17px] max-lg:grid-cols-2 max-sm:grid-cols-1">
-                {filteredLessons.map((lesson) => (
-                  <LearnLessonCard key={lesson.slug} lesson={lesson} lang={lang} />
-                ))}
-              </div>
-              {filteredLessons.length > 0 && (
-                <div className="mt-[26px] flex justify-center">
-                  <LocalizedLink
-                    to="/learn/lessons"
-                    className="inline-flex h-[46px] items-center justify-center rounded-full border border-[#9cfb51]/55 bg-[#9cfb51]/[0.08] px-[24px] text-[14px] font-bold text-[#9cfb51] no-underline transition hover:border-[#9cfb51] hover:bg-[#9cfb51] hover:text-[#062013] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51] focus-visible:ring-offset-2 focus-visible:ring-offset-[#011417]"
-                  >
-                    {copy.viewAllLessons}
-                  </LocalizedLink>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="grid grid-cols-3 gap-[17px] max-lg:grid-cols-2 max-sm:grid-cols-1">
-              {filteredFinds.map((find) => (
-                <LargeFindCard key={find.slug} find={find} lang={lang} badge={copy.findBadge} />
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-3 gap-[17px] max-lg:grid-cols-2 max-sm:grid-cols-1">
+            {filteredLessons.map((lesson) => (
+              <LearnLessonCard key={lesson.slug} lesson={lesson} lang={lang} />
+            ))}
+          </div>
         </LessonSection>
 
         {(SHOW_LEARN_COLLECTIONS ? filteredCollections.length === 0 : true) &&
-          (contentTab === "lessons" ? filteredLessons.length === 0 : filteredFinds.length === 0) && (
+          filteredLessons.length === 0 && (
           <section className="mt-[32px] rounded-[8px] border border-white/10 bg-[#0e2023] px-[20px] py-[38px] text-center">
             <p className="text-[16px] text-white">{copy.noResultsTitle}</p>
             <p className="mt-[6px] text-[14px] text-white/55">{copy.noResultsText}</p>
@@ -473,35 +428,6 @@ export default function LearnOverviewPage() {
         <div className="absolute left-1/2 bottom-[-500px] h-[982px] w-[1720px] -translate-x-[56%] bg-[url('/assets/landing-design/gradient-blob-shape.svg')] bg-[length:100%_100%] bg-center bg-no-repeat opacity-[0.18] blur-[140px] max-md:bottom-[-260px] max-md:h-[548px] max-md:w-[960px] max-md:-translate-x-[59%] max-md:opacity-20 max-md:blur-[75px]" />
       </div>
       <SiteFooter variant="linksOnly" />
-    </div>
-  );
-}
-
-function LearnContentTabs({ activeTab, onChange, lang }: { activeTab: ContentTab; onChange: (tab: ContentTab) => void; lang: LearnLang }) {
-  const copy = pageCopy[lang];
-  const items: { id: ContentTab; label: string }[] = [
-    { id: "lessons", label: copy.lessonsTab },
-    { id: "finds", label: copy.findsTab },
-  ];
-
-  return (
-    <div className="inline-flex h-[36px] shrink-0 rounded-[8px] border border-white/10 bg-[#0e2023] p-[3px]" aria-label={lang === "ru" ? "Тип контента" : "Content type"}>
-      {items.map((item) => {
-        const active = item.id === activeTab;
-        return (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => onChange(item.id)}
-            aria-pressed={active}
-            className={`h-[28px] min-h-0 rounded-[6px] border-0 px-[12px] pb-[1px] text-[13px] font-bold transition ${
-              active ? "bg-[#9cfb51] text-[#062013]" : "bg-transparent text-white/58 hover:bg-white/[0.06] hover:text-white"
-            }`}
-          >
-            {item.label}
-          </button>
-        );
-      })}
     </div>
   );
 }
@@ -597,11 +523,11 @@ function Stat({ value, label, active = false, className = "" }: { value: string;
   );
 }
 
-function LessonSection({ title, action, children }: { title: string; action?: ReactNode; children: ReactNode }) {
+function LessonSection({ title, titleClassName = "", action, children }: { title: string; titleClassName?: string; action?: ReactNode; children: ReactNode }) {
   return (
     <section className="mt-[26px]">
       <div className="mb-[14px] flex items-center justify-between gap-[16px]">
-        <h2 className="text-[22px] font-bold leading-tight text-white">{title}</h2>
+        <h2 className={`text-[22px] font-bold leading-tight text-white ${titleClassName}`}>{title}</h2>
         {action}
       </div>
       {children}
@@ -659,56 +585,6 @@ function CollectionTile({ collection, lang, className = "" }: { collection: Lear
   );
 }
 
-function LargeFindCard({ find, lang, badge }: { find: LearnFind; lang: LearnLang; badge: string }) {
-  return (
-    <LocalizedLink
-      to={getLearnFindRoute(find, lang)}
-      className="group block overflow-hidden rounded-[9px] border border-white/10 bg-[#0e2023] text-left no-underline transition hover:border-[#9cfb51]/45 hover:bg-[#10282c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]"
-    >
-      <div className="relative aspect-video overflow-hidden bg-[#0e2023]">
-        <img
-          src={getYoutubeThumbnailUrl(find.youtubeId)}
-          alt=""
-          width="1280"
-          height="720"
-          loading="lazy"
-          decoding="async"
-          className="h-full w-full object-cover opacity-82 transition duration-500 group-hover:scale-[1.035]"
-          onError={(event) => {
-            const image = event.currentTarget;
-            if (image.dataset.fallback !== "true") {
-              image.dataset.fallback = "true";
-              image.src = getYoutubeThumbnailUrl(find.youtubeId, "hq");
-            }
-          }}
-        />
-        <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(1,16,18,0.04),rgba(1,16,18,0.38))]" />
-        <span className="absolute left-[10px] top-[10px] rounded-[5px] bg-[#9cfb51] px-[8px] py-[5px] text-[11px] font-bold leading-none text-[#062013]">
-          {badge}
-        </span>
-        <span className="absolute left-1/2 top-1/2 grid size-[48px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#9cfb51] text-[#011417] shadow-[0_14px_38px_rgba(156,251,81,0.22)] transition group-hover:scale-[1.04] group-hover:bg-[#8ff144]">
-          <Play size={21} fill="currentColor" className="ml-[2px]" />
-        </span>
-        <span className="absolute bottom-[8px] right-[8px] rounded-[4px] bg-black/72 px-[6px] py-[4px] text-[13px] font-medium leading-none text-white">
-          {find.duration}
-        </span>
-      </div>
-      <div className="px-[14px] pb-[20px] pt-[13px]">
-        <p className="text-[12px] leading-none text-white/38">{topicLabel(find.topic, lang)}</p>
-        <h3 className="mt-[9px] text-[18px] font-bold leading-[1.3] text-white">{getLearnFindTitle(find, lang)}</h3>
-        <p className="mt-[8px] line-clamp-2 text-[13px] leading-[1.45] text-white/58">{getLearnFindDescription(find, lang)}</p>
-        <div className="mt-[18px] flex items-center gap-[10px] text-[13px] text-white/52">
-          <span className="grid size-[25px] shrink-0 place-items-center rounded-full border border-white/12 bg-white/[0.06] text-[11px] font-bold text-[#9cfb51]">
-            AI
-          </span>
-          <span>{getLearnFindSourceLabel(find, lang)}</span>
-          <span className="ml-[6px] text-white/35">{findUpdated(find, lang)}</span>
-        </div>
-      </div>
-    </LocalizedLink>
-  );
-}
-
 function renderFeaturedLessonTitle(lesson: LearnLesson, lang: LearnLang) {
   const title = getLearnLessonTitle(lesson, lang);
   if (lang !== "ru" || title !== "Актуальные нейросети в 2026 году") return title;
@@ -724,15 +600,6 @@ function renderFeaturedLessonTitle(lesson: LearnLesson, lang: LearnLang) {
 
 function topicLabel(topic: TopicFilter | LearnTopic, lang: LearnLang) {
   return topicLabels[lang][topic];
-}
-
-function findUpdated(find: LearnFind, lang: LearnLang) {
-  const date = new Date(`${find.publishedAt}T00:00:00Z`);
-  return new Intl.DateTimeFormat(lang === "ru" ? "ru-RU" : "en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date);
 }
 
 function durationToSeconds(duration: string) {

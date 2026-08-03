@@ -2159,25 +2159,10 @@ const COURSE_PAYMENT_PENDING_STORAGE_KEY = "opten_course_payment_pending_v1";
 
 type CourseDiscountClaimState = "idle" | "checking" | "active" | "expired" | "invalid";
 
-function CoursePurchaseTitle({ count }: { count: number }) {
-  const { lang } = useLang();
+function CoursePurchaseTitle({ title }: { title: string }) {
   const titleClass = "max-w-[314px] text-[19px] font-bold leading-[1.22] tracking-normal text-white max-sm:text-[18px]";
 
-  if (lang === "en") {
-    return (
-      <h2 className={titleClass}>
-        <span className="text-[#9cfb51]">{count}-lesson course</span> about AI for content marketing in{" "}
-        <span className="text-[#9cfb51]">2026</span>
-      </h2>
-    );
-  }
-
-  return (
-    <h2 className={titleClass}>
-      <span className="text-[#9cfb51]">Курс из {count} уроков</span> про ИИ для контента и маркетинга в{" "}
-      <span className="text-[#9cfb51]">2026г</span>
-    </h2>
-  );
+  return <h2 className={titleClass}>{title}</h2>;
 }
 
 function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, initialEmail, playerHeight }: CoursePurchaseCardProps) {
@@ -2280,7 +2265,6 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
   const crossedPrice = formatCoursePrice(baseSaleValue, currency);
   const claimRemaining = activeDiscountClaim ? formatCourseClaimRemaining(claimExpiresAtMs - claimNow) : "";
   const claimDiscountPercent = discountClaimQuote?.claim_discount_percent ?? 20;
-  const courseLessonsCount = collection.progress?.total || collection.lessons.length;
   const formMessage = error
     ? { tone: "error" as const, text: error }
     : claimExpired
@@ -2452,7 +2436,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
       <div className="relative h-[373px] w-[calc(100%-46px)] max-w-[314px]">
         <div className="absolute left-0 top-0 flex w-full items-start justify-between gap-[16px]">
           <div className="min-w-0">
-            <CoursePurchaseTitle count={courseLessonsCount} />
+            <CoursePurchaseTitle title={collection.title[lang]} />
           </div>
         </div>
 

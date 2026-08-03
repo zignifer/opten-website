@@ -30,8 +30,8 @@ export type PrivateCourseIntroContent = {
 
 export const privateCourseIntroContent: PrivateCourseIntroContent = {
   title: {
-    ru: "Курс про нейросети для контента и маркетинга",
-    en: "AI for Content and Marketing Course",
+    ru: "Нейросети в визуале",
+    en: "AI for Visuals",
   },
   description: {
     ru: "На практике создадим с нуля бренд кофейни NOVA: промпты, фото, логотип и видео.\nЗатем соберём сайт и контент для рекламы, чтобы всё выглядело как одна система.",
@@ -1047,8 +1047,8 @@ export const privateCourseHiddenIntroLesson: LearnLesson = {
 export const privateCourseCollection: LearnCollection = {
   id: PRIVATE_COURSE_SLUG,
   title: {
-    ru: "Нейросети для контента и маркетинга 2026",
-    en: "AI for Content and Marketing 2026",
+    ru: "Нейросети в визуале",
+    en: "AI for Visuals",
   },
   description: {
     ru: "Закрытый курс Opten по созданию контента и маркетинговой упаковки с помощью ИИ.",

@@ -187,7 +187,7 @@ assert.match(learn, /course-entitlement-gated-preview/, "Learn playback policy t
 const components = read("src/app/components/space/learn/LearnComponents.tsx");
 const privateCoursePage = read("src/app/pages/space/PrivateCoursePage.tsx");
 assert.match(content, /privateCourseIntroContent/, "Private course must define dedicated intro content");
-assert.match(content, /Курс про нейросети для контента и маркетинга/, "Private course intro title must use the requested wording");
+assert.match(content, /Нейросети в визуале/, "Private course title must use the requested wording");
 assert.match(content, /posterPath:\s*"\/assets\/learn\/video\/actual-ai-tools-2026-poster\.jpg"/, "Private course intro must reuse the Learn hero course cover");
 assert.doesNotMatch(content, /if \(!lessonSlug\) return collection\.lessons\[0\]/, "Private course root must not fall back to lesson 1");
 assert.match(privateCoursePage, /!lessonSlug[\s\S]*<CourseIntroLayout collection=\{collection\} intro=\{privateCourseIntroContent\}/, "Private course root route must render the course intro layout");
