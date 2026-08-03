@@ -24,7 +24,7 @@ export default function PrivateCoursePage() {
   const collection = getPrivateCourseCollection(courseSlug);
   const lesson = findPrivateCourseLesson(courseSlug, lessonSlug);
   const pageTitle = !lessonSlug
-    ? `${privateCourseIntroContent.title[lang].replace(/\s*\n\s*/g, " ")} — Opten course`
+    ? `${privateCourseIntroContent.title[lang]} — Opten course`
     : lesson
       ? `${getLearnLessonTitle(lesson, lang)} — Opten course`
       : "Opten private course";

@@ -1,33 +1,32 @@
-## Course Page Title and Description — Design QA
+## Course Page Title Only — Design QA
 
 **Findings**
 - No actionable P0/P1/P2 findings remain.
 
 **Open Questions**
-- None. The supplied visual is the source of truth for the course title, description, and explicit desktop line breaks; the existing course video, checkout, lesson navigation, and responsive layout remain intentionally unchanged.
+- None. The latest user clarification overrides the earlier course-page interpretation: only the title changes, and the normal course description/layout must remain intact.
 
 **Implementation Checklist**
-- Updated the RU course title to `Нейросети` / `в веб-дизайне` on the course root.
-- Matched the supplied RU description verbatim and locked it to the same seven desktop lines.
-- Kept mobile wrapping natural while preserving the two-line title and preventing horizontal overflow.
-- Updated the shared course title and description so breadcrumbs and checkout headings on lesson pages no longer show `Нейросети в визуале`.
-- Updated the EN course title and description to remain semantically aligned.
-- Kept document titles single-line even though the visible desktop heading uses an explicit break.
+- Updated only the course title to `Нейросети в веб-дизайне` / `AI in web design`.
+- Restored the original course description in RU and EN.
+- Restored the normal course header typography: one title line on desktop and the existing two-line desktop description clamp.
+- Kept the shared new title in breadcrumbs and checkout headings on lesson pages.
+- Kept mobile wrapping natural and confirmed there is no horizontal overflow.
 
 **Follow-up Polish**
 - No P3 follow-up is needed for the requested state.
 
-source visual truth path: `C:\Users\КОМП\AppData\Local\Temp\codex-clipboard-69a8efb8-8078-4269-ab70-7a1a33c1f8e9.png`
-implementation screenshot path: `C:\Users\КОМП\AppData\Local\Temp\opten-course-copy-desktop.png`
-mobile implementation screenshot path: `C:\Users\КОМП\AppData\Local\Temp\opten-course-copy-mobile.png`
+source visual truth path: `C:\Users\КОМП\AppData\Local\Temp\codex-clipboard-69a8efb8-8078-4269-ab70-7a1a33c1f8e9.png`, used for the requested title wording; latest user clarification controls the course-page one-line layout and preserves its existing description.
+implementation screenshot path: `C:\Users\КОМП\AppData\Local\Temp\opten-course-title-one-line-desktop.png`
+mobile implementation screenshot path: `C:\Users\КОМП\AppData\Local\Temp\opten-course-title-one-line-mobile.png`
 viewport: desktop browser override `1440x1000` with `1425px` document width; mobile browser override `390x844` with `375px` document width
 state: signed-out RU course root `/learn/courses/ai-content-marketing-2026` plus lesson `/learn/courses/ai-content-marketing-2026/lesson-1-prompting`
-full-view comparison evidence: side-by-side source/course implementation at `C:\Users\КОМП\AppData\Local\Temp\opten-course-copy-comparison.png`
-focused region comparison evidence: desktop course heading measured exactly two lines (`32px` type, `35.84px` line-height) and the description exactly seven lines (`16px` type, `24.8px` line-height, `white-space: pre-line`).
-required fidelity surfaces: RU title and description match the supplied reference verbatim; explicit desktop line breaks match; PT Root UI, Opten colors, course column geometry, video, purchase card, lesson list, and existing CTAs were preserved; mobile uses natural wrapping and has no horizontal overflow.
+full-view comparison evidence: side-by-side source/course implementation at `C:\Users\КОМП\AppData\Local\Temp\opten-course-title-one-line-comparison.png`
+focused region comparison evidence: desktop course heading measured exactly one line (`32px` type, `35.84px` line-height, `752px` available width); the restored course description measured its original two lines.
+required fidelity surfaces: PT Root UI typography, existing course spacing/layout rhythm, Opten colors/tokens, video/image quality, checkout, lesson list, and all CTAs were preserved; only title copy changed; mobile uses natural wrapping and has no horizontal overflow.
 primary interactions tested: the course root loaded in the default signed-out checkout state; the first lesson route retained the updated course breadcrumb and checkout heading; no payment, promo, or access action was triggered.
 console errors checked: no console errors were present in the final root or lesson state.
-comparison history: the first post-change comparison confirmed the requested copy and line wrapping in the existing course layout, so no additional visual-fix iteration was required.
+comparison history: the earlier pass changed title wrapping and course description; the user identified that as out of scope. The corrective pass restored the description/header behavior and confirmed the new title is one line on desktop.
 final result: passed
 
 ---
