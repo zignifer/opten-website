@@ -50,7 +50,7 @@
 │     GET /api/download-skill   →  validates JWT + Pro, streams opten.zip      │
 │     POST /api/prompt-workbench → image/video Improve + Vibe Coding cleaner   │
 │       coding text in Image/Video → 409 before proxy/usage reservation         │
-│       Vibe: finalize before 200; semantic/meta reject → exact release + 422   │
+│       Vibe: reject → one same-reservation correction → finalize/release      │
 │     POST /api/course-prompt   →  course access gate + prompt body            │
 │     POST /api/kinescope-course-token → course access gate + drmauthtoken     │
 │     POST /api/kinescope-course-auth  → Kinescope playback callback           │

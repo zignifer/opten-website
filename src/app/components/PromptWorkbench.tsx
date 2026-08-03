@@ -71,7 +71,7 @@ const copy = {
     proRequired: "Кредиты доступны после входа или оплаты Pro.",
     authChecking: "Проверяем аккаунт. Попробуйте ещё раз.",
     entitlementUnavailable: "Не удалось проверить подписку. Попробуйте ещё раз.",
-    noImprovement: "Промпт не изменился — кредит возвращён. Уточните запрос и попробуйте ещё раз.",
+    noImprovement: "Не удалось получить корректно переписанный запрос — кредит возвращён. Исходный текст сохранён, попробуйте ещё раз.",
     vibecodingModeSuggested: "Похоже, это запрос для кодинг-агента. Режим переключён на «Вайбкодинг / Codex». Проверьте выбор и нажмите «Улучшить» ещё раз — кредит не списан.",
   },
   en: {
@@ -105,7 +105,7 @@ const copy = {
     proRequired: "Credits are available after sign-in or Pro payment.",
     authChecking: "Checking your account. Please try again.",
     entitlementUnavailable: "We could not verify your subscription. Please try again.",
-    noImprovement: "The prompt did not change, so your credit was returned. Add more detail and try again.",
+    noImprovement: "We could not produce a valid rewritten request, so your credit was returned. The original text was kept; please try again.",
     vibecodingModeSuggested: "This looks like a coding-agent request. The mode was switched to Vibe coding / Codex. Check the selection and click Improve again — no credit was used.",
   },
 } as const;

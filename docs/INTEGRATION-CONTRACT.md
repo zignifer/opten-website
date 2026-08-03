@@ -494,8 +494,10 @@ monthly cycle. Concurrent requests for one user are serialized in PostgreSQL; a
 provider failure releases only its exact reservation, and a repeated DB attempt
 reuses the same idempotency key. A signed website Vibe Coding request is the one
 quality-finalization exception: the proxy must run finalization after Anthropic but
-before serializing any HTTP 200 response. An exact no-op or guardrail rejection also
-releases that request's exact reservation before the proxy returns
+before serializing any HTTP 200 response. A rejected first draft may trigger at most
+one corrective Anthropic call inside the same reservation; it must not call
+`checkUsage` again or spend a second credit. An exact no-op or repeated guardrail
+rejection releases that request's exact reservation before the proxy returns
 `422 no_improvement`. A handler-level integration test must execute this order;
 calling the finalizer directly in a unit test is not sufficient billing coverage.
 
@@ -544,6 +546,9 @@ calling the finalizer directly in a unit test is not sufficient billing coverage
   instruction, caveat, negation, named tool/skill, workflow requirement, and
   completion condition remains. Explicit user instructions to plan, split work into
   stages, test, verify, stay on a branch, preserve context, commit, or push remain.
+  Feedback about a previous rewrite or cleaner result is converted into direct
+  imperative instructions to investigate and fix the explicitly described problem;
+  it is never answered as a conversation about the cleaner's role.
   The website sends
   `vibecoding_original` plus timestamp/model-bound HMAC headers derived from the
   server-only shared JWT secret; the proxy rejects unsigned use of this internal
@@ -554,7 +559,9 @@ calling the finalizer directly in a unit test is not sufficient billing coverage
   characters it must retain at least 50%, and shorter non-trivial requests at least
   40%. Anchor checks independently protect stages, planning, verification, testing,
   context/compaction, branch constraints, completion, commit/push, preservation, and
-  negation. Rejections release the exact reservation and return
+  negation. A rejected first provider draft receives at most one corrective retry
+  within the same usage reservation and provider request flow. If the corrective
+  result is also rejected, the proxy releases the exact reservation and returns
   `422 no_improvement` with `usage_released:true`. The site does not retry that
   response and shows the refund inline.
 - The proxy ignores client billing flags, uses Claude Haiku, loads the matching

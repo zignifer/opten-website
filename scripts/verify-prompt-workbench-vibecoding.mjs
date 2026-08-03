@@ -157,6 +157,8 @@ try {
   assert.match(api, /vibecoding_original:\s*isVibecoding \? prompt/);
   assert.match(api, /!vibecodingPromptReferencesImages\(prompt\) \? \[\] : images/);
   assert.match(cleaner, /Every semantic element[\s\S]*explicit source/i);
+  assert.match(cleaner, /feedback about a previous rewrite[\s\S]*direct imperative instructions/i);
+  assert.match(cleaner, /Do not begin with an acknowledgement/i);
   assert.match(cleaner, /Coverage is more important than brevity/i);
   assert.match(cleaner, /never summarization/i);
   assert.match(cleaner, /return the original request unchanged/i);

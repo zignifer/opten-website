@@ -355,9 +355,11 @@ scripts/verify-prompt-workbench-vibecoding.mjs
 1. Семантическое равенство нельзя доказать одной строковой эвристикой. Cleaner
    prompt остаётся главным closed-world правилом, а runtime guardrails работают
    как fail-safe внутри proxy: при сомнении отклоняют результат.
-2. Ответ провайдера, не прошедший parsing/guardrails, получает
-   `422 no_improvement`, не ретраится и освобождает точную atomic reservation.
-   Сайт показывает возврат кредита, обновляет баланс и не подменяет платный ответ
+2. Ответ провайдера, не прошедший parsing/guardrails, получает максимум одну
+   corrective-попытку внутри той же atomic reservation, без повторного
+   `checkUsage`. Если повторный draft тоже отклонён, proxy возвращает
+   `422 no_improvement` и освобождает точную reservation. Сайт сам не ретраит,
+   показывает возврат кредита, обновляет баланс и не подменяет платный ответ
    исходным текстом как будто улучшение состоялось.
 3. Вложения передаются coding-модели только при явной текстовой ссылке на
    изображение, скриншот, референс или макет. В остальных случаях байты остаются
@@ -381,7 +383,7 @@ scripts/verify-prompt-workbench-vibecoding.mjs
 - [x] Этап 4 — третий тип в существующих селекторах, default `Codex`, RU/EN copy,
   сохранение текста и сброс transient error/copy state без изменения layout-классов.
 - [x] Этап 5 — контракты и `AGENTS.md` / `CLAUDE.md` синхронизированы;
-  focused website verifier (57 golden cases), 35 proxy tests, полный `npm run build` и Playwright
+  focused website verifier (57 golden cases), 36 proxy tests, полный `npm run build` и Playwright
   smoke пройдены.
 
 ## 18. Исправление регрессии семантического сжатия
@@ -421,5 +423,26 @@ rewriter и мог получить оплаченный разговорный 
 
 Первичный production rollout выполнен в порядке `promptscore-proxy` →
 `opten-website`; оба репозитория были закоммичены, запушены и проверены на основных
-production-доменах. Исправление wrong-mode reload из раздела 19 следует выкатывать
-как website-only изменение после focused, build и Playwright reload smoke.
+production-доменах. Исправление wrong-mode reload из раздела 19 также выкатено и
+проверено Playwright smoke на `opten.space` без вызова proxy.
+
+## 20. Корректирующая попытка для meta-feedback
+
+Повторная production-проверка показала, что при правильно выбранном
+`Вайбкодинг / Codex` запрос обратной связи о предыдущем результате дважды получал
+`meta_response`: Claude отвечал пользователю как собеседник вместо выдачи прямого
+задания. Runtime guard вернул оба кредита, однако полезного результата не было.
+
+Cleaner и три `_coding-*` adapter теперь отдельно требуют преобразовывать явно
+сформулированные жалобы и просьбы разобраться в прямые повелительные инструкции:
+проверить прежний результат, выяснить причину потери требований и исправить её.
+Proxy при первом guardrail rejection выполняет максимум одну corrective Anthropic
+попытку с причиной отклонения внутри той же usage reservation. Повторного
+`checkUsage` нет, поэтому пользователь платит максимум один кредит. Успешная
+corrective-попытка сохраняет исходную reservation как одну операцию; повторный
+reject освобождает её и возвращает `422 no_improvement`.
+
+Handler-level тест моделирует реальный сбой `meta_response` на первом вызове и
+валидный прямой запрос на втором, требует HTTP 200, ровно один `checkUsage`, два
+provider-вызова и отсутствие release. Отдельный тест повторного reject требует
+ровно один release и восстановленный баланс.
