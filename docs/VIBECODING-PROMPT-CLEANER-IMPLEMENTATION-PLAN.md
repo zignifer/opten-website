@@ -1,7 +1,7 @@
 # План реализации режима «Вайбкодинг» в генераторе промптов
 
 **Дата:** 2–3 августа 2026 года
-**Статус:** реализовано и локально проверено; production deploy не выполнялся
+**Статус:** реализовано; после production-регрессии добавлен no-op refund hotfix
 **Основной репозиторий:** `C:\Projects\opten-website`
 **Связанный backend:** `C:\Projects\promptscore-proxy`
 
@@ -136,7 +136,7 @@
 - не подключать к coding-запросу текущий image/video `rewriter.md`;
 - сохранить JWT verification, body cap, retries, timeout и общую обработку ошибок;
 - оставить одну billable operation на явный клик `Улучшить`;
-- возвращать исходный prompt при безопасном no-op или при нарушении семантических guardrails;
+- возвращать `422 no_improvement` и освобождать точную usage reservation при no-op или нарушении guardrails;
 - не сохранять prompt, результат или references в Supabase, localStorage или логи.
 
 ### Новый server-only prompt
@@ -183,7 +183,7 @@ Model-specific слой не меняет смысл и не добавляет 
 - website endpoint отображает публичные slugs `codex | claude | gemini` во внутренние `_coding-*` slugs;
 - файлы с `_` не попадают в публичный `/api/skill?list=1` и недоступны через публичный skill endpoint;
 - сохранить существующий `/api/rewrite`, auth, rate limit, atomic reservation и release-on-provider-failure;
-- использовать отдельный `source`, например `website_vibecoding`, только для наблюдаемости; billing остаётся безусловным;
+- использовать `source: website_vibecoding` и серверную HMAC-подпись, чтобы только сайт мог включить proxy-finalization и release-on-no-op;
 - не менять extension request shape и поведение image/video skill-файлов.
 
 ## 9. Runtime guardrails
@@ -354,10 +354,11 @@ scripts/verify-prompt-workbench-vibecoding.mjs
 
 1. Семантическое равенство нельзя доказать одной строковой эвристикой. Cleaner
    prompt остаётся главным closed-world правилом, а runtime guardrails работают
-   как fail-safe: при сомнении возвращают исходный запрос.
-2. Ответ провайдера, не прошедший parsing/guardrails, считается успешным no-op и
-   не вызывает повторный proxy-запрос. Так один уже оплаченный provider response
-   не приводит к дополнительному списанию из-за локальной валидации.
+   как fail-safe внутри proxy: при сомнении отклоняют результат.
+2. Ответ провайдера, не прошедший parsing/guardrails, получает
+   `422 no_improvement`, не ретраится и освобождает точную atomic reservation.
+   Сайт показывает возврат кредита, обновляет баланс и не подменяет платный ответ
+   исходным текстом как будто улучшение состоялось.
 3. Вложения передаются coding-модели только при явной текстовой ссылке на
    изображение, скриншот, референс или макет. В остальных случаях байты остаются
    только в памяти браузера и не влияют на результат.
@@ -376,11 +377,11 @@ scripts/verify-prompt-workbench-vibecoding.mjs
 - [x] Этап 2 — `_coding-codex`, `_coding-claude`, `_coding-gemini`; public catalog
   и direct-fetch блокировка проверены proxy test suite.
 - [x] Этап 3 — backend allowlist/branch, server-side slug mapping, explicit-image
-  gating и successful no-op fallback.
+  gating, server HMAC и refundable no-op finalization.
 - [x] Этап 4 — третий тип в существующих селекторах, default `Codex`, RU/EN copy,
   сохранение текста и сброс transient error/copy state без изменения layout-классов.
 - [x] Этап 5 — контракты и `AGENTS.md` / `CLAUDE.md` синхронизированы;
-  focused website verifier, 30 proxy tests, полный `npm run build` и Playwright
+  focused website verifier (56 golden cases), 33 proxy tests, полный `npm run build` и Playwright
   smoke пройдены.
 
 Итоговый визуальный smoke выполнен для RU/EN на desktop и mobile. Выбор режима не

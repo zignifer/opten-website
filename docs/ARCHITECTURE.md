@@ -200,7 +200,8 @@ api/
 ├── download-skill.ts              — Pro-gated opten.zip stream
 ├── prompt-workbench.ts            — authenticated landing Improve endpoint;
 │                                     popup image/video + site-only Vibe Coding
-│                                     → proxy Haiku + shared ledger
+│                                     → signed proxy Haiku + shared ledger;
+│                                       no-op/guard reject → exact release + 422
 ├── course-prompt.ts               — course-entitlement-gated prompt body fetch
 ├── kinescope-course-token.ts      — course-entitlement-gated Kinescope embed URL
 ├── kinescope-course-auth.ts       — Kinescope server-to-server playback callback

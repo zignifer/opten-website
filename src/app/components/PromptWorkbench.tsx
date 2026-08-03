@@ -22,6 +22,7 @@ interface ApiResponse {
   error?: string;
   result?: { prompt: string };
   retry_after?: number;
+  usage_released?: boolean;
 }
 
 const MAX_PROMPT_CHARS = 6_000;
@@ -68,6 +69,7 @@ const copy = {
     proRequired: "Кредиты доступны после входа или оплаты Pro.",
     authChecking: "Проверяем аккаунт. Попробуйте ещё раз.",
     entitlementUnavailable: "Не удалось проверить подписку. Попробуйте ещё раз.",
+    noImprovement: "Промпт не изменился — кредит возвращён. Уточните запрос и попробуйте ещё раз.",
   },
   en: {
     title: "Opten prompt generator",
@@ -100,6 +102,7 @@ const copy = {
     proRequired: "Credits are available after sign-in or Pro payment.",
     authChecking: "Checking your account. Please try again.",
     entitlementUnavailable: "We could not verify your subscription. Please try again.",
+    noImprovement: "The prompt did not change, so your credit was returned. Add more detail and try again.",
   },
 } as const;
 
@@ -111,6 +114,7 @@ function errorMessage(error: string | undefined, lang: "ru" | "en") {
   if (error === "entitlement_unavailable") return text.entitlementUnavailable;
   if (error === "prompt_too_short") return text.tooShort;
   if (error === "prompt_too_long") return text.tooLong;
+  if (error === "no_improvement") return text.noImprovement;
   if (error === "provider_unavailable" || error === "provider_timeout" || error === "AbortError" || error === "provider_failed") return text.unavailable;
   return text.genericError;
 }
@@ -343,6 +347,7 @@ export default function PromptWorkbench() {
         }),
       });
       const payload = await response.json().catch(() => ({})) as ApiResponse;
+      if (payload.error === "no_improvement" && payload.usage_released) void refresh();
       if (!response.ok || !payload.result?.prompt) throw new Error(payload.error || "request_failed");
       setPrompt(payload.result.prompt);
       void refresh();

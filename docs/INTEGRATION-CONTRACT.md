@@ -492,7 +492,9 @@ new Free accounts may spend their one-time signup credits, exhausted/old Free
 accounts receive a limit error, and Pro accounts spend the normal 300-operation
 monthly cycle. Concurrent requests for one user are serialized in PostgreSQL; a
 provider failure releases only its exact reservation, and a repeated DB attempt
-reuses the same idempotency key.
+reuses the same idempotency key. A signed website Vibe Coding request is the one
+quality-finalization exception: an exact no-op or guardrail rejection also releases
+that request's exact reservation before the proxy returns `422 no_improvement`.
 
 - Accepted action: `improve` only. Prompt scoring is not part of this endpoint.
 - Allowed image models, in popup order: `nano-banana-2`, `nano-banana-pro`,
@@ -525,14 +527,20 @@ reuses the same idempotency key.
   but loads the separate site-owned `vibecoding-cleaner.md`, maps the three public
   model slugs to `_coding-*`, and sends `source: website_vibecoding`. Its
   closed-world contract permits only cleanup/reordering of existing meaning,
-  preserves the user's prose language and protected literals, and never adds a
-  stack, product requirements, tests, acceptance criteria, or a plan. Runtime
-  guardrails reject empty/wrapped/expanded/drifted output and return the original
-  prompt as a successful no-op after a valid provider response; they do not retry
-  or consume another operation for guardrail fallback.
+  preserves the user's prose language and protected literals, and never invents a
+  stack, product requirements, tests, acceptance criteria, or a plan. Explicit
+  user instructions to plan/test/verify remain. The website sends
+  `vibecoding_original` plus timestamp/model-bound HMAC headers derived from the
+  server-only shared JWT secret; the proxy rejects unsigned use of this internal
+  mode before reservation. Runtime guardrails reject exact no-op,
+  empty/wrapped/over-expanded/drifted output, release the exact reservation, and
+  return `422 no_improvement` with `usage_released:true`. The site does not retry
+  that response and shows the refund inline.
 - The proxy ignores client billing flags, uses Claude Haiku, loads the matching
-  server-side skill, and charges every rewrite against the shared operation
-  ledger. The website server never receives the Anthropic API key and never
+  server-side skill, and charges each accepted rewrite against the shared operation
+  ledger. Signed Vibe Coding no-op/rejections are finalized and released by the
+  proxy itself; callers cannot request a refund through a client billing field.
+  The website server never receives the Anthropic API key and never
   decides usage entitlement locally beyond JWT verification.
 - The canonical quick-Improve rewriter prompt remains extension-owned at
   `C:\Projects\promptscore\config\`. Run `npm run sync:prompt-workbench` to

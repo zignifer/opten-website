@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash, createHmac } from "node:crypto";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -59,8 +60,14 @@ try {
       assert.equal(typeof fixture.allowNoop, "boolean", `${fixture.id}: allowNoop must be explicit`);
 
       const validation = validateVibecodingCandidate(fixture.input, fixture.expected);
-      assert.equal(validation.accepted, true, `${fixture.id}: golden output rejected as ${validation.reason}`);
-      assert.equal(validation.prompt, fixture.expected.trim(), `${fixture.id}: accepted output must remain unchanged`);
+      const expectedNoChange = fixture.input.trim().replace(/\s+/g, " ") === fixture.expected.trim().replace(/\s+/g, " ");
+      if (expectedNoChange) {
+        assert.equal(validation.accepted, false, `${fixture.id}: a provider no-op must not be billed as an improvement`);
+        assert.equal(validation.reason, "no_change", `${fixture.id}: unchanged output must be classified as no_change`);
+      } else {
+        assert.equal(validation.accepted, true, `${fixture.id}: golden output rejected as ${validation.reason}`);
+        assert.equal(validation.prompt, fixture.expected.trim(), `${fixture.id}: accepted output must remain unchanged`);
+      }
 
       const expectedLower = fixture.expected.toLocaleLowerCase();
       for (const required of fixture.required) {
@@ -74,9 +81,7 @@ try {
       for (const forbidden of fixture.forbidden) {
         assert.ok(!expectedLower.includes(forbidden.toLocaleLowerCase()), `${fixture.id}: forbidden addition appeared: ${forbidden}`);
       }
-      if (fixture.allowNoop) {
-        assert.equal(validateVibecodingCandidate(fixture.input, fixture.input).accepted, true, `${fixture.id}: safe no-op must be accepted`);
-      }
+      assert.equal(validateVibecodingCandidate(fixture.input, fixture.input).reason, "no_change", `${fixture.id}: exact no-op must be refundable`);
     } catch (error) {
       fixtureFailures.push(error instanceof Error ? error.message : String(error));
     }
@@ -90,10 +95,10 @@ try {
   }
 
   assert.equal(validateVibecodingCandidate("Fix POST /api/items without changing `itemId`.", "Fix the endpoint.").reason, "missing_protected_fragment");
-  assert.equal(validateVibecodingCandidate("Create a landing page for a florist.", "Create a modern responsive landing page for a florist.").reason, "expanded_short_request");
+  assert.equal(validateVibecodingCandidate("Create a landing page for a florist.", "Create a modern responsive landing page for a florist.").reason, "introduced_requirement");
   assert.equal(validateVibecodingCandidate("Create a straightforward landing page for a florist with a catalog and contacts.", "Create a minimalist landing page for a florist with a catalog and contacts.").reason, "introduced_requirement");
   assert.equal(validateVibecodingCandidate("Исправь кнопку оплаты в форме заказа.", "```\nИсправь кнопку оплаты в форме заказа.\n```").reason, "formatting_wrapper");
-  assert.equal(validateVibecodingCandidate("Исправь кнопку оплаты и сохрани форму заказа.", "Исправь кнопку.").reason, "lost_meaningful_terms");
+  assert.equal(validateVibecodingCandidate("Исправь кнопку оплаты и сохрани форму заказа.", "Исправь кнопку.").reason, "compressed_too_far");
   assert.equal(validateVibecodingCandidate("Нужно что-то сделать с профилем.", "").reason, "empty");
 
   assert.equal(detectVibecodingPromptLanguage("Исправь handleSubmit в UserCard"), "ru");
@@ -116,7 +121,9 @@ try {
   assert.match(component, /<option value="vibecoding"/);
   assert.match(api, /codex:\s*"_coding-codex"[\s\S]*claude:\s*"_coding-claude"[\s\S]*gemini:\s*"_coding-gemini"/);
   assert.match(api, /source:\s*isVibecoding \? "website_vibecoding" : "popup"/);
-  assert.match(api, /validateVibecodingCandidate\(prompt,/);
+  assert.doesNotMatch(api, /validateVibecodingCandidate\(prompt,/, "website must not silently replace a billed proxy result after proxy finalization");
+  assert.match(api, /X-Opten-Website-Signature/);
+  assert.match(api, /vibecoding_original:\s*isVibecoding \? prompt/);
   assert.match(api, /!vibecodingPromptReferencesImages\(prompt\) \? \[\] : images/);
   assert.match(cleaner, /Every semantic element[\s\S]*explicit source/i);
   assert.match(cleaner, /return the original request unchanged/i);
@@ -161,14 +168,26 @@ try {
     let nextProxyText = "";
     let nextProxyStatus = 200;
     let nextProxyPlan = "free";
+    let nextProxyExtra = {};
     globalThis.fetch = async (url, init) => {
       assert.equal(String(url), "https://promptscore-proxy.vercel.app/api/rewrite");
-      proxyRequests.push(JSON.parse(init.body));
+      const request = JSON.parse(init.body);
+      proxyRequests.push(request);
+      if (request.source === "website_vibecoding") {
+        const timestamp = init.headers["X-Opten-Website-Timestamp"];
+        const signature = init.headers["X-Opten-Website-Signature"];
+        const promptHash = createHash("sha256").update(request.vibecoding_original, "utf8").digest("hex");
+        const expectedSignature = createHmac("sha256", testJwtSecret)
+          .update(`${timestamp}\n${request.model_name}\n${promptHash}`, "utf8")
+          .digest("hex");
+        assert.equal(signature, expectedSignature, "website Vibe Coding request must be server-signed");
+      }
       return new Response(JSON.stringify({
         content: [{ type: "text", text: nextProxyText }],
         remaining: 2,
         limit: 300,
         plan: nextProxyPlan,
+        ...nextProxyExtra,
       }), { status: nextProxyStatus, headers: { "Content-Type": "application/json" } });
     };
 
@@ -187,29 +206,35 @@ try {
     assert.match(proxyRequests[0].system_prompt, /closed-world editing task/i);
 
     const screenshotPrompt = "По приложенному скриншоту выровняй кнопку с полем ввода, больше ничего не меняй.";
-    nextProxyText = "По скриншоту создай современный адаптивный интерфейс и добавь новую форму.";
+    nextProxyStatus = 422;
+    nextProxyExtra = { error: "no_improvement", reason: "introduced_requirement", usage_released: true, remaining: 3 };
+    const requestCountBeforeGuard = proxyRequests.length;
     const guarded = await callHandler({
       action: "improve",
       prompt: screenshotPrompt,
       model: "claude",
       images: [{ data: "YWJj", mediaType: "image/jpeg" }],
     });
-    assert.equal(guarded.statusCode, 200);
-    assert.equal(guarded.body.result.prompt, screenshotPrompt, "unsafe provider output must become a successful no-op");
+    assert.equal(guarded.statusCode, 422);
+    assert.equal(guarded.body.error, "no_improvement");
+    assert.equal(guarded.body.usage_released, true, "rejected provider output must restore the credit");
+    assert.equal(proxyRequests.length, requestCountBeforeGuard + 1, "refundable no-improvement must never be retried and billed again");
     assert.equal(proxyRequests[1].model_name, "_coding-claude");
     assert.ok(Array.isArray(proxyRequests[1].messages[0].content), "explicit screenshot references must keep the attachment");
     assert.equal(proxyRequests[1].messages[0].content.some((item) => item.type === "image"), true);
+    nextProxyStatus = 200;
+    nextProxyExtra = {};
 
     for (const [publicModel, internalModel] of [["codex", "_coding-codex"], ["claude", "_coding-claude"], ["gemini", "_coding-gemini"]]) {
       nextProxyText = "Create a landing page for a delivery service.";
-      const response = await callHandler({ action: "improve", prompt: nextProxyText, model: publicModel, images: [] });
+      const response = await callHandler({ action: "improve", prompt: "Hey, please create a landing page for a delivery service.", model: publicModel, images: [] });
       assert.equal(response.statusCode, 200);
       assert.equal(proxyRequests.at(-1).model_name, internalModel);
     }
 
     nextProxyPlan = "pro";
     nextProxyText = "Create a landing page for a delivery service.";
-    const proSuccess = await callHandler({ action: "improve", prompt: nextProxyText, model: "codex", images: [] });
+    const proSuccess = await callHandler({ action: "improve", prompt: "Hey, please create a landing page for a delivery service.", model: "codex", images: [] });
     assert.equal(proSuccess.statusCode, 200);
     assert.equal(proSuccess.body.plan, "pro");
     assert.equal(proSuccess.body.tier, "pro");

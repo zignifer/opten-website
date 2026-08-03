@@ -2,6 +2,7 @@
 // Mirrors the extension popup's POPUP_REWRITE_PROMPT quick-Improve transport.
 
 import { readFileSync } from "node:fs";
+import { createHash, createHmac } from "node:crypto";
 import { join } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { PROMPT_WORKBENCH_MODELS, type PromptWorkbenchType } from "../src/content/promptWorkbenchModels.js";
@@ -11,7 +12,6 @@ import {
 } from "./_shared/optenServerAuth.js";
 import {
   detectVibecodingPromptLanguage,
-  validateVibecodingCandidate,
   vibecodingPromptReferencesImages,
 } from "./_shared/promptWorkbenchVibecoding.js";
 
@@ -48,10 +48,25 @@ type WorkbenchAccess =
 
 type ProxyPayload = {
   content?: Array<{ type?: string; text?: string }>;
+  error?: string;
+  reason?: string;
+  usage_released?: boolean;
   remaining?: number;
   limit?: number;
   plan?: string;
 };
+
+class WorkbenchProxyError extends Error {
+  usageReleased?: boolean;
+  usage?: Pick<ProxyPayload, "remaining" | "limit" | "plan">;
+
+  constructor(code: string, payload: ProxyPayload = {}) {
+    super(code);
+    this.name = "WorkbenchProxyError";
+    this.usageReleased = payload.usage_released;
+    this.usage = { remaining: payload.remaining, limit: payload.limit, plan: payload.plan };
+  }
+}
 
 function json(res: ServerResponse, status: number, body: Record<string, unknown>) {
   res.statusCode = status;
@@ -167,6 +182,18 @@ function readServerAsset(...segments: string[]) {
   return readFileSync(join(process.cwd(), ...segments), "utf8");
 }
 
+function buildVibecodingProxySignature(modelName: string, originalPrompt: string) {
+  const secret = process.env.SUPABASE_JWT_SECRET;
+  if (!secret) throw new Error("vibecoding_proxy_signature_unavailable");
+  const timestamp = String(Date.now());
+  const promptHash = createHash("sha256").update(originalPrompt, "utf8").digest("hex");
+  const message = `${timestamp}\n${modelName}\n${promptHash}`;
+  return {
+    timestamp,
+    signature: createHmac("sha256", secret).update(message, "utf8").digest("hex"),
+  };
+}
+
 async function resolveWorkbenchAccess(req: IncomingMessage): Promise<WorkbenchAccess> {
   const token = bearerTokenFromHeader(req.headers.authorization);
   if (!token) return { status: "authentication_required" };
@@ -209,6 +236,7 @@ async function callQuickImproveProxy(
   const proxyModel = isVibecoding
     ? VIBECODING_PROXY_MODELS[modelSlug as keyof typeof VIBECODING_PROXY_MODELS]
     : modelSlug;
+  const proxySignature = isVibecoding ? buildVibecodingProxySignature(proxyModel, prompt) : null;
   const requestBody = JSON.stringify({
     prompt: userMessage,
     messages: [{ role: "user", content: userContent }],
@@ -218,6 +246,7 @@ async function callQuickImproveProxy(
     max_tokens: 1_200,
     count_usage: true,
     source: isVibecoding ? "website_vibecoding" : "popup",
+    vibecoding_original: isVibecoding ? prompt : undefined,
   });
 
   let lastError: unknown = new Error("pro_provider_unavailable");
@@ -230,6 +259,10 @@ async function callQuickImproveProxy(
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
+          ...(proxySignature ? {
+            "X-Opten-Website-Timestamp": proxySignature.timestamp,
+            "X-Opten-Website-Signature": proxySignature.signature,
+          } : {}),
         },
         body: requestBody,
         signal: controller.signal,
@@ -241,21 +274,23 @@ async function callQuickImproveProxy(
 
       const payload = await response.json().catch(() => ({})) as ProxyPayload;
       if (response.status === 401) throw new Error("authentication_required");
+      if (response.status === 403 && payload.error === "invalid_website_signature") throw new Error("pro_provider_unavailable");
       if (response.status === 403) throw new Error("pro_required");
       if (response.status === 429) throw new Error("pro_limit_reached");
+      if (response.status === 422 && payload.error === "no_improvement") {
+        throw new WorkbenchProxyError("no_improvement", payload);
+      }
       if (!response.ok) throw new Error("pro_provider_unavailable");
 
       const text = payload.content?.find((item) => item?.type === "text" && typeof item.text === "string")?.text;
-      const rewrittenPrompt = isVibecoding
-        ? validateVibecodingCandidate(prompt, typeof text === "string" ? text : "").prompt
-        : cleanRewrittenText(text).slice(0, 12_000);
+      const rewrittenPrompt = cleanRewrittenText(text).slice(0, isVibecoding ? MAX_PROMPT_CHARS : 12_000);
       return {
         prompt: rewrittenPrompt,
         usage: { remaining: payload.remaining, limit: payload.limit, plan: payload.plan },
       };
     } catch (error) {
       const code = error instanceof Error ? error.message : "";
-      if (code === "authentication_required" || code === "pro_required" || code === "pro_limit_reached") throw error;
+      if (code === "authentication_required" || code === "pro_required" || code === "pro_limit_reached" || code === "no_improvement") throw error;
       lastError = error;
       if (attempt >= PROXY_RETRIES) throw error;
     } finally {
@@ -317,6 +352,13 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     if (code === "authentication_required") return json(res, 401, { error: code });
     if (code === "pro_required") return json(res, 403, { error: code });
     if (code === "pro_limit_reached") return json(res, 429, { error: code });
+    if (code === "no_improvement" && error instanceof WorkbenchProxyError) {
+      return json(res, 422, {
+        error: code,
+        usage_released: error.usageReleased === true,
+        ...error.usage,
+      });
+    }
     return json(res, isTimeout ? 504 : 502, { error: isTimeout ? "provider_timeout" : "provider_unavailable" });
   }
 }

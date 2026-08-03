@@ -1,13 +1,13 @@
 export type VibecodingGuardrailReason =
   | "accepted"
   | "empty"
+  | "no_change"
   | "too_long"
-  | "expanded_short_request"
   | "expanded_request"
+  | "compressed_too_far"
   | "formatting_wrapper"
   | "missing_protected_fragment"
-  | "introduced_requirement"
-  | "lost_meaningful_terms";
+  | "introduced_requirement";
 
 export interface VibecodingGuardrailResult {
   accepted: boolean;
@@ -15,7 +15,6 @@ export interface VibecodingGuardrailResult {
   reason: VibecodingGuardrailReason;
   missingProtectedFragments?: string[];
   introducedTerms?: string[];
-  retainedMeaningfulTermRatio?: number;
 }
 
 const MAX_PROMPT_CHARS = 6_000;
@@ -65,16 +64,6 @@ const FORBIDDEN_ADDITIONS = [
   "vercel",
 ] as const;
 
-const NON_SEMANTIC_WORDS = new Set([
-  "а", "бы", "в", "во", "вот", "давай", "для", "до", "же", "и", "или", "как", "какбы", "именно",
-  "который", "которая", "которые", "мне", "мой", "моя", "надо", "не", "ну", "нужно", "пожалуйста",
-  "значит", "короче", "нужен", "потом", "получается", "просто", "сделай", "сделайте", "сначала", "слушай", "создай", "создать", "то", "типа", "хочу", "чтобы", "это",
-  "этот", "эта", "этой", "этого", "эту", "я",
-  "a", "actually", "an", "and", "are", "be", "basically", "build", "could", "create", "do", "exactly", "first", "for", "from", "hey", "i",
-  "is", "it", "just", "kind", "like", "make", "me", "my", "need", "of", "or", "please", "should", "so", "that",
-  "the", "then", "this", "to", "want", "well", "while", "with", "would",
-]);
-
 function unique(values: string[]) {
   return [...new Set(values.filter(Boolean))];
 }
@@ -108,6 +97,8 @@ export function extractVibecodingProtectedFragments(prompt: string) {
   fragments.push(...collectMatches(prompt, /\b\d+(?:[.,]\d+)?\b/g));
   fragments.push(...collectMatches(prompt, /`[^`\r\n]+`|"[^"\r\n]+"|'[^'\r\n]+'|«[^»\r\n]+»/g));
   fragments.push(...collectMatches(prompt, /@[A-Za-z][A-Za-z0-9_-]*/g));
+  fragments.push(...collectMatches(prompt, /(?:^|[\s(])(?:branch|ветк[аеиуы]?|ветку)\s+([A-Za-z0-9._/-]+)/giu, 1).map(trimUrlPunctuation));
+  fragments.push(...collectMatches(prompt, /\b[A-Z][A-Za-z0-9]+(?:\s+[A-Z][A-Za-z0-9]+)+\b/g));
   fragments.push(...collectMatches(prompt, /\b[A-Za-z_$][A-Za-z0-9_$]*(?:[._][A-Za-z0-9_$-]+)+\b/g));
   fragments.push(...collectMatches(prompt, /\b[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9][A-Za-z0-9.-]*\b/g));
   fragments.push(...collectMatches(prompt, /\b[a-z_$][a-z0-9_$]*(?:[A-Z][A-Za-z0-9_$]*)+\b/g));
@@ -146,26 +137,18 @@ function hasFormattingWrapper(candidate: string, source: string) {
 function introducedForbiddenTerms(source: string, candidate: string) {
   const sourceLower = source.toLocaleLowerCase();
   const candidateLower = candidate.toLocaleLowerCase();
-  return FORBIDDEN_ADDITIONS.filter((term) => candidateLower.includes(term) && !sourceLower.includes(term));
+  return FORBIDDEN_ADDITIONS.filter((term) => {
+    if (!candidateLower.includes(term) || sourceLower.includes(term)) return false;
+    const significantParts = term.match(/[\p{L}\p{N}]+/gu)?.filter((part) => part.length >= 4) || [];
+    const alreadyPresent = significantParts.length > 0 && significantParts.every((part) => (
+      sourceLower.includes(part.slice(0, Math.min(6, part.length)))
+    ));
+    return !alreadyPresent;
+  });
 }
 
-function meaningfulTokens(value: string) {
-  const tokens = value.toLocaleLowerCase().match(/[\p{L}\p{N}][\p{L}\p{N}_-]*/gu) || [];
-  return unique(tokens.filter((token) => token.length >= 4 && !NON_SEMANTIC_WORDS.has(token)));
-}
-
-function tokensMatch(sourceToken: string, candidateToken: string) {
-  if (sourceToken === candidateToken) return true;
-  if (sourceToken.length < 5 || candidateToken.length < 5) return false;
-  return sourceToken.slice(0, 5) === candidateToken.slice(0, 5);
-}
-
-function retainedMeaningfulTermRatio(source: string, candidate: string) {
-  const sourceTokens = meaningfulTokens(source);
-  if (sourceTokens.length === 0) return 1;
-  const candidateTokens = meaningfulTokens(candidate);
-  const retained = sourceTokens.filter((sourceToken) => candidateTokens.some((candidateToken) => tokensMatch(sourceToken, candidateToken)));
-  return retained.length / sourceTokens.length;
+function normalizedComparison(value: string) {
+  return value.replace(/\s+/g, " ").trim();
 }
 
 export function validateVibecodingCandidate(sourceValue: string, candidateValue: string): VibecodingGuardrailResult {
@@ -174,21 +157,18 @@ export function validateVibecodingCandidate(sourceValue: string, candidateValue:
 
   if (!candidate) return { accepted: false, prompt: source, reason: "empty" };
   if (candidate.length > MAX_PROMPT_CHARS) return { accepted: false, prompt: source, reason: "too_long" };
-  if (candidate === source) return { accepted: true, prompt: source, reason: "accepted", retainedMeaningfulTermRatio: 1 };
+  if (normalizedComparison(candidate) === normalizedComparison(source)) {
+    return { accepted: false, prompt: source, reason: "no_change" };
+  }
 
   if (hasFormattingWrapper(candidate, source)) {
     return { accepted: false, prompt: source, reason: "formatting_wrapper" };
   }
 
-  if (source.length <= 160 && candidate.length > source.length) {
-    return { accepted: false, prompt: source, reason: "expanded_short_request" };
-  }
-
-  const allowedGrowth = Math.max(32, Math.ceil(source.length * 0.08));
+  const allowedGrowth = Math.max(120, Math.ceil(source.length * 0.5));
   if (candidate.length > source.length + allowedGrowth) {
     return { accepted: false, prompt: source, reason: "expanded_request" };
   }
-
   const protectedFragments = extractVibecodingProtectedFragments(source);
   const missingProtectedFragments = protectedFragments.filter((fragment) => !candidate.includes(fragment));
   if (missingProtectedFragments.length > 0) {
@@ -200,16 +180,9 @@ export function validateVibecodingCandidate(sourceValue: string, candidateValue:
     return { accepted: false, prompt: source, reason: "introduced_requirement", introducedTerms: [...introducedTerms] };
   }
 
-  const retainedRatio = retainedMeaningfulTermRatio(source, candidate);
-  const minimumRatio = meaningfulTokens(source).length <= 3 ? 1 : 0.72;
-  if (retainedRatio < minimumRatio) {
-    return {
-      accepted: false,
-      prompt: source,
-      reason: "lost_meaningful_terms",
-      retainedMeaningfulTermRatio: retainedRatio,
-    };
+  if (source.length >= 40 && candidate.length < Math.ceil(source.length * 0.4)) {
+    return { accepted: false, prompt: source, reason: "compressed_too_far" };
   }
 
-  return { accepted: true, prompt: candidate, reason: "accepted", retainedMeaningfulTermRatio: retainedRatio };
+  return { accepted: true, prompt: candidate, reason: "accepted" };
 }
