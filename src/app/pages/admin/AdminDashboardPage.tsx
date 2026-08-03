@@ -147,7 +147,6 @@ function AdminStatsView({ stats }: { stats: AdminTelegramStats }) {
   const metrics = useMemo(
     () => [
       { label: "Запустили бота", value: stats.funnel.start, icon: Users, tone: "slate" },
-      { label: "Выбрали курс", value: stats.events.course_access_clicked ?? 0, icon: CheckCircle2, tone: "blue" },
       { label: "Получили ссылку на курс", value: courseLinksSent, icon: KeyRound, tone: "lime" },
       { label: "Открыли курс", value: courseOpened, icon: CheckCircle2, tone: "blue" },
       { label: "Создали заказ", value: stats.orders.created, icon: ShoppingCart, tone: "amber" },

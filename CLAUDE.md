@@ -254,9 +254,9 @@ deployment compatibility and has `verify_jwt = false`; it validates
 `TELEGRAM_WEBHOOK_SECRET`, stores started users in
 `telegram_hidden_intro_leads`, writes
 funnel events to `telegram_hidden_intro_events`, and issues one random per-user
-`course_discount_claims` token from the explicit course branch. The course
-branch creates or reuses the claim immediately and opens the course root with a
-20% checkout discount for its first 24 hours. The retired lesson-zero route
+`course_discount_claims` token directly from `/start`. The start flow creates
+or reuses the claim immediately and opens the course root with a 20% checkout
+discount for its first 24 hours. The retired lesson-zero route
 `/learn/courses/ai-content-marketing-2026/hidden-intro` redirects to the course
 root while preserving `?claim=...`, so old links may retain an active checkout
 discount but can never open a video. The retired Kinescope video is not in the
@@ -292,20 +292,19 @@ and audit purposes. The bot's expired-state copy always shows the current 20%
 campaign wording instead of the stored historical percentage, so `/start`
 cannot surface the retired 40% message.
 
-For future `/start` updates only, the Telegram bot first sends one navigation
-message, `Что тебе сейчас интереснее?`, with three rows in this order:
-`Мой Telegram с промтами`, `Доступ к курсу по ИИ`, and
-`Все бесплатные уроки`. The Telegram row opens the
-public channel, while the final row opens the public `/learn/lessons` catalog.
-The course row immediately creates or reuses the one-time claim, sends the
-reviewed course intro video, and sends the HTML course offer with an `Открыть
-курс` button to the claim-bearing course root. It does not verify membership or
-grant the generator; the generator opens only after course purchase or through
-active Opten Pro. Retired callbacks `open_hidden_intro`, `check_subscription`,
-and `get_course_access` remain recognized only so buttons already present in old
-chats receive a short retirement notice and the current three-row menu. They
-must not call `getChatMember`, create a claim, grant access, or send the retired
-welcome photo/copy. Reminder links always open the claim-bearing course root.
+For future `/start` updates only, the Telegram bot immediately creates or reuses
+the one-time claim and shows the course without a navigation menu, channel
+membership check, free lesson, or lesson-zero branch. A newly created active
+claim sends the reviewed course intro video, then the Figma-approved HTML course
+offer with one `Открыть курс` button to the claim-bearing course root. A repeated
+request reuses the same token without extending it and sends the short `Ссылка
+на курс уже готова` response without replaying the video. It does not grant the
+generator; the generator opens only after course purchase or through active
+Opten Pro. Retired callbacks `open_hidden_intro`, `check_subscription`, and
+`get_course_access` remain recognized so buttons already present in old chats
+enter the same direct course flow; they must never call `getChatMember`, grant
+lesson access, or send the retired welcome photo/copy. Reminder links always
+open the claim-bearing course root.
 Changing `/start` must never trigger a broadcast or any message to existing
 leads. Every paid lesson continues to point to the normal course purchase surface.
 The locked Bot API name is `Влад Воронежцев | Уроки и промпты`, and the locked
@@ -317,8 +316,8 @@ Telegram-канал с промптами и полезными инструкц
 These exact name, short description, long description, and command values must
 be set and verified in both the default Bot API scope and the `ru` language
 scope, because Telegram clients may prefer the localized RU profile.
-If claim creation fails, the bot shows `Открыть курс` first and `Мой Telegram
-с промтами` second.
+If claim creation fails, the bot shows `Открыть курс` first and `Перейти в
+Telegram` second.
 The video must use a stable public HTTPS URL. The reviewed default is the
 source-controlled 720p H.264/AAC asset at
 `/assets/telegram/ai-content-marketing-2026-intro-v2.mp4` (17.5 MB, below
@@ -331,10 +330,11 @@ under `/admin`, not a Telegram-only one-off. The first module is Telegram
 course-funnel operations: read funnel stats through `/api/admin/telegram-stats`,
 send Telegram broadcasts through `/api/admin/telegram-broadcast`, and review or
 delete stored broadcast history through `/api/admin/telegram-broadcasts`. The
-active dashboard follows the current `/start` resource-menu flow and shows unique
-bot starts, course-offer clicks, checkout orders, successful payments, active
-discounts, and blocked chats. Historical subscription, lesson-zero, and
-free-lesson events may remain in storage for audit compatibility, but they are
+active dashboard follows the current direct `/start` course flow and shows
+unique bot starts, issued course links, course opens where tracked, checkout
+orders, successful payments, active discounts, and blocked chats. Historical
+course-selection, subscription, lesson-zero, and free-lesson events may remain
+in storage for audit compatibility, but they are
 not active funnel stages. Do not call a generic course-root open a lesson open.
 Payment counts come only from Telegram-attributed `course_orders` with
 `status='succeeded'`; the legacy `hidden-intro` endpoint, table, column, and
