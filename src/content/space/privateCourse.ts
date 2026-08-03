@@ -28,12 +28,12 @@ export type PrivateCourseIntroContent = {
 
 export const privateCourseIntroContent: PrivateCourseIntroContent = {
   title: {
-    ru: "Нейросети в визуале",
-    en: "AI for Visuals",
+    ru: "Нейросети\nв веб-дизайне",
+    en: "AI\nin web design",
   },
   description: {
-    ru: "На практике создадим с нуля бренд кофейни NOVA: промпты, фото, логотип и видео.\nЗатем соберём сайт и контент для рекламы, чтобы всё выглядело как одна система.",
-    en: "In practice, we build the NOVA coffee brand from scratch: prompts, photos, logo, and video.\nThen we assemble the website and ad content so the whole system feels consistent.",
+    ru: "Всё, что нужно знать для\nсоздания упаковки бренда,\nне имея навыков в дизайне\nи разработке. За 15 коротких\nуроков мы создадим логотип,\nфото и видео, запустим сайт\nи всё это с помощью ИИ!",
+    en: "Everything you need to know to\ncreate a complete brand package\nwithout design or development skills.\nAcross 15 short lessons, we will create\na logo, photos and videos, launch a site,\nand do it all with AI!",
   },
   posterPath: "/assets/learn/video/actual-ai-tools-2026-poster.jpg",
   publicIntroVideo: {
@@ -964,12 +964,12 @@ export const privateCourseLessons: LearnLesson[] = privateCourseLessonConfigs.ma
 export const privateCourseCollection: LearnCollection = {
   id: PRIVATE_COURSE_SLUG,
   title: {
-    ru: "Нейросети в визуале",
-    en: "AI for Visuals",
+    ru: "Нейросети в веб-дизайне",
+    en: "AI in web design",
   },
   description: {
-    ru: "Закрытый курс Opten по созданию контента и маркетинговой упаковки с помощью ИИ.",
-    en: "A private Opten course on creating content and marketing assets with AI.",
+    ru: "Всё, что нужно знать для создания упаковки бренда, не имея навыков в дизайне и разработке. За 15 коротких уроков мы создадим логотип, фото и видео, запустим сайт и всё это с помощью ИИ!",
+    en: "Everything you need to create a brand package without design or development skills. Across 15 short lessons, we will create a logo, photos and videos, launch a website, and do it all with AI.",
   },
   kind: "course",
   categoryLabel: {

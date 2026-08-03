@@ -596,8 +596,8 @@ function CourseIntroHeader({ intro }: { intro: PrivateCourseIntroContent }) {
 
   return (
     <section className="mt-[32px] max-w-[820px] max-md:mt-[28px]">
-      <h1 className="text-[32px] font-bold leading-[1.12] tracking-[-0.01em] text-white max-md:text-[30px]">{intro.title[lang]}</h1>
-      <p className="mt-[18px] max-w-[760px] whitespace-normal text-[16px] leading-[1.55] text-white/64 md:line-clamp-2 md:whitespace-pre-line max-md:mt-[18px] max-md:text-[18px] max-md:leading-[1.5]">
+      <h1 className="whitespace-normal text-[32px] font-bold leading-[1.12] tracking-[-0.01em] text-white md:whitespace-pre-line max-md:text-[30px]">{intro.title[lang]}</h1>
+      <p className="mt-[18px] max-w-[760px] whitespace-normal text-[16px] leading-[1.55] text-white/64 md:whitespace-pre-line max-md:mt-[18px] max-md:text-[18px] max-md:leading-[1.5]">
         {description}
       </p>
     </section>
