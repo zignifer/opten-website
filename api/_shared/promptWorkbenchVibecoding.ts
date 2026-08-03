@@ -6,7 +6,9 @@ export type VibecodingGuardrailReason =
   | "expanded_request"
   | "compressed_too_far"
   | "formatting_wrapper"
+  | "meta_response"
   | "missing_protected_fragment"
+  | "missing_semantic_anchor"
   | "introduced_requirement";
 
 export interface VibecodingGuardrailResult {
@@ -14,6 +16,7 @@ export interface VibecodingGuardrailResult {
   prompt: string;
   reason: VibecodingGuardrailReason;
   missingProtectedFragments?: string[];
+  missingAnchors?: string[];
   introducedTerms?: string[];
 }
 
@@ -62,6 +65,28 @@ const FORBIDDEN_ADDITIONS = [
   "supabase",
   "postgresql",
   "vercel",
+] as const;
+
+const META_RESPONSE_PATTERNS = [
+  /^\s*(?:я\s+(?:вижу|понимаю)(?=$|[\s,.;:])|мне\s+(?:нужно|необходимо)\s+уточнить(?=$|[\s,.;:])|i\s+(?:see|understand)\b|i\s+need\s+to\s+clarify\b)/iu,
+  /(?:^|\n)\s*(?:я\s*[—-]\s*(?:инструмент|ассистент)(?=$|[\s,.;:])|i\s+am\s+(?:a|an)\s+(?:tool|assistant)\b)/iu,
+  /(?:^|[^\p{L}\p{N}_])(?:моя\s+роль|my\s+role)(?=$|[^\p{L}\p{N}_])/iu,
+  /(?:^|\n)\s*(?:пожалуйста,?\s*)?(?:(?:предоставьте|пришлите|уточните|ответьте)(?=$|[\s,.;:])|please\s+(?:provide|send|clarify|answer)\b)/iu,
+] as const;
+
+const SEMANTIC_ANCHOR_GROUPS = [
+  { name: "stages", pattern: /(?:^|[^\p{L}\p{N}_])(?:этап\p{L}*|стади\p{L}*|шаг\p{L}*|stages?|phases?|steps?)(?=$|[^\p{L}\p{N}_])/iu },
+  { name: "planning", pattern: /(?:^|[^\p{L}\p{N}_])(?:план\p{L}*|спланир\p{L}*|planning|plan(?:ned|ning|s)?)(?=$|[^\p{L}\p{N}_])/iu },
+  { name: "verification", pattern: /(?:^|[^\p{L}\p{N}_])(?:перепровер\p{L}*|провер\p{L}*|аудит\p{L}*|verify\p{L}*|review\p{L}*|audit\p{L}*)(?=$|[^\p{L}\p{N}_])/iu },
+  { name: "testing", pattern: /(?:^|[^\p{L}\p{N}_])(?:тест\p{L}*|потест\p{L}*|tests?|testing|test)(?=$|[^\p{L}\p{N}_])/iu },
+  { name: "context", pattern: /(?:^|[^\p{L}\p{N}_])(?:контекст\p{L}*|context\p{L}*)(?=$|[^\p{L}\p{N}_])/iu },
+  { name: "compaction", pattern: /(?:^|[^\p{L}\p{N}_])(?:сжат\p{L}*|сокращ\p{L}*|обрез\p{L}*|compaction\p{L}*|compress\p{L}*|truncat\p{L}*)(?=$|[^\p{L}\p{N}_])/iu },
+  { name: "branch", pattern: /(?:^|[^\p{L}\p{N}_])(?:ветк\p{L}*|branch(?:es)?)(?=$|[^\p{L}\p{N}_])/iu },
+  { name: "completion", pattern: /(?:^|[^\p{L}\p{N}_])(?:рабоч\p{L}*|заверш\p{L}*|довед\p{L}*|готов\p{L}*|working|complete\p{L}*|finish\p{L}*)(?=$|[^\p{L}\p{N}_])/iu },
+  { name: "commit", pattern: /(?:^|[^\p{L}\p{N}_])(?:заком+ит\p{L}*|ком+ит\p{L}*|commit\p{L}*)(?=$|[^\p{L}\p{N}_])/iu },
+  { name: "push", pattern: /(?:^|[^\p{L}\p{N}_])(?:запуш\p{L}*|пуш\p{L}*|push\p{L}*)(?=$|[^\p{L}\p{N}_])/iu },
+  { name: "preservation", pattern: /(?:^|[^\p{L}\p{N}_])(?:сохран\p{L}*|не\s+тер\p{L}*|preserv\p{L}*|keep(?:ing|s|t)?)(?=$|[^\p{L}\p{N}_])/iu },
+  { name: "negation", pattern: /(?:^|[\s,.;:])(?:не|нельзя|никогда|никак|без|do\s+not|don't|never|without|must\s+not)(?=$|[\s,.;:])/iu },
 ] as const;
 
 function unique(values: string[]) {
@@ -151,6 +176,22 @@ function normalizedComparison(value: string) {
   return value.replace(/\s+/g, " ").trim();
 }
 
+function hasIntroducedMetaResponse(source: string, candidate: string) {
+  return META_RESPONSE_PATTERNS.some((pattern) => pattern.test(candidate) && !pattern.test(source));
+}
+
+function missingSemanticAnchors(source: string, candidate: string) {
+  return SEMANTIC_ANCHOR_GROUPS
+    .filter(({ pattern }) => pattern.test(source) && !pattern.test(candidate))
+    .map(({ name }) => name);
+}
+
+function minimumRetentionRatio(sourceLength: number) {
+  if (sourceLength >= 300) return 0.6;
+  if (sourceLength >= 160) return 0.5;
+  return 0.4;
+}
+
 export function validateVibecodingCandidate(sourceValue: string, candidateValue: string): VibecodingGuardrailResult {
   const source = sourceValue.trim();
   const candidate = candidateValue.trim();
@@ -164,6 +205,9 @@ export function validateVibecodingCandidate(sourceValue: string, candidateValue:
   if (hasFormattingWrapper(candidate, source)) {
     return { accepted: false, prompt: source, reason: "formatting_wrapper" };
   }
+  if (hasIntroducedMetaResponse(source, candidate)) {
+    return { accepted: false, prompt: source, reason: "meta_response" };
+  }
 
   const allowedGrowth = Math.max(120, Math.ceil(source.length * 0.5));
   if (candidate.length > source.length + allowedGrowth) {
@@ -175,12 +219,17 @@ export function validateVibecodingCandidate(sourceValue: string, candidateValue:
     return { accepted: false, prompt: source, reason: "missing_protected_fragment", missingProtectedFragments };
   }
 
+  const missingAnchors = missingSemanticAnchors(source, candidate);
+  if (missingAnchors.length > 0) {
+    return { accepted: false, prompt: source, reason: "missing_semantic_anchor", missingAnchors };
+  }
+
   const introducedTerms = introducedForbiddenTerms(source, candidate);
   if (introducedTerms.length > 0) {
     return { accepted: false, prompt: source, reason: "introduced_requirement", introducedTerms: [...introducedTerms] };
   }
 
-  if (source.length >= 40 && candidate.length < Math.ceil(source.length * 0.4)) {
+  if (source.length >= 40 && candidate.length < Math.ceil(source.length * minimumRetentionRatio(source.length))) {
     return { accepted: false, prompt: source, reason: "compressed_too_far" };
   }
 

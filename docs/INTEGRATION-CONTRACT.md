@@ -493,8 +493,11 @@ accounts receive a limit error, and Pro accounts spend the normal 300-operation
 monthly cycle. Concurrent requests for one user are serialized in PostgreSQL; a
 provider failure releases only its exact reservation, and a repeated DB attempt
 reuses the same idempotency key. A signed website Vibe Coding request is the one
-quality-finalization exception: an exact no-op or guardrail rejection also releases
-that request's exact reservation before the proxy returns `422 no_improvement`.
+quality-finalization exception: the proxy must run finalization after Anthropic but
+before serializing any HTTP 200 response. An exact no-op or guardrail rejection also
+releases that request's exact reservation before the proxy returns
+`422 no_improvement`. A handler-level integration test must execute this order;
+calling the finalizer directly in a unit test is not sufficient billing coverage.
 
 - Accepted action: `improve` only. Prompt scoring is not part of this endpoint.
 - Allowed image models, in popup order: `nano-banana-2`, `nano-banana-pro`,
@@ -528,14 +531,24 @@ that request's exact reservation before the proxy returns `422 no_improvement`.
   model slugs to `_coding-*`, and sends `source: website_vibecoding`. Its
   closed-world contract permits only cleanup/reordering of existing meaning,
   preserves the user's prose language and protected literals, and never invents a
-  stack, product requirements, tests, acceptance criteria, or a plan. Explicit
-  user instructions to plan/test/verify remain. The website sends
+  stack, product requirements, tests, acceptance criteria, or a plan. This is
+  semantic-preservation editing, not summarization: every independently actionable
+  instruction, caveat, negation, named tool/skill, workflow requirement, and
+  completion condition remains. Explicit user instructions to plan, split work into
+  stages, test, verify, stay on a branch, preserve context, commit, or push remain.
+  The website sends
   `vibecoding_original` plus timestamp/model-bound HMAC headers derived from the
   server-only shared JWT secret; the proxy rejects unsigned use of this internal
-  mode before reservation. Runtime guardrails reject exact no-op,
-  empty/wrapped/over-expanded/drifted output, release the exact reservation, and
-  return `422 no_improvement` with `usage_released:true`. The site does not retry
-  that response and shows the refund inline.
+  mode before reservation. Runtime guardrails reject exact no-op, empty/wrapped,
+  introduced conversational/meta responses, over-expanded, excessively compressed,
+  semantically incomplete, or drifted output. For source lengths of at least 300
+  characters the result must retain at least 60% of the source length; for 160–299
+  characters it must retain at least 50%, and shorter non-trivial requests at least
+  40%. Anchor checks independently protect stages, planning, verification, testing,
+  context/compaction, branch constraints, completion, commit/push, preservation, and
+  negation. Rejections release the exact reservation and return
+  `422 no_improvement` with `usage_released:true`. The site does not retry that
+  response and shows the refund inline.
 - The proxy ignores client billing flags, uses Claude Haiku, loads the matching
   server-side skill, and charges each accepted rewrite against the shared operation
   ledger. Signed Vibe Coding no-op/rejections are finalized and released by the

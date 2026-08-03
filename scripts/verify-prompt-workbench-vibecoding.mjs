@@ -98,8 +98,20 @@ try {
   assert.equal(validateVibecodingCandidate("Create a landing page for a florist.", "Create a modern responsive landing page for a florist.").reason, "introduced_requirement");
   assert.equal(validateVibecodingCandidate("Create a straightforward landing page for a florist with a catalog and contacts.", "Create a minimalist landing page for a florist with a catalog and contacts.").reason, "introduced_requirement");
   assert.equal(validateVibecodingCandidate("Исправь кнопку оплаты в форме заказа.", "```\nИсправь кнопку оплаты в форме заказа.\n```").reason, "formatting_wrapper");
-  assert.equal(validateVibecodingCandidate("Исправь кнопку оплаты и сохрани форму заказа.", "Исправь кнопку.").reason, "compressed_too_far");
+  assert.equal(validateVibecodingCandidate("Исправь кнопку оплаты в форме заказа и сделай надпись на ней короче.", "Исправь кнопку.").reason, "compressed_too_far");
   assert.equal(validateVibecodingCandidate("Нужно что-то сделать с профилем.", "").reason, "empty");
+
+  const longSource = "Смотри, нужно реализовать вот такой функционал, но я не уверен, что мы правильно всё тут спланировали. Поэтому нужно, чтобы ты всё перепроверил, разбил на этапы и через Super Powers сделал реализацию, делай всё сразу же в папке в ветки Main. Не переключай ни на какие там другие ветки, разбей там на этапы, спланируй реализацию, э-э так, чтобы контекст между сжатиями не терялся у нас при реализации. и всё реализуй, чтобы у меня в конечном итоге был рабочий функционал. в генераторе промтов на сайте под вайб-кодинг, получается.";
+  const missingRequirements = "Реализуй функционал вайб-кодинга по этапам через Super Powers в ветке Main.";
+  const missingRequirementsValidation = validateVibecodingCandidate(longSource, missingRequirements);
+  assert.equal(missingRequirementsValidation.reason, "missing_semantic_anchor");
+  for (const anchor of ["planning", "verification", "context", "compaction", "completion", "preservation", "negation"]) {
+    assert.ok(missingRequirementsValidation.missingAnchors?.includes(anchor), `Russian semantic guard must detect missing ${anchor}`);
+  }
+
+  const feedbackSource = "Смотри, он очень сильно много моментов упустил. Посмотри, что у нас там за правила и почему он не сохранил разбиение на этапы и Super Powers. Я не хотел такой сильной обрезки. Также этот текущий запрос он вообще не смог переписать.";
+  const metaResponse = "Я вижу ваше разочарование, но мне нужно уточнить мою роль.\n\nЯ — инструмент для очистки запроса.\n\nПожалуйста, предоставьте исходный текст ещё раз.";
+  assert.equal(validateVibecodingCandidate(feedbackSource, metaResponse).reason, "meta_response");
 
   assert.equal(detectVibecodingPromptLanguage("Исправь handleSubmit в UserCard"), "ru");
   assert.equal(detectVibecodingPromptLanguage("Fix handleSubmit in UserCard"), "en");
@@ -126,6 +138,8 @@ try {
   assert.match(api, /vibecoding_original:\s*isVibecoding \? prompt/);
   assert.match(api, /!vibecodingPromptReferencesImages\(prompt\) \? \[\] : images/);
   assert.match(cleaner, /Every semantic element[\s\S]*explicit source/i);
+  assert.match(cleaner, /Coverage is more important than brevity/i);
+  assert.match(cleaner, /never summarization/i);
   assert.match(cleaner, /return the original request unchanged/i);
   assert.match(cleaner, /Do not translate the request/i);
 

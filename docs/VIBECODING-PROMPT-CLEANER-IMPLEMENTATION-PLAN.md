@@ -362,7 +362,7 @@ scripts/verify-prompt-workbench-vibecoding.mjs
 3. Вложения передаются coding-модели только при явной текстовой ссылке на
    изображение, скриншот, референс или макет. В остальных случаях байты остаются
    только в памяти браузера и не влияют на результат.
-4. Golden dataset проверяет 54 RU/EN контрактных кейса, исполняемые guardrails,
+4. Golden dataset проверяет 57 RU/EN контрактных кейсов, исполняемые guardrails,
    безопасный no-op, protected literals и фактический request adapter через
    локальный mock proxy. Он не делает 54 платных live-запроса и не выдаёт
    статическую проверку за доказательство поведения LLM в продакшене.
@@ -372,7 +372,7 @@ scripts/verify-prompt-workbench-vibecoding.mjs
 
 ## 17. Исполнительный журнал этапов
 
-- [x] Этап 1 — отдельный `vibecoding-cleaner.md`, runtime guardrails и 54 golden
+- [x] Этап 1 — отдельный `vibecoding-cleaner.md`, runtime guardrails и 57 golden
   fixtures.
 - [x] Этап 2 — `_coding-codex`, `_coding-claude`, `_coding-gemini`; public catalog
   и direct-fetch блокировка проверены proxy test suite.
@@ -381,8 +381,23 @@ scripts/verify-prompt-workbench-vibecoding.mjs
 - [x] Этап 4 — третий тип в существующих селекторах, default `Codex`, RU/EN copy,
   сохранение текста и сброс transient error/copy state без изменения layout-классов.
 - [x] Этап 5 — контракты и `AGENTS.md` / `CLAUDE.md` синхронизированы;
-  focused website verifier (56 golden cases), 33 proxy tests, полный `npm run build` и Playwright
+  focused website verifier (57 golden cases), 35 proxy tests, полный `npm run build` и Playwright
   smoke пройдены.
+
+## 18. Исправление регрессии семантического сжатия
+
+После production-проверки 03.08.2026 обнаружено, что proxy вызывал Vibe
+finalizer после безусловного `return 200`, поэтому guardrails и возврат exact
+reservation были недостижимы. Блок finalization перенесён между ответом Anthropic
+и успешной сериализацией. Добавлен handler-level тест, который отправляет
+подписанный Vibe-запрос, получает чрезмерно сокращённый ответ провайдера и требует
+`422 no_improvement`, `usage_released:true` и восстановленный баланс.
+
+Cleaner и три `_coding-*` adapter дополнительно закрепляют принцип «редактировать,
+а не пересказывать»: сохраняются все отдельные требования, этапы, именованные
+инструменты, ограничения ветки, контекст между сжатиями и условие рабочего
+результата. Runtime отклоняет введённый разговорный/meta-ответ, потерю семантических
+anchor-групп и чрезмерное сокращение; такие ответы не должны расходовать кредит.
 
 Итоговый визуальный smoke выполнен для RU/EN на desktop и mobile. Выбор режима не
 меняет геометрию карточки: desktop `1194 × 460`, mobile `335 × 464`. В обоих

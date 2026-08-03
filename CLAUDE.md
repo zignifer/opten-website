@@ -84,25 +84,32 @@ and atomically reserves before Anthropic. Normal score/rewrite and image/video
 requests release only on provider failure. Vibe Coding adds a server-signed
 website-only finalization contract: the site signs the original request and model
 with an HMAC derived from `SUPABASE_JWT_SECRET`, the proxy validates the provider
-result, and an exact no-op or rejected result releases its exact reservation before
-returning `no_improvement`. Anonymous requests return
+  result before the success response is serialized, and an exact no-op or rejected
+  result releases its exact reservation before returning `no_improvement`. This
+  finalizer-before-HTTP-200 order is a billing invariant and must be covered by a
+  handler-level integration test; testing the finalizer in isolation is insufficient.
+  Anonymous requests return
 `authentication_required`; signed-in Free users may spend their one-time signup
 credits; exhausted Free users receive the proxy limit error; live Pro users spend
 from the normal 300-operation monthly cycle. The only selectable
 image models are Nano Banana 2, Nano Banana Pro, Chat GPT Image 2, Midjourney 8,
 Midjourney 7, Seedream 5 Lite, Flux 2 Pro, and Z-Image. The only video models are
 Seedance 2.0, Kling 3.0, Kling 2.6, Google Veo 3.1, Google Veo 3.0, and Wan 2.6.
-Vibe Coding is a closed-world cleaner: it should remove filler, fix grammar and
-obvious speech-to-text mistakes, merge
-duplicates, and reorder already-stated requirements, but must not add a stack,
+  Vibe Coding is a closed-world cleaner: it should remove filler, fix grammar and
+  obvious speech-to-text mistakes, merge duplicates, and reorder already-stated
+  requirements, but it edits rather than summarizes and must not add a stack,
 features, pages, states, roles, tests, acceptance criteria, implementation steps,
 Plan Mode, or any other unstated requirement. Explicit user instructions to plan,
-test, verify, or work in stages remain part of the cleaned request. It preserves the user's prose
-language and URLs, paths, commands, versions, quoted literals, API names, and code
-identifiers verbatim. Empty, wrapped, materially expanded, or drifted provider
-output returns `422 no_improvement`, releases the exact reserved operation, shows a
-clear inline message, and is never retried. A provider response identical to the
-original follows the same refund path instead of appearing as a successful result.
+  test, verify, use a named tool/skill, stay on a branch, preserve context, commit,
+  push, or work in stages remain separate requirements in the cleaned request. Long
+  requests retain their level of detail instead of becoming a one-line summary. It
+  preserves the user's prose language and URLs, paths, commands, versions, quoted
+  literals, API names, and code identifiers verbatim. Empty, wrapped, conversational
+  or meta-assistant, materially expanded, excessively compressed, semantically
+  incomplete, or drifted provider output returns `422 no_improvement`, releases the
+  exact reserved operation, shows a clear inline message, and is never retried. A
+  provider response identical to the original follows the same refund path instead
+  of appearing as a successful result.
 The three coding adapters
 remain semantically identical until a benchmark proves a safe model-specific gain.
 The reference picker mirrors the extension popup pipeline (10 MB source cap,
@@ -598,7 +605,7 @@ query itself.
 
 - React Context for i18n only
 - `localStorage` for: `opten_lang_v3` (i18n, written by LangSwitcher only), `opten_pay_currency`. Legacy `opten_lang` is read-only for one-shot EN migration — do not write to it.
-- The landing `PromptWorkbench` is visible publicly but its AI action requires a signed-in website session and is otherwise ephemeral: prompt text, AI results, selected files, compressed reference bytes, and preview URLs stay in component memory and are not written to `localStorage`. The browser calls only same-origin `/api/prompt-workbench`; logged-out clicks show an authentication error, signed-in Free clicks may spend one-time signup credits, exhausted Free users receive the proxy limit error, and live Pro sessions spend the normal 300-operation monthly cycle. The server verifies the JWT and 20-character minimum, allows exactly 14 popup-compatible image/video profiles plus site-only `codex | claude | gemini`, and calls the existing `promptscore-proxy` Claude Haiku rewrite endpoint with legacy-compatible `count_usage: true`; the proxy is the final usage gate and ignores client billing fields through atomic reserve-before-provider accounting. Image/video keeps the popup rewriter contract. Vibe Coding uses its own site-only cleaner and hidden proxy adapters; the website HMAC-signs the original request/model, and proxy runtime guardrails finalize the provider response. An exact no-op or rejected Vibe result returns `422 no_improvement`, releases the exact reservation, is not retried, refreshes the visible account balance, and never silently replaces a billed result with the original prompt. Uploaded references are capped at 8 files, 10 MB per source, compressed client-side to JPEG with a 512 px maximum long edge, and must be revoked/cleared when removed or unmounted; Vibe Coding forwards them only when the prompt explicitly references an image. During `npm run dev`, `vite.config.ts` mounts the same Node handler as dev-only middleware so localhost exercises the production handler contract. The reference-strip add button uses an inset focus ring: the strip scrolls horizontally, so an external ring would be clipped by its overflow boundary after the native file picker closes. Copying is local and does not consume usage: desktop shows a secondary `Скопировать` action beside `Улучшить`, while mobile shows the extension-matching outline copy icon in the workbench header. Both copy the current prompt and cross-fade to the extension's filled icon for 500 ms after success.
+- The landing `PromptWorkbench` is visible publicly but its AI action requires a signed-in website session and is otherwise ephemeral: prompt text, AI results, selected files, compressed reference bytes, and preview URLs stay in component memory and are not written to `localStorage`. The browser calls only same-origin `/api/prompt-workbench`; logged-out clicks show an authentication error, signed-in Free clicks may spend one-time signup credits, exhausted Free users receive the proxy limit error, and live Pro sessions spend the normal 300-operation monthly cycle. The server verifies the JWT and 20-character minimum, allows exactly 14 popup-compatible image/video profiles plus site-only `codex | claude | gemini`, and calls the existing `promptscore-proxy` Claude Haiku rewrite endpoint with legacy-compatible `count_usage: true`; the proxy is the final usage gate and ignores client billing fields through atomic reserve-before-provider accounting. Image/video keeps the popup rewriter contract. Vibe Coding uses its own site-only cleaner and hidden proxy adapters; the website HMAC-signs the original request/model, and proxy runtime guardrails must finalize the provider response before the handler can serialize HTTP 200. An exact no-op, meta response, excessively compressed result, missing semantic anchor, or other rejected Vibe result returns `422 no_improvement`, releases the exact reservation, is not retried, refreshes the visible account balance, and never silently replaces a billed result with the original prompt. A handler-level test must execute this ordering; a unit test of the finalizer alone does not protect billing. Uploaded references are capped at 8 files, 10 MB per source, compressed client-side to JPEG with a 512 px maximum long edge, and must be revoked/cleared when removed or unmounted; Vibe Coding forwards them only when the prompt explicitly references an image. During `npm run dev`, `vite.config.ts` mounts the same Node handler as dev-only middleware so localhost exercises the production handler contract. The reference-strip add button uses an inset focus ring: the strip scrolls horizontally, so an external ring would be clipped by its overflow boundary after the native file picker closes. Copying is local and does not consume usage: desktop shows a secondary `Скопировать` action beside `Улучшить`, while mobile shows the extension-matching outline copy icon in the workbench header. Both copy the current prompt and cross-fade to the extension's filled icon for 500 ms after success.
 - Extension-coupled auth and subscription state lives in the **extension's** `chrome.storage.local` (`ps_*` keys) — legacy site surfaces read via `chrome.runtime.sendMessage(...)`.
 - `/login`, `/pay`, `/account`, and Opten Space `/app/*` share the website Supabase session in `localStorage.opten_space_session_v1` and refresh it through public GoTrue endpoints. Visible auth uses Email OTP/manual email entry only; Google OAuth helpers may remain in code but must not render a login button unless explicitly re-enabled. Credits/subscription state still comes from the shared backend by calling `/functions/v1/account-summary` with the user's Bearer JWT. `/pay` and `/account` use extension messages only as fallback compatibility. Do not put service-role keys, JWT secrets, payment secrets, or proxy API keys in the website bundle.
 - `/account` website logout clears only `localStorage.opten_space_session_v1` and calls public Supabase logout for that website JWT. It must not send extension logout messages or mutate extension-owned `ps_*` keys.

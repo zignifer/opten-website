@@ -49,6 +49,7 @@
 │   API (Vercel serverless):                                                   │
 │     GET /api/download-skill   →  validates JWT + Pro, streams opten.zip      │
 │     POST /api/prompt-workbench → image/video Improve + Vibe Coding cleaner   │
+│       Vibe: finalize before 200; semantic/meta reject → exact release + 422   │
 │     POST /api/course-prompt   →  course access gate + prompt body            │
 │     POST /api/kinescope-course-token → course access gate + drmauthtoken     │
 │     POST /api/kinescope-course-auth  → Kinescope playback callback           │
@@ -201,7 +202,8 @@ api/
 ├── prompt-workbench.ts            — authenticated landing Improve endpoint;
 │                                     popup image/video + site-only Vibe Coding
 │                                     → signed proxy Haiku + shared ledger;
-│                                       no-op/guard reject → exact release + 422
+│                                       finalizer before 200;
+│                                       semantic/meta reject → exact release + 422
 ├── course-prompt.ts               — course-entitlement-gated prompt body fetch
 ├── kinescope-course-token.ts      — course-entitlement-gated Kinescope embed URL
 ├── kinescope-course-auth.ts       — Kinescope server-to-server playback callback
