@@ -23,9 +23,9 @@ import {
 
 const SEGMENT_LABELS: Record<AdminTelegramBroadcastSegment, string> = {
   all: "Все активные чаты",
-  subscribed: "Подтвердили подписку",
-  access_granted: "Получили нулевой урок",
-  access_granted_not_paid: "Получили нулевой урок, не оплатили",
+  subscribed: "Ранее подтвердили подписку",
+  access_granted: "Ранее получали персональную ссылку",
+  access_granted_not_paid: "Ранее получали ссылку, не оплатили",
 };
 
 const SEGMENT_OPTIONS: Array<{ value: AdminTelegramBroadcastSegment; label: string }> = [

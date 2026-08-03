@@ -69,24 +69,40 @@ Telegram, and other marketing surfaces. Its SPA routes remain `noindex` under
 the current architecture; this is a crawler policy, not an indication that the
 course is unlaunched, and (7) a public RU/EN prompt workbench in the landing hero:
 the visible landing UI is improvement-only (no prompt score control or score
-tooltip), lets the user select one of the popup quick-Improve model profiles,
+tooltip), lets the user select an image/video popup quick-Improve profile or the
+site-only `Вайбкодинг` / `Vibe coding` type with Codex, Claude, or Gemini,
 enter a prompt, attach up to 8 ephemeral image references, and invoke improvement.
 It calls this repo's same-origin `POST /api/prompt-workbench`, which verifies a
-website JWT and mirrors the extension popup's `POPUP_REWRITE_PROMPT` flow:
-minimum 20 characters, prompt-content language detection, the same committed
-`rewriter.md`, Anthropic reference blocks, `max_tokens: 1200`,
-legacy-compatible `count_usage: true`, `source: popup`, and the existing promptscore-proxy Claude
-Haiku/shared operation ledger. Proxy billing is unconditional and never trusts this client field: it atomically reserves before Anthropic and releases only on provider failure. Anonymous requests return
+website JWT and uses the existing promptscore-proxy Claude Haiku/shared operation
+ledger. Image/video mirrors the extension popup's `POPUP_REWRITE_PROMPT` flow:
+the same committed `rewriter.md`, popup model skills, and `source: popup`. Vibe
+Coding instead uses the site-owned `vibecoding-cleaner.md`, maps public
+`codex | claude | gemini` to non-public proxy skills `_coding-*`, and sends
+`source: website_vibecoding`. Both branches keep `max_tokens: 1200` and the
+legacy-compatible `count_usage: true`; proxy billing is unconditional and never
+trusts this client field, atomically reserving before Anthropic and releasing only
+on provider failure. Anonymous requests return
 `authentication_required`; signed-in Free users may spend their one-time signup
 credits; exhausted Free users receive the proxy limit error; live Pro users spend
 from the normal 300-operation monthly cycle. The only selectable
 image models are Nano Banana 2, Nano Banana Pro, Chat GPT Image 2, Midjourney 8,
 Midjourney 7, Seedream 5 Lite, Flux 2 Pro, and Z-Image. The only video models are
 Seedance 2.0, Kling 3.0, Kling 2.6, Google Veo 3.1, Google Veo 3.0, and Wan 2.6.
+Vibe Coding is a closed-world cleaner: it may remove filler, fix grammar, merge
+duplicates, and reorder already-stated requirements, but must not add a stack,
+features, pages, states, roles, tests, acceptance criteria, implementation steps,
+Plan Mode, or any other unstated requirement. It preserves the user's prose
+language and URLs, paths, commands, versions, quoted literals, API names, and code
+identifiers verbatim. Empty, wrapped, materially expanded, or drifted provider
+output returns the original prompt as a successful no-op. The three coding adapters
+remain semantically identical until a benchmark proves a safe model-specific gain.
 The reference picker mirrors the extension popup pipeline (10 MB source cap,
 512 px long-edge JPEG compression, quality 0.7, loading/removal states) but follows
 the larger landing-page dimensions from Figma. Reference bytes and previews stay in
-component memory and must never be written to localStorage. The endpoint and landing
+component memory and must never be written to localStorage. In Vibe Coding mode,
+references reach the model only when the text explicitly mentions an image,
+screenshot, reference, or mockup; an image may clarify written context but must not
+introduce product requirements. The endpoint and landing
 UI accept only the `improve` action; prompt scoring is not part of this surface. The
 textarea placeholder and empty-reference label mirror the popup (`Промпт или идея
 20+ символов...`, `Загрузить фото`); inline errors occupy the lower-left status area,
@@ -229,33 +245,18 @@ deployment compatibility and has `verify_jwt = false`; it validates
 `TELEGRAM_WEBHOOK_SECRET`, stores started users in
 `telegram_hidden_intro_leads`, writes
 funnel events to `telegram_hidden_intro_events`, and issues one random per-user
-`course_discount_claims` token through either explicit menu branch. The direct
-course branch creates or reuses the claim immediately and opens the course root
-with a 20% checkout discount for its first 24 hours, without granting lesson-zero
-access. The free-lesson branch creates or reuses the same claim only after
-Telegram confirms channel membership. Once membership is verified, that claim
-permanently unlocks exactly one separate free lesson zero at
-`/learn/courses/ai-content-marketing-2026/hidden-intro`; the discount timer is
-never restarted or extended if the claim already exists. The claim is not a
-course entitlement: all
-16 paid lessons still require `course-access-summary`. Lesson zero must remain
-outside `privateCourseCollection.lessons` so course progress and navigation
-stay at 16, while its reviewed Kinescope id
-`a4722357-b131-491f-8ca0-cdd11d927630` remains in the server playback whitelist.
-The course lesson sidebar still shows lesson zero as a separate `0. AI
-контент-завод` row above the 16 paid lessons. That visible row is an entry into
-the Telegram-gated player only; it must not be added to course progress,
-completion totals, paid lesson navigation, or the paid lesson collection.
-The browser stores the claim token in
-`localStorage.opten_course_preview_claim_v1`; both the page and
-`/api/kinescope-course-token` validate it through the legacy-named
-`/functions/v1/telegram-hidden-intro-opened` endpoint. That endpoint returns
-`preview_access:true` only for a claim whose lead has
-`subscription_verified_at`; never trust a browser boolean. The 24-hour window
-applies only to the 20% checkout discount. Repeated bot requests reuse the same
-claim and must never create, refresh, or extend the discount. Expired or used
-claims keep lesson-zero access but lose the discount. The claim never unlocks
-private course prompts, lesson materials, the 16 paid lessons, or the separate
+`course_discount_claims` token from the explicit course branch. The course
+branch creates or reuses the claim immediately and opens the course root with a
+20% checkout discount for its first 24 hours. The retired lesson-zero route
+`/learn/courses/ai-content-marketing-2026/hidden-intro` redirects to the course
+root while preserving `?claim=...`, so old links may retain an active checkout
+discount but can never open a video. The retired Kinescope video is not in the
+server playback whitelist, the course sidebar contains only the 16 paid lessons,
+and the bot no longer checks channel membership or grants lesson access. The
+legacy storage key `localStorage.opten_course_preview_claim_v1` remains only so
+already-issued discount links survive the retirement. The claim is not a course
+entitlement: all 16 paid lessons still require `course-access-summary`, and the
+claim never unlocks private course prompts, lesson materials, paid lessons, or the separate
 `Генератор промптов Opten` section. That
 collection-level generator block must remain visible on the course root and
 every lesson page. On desktop it stays compact inside the left lesson-content
@@ -283,27 +284,21 @@ campaign wording instead of the stored historical percentage, so `/start`
 cannot surface the retired 40% message.
 
 For future `/start` updates only, the Telegram bot first sends one navigation
-message, `Что тебе сейчас интереснее?`, with four rows in this order:
-`Мой Telegram с промтами`, `Доступ к курсу по ИИ`,
-`Урок про поиск идей`, and `Все бесплатные уроки`. The Telegram row opens the
+message, `Что тебе сейчас интереснее?`, with three rows in this order:
+`Мой Telegram с промтами`, `Доступ к курсу по ИИ`, and
+`Все бесплатные уроки`. The Telegram row opens the
 public channel, while the final row opens the public `/learn/lessons` catalog.
 The course row immediately creates or reuses the one-time claim, sends the
 reviewed course intro video, and sends the HTML course offer with an `Открыть
-курс` button to the claim-bearing course root. It does not verify membership,
-open lesson zero, or grant the generator; the generator opens only after course
-purchase or through active Opten Pro. The free-lesson row sends the existing
-reviewed welcome photo plus HTML copy and the `Подписаться на канал` /
-`Проверить подписку` buttons. Only that branch requires `getChatMember`
-confirmation before lesson-zero access opens. Both `check_subscription` and the
-legacy `get_course_access` callback remain accepted so buttons already present
-in old chats continue to work. The free-lesson access message states that lesson
-access is permanent and that the generator and the remaining course are paid
-separately. Both branches reuse the same claim and never refresh its 24-hour
-discount window. Reminder links open the course root for direct-course leads and
-the hidden-intro page only for leads whose channel subscription was verified.
+курс` button to the claim-bearing course root. It does not verify membership or
+grant the generator; the generator opens only after course purchase or through
+active Opten Pro. Retired callbacks `open_hidden_intro`, `check_subscription`,
+and `get_course_access` remain recognized only so buttons already present in old
+chats receive a short retirement notice and the current three-row menu. They
+must not call `getChatMember`, create a claim, grant access, or send the retired
+welcome photo/copy. Reminder links always open the claim-bearing course root.
 Changing `/start` must never trigger a broadcast or any message to existing
-leads. Only the locked lesson-zero player may deep-link to the bot; every paid
-lesson continues to point to the normal course purchase surface.
+leads. Every paid lesson continues to point to the normal course purchase surface.
 The locked Bot API name is `Влад Воронежцев | Уроки и промпты`, and the locked
 short description is `Доступ к урокам и каналу с промптами.`; future bot
 updates must not change either value unless the owner explicitly asks. The Bot
@@ -328,11 +323,10 @@ course-funnel operations: read funnel stats through `/api/admin/telegram-stats`,
 send Telegram broadcasts through `/api/admin/telegram-broadcast`, and review or
 delete stored broadcast history through `/api/admin/telegram-broadcasts`. The
 active dashboard follows the current `/start` resource-menu flow and shows unique
-bot starts, verified subscriptions, lesson-zero links delivered, lesson opens, checkout orders,
-successful payments, active discounts, and blocked chats. Direct course-offer
-clicks are tracked separately from free-lesson clicks and must never count as a
-lesson-zero link delivery or lesson open. Do not call a generic course-root open
-a lesson open.
+bot starts, course-offer clicks, checkout orders, successful payments, active
+discounts, and blocked chats. Historical subscription, lesson-zero, and
+free-lesson events may remain in storage for audit compatibility, but they are
+not active funnel stages. Do not call a generic course-root open a lesson open.
 Payment counts come only from Telegram-attributed `course_orders` with
 `status='succeeded'`; the legacy `hidden-intro` endpoint, table, column, and
 event names remain internal compatibility identifiers.
@@ -420,7 +414,7 @@ See [docs/TECH.md](docs/TECH.md) for full picture.
 | opten-website (this) | `C:\Projects\opten-website` | Public site |
 | content (private) | `C:\Projects\content` | Canonical content-production rules, style sources, aggregate metrics, Graphify map, and the read-only admin snapshot generated by `scripts/export_content_machine.py` |
 | promptscore (private) | `C:\Projects\promptscore` | Chrome extension (Opten v1.4.1, MV3, post-v2.8 milestone shipped 2026-05-28) + Supabase Edge Functions + migrations + Paddle/YooKassa webhooks. Extension works on 4 platforms: syntx.ai, higgsfield.ai, freepik.com, magnific.com. Extension's Supabase moved cloud → self-hosted (`https://supabase.opten.space`) on 2026-05-25 (Phase 88 cutover); the cloud URL was removed from `host_permissions` in v1.3.7. Popup has **4 tabs** (ИИ-агрегаторы / Скилл / ChatGPT / Улучшить); the ChatGPT tab is a Pro-only «Открыть» CTA that opens a public OpenAI GPT — Pro-gating is UX-only by design. |
-| opten-proxy (private) | `C:\Projects\promptscore-proxy` | Vercel proxy for extension AI requests and the website `PromptWorkbench`, plus 63 model-specific skill files in `skills/*.md` (61 model + 2 fallback). The same skill files are bundled into the Pro-only `opten.zip` Claude Skill served via this repo's `/api/download-skill` |
+| opten-proxy (private) | `C:\Projects\promptscore-proxy` | Vercel proxy for extension AI requests and the website `PromptWorkbench`, plus 66 skill files in `skills/*.md` (61 public model + 2 fallback + 3 non-public Vibe Coding adapters). The public model skills are bundled into the Pro-only `opten.zip` Claude Skill served via this repo's `/api/download-skill`; `_coding-*` adapters stay proxy-only. |
 
 The extension repo owns the Supabase project — all Edge Functions and
 migrations are deployed from there, not from this repo.
@@ -595,7 +589,7 @@ query itself.
 
 - React Context for i18n only
 - `localStorage` for: `opten_lang_v3` (i18n, written by LangSwitcher only), `opten_pay_currency`. Legacy `opten_lang` is read-only for one-shot EN migration — do not write to it.
-- The landing `PromptWorkbench` is visible publicly but its AI action requires a signed-in website session and is otherwise ephemeral: prompt text, AI results, selected files, compressed reference bytes, and preview URLs stay in component memory and are not written to `localStorage`. The browser calls only same-origin `/api/prompt-workbench`; logged-out clicks show an authentication error, signed-in Free clicks may spend one-time signup credits, exhausted Free users receive the proxy limit error, and live Pro sessions spend the normal 300-operation monthly cycle. The server verifies the JWT, enforces the extension popup's exact 14-model quick-Improve allowlist and 20-character minimum, then calls the existing `promptscore-proxy` Claude Haiku rewrite endpoint with the popup-equivalent request and legacy-compatible `count_usage: true`; the proxy is the final usage gate and charges every rewrite regardless of client fields through atomic reserve-before-provider accounting. Uploaded references are capped at 8 files, 10 MB per source, compressed client-side to JPEG with a 512 px maximum long edge, and must be revoked/cleared when removed or unmounted. During `npm run dev`, `vite.config.ts` mounts the same Node handler as dev-only middleware so localhost exercises the production handler contract. The reference-strip add button uses an inset focus ring: the strip scrolls horizontally, so an external ring would be clipped by its overflow boundary after the native file picker closes. Copying is local and does not consume usage: desktop shows a secondary `Скопировать` action beside `Улучшить`, while mobile shows the extension-matching outline copy icon in the workbench header. Both copy the current prompt and cross-fade to the extension's filled icon for 500 ms after success.
+- The landing `PromptWorkbench` is visible publicly but its AI action requires a signed-in website session and is otherwise ephemeral: prompt text, AI results, selected files, compressed reference bytes, and preview URLs stay in component memory and are not written to `localStorage`. The browser calls only same-origin `/api/prompt-workbench`; logged-out clicks show an authentication error, signed-in Free clicks may spend one-time signup credits, exhausted Free users receive the proxy limit error, and live Pro sessions spend the normal 300-operation monthly cycle. The server verifies the JWT and 20-character minimum, allows exactly 14 popup-compatible image/video profiles plus site-only `codex | claude | gemini`, and calls the existing `promptscore-proxy` Claude Haiku rewrite endpoint with legacy-compatible `count_usage: true`; the proxy is the final usage gate and charges every rewrite regardless of client fields through atomic reserve-before-provider accounting. Image/video keeps the popup rewriter contract. Vibe Coding uses its own site-only cleaner and hidden proxy adapters; runtime guardrails fail safely to the original request when the provider adds requirements, loses protected literals, wraps/explains the result, or expands it materially. Uploaded references are capped at 8 files, 10 MB per source, compressed client-side to JPEG with a 512 px maximum long edge, and must be revoked/cleared when removed or unmounted; Vibe Coding forwards them only when the prompt explicitly references an image. During `npm run dev`, `vite.config.ts` mounts the same Node handler as dev-only middleware so localhost exercises the production handler contract. The reference-strip add button uses an inset focus ring: the strip scrolls horizontally, so an external ring would be clipped by its overflow boundary after the native file picker closes. Copying is local and does not consume usage: desktop shows a secondary `Скопировать` action beside `Улучшить`, while mobile shows the extension-matching outline copy icon in the workbench header. Both copy the current prompt and cross-fade to the extension's filled icon for 500 ms after success.
 - Extension-coupled auth and subscription state lives in the **extension's** `chrome.storage.local` (`ps_*` keys) — legacy site surfaces read via `chrome.runtime.sendMessage(...)`.
 - `/login`, `/pay`, `/account`, and Opten Space `/app/*` share the website Supabase session in `localStorage.opten_space_session_v1` and refresh it through public GoTrue endpoints. Visible auth uses Email OTP/manual email entry only; Google OAuth helpers may remain in code but must not render a login button unless explicitly re-enabled. Credits/subscription state still comes from the shared backend by calling `/functions/v1/account-summary` with the user's Bearer JWT. `/pay` and `/account` use extension messages only as fallback compatibility. Do not put service-role keys, JWT secrets, payment secrets, or proxy API keys in the website bundle.
 - `/account` website logout clears only `localStorage.opten_space_session_v1` and calls public Supabase logout for that website JWT. It must not send extension logout messages or mutate extension-owned `ps_*` keys.

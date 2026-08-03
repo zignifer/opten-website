@@ -9,6 +9,11 @@ import {
   bearerTokenFromHeader,
   verifySupabaseUser,
 } from "./_shared/optenServerAuth.js";
+import {
+  detectVibecodingPromptLanguage,
+  validateVibecodingCandidate,
+  vibecodingPromptReferencesImages,
+} from "./_shared/promptWorkbenchVibecoding.js";
 
 const PROXY_URL = "https://promptscore-proxy.vercel.app";
 const MIN_PROMPT_CHARS = 20;
@@ -18,6 +23,11 @@ const MAX_REFERENCE_COUNT = 8;
 const MAX_REFERENCE_BASE64_CHARS = 400_000;
 const PROXY_TIMEOUT_MS = 30_000;
 const PROXY_RETRIES = 2;
+const VIBECODING_PROXY_MODELS = {
+  codex: "_coding-codex",
+  claude: "_coding-claude",
+  gemini: "_coding-gemini",
+} as const;
 
 interface WorkbenchRequest {
   action?: unknown;
@@ -103,14 +113,15 @@ function normalizeReferences(value: unknown): ReferenceImage[] {
 function getModelType(slug: string): PromptWorkbenchType | null {
   if (PROMPT_WORKBENCH_MODELS.image.some((model) => model.slug === slug)) return "image";
   if (PROMPT_WORKBENCH_MODELS.video.some((model) => model.slug === slug)) return "video";
+  if (PROMPT_WORKBENCH_MODELS.vibecoding.some((model) => model.slug === slug)) return "vibecoding";
   return null;
 }
 
-function buildMultimodalContent(textContent: string, images: ReferenceImage[]) {
+function buildMultimodalContent(textContent: string, images: ReferenceImage[], referenceLabel = "Reference image") {
   if (images.length === 0) return textContent;
   return [
     ...images.flatMap((image, index) => [
-      { type: "text", text: `Reference image ${index + 1}:` },
+      { type: "text", text: `${referenceLabel} ${index + 1}:` },
       {
         type: "image",
         source: { type: "base64", media_type: image.mediaType, data: image.data },
@@ -176,19 +187,37 @@ async function callQuickImproveProxy(
   modelType: PromptWorkbenchType,
   images: ReferenceImage[],
 ): Promise<{ prompt: string; usage: Pick<ProxyPayload, "remaining" | "limit" | "plan"> }> {
-  const lang: "ru" | "en" = /[а-яё]/i.test(prompt) ? "ru" : "en";
-  const systemPrompt = readServerAsset("api", "_assets", "prompt-workbench", "rewriter.md");
-  const userMessage = `RESPOND_IN: ${lang}\n\nORIGINAL PROMPT:\n${prompt}${buildRewriterReminder(lang)}`;
-  const userContent = buildMultimodalContent(userMessage, images);
+  const isVibecoding = modelType === "vibecoding";
+  const lang = isVibecoding
+    ? detectVibecodingPromptLanguage(prompt)
+    : (/[а-яё]/i.test(prompt) ? "ru" : "en");
+  const systemPrompt = readServerAsset(
+    "api",
+    "_assets",
+    "prompt-workbench",
+    isVibecoding ? "vibecoding-cleaner.md" : "rewriter.md",
+  );
+  const userMessage = isVibecoding
+    ? `PRESERVE_LANGUAGE: ${lang}\n\nORIGINAL REQUEST:\n${prompt}`
+    : `RESPOND_IN: ${lang}\n\nORIGINAL PROMPT:\n${prompt}${buildRewriterReminder(lang)}`;
+  const relevantImages = isVibecoding && !vibecodingPromptReferencesImages(prompt) ? [] : images;
+  const userContent = buildMultimodalContent(
+    userMessage,
+    relevantImages,
+    isVibecoding ? "Reference screenshot" : "Reference image",
+  );
+  const proxyModel = isVibecoding
+    ? VIBECODING_PROXY_MODELS[modelSlug as keyof typeof VIBECODING_PROXY_MODELS]
+    : modelSlug;
   const requestBody = JSON.stringify({
     prompt: userMessage,
     messages: [{ role: "user", content: userContent }],
-    model_name: modelSlug,
+    model_name: proxyModel,
     is_video: modelType === "video",
     system_prompt: systemPrompt,
     max_tokens: 1_200,
     count_usage: true,
-    source: "popup",
+    source: isVibecoding ? "website_vibecoding" : "popup",
   });
 
   let lastError: unknown = new Error("pro_provider_unavailable");
@@ -217,8 +246,11 @@ async function callQuickImproveProxy(
       if (!response.ok) throw new Error("pro_provider_unavailable");
 
       const text = payload.content?.find((item) => item?.type === "text" && typeof item.text === "string")?.text;
+      const rewrittenPrompt = isVibecoding
+        ? validateVibecodingCandidate(prompt, typeof text === "string" ? text : "").prompt
+        : cleanRewrittenText(text).slice(0, 12_000);
       return {
-        prompt: cleanRewrittenText(text).slice(0, 12_000),
+        prompt: rewrittenPrompt,
         usage: { remaining: payload.remaining, limit: payload.limit, plan: payload.plan },
       };
     } catch (error) {

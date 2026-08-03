@@ -21,7 +21,6 @@ import {
   type CoursePaymentResponse,
   createCoursePayment,
   fetchCourseAccessSummary,
-  fetchTelegramHiddenIntroAccess,
   formatCoursePrice,
   isValidCourseEmail,
   isValidCoursePromoCode,
@@ -31,7 +30,6 @@ import {
   readCourseDiscountClaimTokenFromSearch,
   readStoredCourseDiscountClaim,
 } from "../../../../lib/courseAccess";
-import { getHiddenIntroCopy } from "../../../../content/space/hiddenIntro";
 import { useCurrencyPreference } from "../../../../lib/currency";
 import { ensurePaddle } from "../../../../lib/paddle";
 import LocalizedLink from "../../LocalizedLink";
@@ -58,11 +56,7 @@ import {
   getLessonPosition,
   getLearnAuthorName,
 } from "../../../../content/space/learn";
-import { HIDDEN_INTRO_SLUG } from "../../../../content/space/courseDiscountClaim";
-import {
-  privateCourseHiddenIntroLesson,
-  type PrivateCourseIntroContent,
-} from "../../../../content/space/privateCourse";
+import type { PrivateCourseIntroContent } from "../../../../content/space/privateCourse";
 
 const LEARN_PROGRESS_STORAGE_KEY = "opten_space_learn_progress_v1";
 const AI_CONTENT_MARKETING_COURSE_SLUG = "ai-content-marketing-2026";
@@ -192,15 +186,11 @@ type LessonDetailLayoutProps = {
   collection: LearnCollection;
   previousLesson?: LearnLesson;
   nextLesson?: LearnLesson;
-  telegramHiddenIntro?: {
-    claimToken: string | null;
-    unlockUrl: string;
-  };
 };
 
 type SidebarTab = "lessons" | "timestamps";
 
-export function LessonDetailLayout({ lesson, collection, telegramHiddenIntro }: LessonDetailLayoutProps) {
+export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
   const { account, session, status: authStatus } = useSpaceAuth();
@@ -208,12 +198,7 @@ export function LessonDetailLayout({ lesson, collection, telegramHiddenIntro }: 
   const purchase = collection.purchase;
   const courseAccess = useCourseAccess(purchase, session?.access_token ?? null);
   const courseHasAccess = purchase ? courseAccess.hasAccess : hasPro;
-  const telegramAccess = useTelegramHiddenIntroAccess(
-    Boolean(telegramHiddenIntro && !courseHasAccess),
-    telegramHiddenIntro?.claimToken ?? null,
-  );
-  const lessonHasAccess = courseHasAccess || telegramAccess.hasAccess;
-  const locked = isLessonLocked(lesson, lessonHasAccess);
+  const locked = isLessonLocked(lesson, courseHasAccess);
   const isCourse = collection.kind === "course";
   const [activeTab, setActiveTab] = useState<SidebarTab>(isCourse ? "lessons" : "timestamps");
   const [startSeconds, setStartSeconds] = useState(0);
@@ -300,11 +285,6 @@ export function LessonDetailLayout({ lesson, collection, telegramHiddenIntro }: 
                 purchase={purchase}
                 startSeconds={startSeconds}
                 playRequestId={playRequestId}
-                telegramHiddenIntro={telegramHiddenIntro ? {
-                  ...telegramHiddenIntro,
-                  accessLoading: telegramAccess.loading,
-                  hasAccess: telegramAccess.hasAccess,
-                } : undefined}
               />
             </div>
             <LessonIntro
@@ -354,7 +334,6 @@ export function LessonDetailLayout({ lesson, collection, telegramHiddenIntro }: 
                     onTabChange={setActiveTab}
                     onTimestampSelect={handleTimestampSelect}
                     hasAccess={courseHasAccess}
-                    hiddenIntroHasAccess={telegramAccess.hasAccess}
                     purchase={purchase}
                   />
                 </div>
@@ -379,7 +358,6 @@ export function LessonDetailLayout({ lesson, collection, telegramHiddenIntro }: 
                     onTabChange={setActiveTab}
                     onTimestampSelect={handleTimestampSelect}
                     hasAccess={courseHasAccess}
-                    hiddenIntroHasAccess={telegramAccess.hasAccess}
                     purchase={purchase}
                   />
                 </div>
@@ -395,7 +373,6 @@ export function LessonDetailLayout({ lesson, collection, telegramHiddenIntro }: 
                 onTabChange={setActiveTab}
                 onTimestampSelect={handleTimestampSelect}
                 hasAccess={courseHasAccess}
-                hiddenIntroHasAccess={telegramAccess.hasAccess}
                 purchase={purchase}
               />
               <UnlockProCard hasPro={hasPro} />
@@ -700,12 +677,6 @@ type LessonPlayerProps = {
   purchase?: LearnCoursePurchase;
   startSeconds: number;
   playRequestId: number;
-  telegramHiddenIntro?: {
-    claimToken: string | null;
-    unlockUrl: string;
-    accessLoading: boolean;
-    hasAccess: boolean;
-  };
 };
 
 type KinescopeTokenResponse = {
@@ -842,7 +813,6 @@ function LessonPlayer({
   purchase,
   startSeconds,
   playRequestId,
-  telegramHiddenIntro,
 }: LessonPlayerProps) {
   const { pathname } = useLocation();
   const { lang } = useLang();
@@ -906,8 +876,7 @@ function LessonPlayer({
     if (!isKinescopeVideo || !activated || locked || kinescopeEmbedUrl) return;
 
     const accessToken = session?.access_token;
-    const previewClaimToken = telegramHiddenIntro?.hasAccess ? telegramHiddenIntro.claimToken : null;
-    if (!accessToken && !previewClaimToken) {
+    if (!accessToken) {
       setKinescopeError("missing_session");
       return;
     }
@@ -925,7 +894,6 @@ function LessonPlayer({
       body: JSON.stringify({
         courseSlug: collectionId,
         lessonSlug: lesson.slug,
-        discountClaimToken: previewClaimToken || undefined,
       }),
     })
       .then(async (response) => {
@@ -943,7 +911,7 @@ function LessonPlayer({
     return () => {
       cancelled = true;
     };
-  }, [activated, collectionId, isKinescopeVideo, kinescopeEmbedUrl, lesson.slug, locked, session?.access_token, telegramHiddenIntro?.claimToken, telegramHiddenIntro?.hasAccess]);
+  }, [activated, collectionId, isKinescopeVideo, kinescopeEmbedUrl, lesson.slug, locked, session?.access_token]);
 
   useEffect(() => {
     if (!isKinescopeVideo || !activated || !kinescopeEmbedUrl || kinescopeApiFallback) return;
@@ -1003,7 +971,7 @@ function LessonPlayer({
       data-playback-policy={provider.playbackPolicy}
     >
       <div className="relative aspect-video overflow-hidden bg-[#06191c]">
-        {locked && purchase && !telegramHiddenIntro ? (
+        {locked && purchase ? (
           <>
             <ResponsiveImage
               src={provider.posterPath}
@@ -1049,28 +1017,13 @@ function LessonPlayer({
                     <Lock size={22} />
                   </span>
                   <h2 className="mt-[16px] text-[18px] font-bold leading-tight text-white">
-                    {telegramHiddenIntro ? getHiddenIntroCopy("lockedTitle", lang) : copy.lockedLesson}
+                    {copy.lockedLesson}
                   </h2>
                   <p className="mt-[8px] text-[13px] leading-[1.45] text-white/68">
-                    {telegramHiddenIntro
-                      ? telegramHiddenIntro.accessLoading
-                        ? copy.courseAccessLoading
-                        : getHiddenIntroCopy("lockedDescription", lang)
-                      : purchase
-                        ? copy.courseLockedDescription
-                        : copy.lockedDescription}
+                    {purchase ? copy.courseLockedDescription : copy.lockedDescription}
                   </p>
                   <div className="mt-[18px] flex gap-[8px] max-sm:flex-col">
-                    {telegramHiddenIntro ? (
-                      <a
-                        href={telegramHiddenIntro.unlockUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] bg-[#9cfb51] px-[14px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943]"
-                      >
-                        {getHiddenIntroCopy("lockedAction", lang)}
-                      </a>
-                    ) : purchase ? (
+                    {purchase ? (
                       <a
                         href="#course-purchase"
                         className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] bg-[#9cfb51] px-[14px] text-[14px] font-bold text-[#062013] no-underline transition hover:bg-[#8ee943]"
@@ -1085,14 +1038,12 @@ function LessonPlayer({
                         {copy.openPro}
                       </LocalizedLink>
                     )}
-                    {!telegramHiddenIntro && (
-                      <LocalizedLink
-                        to={`/login?next=${encodeURIComponent(pathname)}`}
-                        className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] border border-[#9cfb51]/65 px-[14px] text-[14px] font-bold text-[#9cfb51] no-underline transition hover:bg-[#9cfb51]/10"
-                      >
-                        {purchase ? copy.signInPurchased : copy.signIn}
-                      </LocalizedLink>
-                    )}
+                    <LocalizedLink
+                      to={`/login?next=${encodeURIComponent(pathname)}`}
+                      className="flex h-[42px] flex-1 items-center justify-center rounded-[8px] border border-[#9cfb51]/65 px-[14px] text-[14px] font-bold text-[#9cfb51] no-underline transition hover:bg-[#9cfb51]/10"
+                    >
+                      {purchase ? copy.signInPurchased : copy.signIn}
+                    </LocalizedLink>
                   </div>
                 </div>
               </div>
@@ -1214,7 +1165,6 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
   const position = getLessonPosition(lesson.slug, lang);
   const description = getLearnLessonDescription(lesson, lang);
   const title = getNumberedCourseLessonTitle(collection, lesson, lang);
-  const isHiddenIntro = collection.id === AI_CONTENT_MARKETING_COURSE_SLUG && lesson.slug === HIDDEN_INTRO_SLUG;
 
   return (
     <section className="mt-[26px] max-md:mt-[22px]">
@@ -1233,13 +1183,7 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
           {collection.purchase ? (
             <span className={`inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51] ${locked ? "" : "max-md:hidden"}`}>
               {locked ? <Lock size={13} /> : <LockOpen size={13} />}
-              {isHiddenIntro
-                ? locked
-                  ? copy.hiddenIntroSubscriptionBadge
-                  : copy.courseAccessOpen
-                : locked
-                  ? copy.unlocksAfterPurchase
-                  : copy.courseOpenBadge}
+              {locked ? copy.unlocksAfterPurchase : copy.courseOpenBadge}
             </span>
           ) : locked ? (
             <span className="inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
@@ -1869,7 +1813,6 @@ type LessonSidebarProps = {
   onTabChange: (tab: SidebarTab) => void;
   onTimestampSelect: (seconds: number) => void;
   hasAccess: boolean;
-  hiddenIntroHasAccess?: boolean;
   purchase?: LearnCoursePurchase;
   currentSlug?: string;
   mobileTimestampsTabOverride?: {
@@ -1885,7 +1828,6 @@ function LessonSidebar({
   onTabChange,
   onTimestampSelect,
   hasAccess,
-  hiddenIntroHasAccess,
   purchase,
   currentSlug,
   mobileTimestampsTabOverride,
@@ -1941,7 +1883,6 @@ function LessonSidebar({
           collection={collection}
           currentSlug={currentSlug ?? lesson.slug}
           hasAccess={hasAccess}
-          hiddenIntroHasAccess={hiddenIntroHasAccess}
         />
       ) : (
         <TimestampList timestamps={getLearnLessonTimestamps(lesson, lang)} onSelect={onTimestampSelect} />
@@ -1954,7 +1895,6 @@ type CourseOutlineProps = {
   collection: LearnCollection;
   currentSlug: string;
   hasAccess: boolean;
-  hiddenIntroHasAccess?: boolean;
   className?: string;
 };
 
@@ -1962,21 +1902,16 @@ export function CourseOutline({
   collection,
   currentSlug,
   hasAccess,
-  hiddenIntroHasAccess = false,
   className = "",
 }: CourseOutlineProps) {
   const { lang } = useLang();
-  const outlineLessons = collection.id === AI_CONTENT_MARKETING_COURSE_SLUG
-    ? [privateCourseHiddenIntroLesson, ...collection.lessons]
-    : collection.lessons;
 
   return (
     <div className={`max-h-[720px] space-y-[2px] overflow-y-auto p-[8px] max-md:max-h-[312px] max-md:space-y-[4px] max-md:p-[12px] ${className}`}>
-      {outlineLessons.map((outlineLesson, index) => {
-        const isHiddenIntro = outlineLesson.slug === HIDDEN_INTRO_SLUG;
+      {collection.lessons.map((outlineLesson) => {
         const current = outlineLesson.slug === currentSlug;
-        const locked = isLessonLocked(outlineLesson, hasAccess || (isHiddenIntro && hiddenIntroHasAccess));
-        const displayNumber = getCourseLessonDisplayNumber(collection, outlineLesson) || String(index + 1);
+        const locked = isLessonLocked(outlineLesson, hasAccess);
+        const displayNumber = getCourseLessonDisplayNumber(collection, outlineLesson);
         const rowClass = `group grid grid-cols-[32px_minmax(0,1fr)_auto] items-center gap-[10px] rounded-[8px] px-[10px] py-[11px] no-underline transition max-md:grid-cols-[42px_minmax(0,1fr)_28px] max-md:gap-[10px] max-md:px-[12px] max-md:py-[14px] ${
           locked ? "min-h-[62px]" : ""
         } ${
@@ -1996,9 +1931,7 @@ export function CourseOutline({
                 {getLearnLessonTitle(outlineLesson, lang)}
               </span>
               <span className="mt-[4px] block text-[12px] leading-tight text-white/44 max-md:text-[14px]">
-                {isHiddenIntro
-                  ? `${lang === "ru" ? "Бесплатный урок" : "Free lesson"} · ${outlineLesson.duration}`
-                  : outlineLesson.duration}
+                {outlineLesson.duration}
               </span>
             </span>
             {locked ? (
@@ -2061,39 +1994,6 @@ type CourseAccessState = {
   loading: boolean;
   error: string | null;
 };
-
-function useTelegramHiddenIntroAccess(active: boolean, claimToken: string | null): CourseAccessState {
-  const [state, setState] = useState<CourseAccessState>({ hasAccess: false, loading: false, error: null });
-
-  useEffect(() => {
-    if (!active || !claimToken) {
-      setState({ hasAccess: false, loading: false, error: null });
-      return;
-    }
-
-    let cancelled = false;
-    setState({ hasAccess: false, loading: true, error: null });
-    fetchTelegramHiddenIntroAccess(claimToken)
-      .then((access) => {
-        if (!cancelled) setState({ hasAccess: access.preview_access === true, loading: false, error: null });
-      })
-      .catch((error) => {
-        if (!cancelled) {
-          setState({
-            hasAccess: false,
-            loading: false,
-            error: error instanceof Error ? error.message : "telegram_hidden_intro_access_failed",
-          });
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [active, claimToken]);
-
-  return state;
-}
 
 function useCourseAccess(purchase: LearnCoursePurchase | undefined, accessToken: string | null): CourseAccessState {
   const [state, setState] = useState<CourseAccessState>({ hasAccess: false, loading: false, error: null });
@@ -2743,7 +2643,6 @@ function getNumberedCourseLessonTitle(collection: LearnCollection, lesson: Learn
 
 function getCourseLessonDisplayNumber(collection: LearnCollection, lesson: LearnLesson) {
   if (collection.kind !== "course") return "";
-  if (collection.id === AI_CONTENT_MARKETING_COURSE_SLUG && lesson.slug === HIDDEN_INTRO_SLUG) return "0";
   const index = collection.lessons.findIndex((item) => item.slug === lesson.slug);
   if (index < 0) return "";
   return String(index + 1);
@@ -2918,7 +2817,6 @@ const detailCopy = {
     progressCount: (completed: number, total: number) => `${completed} из ${total} уроков пройдено`,
     unlocksOnPro: "Разблокируется на Pro",
     unlocksAfterPurchase: "Доступ после покупки",
-    hiddenIntroSubscriptionBadge: "Бесплатно после подписки",
     paidCourseBadge: "Курс",
     courseOpenBadge: "Курс открыт",
     courseAccessOpen: "Доступ открыт",
@@ -3005,7 +2903,6 @@ const detailCopy = {
     progressCount: (completed: number, total: number) => `${completed} of ${total} lessons completed`,
     unlocksOnPro: "Unlocks on Pro",
     unlocksAfterPurchase: "Access after purchase",
-    hiddenIntroSubscriptionBadge: "Free after subscribing",
     paidCourseBadge: "Course",
     courseOpenBadge: "Course open",
     courseAccessOpen: "Access open",

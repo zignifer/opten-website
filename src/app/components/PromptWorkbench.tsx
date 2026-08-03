@@ -33,6 +33,7 @@ const REFERENCE_JPEG_QUALITY = 0.7;
 const DEFAULT_MODEL_BY_TYPE = {
   image: "nano-banana-2",
   video: "seedance-2.0",
+  vibecoding: "codex",
 } as const;
 
 const copy = {
@@ -41,6 +42,7 @@ const copy = {
     placeholder: "Промпт или идея 20+ символов...",
     image: "Изображение",
     video: "Видео",
+    vibecoding: "Вайбкодинг",
     improve: "Улучшить",
     improving: "Улучшаем",
     copyPrompt: "Скопировать",
@@ -72,6 +74,7 @@ const copy = {
     placeholder: "Prompt or idea, 20+ characters...",
     image: "Image",
     video: "Video",
+    vibecoding: "Vibe coding",
     improve: "Improve",
     improving: "Improving",
     copyPrompt: "Copy",
@@ -240,6 +243,11 @@ export default function PromptWorkbench() {
     setType(nextType);
     setModel(DEFAULT_MODEL_BY_TYPE[nextType]);
     setError(null);
+    setCopied(false);
+    if (copyResetTimer.current !== null) {
+      window.clearTimeout(copyResetTimer.current);
+      copyResetTimer.current = null;
+    }
   }
 
   async function copyPrompt() {
@@ -367,11 +375,15 @@ export default function PromptWorkbench() {
               <select
                 aria-label={text.typeLabel}
                 value={type}
-                onChange={(event) => changeType(event.target.value === "video" ? "video" : "image")}
+                onChange={(event) => {
+                  const nextType = event.target.value;
+                  changeType(nextType === "video" || nextType === "vibecoding" ? nextType : "image");
+                }}
                 className="h-10 w-full appearance-none rounded-full border border-white/10 bg-white/[0.06] pl-4 pr-10 text-[14px] text-white outline-none transition hover:border-white/20 focus:border-[#9cfb51]/45 focus:ring-2 focus:ring-[#9cfb51]/10"
               >
                 <option value="image" className="bg-[#102528]">{text.image}</option>
                 <option value="video" className="bg-[#102528]">{text.video}</option>
+                <option value="vibecoding" className="bg-[#102528]">{text.vibecoding}</option>
               </select>
               <ChevronDown aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-white/55" />
             </div>

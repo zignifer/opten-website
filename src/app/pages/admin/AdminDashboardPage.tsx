@@ -142,18 +142,20 @@ export default function AdminDashboardPage() {
 
 function AdminStatsView({ stats }: { stats: AdminTelegramStats }) {
   const paidOrders = stats.orders.succeeded ?? stats.orders.paid;
+  const courseLinksSent = stats.funnel.course_link_sent ?? stats.funnel.access_granted;
+  const courseOpened = stats.funnel.course_opened ?? stats.funnel.hidden_intro_opened;
   const metrics = useMemo(
     () => [
       { label: "Запустили бота", value: stats.funnel.start, icon: Users, tone: "slate" },
-      { label: "Подтвердили подписку", value: stats.funnel.subscription_verified, icon: CheckCircle2, tone: "blue" },
-      { label: "Получили нулевой урок", value: stats.funnel.access_granted, icon: KeyRound, tone: "lime" },
-      { label: "Открыли нулевой урок", value: stats.funnel.hidden_intro_opened, icon: CheckCircle2, tone: "blue" },
+      { label: "Выбрали курс", value: stats.events.course_access_clicked ?? 0, icon: CheckCircle2, tone: "blue" },
+      { label: "Получили ссылку на курс", value: courseLinksSent, icon: KeyRound, tone: "lime" },
+      { label: "Открыли курс", value: courseOpened, icon: CheckCircle2, tone: "blue" },
       { label: "Создали заказ", value: stats.orders.created, icon: ShoppingCart, tone: "amber" },
       { label: "Оплатили", value: paidOrders, icon: ShieldCheck, tone: "emerald" },
       { label: "Скидка действует", value: stats.claims.active, icon: Clock3, tone: "violet" },
       { label: "Заблокировали бота", value: stats.funnel.blocked, icon: AlertTriangle, tone: "red" },
     ],
-    [paidOrders, stats],
+    [courseLinksSent, courseOpened, paidOrders, stats],
   );
 
   return (

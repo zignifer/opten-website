@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-07-30 against extension `manifest.json` version **1.4.2** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench mirrors the extension popup's authenticated quick-Improve model list; standalone course checkout/access, Kinescope course playback, the Telegram `/start` resource menu with a direct 24h 20% course offer and a separate channel-gated free lesson zero, course-or-Pro Opten generators, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads are documented). Backend fully on self-hosted `supabase.opten.space`.
+> **Last sync:** 2026-08-03 against extension `manifest.json` version **1.4.2** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench keeps the extension popup's authenticated image/video quick-Improve profiles and adds a site-only Vibe Coding cleaner; standalone course checkout/access, Kinescope course playback, the Telegram `/start` resource menu with a direct 24h 20% course offer, the retirement of the former lesson-zero branch, course-or-Pro Opten generators, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads are documented). Backend fully on self-hosted `supabase.opten.space`.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -202,7 +202,7 @@ live with these exact paths and the documented behavior.
 | `/dashboard/download-skill` | Pro-only feature in popup → opens new tab | Auth-gated page that calls `/api/download-skill` to fetch `opten.zip`. | [popup Phase 73](../../promptscore/popup/popup.html) |
 | `/prompt-library` | User/site navigation once launched; extension context menu `Открыть библиотеку`; Phase 93 manual fallback after failed direct insert | Free prompt library UI for any logged-in extension account. Calls `GET_AUTH_TOKEN` through the installed extension, then uses Supabase PostgREST for `prompt_library` CRUD/search without a subscription check. After successful mutations it calls `REFRESH_PROMPT_LIBRARY_CACHE` so native extension menus do not keep stale titles/favorite state. SPA-only, `noindex,nofollow`, no `/en/*` sibling. Insert fallback never receives prompt body text in URL. | Phase 91 + Phase 94 + Phase 97 |
 | `/p/:slug` | User-shared public Prompt Library link | Read-only random-link snapshot of a user's library at publish/refresh time. Public read uses `prompt_library_get_public_snapshot` without auth; per-prompt save uses website auth (`localStorage.opten_space_session_v1`) and `prompt_library_save_public_prompt`. SPA-only, `noindex,nofollow`, no `/en/*` sibling. No bulk-copy action. | Phase 98 |
-| `/learn/courses/:courseSlug/*` | Public course marketing, checkout, and gated lessons | Officially launched standalone paid course surface. Its SPA routes remain `noindex`. All 16 paid lessons require website auth + `course-access-summary`. The separate `/hidden-intro` lesson zero may instead open through a server-validated Telegram claim after channel subscription; it stays outside the 16-lesson collection/progress. The claim never unlocks private prompts, paid lesson materials, paid lessons, or the separate Opten generator. The generator links continue to open only for a course buyer or active Pro user. Kinescope playback is gated by `/api/kinescope-course-token` and `/api/kinescope-course-auth`. | Site-only |
+| `/learn/courses/:courseSlug/*` | Public course marketing, checkout, and gated lessons | Officially launched standalone paid course surface. Its SPA routes remain `noindex`. All 16 lessons require website auth + `course-access-summary`; there is no free lesson zero. The retired lesson-zero route `/learn/courses/ai-content-marketing-2026/hidden-intro` redirects to the course root and preserves `?claim=...` only for an already-issued checkout discount. The former video is absent from the Kinescope whitelist. Telegram claims never unlock private prompts, lesson materials, paid lessons, or the separate Opten generator. The generator links continue to open only for a course buyer or active Pro user. Kinescope playback is gated by `/api/kinescope-course-token` and `/api/kinescope-course-auth`. | Site-only |
 | `/app/*` | User/site navigation for Opten Space Beta | Account-based app shell. Canonical namespace for Space Beta app surfaces. `/app/learn*` and `/space/learn*` are compatibility redirects to public `/learn*`; public Learn is no longer indexed inside `/app`. Website auth uses the canonical `/login`; visible login uses Email OTP only while the retained Google OAuth path is hidden. App routes are SPA-only, `noindex,nofollow`, and have no `/en/*` sibling; language switches in-place via `opten_lang_v3`. | Phase 95/96 |
 
 **Locked route names** (renames are breaking):
@@ -239,8 +239,8 @@ The site only **calls** them; it does not own them.
 | `POST /create-payment` | Site (`PayPage` RU path) | Bearer JWT | YooKassa. Body: `{ recurring: boolean }`. Returns `{ confirmation_url }`. `return_url` is hardcoded to `https://opten.space/success`. The JWT may come from website auth or extension fallback. |
 | `POST /create-payment-paddle` | Site (`PayPage` EN path) | Bearer JWT | Paddle. Returns `{ priceId, customerEmail, userId }`. Site then calls `Paddle.Checkout.open(...)`. The JWT may come from website auth or extension fallback. |
 | `POST /create-course-payment` | Hidden Learn course page (`/learn/courses/ai-content-marketing-2026/*`) | Public anon + email | Standalone course checkout, not Pro. Body: `{ course_slug, email, return_url, currency?, promo_code?, discount_claim_token? }`. For promo/claim preview, body may be `{ course_slug, currency?, promo_code?, discount_claim_token?, quote_only: true }`; it validates the code/claim and returns `{ provider, amount_value, list_amount_value, discount_percent, promo_discount_percent?, promo_code?, discount_code?, discount_id?, discount_claim_active?, discount_claim_expires_at?, claim_discount_percent?, discount_source?, currency }` without creating `course_orders`, provider payments, incrementing promo usage, or marking claims used. `discount_claim_token` has priority over `promo_code` and must not stack. Normal `currency="RUB"` checkout returns YooKassa `{ confirmation_url, order_id, amount_value, list_amount_value, discount_percent, promo_discount_percent?, discount_claim_active?, discount_claim_expires_at?, claim_discount_percent?, discount_source?, currency }`; `currency="USD"` returns Paddle `{ provider:"paddle", price_id, order_id, customer_email, custom_data, amount_value, list_amount_value, discount_percent, promo_discount_percent?, discount_code?, discount_id?, discount_claim_active?, discount_claim_expires_at?, claim_discount_percent?, discount_source?, currency }`. Promo errors are `invalid_promo_code`, `promo_not_active`, `promo_not_configured`, or `promo_lookup_failed`; claim errors are `invalid_discount_claim`, `discount_claim_not_found`, `discount_claim_expired`, `discount_claim_used`, or `discount_claim_lookup_failed`. The checkout email becomes the entitlement email; no website login is required before payment. |
-| `POST /telegram-hidden-intro-opened` | Telegram lesson-zero validation + analytics | Public anon + claim token | Legacy-named endpoint retained for deployment compatibility. Body: `{ discount_claim_token, validate_only? }`. It returns `{ preview_access:boolean, discount_active:boolean }`; `preview_access` is true only for a Telegram claim whose lead has `subscription_verified_at`. With `validate_only:true` it is read-only. Otherwise it also records only the first lesson-zero open. It never grants a course entitlement, Pro state, private prompt/material access, paid-lesson playback, or generator access. |
-| `GET/POST /telegram-hidden-intro-stats` | Owner/admin tooling | `X-Opten-Admin-Secret` | Service endpoint returning lead, claim, order, and event counts. Canonical funnel stages are starts, `subscription_verified`, `access_granted`, `hidden_intro_opened`, checkout orders, succeeded payments, active discounts, and blocked chats. A paid Telegram order means `course_orders.discount_source='telegram_hidden_intro' AND status='succeeded'`. Database count failures return an endpoint error instead of silently reporting zero. |
+| `POST /telegram-hidden-intro-opened` | Retired lesson-zero compatibility | Public anon | Legacy-named endpoint retained so old clients fail closed. Every POST returns HTTP `410` with `{ preview_access:false, discount_active:false, error:"lesson_zero_retired" }`; it no longer reads claims, records opens, or grants playback. |
+| `GET/POST /telegram-hidden-intro-stats` | Owner/admin tooling | `X-Opten-Admin-Secret` | Service endpoint returning lead, claim, order, and event counts. Canonical active funnel stages are starts, course-offer clicks, course links/opens where tracked, checkout orders, succeeded payments, active discounts, and blocked chats. Historical subscription and lesson-zero counters may remain as compatibility aliases. A paid Telegram order means `course_orders.discount_source='telegram_hidden_intro' AND status='succeeded'`. Database count failures return an endpoint error instead of silently reporting zero. |
 | `POST /telegram-hidden-intro-broadcast` | Owner/admin tooling | `X-Opten-Admin-Secret` | Manual bot broadcast endpoint. Body supports `{ text, photo_url?, button_text?, button_url?, segment?, limit?, dry_run? }`; segment is `all`, `subscribed`, `access_granted`, or `access_granted_not_paid`. Sends sequentially with a small delay, persists a `telegram_broadcasts` row plus per-recipient `message_id` values for non-dry-run sends, and marks Telegram 403/blocked users as blocked. Broadcasts are delivery-only: they never create, refresh, or extend `course_discount_claims`. Returns `{ broadcast_id, recipients, sent, blocked, failed }` for real sends. |
 | `GET/POST /telegram-hidden-intro-broadcasts` | Owner/admin tooling | `X-Opten-Admin-Secret` | Broadcast history and delete endpoint. `GET` returns recent stored broadcast rows. `POST` with `{ action:"delete", broadcast_id }` calls Telegram `deleteMessage` for stored recipient `chat_id` + `message_id` pairs and updates recipient/broadcast delete counters. Only broadcasts sent after message ID persistence was added are reliably deletable, and Telegram's own message deletion limits still apply. |
 | `GET/POST /telegram-hidden-intro-assets` | Owner/admin tooling + Telegram image fetch | `POST`: `X-Opten-Admin-Secret`; `GET`: random asset token | Broadcast image asset endpoint. `POST` accepts `{ file_name?, content_type, data_base64 }` from the owner-gated website proxy and stores a compressed JPG/PNG/WEBP in `telegram_broadcast_assets` with service-role access. It returns a random HTTPS URL. `GET ?token=...` serves the image bytes publicly by unguessable token so Telegram can fetch `sendPhoto` images. |
@@ -301,14 +301,11 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
   row or increment `times_used`; successful YooKassa/Paddle course webhooks
   increment `times_used` once, only when the order was not already succeeded.
 - Telegram claims live in `course_discount_claims`, not in
-  `course_promo_codes`. One claim may be issued immediately from the explicit
-  direct-course menu branch, or after `getChatMember` verifies membership in the
-  free-lesson branch. The direct-course branch uses the token only for the
-  checkout discount and does not unlock lesson zero. The same claim permanently
-  unlocks the separate `hidden-intro` lesson zero only after its lead receives
-  `subscription_verified_at`. It carries a checkout discount for its first
-  24 hours and is never a course entitlement; it cannot unlock the 16 paid
-  lessons, prompts, materials, or Opten generators.
+  `course_promo_codes`. One claim may be issued from the explicit direct-course
+  menu branch and is used only for a checkout discount on the course root. The
+  bot no longer calls `getChatMember`, and the claim cannot unlock any lesson,
+  prompt, material, or Opten generator. It carries a checkout discount for its
+  first 24 hours and is never a course entitlement.
   New claims use a 20% discount. Already-issued claims keep their stored
   percentage until expiry so a previously promised offer is still honored.
   It is issued exactly once per Telegram lead: repeated course requests always
@@ -360,18 +357,18 @@ Telegram course offer for the same course is intentionally a narrow sales
 funnel:
 
 - `/start` sends one `Что тебе сейчас интереснее?` navigation message with
-  four rows in this order: `Мой Telegram с промтами`, `Доступ к курсу по
-  ИИ`, `Урок про поиск идей`, and `Все бесплатные уроки`. The Telegram row
+  three rows in this order: `Мой Telegram с промтами`, `Доступ к курсу по
+  ИИ`, and `Все бесплатные уроки`. The Telegram row
   opens the public channel, while the final row opens
   `https://opten.space/learn/lessons`. The direct-course callback immediately
   creates or reuses the one-time claim without checking channel membership, sends the public course
   introduction through Bot API `sendVideo`, then sends the separate
   HTML-formatted course offer with an `Открыть курс` button to the claim-bearing
-  course root. The free-lesson callback sends the existing welcome photo/copy
-  and subscription buttons; only its subsequent subscription check can unlock
-  lesson zero. Legacy `get_course_access` / `check_subscription` callbacks
-  remain accepted for buttons already present in old chats. This handler change
-  is not a broadcast and must never push the sequence to existing leads.
+  course root. Retired `open_hidden_intro`, `get_course_access`, and
+  `check_subscription` callbacks are recognized only so old buttons receive a
+  retirement notice and the current menu; they do not call `getChatMember`,
+  create claims, or grant access. This handler change is not a broadcast and
+  must never push the sequence to existing leads.
 - The default `sendVideo` source is the source-controlled 720p H.264/AAC file
   `https://opten.space/assets/telegram/ai-content-marketing-2026-intro-v2.mp4`.
   It stays below Telegram's 20 MB remote-URL limit and may be overridden only
@@ -389,54 +386,44 @@ funnel:
   writes funnel events to `telegram_hidden_intro_events`. These tables are
   RLS-enabled with no public policies and are accessed only by service-role
   Edge Functions.
-- Direct course clicks use `course_access_clicked`; free-lesson menu clicks use
-  `free_lesson_clicked`. A direct course click never writes
-  `access_granted_at` or `hidden_intro_access_granted`, because those fields
-  remain reserved for delivery of the server-validated lesson-zero link.
+- Direct course clicks use `course_access_clicked`. Historical free-lesson and
+  subscription events may remain in the database for audit compatibility but
+  are no longer written by the current bot flow.
 - The website stores the claim token in
-  `localStorage.opten_course_preview_claim_v1`. The lesson-zero page validates
-  it through `telegram-hidden-intro-opened`, records the first real lesson
-  open, and sends it to `/api/kinescope-course-token`; that website API
-  revalidates it server-side before issuing a playback token.
+  `localStorage.opten_course_preview_claim_v1` only for checkout-discount
+  compatibility. The retired `/hidden-intro` page redirects to the course root
+  with the query string intact. `telegram-hidden-intro-opened` fails closed
+  with HTTP 410, and Kinescope APIs do not accept Telegram claims.
 - Owner tooling is intentionally service-endpoint based for MVP:
   `telegram-hidden-intro-stats` for funnel counts,
   `telegram-hidden-intro-broadcast` for manual posts, and
   `telegram-hidden-intro-reminders` for 12h/1h reminders. All use
   `X-Opten-Admin-Secret`; do not expose these controls in public site bundles.
-- Reminder copy and links depend on the lead state: a verified free-lesson lead
-  may be told that lesson-zero access remains and receives a hidden-intro link;
-  a direct-course-only lead receives a course-root link and must not be told
-  that lesson zero is already open.
-- The owner dashboard displays unique bot starts, verified subscriptions,
-  lesson-zero links delivered, first lesson opens, Telegram checkout orders,
-  successful payments, active claims, and blocked chats. The event-type database
-  constraint must stay synchronized with `TelegramFunnelEventType`, including
-  `course_access_clicked` and `hidden_intro_access_unavailable`.
+- Reminder copy and links always point to the claim-bearing course root and do
+  not mention lesson-zero access.
+- The owner dashboard displays unique bot starts, course-offer clicks, course
+  links/opens where tracked, Telegram checkout orders, successful payments,
+  active claims, and blocked chats. Historical lesson-zero counters may remain
+  as compatibility aliases. The event-type database constraint must stay
+  synchronized with `TelegramFunnelEventType`.
 - Paid Kinescope lessons require normal website auth plus
-  `course-access-summary`. Only `hidden-intro` accepts the
-  `telegram-hidden-intro` playback mode, and only after server claim validation.
-- All 16 paid lessons use the same locked course-purchase UI. Only the locked
-  lesson-zero player deep-links to the bot.
-- The free-lesson branch sends the welcome/photo and subscription buttons. A
-  claim created earlier by the direct-course branch is reused after Telegram
-  verifies membership; verification adds permanent lesson-zero access without
-  restarting the discount. Expired/used claims keep lesson-zero access after
-  verification while the message honestly states that the discount ended.
+  `course-access-summary`. No playback mode accepts a Telegram claim.
+- All 16 paid lessons use the same locked course-purchase UI. There is no
+  lesson-zero player or Telegram deep-link in the course outline.
 - Expired or used legacy 40% claims remain inactive and unchanged for checkout
   and audit purposes. Their expired-state Telegram copy uses the current 20%
   campaign percentage rather than the stored historical percentage, so the
   retired 40% wording cannot reappear after `/start`.
-- Private course prompts remain course-entitlement-gated. Telegram preview
-  access must not enable Opten for ChatGPT or the Opten Claude/Codex download.
+- Private course prompts remain course-entitlement-gated. A Telegram discount
+  claim must not enable Opten for ChatGPT or the Opten Claude/Codex download.
   The collection-level `Генератор промптов Opten` block stays visible before
   materials/showcase on the course root and every lesson, but its links open
   only for a course buyer or active Pro user; everyone else gets locked
   previews with one compact `/pay` subscription action. Once access opens, the
   sales description under the generator heading is hidden.
-- `hidden-intro` must remain outside `privateCourseCollection.lessons` so paid
-  course progress stays 16, but its reviewed video id remains in
-  `api/_shared/kinescopeCourse.ts`. It stays outside sitemap, llms.txt, public
-  Learn, and EN sibling maps.
+- The retired `hidden-intro` slug exists only as a redirect guard. Its content
+  module and Kinescope video id are absent from the client and server whitelist;
+  it stays outside sitemap, llms.txt, public Learn, and EN sibling maps.
 
 If the Supabase project is ever rotated/migrated, **all listed site files** plus the extension's
 [`config/api.js`](../../promptscore/config/api.js) must be updated in one coordinated commit.
@@ -512,27 +499,45 @@ reuses the same idempotency key.
   `gpt-image-2`, `midjourney-8`, `midjourney-7`, `seedream-5`, `flux`, `z-image`.
 - Allowed video models, in popup order: `seedance-2.0`, `kling-3`, `kling-2.6`,
   `veo-3.1`, `veo-3`, `wan`. Labels and ordering mirror `PS_CHAT_TOP_MODELS` in
-  the extension popup. Every other slug returns `invalid_model` before proxy use.
+  the extension popup.
+- Allowed site-only Vibe Coding models, in fixed order: `codex`, `claude`,
+  `gemini`. They map server-side to the proxy's non-public `_coding-*` adapters;
+  underscore-prefixed adapters are excluded from and blocked by the public
+  `/api/skill` surface. Every other slug returns `invalid_model` before proxy use.
 - Optional references: up to 8 image files. The browser rejects sources larger
   than 10 MB, decodes them locally, resizes the long edge to at most 512 px, and
   converts them to JPEG at quality 0.7 before request construction. Reference
   bytes, previews, and prompt results are ephemeral component state; they are not
   written to localStorage or Supabase. Reference images use the same Anthropic
-  multimodal content-block shape as the extension popup.
+  multimodal content-block shape as the extension popup. In Vibe Coding mode,
+  attachments reach the model only when the prompt explicitly refers to an image,
+  screenshot, reference, or mockup; images may clarify that written reference but
+  must never supply new product requirements.
 - Access errors are explicit: no/invalid website JWT returns
   `401 authentication_required` before proxy use; exhausted Free or over-limit
   Pro returns `429 pro_limit_reached` from the proxy-backed shared ledger.
-- Transport mirrors `POPUP_REWRITE_PROMPT`: prompt must contain at least 20
-  trimmed characters; response language is detected from prompt text; the server
-  loads the same committed `rewriter.md`; the proxy body uses `model_name`,
-  `is_video`, `max_tokens: 1200`, legacy-compatible `count_usage: true`, and
-  `source: popup`. The proxy ignores client billing flags, uses Claude Haiku,
-  loads the matching skill, and charges every rewrite against the shared
-  operation ledger. The website server never receives the Anthropic API key and
-  never decides usage entitlement locally beyond JWT verification.
+- Image/video transport mirrors `POPUP_REWRITE_PROMPT`: prompt must contain at
+  least 20 trimmed characters; response language is detected from prompt text;
+  the server loads the same committed `rewriter.md`; the proxy body uses
+  `model_name`, `is_video`, `max_tokens: 1200`, legacy-compatible
+  `count_usage: true`, and `source: popup`.
+- Vibe Coding uses the same endpoint, JWT, response shape, provider, and ledger,
+  but loads the separate site-owned `vibecoding-cleaner.md`, maps the three public
+  model slugs to `_coding-*`, and sends `source: website_vibecoding`. Its
+  closed-world contract permits only cleanup/reordering of existing meaning,
+  preserves the user's prose language and protected literals, and never adds a
+  stack, product requirements, tests, acceptance criteria, or a plan. Runtime
+  guardrails reject empty/wrapped/expanded/drifted output and return the original
+  prompt as a successful no-op after a valid provider response; they do not retry
+  or consume another operation for guardrail fallback.
+- The proxy ignores client billing flags, uses Claude Haiku, loads the matching
+  server-side skill, and charges every rewrite against the shared operation
+  ledger. The website server never receives the Anthropic API key and never
+  decides usage entitlement locally beyond JWT verification.
 - The canonical quick-Improve rewriter prompt remains extension-owned at
   `C:\Projects\promptscore\config\`. Run `npm run sync:prompt-workbench` to
-  refresh the committed server-only copies in `api/_assets/prompt-workbench/`.
+  refresh its committed server-only copy in `api/_assets/prompt-workbench/`.
+  `vibecoding-cleaner.md` is site-owned and intentionally excluded from that sync.
 - The extension's paid score/improve transport remains unchanged. The website
   reuses the popup rewrite path server-to-server after JWT verification and
   relies on the proxy for Free-signup/Pro usage enforcement. The website must not
@@ -540,7 +545,7 @@ reuses the same idempotency key.
   product label `Opten`/`Opten Pro` without publishing provider internals.
 - Prompt text/results/reference previews are ephemeral browser state; the website
   does not persist them in localStorage or Supabase. The endpoint applies a strict
-  body cap, 20–6,000-character prompt bounds, exact popup model allowlist,
+  body cap, 20–6,000-character prompt bounds, exact image/video/coding allowlist,
   JWT verification, and proxy timeout/retry policy.
 
 ### 4.1 Prompt Library PostgREST surface (Phase 91, extension save/insert added Phase 92/93)

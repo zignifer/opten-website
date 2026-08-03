@@ -19,6 +19,11 @@ export const PROMPT_WORKBENCH_MODELS = {
     { slug: "veo-3", label: "Google Veo 3.0" },
     { slug: "wan", label: "Wan 2.6" },
   ],
+  vibecoding: [
+    { slug: "codex", label: "Codex" },
+    { slug: "claude", label: "Claude" },
+    { slug: "gemini", label: "Gemini" },
+  ],
 } as const;
 
 export type PromptWorkbenchType = keyof typeof PROMPT_WORKBENCH_MODELS;

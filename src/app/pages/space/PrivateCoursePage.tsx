@@ -5,13 +5,8 @@ import {
   findPrivateCourseLesson,
   getAdjacentPrivateCourseLessons,
   getPrivateCourseCollection,
-  privateCourseHiddenIntroLesson,
   privateCourseIntroContent,
 } from "../../../content/space/privateCourse";
-import {
-  HIDDEN_INTRO_SLUG,
-  HIDDEN_INTRO_TELEGRAM_URL,
-} from "../../../content/space/courseDiscountClaim";
 import { getLearnLessonTitle } from "../../../content/space/learn";
 import { useLang } from "../../../i18n/LangContext";
 import {
@@ -20,15 +15,14 @@ import {
   rememberCourseDiscountClaim,
 } from "../../../lib/courseAccess";
 
+const RETIRED_HIDDEN_INTRO_SLUG = "hidden-intro";
+
 export default function PrivateCoursePage() {
   const { courseSlug, lessonSlug } = useParams();
   const location = useLocation();
   const { lang } = useLang();
   const collection = getPrivateCourseCollection(courseSlug);
-  const isHiddenIntro = lessonSlug === HIDDEN_INTRO_SLUG;
-  const lesson = isHiddenIntro
-    ? privateCourseHiddenIntroLesson
-    : findPrivateCourseLesson(courseSlug, lessonSlug);
+  const lesson = findPrivateCourseLesson(courseSlug, lessonSlug);
   const pageTitle = !lessonSlug
     ? `${privateCourseIntroContent.title[lang]} — Opten course`
     : lesson
@@ -49,6 +43,10 @@ export default function PrivateCoursePage() {
     return <CourseIntroLayout collection={collection} intro={privateCourseIntroContent} />;
   }
 
+  if (lessonSlug === RETIRED_HIDDEN_INTRO_SLUG) {
+    return <Navigate to={`/learn/courses/${collection.id}${location.search}`} replace />;
+  }
+
   if (!lesson) {
     return <Navigate to="/learn" replace />;
   }
@@ -61,10 +59,6 @@ export default function PrivateCoursePage() {
       collection={collection}
       previousLesson={previousLesson}
       nextLesson={nextLesson}
-      telegramHiddenIntro={isHiddenIntro ? {
-        claimToken: discountClaimToken,
-        unlockUrl: HIDDEN_INTRO_TELEGRAM_URL,
-      } : undefined}
     />
   );
 }

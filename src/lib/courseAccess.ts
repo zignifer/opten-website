@@ -33,13 +33,6 @@ export type CoursePaymentResponse = {
   error?: string;
 };
 
-export type TelegramHiddenIntroAccess = {
-  ok: boolean;
-  preview_access: boolean;
-  discount_active: boolean;
-  error?: string;
-};
-
 export const COURSE_TEST_PROMO_CODE = "FREE";
 
 export function normalizeCourseEmail(email: string): string {
@@ -183,31 +176,5 @@ export async function quoteCoursePayment(
   });
   const body = (await response.json().catch(() => ({}))) as CoursePaymentResponse;
   if (!response.ok || body.error) throw new Error(body.error || "course_quote_failed");
-  return body;
-}
-
-export async function fetchTelegramHiddenIntroAccess(
-  discountClaimToken: string,
-  validateOnly = false,
-): Promise<TelegramHiddenIntroAccess> {
-  const normalizedClaimToken = normalizeCourseDiscountClaimToken(discountClaimToken);
-  if (!isValidCourseDiscountClaimToken(normalizedClaimToken)) {
-    throw new Error("invalid_discount_claim");
-  }
-
-  const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/telegram-hidden-intro-opened`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      apikey: SUPABASE_ANON_KEY,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      discount_claim_token: normalizedClaimToken,
-      validate_only: validateOnly,
-    }),
-  });
-  const body = (await response.json().catch(() => ({}))) as TelegramHiddenIntroAccess;
-  if (!response.ok || body.error) throw new Error(body.error || "telegram_hidden_intro_access_failed");
   return body;
 }

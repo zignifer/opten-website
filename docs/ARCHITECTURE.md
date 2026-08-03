@@ -48,7 +48,7 @@
 │                                                                              │
 │   API (Vercel serverless):                                                   │
 │     GET /api/download-skill   →  validates JWT + Pro, streams opten.zip      │
-│     POST /api/prompt-workbench → authenticated popup-parity quick Improve    │
+│     POST /api/prompt-workbench → image/video Improve + Vibe Coding cleaner   │
 │     POST /api/course-prompt   →  course access gate + prompt body            │
 │     POST /api/kinescope-course-token → course access gate + drmauthtoken     │
 │     POST /api/kinescope-course-auth  → Kinescope playback callback           │
@@ -198,13 +198,15 @@ src/
 
 api/
 ├── download-skill.ts              — Pro-gated opten.zip stream
-├── prompt-workbench.ts            — authenticated landing quick Improve;
-│                                     website JWT → proxy Haiku + shared ledger
+├── prompt-workbench.ts            — authenticated landing Improve endpoint;
+│                                     popup image/video + site-only Vibe Coding
+│                                     → proxy Haiku + shared ledger
 ├── course-prompt.ts               — course-entitlement-gated prompt body fetch
 ├── kinescope-course-token.ts      — course-entitlement-gated Kinescope embed URL
 ├── kinescope-course-auth.ts       — Kinescope server-to-server playback callback
 └── _shared/
     ├── optenServerAuth.ts         — server-only Supabase JWT/course access helpers
+    ├── promptWorkbenchVibecoding.ts — closed-world coding response guardrails
     ├── kinescopeCourse.ts         — Kinescope video whitelist + embed URL builder
     └── coursePromptBodies.ts      — private course prompt body whitelist
 ```
@@ -312,23 +314,23 @@ after public Learn changes and `npm run verify:kinescope-course` after any paid 
 ID/materials/prompt change.
 
 Telegram course acquisition is a separate funnel for the same course. `/start`
-sends the reviewed welcome photo and subscription buttons; the extension-owned
-backend creates/reuses a random claim only after `getChatMember` verifies
-channel membership. The claim permanently opens the separate Kinescope lesson
-zero at `/hidden-intro` and carries a 20% checkout discount for its first 24
-hours. The site stores it in `localStorage.opten_course_preview_claim_v1`, while
-both the page and token API validate it through
-`telegram-hidden-intro-opened`. All 16 paid lessons, their materials, and
-private prompts still require the standalone course entitlement. The
+shows the channel, course offer, and public free-lessons catalog. The
+extension-owned backend creates/reuses one random claim from the explicit course
+branch; it carries a 20% checkout discount for its first 24 hours and never
+unlocks playback. The legacy storage key
+`localStorage.opten_course_preview_claim_v1` keeps already-issued discounts
+usable on the course root. The retired `/hidden-intro` route redirects there
+with the query string intact, while `telegram-hidden-intro-opened` fails closed
+and the Kinescope APIs accept only the normal course entitlement. All 16 course
+lessons, their materials, and private prompts require that entitlement. The
 collection-level `Генератор промптов Opten` block appears on
 the course root and every lesson before materials/showcase; its links open for
 a course buyer or active Pro user without the sales description, while other
 visitors see locked previews with one compact `/pay` subscription CTA. Every
-paid lesson uses the same course-purchase UI; only lesson zero deep-links to
-the bot. Lesson zero remains outside `privateCourseCollection.lessons` so
-progress stays 16, but its reviewed video id is present in the server whitelist.
-The route remains outside sitemap, llms.txt, public Learn route lists, and EN
-sibling maps.
+lesson uses the same course-purchase UI. The retired lesson-zero content and
+video id are absent from the client and server whitelist; its compatibility
+slug remains outside sitemap, llms.txt, public Learn route lists, and EN sibling
+maps.
 
 Telegram service tooling currently lives in extension-owned Edge Functions:
 `telegram-hidden-intro-stats`, `telegram-hidden-intro-broadcast`,

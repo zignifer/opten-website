@@ -3,7 +3,6 @@ import { timingSafeEqual } from "node:crypto";
 import { jwtVerify } from "jose";
 import {
   KINESCOPE_PLAYBACK_AUDIENCE,
-  KINESCOPE_HIDDEN_INTRO_SLUG,
   KINESCOPE_PLAYBACK_ISSUER,
   findKinescopeCourseLesson,
   findKinescopeLessonByVideoId,
@@ -63,9 +62,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     });
 
     const lesson = findKinescopeCourseLesson(String(payload.course_slug || ""), String(payload.lesson_slug || ""));
-    const accessModeAllowed =
-      payload.access_mode === "course-entitlement"
-      || (payload.access_mode === "telegram-hidden-intro" && lesson?.lessonSlug === KINESCOPE_HIDDEN_INTRO_SLUG);
+    const accessModeAllowed = payload.access_mode === "course-entitlement";
     if (!lesson || lesson.videoId !== body.id || payload.video_id !== body.id || !accessModeAllowed) {
       res.statusCode = 403;
       res.end();
