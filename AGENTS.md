@@ -317,8 +317,9 @@ cannot surface the retired 40% message.
 For future `/start` updates only, the Telegram bot immediately creates or reuses
 the one-time claim and shows the course without a navigation menu, channel
 membership check, free lesson, or lesson-zero branch. A newly created active
-claim sends the reviewed course intro video, then the Figma-approved HTML course
-offer with one `Открыть курс` button to the claim-bearing course root. A repeated
+claim sends the Figma-approved HTML course offer first, with one `Открыть курс`
+button to the claim-bearing course root, then schedules the reviewed course intro
+video as a background task so media delivery cannot delay the webhook response. A repeated
 request reuses the same token without extending it and sends the short `Ссылка
 на курс уже готова` response without replaying the video. It does not grant the
 generator; the generator opens only after course purchase or through active
@@ -334,16 +335,17 @@ short description is `Доступ к урокам и каналу с промп
 updates must not change either value unless the owner explicitly asks. The Bot
 API long description remains `Привет! Здесь можно получить доступ в мой
 Telegram-канал с промптами и полезными инструкциями или посмотреть курс по
-ИИ.\n\nЖми /Start 👇`, and the `/start` command description is `Открыть навигацию`.
+ИИ.\n\nЖми /Start 👇`, and the `/start` command description is `Открыть курс`.
 These exact name, short description, long description, and command values must
 be set and verified in both the default Bot API scope and the `ru` language
 scope, because Telegram clients may prefer the localized RU profile.
-If claim creation fails, the bot shows `Открыть курс` first and `Перейти в
-Telegram` second.
+If claim creation fails, the bot shows `Открыть курс` first as the recognized
+`get_course_access` retry callback and `Перейти в Telegram` second.
 The video must use a stable public HTTPS URL. The reviewed default is the
 source-controlled 720p H.264/AAC asset at
-`/assets/telegram/ai-content-marketing-2026-intro-v2.mp4` (17.5 MB, below
-Telegram's 20 MB remote-URL limit); `TELEGRAM_INTRO_VIDEO_URL` may override it.
+`/assets/telegram/ai-content-marketing-2026-intro-v2.mp4` (5.9 MB, compressed
+with H.264 CRF 27 and below Telegram's 20 MB remote-URL limit);
+`TELEGRAM_INTRO_VIDEO_URL` may override it.
 Do not use a Telegram `file_id`, because a stale ID can silently restore cached
 media after deploys.
 

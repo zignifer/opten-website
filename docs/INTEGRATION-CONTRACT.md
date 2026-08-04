@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-08-03 against extension `manifest.json` version **1.4.2** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench keeps the extension popup's authenticated image/video quick-Improve profiles and adds a site-only Vibe Coding cleaner; standalone course checkout/access, Kinescope course playback, the Telegram `/start` resource menu with a direct 24h 20% course offer, the retirement of the former lesson-zero branch, course-or-Pro Opten generators, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads are documented). Backend fully on self-hosted `supabase.opten.space`.
+> **Last sync:** 2026-08-05 against extension `manifest.json` version **1.4.2** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench keeps the extension popup's authenticated image/video quick-Improve profiles and adds a site-only Vibe Coding cleaner; standalone course checkout/access, Kinescope course playback, the Telegram `/start` direct 24h 20% course offer with background intro-video delivery, the retirement of the former lesson-zero branch, course-or-Pro Opten generators, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads are documented). Backend fully on self-hosted `supabase.opten.space`.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -358,9 +358,11 @@ funnel:
 
 - `/start` immediately creates or reuses the lead's one-time claim without a
   navigation menu, channel membership check, free lesson, or lesson-zero branch.
-  A new active claim sends the public course introduction through Bot API
-  `sendVideo`, then sends the separate Figma-approved HTML course offer with one
-  `Открыть курс` button to the claim-bearing course root. A repeated request
+  A new active claim first sends the Figma-approved HTML course offer with one
+  `Открыть курс` button to the claim-bearing course root, then schedules the
+  public course introduction through Bot API `sendVideo` as a background task.
+  Telegram API calls have bounded method-specific timeouts, and media delivery
+  cannot delay the webhook response. A repeated request
   reuses the same token without extending it and sends the short existing-link
   response without replaying the video. Retired `open_hidden_intro`,
   `get_course_access`, and `check_subscription` callbacks remain recognized so
@@ -368,15 +370,16 @@ funnel:
   `getChatMember` or grant lesson access. This handler change is not a broadcast
   and must never push the sequence to existing leads.
 - The default `sendVideo` source is the source-controlled 720p H.264/AAC file
-  `https://opten.space/assets/telegram/ai-content-marketing-2026-intro-v2.mp4`.
-  It stays below Telegram's 20 MB remote-URL limit and may be overridden only
-  through the server-side `TELEGRAM_INTRO_VIDEO_URL` environment variable.
+  `https://opten.space/assets/telegram/ai-content-marketing-2026-intro-v2.mp4`
+  (5.9 MB after H.264 CRF 27 compression). It stays below Telegram's 20 MB
+  remote-URL limit and may be overridden only through the server-side
+  `TELEGRAM_INTRO_VIDEO_URL` environment variable.
 - The locked Bot API name is `Влад Воронежцев | Уроки и промпты`, and the
   locked short description is `Доступ к урокам и каналу с промптами.`. Future
   bot updates must not change either value unless the owner explicitly asks.
   The long description remains `Привет! Здесь можно получить доступ в мой
   Telegram-канал с промптами и полезными инструкциями или посмотреть курс по
-  ИИ.\n\nЖми /Start 👇`; the `/start` command description is `Открыть навигацию`.
+  ИИ.\n\nЖми /Start 👇`; the `/start` command description is `Открыть курс`.
   These exact profile and command values must be set and verified in both the
   default Bot API scope and the `ru` language scope; Telegram clients may use
   the localized RU profile instead of the default values.
@@ -414,6 +417,9 @@ funnel:
   and audit purposes. Their expired-state Telegram copy uses the current 20%
   campaign percentage rather than the stored historical percentage, so the
   retired 40% wording cannot reappear after `/start`.
+- If claim creation fails, the first `Открыть курс` button uses the recognized
+  `get_course_access` callback to retry the same direct claim flow; it is not a
+  plain course-root URL that falsely promises a retry it cannot perform.
 - Private course prompts remain course-entitlement-gated. A Telegram discount
   claim must not enable Opten for ChatGPT or the Opten Claude/Codex download.
   The collection-level `Генератор промптов Opten` block stays visible before
