@@ -72,7 +72,7 @@ export interface BlogPostLocale {
   updatedAt: string;
   body: BlogPostBody;
   related?: string[];         // slugs; UI shows max 2
-  editorialLayout?: "upwork-start"; // opt-in renderer for longform editorial stories
+  editorialLayout?: "upwork-start" | "seo-automation"; // opt-in renderers for longform editorial stories
 }
 
 export interface BlogPost {

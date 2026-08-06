@@ -1,0 +1,4 @@
+id,status,query,intent,slug,locale,business_priority,source,checked_at,notes
+topic-001,queued,example search query,informational,example-search-query,en,high,Wordstat,2026-08-06,Replace this row with your topic
+topic-002,deferred,second topic,commercial,second-topic,en,medium,Wordstat,2026-08-06,Owner facts required
+topic-003,published,already published topic,informational,published-topic,en,high,site,2026-08-06,Do not create a duplicate

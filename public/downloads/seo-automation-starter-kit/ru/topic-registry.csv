@@ -1,0 +1,4 @@
+id,status,query,intent,slug,locale,business_priority,source,checked_at,notes
+topic-001,queued,пример поискового запроса,informational,primer-poiskovogo-zaprosa,ru,high,Wordstat,2026-08-06,Замените пример своей темой
+topic-002,deferred,вторая тема,commercial,vtoraya-tema,ru,medium,Wordstat,2026-08-06,Нужны факты от владельца
+topic-003,published,уже опубликованная тема,informational,opublikovannaya-tema,ru,high,site,2026-08-06,Не создавать дубль

@@ -19,6 +19,7 @@ import { post as vibeCodingFreelanceGuide } from "../src/content/blog/vibe-codin
 import { post as aiFreelanceServicesGuide } from "../src/content/blog/ai-freelance-services";
 import { post as makeMoneyWithAiGuide } from "../src/content/blog/make-money-with-ai";
 import { post as whereToFindAiClientsGuide } from "../src/content/blog/where-to-find-ai-clients";
+import { post as seoPipelineWordstatCodexGuide } from "../src/content/blog/seo-pipeline-wordstat-codex";
 import { post as upworkStart2026Guide } from "../src/content/blog/upwork-start-2026-checklist";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
@@ -1386,6 +1387,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex`, name: seoPipelineWordstatCodexGuide.ru.title, datePublished: seoPipelineWordstatCodexGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/where-to-find-ai-clients`, name: whereToFindAiClientsGuide.ru.title, datePublished: whereToFindAiClientsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/make-money-with-ai`, name: makeMoneyWithAiGuide.ru.title, datePublished: makeMoneyWithAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-freelance-services`, name: aiFreelanceServicesGuide.ru.title, datePublished: aiFreelanceServicesGuide.ru.publishedAt },
@@ -1436,6 +1438,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // Editorial SEO automation guide: /blog/seo-pipeline-wordstat-codex.
+  {
+    path: "/blog/seo-pipeline-wordstat-codex",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex`, en: `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex`, xDefault: `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex` },
+    title: seoPipelineWordstatCodexGuide.ru.title,
+    description: seoPipelineWordstatCodexGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex`,
+    ogTitle: seoPipelineWordstatCodexGuide.ru.title,
+    ogDescription: seoPipelineWordstatCodexGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${seoPipelineWordstatCodexGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex`, headline: seoPipelineWordstatCodexGuide.ru.title, description: seoPipelineWordstatCodexGuide.ru.description, datePublished: seoPipelineWordstatCodexGuide.ru.publishedAt, dateModified: seoPipelineWordstatCodexGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: seoPipelineWordstatCodexGuide.ru.tags, image: { url: `${SITE_ORIGIN}${seoPipelineWordstatCodexGuide.ru.cover.src}`, width: seoPipelineWordstatCodexGuide.ru.cover.width, height: seoPipelineWordstatCodexGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex`, url: `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex`, name: seoPipelineWordstatCodexGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((seoPipelineWordstatCodexGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex`, seoPipelineWordstatCodexGuide.ru.title),
+      faqPageBlock(seoPipelineWordstatCodexGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: seoPipelineWordstatCodexGuide.ru.title, url: `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex` }], `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex`),
     ],
   },
 
@@ -3383,6 +3407,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex`, name: seoPipelineWordstatCodexGuide.en.title, datePublished: seoPipelineWordstatCodexGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients`, name: whereToFindAiClientsGuide.en.title, datePublished: whereToFindAiClientsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/make-money-with-ai`, name: makeMoneyWithAiGuide.en.title, datePublished: makeMoneyWithAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-freelance-services`, name: aiFreelanceServicesGuide.en.title, datePublished: aiFreelanceServicesGuide.en.publishedAt },
@@ -3433,6 +3458,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // Editorial SEO automation guide: /en/blog/seo-pipeline-wordstat-codex EN sibling.
+  {
+    path: "/en/blog/seo-pipeline-wordstat-codex",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex`, en: `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex`, xDefault: `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex` },
+    title: seoPipelineWordstatCodexGuide.en.title,
+    description: seoPipelineWordstatCodexGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex`,
+    ogTitle: seoPipelineWordstatCodexGuide.en.title,
+    ogDescription: seoPipelineWordstatCodexGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${seoPipelineWordstatCodexGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex`, headline: seoPipelineWordstatCodexGuide.en.title, description: seoPipelineWordstatCodexGuide.en.description, datePublished: seoPipelineWordstatCodexGuide.en.publishedAt, dateModified: seoPipelineWordstatCodexGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: seoPipelineWordstatCodexGuide.en.tags, image: { url: `${SITE_ORIGIN}${seoPipelineWordstatCodexGuide.en.cover.src}`, width: seoPipelineWordstatCodexGuide.en.cover.width, height: seoPipelineWordstatCodexGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex`, url: `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex`, name: seoPipelineWordstatCodexGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((seoPipelineWordstatCodexGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex`, seoPipelineWordstatCodexGuide.en.title),
+      faqPageBlock(seoPipelineWordstatCodexGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: seoPipelineWordstatCodexGuide.en.title, url: `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex` }], `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex`),
     ],
   },
 

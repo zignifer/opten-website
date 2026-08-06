@@ -54,6 +54,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/seo-pipeline-wordstat-codex":    "src/content/blog/seo-pipeline-wordstat-codex.ts",
+  "/en/blog/seo-pipeline-wordstat-codex": "src/content/blog/seo-pipeline-wordstat-codex.ts",
   "/blog/upwork-start-2026-checklist":    "src/content/blog/upwork-start-2026-checklist.ts",
   "/en/blog/upwork-start-2026-checklist": "src/content/blog/upwork-start-2026-checklist.ts",
   "/blog/where-to-find-ai-clients":    "src/content/blog/where-to-find-ai-clients.ts",

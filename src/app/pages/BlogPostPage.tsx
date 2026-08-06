@@ -19,6 +19,7 @@ import BlogPostCard from "../components/BlogPostCard";
 import FaqBlock from "../components/FaqBlock";
 import ResponsiveImage from "../components/ResponsiveImage";
 import UpworkStartArticle from "../components/blog/UpworkStartArticle";
+import SeoAutomationArticle from "../components/blog/SeoAutomationArticle";
 import { blogPostsBySlug, allBlogPosts, type BlogSlug } from "../../content/blog";
 import type { BlogPromoBanner } from "../../content/blog/types";
 
@@ -102,6 +103,7 @@ export default function BlogPostPage() {
   const sections = data.body.sections ?? [];
   const faq = data.body.faq ?? [];
   const articleHero = data.articleHero ?? data.cover;
+  const hasCustomEditorialLayout = data.editorialLayout === "upwork-start" || data.editorialLayout === "seo-automation";
 
   // Related posts: explicit `related[]` if defined, else other recent posts.
   const explicitRelated = (data.related ?? [])
@@ -173,9 +175,10 @@ export default function BlogPostPage() {
         </p>
 
         {data.editorialLayout === "upwork-start" && <UpworkStartArticle lang={lang} />}
+        {data.editorialLayout === "seo-automation" && <SeoAutomationArticle lang={lang} />}
 
         {/* Optional ordered steps (HowTo source) */}
-        {data.editorialLayout !== "upwork-start" && steps.length > 0 && (
+        {!hasCustomEditorialLayout && steps.length > 0 && (
           <ol className="mt-[40px] flex flex-col gap-[40px]">
             {steps.map((step, i) => (
               <li key={i} className="border-t border-white/10 pt-[28px]">
@@ -223,7 +226,7 @@ export default function BlogPostPage() {
         )}
 
         {/* Optional prose sections (essay-style posts) */}
-        {data.editorialLayout !== "upwork-start" && sections.length > 0 && (
+        {!hasCustomEditorialLayout && sections.length > 0 && (
           <div className="mt-[40px] flex flex-col gap-[32px]">
             {sections.map((sec, i) => (
               <section key={i} className="border-t border-white/10 pt-[24px]">

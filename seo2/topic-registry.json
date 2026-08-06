@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-02",
+  "updatedAt": "2026-08-06",
   "selectionPolicy": "queued-by-queueOrder-then-deferred",
   "research": {
     "rule": "Synthetic seeds discover wording; only Suggest, Wordstat, Bing, GSC, or reviewed manual evidence can create a queued topic.",
@@ -2690,6 +2690,50 @@
       },
       "targetUrl": null,
       "publishedAt": null
+    },
+    {
+      "queueOrder": 31,
+      "slug": "seo-pipeline-wordstat-codex",
+      "status": "published",
+      "titleHint": "Как настроить автоматизацию SEO-статей с Wordstat и Codex",
+      "clusterId": "BL-seo-automation",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "автоматизация seo статей",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU title, intro, body"
+        },
+        {
+          "language": "ru",
+          "phrase": "wordstat api",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU body, FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "seo article automation",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title, intro, body"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "manual"
+        ],
+        "note": "Owner-requested guide; no Wordstat volume claim was used for topic selection",
+        "lastCheckedAt": "2026-08-06"
+      },
+      "targetUrl": "/blog/seo-pipeline-wordstat-codex",
+      "publishedAt": "2026-08-06"
     }
   ]
 }
