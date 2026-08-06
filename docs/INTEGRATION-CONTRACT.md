@@ -8,7 +8,7 @@
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
-> - [`background/background.js`](../../promptscore/background/background.js) — `onMessageExternal` handler (lines ~1002-1084), cross-issuer token guard at `clearAuthState()` (~L263) + token-refresh path (~L405-414) — invalidates stale cloud tokens carried over from pre-Phase-88 sessions
+> - [`background/background.js`](../../promptscore/background/background.js) — `onMessageExternal` handler (lines ~2224-2318), auth reset at `clearAuthState()` (~L1418), and self-hosted issuer guard in `getValidAuthToken()` (~L1527) — invalidates stale cloud tokens carried over from pre-Phase-88 sessions
 > - [`supabase/functions/`](../../promptscore/supabase/functions/) — Edge Functions
 
 ---
@@ -19,8 +19,8 @@ Extension milestone **v2.8 — Self-Hosted Supabase Migration** completed 2026-0
 
 1. **Supabase base URL changed** from `https://vuywydhwkqmihfztpkgl.supabase.co` to `https://supabase.opten.space` (see §4). Site-side source files were updated in lockstep with the extension cutover — verified in [`api/download-skill.ts`](../api/download-skill.ts), [`src/app/pages/PayPage.tsx`](../src/app/pages/PayPage.tsx), and [`src/app/pages/AccountPage.tsx`](../src/app/pages/AccountPage.tsx). The cloud project is now a frozen cold backup, not an active backend.
 2. **Anon key is unchanged.** The self-hosted GoTrue reuses the same `JWT_SECRET` as the cloud project, so the existing `SUPABASE_ANON_KEY` (issuer `ref: vuywydhwkqmihfztpkgl` baked into the JWT payload) is still accepted by self-hosted Kong. No site-side key rotation required.
-3. **Dual-issuer JWT reality.** Cloud-issued user tokens (legacy, ES256, verified via cloud JWKS) and self-hosted-issued tokens (HS256, verified via the shared `JWT_SECRET`) are both accepted by the site's local verifier (`api/download-skill.ts`) AND by self-hosted Edge Functions during the transition window. The extension's service worker additionally drops stale cloud tokens that no longer round-trip through `/auth/v1/user` — site code MUST NOT assume that a token received from `GET_AUTH_TOKEN` was just issued (it may be cloud-legacy and very close to extension-side invalidation).
-4. **Edge Function request/response shapes are unchanged.** All 10 functions (see §4) behave the same to the caller — only the deploy target moved. No site-side code changes required beyond the base-URL constant.
+3. **Dual-issuer JWT reality.** Cloud-issued user tokens (legacy, ES256, verified via cloud JWKS) and self-hosted-issued tokens (HS256, verified via the shared `JWT_SECRET`) are both accepted by the site's local verifier (`api/download-skill.ts`) and by self-hosted Edge Functions for compatibility. The extension service worker does not perform JWKS verification: before returning `GET_AUTH_TOKEN`, it decodes the issuer and clears any stored token whose issuer is not the configured self-hosted URL. A token returned by the current extension is therefore self-hosted; server-side dual-issuer support remains for other legacy callers during the transition.
+4. **Edge Function request/response shapes were preserved through cutover.** The documented function surface in §4 kept its caller contracts; only the deploy target moved. No site-side code changes were required beyond the base-URL constant.
 5. **Extension `host_permissions` no longer includes the cloud URL.** Any future contract change that re-introduces a cloud-Supabase code path must also re-add the host to the extension's `manifest.json` and ship a new extension release.
 
 ---
@@ -112,7 +112,7 @@ chrome.runtime.sendMessage(id, { type: "GET_SUBSCRIPTION" }, (response) => {
   // Pro/cancelled response:
   // {
   //   plan: 'pro' | 'cancelled',
-  //   status: 'active' | 'cancelled' | null,
+  //   status: 'active' | 'cancelled' | 'past_due' | null,
   //   expires_at: ISO8601 | null,
   //   auto_renew: boolean,
   //   card_last4: string | null,
@@ -141,6 +141,7 @@ chrome.runtime.sendMessage(id, { type: "GET_SUBSCRIPTION" }, (response) => {
 
 **Field-level notes:**
 - `plan === 'cancelled'` means the user cancelled but is still inside the paid period. **Treat it as Pro for access purposes only while `expires_at` is absent or in the future** (download skill, no upgrade nag). Once `expires_at` is in the past, clients must treat the user as Free even if the daily `expire-subscriptions` cleanup has not relabeled the row yet. This mirrors the Pro gate in [`api/download-skill.ts`](../api/download-skill.ts).
+- `account-summary` may also return `status === 'past_due'` while the latest Pro period remains unexpired. The extension currently caches that as Pro. Treat it as a temporary current entitlement until expiry; do not collapse it into a successful active payment in business reporting.
 - `limit: 300` for Free is the product positioning: the denominator is the Pro target limit. Since 2026-07-13, newly created Free accounts get `remaining: 3` from `public.users.free_signup_credits`, then count down to `0/300` with no monthly refill. Existing Free accounts keep `0/300`. Server-side proxy keeps production `FREE_LIMIT=0` only as a legacy fallback; canonical Free entitlement is the user-row grant.
 - Forward-compatibility rule: **the site MUST NOT assume the response is exhaustive.** Future fields may be added.
 
@@ -231,7 +232,12 @@ live with these exact paths and the documented behavior.
 
 All functions live in the **extension repo** at
 [`C:\Projects\promptscore\supabase\functions\`](../../promptscore/supabase/functions/),
-not here. Deploy via `npx supabase functions deploy <name>` from that repo.
+not here. Production is self-hosted: deploy through
+[`scripts/ops/SELF-HOSTED-SUPABASE-RUNBOOK.md`](../../promptscore/scripts/ops/SELF-HOSTED-SUPABASE-RUNBOOK.md)
+to `opten-vps:/home/opten/supabase/docker/volumes/functions/`, then restart or
+recreate the Edge Runtime container. Never use `npx supabase functions deploy`,
+`npx supabase db push`, or `--linked` for production; a stale link can target the
+frozen cloud project.
 The site only **calls** them; it does not own them.
 
 | Endpoint | Caller | Auth | Notes |
@@ -248,7 +254,7 @@ The site only **calls** them; it does not own them.
 | `POST /cancel-subscription` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | YooKassa cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
 | `POST /cancel-subscription-paddle` | Site (`/account`) or extension (via `CANCEL_SUBSCRIPTION`) | Bearer JWT | Paddle cancellation. Website path calls directly with website JWT; extension fallback still dispatches through `CANCEL_SUBSCRIPTION`. |
 | `POST /get-subscription` | Site (optional) | Bearer JWT | Reads `subscriptions` table. Used as a fallback if the extension is not installed (rare path). |
-| `POST /account-summary` | Site `/login` consumers, `/pay`, `/account`, `/app/*`, extension popup cache refresh | Bearer JWT | Reads the verified user's account, `users.free_signup_credits`, latest subscription, and `usage_logs` count using service role, then returns a single account/credit summary. No payment mutation. Response is the canonical source for `email`, `plan`, `status`, `limit`, `used`, `remaining`, `expires_at`, `provider`, `currency`, and card metadata. |
+| `POST /account-summary` | Site `/login` consumers, `/pay`, `/account`, `/app/*`, extension popup cache refresh | Bearer JWT | Reads the verified user's account, `users.free_signup_credits`, latest subscription by `created_at DESC`, and `usage_logs` count using service role, then returns a single account/credit summary. No payment mutation. Response is canonical for `email`, `plan`, `status`, `limit`, `used`, `remaining`, `expires_at`, `provider`, `currency`, and card metadata. Current Pro means the latest row is `plan='pro'`, status `active | cancelled | past_due`, and unexpired/null `expires_at`. |
 | `POST /course-access-summary` | Hidden Learn course page + `/api/kinescope-course-token` | Bearer website JWT | Reads/claims a standalone course entitlement for the verified user. If an active entitlement exists for the JWT email and has no `user_id`, the function binds it to `auth.users.id`. Returns `{ course_slug, has_access, status, email, granted_at }`. |
 | `POST /webhook` | YooKassa | IP-whitelist | Provider-only. Updates `subscriptions` table with `provider='yookassa'`. |
 | `POST /webhook-paddle` | Paddle | HMAC-SHA256 | Provider-only. Updates `subscriptions` table with `provider='paddle'`. |
@@ -259,7 +265,7 @@ The site only **calls** them; it does not own them.
 **Hardcoded constants on the site** (must match Supabase project):
 - `SUPABASE_URL = "https://supabase.opten.space"` — self-hosted (Phase 88 cutover COMPLETE — this is the live primary backend; cloud `vuywydhwkqmihfztpkgl.supabase.co` is a frozen cold backup). `PayPage.tsx` / `AccountPage.tsx` use the derived `SUPABASE_FUNCTIONS_URL = "https://supabase.opten.space/functions/v1"`.
 - `SUPABASE_REST_URL = "https://supabase.opten.space/rest/v1"` — used by Prompt Library PostgREST/RPC helpers.
-- `SUPABASE_ANON_KEY = "eyJ...A3apeGWSQih8qioX0XA2O5qbj4PnKwQsshPtG7vrbKg"` — **UNCHANGED** (JWT secret reused; self-hosted Kong accepts the same anon key). (see [`src/lib/optenAuth.ts`](../src/lib/optenAuth.ts), [`src/lib/promptLibraryApi.ts`](../src/lib/promptLibraryApi.ts), [`PayPage.tsx`](../src/app/pages/PayPage.tsx), [`AccountPage.tsx`](../src/app/pages/AccountPage.tsx), [`api/download-skill.ts`](../api/download-skill.ts))
+- `SUPABASE_ANON_KEY` — **UNCHANGED** (JWT secret reused; self-hosted Kong accepts the same public anon key). Keep every duplicate synchronized: [`src/lib/optenAuth.ts`](../src/lib/optenAuth.ts), [`src/lib/promptLibraryApi.ts`](../src/lib/promptLibraryApi.ts), [`PayPage.tsx`](../src/app/pages/PayPage.tsx), [`AccountPage.tsx`](../src/app/pages/AccountPage.tsx), [`api/_shared/optenServerAuth.ts`](../api/_shared/optenServerAuth.ts), and [`api/download-skill.ts`](../api/download-skill.ts).
 
 **Token verification (Phase 87 / D-03, updated Phase 88):** the site (`api/download-skill.ts`) and the Edge Functions verify the user JWT **locally** (jose, dual-issuer allowlist: cloud + self-hosted). `supabase.auth.getUser()` / `/auth/v1/user` is no longer called — it performs a session lookup that rejects cloud-issued tokens on self-hosted (sessions not migrated, Phase 86). **Cloud migrated to ASYMMETRIC signing keys, so cloud-issued tokens are now ES256 — verified via the cloud JWKS (`/auth/v1/.well-known/jwks.json`); self-hosted GoTrue still signs HS256 with the shared secret.** The verifier branches by the token's `alg`: HS256 → shared secret, ES256 → cloud JWKS. Both issuers are accepted during the transition so old-extension tokens keep working (CLIENT-06). Edge `create-payment*` additionally run a server-side preflight (user-exists + not-already-Pro) before charging.
 
@@ -301,8 +307,8 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
   row or increment `times_used`; successful YooKassa/Paddle course webhooks
   increment `times_used` once, only when the order was not already succeeded.
 - Telegram claims live in `course_discount_claims`, not in
-  `course_promo_codes`. One claim may be issued from the explicit direct-course
-  menu branch and is used only for a checkout discount on the course root. The
+  `course_promo_codes`. `/start` immediately creates or reuses one claim and it
+  is used only for a checkout discount on the course root. The
   bot no longer calls `getChatMember`, and the claim cannot unlock any lesson,
   prompt, material, or Opten generator. It carries a checkout discount for its
   first 24 hours and is never a course entitlement.
@@ -777,7 +783,7 @@ Renaming a key on the extension side requires updating the response field too.
 | `ps_plan` | Extension (synced from Supabase) | `GET_SUBSCRIPTION.plan` | `'free' \| 'pro' \| 'cancelled'`. |
 | `ps_remaining` | Extension (`account-summary` + proxy updates) | `GET_SUBSCRIPTION.remaining` | New Free starts at 3, old/spent Free can be 0, Pro counts down from 300. |
 | `ps_limit` | Extension (`account-summary`) | `GET_SUBSCRIPTION.limit` | `300` for both Free display and Pro. |
-| `ps_sub_status` | Extension | `GET_SUBSCRIPTION.status` | `'active' \| 'cancelled' \| null`. |
+| `ps_sub_status` | Extension | `GET_SUBSCRIPTION.status` | `'active' \| 'cancelled' \| 'past_due' \| null`. |
 | `ps_sub_expires` | Extension | `GET_SUBSCRIPTION.expires_at` | ISO8601. |
 | `ps_sub_card_last4` | Extension | `GET_SUBSCRIPTION.card_last4` | |
 | `ps_sub_card_type` | Extension | `GET_SUBSCRIPTION.card_type` | |
@@ -851,9 +857,9 @@ If you switch envs, you must also flip the corresponding Paddle priceIds in the 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
 | Renaming a route (`/pay`, `/welcome`, `/success`) | Already-installed extensions on old versions break for affected users until they update | Keep the routes. To replace, ship a redirect from the old path. |
-| Changing `EXTENSION_IDS` without updating all 3 site pages | "Extension not installed" misdetection | Always grep-and-replace; consider extracting to a single constant. |
+| Changing `EXTENSION_IDS` without updating all 4 site pages | "Extension not installed" misdetection | Always grep-and-replace; consider extracting to a single constant. |
 | Removing a field from `GET_SUBSCRIPTION` response | Site PayPage/AccountPage crashes | Forward-compatible additions only. Removals need extension-side deprecation window. |
-| Rotating `SUPABASE_ANON_KEY` | Both repos break | Coordinate; the key is hardcoded in 3 site files + extension `config/api.js`. |
+| Rotating `SUPABASE_ANON_KEY` | Both repos break | Coordinate every site module listed in §4 plus extension `config/api.js`; grep before changing. |
 | Marking `/dashboard/download-skill` as public | Anyone gets the skill ZIP | Auth + Pro check in [`api/download-skill.ts`](../api/download-skill.ts) is defense-in-depth — keep it. |
 | Treating `plan === 'cancelled'` as always Free or always Pro in site UI | Cancelled-but-not-expired users lose access prematurely, or expired users cannot pay again before cron cleanup | Mirror [`api/download-skill.ts`](../api/download-skill.ts): `'cancelled'` with a future `expires_at` is still Pro; past `expires_at` is Free for payment/UI purposes. |
 | Paddle env-var flip without priceId sync | Real users get sandbox prices (or vice versa) | Treat Paddle env switch as a coordinated deploy across site + Edge Function. |
