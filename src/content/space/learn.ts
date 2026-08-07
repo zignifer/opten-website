@@ -283,7 +283,7 @@ export const learnDefaultAuthor: LearnAuthor = {
     en: "Web designer, AI creator",
   },
   intro: {
-    ru: "Показываю рабочие AI-процессы на реальных уроках: от идеи и промпта до готового видео.",
+    ru: "Показываю рабочие AI-процессы на реальных уроках: от идеи и промпта до результата.",
     en: "I teach practical AI workflows through real lessons: from idea and prompt to finished visual content.",
   },
   note: {
