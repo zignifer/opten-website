@@ -327,9 +327,9 @@ usable on the course root. The retired `/hidden-intro` route redirects there
 with the query string intact, while `telegram-hidden-intro-opened` fails closed
 and the Kinescope APIs accept only the normal course entitlement. All 16 course
 lessons, their materials, and private prompts require that entitlement. The
-collection-level `Генератор промптов Opten` block appears on
-the course root and every lesson before materials/showcase; its links open for
-a course buyer or active Pro user without the sales description, while other
+collection-level `Генератор промптов Opten` block appears on every paid lesson
+before materials, but is absent from the course root. Its links open for a
+course buyer or active Pro user without the sales description, while other
 visitors see locked previews with one compact `/pay` subscription CTA. Every
 lesson uses the same course-purchase UI. The retired lesson-zero content and
 video id are absent from the client and server whitelist; its compatibility

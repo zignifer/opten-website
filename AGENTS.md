@@ -288,11 +288,12 @@ legacy storage key `localStorage.opten_course_preview_claim_v1` remains only so
 already-issued discount links survive the retirement. The claim is not a course
 entitlement: all 16 paid lessons still require `course-access-summary`, and the
 claim never unlocks private course prompts, lesson materials, paid lessons, or the separate
-`Генератор промптов Opten` section. That
-collection-level generator block must remain visible on the course root and
-every lesson page. On desktop it stays compact inside the left lesson-content
-column and appears before lesson materials/course showcase and prompts, never
-as a full-width block below the course sidebar. Its explanatory description is
+`Генератор промптов Opten` section. That collection-level generator block must
+remain visible on every paid lesson page, but must not appear on the course
+root. On desktop lesson pages it stays compact inside the left lesson-content
+column and appears before lesson materials and prompts, never as a full-width
+block below the course sidebar. The course root goes directly from its intro
+copy to the course showcase. Its explanatory description is
 shown only while access is locked; a course buyer or active Pro user sees the
 heading and working ChatGPT and Claude/Codex links without the sales
 description. Everyone else sees the same two generators in a locked conversion

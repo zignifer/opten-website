@@ -604,6 +604,38 @@ const figmaToCodexTimestampsEn: LearnTimestamp[] = [
   { time: "23:13", seconds: 1393, title: "Where to learn the full workflow", description: "Final recommendations and next steps." },
 ];
 
+const clientWebsiteFigmaCodexTimestampsRu: LearnTimestamp[] = [
+  { time: "00:00", seconds: 0, title: "Сайт для клиента за 50 000 ₽: что делаем", description: "Постановка задачи и план работы над сайтом реального клиента." },
+  { time: "00:24", seconds: 24, title: "Референс на Tilda и проблемы с адаптивом", description: "Разбор исходной страницы и её поведения на разных экранах." },
+  { time: "01:46", seconds: 106, title: "Перенос страницы в Figma через Capture Page", description: "Импорт референса в Figma для дальнейшей переработки." },
+  { time: "02:32", seconds: 152, title: "Очистка автолайяутов и настройка сетки", description: "Подготовка структуры макета и рабочей сетки." },
+  { time: "04:14", seconds: 254, title: "Редизайн навигации и первой секции", description: "Обновление шапки и первого экрана сайта." },
+  { time: "06:30", seconds: 390, title: "Логотип и персонаж через ChatGPT", description: "Создание визуальных элементов для нового дизайна." },
+  { time: "11:29", seconds: 689, title: "AI-анимация в Syntx и Kling", description: "Подготовка анимации для визуала с помощью AI-инструментов." },
+  { time: "14:30", seconds: 870, title: "Вторая секция и плагин Blobs", description: "Сборка следующего блока страницы и декоративной графики." },
+  { time: "18:19", seconds: 1099, title: "Мобильная версия макета", description: "Адаптация дизайна под мобильный экран." },
+  { time: "21:31", seconds: 1291, title: "Перенос из Figma в Codex через Figma MCP", description: "Передача готового макета в Codex для вёрстки." },
+  { time: "23:31", seconds: 1411, title: "Результат в браузере и проверка адаптива", description: "Проверка собранной страницы на компьютере и телефоне." },
+  { time: "24:03", seconds: 1443, title: "Исправление бага мобильной навигации", description: "Точечная доработка поведения меню на мобильном устройстве." },
+  { time: "26:15", seconds: 1575, title: "Итоги урока и следующая часть", description: "Финальный результат и анонс продолжения серии." },
+];
+
+const clientWebsiteFigmaCodexTimestampsEn: LearnTimestamp[] = [
+  { time: "00:00", seconds: 0, title: "The 50,000 ₽ client website: the plan", description: "The brief and workflow for a real client website." },
+  { time: "00:24", seconds: 24, title: "The Tilda reference and responsive issues", description: "Reviewing the source page and its behavior across screen sizes." },
+  { time: "01:46", seconds: 106, title: "Moving the page into Figma with Capture Page", description: "Importing the reference into Figma for redesign." },
+  { time: "02:32", seconds: 152, title: "Cleaning auto layouts and setting up the grid", description: "Preparing the layout structure and working grid." },
+  { time: "04:14", seconds: 254, title: "Redesigning navigation and the first section", description: "Updating the header and hero section." },
+  { time: "06:30", seconds: 390, title: "Creating a logo and character with ChatGPT", description: "Building visual elements for the new design." },
+  { time: "11:29", seconds: 689, title: "AI animation in Syntx and Kling", description: "Animating the visual with AI tools." },
+  { time: "14:30", seconds: 870, title: "The second section and the Blobs plugin", description: "Building the next page block and its decorative graphics." },
+  { time: "18:19", seconds: 1099, title: "The mobile layout", description: "Adapting the design for a mobile screen." },
+  { time: "21:31", seconds: 1291, title: "Moving from Figma to Codex through Figma MCP", description: "Passing the finished layout to Codex for implementation." },
+  { time: "23:31", seconds: 1411, title: "Browser result and responsive review", description: "Checking the implemented page on desktop and mobile." },
+  { time: "24:03", seconds: 1443, title: "Fixing the mobile navigation bug", description: "Correcting the menu behavior on mobile." },
+  { time: "26:15", seconds: 1575, title: "Lesson recap and the next part", description: "Reviewing the result and previewing the continuation." },
+];
+
 function lesson(input: LearnLesson): LearnLesson {
   return { ...input, author: input.author ?? learnDefaultAuthor };
 }
@@ -938,6 +970,58 @@ export const publicLearnLessons: LearnLesson[] = [
       en: { youtubeId: "XRVo8ZU6Nis", youtubeUrl: "https://youtu.be/XRVo8ZU6Nis", captionLanguage: "en" },
     },
     timestamps: { ru: figmaToCodexTimestampsRu, en: figmaToCodexTimestampsEn },
+    materials: emptyMaterials,
+  }),
+  lesson({
+    slug: "client-website-figma-codex",
+    title: {
+      ru: "Сайт за 50 000 ₽ в Figma и Codex",
+      en: "50,000 ₽ client site in Figma and Codex",
+    },
+    description: {
+      ru: "Собираю сайт для реального клиента за 50 000 ₽: переношу референс с Tilda в Figma, создаю визуалы и AI-анимацию, а затем верстаю первые две секции в Codex через Figma MCP. Это первый урок из серии о вайбкодинге. Показываю весь проход от сетки и адаптива до рабочего результата на компьютере и телефоне, а затем исправляю баг в навигации.",
+      en: "I build a website for a real client with a 50,000 ₽ budget: move a Tilda reference into Figma, create visuals and AI animation, then implement the first two sections in Codex through Figma MCP. This is the first lesson in a vibe-coding series, covering the full path from the grid and responsive layout to a working desktop and mobile result, followed by a navigation bug fix.",
+    },
+    seoTitle: {
+      ru: "Сайт для клиента за 50 000 ₽ в Figma и Codex через Figma MCP",
+      en: "Building a 50,000 ₽ client site with Figma, Codex, and Figma MCP",
+    },
+    seoDescription: {
+      ru: "Практический урок: перенос референса с Tilda в Figma, редизайн, AI-анимация, адаптив и вёрстка первых секций в Codex через Figma MCP.",
+      en: "A practical lesson on moving a Tilda reference into Figma, redesigning it, creating AI animation, adapting it for mobile, and implementing the first sections in Codex through Figma MCP.",
+    },
+    category: "vibe-coding",
+    duration: "27:30",
+    durationIso: "PT27M30S",
+    status: "Available",
+    access: "free",
+    thumbnailPath: `${learnAssetBase}/thumbs/client-website-figma-codex.jpg`,
+    publishedAt: "2026-08-05",
+    updatedAt: "2026-08-07",
+    releaseNote: {
+      ru: "Первый урок серии о создании сайта для реального клиента в Figma и Codex.",
+      en: "The first lesson in a series about building a real client website with Figma and Codex.",
+    },
+    filters: ["Standalone", "Builder"],
+    topics: {
+      ru: ["Figma", "Codex", "Figma MCP", "Вайбкодинг"],
+      en: ["Figma", "Codex", "Figma MCP", "Vibe coding"],
+    },
+    whatYouWillLearn: {
+      ru: ["Перенести референс с Tilda в Figma", "Собрать сетку, навигацию и первые две секции", "Создать визуалы и AI-анимацию", "Перенести макет в Codex через Figma MCP и проверить адаптив"],
+      en: ["Move a Tilda reference into Figma", "Build the grid, navigation, and first two sections", "Create visuals and AI animation", "Move the layout into Codex through Figma MCP and verify responsive behavior"],
+    },
+    updatedNote: {
+      ru: "Метаданные, обложка и 13 глав сверены с YouTube 2026-08-07.",
+      en: "Metadata, thumbnail, and all 13 chapters verified against YouTube on 2026-08-07.",
+    },
+    youtubeId: "hekYDp3-ErQ",
+    youtubeUrl: "https://youtu.be/hekYDp3-ErQ",
+    localizedVideo: {
+      ru: { youtubeId: "hekYDp3-ErQ", youtubeUrl: "https://youtu.be/hekYDp3-ErQ", audioLanguage: "ru", captionLanguage: "ru" },
+      en: { youtubeId: "hekYDp3-ErQ", youtubeUrl: "https://youtu.be/hekYDp3-ErQ", captionLanguage: "en" },
+    },
+    timestamps: { ru: clientWebsiteFigmaCodexTimestampsRu, en: clientWebsiteFigmaCodexTimestampsEn },
     materials: emptyMaterials,
   }),
 ];

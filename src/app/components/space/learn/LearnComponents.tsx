@@ -460,13 +460,6 @@ export function CourseIntroLayout({ collection, intro }: CourseIntroLayoutProps)
             <CourseIntroHeader intro={intro} />
           </div>
           <div className={courseMobileOrder(4)}>
-            <OptenPromptGeneratorsSection
-              materials={getLearnCollectionPromptGenerators(displayedCollection, lang)}
-              courseAccess={courseAccess.hasAccess}
-              proAccess={hasPro}
-              loading={authStatus === "loading" || (courseAccess.loading && !hasPro)}
-              purchase={purchase}
-            />
             <CourseIntroShowcase intro={intro} />
           </div>
         </div>

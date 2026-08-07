@@ -31,6 +31,8 @@ const requiredFiles = [
   "public/assets/learn/og/actual-ai-tools-2026.jpg",
   "public/assets/learn/thumbs/figma-to-codex-website.jpg",
   "public/assets/learn/og/figma-to-codex-website.jpg",
+  "public/assets/learn/thumbs/client-website-figma-codex.jpg",
+  "public/assets/learn/og/client-website-figma-codex.jpg",
 ];
 
 for (const file of requiredFiles) {
@@ -83,6 +85,10 @@ assert.match(content, /web-design-references/, "Learn catalog must include the w
 assert.match(content, /figma-to-codex-website/, "Learn catalog must include the Figma-to-Codex lesson");
 assert.match(content, /youtubeId: "XRVo8ZU6Nis"/, "Figma-to-Codex lesson must use the requested YouTube video");
 assert.match(content, /time: "23:13", seconds: 1393/, "Figma-to-Codex lesson must keep all original YouTube chapters");
+assert.match(content, /client-website-figma-codex/, "Learn catalog must include the new client website lesson");
+assert.match(content, /title:\s*\{[\s\S]*?ru: "Сайт за 50 000 ₽ в Figma и Codex"/, "New lesson must use the reviewed two-line card title");
+assert.match(content, /youtubeId: "hekYDp3-ErQ"/, "New client website lesson must use the requested YouTube video");
+assert.match(content, /time: "26:15", seconds: 1575/, "New client website lesson must keep all original YouTube chapters");
 assert.match(content, /https:\/\/higgsfield\.ai\//, "Actual AI tools lesson must include the Higgsfield material");
 assert.match(content, /https:\/\/freepik\.com\//, "Actual AI tools lesson must include the Freepik / Magnific material");
 assert.match(content, /https:\/\/syntx\.ai\/welcome\/GlUETIt6/, "Actual AI tools lesson must include the Syntx material");

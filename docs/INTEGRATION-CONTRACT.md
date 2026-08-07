@@ -429,10 +429,10 @@ funnel:
 - Private course prompts remain course-entitlement-gated. A Telegram discount
   claim must not enable Opten for ChatGPT or the Opten Claude/Codex download.
   The collection-level `Генератор промптов Opten` block stays visible before
-  materials/showcase on the course root and every lesson, but its links open
-  only for a course buyer or active Pro user; everyone else gets locked
-  previews with one compact `/pay` subscription action. Once access opens, the
-  sales description under the generator heading is hidden.
+  materials on every paid lesson page, but is absent from the course root. Its
+  links open only for a course buyer or active Pro user; everyone else gets
+  locked previews with one compact `/pay` subscription action. Once access
+  opens, the sales description under the generator heading is hidden.
 - The retired `hidden-intro` slug exists only as a redirect guard. Its content
   module and Kinescope video id are absent from the client and server whitelist;
   it stays outside sitemap, llms.txt, public Learn, and EN sibling maps.

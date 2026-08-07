@@ -205,6 +205,12 @@ const courseIntroEnd = components.indexOf("type LessonPlayerProps", courseIntroS
 assert.ok(courseIntroStart >= 0 && courseIntroEnd > courseIntroStart, "Private course intro source block must be readable");
 const courseIntroSource = components.slice(courseIntroStart, courseIntroEnd);
 assert.doesNotMatch(courseIntroSource, /<LessonPlayer|<LessonMaterials|<LessonPrompts|<LessonMissingItems|\/api\/kinescope-course-token|drmauthtoken/, "Private course intro must not embed a gated lesson player, materials, prompts, or tokenized playback");
+assert.doesNotMatch(courseIntroSource, /<OptenPromptGeneratorsSection/, "Private course root must not render the Opten prompt generator block");
+const lessonDetailStart = components.indexOf("export function LessonDetailLayout");
+const lessonDetailEnd = components.indexOf("type CourseIntroLayoutProps", lessonDetailStart);
+assert.ok(lessonDetailStart >= 0 && lessonDetailEnd > lessonDetailStart, "Private lesson detail source block must be readable");
+const lessonDetailSource = components.slice(lessonDetailStart, lessonDetailEnd);
+assert.match(lessonDetailSource, /<OptenPromptGeneratorsSection/, "Paid lesson pages must keep the Opten prompt generator block");
 for (const assetPath of [introVideoOneAsset, introVideoTwoAsset, introPhotoFourAsset]) {
   assert.ok(existsSync(join(root, assetPath)), `Private course intro asset must exist: ${assetPath}`);
   assert.ok(statSync(join(root, assetPath)).size > 0, `Private course intro asset must not be empty: ${assetPath}`);
