@@ -803,7 +803,7 @@ export const publicLearnLessons: LearnLesson[] = [
     durationIso: "PT29M34S",
     status: "Available",
     access: "free",
-    thumbnailPath: `${learnAssetBase}/thumbs/client-website-navigation-hero.jpg`,
+    thumbnailPath: "https://i.ytimg.com/vi/MEs-DdIjPy0/maxresdefault.jpg",
     publishedAt: "2026-05-24",
     updatedAt: "2026-06-06",
     releaseNote: {

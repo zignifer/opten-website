@@ -37,6 +37,7 @@ import ResponsiveImage from "../../ResponsiveImage";
 import SiteFooter from "../../SiteFooter";
 import SpaceHeader from "../SpaceHeader";
 import { useSpaceAuth } from "../SpaceAuthProvider";
+import LearnLessonCard from "./LearnLessonCard";
 import type { LearnCollection, LearnCoursePurchase, LearnLesson, LearnMaterial, LearnMissingItem, LearnOverviewSection, LearnPromptBlock, LearnTimestamp } from "../../../../content/space/learn";
 import {
   getLearnCollectionCategoryLabel,
@@ -56,11 +57,17 @@ import {
   getLessonPosition,
   getLearnAuthorName,
 } from "../../../../content/space/learn";
-import type { PrivateCourseIntroContent } from "../../../../content/space/privateCourse";
+import { privateCourseCollection, type PrivateCourseIntroContent } from "../../../../content/space/privateCourse";
 
 const LEARN_PROGRESS_STORAGE_KEY = "opten_space_learn_progress_v1";
 const AI_CONTENT_MARKETING_COURSE_SLUG = "ai-content-marketing-2026";
 const COURSE_INTRO_SHOWCASE_HEADING_ID = "course-intro-showcase-title";
+const FREE_LESSON_COURSE_PROMO_SLUGS = ["lesson-14-codex", "lesson-16-nova-website"] as const;
+const freeLessonCoursePromoLessons = FREE_LESSON_COURSE_PROMO_SLUGS.map((slug) => {
+  const lesson = privateCourseCollection.lessons.find((item) => item.slug === slug);
+  if (!lesson) throw new Error(`Missing promoted course lesson: ${slug}`);
+  return lesson;
+});
 
 type StoredLearnProgress = {
   completed: string[];
@@ -375,7 +382,6 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
                 hasAccess={courseHasAccess}
                 purchase={purchase}
               />
-              <UnlockProCard hasPro={hasPro} />
             </>
           )}
         </aside>
@@ -589,8 +595,8 @@ function CourseIntroHeader({ intro }: { intro: PrivateCourseIntroContent }) {
 
   return (
     <section className="mt-[32px] max-w-[820px] max-md:mt-[28px]">
-      <h1 className="text-[32px] font-bold leading-[1.12] tracking-[-0.01em] text-white max-md:text-[30px]">{intro.title[lang]}</h1>
-      <p className="mt-[18px] max-w-[760px] whitespace-normal text-[16px] leading-[1.55] text-white/64 md:line-clamp-2 md:whitespace-pre-line max-md:mt-[18px] max-md:text-[18px] max-md:leading-[1.5]">
+      <h1 className="text-[32px] font-bold leading-[1.12] tracking-[-0.01em] text-white max-md:text-[24px] max-md:leading-tight max-md:tracking-normal">{intro.title[lang]}</h1>
+      <p className="mt-[18px] max-w-[760px] whitespace-normal text-[16px] leading-[1.55] text-white/64 md:line-clamp-2 md:whitespace-pre-line max-md:mt-[18px] max-md:text-[14px] max-md:leading-[1.55]">
         {description}
       </p>
     </section>
@@ -1158,42 +1164,40 @@ function LessonIntro({ lesson, collection, locked, completed, onCompletionChange
   const position = getLessonPosition(lesson.slug, lang);
   const description = getLearnLessonDescription(lesson, lang);
   const title = getNumberedCourseLessonTitle(collection, lesson, lang);
+  const showMeta = Boolean(position || collection.purchase || locked);
 
   return (
     <section className="mt-[26px] max-md:mt-[22px]">
-      <div className="flex flex-wrap items-center justify-between gap-[12px] max-md:flex-col max-md:items-start max-md:gap-[10px]">
-        <div className="flex flex-wrap items-center gap-[10px]">
-          {position && (
-            <span className="rounded-[6px] bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
-              {position}
-            </span>
+      {showMeta && (
+        <div className="flex flex-wrap items-center justify-between gap-[12px] max-md:flex-col max-md:items-start max-md:gap-[10px]">
+          <div className="flex flex-wrap items-center gap-[10px]">
+            {position && (
+              <span className="rounded-[6px] bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
+                {position}
+              </span>
+            )}
+            {collection.purchase ? (
+              <span className={`inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51] ${locked ? "" : "max-md:hidden"}`}>
+                {locked ? <Lock size={13} /> : <LockOpen size={13} />}
+                {locked ? copy.unlocksAfterPurchase : copy.courseOpenBadge}
+              </span>
+            ) : locked ? (
+              <span className="inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
+                <Lock size={13} />
+                Pro
+              </span>
+            ) : null}
+          </div>
+          {collection.purchase && !locked && (
+            <LessonCompletionAction
+              completed={completed}
+              copy={copy}
+              onToggle={() => onCompletionChange(!completed)}
+            />
           )}
-          {!collection.purchase && (
-            <span className="rounded-[6px] bg-white/[0.05] px-[9px] py-[5px] text-[12px] font-medium leading-none text-white/56">
-              {getLearnCollectionCategoryLabel(collection, lang)}
-            </span>
-          )}
-          {collection.purchase ? (
-            <span className={`inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51] ${locked ? "" : "max-md:hidden"}`}>
-              {locked ? <Lock size={13} /> : <LockOpen size={13} />}
-              {locked ? copy.unlocksAfterPurchase : copy.courseOpenBadge}
-            </span>
-          ) : locked ? (
-            <span className="inline-flex items-center gap-[5px] rounded-[6px] border border-[#9cfb51]/35 bg-[#9cfb51]/10 px-[9px] py-[5px] text-[12px] font-bold leading-none text-[#9cfb51]">
-              <Lock size={13} />
-              Pro
-            </span>
-          ) : null}
         </div>
-        {!locked && (
-          <LessonCompletionAction
-            completed={completed}
-            copy={copy}
-            onToggle={() => onCompletionChange(!completed)}
-          />
-        )}
-      </div>
-      <h1 className="mt-[18px] max-w-[820px] text-[30px] font-bold leading-[1.14] text-white max-md:mt-[20px] max-md:text-[25px]">
+      )}
+      <h1 className={`${showMeta ? "mt-[18px] max-md:mt-[20px]" : ""} max-w-[820px] text-[30px] font-bold leading-[1.14] text-white max-md:text-[25px]`}>
         {title}
       </h1>
       <LessonDescription description={description} copy={copy} />
@@ -1697,11 +1701,7 @@ function CollectionSummaryCard({ lesson, collection }: CollectionSummaryCardProp
   const progress = collection.progress;
   const isStandalone = collection.kind === "standalone";
   const mobileCourseProgress = collection.purchase ? progress : undefined;
-  const eyebrow = collection.purchase
-    ? copy.courseAccessOpen
-    : isStandalone
-      ? copy.singleLesson
-      : getLearnCollectionCategoryLabel(collection, lang);
+  const eyebrow = collection.purchase ? copy.courseAccessOpen : getLearnCollectionCategoryLabel(collection, lang);
 
   return (
     <>
@@ -1711,10 +1711,9 @@ function CollectionSummaryCard({ lesson, collection }: CollectionSummaryCardProp
           mobileCourseProgress ? "max-lg:hidden" : ""
         }`}
       >
-        <p className="text-[13px] font-medium leading-tight text-white/42">{eyebrow}</p>
-        <h2 className="mt-[14px] text-[20px] font-bold leading-[1.2] text-white">{isStandalone ? copy.lessonAuthor : getLearnCollectionTitle(collection, lang)}</h2>
-        {isStandalone && <p className="mt-[10px] text-[13px] leading-[1.45] text-white/58">{getLearnLessonAuthorIntro(lesson, lang)}</p>}
-        <div className="mt-[20px] flex items-center gap-[11px]">
+        {!isStandalone && <p className="text-[13px] font-medium leading-tight text-white/42">{eyebrow}</p>}
+        <h2 className={`${isStandalone ? "" : "mt-[14px]"} text-[20px] font-bold leading-[1.2] text-white`}>{isStandalone ? copy.lessonAuthor : getLearnCollectionTitle(collection, lang)}</h2>
+        <div className="mt-[16px] flex items-center gap-[11px]">
           <ResponsiveImage
             src={author.avatarPath}
             alt=""
@@ -1730,6 +1729,7 @@ function CollectionSummaryCard({ lesson, collection }: CollectionSummaryCardProp
             <p className="mt-[4px] truncate text-[12px] leading-tight text-white/50">{getLearnLessonAuthorRole(lesson, lang)}</p>
           </div>
         </div>
+        {isStandalone && <p className="mt-[16px] text-[13px] leading-[1.45] text-white/58">{getLearnLessonAuthorIntro(lesson, lang)}</p>}
         <AuthorSocialLinks copy={copy} />
         {progress && <CourseProgressBlock progress={progress} copy={copy} framed />}
       </section>
@@ -2556,12 +2556,41 @@ type RelatedLessonsProps = {
 function RelatedLessons({ collection, currentSlug, hasAccess, purchase }: RelatedLessonsProps) {
   const { lang } = useLang();
   const copy = detailCopy[lang];
+  const isFreeLessonPage = !collection.purchase;
   const lessons = useMemo(
-    () => collection.lessons.filter((item) => item.slug !== currentSlug).slice(0, 2),
-    [collection.lessons, currentSlug],
+    () => isFreeLessonPage ? freeLessonCoursePromoLessons : collection.lessons.filter((item) => item.slug !== currentSlug).slice(0, 2),
+    [collection.lessons, currentSlug, isFreeLessonPage],
   );
 
   if (lessons.length === 0) return null;
+
+  if (isFreeLessonPage) {
+    const courseHref = privateCourseCollection.routeBasePath?.[lang] ?? `/learn/courses/${AI_CONTENT_MARKETING_COURSE_SLUG}`;
+
+    return (
+      <section className="mt-[36px]">
+        <div className="mb-[16px] flex items-center justify-between gap-[16px]">
+          <h2 className="text-[24px] font-bold leading-tight text-white max-md:text-[20px]">{copy.aiTraining}</h2>
+          <LocalizedLink
+            to={courseHref}
+            className="inline-flex h-[30px] shrink-0 items-center rounded-full border border-[#9cfb51]/45 px-[12px] text-[12px] font-bold leading-none text-[#9cfb51] no-underline transition hover:bg-[#9cfb51]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]/70"
+          >
+            {copy.viewAllCourse}
+          </LocalizedLink>
+        </div>
+        <div className="grid grid-cols-2 gap-[16px] max-sm:grid-cols-1">
+          {lessons.map((item) => (
+            <LearnLessonCard
+              key={item.slug}
+              lesson={item}
+              lang={lang}
+              href={`${courseHref}/${item.slug}`}
+            />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="mt-[36px]">
@@ -2765,7 +2794,6 @@ const detailCopy = {
   ru: {
     breadcrumb: "Навигация по курсу",
     courses: "Курсы",
-    singleLesson: "Одиночный урок",
     lessonAuthor: "Автор урока",
     authorSocials: "Соцсети автора",
     lessonsTab: "Уроки",
@@ -2845,13 +2873,14 @@ const detailCopy = {
     buyCourseShort: (price: string) => `Открыть весь курс за ${price}`,
     courseAccessActive: "Доступ к курсу активен",
     courseAccessActiveDescription: "Видео и материалы курса открыты для этого аккаунта.",
+    aiTraining: "Обучение ИИ",
+    viewAllCourse: "Смотреть все",
     allLessons: "Все уроки",
     watchLesson: "Смотреть урок",
   },
   en: {
     breadcrumb: "Course navigation",
     courses: "Courses",
-    singleLesson: "Single lesson",
     lessonAuthor: "Lesson author",
     authorSocials: "Author socials",
     lessonsTab: "Lessons",
@@ -2931,6 +2960,8 @@ const detailCopy = {
     buyCourseShort: (price: string) => `Open full course for ${price}`,
     courseAccessActive: "Course access active",
     courseAccessActiveDescription: "Course videos and materials are unlocked for this account.",
+    aiTraining: "AI training",
+    viewAllCourse: "View all",
     allLessons: "All lessons",
     watchLesson: "Watch lesson",
   },

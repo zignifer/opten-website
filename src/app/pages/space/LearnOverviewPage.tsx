@@ -17,7 +17,6 @@ import {
   getLearnLessonCategoryLabel,
   getLearnLessonDescription,
   getLearnLessonTitle,
-  hiddenLearnOverviewLessonSlugs,
   learnHubFaq,
   learnTopicLabels,
   publicLearnLessons,
@@ -39,8 +38,17 @@ type TopicFilter = "all" | "ai-image" | "ai-video" | "vibe-coding" | "vibe-desig
 type SortKey = "new" | "duration";
 
 const SHOW_LEARN_COLLECTIONS = false;
-const HIDDEN_LEARN_LESSON_SLUGS = new Set<string>(hiddenLearnOverviewLessonSlugs);
 const topics: TopicFilter[] = ["all", "ai-image", "ai-video", "vibe-coding", "vibe-design"];
+const PINNED_FREE_LESSON_SLUGS = [
+  "client-website-figma-codex",
+  "figma-to-codex-website",
+  "client-website-navigation-hero",
+] as const;
+const pinnedFreeLessons = PINNED_FREE_LESSON_SLUGS.map((slug) => {
+  const lesson = publicLearnLessons.find((item) => item.slug === slug);
+  if (!lesson) throw new Error(`Missing pinned Learn lesson: ${slug}`);
+  return lesson;
+});
 
 const authorSocialLinks = [
   { label: "YouTube", href: "https://www.youtube.com/channel/UC797Sd_fYNILYZFuXsjjFDA", iconPath: "/assets/space/social/youtube.svg" },
@@ -190,8 +198,7 @@ export default function LearnOverviewPage() {
   );
 
   const filteredLessons = useMemo(() => {
-    const lessons = publicLearnLessons.filter((lesson) => {
-      if (HIDDEN_LEARN_LESSON_SLUGS.has(lesson.slug)) return false;
+    const lessons = pinnedFreeLessons.filter((lesson) => {
       const topicMatch = activeTopic === "all" || lesson.category === activeTopic;
       const haystack = [
         getLearnLessonTitle(lesson, lang),

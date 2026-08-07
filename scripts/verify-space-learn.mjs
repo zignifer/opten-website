@@ -80,6 +80,7 @@ assert.match(content, /actual-ai-tools-2026/, "Learn catalog must include the fe
 assert.match(content, /ai-avatar-motion-control/, "Learn catalog must include the AI avatar lesson");
 assert.match(content, /junior-designer-1100-order/, "Learn catalog must include the junior designer order lesson");
 assert.match(content, /client-website-navigation-hero/, "Learn catalog must include the client website lesson");
+assert.match(content, /thumbnailPath: "https:\/\/i\.ytimg\.com\/vi\/MEs-DdIjPy0\/maxresdefault\.jpg"/, "Client website navigation lesson must use its current YouTube thumbnail");
 assert.match(content, /ai-marketplace-product-cards/, "Learn catalog must include the AI marketplace cards lesson");
 assert.match(content, /web-design-references/, "Learn catalog must include the web design references lesson");
 assert.match(content, /figma-to-codex-website/, "Learn catalog must include the Figma-to-Codex lesson");
@@ -103,6 +104,14 @@ assert.match(content, /findLearnLesson/, "Learn detail lookup helper must be exp
 assert.match(content, /getAdjacentLearnLessons/, "Adjacent lesson navigation helper must be exported");
 assert.match(content, /learnTemplateCollections/, "Noindex Learn template collections must be preserved for future course authoring");
 assert.match(content, /routeBasePath/, "Template collections must keep internal template lesson links on template URLs");
+
+const learnOverview = readFileSync(join(root, "src/app/pages/space/LearnOverviewPage.tsx"), "utf8");
+assert.match(
+  learnOverview,
+  /const PINNED_FREE_LESSON_SLUGS = \[\s*"client-website-figma-codex",\s*"figma-to-codex-website",\s*"client-website-navigation-hero",\s*\] as const;/,
+  "Learn overview must keep exactly the three reviewed free lessons in the requested order",
+);
+assert.match(learnOverview, /const lessons = pinnedFreeLessons\.filter/, "Learn overview filters must stay limited to the pinned free lessons");
 
 const paths = readFileSync(join(root, "src/i18n/paths.ts"), "utf8");
 assert.match(paths, /LEARN_LESSON_SLUGS/, "LocalizedLink must know public Learn lesson siblings");
@@ -153,6 +162,16 @@ assert.doesNotMatch(learnComponents, /section\.description/, "Learn overview sec
 assert.match(learnComponents, /text-\[14px\] text-white\/68/, "Lesson breadcrumbs must be 2px smaller than the original 16px");
 assert.match(learnComponents, /grid-cols-\[minmax\(0,1fr\)_360px\]/, "Lesson detail layout must use the available left rail for a larger player");
 assert.match(learnComponents, /pb-\[20px\] text-\[14px\] leading-\[1\.55\]/, "Lesson detail description must render at 14px");
+assert.match(
+  learnComponents,
+  /const FREE_LESSON_COURSE_PROMO_SLUGS = \["lesson-14-codex", "lesson-16-nova-website"\] as const;/,
+  "Every free lesson detail must promote exactly course lessons 14 and 16",
+);
+assert.match(learnComponents, /isFreeLessonPage \? freeLessonCoursePromoLessons/, "Free lesson details must use the fixed paid-course lesson pair");
+assert.match(learnComponents, /collection\.purchase && !locked &&/, "Completion controls must stay limited to purchased-course lesson pages");
+assert.doesNotMatch(learnComponents, /copy\.singleLesson/, "Free lesson details must not render the redundant single-lesson label");
+assert.match(learnComponents, /copy\.aiTraining/, "Free lesson recommendations must use the AI training heading");
+assert.match(learnComponents, /copy\.viewAllCourse/, "Free lesson recommendations must link to the complete course");
 assert.doesNotMatch(learnComponents, /No media is generated in Opten Space/, "Temporary media disclaimer must not be visible in the lesson detail");
 assert.doesNotMatch(learnComponents, /Author updates|Topics covered/, "Temporary detail sidebar sections must stay out of the first Learn pass");
 
