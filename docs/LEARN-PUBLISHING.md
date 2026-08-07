@@ -152,14 +152,15 @@ player overlay. Kinescope then calls the auth callback during playback and gets
 The paid course `ai-content-marketing-2026` is not unlocked by Pro. It uses a
 separate one-time course purchase:
 
-- RUB base price `4 990 ₽`
+- RUB base price `2 990 ₽`
 - public discounts are server-side promo codes, not hard-coded sale pricing
-- USD list price `$69`
+- USD base/list price `$41`
 - current USD checkout price is controlled by the Paddle price ID returned from
   `create-course-payment`
 - internal test promo `FREE`: `100 ₽` or `$1`
-- open-ended fixed-price promo `LAST`: `2 990 ₽` or `$41`; disable it
-  manually when the owner requests it, without a timer or expiry timestamp
+- retired fixed-price promo `LAST`: `2 990 ₽` or `$41`; keep it disabled in
+  the database and archived in Paddle because that amount is now the public
+  base price
 - partner/owner promo codes are stored server-side in `course_promo_codes`;
   use uppercase `A-Z0-9` codes so RUB/YooKassa and USD/Paddle stay in sync
 
