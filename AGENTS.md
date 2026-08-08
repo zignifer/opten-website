@@ -94,8 +94,10 @@ with an HMAC derived from `SUPABASE_JWT_SECRET`, the proxy validates the provide
   result before the success response is serialized, and an exact no-op or rejected
   first draft gets at most one corrective Anthropic attempt inside the same usage
   reservation. There is no second `checkUsage` call and no second credit. If the
-  corrective result is still rejected, the proxy releases its exact reservation
-  before returning `no_improvement`. This
+  corrective result still misses a guard, the proxy must return HTTP 200 with the
+  best usable provider draft; if neither provider draft is usable, it returns the
+  original request as a safe fallback. A successfully completed provider flow never
+  returns `no_improvement` and keeps the single reservation. This
   finalizer-before-HTTP-200 order is a billing invariant and must be covered by a
   handler-level integration test; testing the finalizer in isolation is insufficient.
   Anonymous requests return
@@ -120,11 +122,12 @@ Plan Mode, or any other unstated requirement. Explicit user instructions to plan
   literals, API names, and code identifiers verbatim. Empty, wrapped, conversational
   or meta-assistant, materially expanded, excessively compressed, semantically
   incomplete, or drifted provider output gets at most one internal corrective attempt.
-  If that attempt also fails, the proxy returns `422 no_improvement`, releases the
-  exact reserved operation, and shows a clear inline message. The website itself does
-  not retry. A
-  provider response identical to the original follows the same refund path instead
-  of appearing as a successful result.
+  The corrective prompt receives bounded details about missing literals or semantic
+  anchors. If that attempt still misses a guard, the guards become best-effort quality
+  signals: the proxy returns the best non-empty, non-meta, materially edited provider
+  draft, falling back to the original request only when neither draft is usable.
+  This fallback is a successful single-credit result, not a refund/error loop. Provider
+  transport failures still release the exact reservation.
 The three coding adapters
 remain semantically identical until a benchmark proves a safe model-specific gain.
 The reference picker mirrors the extension popup pipeline (10 MB source cap,

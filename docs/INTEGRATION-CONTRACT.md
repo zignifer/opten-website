@@ -572,14 +572,17 @@ calling the finalizer directly in a unit test is not sufficient billing coverage
   40%. Anchor checks independently protect stages, planning, verification, testing,
   context/compaction, branch constraints, completion, commit/push, preservation, and
   negation. A rejected first provider draft receives at most one corrective retry
-  within the same usage reservation and provider request flow. If the corrective
-  result is also rejected, the proxy releases the exact reservation and returns
-  `422 no_improvement` with `usage_released:true`. The site does not retry that
-  response and shows the refund inline.
+  within the same usage reservation and provider request flow. The corrective prompt
+  includes bounded missing-fragment or missing-anchor details when available. If the
+  corrective result still misses a guard, the proxy returns HTTP 200 with the best
+  usable non-empty, non-meta provider draft; if neither draft is usable, it returns
+  the original request as a safe fallback. A completed provider flow therefore never
+  returns `no_improvement` or releases the reservation.
 - The proxy ignores client billing flags, uses Claude Haiku, loads the matching
   server-side skill, and charges each accepted rewrite against the shared operation
-  ledger. Signed Vibe Coding no-op/rejections are finalized and released by the
-  proxy itself; callers cannot request a refund through a client billing field.
+  ledger. Signed Vibe Coding results are finalized by the proxy itself; callers cannot
+  request a refund through a client billing field. Provider transport failures still
+  release the exact reservation.
   The website server never receives the Anthropic API key and never
   decides usage entitlement locally beyond JWT verification.
 - The canonical quick-Improve rewriter prompt remains extension-owned at
