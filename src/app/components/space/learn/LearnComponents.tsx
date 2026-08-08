@@ -1,17 +1,23 @@
 import {
   Check,
+  ChevronDown,
   Clock,
   Copy,
   CreditCard,
   Crown,
+  ExternalLink,
   FileText,
   Link as LinkIcon,
   Lock,
   LockOpen,
   Mail,
+  MessageCircle,
+  Pin,
   Play,
   Tag,
+  ThumbsUp,
   Video,
+  Youtube,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 import { useLocation } from "react-router";
@@ -32,6 +38,7 @@ import {
 } from "../../../../lib/courseAccess";
 import { useCurrencyPreference } from "../../../../lib/currency";
 import { ensurePaddle } from "../../../../lib/paddle";
+import { fetchYouTubeLessonComments, type YouTubeLessonComment, type YouTubeLessonCommentReply, type YouTubeLessonCommentsResponse } from "../../../../lib/youtubeComments";
 import LocalizedLink from "../../LocalizedLink";
 import ResponsiveImage from "../../ResponsiveImage";
 import SiteFooter from "../../SiteFooter";
@@ -320,6 +327,7 @@ export function LessonDetailLayout({ lesson, collection }: LessonDetailLayoutPro
               accessToken={session?.access_token ?? null}
             />
             <LessonMissingItems items={getLearnLessonMissingItems(displayedLesson, lang)} />
+            {!purchase && <YouTubeCommentsSection lesson={displayedLesson} />}
           </div>
           <div className={isCourse ? "max-lg:hidden" : undefined}>
             <RelatedLessons collection={displayedCollection} currentSlug={lesson.slug} hasAccess={courseHasAccess} purchase={purchase} />
@@ -1342,6 +1350,318 @@ function LessonMaterials({ materials, locked, purchase, heading, description }: 
       </div>
     </section>
   );
+}
+
+const YOUTUBE_COMMENTS_PAGE_SIZE = 5;
+
+function YouTubeCommentsSection({ lesson }: { lesson: LearnLesson }) {
+  const { lang } = useLang();
+  const copy = detailCopy[lang];
+  const youtubeId = lesson.localizedVideo?.[lang]?.youtubeId ?? lesson.youtubeId;
+  const [data, setData] = useState<YouTubeLessonCommentsResponse | null>(null);
+  const [visibleCount, setVisibleCount] = useState(YOUTUBE_COMMENTS_PAGE_SIZE);
+
+  useEffect(() => {
+    setData(null);
+    setVisibleCount(YOUTUBE_COMMENTS_PAGE_SIZE);
+    if (!youtubeId) return;
+
+    const abortController = new AbortController();
+    fetchYouTubeLessonComments(lesson.slug, lang, abortController.signal)
+      .then((response) => setData(response))
+      .catch(() => {
+        if (!abortController.signal.aborted) setData(null);
+      });
+
+    return () => abortController.abort();
+  }, [lang, lesson.slug, youtubeId]);
+
+  if (!youtubeId || !data?.enabled) return null;
+
+  const visibleComments = data.comments.slice(0, visibleCount);
+  const remainingLoadedComments = Math.max(0, data.comments.length - visibleComments.length);
+  const nextBatchSize = Math.min(YOUTUBE_COMMENTS_PAGE_SIZE, remainingLoadedComments);
+
+  return (
+    <section className="mt-[34px] border-t border-white/10 pt-[30px] max-md:mt-[28px] max-md:pt-[26px]" aria-labelledby="youtube-comments-title">
+      <div className="flex items-center justify-between gap-[16px] max-sm:items-start">
+        <div className="flex min-w-0 items-center gap-[10px]">
+          <Youtube size={23} className="shrink-0 text-[#9cfb51]" aria-hidden="true" />
+          <h2 id="youtube-comments-title" className="text-[22px] font-bold leading-tight text-white max-md:text-[20px]">
+            {copy.youtubeComments}
+          </h2>
+          <span className="rounded-full bg-white/[0.07] px-[9px] py-[4px] text-[12px] font-bold leading-none text-white/58">
+            {formatCommentCount(data.totalCommentCount, lang)}
+          </span>
+        </div>
+        <a
+          href={data.youtubeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex shrink-0 items-center gap-[6px] text-[13px] font-bold text-white/62 no-underline transition hover:text-[#9cfb51] max-sm:hidden"
+        >
+          {copy.youtubeAllComments}
+          <ExternalLink size={15} aria-hidden="true" />
+        </a>
+      </div>
+
+      <a
+        href={data.youtubeUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-[20px] flex min-h-[56px] items-center justify-between gap-[14px] rounded-[9px] border border-white/10 bg-[#0e2023] px-[17px] py-[11px] text-left no-underline transition hover:border-[#9cfb51]/45 hover:bg-[#10282c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9cfb51]"
+      >
+        <span className="flex min-w-0 items-center gap-[11px] text-[14px] text-white/58">
+          <MessageCircle size={20} className="shrink-0 text-white/45" aria-hidden="true" />
+          <span>{copy.youtubeLeaveComment}</span>
+        </span>
+        <span className="inline-flex shrink-0 items-center gap-[6px] rounded-[7px] bg-[#9cfb51] px-[13px] py-[9px] text-[12px] font-bold leading-none text-[#011417]">
+          YouTube
+          <ExternalLink size={13} aria-hidden="true" />
+        </span>
+      </a>
+
+      {visibleComments.length > 0 ? (
+        <div className="mt-[8px] divide-y divide-white/[0.08]">
+          {visibleComments.map((comment) => (
+            <YouTubeCommentItem key={comment.id} comment={comment} youtubeUrl={data.youtubeUrl} lang={lang} copy={copy} />
+          ))}
+        </div>
+      ) : (
+        <p className="mt-[20px] text-[14px] leading-[1.5] text-white/52">{copy.youtubeNoComments}</p>
+      )}
+
+      <div className="mt-[18px] flex flex-wrap items-center gap-[10px] max-sm:flex-col max-sm:items-stretch">
+        {remainingLoadedComments > 0 && (
+          <button
+            type="button"
+            onClick={() => setVisibleCount((current) => current + YOUTUBE_COMMENTS_PAGE_SIZE)}
+            className="inline-flex min-h-[42px] cursor-pointer items-center justify-center gap-[7px] rounded-[8px] border border-white/14 bg-transparent px-[15px] text-[13px] font-bold text-white transition hover:border-white/30 hover:bg-white/[0.05]"
+          >
+            {copy.youtubeShowMore(nextBatchSize)}
+            <ChevronDown size={16} aria-hidden="true" />
+          </button>
+        )}
+        <a
+          href={data.youtubeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-[42px] items-center justify-center gap-[7px] rounded-[8px] px-[4px] text-[13px] font-bold text-[#9cfb51] no-underline transition hover:text-white max-sm:border max-sm:border-[#9cfb51]/35 max-sm:px-[15px]"
+        >
+          {copy.youtubeAllComments}
+          <ExternalLink size={15} aria-hidden="true" />
+        </a>
+      </div>
+    </section>
+  );
+}
+
+function YouTubeCommentItem({
+  comment,
+  youtubeUrl,
+  lang,
+  copy,
+}: {
+  comment: YouTubeLessonComment;
+  youtubeUrl: string;
+  lang: "ru" | "en";
+  copy: (typeof detailCopy)["ru"];
+}) {
+  const [repliesExpanded, setRepliesExpanded] = useState(false);
+  const returnedReplyCount = comment.replies.length;
+  const missingReplyCount = Math.max(0, comment.replyCount - returnedReplyCount);
+  const author = (
+    <>
+      {comment.authorAvatarUrl ? (
+        <img
+          src={comment.authorAvatarUrl}
+          alt=""
+          width="40"
+          height="40"
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          className="size-[40px] shrink-0 rounded-full border border-white/10 bg-white/[0.06] object-cover"
+        />
+      ) : (
+        <span className="grid size-[40px] shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.06] text-[14px] font-bold text-white/55">
+          {comment.authorName.slice(0, 1).toUpperCase()}
+        </span>
+      )}
+      <span className="min-w-0">
+        <span className="block truncate text-[13px] font-bold text-white/86">{comment.authorName}</span>
+        {comment.publishedAt && (
+          <span className="mt-[3px] block text-[11px] text-white/38">{formatCommentDate(comment.publishedAt, lang)}</span>
+        )}
+      </span>
+    </>
+  );
+
+  return (
+    <article className={`py-[20px] first:pt-[18px] ${comment.pinned ? "my-[10px] rounded-[9px] border border-[#9cfb51]/22 bg-[#9cfb51]/[0.035] px-[14px] first:pt-[14px]" : ""}`}>
+      <div className="flex items-center gap-[11px]">
+        {comment.authorChannelUrl ? (
+          <a href={comment.authorChannelUrl} target="_blank" rel="noopener noreferrer" className="flex min-w-0 items-center gap-[11px] no-underline">
+            {author}
+          </a>
+        ) : author}
+        {comment.pinned && (
+          <span className="ml-auto inline-flex shrink-0 items-center gap-[5px] rounded-full bg-[#9cfb51]/10 px-[8px] py-[5px] text-[11px] font-bold leading-none text-[#9cfb51]">
+            <Pin size={12} fill="currentColor" aria-hidden="true" />
+            {copy.youtubePinnedComment}
+          </span>
+        )}
+      </div>
+      <p className="mt-[12px] whitespace-pre-wrap break-words text-[14px] leading-[1.55] text-white/76 max-md:text-[15px]">
+        {renderCommentText(comment.text)}
+      </p>
+      {(comment.likeCount > 0 || comment.replyCount > 0) && (
+        <div className="mt-[12px] flex flex-wrap items-center gap-[15px] text-[12px] text-white/42">
+          {comment.likeCount > 0 && (
+            <span className="inline-flex items-center gap-[5px]">
+              <ThumbsUp size={14} aria-hidden="true" />
+              {formatCommentCount(comment.likeCount, lang)}
+            </span>
+          )}
+          {comment.replyCount > 0 && returnedReplyCount > 0 ? (
+            <button
+              type="button"
+              aria-expanded={repliesExpanded}
+              onClick={() => setRepliesExpanded((current) => !current)}
+              className="inline-flex cursor-pointer items-center gap-[5px] border-0 bg-transparent p-0 text-[12px] font-bold text-[#9cfb51] transition hover:text-white"
+            >
+              {repliesExpanded ? copy.youtubeHideReplies : copy.youtubeShowReplies(comment.replyCount)}
+              <ChevronDown size={14} className={`transition ${repliesExpanded ? "rotate-180" : ""}`} aria-hidden="true" />
+            </button>
+          ) : comment.replyCount > 0 ? (
+            <a href={getYouTubeCommentUrl(youtubeUrl, comment.id)} target="_blank" rel="noopener noreferrer" className="font-bold text-[#9cfb51] no-underline hover:text-white">
+              {copy.youtubeShowReplies(comment.replyCount)}
+            </a>
+          ) : null}
+        </div>
+      )}
+
+      {repliesExpanded && returnedReplyCount > 0 && (
+        <div className="ml-[20px] mt-[16px] border-l border-white/10 pl-[14px] max-sm:ml-[8px] max-sm:pl-[12px]">
+          {comment.replies.map((reply) => (
+            <YouTubeReplyItem key={reply.id} reply={reply} lang={lang} />
+          ))}
+          {missingReplyCount > 0 && (
+            <a
+              href={getYouTubeCommentUrl(youtubeUrl, comment.id)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-[12px] inline-flex items-center gap-[6px] text-[12px] font-bold text-[#9cfb51] no-underline hover:text-white"
+            >
+              {copy.youtubeMoreRepliesOnYouTube(missingReplyCount)}
+              <ExternalLink size={13} aria-hidden="true" />
+            </a>
+          )}
+        </div>
+      )}
+    </article>
+  );
+}
+
+function YouTubeReplyItem({ reply, lang }: { reply: YouTubeLessonCommentReply; lang: "ru" | "en" }) {
+  const authorContent = (
+    <>
+      {reply.authorAvatarUrl ? (
+        <img
+          src={reply.authorAvatarUrl}
+          alt=""
+          width="30"
+          height="30"
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          className="size-[30px] shrink-0 rounded-full border border-white/10 bg-white/[0.06] object-cover"
+        />
+      ) : (
+        <span className="grid size-[30px] shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.06] text-[11px] font-bold text-white/55">
+          {reply.authorName.slice(0, 1).toUpperCase()}
+        </span>
+      )}
+      <span className="min-w-0">
+        <span className="block truncate text-[12px] font-bold text-white/78">{reply.authorName}</span>
+        {reply.publishedAt && <span className="mt-[2px] block text-[10px] text-white/34">{formatCommentDate(reply.publishedAt, lang)}</span>}
+      </span>
+    </>
+  );
+
+  return (
+    <div className="border-b border-white/[0.07] py-[12px] first:pt-0 last:border-b-0 last:pb-0">
+      <div className="flex items-center gap-[9px]">
+        {reply.authorChannelUrl ? (
+          <a href={reply.authorChannelUrl} target="_blank" rel="noopener noreferrer" className="flex min-w-0 items-center gap-[9px] no-underline">
+            {authorContent}
+          </a>
+        ) : authorContent}
+      </div>
+      <p className="mt-[9px] whitespace-pre-wrap break-words text-[13px] leading-[1.5] text-white/68 max-md:text-[14px]">
+        {renderCommentText(reply.text)}
+      </p>
+      {reply.likeCount > 0 && (
+        <span className="mt-[8px] inline-flex items-center gap-[5px] text-[11px] text-white/38">
+          <ThumbsUp size={12} aria-hidden="true" />
+          {formatCommentCount(reply.likeCount, lang)}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function getYouTubeCommentUrl(youtubeUrl: string, commentId: string) {
+  try {
+    const url = new URL(youtubeUrl);
+    url.hash = "";
+    url.searchParams.set("lc", commentId);
+    return url.toString();
+  } catch {
+    return youtubeUrl;
+  }
+}
+
+function renderCommentText(text: string) {
+  const urlPattern = /https?:\/\/[^\s<]+/gi;
+  const nodes: ReactNode[] = [];
+  let cursor = 0;
+
+  for (const match of text.matchAll(urlPattern)) {
+    const index = match.index ?? 0;
+    const matchedUrl = match[0];
+    const url = matchedUrl.replace(/[),.!?;:\]}]+$/g, "");
+    const trailingText = matchedUrl.slice(url.length);
+    if (index > cursor) nodes.push(text.slice(cursor, index));
+    nodes.push(
+      <a
+        key={`${index}-${url}`}
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="break-all font-medium text-[#9cfb51] underline decoration-[#9cfb51]/45 underline-offset-[3px] transition hover:text-white"
+      >
+        {url}
+      </a>,
+    );
+    if (trailingText) nodes.push(trailingText);
+    cursor = index + matchedUrl.length;
+  }
+
+  if (cursor < text.length) nodes.push(text.slice(cursor));
+  return nodes.length > 0 ? nodes : text;
+}
+
+function formatCommentCount(count: number, lang: "ru" | "en") {
+  return new Intl.NumberFormat(lang === "ru" ? "ru-RU" : "en-US").format(count);
+}
+
+function formatCommentDate(value: string, lang: "ru" | "en") {
+  return new Intl.DateTimeFormat(lang === "ru" ? "ru-RU" : "en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(value));
 }
 
 type OptenPromptGeneratorsSectionProps = {
@@ -2822,6 +3142,15 @@ const detailCopy = {
     showLessMaterials: "Скрыть",
     showMoreDescription: "Показать ещё",
     showLessDescription: "Скрыть",
+    youtubeComments: "Комментарии",
+    youtubePinnedComment: "Закреплено",
+    youtubeLeaveComment: "Оставить комментарий к уроку",
+    youtubeAllComments: "Все комментарии на YouTube",
+    youtubeNoComments: "Комментариев пока нет. Можно оставить первый на YouTube.",
+    youtubeShowMore: (count: number) => `Показать ещё ${count}`,
+    youtubeShowReplies: (count: number) => `Показать ${count} ${getRussianPlural(count, "ответ", "ответа", "ответов")}`,
+    youtubeHideReplies: "Скрыть ответы",
+    youtubeMoreRepliesOnYouTube: (count: number) => `Ещё ${count} ${getRussianPlural(count, "ответ", "ответа", "ответов")} на YouTube`,
     markLessonCompleted: "Отметить как пройдено",
     lessonCompleted: "Отмечено как пройдено",
     undoCompleted: "Отменить",
@@ -2909,6 +3238,15 @@ const detailCopy = {
     showLessMaterials: "Show less",
     showMoreDescription: "Show more",
     showLessDescription: "Show less",
+    youtubeComments: "Comments",
+    youtubePinnedComment: "Pinned",
+    youtubeLeaveComment: "Leave a comment on this lesson",
+    youtubeAllComments: "All comments on YouTube",
+    youtubeNoComments: "No comments yet. You can leave the first one on YouTube.",
+    youtubeShowMore: (count: number) => `Show ${count} more`,
+    youtubeShowReplies: (count: number) => `Show ${count} ${count === 1 ? "reply" : "replies"}`,
+    youtubeHideReplies: "Hide replies",
+    youtubeMoreRepliesOnYouTube: (count: number) => `${count} more ${count === 1 ? "reply" : "replies"} on YouTube`,
     markLessonCompleted: "Mark as completed",
     lessonCompleted: "Marked as completed",
     undoCompleted: "Undo",

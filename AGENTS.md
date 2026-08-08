@@ -237,6 +237,25 @@ the source YouTube thumbnail URL for cards unless a reviewed local asset is
 added later. The page removes the Opten author/course card and labels the source
 as another author/source instead.
 
+Public Learn lessons backed by YouTube show a bounded, read-only comments block
+in the Opten design. The browser calls the same-origin `/api/youtube-comments`
+endpoint with the public lesson slug; the server resolves the allowlisted
+`youtubeId`, keeps `YOUTUBE_API_KEY` server-only, caches the YouTube Data API
+response, and returns the public comment count plus at most 20 top-level comment
+threads. The page initially shows 5 comments and reveals 5 more per click.
+YouTube's public API does not expose the pinned state, so a lesson may set
+`youtubePinnedCommentId`; that live comment is moved to the first position and
+labelled as pinned without copying its text into the site. Plain-text `http` and
+`https` URLs in fetched comments and replies are rendered as safe external
+links. YouTube replies returned with each thread stay collapsed behind a
+localized reply-count control; if YouTube omits part of a long thread, the UI
+shows the returned replies and sends the viewer to YouTube for the remainder.
+Do not repeat a `YouTube` source label under every individual comment; the block
+heading and external actions already make the source clear.
+Writing, replying, liking, and viewing the complete thread remain on YouTube:
+the site provides normal external links to the original watch page and does not
+add Google/YouTube OAuth or store YouTube user tokens.
+
 The launched Kinescope course routes live under `/learn/courses/:courseSlug`
 and `/learn/courses/:courseSlug/:lessonSlug`. They are SPA-only and `noindex`
 under the current routing policy, but public Learn and marketing pages may link

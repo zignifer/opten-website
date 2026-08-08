@@ -112,6 +112,7 @@ export type LearnLesson = {
   updatedNote: LocalizedText;
   youtubeId?: string;
   youtubeUrl?: string;
+  youtubePinnedCommentId?: string;
   localizedVideo?: Partial<Record<LearnLang, LearnLocalizedVideo>>;
   localVideo?: LearnLocalVideo;
   timestamps: Record<LearnLang, LearnTimestamp[]>;
@@ -1017,6 +1018,7 @@ export const publicLearnLessons: LearnLesson[] = [
     },
     youtubeId: "hekYDp3-ErQ",
     youtubeUrl: "https://youtu.be/hekYDp3-ErQ",
+    youtubePinnedCommentId: "UgwOceSJ09Q1jVsn6WZ4AaABAg",
     localizedVideo: {
       ru: { youtubeId: "hekYDp3-ErQ", youtubeUrl: "https://youtu.be/hekYDp3-ErQ", audioLanguage: "ru", captionLanguage: "ru" },
       en: { youtubeId: "hekYDp3-ErQ", youtubeUrl: "https://youtu.be/hekYDp3-ErQ", captionLanguage: "en" },

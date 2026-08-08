@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { imagetools } from 'vite-imagetools'
 import promptWorkbenchHandler from './api/prompt-workbench'
+import youtubeCommentsHandler from './api/youtube-comments'
 
 function promptWorkbenchDevApi(): Plugin {
   return {
@@ -24,10 +25,30 @@ function promptWorkbenchDevApi(): Plugin {
   }
 }
 
+function youtubeCommentsDevApi(): Plugin {
+  return {
+    name: 'opten-youtube-comments-dev-api',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/api/youtube-comments', (req, res) => {
+        void youtubeCommentsHandler(req, res).catch((error: unknown) => {
+          console.error('[youtube-comments] local handler failed', error)
+          if (!res.headersSent) {
+            res.statusCode = 500
+            res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          }
+          if (!res.writableEnded) res.end(JSON.stringify({ error: 'local_handler_failed' }))
+        })
+      })
+    },
+  }
+}
+
 export default defineConfig(({ isSsrBuild }) => {
   return ({
   plugins: [
     promptWorkbenchDevApi(),
+    youtubeCommentsDevApi(),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them
     react(),
