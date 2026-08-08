@@ -2650,6 +2650,9 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
         <div className="absolute left-0 top-0 flex w-full items-start justify-between gap-[16px]">
           <div className="min-w-0">
             <CoursePurchaseTitle title={collection.title[lang]} />
+            <p className="mt-[10px] hidden truncate whitespace-nowrap text-[12px] font-medium leading-[16px] text-white/55 lg:block">
+              {copy.coursePurchaseTitle(collection.lessons.length)}
+            </p>
           </div>
         </div>
 
@@ -3176,7 +3179,7 @@ const detailCopy = {
     unlockAllDescription: "Получите доступ ко всем материалам курса и Pro-урокам без ограничений.",
     unlockOnPro: "Разблокировать на Pro",
     courseLessonsCount: (count: number) => `${count} ${getRussianPlural(count, "урок", "урока", "уроков")}`,
-    coursePurchaseTitle: (count: number) => `Курс из ${count} ${getRussianPlural(count, "урока", "уроков", "уроков")} про нейросети для контента`,
+    coursePurchaseTitle: (count: number) => `Курс из ${count} ${getRussianPlural(count, "урока", "уроков", "уроков")} по ИИ для начинающих`,
     courseSaleEnds: "Скидка закончится через",
     coursePromoLabel: "Промокод",
     coursePromoPlaceholder: "",
@@ -3272,7 +3275,7 @@ const detailCopy = {
     unlockAllDescription: "Get access to every course material and Pro lesson without limits.",
     unlockOnPro: "Unlock on Pro",
     courseLessonsCount: (count: number) => `${count} ${count === 1 ? "lesson" : "lessons"}`,
-    coursePurchaseTitle: (count: number) => `${count}-lesson course about AI for content`,
+    coursePurchaseTitle: (count: number) => `${count}-lesson AI course for beginners`,
     courseSaleEnds: "Discount ends in",
     coursePromoLabel: "Promo code",
     coursePromoPlaceholder: "",

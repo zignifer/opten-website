@@ -716,7 +716,7 @@ export const publicLearnLessons: LearnLesson[] = [
     durationIso: "PT9M38S",
     status: "Available",
     access: "free",
-    thumbnailPath: `${learnAssetBase}/thumbs/ai-avatar-motion-control.jpg`,
+    thumbnailPath: "https://i.ytimg.com/vi/slxq1d8u-Hg/maxresdefault.jpg",
     publishedAt: "2026-05-29",
     updatedAt: "2026-06-06",
     releaseNote: {
@@ -760,7 +760,7 @@ export const publicLearnLessons: LearnLesson[] = [
     durationIso: "PT29M57S",
     status: "Available",
     access: "free",
-    thumbnailPath: `${learnAssetBase}/thumbs/junior-designer-1100-order.jpg`,
+    thumbnailPath: "https://i.ytimg.com/vi/blrSogS4yXM/maxresdefault.jpg",
     publishedAt: "2026-06-02",
     updatedAt: "2026-06-06",
     releaseNote: {
@@ -848,7 +848,7 @@ export const publicLearnLessons: LearnLesson[] = [
     durationIso: "PT26M22S",
     status: "Available",
     access: "free",
-    thumbnailPath: `${learnAssetBase}/thumbs/ai-marketplace-product-cards.jpg`,
+    thumbnailPath: "https://i.ytimg.com/vi/-0elJixu1kc/maxresdefault.jpg",
     publishedAt: "2026-05-20",
     updatedAt: "2026-06-06",
     releaseNote: {
@@ -892,7 +892,7 @@ export const publicLearnLessons: LearnLesson[] = [
     durationIso: "PT13M52S",
     status: "Available",
     access: "free",
-    thumbnailPath: `${learnAssetBase}/thumbs/web-design-references.jpg`,
+    thumbnailPath: "https://i.ytimg.com/vi/MsIkbE1w-fM/maxresdefault.jpg",
     publishedAt: "2026-06-04",
     updatedAt: "2026-06-06",
     releaseNote: {
@@ -944,7 +944,7 @@ export const publicLearnLessons: LearnLesson[] = [
     durationIso: "PT24M29S",
     status: "Available",
     access: "free",
-    thumbnailPath: `${learnAssetBase}/thumbs/figma-to-codex-website.jpg`,
+    thumbnailPath: "https://i.ytimg.com/vi/XRVo8ZU6Nis/maxresdefault.jpg",
     publishedAt: "2026-07-22",
     updatedAt: "2026-08-01",
     releaseNote: {
@@ -996,7 +996,7 @@ export const publicLearnLessons: LearnLesson[] = [
     durationIso: "PT27M30S",
     status: "Available",
     access: "free",
-    thumbnailPath: `${learnAssetBase}/thumbs/client-website-figma-codex.jpg`,
+    thumbnailPath: "https://i.ytimg.com/vi/hekYDp3-ErQ/maxresdefault.jpg",
     publishedAt: "2026-08-05",
     updatedAt: "2026-08-07",
     releaseNote: {

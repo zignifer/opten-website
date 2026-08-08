@@ -130,7 +130,7 @@ Plan Mode, or any other unstated requirement. Explicit user instructions to plan
   transport failures still release the exact reservation.
 The three coding adapters
 remain semantically identical until a benchmark proves a safe model-specific gain.
-The reference picker mirrors the extension popup pipeline (10 MB source cap,
+  The reference picker mirrors the extension popup pipeline (10 MB source cap,
 512 px long-edge JPEG compression, quality 0.7, loading/removal states) but follows
 the larger landing-page dimensions from Figma. Reference bytes and previews stay in
 component memory and must never be written to localStorage. In Vibe Coding mode,
@@ -270,6 +270,11 @@ Writing, replying, liking, and viewing the complete thread remain on YouTube:
 the site provides normal external links to the original watch page and does not
 add Google/YouTube OAuth or store YouTube user tokens.
 
+Public free lessons with a `youtubeId` use that video's live YouTube
+`maxresdefault` thumbnail URL for cards and lesson posters, so the site stays in
+sync when the YouTube cover changes. The local-only lesson `actual-ai-tools-2026`
+has no YouTube cover and intentionally keeps its existing local image.
+
 The launched Kinescope course routes live under `/learn/courses/:courseSlug`
 and `/learn/courses/:courseSlug/:lessonSlug`. They are SPA-only and `noindex`
 under the current routing policy, but public Learn and marketing pages may link
@@ -288,7 +293,10 @@ send a direct website auth link to the same email. The internal test promo
 `FREE` maps to `100 ₽` or `$1` and requires a separate Paddle `$1` price ID.
 The public base price is `2 990 ₽` / `$41`; public discounts are not hard-coded in
 the website and must be represented by server-side promo codes (planned common
-campaigns: `-20%` and `-40%`). Marketing/partner course promo codes live in the extension-owned
+campaigns: `-20%` and `-40%`). On desktop, the course-root checkout card shows
+the compact subtitle `Курс из 16 уроков по ИИ для начинающих` directly below
+the course name without increasing the fixed card height; the subtitle stays
+hidden on mobile. Marketing/partner course promo codes live in the extension-owned
 `course_promo_codes` table (RLS on, no public policies) with `discount_kind` =
 `fixed_price` or `percentage`, `enabled`, optional `usage_limit`, `times_used`,
 `starts_at`, and `expires_at`. Codes must use uppercase `A-Z0-9` so the same
@@ -367,9 +375,10 @@ leads. Every paid lesson continues to point to the normal course purchase surfac
 The locked Bot API name is `Влад Воронежцев | Уроки и промпты`, and the locked
 short description is `Доступ к урокам и каналу с промптами.`; future bot
 updates must not change either value unless the owner explicitly asks. The Bot
-API long description remains `Привет! Здесь можно получить доступ в мой
-Telegram-канал с промптами и полезными инструкциями или посмотреть курс по
-ИИ.\n\nЖми /Start 👇`, and the `/start` command description is `Открыть курс`.
+API long description remains `Привет! Здесь можно получить доступ к курсу по
+ИИ или перейти в мой закрытый телеграм канал с промптами и
+инструкциями.\n\nЖми /Start 👇`, and the `/start` command description is
+`Открыть доступ`.
 These exact name, short description, long description, and command values must
 be set and verified in both the default Bot API scope and the `ru` language
 scope, because Telegram clients may prefer the localized RU profile.

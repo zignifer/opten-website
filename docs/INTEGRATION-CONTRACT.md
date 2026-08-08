@@ -383,9 +383,10 @@ funnel:
 - The locked Bot API name is `Влад Воронежцев | Уроки и промпты`, and the
   locked short description is `Доступ к урокам и каналу с промптами.`. Future
   bot updates must not change either value unless the owner explicitly asks.
-  The long description remains `Привет! Здесь можно получить доступ в мой
-  Telegram-канал с промптами и полезными инструкциями или посмотреть курс по
-  ИИ.\n\nЖми /Start 👇`; the `/start` command description is `Открыть курс`.
+  The long description remains `Привет! Здесь можно получить доступ к курсу по
+  ИИ или перейти в мой закрытый телеграм канал с промптами и
+  инструкциями.\n\nЖми /Start 👇`; the `/start` command description is `Открыть
+  доступ`.
   These exact profile and command values must be set and verified in both the
   default Bot API scope and the `ru` language scope; Telegram clients may use
   the localized RU profile instead of the default values.
