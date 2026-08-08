@@ -15,6 +15,7 @@ import {
   detectVibecodingPromptLanguage,
   vibecodingPromptReferencesImages,
 } from "./_shared/promptWorkbenchVibecoding.js";
+import { normalizeDigitalVoicePrompt } from "./_shared/digitalVoiceNormalizer.js";
 
 const PROXY_URL = "https://promptscore-proxy.vercel.app";
 const MIN_PROMPT_CHARS = 20;
@@ -319,13 +320,15 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   }
 
   if (body.action !== "improve") return json(res, 400, { error: "invalid_action" });
-  const prompt = typeof body.prompt === "string" ? body.prompt.trim() : "";
-  if (prompt.length < MIN_PROMPT_CHARS) return json(res, 422, { error: "prompt_too_short", min_chars: MIN_PROMPT_CHARS });
-  if (prompt.length > MAX_PROMPT_CHARS) return json(res, 413, { error: "prompt_too_long", max_chars: MAX_PROMPT_CHARS });
+  const rawPrompt = typeof body.prompt === "string" ? body.prompt.trim() : "";
+  if (rawPrompt.length < MIN_PROMPT_CHARS) return json(res, 422, { error: "prompt_too_short", min_chars: MIN_PROMPT_CHARS });
+  if (rawPrompt.length > MAX_PROMPT_CHARS) return json(res, 413, { error: "prompt_too_long", max_chars: MAX_PROMPT_CHARS });
 
   const modelSlug = typeof body.model === "string" ? body.model : "";
   const modelType = getModelType(modelSlug);
   if (!modelType) return json(res, 400, { error: "invalid_model" });
+  const normalizedVoicePrompt = normalizeDigitalVoicePrompt(rawPrompt, modelSlug).prompt;
+  const prompt = normalizedVoicePrompt.length <= MAX_PROMPT_CHARS ? normalizedVoicePrompt : rawPrompt;
 
   let images: ReferenceImage[];
   try {

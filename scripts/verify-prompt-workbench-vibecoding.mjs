@@ -10,10 +10,12 @@ import { SignJWT } from "jose";
 const ROOT = process.cwd();
 const FIXTURE_PATH = join(ROOT, "scripts", "fixtures", "prompt-workbench-vibecoding.json");
 const GUARDRAIL_PATH = join(ROOT, "api", "_shared", "promptWorkbenchVibecoding.ts");
+const VOICE_NORMALIZER_PATH = join(ROOT, "api", "_shared", "digitalVoiceNormalizer.ts");
 const INTENT_PATH = join(ROOT, "src", "lib", "promptWorkbenchIntent.ts");
 
 const tempDir = await mkdtemp(join(tmpdir(), "opten-vibecoding-"));
 const bundledGuardrails = join(tempDir, "guardrails.mjs");
+const bundledVoiceNormalizer = join(tempDir, "digital-voice-normalizer.mjs");
 const bundledHandler = join(tempDir, "prompt-workbench.mjs");
 const bundledIntent = join(tempDir, "prompt-workbench-intent.mjs");
 
@@ -21,6 +23,15 @@ try {
   await build({
     entryPoints: [GUARDRAIL_PATH],
     outfile: bundledGuardrails,
+    bundle: true,
+    format: "esm",
+    platform: "node",
+    target: "node18",
+    logLevel: "silent",
+  });
+  await build({
+    entryPoints: [VOICE_NORMALIZER_PATH],
+    outfile: bundledVoiceNormalizer,
     bundle: true,
     format: "esm",
     platform: "node",
@@ -52,6 +63,7 @@ try {
     validateVibecodingCandidate,
     vibecodingPromptReferencesImages,
   } = await import(`${pathToFileURL(bundledGuardrails).href}?v=${Date.now()}`);
+  const { normalizeDigitalVoicePrompt } = await import(`${pathToFileURL(bundledVoiceNormalizer).href}?v=${Date.now()}`);
   const { promptLooksLikeVibecoding } = await import(`${pathToFileURL(bundledIntent).href}?v=${Date.now()}`);
 
   const fixtures = JSON.parse(await readFile(FIXTURE_PATH, "utf8"));
@@ -136,6 +148,23 @@ try {
   assert.equal(promptLooksLikeVibecoding("Создай изображение интерфейса сайта в зелёных тонах."), false);
   assert.equal(promptLooksLikeVibecoding("Сделай видео о планировании рабочего дня."), false);
 
+  const normalize = (prompt, model = "codex") => normalizeDigitalVoicePrompt(prompt, model).prompt;
+  assert.equal(normalize("Проанализируй инструкции для Сиденс 2.5."), "Проанализируй инструкции для Seedance 2.5.");
+  assert.equal(normalize("Седаны длиной 2.5 метра покажи в таблице."), "Седаны длиной 2.5 метра покажи в таблице.");
+  assert.equal(normalize("Сравни Клауд и Chat GPT по кодингу."), "Сравни Claude и ChatGPT по кодингу.");
+  assert.equal(normalize("Придумай рекламу для Клауд."), "Придумай рекламу для Клауд.");
+  assert.equal(normalize("Сделай на Супабазе auth и таблицы."), "Сделай на Supabase auth и таблицы.");
+  assert.equal(normalize("Найди супер базу референсов."), "Найди супер базу референсов.");
+  assert.equal(normalize("Открой проект в курсоре и запусти кодинг агента."), "Открой проект в Cursor и запусти кодинг агента.");
+  assert.equal(normalize("Поставь курсор в начало строки."), "Поставь курсор в начало строки.");
+  assert.equal(normalize("Перенеси дизайн из фигмы в кодекс."), "Перенеси дизайн из Figma в OpenAI Codex.");
+  assert.equal(normalize("Сделай через Гемини промпт для Veo.", "gemini"), "Сделай через Gemini промпт для Veo.");
+  assert.equal(normalize("Собери сценарий в Мейке с вебхуком."), "Собери сценарий в Make с вебхуком.");
+  assert.equal(normalize("Выполни make build && make deploy."), "Выполни make build && make deploy.");
+  assert.equal(normalize("Не меняй путь /api/make/run."), "Не меняй путь /api/make/run.");
+  assert.equal(normalize("Открой скрипт `zapier_trigger = true`."), "Открой скрипт `zapier_trigger = true`.");
+  assert.equal(normalize("Сделай не Seedance 2.0, а именно Сидэнс 2.5."), "Сделай не Seedance 2.0, а именно Seedance 2.5.");
+
   const [models, component, api, cleaner] = await Promise.all([
     readFile(join(ROOT, "src", "content", "promptWorkbenchModels.ts"), "utf8"),
     readFile(join(ROOT, "src", "app", "components", "PromptWorkbench.tsx"), "utf8"),
@@ -152,6 +181,7 @@ try {
   assert.match(component, /promptLooksLikeVibecoding\(prompt\)/);
   assert.match(api, /codex:\s*"_coding-codex"[\s\S]*claude:\s*"_coding-claude"[\s\S]*gemini:\s*"_coding-gemini"/);
   assert.match(api, /source:\s*isVibecoding \? "website_vibecoding" : "popup"/);
+  assert.match(api, /normalizeDigitalVoicePrompt\(rawPrompt,\s*modelSlug\)/);
   assert.doesNotMatch(api, /validateVibecodingCandidate\(prompt,/, "website must not silently replace a billed proxy result after proxy finalization");
   assert.match(api, /X-Opten-Website-Signature/);
   assert.match(api, /vibecoding_original:\s*isVibecoding \? prompt/);
@@ -240,6 +270,22 @@ try {
     assert.equal(typeof proxyRequests[0].messages[0].content, "string", "unreferenced image bytes must not reach the coding model");
     assert.match(proxyRequests[0].system_prompt, /closed-world editing task/i);
 
+    nextProxyText = "Проанализируй инструкции для Seedance 2.5 и собери правила.";
+    const voiceRequestCount = proxyRequests.length;
+    const voiceNormalized = await callHandler({
+      action: "improve",
+      prompt: "Проанализируй инструкции для Sedans 2.5 и собери правила.",
+      model: "codex",
+      images: [],
+    });
+    assert.equal(voiceNormalized.statusCode, 200);
+    assert.equal(proxyRequests.length, voiceRequestCount + 1, "voice normalization must not add a provider call");
+    const normalizedProxyRequest = proxyRequests.at(-1);
+    assert.equal(normalizedProxyRequest.vibecoding_original, "Проанализируй инструкции для Seedance 2.5 и собери правила.");
+    assert.match(normalizedProxyRequest.prompt, /Seedance 2\.5/);
+    assert.doesNotMatch(normalizedProxyRequest.prompt, /Sedans 2\.5/);
+    assert.doesNotMatch(normalizedProxyRequest.prompt, /DICTATION|DIGITAL_VOICE_RULES|voice_dictation_errors/i, "runtime dictionary must not be injected into provider input");
+
     const wrongModePrompt = "Перепроверь правила, разбей реализацию на этапы через SuperPowers и сохрани контекст между сжатиями.";
     const requestCountBeforeMismatch = proxyRequests.length;
     const wrongMode = await callHandler({
@@ -267,9 +313,10 @@ try {
     assert.equal(guarded.body.error, "no_improvement");
     assert.equal(guarded.body.usage_released, true, "rejected provider output must restore the credit");
     assert.equal(proxyRequests.length, requestCountBeforeGuard + 1, "refundable no-improvement must never be retried and billed again");
-    assert.equal(proxyRequests[1].model_name, "_coding-claude");
-    assert.ok(Array.isArray(proxyRequests[1].messages[0].content), "explicit screenshot references must keep the attachment");
-    assert.equal(proxyRequests[1].messages[0].content.some((item) => item.type === "image"), true);
+    const guardedProxyRequest = proxyRequests.at(-1);
+    assert.equal(guardedProxyRequest.model_name, "_coding-claude");
+    assert.ok(Array.isArray(guardedProxyRequest.messages[0].content), "explicit screenshot references must keep the attachment");
+    assert.equal(guardedProxyRequest.messages[0].content.some((item) => item.type === "image"), true);
     nextProxyStatus = 200;
     nextProxyExtra = {};
 

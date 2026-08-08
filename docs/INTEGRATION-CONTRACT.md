@@ -515,10 +515,10 @@ calling the finalizer directly in a unit test is not sufficient billing coverage
 
 - Accepted action: `improve` only. Prompt scoring is not part of this endpoint.
 - Allowed image models, in popup order: `nano-banana-2`, `nano-banana-pro`,
-  `gpt-image-2`, `midjourney-8`, `midjourney-7`, `seedream-5`, `flux`, `z-image`.
-- Allowed video models, in popup order: `seedance-2.0`, `kling-3`, `kling-2.6`,
-  `veo-3.1`, `veo-3`, `wan`. Labels and ordering mirror `PS_CHAT_TOP_MODELS` in
-  the extension popup.
+  `gpt-image-2`, `midjourney-8.1`, `seedream-5-pro`, `recraft-v4.1`.
+- Allowed video models, in popup order: `seedance-2.5`, `seedance-2.0`,
+  `kling-3`, `veo-3.1`, `flux-3`, `grok-imagine-video-1.5`. Labels and ordering
+  mirror `PS_CHAT_TOP_MODELS` in the extension popup.
 - Allowed site-only Vibe Coding models, in fixed order: `codex`, `claude`,
   `gemini`. They map server-side to the proxy's non-public `_coding-*` adapters;
   underscore-prefixed adapters are excluded from and blocked by the public
@@ -548,6 +548,19 @@ calling the finalizer directly in a unit test is not sufficient billing coverage
   the server loads the same committed `rewriter.md`; the proxy body uses
   `model_name`, `is_video`, `max_tokens: 1200`, legacy-compatible
   `count_usage: true`, and `source: popup`.
+- Before coding-intent detection, signature generation, and proxy transport, the
+  website applies a deterministic server-side voice-dictation normalizer. The
+  committed runtime artifact contains 435 reviewed aliases grouped into 80
+  digital product/model/tool targets; it is code/data used locally by the
+  serverless function and is never inserted into `system_prompt`, `prompt`, or
+  `messages`. Therefore it performs no second provider call, spends no extra
+  operation, and adds zero Anthropic input tokens. Context-required aliases need
+  positive digital context and no negative context; ambiguous everyday terms
+  fail closed. The normalizer skips code fences, quoted literals, URLs, routes,
+  filesystem paths, HTTP route literals, and shell command lines. It preserves
+  the explicitly dictated version rather than upgrading or downgrading it. The
+  normalized text becomes the signed `vibecoding_original`, so proxy finalization
+  still validates exactly the text that was sent to the provider.
 - Vibe Coding uses the same endpoint, JWT, response shape, provider, and ledger,
   but loads the separate site-owned `vibecoding-cleaner.md`, maps the three public
   model slugs to `_coding-*`, and sends `source: website_vibecoding`. Its

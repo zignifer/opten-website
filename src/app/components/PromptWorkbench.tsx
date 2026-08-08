@@ -35,7 +35,7 @@ const REFERENCE_JPEG_QUALITY = 0.7;
 const PREFERENCES_STORAGE_KEY = "opten_prompt_workbench_preferences_v1";
 const DEFAULT_MODEL_BY_TYPE = {
   image: "nano-banana-2",
-  video: "seedance-2.0",
+  video: "seedance-2.5",
   vibecoding: "codex",
 } as const;
 

@@ -104,9 +104,9 @@ with an HMAC derived from `SUPABASE_JWT_SECRET`, the proxy validates the provide
 `authentication_required`; signed-in Free users may spend their one-time signup
 credits; exhausted Free users receive the proxy limit error; live Pro users spend
 from the normal 300-operation monthly cycle. The only selectable
-image models are Nano Banana 2, Nano Banana Pro, Chat GPT Image 2, Midjourney 8,
-Midjourney 7, Seedream 5 Lite, Flux 2 Pro, and Z-Image. The only video models are
-Seedance 2.0, Kling 3.0, Kling 2.6, Google Veo 3.1, Google Veo 3.0, and Wan 2.6.
+image models are Nano Banana 2, Nano Banana Pro, GPT Image 2, Midjourney 8.1,
+Seedream 5.0 Pro, and Recraft V4.1. The only video models are Seedance 2.5,
+Seedance 2.0, Kling 3.0, Google Veo 3.1, FLUX 3, and Grok Imagine.
   Vibe Coding is a closed-world cleaner: it should remove filler, fix grammar and
   obvious speech-to-text mistakes, merge duplicates, and reorder already-stated
   requirements, but it edits rather than summarizes and must not add a stack,
@@ -138,6 +138,17 @@ references reach the model only when the text explicitly mentions an image,
 screenshot, reference, or mockup; an image may clarify written context but must not
 introduce product requirements. The endpoint and landing
 UI accept only the `improve` action; prompt scoring is not part of this surface. The
+website endpoint applies a deterministic server-side voice-dictation normalizer
+before prompt classification, signing, and proxy transport. Its committed runtime
+rules contain only digital product, model, platform, and technology names distilled
+from the reviewed research dataset; the full research dictionary is never inserted
+into the model prompt. Normalization performs no AI request, spends no additional
+credit, and adds zero provider-input tokens. Context-required aliases are changed
+only with positive digital context and without negative context; ambiguous everyday
+words fail closed. URLs, routes, filesystem paths, shell commands, code fences,
+quoted literals, API/code identifiers, and explicit version numbers remain protected.
+The selected version is preserved (`Sedans 2.5` may become `Seedance 2.5`, never
+`Seedance 2.0`). Professional slang and prose style are left to the existing cleaner.
 textarea placeholder and empty-reference label mirror the popup (`Промпт или идея
 20+ символов...`, `Загрузить фото`); inline errors occupy the lower-left status area,
 while the lower-right always shows `Последнее обновление: DD.MM.YYYY`, computed from
