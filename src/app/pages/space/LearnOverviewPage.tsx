@@ -40,9 +40,9 @@ type SortKey = "new" | "duration";
 const SHOW_LEARN_COLLECTIONS = false;
 const topics: TopicFilter[] = ["all", "ai-image", "ai-video", "vibe-coding", "vibe-design"];
 const PINNED_FREE_LESSON_SLUGS = [
+  "ai-website-vibe-design",
   "client-website-figma-codex",
   "figma-to-codex-website",
-  "client-website-navigation-hero",
 ] as const;
 const pinnedFreeLessons = PINNED_FREE_LESSON_SLUGS.map((slug) => {
   const lesson = publicLearnLessons.find((item) => item.slug === slug);

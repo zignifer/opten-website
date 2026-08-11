@@ -7,6 +7,7 @@ export const LEARN_LESSON_SLUGS = [
   "web-design-references",
   "figma-to-codex-website",
   "client-website-figma-codex",
+  "ai-website-vibe-design",
 ] as const;
 
 export const LEARN_FIND_SLUGS = [

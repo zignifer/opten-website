@@ -90,6 +90,11 @@ assert.match(content, /client-website-figma-codex/, "Learn catalog must include 
 assert.match(content, /title:\s*\{[\s\S]*?ru: "Сайт за 50 000 ₽ в Figma и Codex"/, "New lesson must use the reviewed two-line card title");
 assert.match(content, /youtubeId: "hekYDp3-ErQ"/, "New client website lesson must use the requested YouTube video");
 assert.match(content, /time: "26:15", seconds: 1575/, "New client website lesson must keep all original YouTube chapters");
+assert.match(content, /ai-website-vibe-design/, "Learn catalog must include the new AI website vibe-design lesson");
+assert.match(content, /thumbnailPath: "https:\/\/i\.ytimg\.com\/vi\/ZWLiM5Wqv3M\/maxresdefault\.jpg"/, "AI website vibe-design lesson must use its live YouTube thumbnail");
+assert.match(content, /youtubeId: "ZWLiM5Wqv3M"/, "AI website vibe-design lesson must use the requested YouTube video");
+assert.match(content, /time: "31:07", seconds: 1867/, "AI website vibe-design lesson must keep all 20 original YouTube chapters");
+assert.match(content, /https:\/\/t\.me\/v_voronezhtsev/, "AI website vibe-design lesson must include the author's Seedance materials link");
 assert.match(content, /https:\/\/higgsfield\.ai\//, "Actual AI tools lesson must include the Higgsfield material");
 assert.match(content, /https:\/\/freepik\.com\//, "Actual AI tools lesson must include the Freepik / Magnific material");
 assert.match(content, /https:\/\/syntx\.ai\/welcome\/GlUETIt6/, "Actual AI tools lesson must include the Syntx material");
@@ -108,7 +113,7 @@ assert.match(content, /routeBasePath/, "Template collections must keep internal 
 const learnOverview = readFileSync(join(root, "src/app/pages/space/LearnOverviewPage.tsx"), "utf8");
 assert.match(
   learnOverview,
-  /const PINNED_FREE_LESSON_SLUGS = \[\s*"client-website-figma-codex",\s*"figma-to-codex-website",\s*"client-website-navigation-hero",\s*\] as const;/,
+  /const PINNED_FREE_LESSON_SLUGS = \[\s*"ai-website-vibe-design",\s*"client-website-figma-codex",\s*"figma-to-codex-website",\s*\] as const;/,
   "Learn overview must keep exactly the three reviewed free lessons in the requested order",
 );
 assert.match(learnOverview, /const lessons = pinnedFreeLessons\.filter/, "Learn overview filters must stay limited to the pinned free lessons");

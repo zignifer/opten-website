@@ -305,6 +305,19 @@ export const learnIntegrationTodos = {
 
 const emptyMaterials: Record<LearnLang, LearnMaterial[]> = { ru: [], en: [] };
 
+const aiWebsiteVibeDesignMaterials: Record<LearnLang, LearnMaterial[]> = {
+  ru: [
+    { title: "Инструкция и материалы Seedance 2.5", meta: "Материалы к уроку в Telegram-канале автора", kind: "link", actionLabel: "Открыть", href: "https://t.me/v_voronezhtsev" },
+    { title: "Syntx", meta: "Генерация фото и видео со скидкой автора 15%", kind: "link", actionLabel: "Перейти", href: "https://syntx.ai/welcome/GlUETIt6" },
+    { title: "Полный курс по нейросетям", meta: "Визуал, видео и сайты с помощью ИИ", kind: "link", actionLabel: "Открыть курс", href: "/learn/courses/ai-content-marketing-2026" },
+  ],
+  en: [
+    { title: "Seedance 2.5 guide and materials", meta: "Lesson materials in the author's Telegram channel", kind: "link", actionLabel: "Open", href: "https://t.me/v_voronezhtsev" },
+    { title: "Syntx", meta: "AI image and video generation with the author's 15% discount", kind: "link", actionLabel: "Open", href: "https://syntx.ai/welcome/GlUETIt6" },
+    { title: "Complete AI course", meta: "Visuals, video, and websites made with AI", kind: "link", actionLabel: "Open course", href: "/learn/courses/ai-content-marketing-2026" },
+  ],
+};
+
 const actualAiToolsMaterials: Record<LearnLang, LearnMaterial[]> = {
   ru: [
     { title: "Higgsfield", meta: "AI-видео, движение камеры и визуальные эффекты", kind: "link", actionLabel: "Перейти", href: "https://higgsfield.ai/" },
@@ -635,6 +648,52 @@ const clientWebsiteFigmaCodexTimestampsEn: LearnTimestamp[] = [
   { time: "23:31", seconds: 1411, title: "Browser result and responsive review", description: "Checking the implemented page on desktop and mobile." },
   { time: "24:03", seconds: 1443, title: "Fixing the mobile navigation bug", description: "Correcting the menu behavior on mobile." },
   { time: "26:15", seconds: 1575, title: "Lesson recap and the next part", description: "Reviewing the result and previewing the continuation." },
+];
+
+const aiWebsiteVibeDesignTimestampsRu: LearnTimestamp[] = [
+  { time: "00:00", seconds: 0, title: "Вайбкодинг сайта для клиента: план урока", description: "План продолжения работы над реальным клиентским сайтом." },
+  { time: "00:27", seconds: 27, title: "Результат урока 1 и запуск локального сервера", description: "Проверка первой версии проекта и подготовка локальной среды." },
+  { time: "01:22", seconds: 82, title: "Три способа продолжить дизайн сайта", description: "Сравнение подходов к развитию существующего макета." },
+  { time: "02:02", seconds: 122, title: "GPT Image 2.0: генерируем новые секции", description: "Создание вариантов новых блоков сайта через GPT Image 2.0." },
+  { time: "04:15", seconds: 255, title: "Промпт для сетки 1440/1200 px", description: "Настройка размеров холста и контентной сетки в запросе." },
+  { time: "05:31", seconds: 331, title: "Product Design в Codex и шаблон стиля", description: "Передача визуального направления и правил проекта в Codex." },
+  { time: "09:10", seconds: 550, title: "Почему прямой AI-дизайн получается шаблонным", description: "Разбор слабых мест полностью автоматической генерации дизайна." },
+  { time: "10:32", seconds: 632, title: "Выбираем секции и собираем макет в Figma", description: "Отбор удачных блоков и сборка цельной страницы в Figma." },
+  { time: "13:47", seconds: 827, title: "Image to Code: вёрстка сайта по изображению", description: "Перенос выбранного визуального решения в рабочий код." },
+  { time: "15:47", seconds: 947, title: "Иконки без артефактов в GPT Image", description: "Генерация чистых иконок для интерфейса сайта." },
+  { time: "18:10", seconds: 1090, title: "Результат в Codex и перенос сайта в Figma", description: "Проверка реализации и возврат собранных секций в макет." },
+  { time: "19:04", seconds: 1144, title: "Ручная доработка секций в Figma", description: "Точечная правка композиции и деталей после AI-генерации." },
+  { time: "21:05", seconds: 1265, title: "Отзывы, форма и маркетинг секций", description: "Добавление контентных блоков, которые поддерживают задачу сайта." },
+  { time: "22:04", seconds: 1324, title: "Рекламное видео для сайта в Seedance 2.5", description: "Подготовка сценария и референсов для AI-видео." },
+  { time: "25:16", seconds: 1516, title: "Настройки Syntx: Omni Reference и 720p", description: "Выбор параметров для 15-секундной генерации в Seedance 2.5." },
+  { time: "26:54", seconds: 1614, title: "Что получилось в 15-секундной генерации", description: "Просмотр результата и выявление проблемного финала ролика." },
+  { time: "27:45", seconds: 1665, title: "Исправляем AI-видео в Adobe Premiere Pro", description: "Монтажная правка неудачной части готовой генерации." },
+  { time: "29:04", seconds: 1744, title: "Готовые иконки, иллюстрации и видео", description: "Обзор подготовленного набора визуальных материалов." },
+  { time: "29:47", seconds: 1787, title: "Возвращаем новые секции в основной проект Codex", description: "Интеграция доработанных блоков в рабочую версию сайта." },
+  { time: "31:07", seconds: 1867, title: "Что будет в финальном уроке", description: "Анонс заключительной части серии о клиентском сайте." },
+];
+
+const aiWebsiteVibeDesignTimestampsEn: LearnTimestamp[] = [
+  { time: "00:00", seconds: 0, title: "The client website vibe-coding plan", description: "Planning the next stage of the real client website project." },
+  { time: "00:27", seconds: 27, title: "Lesson one result and local server", description: "Reviewing the first build and preparing the local environment." },
+  { time: "01:22", seconds: 82, title: "Three ways to continue the website design", description: "Comparing approaches for extending the existing layout." },
+  { time: "02:02", seconds: 122, title: "Generating new sections with GPT Image 2.0", description: "Creating alternative website sections with GPT Image 2.0." },
+  { time: "04:15", seconds: 255, title: "A prompt for the 1440/1200 px grid", description: "Defining the canvas and content grid dimensions in the prompt." },
+  { time: "05:31", seconds: 331, title: "Product Design in Codex and the style template", description: "Passing the visual direction and project rules to Codex." },
+  { time: "09:10", seconds: 550, title: "Why direct AI design looks generic", description: "Examining the weak points of fully automated design generation." },
+  { time: "10:32", seconds: 632, title: "Selecting sections and assembling them in Figma", description: "Choosing the strongest blocks and building a coherent Figma page." },
+  { time: "13:47", seconds: 827, title: "Image to Code: implementing from an image", description: "Turning the selected visual direction into working code." },
+  { time: "15:47", seconds: 947, title: "Artifact-free icons in GPT Image", description: "Generating clean interface icons for the website." },
+  { time: "18:10", seconds: 1090, title: "The Codex result and moving it into Figma", description: "Reviewing the implementation and returning the sections to the design." },
+  { time: "19:04", seconds: 1144, title: "Manual section refinements in Figma", description: "Adjusting composition and details after AI generation." },
+  { time: "21:05", seconds: 1265, title: "Testimonials, form, and section marketing", description: "Adding content blocks that support the website's business goal." },
+  { time: "22:04", seconds: 1324, title: "A Seedance 2.5 promo video for the website", description: "Preparing the script and references for an AI-generated video." },
+  { time: "25:16", seconds: 1516, title: "Syntx settings: Omni Reference and 720p", description: "Choosing settings for a 15-second Seedance 2.5 generation." },
+  { time: "26:54", seconds: 1614, title: "The 15-second generation result", description: "Reviewing the output and identifying its problematic ending." },
+  { time: "27:45", seconds: 1665, title: "Fixing the AI video in Adobe Premiere Pro", description: "Editing the weak part of the generated video." },
+  { time: "29:04", seconds: 1744, title: "Finished icons, illustrations, and video", description: "Reviewing the completed set of visual assets." },
+  { time: "29:47", seconds: 1787, title: "Returning new sections to the main Codex project", description: "Integrating the refined blocks into the working website." },
+  { time: "31:07", seconds: 1867, title: "What the final lesson will cover", description: "Previewing the last part of the client website series." },
 ];
 
 function lesson(input: LearnLesson): LearnLesson {
@@ -1025,6 +1084,58 @@ export const publicLearnLessons: LearnLesson[] = [
     },
     timestamps: { ru: clientWebsiteFigmaCodexTimestampsRu, en: clientWebsiteFigmaCodexTimestampsEn },
     materials: emptyMaterials,
+  }),
+  lesson({
+    slug: "ai-website-vibe-design",
+    title: {
+      ru: "Вайб-дизайн сайта с нейросетями",
+      en: "AI vibe design for a client website",
+    },
+    description: {
+      ru: "Продолжаю делать сайт для реального клиента за 50 000 ₽ и показываю три способа развить дизайн с помощью ИИ. Генерирую новые секции и иконки в GPT Image 2.0, верстаю выбранные блоки в Codex по изображению, возвращаю результат в Figma и создаю 15-секундное рекламное видео в Seedance 2.5. В финале исправляю неудачную часть AI-видео в Adobe Premiere Pro и интегрирую готовые материалы в основной проект.",
+      en: "I continue building a website for a real client with a 50,000 ₽ budget and compare three ways to extend its design with AI. I generate new sections and icons in GPT Image 2.0, implement the selected blocks in Codex from an image, return the result to Figma, and create a 15-second promo video in Seedance 2.5. Finally, I repair the weak part of the AI video in Adobe Premiere Pro and integrate the finished assets into the main project.",
+    },
+    seoTitle: {
+      ru: "Вайб-дизайн сайта с помощью нейросетей: GPT Image, Codex и Seedance",
+      en: "AI website vibe design with GPT Image, Codex, and Seedance",
+    },
+    seoDescription: {
+      ru: "Практический урок по вайб-дизайну: секции и иконки в GPT Image 2.0, вёрстка по изображению в Codex, макет в Figma и AI-видео в Seedance 2.5.",
+      en: "A practical AI vibe-design lesson covering GPT Image 2.0 sections and icons, image-to-code implementation in Codex, Figma refinement, and a Seedance 2.5 promo video.",
+    },
+    category: "vibe-design",
+    duration: "32:09",
+    durationIso: "PT32M9S",
+    status: "Available",
+    access: "free",
+    thumbnailPath: "https://i.ytimg.com/vi/ZWLiM5Wqv3M/maxresdefault.jpg",
+    publishedAt: "2026-08-11",
+    updatedAt: "2026-08-11",
+    releaseNote: {
+      ru: "Второй урок серии о создании сайта для реального клиента с помощью Figma, Codex и нейросетей.",
+      en: "The second lesson in the series about building a real client website with Figma, Codex, and AI tools.",
+    },
+    filters: ["Standalone", "Builder"],
+    topics: {
+      ru: ["Вайб-дизайн", "GPT Image 2.0", "Codex", "Seedance 2.5"],
+      en: ["Vibe design", "GPT Image 2.0", "Codex", "Seedance 2.5"],
+    },
+    whatYouWillLearn: {
+      ru: ["Продолжить существующий дизайн тремя AI-способами", "Создать секции и чистые иконки в GPT Image 2.0", "Перенести дизайн в код через Codex и вернуть его в Figma", "Собрать и исправить 15-секундное AI-видео в Seedance 2.5 и Premiere Pro"],
+      en: ["Extend an existing design with three AI approaches", "Create sections and clean icons in GPT Image 2.0", "Move a design into code with Codex and return it to Figma", "Create and repair a 15-second AI video with Seedance 2.5 and Premiere Pro"],
+    },
+    updatedNote: {
+      ru: "Метаданные, живая обложка и все 20 глав сверены с YouTube 2026-08-11.",
+      en: "Metadata, live thumbnail, and all 20 chapters verified against YouTube on 2026-08-11.",
+    },
+    youtubeId: "ZWLiM5Wqv3M",
+    youtubeUrl: "https://youtu.be/ZWLiM5Wqv3M",
+    localizedVideo: {
+      ru: { youtubeId: "ZWLiM5Wqv3M", youtubeUrl: "https://youtu.be/ZWLiM5Wqv3M", audioLanguage: "ru", captionLanguage: "ru" },
+      en: { youtubeId: "ZWLiM5Wqv3M", youtubeUrl: "https://youtu.be/ZWLiM5Wqv3M", captionLanguage: "en" },
+    },
+    timestamps: { ru: aiWebsiteVibeDesignTimestampsRu, en: aiWebsiteVibeDesignTimestampsEn },
+    materials: aiWebsiteVibeDesignMaterials,
   }),
 ];
 
