@@ -4,7 +4,7 @@
 > (`C:\Projects\opten-website`) and the extension (`C:\Projects\promptscore`).
 > Any change here is a breaking change for the other side and must be coordinated.
 >
-> **Last sync:** 2026-08-05 against extension `manifest.json` version **1.4.2** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench keeps the extension popup's authenticated image/video quick-Improve profiles and adds a site-only Vibe Coding cleaner; standalone course checkout/access, Kinescope course playback, the Telegram `/start` direct 24h 20% course offer with background intro-video delivery, the retirement of the former lesson-zero branch, course-or-Pro Opten generators, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads are documented). Backend fully on self-hosted `supabase.opten.space`.
+> **Last sync:** 2026-08-11 against extension `manifest.json` version **1.4.3** (post-v2.8 milestone — Self-Hosted Supabase Migration completed; Phase 88 cutover done 2026-05-25; Phase 89 daily encrypted backups + monitoring shipped 2026-05-28; Phase 91 prompt-library schema/route contract added and launched in visible site navigation on 2026-06-02; Phase 92 extension context-menu save contract added; Phase 93 extension context-menu insert contract added in-tree; Phase 94 site-triggered prompt-library cache refresh added; Phase 95 Opten Space `/app/*` website-auth + `account-summary` backend surface documented; Phase 96 shared website login, website-first `/pay` + `/account`, and direct website cancellation documented; Phase 97 prompt-library free access for authenticated extension accounts documented; Phase 98 public Prompt Library snapshot route/RPC contract documented; Phase 99 visible auth switched to Email OTP/manual email entry only while retaining hidden Google OAuth architecture; the landing Prompt Workbench keeps the extension popup's authenticated image/video quick-Improve profiles and adds a site-only Vibe Coding cleaner; standalone course checkout/access, Kinescope course playback, the Telegram `/start` direct 24h 20% course offer with background intro-video delivery, the retirement of the former lesson-zero branch, course-or-Pro Opten generators, owner service endpoints, Telegram broadcast history/deletion, and Telegram broadcast image uploads are documented). Backend fully on self-hosted `supabase.opten.space`.
 > **Extension repo:** [zignifer/promptscore](https://github.com/zignifer/promptscore) (private).
 > **Source of truth for the extension side:**
 > - [`manifest.json`](../../promptscore/manifest.json) — `externally_connectable` block
@@ -274,7 +274,7 @@ The site only **calls** them; it does not own them.
 Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
 
 - The site shows a standalone course offer controlled by the global website
-  currency switcher. The public base price is `2 990 ₽` / `$41`; public discounts
+  currency switcher. The public base price is `4 990 ₽` / `$69`; public discounts
   are not hard-coded in the website and must come from server-side promo codes
   (planned common campaigns: `-20%` and `-40%`). The current USD checkout still
   uses the configured course Paddle one-time price ID returned by the backend.
@@ -334,9 +334,9 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
 - Fixed-price promos require configured RUB and USD fixed amounts. Internal
   `FREE` (`100 ₽` / `$1`) uses the separate Paddle `$1` price ID. Public
   fixed-price promos use the standard course price ID plus a Paddle discount
-  code. The retired `LAST` promo mapped to `2 990 ₽` / `$41`; it stays disabled
-  in the database and archived in Paddle because that amount is now the public
-  base price. Never let the browser set arbitrary checkout amounts.
+  code. Current `LAST` maps to `2 990 ₽` / `$41`, has no start timer, expiry
+  timestamp, or usage limit, and stays enabled until the owner requests manual
+  deactivation. Never let the browser set arbitrary checkout amounts.
 - The YooKassa `/webhook` handler must branch on `metadata.kind` before
   requiring `metadata.user_id`. Course webhooks grant/confirm
   `course_entitlements`, create or reuse the Supabase Auth user for that email,
@@ -862,7 +862,7 @@ The paid course purchase card also calls `ensurePaddle()` lazily before USD cour
   `PADDLE_PRICE_ID_COURSE_AI_CONTENT_MARKETING_2026_{SANDBOX|PRODUCTION}`
   and `PADDLE_PRICE_ID_COURSE_AI_CONTENT_MARKETING_2026_FREE_{SANDBOX|PRODUCTION}`.
   The current live production IDs are
-  `pri_01kzdsw3cjmjfr97btgc9bcdp2` (`$41`) and
+  `pri_01kvk9vzec7cwgq7zgs9azw2re` (`$69`) and
   `pri_01kvk9x5mcnadfj0beymk23ze5` (`$1` FREE test).
 
 If you switch envs, you must also flip the corresponding Paddle priceIds in the extension's `create-payment-paddle` and `create-course-payment` Edge Functions.
