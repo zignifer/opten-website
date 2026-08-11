@@ -3,6 +3,8 @@ import { futureProtectedVideoDeliveryNote, learnDefaultAuthor } from "./learn";
 import { getPrivateCourseLessonExtras } from "./privateCourseExtras";
 
 export const PRIVATE_COURSE_SLUG = "ai-content-marketing-2026";
+export const PRIVATE_COURSE_TITLE_RU = "Курс по ИИ";
+export const PRIVATE_COURSE_TITLE_EN = "AI Course";
 export const PRIVATE_COURSE_FIRST_LESSON_SLUG = "lesson-1-prompting";
 export const PRIVATE_COURSE_FIRST_KINESCOPE_VIDEO_ID = "e941e14d-c5bf-40fc-abe5-a41e247777cf";
 export const PRIVATE_COURSE_PRICE_RUB = 4990;
@@ -28,8 +30,8 @@ export type PrivateCourseIntroContent = {
 
 export const privateCourseIntroContent: PrivateCourseIntroContent = {
   title: {
-    ru: "Нейросети в веб-дизайне",
-    en: "AI in web design",
+    ru: PRIVATE_COURSE_TITLE_RU,
+    en: PRIVATE_COURSE_TITLE_EN,
   },
   description: {
     ru: "На практике создадим с нуля бренд кофейни NOVA: промпты, фото, логотип и видео.\nЗатем соберём сайт и контент для рекламы, чтобы всё выглядело как одна система.",
@@ -964,8 +966,8 @@ export const privateCourseLessons: LearnLesson[] = privateCourseLessonConfigs.ma
 export const privateCourseCollection: LearnCollection = {
   id: PRIVATE_COURSE_SLUG,
   title: {
-    ru: "Нейросети в веб-дизайне",
-    en: "AI in web design",
+    ru: PRIVATE_COURSE_TITLE_RU,
+    en: PRIVATE_COURSE_TITLE_EN,
   },
   description: {
     ru: "Закрытый курс Opten по созданию контента и маркетинговой упаковки с помощью ИИ.",

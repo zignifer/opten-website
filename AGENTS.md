@@ -291,7 +291,7 @@ Guest checkout is initiated with an email address, selected currency, and
 optional uppercase promo code. Provider webhooks grant a course entitlement and
 send a direct website auth link to the same email. The internal test promo
 `FREE` maps to `100 ₽` or `$1` and requires a separate Paddle `$1` price ID.
-The public base price is `4 990 ₽` / `$69`; public discounts are not hard-coded in
+The canonical course name is `Курс по ИИ` (`AI Course` in EN). The public base price is `4 990 ₽` / `$69`; public discounts are not hard-coded in
 the website and must be represented by server-side promo codes (planned common
 campaigns: `-20%` and `-40%`). On desktop, the course-root checkout card shows
 the compact subtitle `Курс из 16 уроков по ИИ для начинающих` directly below

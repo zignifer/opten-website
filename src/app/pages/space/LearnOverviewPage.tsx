@@ -25,7 +25,11 @@ import {
   type LearnLesson,
   type LearnTopic,
 } from "../../../content/space/learn";
-import { privateCourseCollection } from "../../../content/space/privateCourse";
+import {
+  PRIVATE_COURSE_TITLE_EN,
+  PRIVATE_COURSE_TITLE_RU,
+  privateCourseCollection,
+} from "../../../content/space/privateCourse";
 import LocalizedLink from "../../components/LocalizedLink";
 import ResponsiveImage from "../../components/ResponsiveImage";
 import SiteFooter from "../../components/SiteFooter";
@@ -151,12 +155,12 @@ const courseAuthor = {
 const featuredCoursePromo = {
   coverPath: "/assets/learn/video/actual-ai-tools-2026-poster.jpg",
   title: {
-    ru: "Нейросети\nв веб-дизайне",
-    en: "AI in web design",
+    ru: PRIVATE_COURSE_TITLE_RU.replace(" по ", "\nпо "),
+    en: PRIVATE_COURSE_TITLE_EN,
   },
   description: {
-    ru: "Всё, что нужно знать для\nсоздания упаковки бренда,\nне имея навыков в дизайне\nи разработке. За 15 коротких\nуроков мы создадим логотип,\nфото и видео, запустим сайт\nи всё это с помощью ИИ!",
-    en: "Everything you need to create a brand package without design or development skills. Across 15 short lessons, we will create a logo, photos and videos, launch a website, and do it all with AI.",
+    ru: "Всё, что нужно знать для\nсоздания упаковки бренда,\nне имея навыков в дизайне\nи разработке. За 16 коротких\nуроков мы создадим логотип,\nфото и видео, запустим сайт\nи всё это с помощью ИИ!",
+    en: "Everything you need to create a brand package without design or development skills. Across 16 short lessons, we will create a logo, photos and videos, launch a website, and do it all with AI.",
   },
   cta: {
     ru: "Перейти",

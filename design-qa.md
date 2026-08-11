@@ -7,7 +7,7 @@
 - None. The latest user clarification overrides the earlier course-page interpretation: only the title changes, and the normal course description/layout must remain intact.
 
 **Implementation Checklist**
-- Updated only the course title to `Нейросети в веб-дизайне` / `AI in web design`.
+- Canonical course title is `Курс по ИИ` / `AI Course`.
 - Restored the original course description in RU and EN.
 - Restored the normal course header typography: one title line on desktop and the existing two-line desktop description clamp.
 - Kept the shared new title in breadcrumbs and checkout headings on lesson pages.

@@ -152,6 +152,7 @@ player overlay. Kinescope then calls the auth callback during playback and gets
 The paid course `ai-content-marketing-2026` is not unlocked by Pro. It uses a
 separate one-time course purchase:
 
+- canonical product name `Курс по ИИ` (`AI Course` in EN)
 - RUB base price `4 990 ₽`
 - public discounts are server-side promo codes, not hard-coded sale pricing
 - USD base/list price `$69`
