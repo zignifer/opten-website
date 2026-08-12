@@ -54,6 +54,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/ai-for-business":         "src/content/blog/ai-for-business.ts",
+  "/en/blog/ai-for-business":      "src/content/blog/ai-for-business.ts",
   "/blog/ai-marketplace-cards":    "src/content/blog/ai-marketplace-cards.ts",
   "/en/blog/ai-marketplace-cards": "src/content/blog/ai-marketplace-cards.ts",
   "/blog/seo-pipeline-wordstat-codex":    "src/content/blog/seo-pipeline-wordstat-codex.ts",

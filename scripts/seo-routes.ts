@@ -20,6 +20,7 @@ import { post as aiFreelanceServicesGuide } from "../src/content/blog/ai-freelan
 import { post as makeMoneyWithAiGuide } from "../src/content/blog/make-money-with-ai";
 import { post as whereToFindAiClientsGuide } from "../src/content/blog/where-to-find-ai-clients";
 import { post as seoPipelineWordstatCodexGuide } from "../src/content/blog/seo-pipeline-wordstat-codex";
+import { post as aiForBusinessGuide } from "../src/content/blog/ai-for-business";
 import { post as aiMarketplaceCardsGuide } from "../src/content/blog/ai-marketplace-cards";
 import { post as upworkStart2026Guide } from "../src/content/blog/upwork-start-2026-checklist";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
@@ -1388,6 +1389,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/ai-for-business`, name: aiForBusinessGuide.ru.title, datePublished: aiForBusinessGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-marketplace-cards`, name: aiMarketplaceCardsGuide.ru.title, datePublished: aiMarketplaceCardsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex`, name: seoPipelineWordstatCodexGuide.ru.title, datePublished: seoPipelineWordstatCodexGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/where-to-find-ai-clients`, name: whereToFindAiClientsGuide.ru.title, datePublished: whereToFindAiClientsGuide.ru.publishedAt },
@@ -1440,6 +1442,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/ai-for-business.
+  {
+    path: "/blog/ai-for-business",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/ai-for-business`, en: `${SITE_ORIGIN}/en/blog/ai-for-business`, xDefault: `${SITE_ORIGIN}/blog/ai-for-business` },
+    title: aiForBusinessGuide.ru.title,
+    description: aiForBusinessGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-for-business`,
+    ogTitle: aiForBusinessGuide.ru.title,
+    ogDescription: aiForBusinessGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiForBusinessGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/ai-for-business`, headline: aiForBusinessGuide.ru.title, description: aiForBusinessGuide.ru.description, datePublished: aiForBusinessGuide.ru.publishedAt, dateModified: aiForBusinessGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: aiForBusinessGuide.ru.tags, image: { url: `${SITE_ORIGIN}${aiForBusinessGuide.ru.cover.src}`, width: aiForBusinessGuide.ru.cover.width, height: aiForBusinessGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/ai-for-business`, url: `${SITE_ORIGIN}/blog/ai-for-business`, name: aiForBusinessGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((aiForBusinessGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/ai-for-business`, aiForBusinessGuide.ru.title),
+      faqPageBlock(aiForBusinessGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-for-business`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: aiForBusinessGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-for-business` }], `${SITE_ORIGIN}/blog/ai-for-business`),
     ],
   },
 
@@ -3431,6 +3455,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/ai-for-business`, name: aiForBusinessGuide.en.title, datePublished: aiForBusinessGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-marketplace-cards`, name: aiMarketplaceCardsGuide.en.title, datePublished: aiMarketplaceCardsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex`, name: seoPipelineWordstatCodexGuide.en.title, datePublished: seoPipelineWordstatCodexGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients`, name: whereToFindAiClientsGuide.en.title, datePublished: whereToFindAiClientsGuide.en.publishedAt },
@@ -3483,6 +3508,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/ai-for-business EN sibling.
+  {
+    path: "/en/blog/ai-for-business",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/ai-for-business`, en: `${SITE_ORIGIN}/en/blog/ai-for-business`, xDefault: `${SITE_ORIGIN}/blog/ai-for-business` },
+    title: aiForBusinessGuide.en.title,
+    description: aiForBusinessGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-for-business`,
+    ogTitle: aiForBusinessGuide.en.title,
+    ogDescription: aiForBusinessGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiForBusinessGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/ai-for-business`, headline: aiForBusinessGuide.en.title, description: aiForBusinessGuide.en.description, datePublished: aiForBusinessGuide.en.publishedAt, dateModified: aiForBusinessGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: aiForBusinessGuide.en.tags, image: { url: `${SITE_ORIGIN}${aiForBusinessGuide.en.cover.src}`, width: aiForBusinessGuide.en.cover.width, height: aiForBusinessGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/ai-for-business`, url: `${SITE_ORIGIN}/en/blog/ai-for-business`, name: aiForBusinessGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((aiForBusinessGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/ai-for-business`, aiForBusinessGuide.en.title),
+      faqPageBlock(aiForBusinessGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-for-business`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: aiForBusinessGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-for-business` }], `${SITE_ORIGIN}/en/blog/ai-for-business`),
     ],
   },
 

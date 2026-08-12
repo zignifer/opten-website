@@ -3,6 +3,7 @@
 // + src/i18n/paths.ts + scripts/sitemap.mjs PATH_TO_SOURCE must stay in sync.
 
 import { post as gptImage2 } from "./gpt-image-2";
+import { post as aiForBusiness } from "./ai-for-business";
 import { post as aiMarketplaceCards } from "./ai-marketplace-cards";
 import { post as seoPipelineWordstatCodex } from "./seo-pipeline-wordstat-codex";
 import { post as neuralNetworksFromScratch } from "./neural-networks-from-scratch";
@@ -40,6 +41,7 @@ import { post as aiLogoGeneratorPrompt } from "./ai-logo-generator-prompt";
 import type { BlogPost } from "./types";
 
 export const blogPostsBySlug = {
+  "ai-for-business": aiForBusiness,
   "ai-marketplace-cards": aiMarketplaceCards,
   "seo-pipeline-wordstat-codex": seoPipelineWordstatCodex,
   "where-to-find-ai-clients": whereToFindAiClients,

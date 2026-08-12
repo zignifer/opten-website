@@ -2204,7 +2204,7 @@
     {
       "queueOrder": 25,
       "slug": "ai-for-business",
-      "status": "queued",
+      "status": "published",
       "titleHint": "ИИ для бизнеса: какие задачи реально ускоряют продажи и контент",
       "clusterId": "BL-commerce",
       "intentType": "guide",
@@ -2274,8 +2274,8 @@
         "note": "Imported Yandex Wordstat RU evidence",
         "lastCheckedAt": "2026-06-28"
       },
-      "targetUrl": null,
-      "publishedAt": null
+      "targetUrl": "/blog/ai-for-business",
+      "publishedAt": "2026-08-13"
     },
     {
       "queueOrder": 26,
