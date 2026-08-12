@@ -2280,7 +2280,7 @@
     {
       "queueOrder": 26,
       "slug": "ai-for-designers",
-      "status": "queued",
+      "status": "published",
       "titleHint": "Нейросети для дизайнеров: как ускорить визуал, идеи и клиентские задачи",
       "clusterId": "BL-design",
       "intentType": "guide",
@@ -2358,8 +2358,8 @@
         "note": "Imported Yandex Wordstat RU evidence",
         "lastCheckedAt": "2026-06-28"
       },
-      "targetUrl": null,
-      "publishedAt": null
+      "targetUrl": "/blog/ai-for-designers",
+      "publishedAt": "2026-08-13"
     },
     {
       "queueOrder": 27,

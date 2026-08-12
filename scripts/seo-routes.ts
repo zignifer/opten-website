@@ -20,6 +20,7 @@ import { post as aiFreelanceServicesGuide } from "../src/content/blog/ai-freelan
 import { post as makeMoneyWithAiGuide } from "../src/content/blog/make-money-with-ai";
 import { post as whereToFindAiClientsGuide } from "../src/content/blog/where-to-find-ai-clients";
 import { post as seoPipelineWordstatCodexGuide } from "../src/content/blog/seo-pipeline-wordstat-codex";
+import { post as aiForDesignersGuide } from "../src/content/blog/ai-for-designers";
 import { post as aiForBusinessGuide } from "../src/content/blog/ai-for-business";
 import { post as aiMarketplaceCardsGuide } from "../src/content/blog/ai-marketplace-cards";
 import { post as upworkStart2026Guide } from "../src/content/blog/upwork-start-2026-checklist";
@@ -1389,6 +1390,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/ai-for-designers`, name: aiForDesignersGuide.ru.title, datePublished: aiForDesignersGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-for-business`, name: aiForBusinessGuide.ru.title, datePublished: aiForBusinessGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-marketplace-cards`, name: aiMarketplaceCardsGuide.ru.title, datePublished: aiMarketplaceCardsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex`, name: seoPipelineWordstatCodexGuide.ru.title, datePublished: seoPipelineWordstatCodexGuide.ru.publishedAt },
@@ -1442,6 +1444,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/ai-for-designers.
+  {
+    path: "/blog/ai-for-designers",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/ai-for-designers`, en: `${SITE_ORIGIN}/en/blog/ai-for-designers`, xDefault: `${SITE_ORIGIN}/blog/ai-for-designers` },
+    title: aiForDesignersGuide.ru.title,
+    description: aiForDesignersGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-for-designers`,
+    ogTitle: aiForDesignersGuide.ru.title,
+    ogDescription: aiForDesignersGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiForDesignersGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/ai-for-designers`, headline: aiForDesignersGuide.ru.title, description: aiForDesignersGuide.ru.description, datePublished: aiForDesignersGuide.ru.publishedAt, dateModified: aiForDesignersGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: aiForDesignersGuide.ru.tags, image: { url: `${SITE_ORIGIN}${aiForDesignersGuide.ru.cover.src}`, width: aiForDesignersGuide.ru.cover.width, height: aiForDesignersGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/ai-for-designers`, url: `${SITE_ORIGIN}/blog/ai-for-designers`, name: aiForDesignersGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((aiForDesignersGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/ai-for-designers`, aiForDesignersGuide.ru.title),
+      faqPageBlock(aiForDesignersGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-for-designers`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: aiForDesignersGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-for-designers` }], `${SITE_ORIGIN}/blog/ai-for-designers`),
     ],
   },
 
@@ -3455,6 +3479,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/ai-for-designers`, name: aiForDesignersGuide.en.title, datePublished: aiForDesignersGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-for-business`, name: aiForBusinessGuide.en.title, datePublished: aiForBusinessGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-marketplace-cards`, name: aiMarketplaceCardsGuide.en.title, datePublished: aiMarketplaceCardsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex`, name: seoPipelineWordstatCodexGuide.en.title, datePublished: seoPipelineWordstatCodexGuide.en.publishedAt },
@@ -3508,6 +3533,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/ai-for-designers EN sibling.
+  {
+    path: "/en/blog/ai-for-designers",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/ai-for-designers`, en: `${SITE_ORIGIN}/en/blog/ai-for-designers`, xDefault: `${SITE_ORIGIN}/blog/ai-for-designers` },
+    title: aiForDesignersGuide.en.title,
+    description: aiForDesignersGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-for-designers`,
+    ogTitle: aiForDesignersGuide.en.title,
+    ogDescription: aiForDesignersGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiForDesignersGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/ai-for-designers`, headline: aiForDesignersGuide.en.title, description: aiForDesignersGuide.en.description, datePublished: aiForDesignersGuide.en.publishedAt, dateModified: aiForDesignersGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: aiForDesignersGuide.en.tags, image: { url: `${SITE_ORIGIN}${aiForDesignersGuide.en.cover.src}`, width: aiForDesignersGuide.en.cover.width, height: aiForDesignersGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/ai-for-designers`, url: `${SITE_ORIGIN}/en/blog/ai-for-designers`, name: aiForDesignersGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((aiForDesignersGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/ai-for-designers`, aiForDesignersGuide.en.title),
+      faqPageBlock(aiForDesignersGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-for-designers`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: aiForDesignersGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-for-designers` }], `${SITE_ORIGIN}/en/blog/ai-for-designers`),
     ],
   },
 
