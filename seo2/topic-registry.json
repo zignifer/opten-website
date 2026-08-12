@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-06",
+  "updatedAt": "2026-08-13",
   "selectionPolicy": "queued-by-queueOrder-then-deferred",
   "research": {
     "rule": "Synthetic seeds discover wording; only Suggest, Wordstat, Bing, GSC, or reviewed manual evidence can create a queued topic.",
@@ -2128,7 +2128,7 @@
     {
       "queueOrder": 24,
       "slug": "ai-marketplace-cards",
-      "status": "queued",
+      "status": "published",
       "titleHint": "Нейросети для маркетплейсов: карточки товаров, описания и визуалы",
       "clusterId": "BL-commerce",
       "intentType": "guide",
@@ -2198,8 +2198,8 @@
         "note": "Imported Yandex Wordstat RU evidence",
         "lastCheckedAt": "2026-06-28"
       },
-      "targetUrl": null,
-      "publishedAt": null
+      "targetUrl": "/blog/ai-marketplace-cards",
+      "publishedAt": "2026-08-13"
     },
     {
       "queueOrder": 25,

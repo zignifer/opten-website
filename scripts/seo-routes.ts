@@ -20,6 +20,7 @@ import { post as aiFreelanceServicesGuide } from "../src/content/blog/ai-freelan
 import { post as makeMoneyWithAiGuide } from "../src/content/blog/make-money-with-ai";
 import { post as whereToFindAiClientsGuide } from "../src/content/blog/where-to-find-ai-clients";
 import { post as seoPipelineWordstatCodexGuide } from "../src/content/blog/seo-pipeline-wordstat-codex";
+import { post as aiMarketplaceCardsGuide } from "../src/content/blog/ai-marketplace-cards";
 import { post as upworkStart2026Guide } from "../src/content/blog/upwork-start-2026-checklist";
 import { post as aiHeadshotGeneratorGuide } from "../src/content/blog/ai-headshot-generator";
 import { post as aiUgcForBrandsGuide } from "../src/content/blog/ai-ugc-for-brands";
@@ -1387,6 +1388,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/ai-marketplace-cards`, name: aiMarketplaceCardsGuide.ru.title, datePublished: aiMarketplaceCardsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/seo-pipeline-wordstat-codex`, name: seoPipelineWordstatCodexGuide.ru.title, datePublished: seoPipelineWordstatCodexGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/where-to-find-ai-clients`, name: whereToFindAiClientsGuide.ru.title, datePublished: whereToFindAiClientsGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/make-money-with-ai`, name: makeMoneyWithAiGuide.ru.title, datePublished: makeMoneyWithAiGuide.ru.publishedAt },
@@ -1438,6 +1440,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/ai-marketplace-cards.
+  {
+    path: "/blog/ai-marketplace-cards",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/ai-marketplace-cards`, en: `${SITE_ORIGIN}/en/blog/ai-marketplace-cards`, xDefault: `${SITE_ORIGIN}/blog/ai-marketplace-cards` },
+    title: aiMarketplaceCardsGuide.ru.title,
+    description: aiMarketplaceCardsGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/ai-marketplace-cards`,
+    ogTitle: aiMarketplaceCardsGuide.ru.title,
+    ogDescription: aiMarketplaceCardsGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiMarketplaceCardsGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/ai-marketplace-cards`, headline: aiMarketplaceCardsGuide.ru.title, description: aiMarketplaceCardsGuide.ru.description, datePublished: aiMarketplaceCardsGuide.ru.publishedAt, dateModified: aiMarketplaceCardsGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: aiMarketplaceCardsGuide.ru.tags, image: { url: `${SITE_ORIGIN}${aiMarketplaceCardsGuide.ru.cover.src}`, width: aiMarketplaceCardsGuide.ru.cover.width, height: aiMarketplaceCardsGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/ai-marketplace-cards`, url: `${SITE_ORIGIN}/blog/ai-marketplace-cards`, name: aiMarketplaceCardsGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((aiMarketplaceCardsGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/ai-marketplace-cards`, aiMarketplaceCardsGuide.ru.title),
+      faqPageBlock(aiMarketplaceCardsGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/ai-marketplace-cards`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: aiMarketplaceCardsGuide.ru.title, url: `${SITE_ORIGIN}/blog/ai-marketplace-cards` }], `${SITE_ORIGIN}/blog/ai-marketplace-cards`),
     ],
   },
 
@@ -3407,6 +3431,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/ai-marketplace-cards`, name: aiMarketplaceCardsGuide.en.title, datePublished: aiMarketplaceCardsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/seo-pipeline-wordstat-codex`, name: seoPipelineWordstatCodexGuide.en.title, datePublished: seoPipelineWordstatCodexGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/where-to-find-ai-clients`, name: whereToFindAiClientsGuide.en.title, datePublished: whereToFindAiClientsGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/make-money-with-ai`, name: makeMoneyWithAiGuide.en.title, datePublished: makeMoneyWithAiGuide.en.publishedAt },
@@ -3458,6 +3483,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/ai-marketplace-cards EN sibling.
+  {
+    path: "/en/blog/ai-marketplace-cards",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/ai-marketplace-cards`, en: `${SITE_ORIGIN}/en/blog/ai-marketplace-cards`, xDefault: `${SITE_ORIGIN}/blog/ai-marketplace-cards` },
+    title: aiMarketplaceCardsGuide.en.title,
+    description: aiMarketplaceCardsGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/ai-marketplace-cards`,
+    ogTitle: aiMarketplaceCardsGuide.en.title,
+    ogDescription: aiMarketplaceCardsGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${aiMarketplaceCardsGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/ai-marketplace-cards`, headline: aiMarketplaceCardsGuide.en.title, description: aiMarketplaceCardsGuide.en.description, datePublished: aiMarketplaceCardsGuide.en.publishedAt, dateModified: aiMarketplaceCardsGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: aiMarketplaceCardsGuide.en.tags, image: { url: `${SITE_ORIGIN}${aiMarketplaceCardsGuide.en.cover.src}`, width: aiMarketplaceCardsGuide.en.cover.width, height: aiMarketplaceCardsGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/ai-marketplace-cards`, url: `${SITE_ORIGIN}/en/blog/ai-marketplace-cards`, name: aiMarketplaceCardsGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((aiMarketplaceCardsGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/ai-marketplace-cards`, aiMarketplaceCardsGuide.en.title),
+      faqPageBlock(aiMarketplaceCardsGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/ai-marketplace-cards`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: aiMarketplaceCardsGuide.en.title, url: `${SITE_ORIGIN}/en/blog/ai-marketplace-cards` }], `${SITE_ORIGIN}/en/blog/ai-marketplace-cards`),
     ],
   },
 

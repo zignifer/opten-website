@@ -21,6 +21,7 @@ const STATIC_EN_SIBLINGS: readonly string[] = [
   "/refund",
   "/about", // Phase 4.1 B-03
   "/blog", // Phase 5 B-04
+  "/blog/ai-marketplace-cards", // seo2 manual blog automation
   "/blog/seo-pipeline-wordstat-codex", // editorial SEO automation guide
   "/blog/upwork-start-2026-checklist", // editorial longform guide
   "/blog/where-to-find-ai-clients", // seo2 manual blog automation
