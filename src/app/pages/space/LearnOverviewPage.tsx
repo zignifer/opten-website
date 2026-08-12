@@ -155,7 +155,7 @@ const courseAuthor = {
 const featuredCoursePromo = {
   coverPath: "/assets/learn/video/actual-ai-tools-2026-poster.jpg",
   title: {
-    ru: PRIVATE_COURSE_TITLE_RU.replace(" по ", "\nпо "),
+    ru: PRIVATE_COURSE_TITLE_RU,
     en: PRIVATE_COURSE_TITLE_EN,
   },
   description: {
@@ -246,7 +246,7 @@ export default function LearnOverviewPage() {
 
           <HeroVideoCard lang={lang} className="mt-[51px] max-[1119px]:max-w-[552px] max-md:mt-[30px] min-[1120px]:col-start-1 min-[1120px]:row-start-2" />
           <article className="mt-[51px] flex min-h-[310px] flex-col justify-center max-[1119px]:max-w-[552px] max-md:mt-[20px] max-md:min-h-0 max-md:items-stretch max-md:text-left min-[1120px]:col-start-2 min-[1120px]:row-start-2 min-[1120px]:w-[215px] min-[1120px]:max-w-[215px] min-[1120px]:-ml-[18px]">
-            <h2 className="text-[21px] font-bold leading-tight text-white max-md:text-[24px] min-[1120px]:whitespace-pre-line">
+            <h2 className="whitespace-nowrap text-[21px] font-bold leading-tight text-white max-md:text-[24px]">
               {featuredCoursePromo.title[lang]}
             </h2>
             <p className="mt-[15px] text-[14px] leading-[1.55] text-white/55 min-[1120px]:whitespace-pre-line">
