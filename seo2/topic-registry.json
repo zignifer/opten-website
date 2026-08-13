@@ -2533,7 +2533,7 @@
     {
       "queueOrder": 29,
       "slug": "prompt-engineering-course",
-      "status": "queued",
+      "status": "published",
       "titleHint": "Prompt engineering course: как учиться промптам через практические задачи",
       "clusterId": "BL-prompting",
       "intentType": "guide",
@@ -2603,8 +2603,8 @@
         "note": "Imported Bing EN and prompt keyword evidence",
         "lastCheckedAt": "2026-06-28"
       },
-      "targetUrl": null,
-      "publishedAt": null
+      "targetUrl": "/blog/prompt-engineering-course",
+      "publishedAt": "2026-08-14"
     },
     {
       "queueOrder": 30,

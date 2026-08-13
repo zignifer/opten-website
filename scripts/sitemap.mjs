@@ -54,6 +54,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/prompt-engineering-course":        "src/content/blog/prompt-engineering-course.ts",
+  "/en/blog/prompt-engineering-course":     "src/content/blog/prompt-engineering-course.ts",
   "/blog/figma-course-beginners":        "src/content/blog/figma-course-beginners.ts",
   "/en/blog/figma-course-beginners":     "src/content/blog/figma-course-beginners.ts",
   "/blog/web-design-with-ai":        "src/content/blog/web-design-with-ai.ts",

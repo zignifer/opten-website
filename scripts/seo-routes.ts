@@ -20,6 +20,7 @@ import { post as aiFreelanceServicesGuide } from "../src/content/blog/ai-freelan
 import { post as makeMoneyWithAiGuide } from "../src/content/blog/make-money-with-ai";
 import { post as whereToFindAiClientsGuide } from "../src/content/blog/where-to-find-ai-clients";
 import { post as seoPipelineWordstatCodexGuide } from "../src/content/blog/seo-pipeline-wordstat-codex";
+import { post as promptEngineeringCourseGuide } from "../src/content/blog/prompt-engineering-course";
 import { post as figmaCourseBeginnersGuide } from "../src/content/blog/figma-course-beginners";
 import { post as webDesignWithAiGuide } from "../src/content/blog/web-design-with-ai";
 import { post as aiForDesignersGuide } from "../src/content/blog/ai-for-designers";
@@ -1392,6 +1393,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/prompt-engineering-course`, name: promptEngineeringCourseGuide.ru.title, datePublished: promptEngineeringCourseGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/figma-course-beginners`, name: figmaCourseBeginnersGuide.ru.title, datePublished: figmaCourseBeginnersGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/web-design-with-ai`, name: webDesignWithAiGuide.ru.title, datePublished: webDesignWithAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-for-designers`, name: aiForDesignersGuide.ru.title, datePublished: aiForDesignersGuide.ru.publishedAt },
@@ -1448,6 +1450,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/prompt-engineering-course.
+  {
+    path: "/blog/prompt-engineering-course",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/prompt-engineering-course`, en: `${SITE_ORIGIN}/en/blog/prompt-engineering-course`, xDefault: `${SITE_ORIGIN}/blog/prompt-engineering-course` },
+    title: promptEngineeringCourseGuide.ru.title,
+    description: promptEngineeringCourseGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/prompt-engineering-course`,
+    ogTitle: promptEngineeringCourseGuide.ru.title,
+    ogDescription: promptEngineeringCourseGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${promptEngineeringCourseGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/prompt-engineering-course`, headline: promptEngineeringCourseGuide.ru.title, description: promptEngineeringCourseGuide.ru.description, datePublished: promptEngineeringCourseGuide.ru.publishedAt, dateModified: promptEngineeringCourseGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: promptEngineeringCourseGuide.ru.tags, image: { url: `${SITE_ORIGIN}${promptEngineeringCourseGuide.ru.cover.src}`, width: promptEngineeringCourseGuide.ru.cover.width, height: promptEngineeringCourseGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/prompt-engineering-course`, url: `${SITE_ORIGIN}/blog/prompt-engineering-course`, name: promptEngineeringCourseGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((promptEngineeringCourseGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/prompt-engineering-course`, promptEngineeringCourseGuide.ru.title),
+      faqPageBlock(promptEngineeringCourseGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/prompt-engineering-course`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: promptEngineeringCourseGuide.ru.title, url: `${SITE_ORIGIN}/blog/prompt-engineering-course` }], `${SITE_ORIGIN}/blog/prompt-engineering-course`),
     ],
   },
 
@@ -3527,6 +3551,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/prompt-engineering-course`, name: promptEngineeringCourseGuide.en.title, datePublished: promptEngineeringCourseGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/figma-course-beginners`, name: figmaCourseBeginnersGuide.en.title, datePublished: figmaCourseBeginnersGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/web-design-with-ai`, name: webDesignWithAiGuide.en.title, datePublished: webDesignWithAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-for-designers`, name: aiForDesignersGuide.en.title, datePublished: aiForDesignersGuide.en.publishedAt },
@@ -3583,6 +3608,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/prompt-engineering-course EN sibling.
+  {
+    path: "/en/blog/prompt-engineering-course",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/prompt-engineering-course`, en: `${SITE_ORIGIN}/en/blog/prompt-engineering-course`, xDefault: `${SITE_ORIGIN}/blog/prompt-engineering-course` },
+    title: promptEngineeringCourseGuide.en.title,
+    description: promptEngineeringCourseGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/prompt-engineering-course`,
+    ogTitle: promptEngineeringCourseGuide.en.title,
+    ogDescription: promptEngineeringCourseGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${promptEngineeringCourseGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/prompt-engineering-course`, headline: promptEngineeringCourseGuide.en.title, description: promptEngineeringCourseGuide.en.description, datePublished: promptEngineeringCourseGuide.en.publishedAt, dateModified: promptEngineeringCourseGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: promptEngineeringCourseGuide.en.tags, image: { url: `${SITE_ORIGIN}${promptEngineeringCourseGuide.en.cover.src}`, width: promptEngineeringCourseGuide.en.cover.width, height: promptEngineeringCourseGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/prompt-engineering-course`, url: `${SITE_ORIGIN}/en/blog/prompt-engineering-course`, name: promptEngineeringCourseGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((promptEngineeringCourseGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/prompt-engineering-course`, promptEngineeringCourseGuide.en.title),
+      faqPageBlock(promptEngineeringCourseGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/prompt-engineering-course`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: promptEngineeringCourseGuide.en.title, url: `${SITE_ORIGIN}/en/blog/prompt-engineering-course` }], `${SITE_ORIGIN}/en/blog/prompt-engineering-course`),
     ],
   },
 
