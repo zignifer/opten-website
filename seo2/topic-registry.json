@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-13",
+  "updatedAt": "2026-08-14",
   "selectionPolicy": "queued-by-queueOrder-then-deferred",
   "research": {
     "rule": "Synthetic seeds discover wording; only Suggest, Wordstat, Bing, GSC, or reviewed manual evidence can create a queued topic.",
@@ -2364,7 +2364,7 @@
     {
       "queueOrder": 27,
       "slug": "web-design-with-ai",
-      "status": "queued",
+      "status": "published",
       "titleHint": "Курсы веб-дизайна и ИИ: как учиться дизайну сайтов на практике",
       "clusterId": "BL-design",
       "intentType": "guide",
@@ -2442,8 +2442,8 @@
         "note": "Imported Yandex Wordstat RU evidence",
         "lastCheckedAt": "2026-06-28"
       },
-      "targetUrl": null,
-      "publishedAt": null
+      "targetUrl": "/blog/web-design-with-ai",
+      "publishedAt": "2026-08-14"
     },
     {
       "queueOrder": 28,

@@ -54,6 +54,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/web-design-with-ai":        "src/content/blog/web-design-with-ai.ts",
+  "/en/blog/web-design-with-ai":     "src/content/blog/web-design-with-ai.ts",
   "/blog/ai-for-designers":        "src/content/blog/ai-for-designers.ts",
   "/en/blog/ai-for-designers":     "src/content/blog/ai-for-designers.ts",
   "/blog/ai-for-business":         "src/content/blog/ai-for-business.ts",
