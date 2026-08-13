@@ -958,6 +958,11 @@ Non-negotiables (the full set lives in `docs/CONTENT-AUTHORING.md`):
     After `npm run build`, run `npm run verify:blog-seo -- <slug>` to assert the
     prerendered DOM/metadata/schema contract for both `/blog/<slug>` and
     `/en/blog/<slug>`. A normal build is not enough for SEO2 posts.
+16. New SEO2 posts must not use the paired `before`/`after` step fields, visible
+    «Было / Стало» or `Before / After` blocks, or the same comparison labels in
+    inline images. Show the final useful example as a standalone prompt,
+    checklist, sequence, annotated result, or another structure that does not
+    recreate this pair. Existing published articles and assets stay unchanged.
 
 **The full playbook with route-registration checklist, schema graph rules, image conventions, and a list of optimizations that have already been tried and rejected: [docs/CONTENT-AUTHORING.md](docs/CONTENT-AUTHORING.md).** Open this file alongside `seo-routes.ts` whenever adding a new page.
 

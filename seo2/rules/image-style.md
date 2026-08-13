@@ -54,7 +54,7 @@ aesthetic, cinematic, no text, 16:9.
   generate the EN sibling with the exact English text while preserving the same
   composition, camera, lighting, object, and color palette.
 - Text: one large hero label plus an information layer: 3-4 short supporting
-  labels, checklist rows, micro-cards, score chips, before/after markers, flow
+  labels, checklist rows, micro-cards, score chips, flow
   nodes, or anatomy callouts. All text must be rendered by the image model into
   the final raster.
 - Visual-first: strong object/result first, explanatory labels second. The image
@@ -80,6 +80,8 @@ Avoid:
 - title-only images where the only meaningful text is one big word or headline;
 - decorative icons without readable explanatory labels;
 - paragraphs of text inside images;
+- paired «Было / Стало» or `Before / After` labels and equivalent comparison
+  pairs under different headings;
 - adding text after generation with an editor, Canvas, HTML/CSS, Sharp, or any
   other overlay/post-processing step;
 - Opten UI / score / PromptScore / extension sales panels;
