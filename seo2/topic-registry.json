@@ -2448,7 +2448,7 @@
     {
       "queueOrder": 28,
       "slug": "figma-course-beginners",
-      "status": "queued",
+      "status": "published",
       "titleHint": "Figma с нуля: как учиться интерфейсам и использовать ИИ в дизайне",
       "clusterId": "BL-design",
       "intentType": "guide",
@@ -2527,8 +2527,8 @@
         "note": "Imported Yandex Wordstat RU and Bing EN evidence",
         "lastCheckedAt": "2026-06-28"
       },
-      "targetUrl": null,
-      "publishedAt": null
+      "targetUrl": "/blog/figma-course-beginners",
+      "publishedAt": "2026-08-14"
     },
     {
       "queueOrder": 29,

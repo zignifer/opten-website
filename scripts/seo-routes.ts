@@ -20,6 +20,7 @@ import { post as aiFreelanceServicesGuide } from "../src/content/blog/ai-freelan
 import { post as makeMoneyWithAiGuide } from "../src/content/blog/make-money-with-ai";
 import { post as whereToFindAiClientsGuide } from "../src/content/blog/where-to-find-ai-clients";
 import { post as seoPipelineWordstatCodexGuide } from "../src/content/blog/seo-pipeline-wordstat-codex";
+import { post as figmaCourseBeginnersGuide } from "../src/content/blog/figma-course-beginners";
 import { post as webDesignWithAiGuide } from "../src/content/blog/web-design-with-ai";
 import { post as aiForDesignersGuide } from "../src/content/blog/ai-for-designers";
 import { post as aiForBusinessGuide } from "../src/content/blog/ai-for-business";
@@ -1391,6 +1392,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/figma-course-beginners`, name: figmaCourseBeginnersGuide.ru.title, datePublished: figmaCourseBeginnersGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/web-design-with-ai`, name: webDesignWithAiGuide.ru.title, datePublished: webDesignWithAiGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-for-designers`, name: aiForDesignersGuide.ru.title, datePublished: aiForDesignersGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/ai-for-business`, name: aiForBusinessGuide.ru.title, datePublished: aiForBusinessGuide.ru.publishedAt },
@@ -1446,6 +1448,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/figma-course-beginners.
+  {
+    path: "/blog/figma-course-beginners",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/figma-course-beginners`, en: `${SITE_ORIGIN}/en/blog/figma-course-beginners`, xDefault: `${SITE_ORIGIN}/blog/figma-course-beginners` },
+    title: figmaCourseBeginnersGuide.ru.title,
+    description: figmaCourseBeginnersGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/figma-course-beginners`,
+    ogTitle: figmaCourseBeginnersGuide.ru.title,
+    ogDescription: figmaCourseBeginnersGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${figmaCourseBeginnersGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/figma-course-beginners`, headline: figmaCourseBeginnersGuide.ru.title, description: figmaCourseBeginnersGuide.ru.description, datePublished: figmaCourseBeginnersGuide.ru.publishedAt, dateModified: figmaCourseBeginnersGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: figmaCourseBeginnersGuide.ru.tags, image: { url: `${SITE_ORIGIN}${figmaCourseBeginnersGuide.ru.cover.src}`, width: figmaCourseBeginnersGuide.ru.cover.width, height: figmaCourseBeginnersGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/figma-course-beginners`, url: `${SITE_ORIGIN}/blog/figma-course-beginners`, name: figmaCourseBeginnersGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((figmaCourseBeginnersGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/figma-course-beginners`, figmaCourseBeginnersGuide.ru.title),
+      faqPageBlock(figmaCourseBeginnersGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/figma-course-beginners`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: figmaCourseBeginnersGuide.ru.title, url: `${SITE_ORIGIN}/blog/figma-course-beginners` }], `${SITE_ORIGIN}/blog/figma-course-beginners`),
     ],
   },
 
@@ -3503,6 +3527,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/figma-course-beginners`, name: figmaCourseBeginnersGuide.en.title, datePublished: figmaCourseBeginnersGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/web-design-with-ai`, name: webDesignWithAiGuide.en.title, datePublished: webDesignWithAiGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-for-designers`, name: aiForDesignersGuide.en.title, datePublished: aiForDesignersGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/ai-for-business`, name: aiForBusinessGuide.en.title, datePublished: aiForBusinessGuide.en.publishedAt },
@@ -3558,6 +3583,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/figma-course-beginners EN sibling.
+  {
+    path: "/en/blog/figma-course-beginners",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/figma-course-beginners`, en: `${SITE_ORIGIN}/en/blog/figma-course-beginners`, xDefault: `${SITE_ORIGIN}/blog/figma-course-beginners` },
+    title: figmaCourseBeginnersGuide.en.title,
+    description: figmaCourseBeginnersGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/figma-course-beginners`,
+    ogTitle: figmaCourseBeginnersGuide.en.title,
+    ogDescription: figmaCourseBeginnersGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${figmaCourseBeginnersGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/figma-course-beginners`, headline: figmaCourseBeginnersGuide.en.title, description: figmaCourseBeginnersGuide.en.description, datePublished: figmaCourseBeginnersGuide.en.publishedAt, dateModified: figmaCourseBeginnersGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: figmaCourseBeginnersGuide.en.tags, image: { url: `${SITE_ORIGIN}${figmaCourseBeginnersGuide.en.cover.src}`, width: figmaCourseBeginnersGuide.en.cover.width, height: figmaCourseBeginnersGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/figma-course-beginners`, url: `${SITE_ORIGIN}/en/blog/figma-course-beginners`, name: figmaCourseBeginnersGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((figmaCourseBeginnersGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/figma-course-beginners`, figmaCourseBeginnersGuide.en.title),
+      faqPageBlock(figmaCourseBeginnersGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/figma-course-beginners`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: figmaCourseBeginnersGuide.en.title, url: `${SITE_ORIGIN}/en/blog/figma-course-beginners` }], `${SITE_ORIGIN}/en/blog/figma-course-beginners`),
     ],
   },
 
