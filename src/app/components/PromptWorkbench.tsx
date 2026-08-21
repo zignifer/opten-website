@@ -558,7 +558,11 @@ export default function PromptWorkbench() {
           <p className="hidden text-white/30 md:col-start-2 md:block">
             {text.poweredBy}<span className="text-white/90">Claude Opus 5</span>
           </p>
-          <span aria-hidden="true" className="hidden size-[5px] rounded-full bg-white/35 md:col-start-3 md:block" />
+          <span
+            aria-hidden="true"
+            className="hidden bg-white/35 md:col-start-3 md:block"
+            style={{ width: 5, height: 5, minWidth: 5, minHeight: 5, borderRadius: "50%" }}
+          />
           <p suppressHydrationWarning className="col-start-2 row-start-1 shrink-0 text-white/30 md:col-start-4">
             {text.updated}{formatLocalDate(today)}
           </p>
