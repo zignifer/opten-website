@@ -189,8 +189,11 @@ sitemap URLs as the allowed graph and `/` as the BFS root:
 The original 22 priority URLs now have depths 1-3. The full production build
 also passed the content registry, prerender (256 routes), sitemap, llms.txt,
 FAQ visible/schema parity (210 routes, 1,267 questions), and font validators.
-The build's normal IndexNow notification returned HTTP 200; no Google URL
-Inspection indexing request or GSC sitemap resubmission was made.
+The build's normal IndexNow notification returned HTTP 200. After production
+verification, `https://opten.space/sitemap.xml` was submitted once to the
+`sc-domain:opten.space` property (HTTP 204). GSC downloaded it immediately at
+2026-08-21T07:12:00.885Z with zero warnings and zero errors. No Google URL
+Inspection indexing request was made.
 
 ## Reauthorization and repeatable tooling
 
