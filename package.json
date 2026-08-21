@@ -11,6 +11,7 @@
     "seo:keywords": "node scripts/collect-seo-keywords.mjs",
     "gsc:refresh-auth": "node scripts/gsc-oauth-refresh.mjs",
     "gsc:inspect": "node scripts/gsc.mjs inspect",
+    "gsc:inspect-sitemap": "node scripts/gsc.mjs inspect-sitemap",
     "gsc:performance": "node scripts/gsc.mjs performance",
     "gsc:queries": "node scripts/gsc.mjs queries",
     "gsc:sitemaps": "node scripts/gsc.mjs sitemaps",

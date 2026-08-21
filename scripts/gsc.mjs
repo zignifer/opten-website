@@ -1,10 +1,13 @@
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const ROOT = resolve(import.meta.dirname, "..");
 const DEFAULT_ENV_PATH = resolve(ROOT, ".secrets", "gsc-oauth.env");
 const DEFAULT_SITE = "sc-domain:opten.space";
 const DEFAULT_SITEMAP = "https://opten.space/sitemap.xml";
+const DEFAULT_INSPECTION_REPORT = resolve(ROOT, ".secrets", "gsc-inspection-latest.json");
+const INSPECTION_CONCURRENCY = 8;
+const GOOGLE_REQUEST_TIMEOUT_MS = 30_000;
 
 function parseEnv(raw) {
   const out = {};
@@ -54,12 +57,14 @@ async function accessToken(config) {
 }
 
 async function googleJson(url, token, options = {}) {
+  const { headers: optionHeaders = {}, ...fetchOptions } = options;
   const res = await fetch(url, {
-    ...options,
+    ...fetchOptions,
+    signal: options.signal || AbortSignal.timeout(GOOGLE_REQUEST_TIMEOUT_MS),
     headers: {
       Authorization: `Bearer ${token}`,
       ...(options.body ? { "Content-Type": "application/json" } : {}),
-      ...(options.headers || {}),
+      ...optionHeaders,
     },
   });
   if (res.status === 204) return { status: res.status, body: null };
@@ -92,8 +97,7 @@ async function submitSitemap(token, config, sitemapUrl = DEFAULT_SITEMAP) {
   console.log(JSON.stringify({ siteUrl: config.siteUrl, sitemapUrl, status, submitted: status === 204 }, null, 2));
 }
 
-async function inspect(token, config, inspectionUrl) {
-  if (!inspectionUrl) throw new Error("Usage: node scripts/gsc.mjs inspect https://opten.space/path");
+async function inspectUrl(token, config, inspectionUrl) {
   const { body } = await googleJson("https://searchconsole.googleapis.com/v1/urlInspection/index:inspect", token, {
     method: "POST",
     body: JSON.stringify({
@@ -102,7 +106,7 @@ async function inspect(token, config, inspectionUrl) {
     }),
   });
   const idx = body.inspectionResult?.indexStatusResult;
-  console.log(JSON.stringify({
+  return {
     inspectionUrl,
     verdict: idx?.verdict,
     coverageState: idx?.coverageState,
@@ -114,6 +118,93 @@ async function inspect(token, config, inspectionUrl) {
     lastCrawlTime: idx?.lastCrawlTime,
     sitemap: idx?.sitemap,
     referringUrls: idx?.referringUrls,
+  };
+}
+
+async function inspect(token, config, inspectionUrl) {
+  if (!inspectionUrl) throw new Error("Usage: node scripts/gsc.mjs inspect https://opten.space/path");
+  console.log(JSON.stringify(await inspectUrl(token, config, inspectionUrl), null, 2));
+}
+
+function decodeXml(value) {
+  return value
+    .replaceAll("&amp;", "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&apos;", "'");
+}
+
+async function inspectSitemap(token, config, sitemapUrl = DEFAULT_SITEMAP) {
+  const sitemapRes = await fetch(sitemapUrl);
+  if (!sitemapRes.ok) throw new Error(`Sitemap fetch failed: ${sitemapRes.status} ${sitemapRes.statusText}`);
+  const xml = await sitemapRes.text();
+  const urls = [...xml.matchAll(/<loc>([\s\S]*?)<\/loc>/g)]
+    .map((match) => decodeXml(match[1].trim()))
+    .filter((url) => url.startsWith("https://opten.space/"));
+  if (urls.length === 0) throw new Error(`No opten.space URLs found in ${sitemapUrl}`);
+
+  const results = new Array(urls.length);
+  let nextIndex = 0;
+  let completed = 0;
+  async function worker() {
+    while (nextIndex < urls.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      const inspectionUrl = urls[index];
+      try {
+        results[index] = await inspectUrl(token, config, inspectionUrl);
+      } catch (error) {
+        results[index] = { inspectionUrl, error: String(error?.message || error) };
+      } finally {
+        completed += 1;
+        if (completed % 25 === 0 || completed === urls.length) {
+          console.error(`gsc inspect-sitemap: ${completed}/${urls.length}`);
+        }
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: INSPECTION_CONCURRENCY }, () => worker()));
+
+  const byCoverageState = {};
+  const byVerdict = {};
+  for (const result of results) {
+    const coverageState = result.coverageState || (result.error ? "Inspection error" : "Unknown");
+    const verdict = result.verdict || (result.error ? "ERROR" : "UNKNOWN");
+    byCoverageState[coverageState] = (byCoverageState[coverageState] || 0) + 1;
+    byVerdict[verdict] = (byVerdict[verdict] || 0) + 1;
+  }
+
+  const examplesByCoverageState = Object.fromEntries(
+    Object.keys(byCoverageState).map((coverageState) => [
+      coverageState,
+      results
+        .filter((result) =>
+          (result.coverageState || (result.error ? "Inspection error" : "Unknown")) === coverageState,
+        )
+        .slice(0, 10)
+        .map((result) => result.inspectionUrl),
+    ]),
+  );
+  const report = {
+    generatedAt: new Date().toISOString(),
+    siteUrl: config.siteUrl,
+    sitemapUrl,
+    total: results.length,
+    byVerdict,
+    byCoverageState,
+    results,
+  };
+  await writeFile(DEFAULT_INSPECTION_REPORT, JSON.stringify(report, null, 2), "utf8");
+  console.log(JSON.stringify({
+    generatedAt: report.generatedAt,
+    siteUrl: report.siteUrl,
+    sitemapUrl: report.sitemapUrl,
+    total: report.total,
+    byVerdict,
+    byCoverageState,
+    examplesByCoverageState,
+    reportPath: DEFAULT_INSPECTION_REPORT,
   }, null, 2));
 }
 
@@ -169,6 +260,7 @@ async function main() {
       "  node scripts/gsc.mjs sitemaps",
       "  node scripts/gsc.mjs submit-sitemap [sitemapUrl]",
       "  node scripts/gsc.mjs inspect https://opten.space/path",
+      "  node scripts/gsc.mjs inspect-sitemap [sitemapUrl]",
       "  node scripts/gsc.mjs performance [days]",
       "  node scripts/gsc.mjs queries [days]",
     ].join("\n"));
@@ -182,6 +274,7 @@ async function main() {
   if (command === "sitemaps") return sitemaps(token, config);
   if (command === "submit-sitemap") return submitSitemap(token, config, arg);
   if (command === "inspect") return inspect(token, config, arg);
+  if (command === "inspect-sitemap") return inspectSitemap(token, config, arg);
   if (command === "performance") return performance(token, config, arg);
   if (command === "queries") return queries(token, config, arg);
   throw new Error(`Unknown command: ${command}`);

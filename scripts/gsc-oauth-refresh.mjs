@@ -11,6 +11,9 @@ const ROOT = resolve(__dirname, "..");
 const STATUS_PATH = resolve(ROOT, ".secrets", "gsc-oauth-refresh.status.json");
 const OUT_PATH = resolve(ROOT, ".secrets", "gsc-oauth-refresh.out.log");
 const ERR_PATH = resolve(ROOT, ".secrets", "gsc-oauth-refresh.err.log");
+const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
+const TOKEN_EXCHANGE_ATTEMPTS = 3;
+const TOKEN_EXCHANGE_RETRY_DELAYS_MS = [750, 2_000];
 const ENV_PATHS = [
   resolve(ROOT, ".secrets", "gsc-oauth.env"),
 ].filter((path, index, list) => existsSync(path) && list.indexOf(path) === index);
@@ -48,6 +51,58 @@ async function updateToken(refreshToken) {
   }
 }
 
+function formatError(error) {
+  const message = String(error?.message || error);
+  const causeCode = error?.cause?.code;
+  const causeMessage = error?.cause?.message;
+  return [message, causeCode, causeMessage].filter(Boolean).join(" | ");
+}
+
+async function exchangeAuthorizationCode(cfg, code, redirectUri) {
+  for (let attempt = 1; attempt <= TOKEN_EXCHANGE_ATTEMPTS; attempt += 1) {
+    let tokenRes;
+    try {
+      tokenRes = await fetch(TOKEN_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          client_id: cfg.GSC_CLIENT_ID,
+          client_secret: cfg.GSC_CLIENT_SECRET,
+          code,
+          redirect_uri: redirectUri,
+          grant_type: "authorization_code",
+        }),
+        signal: AbortSignal.timeout(20_000),
+      });
+    } catch (error) {
+      if (attempt === TOKEN_EXCHANGE_ATTEMPTS) {
+        throw new Error(
+          `Token transport failed after ${TOKEN_EXCHANGE_ATTEMPTS} attempts: ${formatError(error)}`,
+        );
+      }
+      await new Promise((resolveWait) =>
+        setTimeout(resolveWait, TOKEN_EXCHANGE_RETRY_DELAYS_MS[attempt - 1]),
+      );
+      continue;
+    }
+
+    const tokenBody = await tokenRes.json().catch(() => ({}));
+    if (tokenRes.ok && tokenBody.refresh_token) return tokenBody.refresh_token;
+
+    const retryableStatus = tokenRes.status === 429 || tokenRes.status >= 500;
+    if (retryableStatus && attempt < TOKEN_EXCHANGE_ATTEMPTS) {
+      await new Promise((resolveWait) =>
+        setTimeout(resolveWait, TOKEN_EXCHANGE_RETRY_DELAYS_MS[attempt - 1]),
+      );
+      continue;
+    }
+
+    throw new Error(`Token exchange failed: ${tokenBody.error || tokenRes.status}`);
+  }
+
+  throw new Error("Token exchange failed without a response");
+}
+
 async function serve() {
   try {
     const raw = await readFile(ENV_PATHS[0], "utf8");
@@ -72,23 +127,8 @@ async function serve() {
         if (!code) throw new Error("No OAuth code returned");
 
         const redirectUri = `http://127.0.0.1:${server.address().port}/oauth2callback`;
-        const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({
-            client_id: cfg.GSC_CLIENT_ID,
-            client_secret: cfg.GSC_CLIENT_SECRET,
-            code,
-            redirect_uri: redirectUri,
-            grant_type: "authorization_code",
-          }),
-        });
-        const tokenBody = await tokenRes.json();
-        if (!tokenRes.ok || !tokenBody.refresh_token) {
-          throw new Error(`Token exchange failed: ${tokenBody.error || tokenRes.status}`);
-        }
-
-        await updateToken(tokenBody.refresh_token);
+        const refreshToken = await exchangeAuthorizationCode(cfg, code, redirectUri);
+        await updateToken(refreshToken);
         await writeStatus({ status: "complete", updatedFiles: ENV_PATHS.length });
         res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }).end(
           "<h1>Search Console access refreshed</h1><p>You can close this tab and return to Codex.</p>",
@@ -96,8 +136,9 @@ async function serve() {
         clearTimeout(timeout);
         server.close(() => process.exit(0));
       } catch (error) {
-        await writeStatus({ status: "error", message: String(error.message || error) });
-        res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" }).end(String(error.message || error));
+        const message = formatError(error);
+        await writeStatus({ status: "error", message });
+        res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" }).end(message);
         clearTimeout(timeout);
         server.close(() => process.exit(1));
       }
@@ -128,7 +169,7 @@ async function serve() {
       server.close(() => process.exit(1));
     }, 600000);
   } catch (error) {
-    await writeStatus({ status: "error", message: String(error.message || error) });
+    await writeStatus({ status: "error", message: formatError(error) });
     process.exit(1);
   }
 }
