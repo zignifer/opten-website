@@ -32,13 +32,11 @@ export default function ExtensionVideoAvatar() {
     ? {
         region: "Opten video",
         play: "Play video with sound",
-        replay: "Watch from the beginning",
         close: "Collapse video",
       }
     : {
         region: "Видео об Opten",
         play: "Включить видео со звуком",
-        replay: "Посмотреть видео сначала",
         close: "Свернуть видео",
       };
 
@@ -60,20 +58,13 @@ export default function ExtensionVideoAvatar() {
     });
   }, [mode, fullVideoSrc]);
 
-  function playWithSound() {
-    const video = videoRef.current;
+  function toggleAvatar() {
     if (isIdle) {
       setMode("active");
       return;
     }
 
-    if (!video) return;
-    video.muted = false;
-    video.currentTime = 0;
-    video.play().catch(() => {
-      video.muted = true;
-      video.play().catch(() => {});
-    });
+    setMode("idle");
   }
 
   function closeAvatar(event: MouseEvent<HTMLButtonElement>) {
@@ -101,8 +92,8 @@ export default function ExtensionVideoAvatar() {
       <button
         className="opten-extension-avatar__media"
         type="button"
-        aria-label={isIdle ? label.play : label.replay}
-        onClick={playWithSound}
+        aria-label={isIdle ? label.play : label.close}
+        onClick={toggleAvatar}
       >
         <video
           key={activeVideoSrc}
