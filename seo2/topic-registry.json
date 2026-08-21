@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-14",
+  "updatedAt": "2026-08-21",
   "selectionPolicy": "queued-by-queueOrder-then-deferred",
   "research": {
     "rule": "Synthetic seeds discover wording; only Suggest, Wordstat, Bing, GSC, or reviewed manual evidence can create a queued topic.",
@@ -2609,7 +2609,7 @@
     {
       "queueOrder": 30,
       "slug": "best-ai-tools-for-work",
-      "status": "queued",
+      "status": "published",
       "titleHint": "Лучшие нейросети для работы: как выбрать AI-инструмент под задачу",
       "clusterId": "BL-work",
       "intentType": "guide",
@@ -2688,8 +2688,8 @@
         "note": "Imported Bing EN and Yandex Wordstat RU evidence",
         "lastCheckedAt": "2026-06-28"
       },
-      "targetUrl": null,
-      "publishedAt": null
+      "targetUrl": "/blog/best-ai-tools-for-work",
+      "publishedAt": "2026-08-21"
     },
     {
       "queueOrder": 31,

@@ -20,6 +20,7 @@ import { post as aiFreelanceServicesGuide } from "../src/content/blog/ai-freelan
 import { post as makeMoneyWithAiGuide } from "../src/content/blog/make-money-with-ai";
 import { post as whereToFindAiClientsGuide } from "../src/content/blog/where-to-find-ai-clients";
 import { post as seoPipelineWordstatCodexGuide } from "../src/content/blog/seo-pipeline-wordstat-codex";
+import { post as bestAiToolsForWorkGuide } from "../src/content/blog/best-ai-tools-for-work";
 import { post as promptEngineeringCourseGuide } from "../src/content/blog/prompt-engineering-course";
 import { post as figmaCourseBeginnersGuide } from "../src/content/blog/figma-course-beginners";
 import { post as webDesignWithAiGuide } from "../src/content/blog/web-design-with-ai";
@@ -1393,6 +1394,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /guides retired; ItemList points at the new /blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/blog/best-ai-tools-for-work`, name: bestAiToolsForWorkGuide.ru.title, datePublished: bestAiToolsForWorkGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/prompt-engineering-course`, name: promptEngineeringCourseGuide.ru.title, datePublished: promptEngineeringCourseGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/figma-course-beginners`, name: figmaCourseBeginnersGuide.ru.title, datePublished: figmaCourseBeginnersGuide.ru.publishedAt },
           { url: `${SITE_ORIGIN}/blog/web-design-with-ai`, name: webDesignWithAiGuide.ru.title, datePublished: webDesignWithAiGuide.ru.publishedAt },
@@ -1450,6 +1452,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /blog/best-ai-tools-for-work.
+  {
+    path: "/blog/best-ai-tools-for-work",
+    htmlLang: "ru",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/best-ai-tools-for-work`, en: `${SITE_ORIGIN}/en/blog/best-ai-tools-for-work`, xDefault: `${SITE_ORIGIN}/blog/best-ai-tools-for-work` },
+    title: bestAiToolsForWorkGuide.ru.title,
+    description: bestAiToolsForWorkGuide.ru.description,
+    canonical: `${SITE_ORIGIN}/blog/best-ai-tools-for-work`,
+    ogTitle: bestAiToolsForWorkGuide.ru.title,
+    ogDescription: bestAiToolsForWorkGuide.ru.excerpt,
+    ogImage: `${SITE_ORIGIN}${bestAiToolsForWorkGuide.ru.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/blog/best-ai-tools-for-work`, headline: bestAiToolsForWorkGuide.ru.title, description: bestAiToolsForWorkGuide.ru.description, datePublished: bestAiToolsForWorkGuide.ru.publishedAt, dateModified: bestAiToolsForWorkGuide.ru.updatedAt, inLanguage: "ru-RU", articleSection: "Гайд", keywords: bestAiToolsForWorkGuide.ru.tags, image: { url: `${SITE_ORIGIN}${bestAiToolsForWorkGuide.ru.cover.src}`, width: bestAiToolsForWorkGuide.ru.cover.width, height: bestAiToolsForWorkGuide.ru.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/blog/best-ai-tools-for-work`, url: `${SITE_ORIGIN}/blog/best-ai-tools-for-work`, name: bestAiToolsForWorkGuide.ru.title, inLanguage: "ru-RU", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((bestAiToolsForWorkGuide.ru.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/blog/best-ai-tools-for-work`, bestAiToolsForWorkGuide.ru.title),
+      faqPageBlock(bestAiToolsForWorkGuide.ru.body.faq ?? [], `${SITE_ORIGIN}/blog/best-ai-tools-for-work`),
+      breadcrumbBlock([{ name: "Главная", url: `${SITE_ORIGIN}/` }, { name: "Блог", url: `${SITE_ORIGIN}/blog` }, { name: bestAiToolsForWorkGuide.ru.title, url: `${SITE_ORIGIN}/blog/best-ai-tools-for-work` }], `${SITE_ORIGIN}/blog/best-ai-tools-for-work`),
     ],
   },
 
@@ -3551,6 +3575,7 @@ export const routes: RouteMeta[] = [
       itemListBlock(
         [
           // Phase 5 B-07: /en/guides retired; ItemList points at the new /en/blog canonical (codex review P2).
+          { url: `${SITE_ORIGIN}/en/blog/best-ai-tools-for-work`, name: bestAiToolsForWorkGuide.en.title, datePublished: bestAiToolsForWorkGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/prompt-engineering-course`, name: promptEngineeringCourseGuide.en.title, datePublished: promptEngineeringCourseGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/figma-course-beginners`, name: figmaCourseBeginnersGuide.en.title, datePublished: figmaCourseBeginnersGuide.en.publishedAt },
           { url: `${SITE_ORIGIN}/en/blog/web-design-with-ai`, name: webDesignWithAiGuide.en.title, datePublished: webDesignWithAiGuide.en.publishedAt },
@@ -3608,6 +3633,28 @@ export const routes: RouteMeta[] = [
         ],
         `${SITE_ORIGIN}/en/blog`,
       ),
+    ],
+  },
+
+  // seo2 manual blog automation: /en/blog/best-ai-tools-for-work EN sibling.
+  {
+    path: "/en/blog/best-ai-tools-for-work",
+    htmlLang: "en",
+    hreflangAlternates: { ru: `${SITE_ORIGIN}/blog/best-ai-tools-for-work`, en: `${SITE_ORIGIN}/en/blog/best-ai-tools-for-work`, xDefault: `${SITE_ORIGIN}/blog/best-ai-tools-for-work` },
+    title: bestAiToolsForWorkGuide.en.title,
+    description: bestAiToolsForWorkGuide.en.description,
+    canonical: `${SITE_ORIGIN}/en/blog/best-ai-tools-for-work`,
+    ogTitle: bestAiToolsForWorkGuide.en.title,
+    ogDescription: bestAiToolsForWorkGuide.en.excerpt,
+    ogImage: `${SITE_ORIGIN}${bestAiToolsForWorkGuide.en.cover.src}`,
+    author: FOUNDER_NAME, prerender: "full", changefreq: "monthly", priority: 0.7,
+    schema: [
+      ORG_BLOCK_EN,
+      blogPostingBlock({ pageId: `${SITE_ORIGIN}/en/blog/best-ai-tools-for-work`, headline: bestAiToolsForWorkGuide.en.title, description: bestAiToolsForWorkGuide.en.description, datePublished: bestAiToolsForWorkGuide.en.publishedAt, dateModified: bestAiToolsForWorkGuide.en.updatedAt, inLanguage: "en-US", articleSection: "Guide", keywords: bestAiToolsForWorkGuide.en.tags, image: { url: `${SITE_ORIGIN}${bestAiToolsForWorkGuide.en.cover.src}`, width: bestAiToolsForWorkGuide.en.cover.width, height: bestAiToolsForWorkGuide.en.cover.height } }),
+      webPageBlock({ pageId: `${SITE_ORIGIN}/en/blog/best-ai-tools-for-work`, url: `${SITE_ORIGIN}/en/blog/best-ai-tools-for-work`, name: bestAiToolsForWorkGuide.en.title, inLanguage: "en-US", cssSelector: ["h1", ".blog-intro", "h2"] }),
+      howToBlock((bestAiToolsForWorkGuide.en.body.steps ?? []).map((s) => ({ title: s.title, body: s.body })), `${SITE_ORIGIN}/en/blog/best-ai-tools-for-work`, bestAiToolsForWorkGuide.en.title),
+      faqPageBlock(bestAiToolsForWorkGuide.en.body.faq ?? [], `${SITE_ORIGIN}/en/blog/best-ai-tools-for-work`),
+      breadcrumbBlock([{ name: "Home", url: `${SITE_ORIGIN}/en/` }, { name: "Blog", url: `${SITE_ORIGIN}/en/blog` }, { name: bestAiToolsForWorkGuide.en.title, url: `${SITE_ORIGIN}/en/blog/best-ai-tools-for-work` }], `${SITE_ORIGIN}/en/blog/best-ai-tools-for-work`),
     ],
   },
 
