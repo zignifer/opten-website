@@ -772,6 +772,13 @@ from `ps_prompt_library_cache`, direct PostgREST refreshes, and site-triggered
 
 - `Вставить последний`, bounded `Избранные`, bounded `Недавние`, and
   `Открыть библиотеку`.
+- A successful extension login force-refreshes the cache before the auth message
+  completes, so logout -> login restores the user's menu rows without requiring
+  a Prompt Library mutation. `runtime.onStartup` performs the same refresh as a
+  recovery path when Chrome starts with an authenticated extension session.
+- Cache writes are owner-bound to the JWT `sub`. The extension checks the active
+  user before and after each write so an in-flight request from a logged-out or
+  replaced account cannot repopulate the cache or erase a newer account's cache.
 - Generic HTTP(S) page insertion uses `activeTab` + `chrome.scripting`
   after the explicit native context-menu gesture. The extension must not add
   `<all_urls>`, `clipboardRead`, or `clipboardWrite` for this feature.
@@ -810,7 +817,7 @@ Renaming a key on the extension side requires updating the response field too.
 | `ps_sub_provider` | Extension (set by webhook) | — (used internally for cancellation dispatch) | `'yookassa' \| 'paddle'`. Missing → fallback to `'yookassa'`. |
 | `ps_pkce_verifier` | Extension | — | Internal Google OAuth state; retained behind hidden UI. |
 | `ps_email_auth_pending` | Extension | — | Internal/local-only Email OTP popup state. Shape: `{ email, sentAt }`. Used only to restore the code-entry screen after Chrome closes the popup while the user checks email; cleared on successful sign-in, logout, and auth reset; never mirrored through the site message API. |
-| `ps_prompt_library_cache` | Extension | — | Phase 92 local-only bounded cache for Prompt Library context menus; Phase 93 uses it for insert menu rows and may refresh it through PostgREST; Phase 94 lets the site trigger a refresh via `REFRESH_PROMPT_LIBRARY_CACHE` after successful library mutations. Shape: `{ version, updated_at, last_saved_id, last_saved_at, recent, favorites }`; `recent` is capped at 20 rows, `favorites` at 10 rows, and native menus show smaller bounded subsets. Rows may include prompt `body` for insertion, so the key is cleared on logout/auth reset and is never mirrored through the site message API. |
+| `ps_prompt_library_cache` | Extension | — | Phase 92 local-only bounded cache for Prompt Library context menus; Phase 93 uses it for insert menu rows and may refresh it through PostgREST; Phase 94 lets the site trigger a refresh via `REFRESH_PROMPT_LIBRARY_CACHE` after successful library mutations. Cache version 2 shape: `{ version, owner_user_id, updated_at, last_saved_id, last_saved_at, recent, favorites }`; `owner_user_id` is the authenticated JWT `sub`, `recent` is capped at 20 rows, `favorites` at 10 rows, and native menus show smaller bounded subsets. The extension refreshes it after login and on authenticated Chrome startup, rejects cache rows owned by another account, and preserves version 1 only as an in-place upgrade fallback for an already authenticated user. Rows may include prompt `body` for insertion, so the key is cleared on logout/auth reset and is never mirrored through the site message API. |
 
 **Breaking-change protocol:**
 1. Add a new key in the extension first (parallel to the old one).
