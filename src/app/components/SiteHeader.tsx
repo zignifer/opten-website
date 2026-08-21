@@ -200,7 +200,7 @@ const headerCopy = {
     language: "Язык",
     openMenu: "Открыть меню",
     signIn: "Войти",
-    nav: { Learn: "Курсы", Extension: "Генератор промптов", Library: "Библиотека" },
+    nav: { Learn: "Обучение", Extension: "Генератор промптов", Library: "Библиотека" },
     usage: (value: string) => `Использовано кредитов: ${value}`,
   },
   en: {

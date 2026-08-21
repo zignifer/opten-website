@@ -8,6 +8,8 @@ const appPath = path.join(rootDir, "src/app/App.tsx");
 const cssPath = path.join(rootDir, "src/styles/theme.css");
 const ruVideoPath = path.join(rootDir, "public/assets/extension-avatar/opten-extension-avatar.mp4");
 const enVideoPath = path.join(rootDir, "public/assets/extension-avatar/opten-extension-avatar-en.mp4");
+const ruPreviewPath = path.join(rootDir, "public/assets/extension-avatar/opten-extension-avatar-preview.mp4");
+const enPreviewPath = path.join(rootDir, "public/assets/extension-avatar/opten-extension-avatar-en-preview.mp4");
 
 const failures = [];
 
@@ -33,6 +35,14 @@ assert(
   "opten-extension-avatar-en.mp4 must be present as a local public asset",
 );
 assert(
+  existsSync(ruPreviewPath) && statSync(ruPreviewPath).size < 200_000,
+  "RU avatar preview must exist and stay below 200 KB",
+);
+assert(
+  existsSync(enPreviewPath) && statSync(enPreviewPath).size < 200_000,
+  "EN avatar preview must exist and stay below 200 KB",
+);
+assert(
   component.includes('import { useLang } from "../../i18n/LangContext";'),
   "component must read the active language from LangContext",
 );
@@ -42,17 +52,28 @@ assert(
   "component must define RU and EN local avatar video sources",
 );
 assert(
-  component.includes("const videoSrc = EXTENSION_AVATAR_VIDEO_SOURCES[lang];") &&
+  component.includes('ru: "/assets/extension-avatar/opten-extension-avatar-preview.mp4"') &&
+    component.includes('en: "/assets/extension-avatar/opten-extension-avatar-en-preview.mp4"'),
+  "component must define RU and EN lightweight preview sources",
+);
+assert(
+  component.includes("const fullVideoSrc = EXTENSION_AVATAR_VIDEO_SOURCES[lang];") &&
+    component.includes("const previewVideoSrc = EXTENSION_AVATAR_PREVIEW_SOURCES[lang];") &&
+    component.includes("const activeVideoSrc = isIdle ? previewVideoSrc : fullVideoSrc;") &&
     component.includes('data-video-format={videoFormat}'),
-  "component must switch source and layout format from the active language",
+  "component must use the preview while idle and the full source only while active",
 );
 assert(
-  /<video[\s\S]*autoPlay[\s\S]*muted=\{isIdle\}[\s\S]*loop[\s\S]*playsInline/.test(component),
-  "video must autoplay muted in idle mode, unmute after click, loop, and use playsInline",
+  /<video[\s\S]*src=\{activeVideoSrc\}[\s\S]*autoPlay=\{isIdle\}[\s\S]*muted=\{isIdle\}[\s\S]*loop[\s\S]*playsInline/.test(component),
+  "only the lightweight idle preview may autoplay; active playback must stay inline",
 );
 assert(
-  /useEffect\(\(\) => \{[\s\S]*setMode\("idle"\);[\s\S]*video\.muted = true;[\s\S]*video\.play\(\)\.catch\(\(\) => \{\}\);[\s\S]*\}, \[videoSrc\]\);/.test(component),
-  "component must reset and start the muted preview when the language-specific video changes",
+  !component.includes("video.load()"),
+  "component must not manually reload a video that the browser already loaded from src",
+);
+assert(
+  /useEffect\(\(\) => \{[\s\S]*if \(mode !== "active"\) return;[\s\S]*video\.muted = false;[\s\S]*video\.play\(\)[\s\S]*\}, \[mode, fullVideoSrc\]\);/.test(component),
+  "component must request and play the full video only after entering active mode",
 );
 assert(
   component.includes('setMode("active")') && component.includes('setMode("idle")'),

@@ -7,6 +7,11 @@ const EXTENSION_AVATAR_VIDEO_SOURCES = {
   en: "/assets/extension-avatar/opten-extension-avatar-en.mp4",
 } as const;
 
+const EXTENSION_AVATAR_PREVIEW_SOURCES = {
+  ru: "/assets/extension-avatar/opten-extension-avatar-preview.mp4",
+  en: "/assets/extension-avatar/opten-extension-avatar-en-preview.mp4",
+} as const;
+
 const EXTENSION_AVATAR_VIDEO_FORMATS = {
   ru: "portrait",
   en: "landscape",
@@ -18,9 +23,11 @@ export default function ExtensionVideoAvatar() {
   const { lang } = useLang();
   const [mode, setMode] = useState<AvatarMode>("idle");
   const videoRef = useRef<HTMLVideoElement>(null);
-  const videoSrc = EXTENSION_AVATAR_VIDEO_SOURCES[lang];
+  const fullVideoSrc = EXTENSION_AVATAR_VIDEO_SOURCES[lang];
+  const previewVideoSrc = EXTENSION_AVATAR_PREVIEW_SOURCES[lang];
   const videoFormat = EXTENSION_AVATAR_VIDEO_FORMATS[lang];
   const isIdle = mode === "idle";
+  const activeVideoSrc = isIdle ? previewVideoSrc : fullVideoSrc;
   const label = lang === "en"
     ? {
         region: "Opten video",
@@ -36,22 +43,31 @@ export default function ExtensionVideoAvatar() {
       };
 
   useEffect(() => {
-    const video = videoRef.current;
     setMode("idle");
+  }, [lang]);
+
+  useEffect(() => {
+    if (mode !== "active") return;
+
+    const video = videoRef.current;
     if (!video) return;
 
-    video.muted = true;
+    video.muted = false;
     video.currentTime = 0;
-    video.load();
-    video.play().catch(() => {});
-  }, [videoSrc]);
+    video.play().catch(() => {
+      video.muted = true;
+      video.play().catch(() => {});
+    });
+  }, [mode, fullVideoSrc]);
 
   function playWithSound() {
     const video = videoRef.current;
-    setMode("active");
+    if (isIdle) {
+      setMode("active");
+      return;
+    }
 
     if (!video) return;
-
     video.muted = false;
     video.currentTime = 0;
     video.play().catch(() => {
@@ -62,14 +78,7 @@ export default function ExtensionVideoAvatar() {
 
   function closeAvatar(event: MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
-    const video = videoRef.current;
     setMode("idle");
-
-    if (!video) return;
-
-    video.muted = true;
-    video.currentTime = 0;
-    video.play().catch(() => {});
   }
 
   return (
@@ -96,13 +105,14 @@ export default function ExtensionVideoAvatar() {
         onClick={playWithSound}
       >
         <video
+          key={activeVideoSrc}
           ref={videoRef}
-          src={videoSrc}
-          autoPlay
+          src={activeVideoSrc}
+          autoPlay={isIdle}
           muted={isIdle}
           loop
           playsInline
-          preload="metadata"
+          preload={isIdle ? "auto" : "metadata"}
           aria-hidden="true"
         />
         {isIdle && (

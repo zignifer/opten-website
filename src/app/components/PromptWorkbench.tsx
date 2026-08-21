@@ -51,6 +51,7 @@ const copy = {
     copyPrompt: "Скопировать",
     copiedPrompt: "Скопировано",
     copyFailed: "Не удалось скопировать промпт.",
+    poweredBy: "Работает на: ",
     updated: "Последнее обновление: ",
     inputLabel: "Промпт",
     typeLabel: "Тип генерации",
@@ -85,6 +86,7 @@ const copy = {
     copyPrompt: "Copy",
     copiedPrompt: "Copied",
     copyFailed: "The prompt could not be copied.",
+    poweredBy: "Powered by: ",
     updated: "Last updated: ",
     inputLabel: "Prompt",
     typeLabel: "Generation type",
@@ -544,7 +546,7 @@ export default function PromptWorkbench() {
           </div>
         </div>
 
-        <div className="flex min-h-8 items-center justify-between gap-3 px-2 pb-1 pt-2 text-[12px]">
+        <div className="grid min-h-8 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-2 pb-1 pt-2 text-[12px] md:grid-cols-[minmax(0,1fr)_auto_auto]">
           {error ? (
             <p role="alert" className="flex min-w-0 items-center gap-1.5 text-[#ff9a8d]">
               <CircleAlert aria-hidden="true" className="size-3.5 shrink-0" />
@@ -553,7 +555,10 @@ export default function PromptWorkbench() {
           ) : (
             <p className="text-white/30">{prompt.length.toLocaleString(lang === "ru" ? "ru-RU" : "en-US")} / {MAX_PROMPT_CHARS.toLocaleString()}</p>
           )}
-          <p suppressHydrationWarning className="shrink-0 text-white/30">
+          <p className="hidden text-white/30 md:col-start-2 md:block">
+            {text.poweredBy}<span className="text-white/90">Claude Opus 5</span>
+          </p>
+          <p suppressHydrationWarning className="col-start-2 row-start-1 shrink-0 text-white/30 md:col-start-3">
             {text.updated}{formatLocalDate(today)}
           </p>
         </div>
