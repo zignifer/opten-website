@@ -64,6 +64,7 @@ export default function ModelsHubPage() {
 
   // General/umbrella models are kept live but hidden from the hub grid + counts.
   const hubModels = useMemo(() => allModels.filter((m) => !HUB_HIDDEN_SLUGS.has(m.slug)), []);
+  const familyModels = useMemo(() => allModels.filter((m) => HUB_HIDDEN_SLUGS.has(m.slug)), []);
   const imageCount = useMemo(() => hubModels.filter((m) => m.meta.type === "image").length, [hubModels]);
   const videoCount = useMemo(() => hubModels.filter((m) => m.meta.type === "video").length, [hubModels]);
 
@@ -240,6 +241,33 @@ export default function ModelsHubPage() {
             })}
           </div>
         )}
+
+        <section
+          className="mt-[72px] border-t border-white/10 pt-[40px]"
+          aria-labelledby="model-family-guides-heading"
+        >
+          <h2
+            id="model-family-guides-heading"
+            className="font-['Unbounded',sans-serif] text-[24px] font-bold leading-[1.25] tracking-[-0.4px] text-white md:text-[30px]"
+          >
+            {t("models.hub.familiesHeading")}
+          </h2>
+          <p className="mt-[12px] max-w-[720px] text-[15px] leading-[1.6] text-white/60">
+            {t("models.hub.familiesIntro")}
+          </p>
+          <ul className="mt-[24px] grid gap-x-[32px] gap-y-[12px] sm:grid-cols-2 lg:grid-cols-3">
+            {familyModels.map((model) => (
+              <li key={model.slug}>
+                <LocalizedLink
+                  to={`/models/${model.slug}`}
+                  className="text-[14px] leading-[1.45] text-white/70 underline decoration-white/20 underline-offset-4 transition hover:text-[#9cfb51] hover:decoration-[#9cfb51]/50"
+                >
+                  {metaField(model.meta, "name", lang)}
+                </LocalizedLink>
+              </li>
+            ))}
+          </ul>
+        </section>
       </main>
 
       <SiteFooter />

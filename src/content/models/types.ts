@@ -3,6 +3,8 @@
 // pages (TechArticle + SoftwareApplication, not BlogPosting). 62 model pages
 // generated from C:/Projects/promptscore-proxy/skills/*.md via Phase 1 parser.
 
+import type { EditorialEvidenceLink } from "../editorialEvidence";
+
 export type ModelType = "image" | "video";
 
 export type ModelBestLanguage = "en" | "ru" | "both";
@@ -76,6 +78,7 @@ export interface ModelLocale {
   examples: ModelExample[];       // exactly 3 before/after pairs
   mistakes: ModelMistake[];       // exactly 5 common mistakes
   faq: ModelFaqItem[];            // ≥6 Q-A, answer ≥30 words
+  evidenceLinks?: EditorialEvidenceLink[]; // visible official sources + contextual internal guides
 }
 
 export interface ModelContent {

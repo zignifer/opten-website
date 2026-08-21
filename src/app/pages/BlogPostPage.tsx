@@ -18,6 +18,7 @@ import SiteFooter from "../components/SiteFooter";
 import BlogPostCard from "../components/BlogPostCard";
 import FaqBlock from "../components/FaqBlock";
 import ResponsiveImage from "../components/ResponsiveImage";
+import EditorialEvidenceLinks from "../components/EditorialEvidenceLinks";
 import UpworkStartArticle from "../components/blog/UpworkStartArticle";
 import SeoAutomationArticle from "../components/blog/SeoAutomationArticle";
 import { blogPostsBySlug, allBlogPosts, type BlogSlug } from "../../content/blog";
@@ -255,6 +256,8 @@ export default function BlogPostPage() {
             ))}
           </div>
         )}
+
+        {data.evidenceLinks && <EditorialEvidenceLinks links={data.evidenceLinks} />}
 
         {/* Tags are surfaced in the byline + JSON-LD keywords; no duplicate pill row at the foot. */}
       </main>

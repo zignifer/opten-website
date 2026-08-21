@@ -19,6 +19,7 @@ import ModelQuickFacts from "../components/ModelQuickFacts";
 import InlineOptenCallout from "../components/InlineOptenCallout";
 import ModelInstallCta from "../components/ModelInstallCta";
 import RelatedModels from "../components/RelatedModels";
+import EditorialEvidenceLinks from "../components/EditorialEvidenceLinks";
 import { getModelBySlug, loadModelBySlug } from "@/content/models";
 import type { ModelEntry } from "../../content/models/types";
 import { metaField } from "../../content/models/metaEn";
@@ -268,6 +269,8 @@ export default function ModelPage() {
             </div>
           </section>
         )}
+
+        {locale?.evidenceLinks && <EditorialEvidenceLinks links={locale.evidenceLinks} />}
       </main>
 
       {/* FAQ — FaqBlock id matches verify-faq-mainentity.mjs regex (id="[^"]*faq[^"]*") */}

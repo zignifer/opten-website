@@ -153,6 +153,45 @@ Google does not guarantee indexing for every valid page. The target is not to
 force the excluded count to zero; it is to make every valuable URL discoverable,
 distinct, evidence-backed, and easy to select.
 
+## Release implemented — 2026-08-21
+
+The approved P0/P1 pilot was implemented after the baseline above:
+
+- `/blog` and `/en/blog` now render a visible, ordinary-link index of all blog
+  posts in prerendered HTML. Client-side filters and pagination remain usable,
+  but no longer control crawler discovery.
+- `/models` and `/en/models` now render a visible index for the 11 general model
+  family pages that remain intentionally absent from the version-specific card
+  grid.
+- `/welcome` and `/en/welcome` are linked from the shared footer. Their stale
+  Google-login metadata was aligned with the live Email-code flow.
+- `/learn` and `/en/learn` now expose a complete visible index of public lessons
+  and Learn Finds, closing the remaining unrelated gaps found by the post-build
+  full-site crawl.
+- Five pilot posts were updated in both locales: `kling-3-prompts`,
+  `ai-lip-sync`, `prompt-examples`, `negative-prompt`, and `image-to-video`.
+  Each now has visible official-source attribution plus contextual internal
+  links. Unsupported first-person success claims were replaced with bounded,
+  reproducible comparison procedures.
+
+### Post-build acceptance evidence
+
+A second raw-HTML crawl was run over the generated `dist` output using the 256
+sitemap URLs as the allowed graph and `/` as the BFS root:
+
+| Metric | Before | After |
+|---|---:|---:|
+| Sitemap URLs unreachable from `/` | 16 priority non-indexed URLs, plus unrelated Learn gaps discovered later | **0** |
+| Sitemap URLs with zero HTML inbound links | not used as the baseline headline | **0** |
+| URLs deeper than 3 links | 6 priority non-indexed URLs, plus 6 unrelated EN Learn lessons | **0** |
+| Maximum homepage crawl depth | 6 among the priority set | **3** site-wide |
+
+The original 22 priority URLs now have depths 1-3. The full production build
+also passed the content registry, prerender (256 routes), sitemap, llms.txt,
+FAQ visible/schema parity (210 routes, 1,267 questions), and font validators.
+The build's normal IndexNow notification returned HTTP 200; no Google URL
+Inspection indexing request or GSC sitemap resubmission was made.
+
 ## Reauthorization and repeatable tooling
 
 - `npm run gsc:refresh-auth` starts the one-time localhost OAuth callback.
@@ -167,7 +206,7 @@ distinct, evidence-backed, and easy to select.
 
 ## Limits
 
-This snapshot covers the live sitemap and URL Inspection API on 2026-08-21. It
-does not reproduce the Search Console UI's historical validation timelines, and
-no index request, sitemap submission, or site-content change was made as part of
-this audit.
+The baseline snapshot covers the live sitemap and URL Inspection API on
+2026-08-21. It does not reproduce the Search Console UI's historical validation
+timelines. The release evidence above is local generated-HTML validation; Google
+coverage can change only after deployment and recrawl.

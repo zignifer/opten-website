@@ -4,6 +4,8 @@
 // readingTimeMin for the byline. Author is implicit — single-author site, uses FOUNDER_NAME
 // from scripts/seo-routes.ts:49 everywhere a byline renders.
 
+import type { EditorialEvidenceLink } from "../editorialEvidence";
+
 export type BlogTag =
   | "ai-image-gen"
   | "ai-video-gen"
@@ -72,6 +74,7 @@ export interface BlogPostLocale {
   updatedAt: string;
   body: BlogPostBody;
   related?: string[];         // slugs; UI shows max 2
+  evidenceLinks?: EditorialEvidenceLink[]; // visible official sources + contextual internal guides
   editorialLayout?: "upwork-start" | "seo-automation"; // opt-in renderers for longform editorial stories
 }
 

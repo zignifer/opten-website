@@ -1,6 +1,7 @@
 import type { BlogPost, BlogPostLocale } from "./types";
 
 const PUBLISHED = "2026-06-05";
+const UPDATED = "2026-08-21";
 
 const COVER_RU = {
   src: "/blog/kling-3-prompts/cover.jpg",
@@ -27,8 +28,22 @@ const ru: BlogPostLocale = {
   cover: COVER_RU,
   readingTimeMin: 7,
   publishedAt: PUBLISHED,
-  updatedAt: PUBLISHED,
+  updatedAt: UPDATED,
   related: ["prompt-structure", "negative-prompt", "seedance-2-0-prompts"],
+  evidenceLinks: [
+    {
+      kind: "source",
+      label: "Kling VIDEO 3.0 Model User Guide",
+      href: "https://app.klingai.com/cn/quickstart/klingai-video-3-model-user-guide",
+      note: "Официальное руководство Kling по режимам Video 3.0 и структуре запросов.",
+    },
+    {
+      kind: "guide",
+      label: "Kling 3.0: структура промпта и примеры",
+      href: "/models/kling-3",
+      note: "Карточка модели с ограничениями, типичными ошибками и примерами до/после.",
+    },
+  ],
   body: {
     intro:
       "Kling 3.0 — это линейка AI video моделей Kuaishou для более длинных, связных и управляемых сцен: Video 3.0, Video 3.0 Omni, Image 3.0 и Image 3.0 Omni. В промпте для Kling 3.0 нужно описывать не только идею, но и камеру, движение, continuity, звук и запреты.",
@@ -46,7 +61,7 @@ const ru: BlogPostLocale = {
       {
         title: "Фиксируйте камеру, движение и объект вместе",
         body:
-          "Kling 3.0 стал сильнее в связности, но короткий motion prompt все равно может развалить сцену. Если камера «летит вокруг героя», а герой не зафиксирован, модель может сменить лицо, одежду или пропорции между кадрами. Если объект зафиксирован, но камера описана общо, кадр дрожит или делает лишний рывок.\n\nПрактический кейс: запрос про человека на ночной улице дал красивый свет, но камера хаотично прыгала, а лицо менялось на втором повороте. Исправление было не в `more stable`, а в связке: `locked eye-level tracking shot`, `same face and outfit`, `slow backward dolly`, `no sudden cuts`. После такого блока клип остается живым, но перестает выглядеть как нарезка случайных кадров.",
+          "Kling 3.0 стал сильнее в связности, но короткий motion prompt все равно может развалить сцену. Если камера «летит вокруг героя», а герой не зафиксирован, модель может сменить лицо, одежду или пропорции между кадрами. Если объект зафиксирован, но камера описана общо, кадр дрожит или делает лишний рывок.\n\nДля контролируемой проверки меняйте одну ось за итерацию. Сначала сравните общий `camera moves around him` с точным маршрутом `locked eye-level tracking shot, slow backward dolly`; затем добавьте `same face and outfit` и `no sudden cuts`. Так можно увидеть, какая инструкция отвечает за камеру, а какая — за сохранение героя, не выдавая единичный удачный рендер за универсальное правило.",
         before:
           "A man walks through a neon street, camera moves around him, cinematic motion.",
         after:
@@ -111,8 +126,22 @@ const en: BlogPostLocale = {
   cover: COVER_EN,
   readingTimeMin: 6,
   publishedAt: PUBLISHED,
-  updatedAt: PUBLISHED,
+  updatedAt: UPDATED,
   related: ru.related,
+  evidenceLinks: [
+    {
+      kind: "source",
+      label: "Kling VIDEO 3.0 Model User Guide",
+      href: "https://app.klingai.com/cn/quickstart/klingai-video-3-model-user-guide",
+      note: "Kling's official guide to Video 3.0 modes and prompt workflows.",
+    },
+    {
+      kind: "guide",
+      label: "Kling 3.0 prompt structure and examples",
+      href: "/models/kling-3",
+      note: "Model card with constraints, common mistakes, and before/after prompt examples.",
+    },
+  ],
   body: {
     intro:
       "Kling 3.0 is Kuaishou's AI video and image model series for longer, more controllable scenes: Video 3.0, Video 3.0 Omni, Image 3.0, and Image 3.0 Omni. A good kling 3.0 prompt describes not only the idea, but camera motion, subject continuity, timing, audio, and constraints.",
@@ -130,7 +159,7 @@ const en: BlogPostLocale = {
       {
         title: "Lock camera, motion, and subject together",
         body:
-          "Kling 3.0 ai is better at consistency, but a short motion prompt can still break the scene. If the camera is told to move around a person and the person is not locked, the model may change the face, coat, or body proportions between beats. If the subject is locked but the camera is vague, the shot can wobble or cut too hard.\n\nPractical case: a prompt about a person on a neon night street produced good lighting, but the camera jumped and the face changed on the turn. The fix was not `more stable`; it was a linked set of instructions: `locked eye-level tracking shot`, `same face and outfit`, `slow backward dolly`, `no sudden cuts`. The clip still has motion, but it stops feeling like random stitched frames.",
+          "Kling 3.0 ai is better at consistency, but a short motion prompt can still break the scene. If the camera is told to move around a person and the person is not locked, the model may change the face, coat, or body proportions between beats. If the subject is locked but the camera is vague, the shot can wobble or cut too hard.\n\nFor a controlled comparison, change one axis per iteration. First compare a vague `camera moves around him` with `locked eye-level tracking shot, slow backward dolly`; then add `same face and outfit` and `no sudden cuts`. This separates camera control from subject continuity without presenting one favorable render as a universal result.",
         before:
           "A man walks through a neon street, camera moves around him, cinematic motion.",
         after:

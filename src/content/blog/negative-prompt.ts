@@ -1,6 +1,7 @@
 import type { BlogPost, BlogPostLocale } from "./types";
 
 const PUBLISHED = "2026-05-27";
+const UPDATED = "2026-08-21";
 
 const COVER_RU = {
   src: "/blog/negative-prompt/cover.jpg",
@@ -20,16 +21,36 @@ const ru: BlogPostLocale = {
   slug: "negative-prompt",
   title: "Негативный промпт: как убирать артефакты",
   excerpt:
-    "Что такое негативный промпт, когда он помогает в Imagen 4 Ultra, Midjourney 8.1 и Seedream 5, а когда лучше писать позитивные ограничения сцены.",
+    "Что такое негативный промпт, когда он помогает в Imagen 4 Ultra, Midjourney 8.2 и Seedream 5, а когда лучше писать позитивные ограничения сцены.",
   description:
-    "Гайд по negative prompt: что такое негативный промпт, как убрать артефакты и не сломать кадр в Imagen 4 Ultra, Midjourney 8.1 и Seedream 5 на практике.",
+    "Гайд по negative prompt: что такое негативный промпт, как убрать артефакты и не сломать кадр в Imagen 4 Ultra, Midjourney 8.2 и Seedream 5 на практике.",
   category: "guide",
   tags: ["prompt-engineering", "ai-image-gen", "workflow"],
   cover: COVER_RU,
   readingTimeMin: 7,
   publishedAt: PUBLISHED,
-  updatedAt: PUBLISHED,
+  updatedAt: UPDATED,
   related: ["gpt-image-2", "image-to-video"],
+  evidenceLinks: [
+    {
+      kind: "source",
+      label: "Midjourney: Parameter List",
+      href: "https://docs.midjourney.com/hc/en-us/articles/32859204029709-Parameter-List",
+      note: "Официальный список параметров подтверждает назначение `--no` и актуальные video/image-параметры.",
+    },
+    {
+      kind: "guide",
+      label: "Midjourney 8.2: структура и актуальные параметры",
+      href: "/models/midjourney",
+      note: "Общий гайд по текущей версии, порядку промпта и типичным ошибкам.",
+    },
+    {
+      kind: "guide",
+      label: "GPT Image 2: позитивные ограничения и примеры",
+      href: "/models/gpt-image-2",
+      note: "Когда естественная позитивная инструкция полезнее длинного списка запретов.",
+    },
+  ],
   body: {
     intro:
       "Негативный промпт - это блок запретов для генерации изображений: он объясняет нейросети, чего не должно быть в кадре. Он полезен против артефактов, лишних пальцев, грязного фона и нежелательного стиля, но работает лучше всего рядом с четким позитивным описанием сцены, а не как список случайных слов.",
@@ -47,7 +68,7 @@ const ru: BlogPostLocale = {
       {
         title: "Пишите мягкие запреты вместо мусорных списков",
         body:
-          "Разговорный запрос «как убрать артефакты в нейросети» обычно решается не сотней тегов, а коротким списком точных рисков. Для портрета это могут быть руки, кожа, зубы, фон и лишние объекты. Для логотипа - мелкий текст, псевдобуквы, сложные тени и фото-фактура. В Midjourney 8.1 старые negative prompt списки из Stable Diffusion часто дают непредсказуемый эффект, поэтому лучше использовать `--no` только для конкретных объектов или признаков, а стиль задавать в основном промпте.",
+          "Разговорный запрос «как убрать артефакты в нейросети» обычно решается не сотней тегов, а коротким списком точных рисков. Для портрета это могут быть руки, кожа, зубы, фон и лишние объекты. Для логотипа - мелкий текст, псевдобуквы, сложные тени и фото-фактура. В Midjourney 8.2 официальный параметр `--no` предназначен для того, чего не должно быть в изображении; используйте его для конкретных объектов или признаков, а нужный стиль задавайте в основном промпте.",
         before:
           "no ugly, no bad anatomy, no low quality, no worst quality, no jpeg artifacts, no mutation, no noise, no text, no logo",
         after:
@@ -67,7 +88,7 @@ const ru: BlogPostLocale = {
       {
         title: "Проверяйте модель на первом рендере",
         body:
-          "Практический кейс: для fashion-кадра в Imagen 4 Ultra первый рендер сделал кожу слишком пластиковой и добавил шестой палец на видимой руке. Исправление сработало не через общий «bad anatomy», а через точный патч: `natural skin texture, preserve five fingers on each visible hand; negative: no glossy plastic skin, no extra fingers, no fused fingers`. После этого поза сохранилась, но рука и фактура стали нормальными. Такой тест стоит делать до финальной серии: один рендер показывает, какие именно запреты нужны вашей модели.",
+          "Используйте первый рендер как диагностику, а не как доказательство универсального рецепта. Если в fashion-кадре кожа выглядит пластиковой или рука деформирована, не добавляйте общий `bad anatomy`. Проверьте точный патч: `natural skin texture, preserve five fingers on each visible hand; negative: no glossy plastic skin, no extra fingers, no fused fingers`. Затем сравните вариант при том же seed или максимально близких настройках, меняя только этот блок. Так видно, помогло ли конкретное ограничение вашей модели.",
         before:
           "Портрет модели в зеленом пальто, студийный свет, модный журнал. Negative: bad anatomy.",
         after:
@@ -104,16 +125,36 @@ const en: BlogPostLocale = {
   slug: "negative-prompt",
   title: "Negative prompt: remove AI image artifacts",
   excerpt:
-    "What a negative prompt is, when it helps in Imagen 4 Ultra, Midjourney 8.1, and Seedream 5, and when positive scene constraints work better.",
+    "What a negative prompt is, when it helps in Imagen 4 Ultra, Midjourney 8.2, and Seedream 5, and when positive scene constraints work better.",
   description:
-    "Learn how to write a negative prompt, remove AI image artifacts, and avoid overloading models like Imagen 4 Ultra, Midjourney 8.1, and Seedream 5 in practice.",
+    "Learn how to write a negative prompt, remove AI image artifacts, and avoid overloading models like Imagen 4 Ultra, Midjourney 8.2, and Seedream 5 in practice.",
   category: "guide",
   tags: ["prompt-engineering", "ai-image-gen", "workflow"],
   cover: COVER_EN,
   readingTimeMin: 6,
   publishedAt: PUBLISHED,
-  updatedAt: PUBLISHED,
+  updatedAt: UPDATED,
   related: ["gpt-image-2", "image-to-video"],
+  evidenceLinks: [
+    {
+      kind: "source",
+      label: "Midjourney: Parameter List",
+      href: "https://docs.midjourney.com/hc/en-us/articles/32859204029709-Parameter-List",
+      note: "The official parameter list documents `--no` and the currently supported image and video controls.",
+    },
+    {
+      kind: "guide",
+      label: "Midjourney 8.2 prompt structure and parameters",
+      href: "/models/midjourney",
+      note: "Current-version guidance on prompt order, parameters, and common mistakes.",
+    },
+    {
+      kind: "guide",
+      label: "GPT Image 2 positive constraints and examples",
+      href: "/models/gpt-image-2",
+      note: "When a clear positive instruction is more useful than a long exclusion list.",
+    },
+  ],
   body: {
     intro:
       "A negative prompt is the constraint block in an AI image prompt: it tells the model what must not appear in the frame. It helps with artifacts, extra fingers, noisy backgrounds, unwanted styles, and accidental objects, but it works best beside a clear positive scene description, not as a random pile of banned words.",
@@ -131,7 +172,7 @@ const en: BlogPostLocale = {
       {
         title: "Use soft blocks instead of junk lists",
         body:
-          "The query «how to remove AI image artifacts» is usually solved by a short list of exact risks, not by a hundred inherited tags. For portraits, those risks are hands, skin, teeth, background, and unwanted objects. For a logo, they are tiny text, pseudo-letters, complex shadows, and photo texture. In Midjourney 8.1, old Stable Diffusion negative lists can behave unpredictably, so use `--no` for specific objects or traits and keep style control in the main prompt.",
+          "The query «how to remove AI image artifacts» is usually solved by a short list of exact risks, not by a hundred inherited tags. For portraits, those risks are hands, skin, teeth, background, and unwanted objects. For a logo, they are tiny text, pseudo-letters, complex shadows, and photo texture. In Midjourney 8.2, the official `--no` parameter tells the model what should not appear; use it for specific objects or traits and keep desired style control in the main prompt.",
         before:
           "no ugly, no bad anatomy, no low quality, no worst quality, no jpeg artifacts, no mutation, no noise, no text, no logo",
         after:
@@ -151,7 +192,7 @@ const en: BlogPostLocale = {
       {
         title: "Test the model on the first render",
         body:
-          "A practical case: for a fashion image in Imagen 4 Ultra, the first render made the skin too glossy and gave one visible hand six fingers. The fix was not a vague «bad anatomy» tag; it was a precise patch: `natural skin texture, preserve five fingers on each visible hand; negative: no glossy plastic skin, no extra fingers, no fused fingers`. The pose stayed intact, while the hand and skin texture became normal. Run this test before a final batch: one render shows which constraints your model actually needs.",
+          "Use the first render as a diagnostic, not as proof of a universal recipe. If a fashion image has glossy skin or a malformed hand, do not reach first for a vague `bad anatomy` tag. Test a precise patch: `natural skin texture, preserve five fingers on each visible hand; negative: no glossy plastic skin, no extra fingers, no fused fingers`. Compare it with the same seed or the closest available settings while changing only that block, then keep the constraint only if it helps your model.",
         before:
           "Fashion portrait in a green coat, studio light, magazine look. Negative: bad anatomy.",
         after:

@@ -24,6 +24,7 @@ export default function SiteFooter({ variant = "full" }: SiteFooterProps): JSX.E
       <LocalizedLink to="/blog" className="hover:text-white">{t("nav.blog")}</LocalizedLink>
       {/* Phase v2.0 MODELS-A-11: Models hub link */}
       <LocalizedLink to="/models" className="hover:text-white">{t("nav.models")}</LocalizedLink>
+      <LocalizedLink to="/welcome" className="hover:text-white">{t("footer.getStarted")}</LocalizedLink>
       <LocalizedLink to="/privacy" className="hover:text-white">{t("footer.privacy")}</LocalizedLink>
       <LocalizedLink to="/terms" className="hover:text-white">{t("footer.terms")}</LocalizedLink>
       <LocalizedLink to="/refund" className="hover:text-white">{t("footer.refund")}</LocalizedLink>

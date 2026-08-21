@@ -25,6 +25,7 @@ import {
   type LearnLesson,
   type LearnTopic,
 } from "../../../content/space/learn";
+import { getLearnFindTitle, learnFinds } from "../../../content/space/learnFinds";
 import {
   PRIVATE_COURSE_TITLE_EN,
   PRIVATE_COURSE_TITLE_RU,
@@ -105,6 +106,10 @@ const pageCopy = {
     soon: "Скоро",
     lessonUnit: "уроков",
     faqTitle: "Ответы по курсам",
+    indexTitle: "Все материалы Learn",
+    indexIntro: "Полный список бесплатных уроков и разборов других авторов.",
+    lessonsIndexTitle: "Уроки Opten",
+    findsIndexTitle: "Learn Finds",
   },
   en: {
     heroTitleLine1Before: "",
@@ -127,6 +132,10 @@ const pageCopy = {
     soon: "Soon",
     lessonUnit: "lessons",
     faqTitle: "Course answers",
+    indexTitle: "All Learn resources",
+    indexIntro: "The complete index of free Opten lessons and curated third-party breakdowns.",
+    lessonsIndexTitle: "Opten lessons",
+    findsIndexTitle: "Learn Finds",
   },
 } as const;
 
@@ -429,6 +438,53 @@ export default function LearnOverviewPage() {
             <p className="mt-[6px] text-[14px] text-white/55">{copy.noResultsText}</p>
           </section>
           )}
+
+        <section
+          className="mt-[54px] border-t border-white/10 pt-[34px]"
+          aria-labelledby="learn-resource-index-heading"
+        >
+          <h2
+            id="learn-resource-index-heading"
+            className="font-['Unbounded',sans-serif] text-[24px] font-bold leading-[1.2] text-white max-md:text-[21px]"
+          >
+            {copy.indexTitle}
+          </h2>
+          <p className="mt-[10px] text-[14px] leading-[1.6] text-white/55">{copy.indexIntro}</p>
+
+          <div className="mt-[24px] grid gap-[28px] lg:grid-cols-2">
+            <div>
+              <h3 className="text-[16px] font-bold text-white">{copy.lessonsIndexTitle}</h3>
+              <ul className="mt-[12px] flex flex-col gap-[9px]">
+                {publicLearnLessons.map((lesson) => (
+                  <li key={lesson.slug}>
+                    <LocalizedLink
+                      to={`/learn/${lesson.slug}`}
+                      className="text-[14px] leading-[1.45] text-white/65 underline decoration-white/20 underline-offset-4 transition hover:text-[#9cfb51] hover:decoration-[#9cfb51]/50"
+                    >
+                      {getLearnLessonTitle(lesson, lang)}
+                    </LocalizedLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-[16px] font-bold text-white">{copy.findsIndexTitle}</h3>
+              <ul className="mt-[12px] flex flex-col gap-[9px]">
+                {learnFinds.map((find) => (
+                  <li key={find.slug}>
+                    <LocalizedLink
+                      to={`/learn/finds/${find.slug}`}
+                      className="text-[14px] leading-[1.45] text-white/65 underline decoration-white/20 underline-offset-4 transition hover:text-[#9cfb51] hover:decoration-[#9cfb51]/50"
+                    >
+                      {getLearnFindTitle(find, lang)}
+                    </LocalizedLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
 
         <LearnFaqSection lang={lang} />
       </main>

@@ -13,6 +13,7 @@ import { useLang, useT } from "../../i18n/LangContext";
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
 import BlogPostCard from "../components/BlogPostCard";
+import LocalizedLink from "../components/LocalizedLink";
 import { allBlogPosts } from "../../content/blog";
 import type { BlogCategory } from "../../content/blog/types";
 
@@ -286,6 +287,33 @@ export default function BlogListPage() {
             </button>
           </nav>
         )}
+
+        <section
+          className="mt-[72px] border-t border-white/10 pt-[40px]"
+          aria-labelledby="all-blog-posts-heading"
+        >
+          <h2
+            id="all-blog-posts-heading"
+            className="font-['Unbounded',sans-serif] text-[24px] font-bold leading-[1.25] tracking-[-0.4px] text-white md:text-[30px]"
+          >
+            {t("blog.allArticlesHeading")}
+          </h2>
+          <p className="mt-[12px] max-w-[720px] text-[15px] leading-[1.6] text-white/60">
+            {t("blog.allArticlesIntro")}
+          </p>
+          <ul className="mt-[24px] grid gap-x-[32px] gap-y-[12px] sm:grid-cols-2">
+            {localizedPosts.map((post) => (
+              <li key={post.slug}>
+                <LocalizedLink
+                  to={`/blog/${post.slug}`}
+                  className="text-[14px] leading-[1.45] text-white/70 underline decoration-white/20 underline-offset-4 transition hover:text-[#9cfb51] hover:decoration-[#9cfb51]/50"
+                >
+                  {post.title}
+                </LocalizedLink>
+              </li>
+            ))}
+          </ul>
+        </section>
       </main>
 
       <SiteFooter />

@@ -1,6 +1,7 @@
 import type { BlogPost, BlogPostLocale } from "./types";
 
 const PUBLISHED = "2026-06-11";
+const UPDATED = "2026-08-21";
 
 const COVER_RU = {
   src: "/blog/ai-lip-sync/cover.jpg",
@@ -27,8 +28,28 @@ const ru: BlogPostLocale = {
   cover: COVER_RU,
   readingTimeMin: 7,
   publishedAt: PUBLISHED,
-  updatedAt: PUBLISHED,
+  updatedAt: UPDATED,
   related: ["image-to-video", "prompt-structure", "negative-prompt"],
+  evidenceLinks: [
+    {
+      kind: "source",
+      label: "HeyGen: How to Get Started with Photo Avatars",
+      href: "https://help.heygen.com/en/articles/10034438-how-to-get-started-with-photo-avatars",
+      note: "Официальные требования к читаемому лицу, видимым губам и крупности персонажа для корректной анимации.",
+    },
+    {
+      kind: "guide",
+      label: "Image-to-video: как подготовить стабильный исходный клип",
+      href: "/blog/image-to-video",
+      note: "Промпт для движения, камеры и preserve-блоков до этапа lip sync.",
+    },
+    {
+      kind: "guide",
+      label: "VEED Fabric: промпты для говорящих видео",
+      href: "/models/veed-fabric",
+      note: "Структура запросов и ограничения для генерации говорящего персонажа.",
+    },
+  ],
   body: {
     intro:
       "AI lip sync — это синхронизация речи и движения губ в видео, когда нейросеть подгоняет артикуляцию под голос, дубляж или новый текст. Лучший результат получается не из «волшебной» кнопки, а из чистого аудио, крупного лица, стабильной позы и prompt-ограничений до генерации.",
@@ -46,7 +67,7 @@ const ru: BlogPostLocale = {
       {
         title: "Синхронизация губ через нейросеть: крупный план важнее модели",
         body:
-          "Когда говорят «нейросеть для синхронизации губ», обычно сразу сравнивают сервисы. На практике первый фильтр проще: видно ли рот. Широкий кадр с человеком в полный рост почти всегда проигрывает крупному плану, даже если модель сильная. Лицо должно быть освещено, губы не закрыты микрофоном, рукой, волосами или тяжелой тенью.\n\nПрактический кейс: тестовый ролик для HeyGen выглядел нормально в широком кадре, но рот плавал, потому что лицо занимало меньше 12% высоты кадра. Исправление было не в слове `realistic`, а в исходном prompt: `medium close-up talking portrait, clear mouth movement, stable head pose, soft frontal light, no fast turn`. После перегенерации крупности lip sync стал заметно ровнее.",
+          "Когда говорят «нейросеть для синхронизации губ», обычно сразу сравнивают сервисы. На практике первый фильтр проще: видно ли рот. Широкий кадр с человеком в полный рост почти всегда проигрывает крупному плану, даже если модель сильная. Лицо должно быть освещено, губы не закрыты микрофоном, рукой, волосами или тяжелой тенью.\n\nHeyGen в официальных рекомендациях отдельно указывает, что губы должны быть ясно видны, а слишком маленький персонаж в кадре работает хуже. Поэтому начните с контролируемого теста: один и тот же короткий аудиофрагмент, сначала широкий кадр, затем `medium close-up talking portrait, clear mouth movement, stable head pose, soft frontal light, no fast turn`. Сравнивайте артикуляцию, не меняя одновременно голос, свет и темп.",
         before:
           "A presenter stands in a dark studio and talks to camera, cinematic wide shot.",
         after:
@@ -120,8 +141,28 @@ const en: BlogPostLocale = {
   cover: COVER_EN,
   readingTimeMin: 6,
   publishedAt: PUBLISHED,
-  updatedAt: PUBLISHED,
+  updatedAt: UPDATED,
   related: ru.related,
+  evidenceLinks: [
+    {
+      kind: "source",
+      label: "HeyGen: How to Get Started with Photo Avatars",
+      href: "https://help.heygen.com/en/articles/10034438-how-to-get-started-with-photo-avatars",
+      note: "HeyGen's official requirements for a readable face, visible lips, and adequate character size.",
+    },
+    {
+      kind: "guide",
+      label: "Image-to-video: prepare a stable source clip",
+      href: "/blog/image-to-video",
+      note: "Motion, camera, and preserve-block guidance before the lip-sync stage.",
+    },
+    {
+      kind: "guide",
+      label: "VEED Fabric prompts for talking video",
+      href: "/models/veed-fabric",
+      note: "Prompt structure and constraints for generating a speaking character.",
+    },
+  ],
   body: {
     intro:
       "AI lip sync is the process of matching spoken audio to visible mouth movement in a video. Good output depends less on a magic tool and more on clean audio, a readable close-up face, stable head pose, and prompt constraints before you generate or edit the clip.",
@@ -139,7 +180,7 @@ const en: BlogPostLocale = {
       {
         title: "For ai lip sync video, close-up beats a wide shot",
         body:
-          "When people compare ai lip sync tools, they often start with the service name. In production, the first filter is simpler: can the model see the mouth? A wide full-body shot almost always loses to a close-up, even with a stronger model. The face needs light, and the lips cannot be blocked by a mic, hand, hair, or heavy shadow.\n\nPractical case: a HeyGen test clip looked fine as a wide studio shot, but the mouth drifted because the face used less than 12% of the frame height. The fix was not `realistic`; it was the source prompt: `medium close-up talking portrait, clear mouth movement, stable head pose, soft frontal light, no fast turn`. After regenerating the crop, the lip sync became much steadier.",
+          "When people compare ai lip sync tools, they often start with the service name. In production, the first filter is simpler: can the model see the mouth? A wide full-body shot almost always loses to a close-up, even with a stronger model. The face needs light, and the lips cannot be blocked by a mic, hand, hair, or heavy shadow.\n\nHeyGen's official guidance specifically calls for clearly visible lips and warns that a character that is too small in the frame may not work well. Start with a controlled comparison: use the same short audio clip with a wide shot, then with `medium close-up talking portrait, clear mouth movement, stable head pose, soft frontal light, no fast turn`. Review articulation without changing voice, light, and pace at the same time.",
         before:
           "A presenter stands in a dark studio and talks to camera, cinematic wide shot.",
         after:

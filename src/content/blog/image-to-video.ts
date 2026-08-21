@@ -1,7 +1,7 @@
 import type { BlogPost, BlogPostLocale } from "./types";
 
 const PUBLISHED = "2026-05-26";
-const UPDATED = "2026-05-27";
+const UPDATED = "2026-08-21";
 
 const COVER_RU = {
   src: "/blog/image-to-video/cover.jpg",
@@ -30,7 +30,27 @@ const ru: BlogPostLocale = {
   readingTimeMin: 7,
   publishedAt: PUBLISHED,
   updatedAt: UPDATED,
-  related: ["gpt-image-2"],
+  related: ["kling-3-prompts", "prompt-structure", "gpt-image-2"],
+  evidenceLinks: [
+    {
+      kind: "source",
+      label: "Midjourney: Video",
+      href: "https://docs.midjourney.com/hc/en-us/articles/37460773864589-Video",
+      note: "Официальная документация по starting frame, 5-секундной генерации, motion low/high, extend и video-параметрам.",
+    },
+    {
+      kind: "guide",
+      label: "Midjourney Video: структура motion-промпта",
+      href: "/models/midjourney-video",
+      note: "Как разделить движение субъекта, камеры и темп для одного исходного кадра.",
+    },
+    {
+      kind: "guide",
+      label: "Kling 3.0: управляемые шоты и continuity",
+      href: "/blog/kling-3-prompts",
+      note: "Более подробный режиссёрский бриф для сцен, камеры и сохранения героя.",
+    },
+  ],
   body: {
     intro:
       "Нейросеть для видео превращает статичную картинку в короткий ролик: это практический ответ на задачу «как оживить фото через нейросеть». Рабочий image-to-video запрос описывает исходный кадр, движение камеры, действие, свет, темп и ограничения. Если эти блоки заданы явно, Kling 3.0, Veo 3.1 и Seedance 2.0 меньше ломают лица, фон и композицию.",
@@ -68,7 +88,7 @@ const ru: BlogPostLocale = {
       {
         title: "Проверьте лицо, руки, фон и темп перед рендером",
         body:
-          "Перед запуском финальной генерации проверьте четыре риска: лицо, руки, фон и темп. В реальном тесте для короткого fashion-кадра Kling 3.0 первый рендер дал шесть пальцев на руке, а повтор с ограничением `preserve finger count, keep both hands anatomically correct` убрал артефакт без смены позы. Для людей явно просите сохранять черты лица, количество пальцев и пропорции тела. Для предметов фиксируйте форму, логотипы лучше не добавлять в кадр мелким текстом, а для фона запрещайте появление новых объектов. Отдельно задайте длительность: 4-6 секунд обычно безопаснее, чем длинный ролик с большим числом событий.",
+          "Перед запуском финальной генерации проверьте четыре риска: лицо, руки, фон и темп. Для диагностического прогона используйте короткий клип и меняйте один блок за раз: например, сравните базовый prompt с версией `preserve finger count, keep both hands anatomically correct`, не меняя одновременно камеру и действие. Для людей явно просите сохранять черты лица, количество пальцев и пропорции тела. Для предметов фиксируйте форму, логотипы лучше не добавлять в кадр мелким текстом, а для фона запрещайте появление новых объектов. Midjourney официально начинает video generation с 5 секунд; для других моделей проверяйте доступную длительность в текущем интерфейсе.",
         before:
           "Сделай 12 секунд, пусть персонаж идет, машет рукой, камера меняет ракурс, фон оживает.",
         after:
@@ -114,7 +134,27 @@ const en: BlogPostLocale = {
   readingTimeMin: 6,
   publishedAt: PUBLISHED,
   updatedAt: UPDATED,
-  related: ["gpt-image-2"],
+  related: ru.related,
+  evidenceLinks: [
+    {
+      kind: "source",
+      label: "Midjourney: Video",
+      href: "https://docs.midjourney.com/hc/en-us/articles/37460773864589-Video",
+      note: "Official documentation for starting frames, five-second generations, motion low/high, extensions, and video parameters.",
+    },
+    {
+      kind: "guide",
+      label: "Midjourney Video motion-prompt structure",
+      href: "/models/midjourney-video",
+      note: "Separate subject motion, camera motion, and pace for one source frame.",
+    },
+    {
+      kind: "guide",
+      label: "Kling 3.0 controllable shots and continuity",
+      href: "/blog/kling-3-prompts",
+      note: "A fuller director brief for scene blocks, camera paths, and subject preservation.",
+    },
+  ],
   body: {
     intro:
       "Image to video AI turns a still frame into a short clip, but the useful result comes from a structured prompt, not from a lucky render. In Kling 3.0, Veo 3.1, and Seedance 2.0, a good image-to-video brief defines the source frame, camera motion, subject action, lighting, pace, and constraints so the model keeps identity, background, and composition stable.",
@@ -152,7 +192,7 @@ const en: BlogPostLocale = {
       {
         title: "Check face, hands, background, and pace before render",
         body:
-          "Before the final render, check four risk areas: face, hands, background, and pace. In a real short fashion-shot test, the first Kling 3.0 render gave the model six fingers on one hand; rerunning with `preserve finger count, keep both hands anatomically correct` fixed the artifact without changing the pose. For people, explicitly preserve facial features, finger count, and body proportions. For objects, lock shape and material. For backgrounds, block new objects from appearing. Keep duration modest: 4-6 seconds is usually safer than a long clip with several events.",
+          "Before the final render, check four risk areas: face, hands, background, and pace. For a diagnostic pass, use a short clip and change one block at a time: compare the base prompt with `preserve finger count, keep both hands anatomically correct` without also changing camera and action. For people, explicitly preserve facial features, finger count, and body proportions. For objects, lock shape and material. For backgrounds, block new objects from appearing. Midjourney officially starts video generations at five seconds; for other models, confirm the available duration in the current interface.",
         before:
           "Make it 12 seconds, the character walks, waves, camera changes angle, background comes alive.",
         after:

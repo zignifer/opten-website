@@ -1,6 +1,7 @@
 import type { BlogPost, BlogPostLocale } from "./types";
 
 const PUBLISHED = "2026-06-02";
+const UPDATED = "2026-08-21";
 
 const COVER_RU = {
   src: "/blog/prompt-examples/cover.jpg",
@@ -28,8 +29,28 @@ const ru: BlogPostLocale = {
   cover: COVER_RU,
   readingTimeMin: 7,
   publishedAt: PUBLISHED,
-  updatedAt: PUBLISHED,
+  updatedAt: UPDATED,
   related: ["prompt-structure", "negative-prompt", "gpt-image-2"],
+  evidenceLinks: [
+    {
+      kind: "source",
+      label: "OpenAI: как создавать хорошие промпты",
+      href: "https://help.openai.com/en/articles/4936848-how-do-i-create-a-good-prompt-for-an-ai-model",
+      note: "Официальные рекомендации: ясно формулировать задачу, добавлять контекст и улучшать запрос итерациями.",
+    },
+    {
+      kind: "source",
+      label: "OpenAI: prompt engineering best practices",
+      href: "https://help.openai.com/en/articles/10032626-how-do-i-prompt-chatgpt-effectively",
+      note: "Краткая официальная база по конкретности, контексту и итеративной проверке результата.",
+    },
+    {
+      kind: "guide",
+      label: "Структура промпта: 7 обязательных блоков",
+      href: "/blog/prompt-structure",
+      note: "Как превратить найденный пример в проверяемый бриф под свою задачу.",
+    },
+  ],
   body: {
     intro:
       "Примеры промптов помогают не тогда, когда их копируют целиком, а когда по ним видно логику запроса: цель, сцена, модель, ограничения и критерий результата. Хороший пример промпта показывает, что менять под свою задачу, а не обещает универсальную фразу для любой нейросети.",
@@ -37,7 +58,7 @@ const ru: BlogPostLocale = {
       {
         title: "Разбирайте примеры промптов, а не собирайте коллекцию",
         body:
-          "Большая подборка выглядит полезной, но чаще мешает. Человек берет строку из чужого кейса, вставляет ее в Midjourney 8.1, GPT Image 2 или Kling 3.0 и получает другой стиль, другой свет или слишком общий результат. Причина простая: пример был написан под конкретную модель, формат и исходный материал.\n\nРаботайте с примером как с разметкой. Найдите задачу, субъект, стиль, камеру, свет, ограничения и критерий проверки. Если в промпте есть только красивые слова вроде `cinematic`, `ultra detailed`, `award winning`, это не готовый prompt, а набор эстетических маркеров. Его нужно превратить в бриф, иначе модель сама решит, что важнее: лицо, фон, текст, движение или настроение.",
+          "Большая подборка выглядит полезной, но чаще мешает. Человек берет строку из чужого кейса, вставляет ее в Midjourney 8.2, GPT Image 2 или Kling 3.0 и получает другой стиль, другой свет или слишком общий результат. Причина простая: пример был написан под конкретную модель, формат и исходный материал.\n\nРаботайте с примером как с разметкой. Найдите задачу, субъект, стиль, камеру, свет, ограничения и критерий проверки. Если в промпте есть только красивые слова вроде `cinematic`, `ultra detailed`, `award winning`, это не готовый prompt, а набор эстетических маркеров. Его нужно превратить в бриф, иначе модель сама решит, что важнее: лицо, фон, текст, движение или настроение.",
         before:
           "cinematic cyberpunk city, girl, neon, ultra detailed, 8k, masterpiece",
         after:
@@ -65,9 +86,9 @@ const ru: BlogPostLocale = {
         imageSrc: "/blog/prompt-examples/ru/step-3.jpg",
       },
       {
-        title: "Кейс GPT Image 2: чужой пример дал другой стиль",
+        title: "Контрольный пример: адаптация под GPT Image 2",
         body:
-          "Практический кейс: команда взяла готовый prompt для Midjourney 8.1 - `minimal product shot, lime glow, premium, sharp shadows` - и перенесла его в GPT Image 2. Результат был аккуратным, но не тем: модель сделала слишком пустой кадр, смягчила тени и потеряла ощущение дорогого материала. Проблема была не в модели, а в том, что пример полагался на Midjourney-эстетику и не объяснял назначение кадра.\n\nИсправление заняло одну итерацию. Мы добавили purpose, материал, свет и композицию: `landing page hero for a premium AI tool, brushed black metal object, one lime rim light, diagonal shadow across the lower third, subject fills 45% of frame, no text`. После этого GPT Image 2 дал ближе к нужному результату: меньше случайной эстетики, больше управляемого кадра. Это и есть промпт инжиниринг: примеры промптов нужны как исходник, а не как финальная команда.",
+          "Возьмите готовую строку для Midjourney 8.2 — `minimal product shot, lime glow, premium, sharp shadows` — и разберите ее перед переносом в GPT Image 2. В ней нет назначения кадра, материала объекта, положения света и измеримой композиции. Поэтому любой результат трудно оценить: непонятно, что именно модель должна сохранить.\n\nКонтрольная адаптация добавляет эти блоки: `landing page hero for a premium AI tool, brushed black metal object, one lime rim light, diagonal shadow across the lower third, subject fills 45% of frame, no text`. Сравнивайте варианты при одинаковом формате и референсах, меняя только структуру запроса. Это и есть полезный prompt engineering: пример служит гипотезой, а не обещанием результата.",
         before:
           "minimal product shot, lime glow, premium, sharp shadows",
         after:
@@ -122,8 +143,28 @@ const en: BlogPostLocale = {
   cover: COVER_EN,
   readingTimeMin: 6,
   publishedAt: PUBLISHED,
-  updatedAt: PUBLISHED,
+  updatedAt: UPDATED,
   related: ru.related,
+  evidenceLinks: [
+    {
+      kind: "source",
+      label: "OpenAI: How do I create a good prompt?",
+      href: "https://help.openai.com/en/articles/4936848-how-do-i-create-a-good-prompt-for-an-ai-model",
+      note: "Official guidance on clear tasks, relevant context, and iterative prompt refinement.",
+    },
+    {
+      kind: "source",
+      label: "OpenAI: Prompt engineering best practices",
+      href: "https://help.openai.com/en/articles/10032626-how-do-i-prompt-chatgpt-effectively",
+      note: "Official fundamentals for specificity, context, and reviewing the result iteratively.",
+    },
+    {
+      kind: "guide",
+      label: "Prompt structure: seven practical blocks",
+      href: "/blog/prompt-structure",
+      note: "Turn a found example into a testable brief for your own task.",
+    },
+  ],
   body: {
     intro:
       "Prompt examples are useful when they reveal the logic of a request: goal, scene, model, constraints, and success criteria. They fail when copied as universal templates. A good example shows what to change for your model and task, not a magic sentence that works everywhere.",
@@ -131,7 +172,7 @@ const en: BlogPostLocale = {
       {
         title: "Treat prompt examples as patterns, not collections",
         body:
-          "A giant list feels useful, but it often slows people down. You copy a line from someone else's Midjourney 8.1, GPT Image 2, or Kling 3.0 case and get a different style, different lighting, or a flat result. The reason is usually simple: the example was written for one model, one format, and one source material.\n\nRead the example as markup. Find the job, subject, style, camera, lighting, constraints, and quality check. If the prompt only says `cinematic`, `ultra detailed`, `award winning`, it is not a working prompt yet. It is a bag of aesthetic tags. Turn it into a brief or the model will decide what matters: face, background, text, motion, or mood.",
+          "A giant list feels useful, but it often slows people down. You copy a line from someone else's Midjourney 8.2, GPT Image 2, or Kling 3.0 case and get a different style, different lighting, or a flat result. The reason is usually simple: the example was written for one model, one format, and one source material.\n\nRead the example as markup. Find the job, subject, style, camera, lighting, constraints, and quality check. If the prompt only says `cinematic`, `ultra detailed`, `award winning`, it is not a working prompt yet. It is a bag of aesthetic tags. Turn it into a brief or the model will decide what matters: face, background, text, motion, or mood.",
         before:
           "cinematic cyberpunk city, girl, neon, ultra detailed, 8k, masterpiece",
         after:
@@ -159,9 +200,9 @@ const en: BlogPostLocale = {
         imageSrc: "/blog/prompt-examples/en/step-3.jpg",
       },
       {
-        title: "GPT Image 2 case: copied style did not transfer",
+        title: "Controlled example: adapt the brief for GPT Image 2",
         body:
-          "Practical case: a team copied a Midjourney 8.1 prompt into GPT Image 2: `minimal product shot, lime glow, premium, sharp shadows`. The result was clean but wrong. GPT Image 2 made the frame too empty, softened the shadows, and lost the expensive material feel. The problem was not the model. The example relied on Midjourney aesthetics and never explained the shot's purpose.\n\nThe fix took one iteration. We added purpose, material, lighting, and composition: `landing page hero for a premium AI tool, brushed black metal object, one lime rim light, diagonal shadow across the lower third, subject fills 45% of frame, no text`. GPT Image 2 then moved much closer: less random style, more controlled frame. That is the useful side of prompt engineering: examples are raw material, not final commands.",
+          "Take a short Midjourney 8.2 line — `minimal product shot, lime glow, premium, sharp shadows` — and inspect it before moving it to GPT Image 2. It does not define the job, object material, light position, or measurable composition. That makes any output hard to evaluate because the model has no explicit target to preserve.\n\nA controlled adaptation adds those blocks: `landing page hero for a premium AI tool, brushed black metal object, one lime rim light, diagonal shadow across the lower third, subject fills 45% of frame, no text`. Compare both versions with the same format and references, changing only prompt structure. Prompt engineering treats an example as a hypothesis, not a guaranteed result.",
         before:
           "minimal product shot, lime glow, premium, sharp shadows",
         after:
