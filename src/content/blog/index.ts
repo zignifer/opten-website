@@ -3,6 +3,7 @@
 // + src/i18n/paths.ts + scripts/sitemap.mjs PATH_TO_SOURCE must stay in sync.
 
 import { post as gptImage2 } from "./gpt-image-2";
+import { post as bestAiImageGenerator2026 } from "./best-ai-image-generator-2026";
 import { post as bestAiToolsForWork } from "./best-ai-tools-for-work";
 import { post as promptEngineeringCourse } from "./prompt-engineering-course";
 import { post as figmaCourseBeginners } from "./figma-course-beginners";
@@ -46,6 +47,7 @@ import { post as aiLogoGeneratorPrompt } from "./ai-logo-generator-prompt";
 import type { BlogPost } from "./types";
 
 export const blogPostsBySlug = {
+  "best-ai-image-generator-2026": bestAiImageGenerator2026,
   "best-ai-tools-for-work": bestAiToolsForWork,
   "prompt-engineering-course": promptEngineeringCourse,
   "figma-course-beginners": figmaCourseBeginners,

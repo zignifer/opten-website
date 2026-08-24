@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-21",
+  "updatedAt": "2026-08-25",
   "selectionPolicy": "queued-by-queueOrder-then-deferred",
   "research": {
     "rule": "Synthetic seeds discover wording; only Suggest, Wordstat, Bing, GSC, or reviewed manual evidence can create a queued topic.",
@@ -2734,6 +2734,176 @@
       },
       "targetUrl": "/blog/seo-pipeline-wordstat-codex",
       "publishedAt": "2026-08-06"
+    },
+    {
+      "queueOrder": 32,
+      "slug": "image-to-video-ai",
+      "status": "rejected",
+      "titleHint": "Видео из фото через нейросеть: как получить управляемое движение",
+      "clusterId": "BL-video-technique",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "видео из фото нейросеть",
+          "role": "primary",
+          "broadVolume": 12937,
+          "exactLikeVolume": 503,
+          "placement": "RU title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "сделать видео из фото нейросеть",
+          "role": "secondary",
+          "broadVolume": 3207,
+          "exactLikeVolume": null,
+          "placement": "RU H2/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "создать видео из фото нейросеть",
+          "role": "secondary",
+          "broadVolume": 1810,
+          "exactLikeVolume": null,
+          "placement": "RU body"
+        },
+        {
+          "language": "ru",
+          "phrase": "оживить картинку нейросеть",
+          "role": "secondary",
+          "broadVolume": 1808,
+          "exactLikeVolume": null,
+          "placement": "RU body/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для создания видео из фото",
+          "role": "secondary",
+          "broadVolume": 1561,
+          "exactLikeVolume": null,
+          "placement": "RU FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "image to video ai",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "en",
+          "phrase": "image to video ai generator",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN H2/body"
+        },
+        {
+          "language": "en",
+          "phrase": "image to video ai with prompt",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body/FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "suggest",
+          "wordstat"
+        ],
+        "note": "Rejected after review because the existing /blog/image-to-video article already satisfies the same RU and EN search intent",
+        "lastCheckedAt": "2026-08-25"
+      },
+      "targetUrl": "/blog/image-to-video-ai",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 33,
+      "slug": "best-ai-image-generator-2026",
+      "status": "published",
+      "titleHint": "Лучшие нейросети для генерации изображений в 2026 году: выбор по задаче",
+      "clusterId": "BL-image-model-comparison",
+      "intentType": "comparison",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "лучшие нейросети для генерации изображений",
+          "role": "primary",
+          "broadVolume": 1621,
+          "exactLikeVolume": 701,
+          "placement": "RU title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "лучшая нейросеть для изображений",
+          "role": "secondary",
+          "broadVolume": 2249,
+          "exactLikeVolume": 42,
+          "placement": "RU excerpt/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "какая нейросеть лучше для изображений",
+          "role": "secondary",
+          "broadVolume": 180,
+          "exactLikeVolume": null,
+          "placement": "RU body/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "лучшие нейросети для генерации изображений 2026",
+          "role": "secondary",
+          "broadVolume": 75,
+          "exactLikeVolume": null,
+          "placement": "RU intro/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "лучшая нейросеть для редактирования изображений",
+          "role": "secondary",
+          "broadVolume": 58,
+          "exactLikeVolume": null,
+          "placement": "RU H2/body"
+        },
+        {
+          "language": "en",
+          "phrase": "best ai image generator",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "en",
+          "phrase": "best ai image generator for realistic photos",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN H2/body"
+        },
+        {
+          "language": "en",
+          "phrase": "best ai image generator prompt",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body/FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "suggest",
+          "wordstat"
+        ],
+        "note": "Google Suggest confirmed the EN comparison cluster and Yandex Wordstat measured RU broad and exact-like demand",
+        "lastCheckedAt": "2026-08-25"
+      },
+      "targetUrl": "/blog/best-ai-image-generator-2026",
+      "publishedAt": "2026-08-25"
     }
   ]
 }

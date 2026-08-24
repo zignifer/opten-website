@@ -54,6 +54,8 @@ const PATH_TO_SOURCE = {
   "/en/about":               "src/content/about.tsx",
   "/blog":                   "src/content/blog/index.ts",
   "/en/blog":                "src/content/blog/index.ts",
+  "/blog/best-ai-image-generator-2026":    "src/content/blog/best-ai-image-generator-2026.ts",
+  "/en/blog/best-ai-image-generator-2026": "src/content/blog/best-ai-image-generator-2026.ts",
   "/blog/best-ai-tools-for-work":        "src/content/blog/best-ai-tools-for-work.ts",
   "/en/blog/best-ai-tools-for-work":     "src/content/blog/best-ai-tools-for-work.ts",
   "/blog/prompt-engineering-course":        "src/content/blog/prompt-engineering-course.ts",
