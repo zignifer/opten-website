@@ -530,7 +530,7 @@ calling the finalizer directly in a unit test is not sufficient billing coverage
   reference data are never stored with it. A reload restores the preference instead
   of silently resetting Vibe Coding to Image. The browser conservatively detects
   explicit coding-workflow markers under an Image/Video selection, switches to
-  `Вайбкодинг / Codex`, and requires a second click. The endpoint repeats the check
+  `Вайб-кодинг / Codex`, and requires a second click. The endpoint repeats the check
   after website authentication but before proxy use and returns
   `409 vibecoding_mode_required`, so this mismatch cannot reserve or spend usage.
 - Optional references: up to 8 image files. The browser rejects sources larger

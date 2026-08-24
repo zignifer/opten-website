@@ -174,7 +174,7 @@ try {
 
   assert.match(models, /vibecoding:\s*\[[\s\S]*slug:\s*"codex"[\s\S]*slug:\s*"claude"[\s\S]*slug:\s*"gemini"/);
   assert.match(component, /vibecoding:\s*"codex"/);
-  assert.match(component, /vibecoding:\s*"Вайбкодинг"/);
+  assert.match(component, /vibecoding:\s*"Вайб-кодинг"/);
   assert.match(component, /vibecoding:\s*"Vibe coding"/);
   assert.match(component, /<option value="vibecoding"/);
   assert.match(component, /opten_prompt_workbench_preferences_v1/);
