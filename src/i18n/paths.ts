@@ -21,6 +21,7 @@ const STATIC_EN_SIBLINGS: readonly string[] = [
   "/refund",
   "/about", // Phase 4.1 B-03
   "/blog", // Phase 5 B-04
+  "/blog/midjourney-alternatives-2026", // seo2 manual blog automation
   "/blog/best-ai-image-generator-2026", // seo2 manual blog automation
   "/blog/best-ai-tools-for-work", // seo2 manual blog automation
   "/blog/prompt-engineering-course", // seo2 manual blog automation

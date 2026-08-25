@@ -2904,6 +2904,169 @@
       },
       "targetUrl": "/blog/best-ai-image-generator-2026",
       "publishedAt": "2026-08-25"
+    },
+    {
+      "queueOrder": 34,
+      "slug": "best-ai-video-generator-2026",
+      "status": "rejected",
+      "titleHint": "Лучшие нейросети для генерации видео в 2026 году: как выбрать модель под задачу",
+      "clusterId": "BL-video-model-comparison",
+      "intentType": "comparison",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросети для генерации видео",
+          "role": "primary",
+          "broadVolume": 13180,
+          "exactLikeVolume": 2902,
+          "placement": "RU title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "лучшие нейросети для видео",
+          "role": "secondary",
+          "broadVolume": 2551,
+          "exactLikeVolume": 76,
+          "placement": "RU excerpt/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "лучшие нейросети для создания видео",
+          "role": "secondary",
+          "broadVolume": 1022,
+          "exactLikeVolume": 278,
+          "placement": "RU H2/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "лучшие нейросети для генерации видео",
+          "role": "secondary",
+          "broadVolume": 884,
+          "exactLikeVolume": 326,
+          "placement": "RU body/FAQ/image alt"
+        },
+        {
+          "language": "ru",
+          "phrase": "лучшая нейросеть для видео 2026",
+          "role": "secondary",
+          "broadVolume": 146,
+          "exactLikeVolume": null,
+          "placement": "RU intro/body"
+        },
+        {
+          "language": "en",
+          "phrase": "best ai video generator",
+          "role": "primary",
+          "broadVolume": 1947,
+          "exactLikeVolume": 1229,
+          "placement": "EN title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "en",
+          "phrase": "best ai video generator for youtube",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN H2/body"
+        },
+        {
+          "language": "en",
+          "phrase": "best ai video generator for animation",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body/FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "suggest",
+          "wordstat",
+          "bing"
+        ],
+        "note": "Rejected after review because the existing /blog/best-ai-video-2026 already satisfies the same RU and EN search intent",
+        "lastCheckedAt": "2026-08-25"
+      },
+      "targetUrl": "/blog/best-ai-video-generator-2026",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 35,
+      "slug": "midjourney-alternatives-2026",
+      "status": "published",
+      "titleHint": "Аналоги Midjourney в 2026 году: какую нейросеть выбрать под свою задачу",
+      "clusterId": "BL-midjourney-alternatives",
+      "intentType": "comparison",
+      "buyerStage": "consideration",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "аналог Midjourney",
+          "role": "primary",
+          "broadVolume": 112,
+          "exactLikeVolume": 7,
+          "placement": "RU title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "аналоги Midjourney",
+          "role": "secondary",
+          "broadVolume": 112,
+          "exactLikeVolume": 7,
+          "placement": "RU excerpt/body"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети похожие на Midjourney",
+          "role": "secondary",
+          "broadVolume": 17,
+          "exactLikeVolume": 1,
+          "placement": "RU H2/body/FAQ"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть Midjourney аналоги",
+          "role": "secondary",
+          "broadVolume": 13,
+          "exactLikeVolume": null,
+          "placement": "RU body/image alt"
+        },
+        {
+          "language": "en",
+          "phrase": "midjourney alternative",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone, intro, meta description"
+        },
+        {
+          "language": "en",
+          "phrase": "midjourney alternative for image generation",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN excerpt/body"
+        },
+        {
+          "language": "en",
+          "phrase": "midjourney alternative open source",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body/FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": [
+          "suggest",
+          "wordstat"
+        ],
+        "note": "Google Suggest confirmed the EN alternative cluster; Yandex Wordstat measured RU broad and exact-like demand",
+        "lastCheckedAt": "2026-08-25"
+      },
+      "targetUrl": "/blog/midjourney-alternatives-2026",
+      "publishedAt": "2026-08-25"
     }
   ]
 }
