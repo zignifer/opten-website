@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-25",
+  "updatedAt": "2026-08-26",
   "selectionPolicy": "queued-by-queueOrder-then-deferred",
   "research": {
-    "rule": "Synthetic seeds discover wording; only Suggest, Wordstat, Bing, GSC, or reviewed manual evidence can create a queued topic.",
+    "rule": "Synthetic seeds discover wording; only Suggest, Wordstat, Bing, GSC, Yandex Webmaster, or reviewed manual evidence can create a queued topic.",
     "familyTerms": {
       "en": [
         "kling",
@@ -229,6 +229,182 @@
             "как составить промпт",
             "негативный промпт",
             "идеи промптов"
+          ]
+        }
+      },
+      {
+        "name": "vibecoding",
+        "includeTerms": [
+          "vibe",
+          "вайб",
+          "coding",
+          "кодинг",
+          "code",
+          "код",
+          "codex",
+          "claude",
+          "website",
+          "сайт",
+          "app",
+          "прилож"
+        ],
+        "seeds": {
+          "en": [
+            "vibe coding",
+            "vibe coding prompts",
+            "ai coding for beginners",
+            "build website with ai",
+            "build app with ai",
+            "codex prompt",
+            "claude code prompt"
+          ],
+          "ru": [
+            "вайб кодинг",
+            "промпты для вайб кодинга",
+            "нейросеть для программирования",
+            "создать сайт с нейросетью",
+            "создать приложение с нейросетью",
+            "промпт для codex",
+            "промпт для claude code"
+          ]
+        }
+      },
+      {
+        "name": "prompt-library",
+        "includeTerms": [
+          "prompt",
+          "промпт",
+          "library",
+          "библиотек",
+          "manager",
+          "менеджер",
+          "save",
+          "сохран"
+        ],
+        "seeds": {
+          "en": [
+            "prompt library",
+            "ai prompt library",
+            "prompt manager",
+            "prompts for marketers",
+            "prompts for designers",
+            "prompts for content creators"
+          ],
+          "ru": [
+            "библиотека промптов",
+            "готовые промпты для нейросетей",
+            "менеджер промптов",
+            "промпты для маркетолога",
+            "промпты для дизайнера",
+            "промпты для контента"
+          ]
+        }
+      },
+      {
+        "name": "ai-income",
+        "includeTerms": [
+          "ai",
+          "ии",
+          "нейросет",
+          "earn",
+          "money",
+          "заработ",
+          "доход",
+          "freelance",
+          "фриланс",
+          "service",
+          "услуг"
+        ],
+        "seeds": {
+          "en": [
+            "make money with ai",
+            "ai freelance services",
+            "ai video services",
+            "ai image services",
+            "ai services for marketplaces",
+            "sell websites made with ai"
+          ],
+          "ru": [
+            "как заработать на нейросетях",
+            "фриланс с нейросетями",
+            "услуги с нейросетями",
+            "заработок на ии видео",
+            "заработок на ии изображениях",
+            "продавать сайты сделанные нейросетью"
+          ]
+        }
+      },
+      {
+        "name": "learning-portal",
+        "includeTerms": [
+          "ai",
+          "ии",
+          "нейросет",
+          "course",
+          "курс",
+          "learn",
+          "обуч",
+          "coding",
+          "кодинг",
+          "content",
+          "контент",
+          "marketing",
+          "маркетинг"
+        ],
+        "seeds": {
+          "en": [
+            "ai course for beginners",
+            "learn ai from scratch",
+            "vibe coding course",
+            "ai content creation course",
+            "ai marketing course",
+            "ai tools for beginners"
+          ],
+          "ru": [
+            "курс по ии для начинающих",
+            "обучение нейросетям с нуля",
+            "курс по вайб кодингу",
+            "курс по созданию контента с ии",
+            "курс по ии для маркетинга",
+            "нейросети для начинающих"
+          ]
+        }
+      },
+      {
+        "name": "creator-marketing",
+        "includeTerms": [
+          "ai",
+          "ии",
+          "нейросет",
+          "content",
+          "контент",
+          "creator",
+          "блогер",
+          "marketing",
+          "маркетолог",
+          "social",
+          "соцсет",
+          "ugc",
+          "automation",
+          "автоматизац"
+        ],
+        "seeds": {
+          "en": [
+            "ai for marketers",
+            "ai for bloggers",
+            "ai for content creators",
+            "ai for social media",
+            "ai for advertising",
+            "ai content automation",
+            "ai ugc services"
+          ],
+          "ru": [
+            "нейросети для маркетолога",
+            "нейросети для блогера",
+            "нейросети для соцсетей",
+            "нейросети для рекламы",
+            "автоматизация контента с ии",
+            "услуги ai ugc"
           ]
         }
       }
@@ -3067,6 +3243,1026 @@
       },
       "targetUrl": "/blog/midjourney-alternatives-2026",
       "publishedAt": "2026-08-25"
+    },
+    {
+      "queueOrder": 36,
+      "slug": "vibe-coding-prompts",
+      "status": "queued",
+      "titleHint": "Промпты для вайб-кодинга: как ставить задачу Codex, Claude и Gemini",
+      "clusterId": "BL-vibecoding-prompts",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "primaryDestination": "/",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "промты для вайб кодинга",
+          "role": "primary",
+          "broadVolume": 26,
+          "exactLikeVolume": 4,
+          "placement": "RU semantic lock; use correct natural spelling in visible copy"
+        },
+        {
+          "language": "ru",
+          "phrase": "промпты для вайб-кодинга",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "vibe coding prompts",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "prompts for vibe coding",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat"],
+        "note": "Wordstat confirmed bounded RU demand; Suggest confirmed the EN wording and coding-prompt intent",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/vibe-coding-prompts",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 37,
+      "slug": "codex-prompting-guide",
+      "status": "queued",
+      "titleHint": "Как писать промпты для Codex: контекст, ограничения и проверка результата",
+      "clusterId": "BL-codex-prompting",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "primaryDestination": "/",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "промпт для codex",
+          "role": "primary",
+          "broadVolume": 39,
+          "exactLikeVolume": 2,
+          "placement": "RU title/H1-zone and intro"
+        },
+        {
+          "language": "ru",
+          "phrase": "как писать промпты для codex",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU body and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "codex prompt best practices",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "codex prompting guide",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat", "manual"],
+        "note": "Wordstat measured the RU query; Suggest and reviewed official Codex guidance support a distinct prompting task",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/codex-prompting-guide",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 38,
+      "slug": "claude-code-prompting-guide",
+      "status": "queued",
+      "titleHint": "Промпты для Claude Code: как давать контекст и не терять требования",
+      "clusterId": "BL-claude-code-prompting",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "primaryDestination": "/",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "промпт для claude code",
+          "role": "primary",
+          "broadVolume": 20,
+          "exactLikeVolume": 2,
+          "placement": "RU title/H1-zone and intro"
+        },
+        {
+          "language": "ru",
+          "phrase": "как писать промпты для claude code",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU body and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "claude code prompting best practices",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "claude code prompting guide",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat", "manual"],
+        "note": "Wordstat measured RU demand; Suggest and Anthropic documentation confirm a separate Claude Code prompting intent",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/claude-code-prompting-guide",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 39,
+      "slug": "build-app-with-ai",
+      "status": "queued",
+      "titleHint": "Как создать приложение с нейросетью: путь от идеи до работающего прототипа",
+      "clusterId": "BL-build-app-with-ai",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "primaryDestination": "/",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "как создать приложение с нейросетью",
+          "role": "primary",
+          "broadVolume": 87,
+          "exactLikeVolume": 1,
+          "placement": "RU title/H1-zone and intro"
+        },
+        {
+          "language": "ru",
+          "phrase": "создать приложение с помощью ии",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU body and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "build app with ai",
+          "role": "primary",
+          "broadVolume": 44,
+          "exactLikeVolume": 24,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "build an app with ai",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat", "bing"],
+        "note": "RU demand is modest but explicit; Bing measured the EN task and Suggest confirmed both wordings",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/build-app-with-ai",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 40,
+      "slug": "ai-coding-for-beginners",
+      "status": "queued",
+      "titleHint": "Нейросети для программирования: что выбрать новичку для вайб-кодинга",
+      "clusterId": "BL-ai-coding-beginners",
+      "intentType": "comparison",
+      "buyerStage": "awareness",
+      "primaryDestination": "/",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросеть для программирования",
+          "role": "primary",
+          "broadVolume": 2183,
+          "exactLikeVolume": 361,
+          "placement": "RU title/H1-zone, intro and meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для программирования новичку",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU body and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "ai coding for beginners",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "best ai coding tools for beginners",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN comparison and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat"],
+        "note": "This is the strongest RU coding cluster in the batch; the angle is tool choice and workflow, not another generic course page",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/ai-coding-for-beginners",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 41,
+      "slug": "ai-prompt-library",
+      "status": "queued",
+      "titleHint": "Библиотека промптов: как хранить, находить и повторно использовать запросы",
+      "clusterId": "BL-ai-prompt-library",
+      "intentType": "transactional",
+      "buyerStage": "consideration",
+      "primaryDestination": "/prompt-library",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "библиотека промптов",
+          "role": "primary",
+          "broadVolume": 402,
+          "exactLikeVolume": 55,
+          "placement": "RU title/H1-zone, intro and meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "библиотека готовых промптов",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU body and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "prompt library",
+          "role": "primary",
+          "broadVolume": 1182,
+          "exactLikeVolume": 775,
+          "placement": "EN title/H1-zone, intro and meta description"
+        },
+        {
+          "language": "en",
+          "phrase": "ai prompt library",
+          "role": "secondary",
+          "broadVolume": 124,
+          "exactLikeVolume": 124,
+          "placement": "EN body and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat", "bing"],
+        "note": "Both RU and EN show direct library intent and map exactly to the existing free Prompt Library",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/ai-prompt-library",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 42,
+      "slug": "prompts-for-marketers",
+      "status": "queued",
+      "titleHint": "Промпты для маркетолога: готовые шаблоны для исследования, оффера и контента",
+      "clusterId": "BL-prompts-marketers",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "primaryDestination": "/prompt-library",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "промпты для маркетолога",
+          "role": "primary",
+          "broadVolume": 58,
+          "exactLikeVolume": 7,
+          "placement": "RU title/H1-zone and intro"
+        },
+        {
+          "language": "ru",
+          "phrase": "готовые промпты для маркетинга",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU sections and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "prompts for marketers",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "ai prompts for marketing",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN sections and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat"],
+        "note": "Wordstat confirms a focused RU role cluster; Suggest confirms the matching EN template intent",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/prompts-for-marketers",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 43,
+      "slug": "prompts-for-content-creators",
+      "status": "queued",
+      "titleHint": "Промпты для контента: шаблоны для идей, контент-плана и публикаций",
+      "clusterId": "BL-prompts-content-creators",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "primaryDestination": "/prompt-library",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "промпты для контента",
+          "role": "primary",
+          "broadVolume": 226,
+          "exactLikeVolume": 2,
+          "placement": "RU title/H1-zone and intro"
+        },
+        {
+          "language": "ru",
+          "phrase": "промпт для контент плана",
+          "role": "secondary",
+          "broadVolume": 83,
+          "exactLikeVolume": null,
+          "placement": "RU section about planning"
+        },
+        {
+          "language": "en",
+          "phrase": "prompts for content creators",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "content planning prompts",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN planning section and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat"],
+        "note": "Wordstat shows a wider content-template cluster; Suggest supports the EN creator wording",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/prompts-for-content-creators",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 44,
+      "slug": "prompts-for-designers",
+      "status": "queued",
+      "titleHint": "Промпты для дизайнера: шаблоны для брифа, референсов и визуальных концепций",
+      "clusterId": "BL-prompts-designers",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "primaryDestination": "/prompt-library",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "промпты для дизайнера",
+          "role": "primary",
+          "broadVolume": 107,
+          "exactLikeVolume": 3,
+          "placement": "RU title/H1-zone and intro"
+        },
+        {
+          "language": "ru",
+          "phrase": "готовые промпты для дизайнеров",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU sections and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "prompts for designers",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "ai prompts for designers",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN sections and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat"],
+        "note": "The template intent is distinct from the existing broad AI-for-designers article and maps to reusable library items",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/prompts-for-designers",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 45,
+      "slug": "prompt-manager",
+      "status": "queued",
+      "titleHint": "Менеджер промптов: как организовать личную библиотеку без хаоса",
+      "clusterId": "BL-prompt-manager",
+      "intentType": "transactional",
+      "buyerStage": "consideration",
+      "primaryDestination": "/prompt-library",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "менеджер промптов",
+          "role": "primary",
+          "broadVolume": 110,
+          "exactLikeVolume": 0,
+          "placement": "RU title/H1-zone and intro"
+        },
+        {
+          "language": "ru",
+          "phrase": "промпт менеджер",
+          "role": "secondary",
+          "broadVolume": 108,
+          "exactLikeVolume": null,
+          "placement": "RU body and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "prompt manager",
+          "role": "primary",
+          "broadVolume": 18,
+          "exactLikeVolume": 18,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "ai prompt manager",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN body and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat", "bing"],
+        "note": "Broad RU wording and exact EN demand support an organizational product-intent article despite zero RU exact-like count",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/prompt-manager",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 46,
+      "slug": "ai-for-marketers",
+      "status": "queued",
+      "titleHint": "Нейросети для маркетолога: рабочий набор задач и инструментов",
+      "clusterId": "BL-ai-marketers",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "primaryDestination": "/learn",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросети для маркетолога",
+          "role": "primary",
+          "broadVolume": 184,
+          "exactLikeVolume": 48,
+          "placement": "RU title/H1-zone, intro and meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "как маркетологу использовать нейросети",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU workflow sections"
+        },
+        {
+          "language": "en",
+          "phrase": "ai for marketers",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "ai tools for marketers",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN workflow sections and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat"],
+        "note": "Strong exact-like RU role demand and Suggest-confirmed EN wording fit the practical Learn catalog",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/ai-for-marketers",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 47,
+      "slug": "ai-for-bloggers",
+      "status": "queued",
+      "titleHint": "Нейросети для блогера: идеи, сценарии, визуалы и проверка контента",
+      "clusterId": "BL-ai-bloggers",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "primaryDestination": "/learn",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросети для блогера",
+          "role": "primary",
+          "broadVolume": 65,
+          "exactLikeVolume": 5,
+          "placement": "RU title/H1-zone and intro"
+        },
+        {
+          "language": "ru",
+          "phrase": "ии инструменты для блогера",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU sections and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "ai for bloggers",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "ai tools for bloggers",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN sections and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat"],
+        "note": "Wordstat validates the RU creator niche; a dedicated Suggest seed confirmed the EN blogger wording",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/ai-for-bloggers",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 48,
+      "slug": "ai-for-social-media",
+      "status": "queued",
+      "titleHint": "Нейросети для соцсетей: контент-план, посты, визуалы и аналитика",
+      "clusterId": "BL-ai-social-media",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "primaryDestination": "/learn",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросети для соцсетей",
+          "role": "primary",
+          "broadVolume": 902,
+          "exactLikeVolume": 13,
+          "placement": "RU title/H1-zone, intro and meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросеть для ведения соцсетей",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU workflow sections"
+        },
+        {
+          "language": "en",
+          "phrase": "ai for social media",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "ai for social media content",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN workflow sections and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat"],
+        "note": "High broad RU demand and a dense EN Suggest cluster support a comprehensive social-media workflow guide",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/ai-for-social-media",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 49,
+      "slug": "ai-for-content-creation",
+      "status": "queued",
+      "titleHint": "Нейросети для создания контента: процесс от идеи до публикации",
+      "clusterId": "BL-ai-content-creation",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "primaryDestination": "/learn",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросети для создания контента",
+          "role": "primary",
+          "broadVolume": 725,
+          "exactLikeVolume": 34,
+          "placement": "RU title/H1-zone, intro and meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "создание контента с помощью ии",
+          "role": "secondary",
+          "broadVolume": 190,
+          "exactLikeVolume": 15,
+          "placement": "RU workflow sections and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "ai for content creation",
+          "role": "primary",
+          "broadVolume": 42,
+          "exactLikeVolume": 42,
+          "placement": "EN title/H1-zone, intro and meta description"
+        },
+        {
+          "language": "en",
+          "phrase": "ai content creation workflow",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN workflow sections"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat", "bing"],
+        "note": "Strong RU cluster and exact EN Bing demand support a portal-level workflow guide rather than a sales-only course page",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/ai-for-content-creation",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 50,
+      "slug": "ai-for-advertising",
+      "status": "queued",
+      "titleHint": "Нейросети для рекламы: креативы, тексты, видео и контроль качества",
+      "clusterId": "BL-ai-advertising",
+      "intentType": "guide",
+      "buyerStage": "awareness",
+      "primaryDestination": "/learn",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "нейросети для рекламы",
+          "role": "primary",
+          "broadVolume": 936,
+          "exactLikeVolume": 19,
+          "placement": "RU title/H1-zone, intro and meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "нейросети для создания рекламы",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU sections and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "ai for advertising",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "ai tools for advertising",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN sections and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat"],
+        "note": "Wordstat shows strong RU demand; a dedicated Suggest seed confirmed broad EN advertising and tool variants",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/ai-for-advertising",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 51,
+      "slug": "vibe-coding-course",
+      "status": "queued",
+      "titleHint": "Курс по вайб-кодингу: чему учиться и как выбрать программу",
+      "clusterId": "BL-vibecoding-course",
+      "intentType": "transactional",
+      "buyerStage": "decision",
+      "primaryDestination": "/learn/courses/ai-content-marketing-2026",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "курс по вайб кодингу",
+          "role": "primary",
+          "broadVolume": 154,
+          "exactLikeVolume": 53,
+          "placement": "RU title/H1-zone, intro and meta description"
+        },
+        {
+          "language": "ru",
+          "phrase": "обучение вайб-кодингу",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU comparison criteria and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "vibe coding course",
+          "role": "primary",
+          "broadVolume": 28,
+          "exactLikeVolume": 28,
+          "placement": "EN title/H1-zone, intro and meta description"
+        },
+        {
+          "language": "en",
+          "phrase": "learn vibe coding",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN criteria and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat", "bing"],
+        "note": "Strong exact-like RU demand and measured EN demand support a decision-stage course guide",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/vibe-coding-course",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 52,
+      "slug": "ai-content-creation-course",
+      "status": "queued",
+      "titleHint": "Курс по созданию контента с ИИ: что должно быть в программе",
+      "clusterId": "BL-ai-content-course",
+      "intentType": "transactional",
+      "buyerStage": "decision",
+      "primaryDestination": "/learn/courses/ai-content-marketing-2026",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "курс по созданию ии контента",
+          "role": "primary",
+          "broadVolume": 37,
+          "exactLikeVolume": 3,
+          "placement": "RU title/H1-zone and intro"
+        },
+        {
+          "language": "ru",
+          "phrase": "курс по созданию контента с ии",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU program criteria and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "ai content creation course",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "content creation with ai course",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN program criteria and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat"],
+        "note": "The RU query has explicit course intent; Suggest confirms a natural EN counterpart without treating empty Bing as zero demand",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/ai-content-creation-course",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 53,
+      "slug": "ai-marketing-course",
+      "status": "queued",
+      "titleHint": "Курс по ИИ для маркетинга: навыки, практика и критерии выбора",
+      "clusterId": "BL-ai-marketing-course",
+      "intentType": "transactional",
+      "buyerStage": "decision",
+      "primaryDestination": "/learn/courses/ai-content-marketing-2026",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "курс ии для маркетинга",
+          "role": "primary",
+          "broadVolume": 49,
+          "exactLikeVolume": 2,
+          "placement": "RU title/H1-zone and intro"
+        },
+        {
+          "language": "ru",
+          "phrase": "курс по нейросетям для маркетолога",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU criteria and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "ai marketing course",
+          "role": "primary",
+          "broadVolume": 118,
+          "exactLikeVolume": 0,
+          "placement": "EN title/H1-zone, intro and meta description"
+        },
+        {
+          "language": "en",
+          "phrase": "ai course for marketers",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN criteria and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat", "bing"],
+        "note": "Both markets show decision-stage course language; Bing broad demand is retained separately from the zero exact-like count",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/ai-marketing-course",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 54,
+      "slug": "ai-content-automation-course",
+      "status": "queued",
+      "titleHint": "Автоматизация контента с ИИ: как собрать систему без потери качества",
+      "clusterId": "BL-ai-content-automation",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "primaryDestination": "/learn/courses/ai-content-marketing-2026",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "автоматизация контента с помощью ии",
+          "role": "primary",
+          "broadVolume": 12,
+          "exactLikeVolume": 5,
+          "placement": "RU title/H1-zone and intro"
+        },
+        {
+          "language": "ru",
+          "phrase": "автоматизация создания контента",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU workflow sections and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "ai content automation",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "ai content automation system",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN workflow sections and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat"],
+        "note": "The RU exact-like share is meaningful for a narrow workflow query and EN Suggest exposes a broad system/tool cluster",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/ai-content-automation-course",
+      "publishedAt": null
+    },
+    {
+      "queueOrder": 55,
+      "slug": "make-money-with-ai-video",
+      "status": "queued",
+      "titleHint": "Как зарабатывать на ИИ-видео: услуги, портфолио и первые клиенты",
+      "clusterId": "BL-ai-video-income",
+      "intentType": "guide",
+      "buyerStage": "consideration",
+      "primaryDestination": "/learn/courses/ai-content-marketing-2026",
+      "keywords": [
+        {
+          "language": "ru",
+          "phrase": "заработок на ии видео",
+          "role": "primary",
+          "broadVolume": 40,
+          "exactLikeVolume": 5,
+          "placement": "RU title/H1-zone and intro"
+        },
+        {
+          "language": "ru",
+          "phrase": "как зарабатывать на видео с нейросетями",
+          "role": "secondary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "RU services and FAQ"
+        },
+        {
+          "language": "en",
+          "phrase": "make money with ai videos",
+          "role": "primary",
+          "broadVolume": null,
+          "exactLikeVolume": null,
+          "placement": "EN title/H1-zone and intro"
+        },
+        {
+          "language": "en",
+          "phrase": "ai video production",
+          "role": "secondary",
+          "broadVolume": 263,
+          "exactLikeVolume": 52,
+          "placement": "EN service packaging and FAQ"
+        }
+      ],
+      "evidence": {
+        "sources": ["suggest", "wordstat", "bing"],
+        "note": "This narrows the existing generic earnings cluster to a sellable AI-video service with measured RU and EN support",
+        "lastCheckedAt": "2026-08-26"
+      },
+      "targetUrl": "/blog/make-money-with-ai-video",
+      "publishedAt": null
     }
   ]
 }

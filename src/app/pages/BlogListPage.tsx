@@ -18,6 +18,7 @@ import { allBlogPosts } from "../../content/blog";
 import type { BlogCategory } from "../../content/blog/types";
 
 const PAGE_SIZE = 12;
+const ALL_POSTS_PREVIEW_SIZE = 8;
 const SEARCH_DEBOUNCE_MS = 250;
 const BLOG_CATEGORIES: BlogCategory[] = ["news", "guide"];
 
@@ -31,6 +32,7 @@ export default function BlogListPage() {
   // URL (?category, ?q, ?page) doesn't throw a hydration mismatch — the prerender
   // always emits page 1 of the full inventory. After mount we flip to the URL.
   const [hydrated, setHydrated] = useState(false);
+  const [showAllPosts, setShowAllPosts] = useState(false);
   const activeCategory = (hydrated ? searchParams.get("category") ?? "" : "") as BlogCategory | "";
   const pageParam = Number.parseInt((hydrated ? searchParams.get("page") : null) ?? "1", 10);
   const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
@@ -301,18 +303,51 @@ export default function BlogListPage() {
           <p className="mt-[12px] max-w-[720px] text-[15px] leading-[1.6] text-white/60">
             {t("blog.allArticlesIntro")}
           </p>
-          <ul className="mt-[24px] grid gap-x-[32px] gap-y-[12px] sm:grid-cols-2">
-            {localizedPosts.map((post) => (
-              <li key={post.slug}>
+          <ul
+            id="all-blog-posts-list"
+            className="mt-[24px] grid gap-x-[32px] gap-y-[12px] sm:grid-cols-2"
+          >
+            {localizedPosts.map((post, index) => (
+              <li
+                key={post.slug}
+                className={!showAllPosts && index >= ALL_POSTS_PREVIEW_SIZE ? "hidden" : undefined}
+              >
                 <LocalizedLink
                   to={`/blog/${post.slug}`}
-                  className="text-[14px] leading-[1.45] text-white/70 underline decoration-white/20 underline-offset-4 transition hover:text-[#9cfb51] hover:decoration-[#9cfb51]/50"
+                  className="text-[14px] leading-[1.45] text-white/70 underline decoration-white/20 underline-offset-4 transition hover:text-[#9cfb51] hover:decoration-[#9cfb51]/50 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#9cfb51]"
                 >
                   {post.title}
                 </LocalizedLink>
               </li>
             ))}
           </ul>
+          {localizedPosts.length > ALL_POSTS_PREVIEW_SIZE && (
+            <div className="mt-[28px] flex justify-center">
+              <button
+                type="button"
+                onClick={() => setShowAllPosts((current) => !current)}
+                aria-expanded={showAllPosts}
+                aria-controls="all-blog-posts-list"
+                className="inline-flex h-[40px] items-center gap-[8px] rounded-full border border-white/15 bg-white/5 px-[18px] text-[14px] font-medium text-white/80 transition hover:border-white/30 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#9cfb51]"
+              >
+                <span>{t(showAllPosts ? "blog.showLessArticles" : "blog.showMoreArticles")}</span>
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 16 16"
+                  className={`h-[14px] w-[14px] transition-transform ${showAllPosts ? "rotate-180" : ""}`}
+                  fill="none"
+                >
+                  <path
+                    d="M4 6l4 4 4-4"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
         </section>
       </main>
 

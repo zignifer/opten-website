@@ -59,6 +59,15 @@ aesthetic, cinematic, no text, 16:9.
   the final raster.
 - Visual-first: strong object/result first, explanatory labels second. The image
   must teach one concrete decision from the article even without the paragraph.
+- Human presence is planned, not left to the model. A standard 4-5-frame SEO2
+  inline series uses one humanized frame (`hands-only`, `human-detail`,
+  `single-person`, or `interaction`) and keeps the remaining frames human-free.
+  The person, hands, gesture, or interaction must prove an action, decision,
+  scale, review, or handoff from the adjacent article step. Do not add generic
+  office people for atmosphere. A second humanized frame is allowed only for an
+  inherently human-centered topic with a written `Human-heavy exception`; never
+  humanize every frame. For human-free frames, prompt `no people, no hands, no
+  human silhouettes` explicitly.
 
 Prompt pattern:
 
@@ -79,6 +88,8 @@ Avoid:
 - dense UI tables;
 - title-only images where the only meaningful text is one big word or headline;
 - decorative icons without readable explanatory labels;
+- random stock-office people, decorative crowds, or passive laptop users with
+  no semantic role;
 - paragraphs of text inside images;
 - paired «Было / Стало» or `Before / After` labels and equivalent comparison
   pairs under different headings;

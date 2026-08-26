@@ -10,7 +10,13 @@ const BLOG_INDEX = resolve(BLOG_DIR, "index.ts");
 const STATUSES = new Set(["queued", "deferred", "published", "parked", "rejected"]);
 const INTENTS = new Set(["transactional", "problem", "comparison", "guide", "info"]);
 const BUYER_STAGES = new Set(["awareness", "consideration", "decision"]);
-const SOURCES = new Set(["suggest", "wordstat", "bing", "gsc", "manual", "legacy-import"]);
+const SOURCES = new Set(["suggest", "wordstat", "bing", "gsc", "yandex-webmaster", "manual", "legacy-import"]);
+const PRIMARY_DESTINATIONS = new Set([
+  "/",
+  "/prompt-library",
+  "/learn",
+  "/learn/courses/ai-content-marketing-2026",
+]);
 
 let failures = 0;
 function fail(message) {
@@ -68,6 +74,9 @@ for (const [index, topic] of (registry.topics ?? []).entries()) {
   if (!STATUSES.has(topic.status)) fail(`${label}: unsupported status ${topic.status}`);
   if (!INTENTS.has(topic.intentType)) fail(`${label}: unsupported intentType ${topic.intentType}`);
   if (topic.buyerStage !== null && !BUYER_STAGES.has(topic.buyerStage)) fail(`${label}: unsupported buyerStage ${topic.buyerStage}`);
+  if (["queued", "deferred"].includes(topic.status) && !PRIMARY_DESTINATIONS.has(topic.primaryDestination)) {
+    fail(`${label}: active topic needs a supported primaryDestination`);
+  }
   if (typeof topic.titleHint !== "string" || topic.titleHint.trim().length < 3) fail(`${label}: titleHint is required`);
   if (!/^BL-[a-z0-9-]+$/i.test(topic.clusterId ?? "")) fail(`${label}: invalid clusterId`);
 

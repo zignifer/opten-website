@@ -43,6 +43,7 @@ type TopicFilter = "all" | "ai-image" | "ai-video" | "vibe-coding" | "vibe-desig
 type SortKey = "new" | "duration";
 
 const SHOW_LEARN_COLLECTIONS = false;
+const RESOURCE_INDEX_PREVIEW_SIZE = 4;
 const topics: TopicFilter[] = ["all", "ai-image", "ai-video", "vibe-coding", "vibe-design"];
 const PINNED_FREE_LESSON_SLUGS = [
   "ai-website-vibe-design",
@@ -110,6 +111,8 @@ const pageCopy = {
     indexIntro: "Полный список бесплатных уроков и разборов других авторов.",
     lessonsIndexTitle: "Уроки Opten",
     findsIndexTitle: "Learn Finds",
+    showMoreResources: "Показать ещё",
+    showLessResources: "Свернуть",
   },
   en: {
     heroTitleLine1Before: "",
@@ -136,6 +139,8 @@ const pageCopy = {
     indexIntro: "The complete index of free Opten lessons and curated third-party breakdowns.",
     lessonsIndexTitle: "Opten lessons",
     findsIndexTitle: "Learn Finds",
+    showMoreResources: "Show more",
+    showLessResources: "Show less",
   },
 } as const;
 
@@ -187,6 +192,7 @@ export default function LearnOverviewPage() {
   const [sortKey, setSortKey] = useState<SortKey>("new");
   const [query, setQuery] = useState("");
   const [showAllCollections, setShowAllCollections] = useState(false);
+  const [showAllResources, setShowAllResources] = useState(false);
 
   const normalizedQuery = query.trim().toLowerCase();
 
@@ -454,12 +460,15 @@ export default function LearnOverviewPage() {
           <div className="mt-[24px] grid gap-[28px] lg:grid-cols-2">
             <div>
               <h3 className="text-[16px] font-bold text-white">{copy.lessonsIndexTitle}</h3>
-              <ul className="mt-[12px] flex flex-col gap-[9px]">
-                {publicLearnLessons.map((lesson) => (
-                  <li key={lesson.slug}>
+              <ul id="learn-lessons-index" className="mt-[12px] flex flex-col gap-[9px]">
+                {publicLearnLessons.map((lesson, index) => (
+                  <li
+                    key={lesson.slug}
+                    className={!showAllResources && index >= RESOURCE_INDEX_PREVIEW_SIZE ? "hidden" : undefined}
+                  >
                     <LocalizedLink
                       to={`/learn/${lesson.slug}`}
-                      className="text-[14px] leading-[1.45] text-white/65 underline decoration-white/20 underline-offset-4 transition hover:text-[#9cfb51] hover:decoration-[#9cfb51]/50"
+                      className="text-[14px] leading-[1.45] text-white/65 underline decoration-white/20 underline-offset-4 transition hover:text-[#9cfb51] hover:decoration-[#9cfb51]/50 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#9cfb51]"
                     >
                       {getLearnLessonTitle(lesson, lang)}
                     </LocalizedLink>
@@ -470,12 +479,15 @@ export default function LearnOverviewPage() {
 
             <div>
               <h3 className="text-[16px] font-bold text-white">{copy.findsIndexTitle}</h3>
-              <ul className="mt-[12px] flex flex-col gap-[9px]">
-                {learnFinds.map((find) => (
-                  <li key={find.slug}>
+              <ul id="learn-finds-index" className="mt-[12px] flex flex-col gap-[9px]">
+                {learnFinds.map((find, index) => (
+                  <li
+                    key={find.slug}
+                    className={!showAllResources && index >= RESOURCE_INDEX_PREVIEW_SIZE ? "hidden" : undefined}
+                  >
                     <LocalizedLink
                       to={`/learn/finds/${find.slug}`}
-                      className="text-[14px] leading-[1.45] text-white/65 underline decoration-white/20 underline-offset-4 transition hover:text-[#9cfb51] hover:decoration-[#9cfb51]/50"
+                      className="text-[14px] leading-[1.45] text-white/65 underline decoration-white/20 underline-offset-4 transition hover:text-[#9cfb51] hover:decoration-[#9cfb51]/50 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#9cfb51]"
                     >
                       {getLearnFindTitle(find, lang)}
                     </LocalizedLink>
@@ -484,6 +496,25 @@ export default function LearnOverviewPage() {
               </ul>
             </div>
           </div>
+          {(publicLearnLessons.length > RESOURCE_INDEX_PREVIEW_SIZE ||
+            learnFinds.length > RESOURCE_INDEX_PREVIEW_SIZE) && (
+            <div className="mt-[28px] flex justify-center">
+              <button
+                type="button"
+                onClick={() => setShowAllResources((current) => !current)}
+                aria-expanded={showAllResources}
+                aria-controls="learn-lessons-index learn-finds-index"
+                className="inline-flex h-[40px] items-center gap-[8px] rounded-full border border-white/15 bg-white/5 px-[18px] text-[14px] font-medium text-white/80 transition hover:border-white/30 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#9cfb51]"
+              >
+                <span>{showAllResources ? copy.showLessResources : copy.showMoreResources}</span>
+                <ChevronDown
+                  aria-hidden="true"
+                  size={14}
+                  className={`transition-transform ${showAllResources ? "rotate-180" : ""}`}
+                />
+              </button>
+            </div>
+          )}
         </section>
 
         <LearnFaqSection lang={lang} />

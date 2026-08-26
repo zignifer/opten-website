@@ -2,7 +2,7 @@
 tags: [seo, geo, strategy, canonical]
 status: canonical
 created: 2026-07-10
-last_reviewed: 2026-07-11
+last_reviewed: 2026-08-26
 review_cycle: monthly
 ---
 
@@ -35,8 +35,16 @@ SEO-идея конфликтует с продуктовым контракто
 - установке расширения;
 - первому и повторному использованию Opten;
 - покупке Pro;
+- использованию бесплатной библиотеки промптов;
+- переходу в публичный Learn и дальнейшему обучению;
 - покупке отдельного курса, если пользователь пришёл на соответствующий
   публичный маркетинговый материал.
+
+Для новых ограниченных батчей контента действует портальная модель: примерно
+50% тем ведут в продуктовые поверхности (`/` и `/prompt-library`), ещё 50% —
+в учебные (`/learn` и `/learn/courses/ai-content-marketing-2026`). Внутри обеих
+половин темы распределяются максимально ровно. Это правило задаёт баланс
+батча, но не заставляет ставить нерелевантный CTA в конкретную статью.
 
 Рабочая последовательность:
 
@@ -263,10 +271,13 @@ Integration pages можно планировать для Syntx, Higgsfield, Fr
 | Слой | Приоритет | Формат | Пример | Цель |
 |---|---:|---|---|---|
 | Product facts | P0 | Support matrix/methodology | Product Facts | Доверие и единая сущность |
+| Prompt generator | P1 | Product-led guide/workflow | Вайб-кодинг prompts, Codex/Claude Code | Использование генератора и Pro |
+| Prompt Library | P1 | Role/use-case prompt collections | Промпты для маркетолога | Сохранение и повторное использование промптов |
 | Integration | P1 | Подтверждённая platform landing | Opten для Higgsfield | Высококонверсионный product intent |
 | Broad model guide | P1 | Полный tutorial | Runway prompts | Generic informational intent |
 | Version model page | P1 | Точная версия/параметры | Runway Gen-4.5 | Long-tail и справка |
 | Public Learn | P1 | Видео + извлекаемый текст | Existing lessons/Finds | Доверие, обучение, AI citation |
+| Paid course | P1 | Intent-matched public blog funnel | Курс по ИИ для маркетинга | Продажа самостоятельного курса без индексации paid SPA |
 | Research | P1/P2 | Benchmark/dataset | Runway vs Kling vs PixVerse | Earned links и authority |
 | Use case | P2 | Решение работы | AI UGC, product video | Целевой task demand |
 | Comparison | P2 | Собственный тест | Flux vs Midjourney | Commercial investigation |

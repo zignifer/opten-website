@@ -20,7 +20,6 @@ import {
   type AdminTelegramStats,
 } from "../../../lib/adminApi";
 import { AdminTelegramBroadcastPanel } from "./AdminTelegramBroadcastPanel";
-import { AdminContentMachine } from "./AdminContentMachine";
 
 const REFRESH_INTERVAL_MS = 45_000;
 
@@ -32,7 +31,6 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   const accessToken = session?.access_token || "";
-  const activeView = new URLSearchParams(location.search).get("view") === "content" ? "content" : "admin";
 
   const loadStats = useCallback(
     async (background = false) => {
@@ -53,15 +51,15 @@ export default function AdminDashboardPage() {
   );
 
   useEffect(() => {
-    if (activeView !== "admin" || status !== "signed_in" || !accessToken) return;
+    if (status !== "signed_in" || !accessToken) return;
     void loadStats(false);
     const timer = window.setInterval(() => void loadStats(true), REFRESH_INTERVAL_MS);
     return () => window.clearInterval(timer);
-  }, [accessToken, activeView, loadStats, status]);
+  }, [accessToken, loadStats, status]);
 
   if (status === "loading") {
     return (
-      <AdminShell accountEmail={account?.email ?? session?.user.email ?? null} activeView={activeView}>
+      <AdminShell accountEmail={account?.email ?? session?.user.email ?? null}>
         <CenteredState icon={<RefreshCw className="animate-spin" size={22} />} title="Проверяем сессию" />
       </AdminShell>
     );
@@ -69,7 +67,7 @@ export default function AdminDashboardPage() {
 
   if (status === "signed_out" || !session) {
     return (
-      <AdminShell accountEmail={null} activeView={activeView}>
+      <AdminShell accountEmail={null}>
         <CenteredState
           icon={<Lock size={22} />}
           title="Нужен вход в owner-аккаунт"
@@ -80,16 +78,8 @@ export default function AdminDashboardPage() {
     );
   }
 
-  if (activeView === "content") {
-    return (
-      <AdminShell accountEmail={account?.email ?? session.user.email} activeView={activeView}>
-        <AdminContentMachine accessToken={accessToken} />
-      </AdminShell>
-    );
-  }
-
   return (
-    <AdminShell accountEmail={account?.email ?? session.user.email} activeView={activeView}>
+    <AdminShell accountEmail={account?.email ?? session.user.email}>
       <section className="flex flex-col gap-[18px]">
         <div className="flex flex-col gap-[14px] border-b border-[#dbe2d5] pb-[18px] md:flex-row md:items-end md:justify-between">
           <div>
@@ -173,11 +163,9 @@ function AdminStatsView({ stats }: { stats: AdminTelegramStats }) {
 
 function AdminShell({
   accountEmail,
-  activeView,
   children,
 }: {
   accountEmail: string | null;
-  activeView: "admin" | "content";
   children: ReactNode;
 }) {
   return (
@@ -190,22 +178,6 @@ function AdminShell({
             </span>
             <span className="font-['Unbounded',sans-serif] text-[16px] font-semibold tracking-[0]">Opten Admin</span>
           </Link>
-          <nav aria-label="Режим админки" className="order-3 flex w-full rounded-[8px] border border-white/10 bg-white/[0.04] p-[3px] sm:order-none sm:w-auto">
-            <Link
-              to="/admin"
-              aria-current={activeView === "admin" ? "page" : undefined}
-              className={`inline-flex h-[38px] flex-1 items-center justify-center rounded-[6px] px-[13px] text-[13px] font-semibold no-underline transition sm:flex-none ${activeView === "admin" ? "bg-[#9cfb51] text-[#071513]" : "text-white/68 hover:bg-white/8 hover:text-white"}`}
-            >
-              Админка
-            </Link>
-            <Link
-              to="/admin?view=content"
-              aria-current={activeView === "content" ? "page" : undefined}
-              className={`inline-flex h-[38px] flex-1 items-center justify-center rounded-[6px] px-[13px] text-[13px] font-semibold no-underline transition sm:flex-none ${activeView === "content" ? "bg-[#9cfb51] text-[#071513]" : "text-white/68 hover:bg-white/8 hover:text-white"}`}
-            >
-              Контент-машина
-            </Link>
-          </nav>
           <div className="flex min-w-0 items-center gap-[8px] text-[13px] text-white/72">
             <span className="hidden h-[8px] w-[8px] rounded-full bg-[#9cfb51] sm:block" aria-hidden="true" />
             <span className="max-w-[190px] truncate">{accountEmail || "signed out"}</span>

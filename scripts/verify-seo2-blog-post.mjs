@@ -3,7 +3,7 @@
 //
 // This intentionally checks the source layer before build. npm run build catches
 // route/schema mechanics, but it does not know whether a SEO2 article has the
-// required localized inline image set and course CTA layer.
+// required localized inline image set and intent-matched promo CTA layer.
 
 import { existsSync, readFileSync } from "node:fs";
 import { readdir } from "node:fs/promises";
@@ -14,7 +14,16 @@ import sharp from "sharp";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const COURSE_URL = "/learn/courses/ai-content-marketing-2026";
+const TOPIC_REGISTRY = resolve(ROOT, "seo2", "topic-registry.json");
 const VISUAL_PLAN_REQUIRED_FROM = "2026-07-25";
+const HUMAN_PRESENCE_REQUIRED_FROM = "2026-08-25";
+const HUMAN_PRESENCE_TYPES = new Set([
+  "none",
+  "hands-only",
+  "human-detail",
+  "single-person",
+  "interaction",
+]);
 const AVOIDABLE_ENGLISH_IN_RU =
   /\b(prompt|prompts|brief|workflow|preflight|production prompt|visual brief|visual direction|deck|draft|review)\b/gi;
 
@@ -56,6 +65,20 @@ function captureString(section, field) {
   return match?.[1] ?? "";
 }
 
+function expectedPromoDestination(slug) {
+  if (!existsSync(TOPIC_REGISTRY)) return COURSE_URL;
+  const registry = JSON.parse(readFileSync(TOPIC_REGISTRY, "utf8"));
+  return registry.topics?.find((topic) => topic.slug === slug)?.primaryDestination ?? COURSE_URL;
+}
+
+function resolvedHrefValues(section, source) {
+  return allMatches(section, /href:\s*(?:"([^"]+)"|([A-Z][A-Z0-9_]*))/g).map((match) => {
+    if (match[1]) return match[1];
+    const constantName = match[2];
+    return source.match(new RegExp(`const\\s+${constantName}\\s*=\\s*"([^"]+)"`))?.[1] ?? "";
+  });
+}
+
 function visibleStringLiterals(section) {
   return allMatches(section, /"((?:\\.|[^"\\])*)"/g)
     .map((match) => match[1])
@@ -89,6 +112,7 @@ async function verifySlug(slug) {
   console.log(`\n=== SEO2 source gate: ${slug} ===`);
   const sourcePath = resolve(ROOT, "src", "content", "blog", `${slug}.ts`);
   const source = existsSync(sourcePath) ? readFileSync(sourcePath, "utf8") : "";
+  const promoDestination = expectedPromoDestination(slug);
   if (!source) {
     fail(`${slug}: missing source file ${sourcePath}`);
     return;
@@ -140,6 +164,72 @@ async function verifySlug(slug) {
 
       if (!flatTypography) fail(`${slug}: visual plan must declare flat Typography treatment`);
       else pass(`${slug}: flat typography treatment declared`);
+
+      if (publishedAt >= HUMAN_PRESENCE_REQUIRED_FROM) {
+        const declaredHumanizedFrames = Number(
+          visualPlan.match(/^- Humanized frames:\s*(\d+)\s*$/mi)?.[1] ?? Number.NaN,
+        );
+        const humanHeavyException =
+          visualPlan.match(/^- Human-heavy exception:\s*(\S.+)$/mi)?.[1]?.trim() ?? "";
+        const frameSections = visualPlan
+          .split(/^## Frame \d+\b[^\r\n]*$/gmi)
+          .slice(1, frameCount + 1);
+        const frameHumanPlans = frameSections.map((section, index) => ({
+          frame: index + 1,
+          presence: section.match(/^- Human presence:\s*(\S.*?)\s*$/mi)?.[1]?.toLowerCase() ?? "",
+          purpose: section.match(/^- Human purpose:\s*(\S.+)$/mi)?.[1]?.trim() ?? "",
+        }));
+        let humanPlanValid = true;
+
+        for (const framePlan of frameHumanPlans) {
+          if (!HUMAN_PRESENCE_TYPES.has(framePlan.presence)) {
+            fail(
+              `${slug}: Frame ${framePlan.frame} needs Human presence: ${Array.from(HUMAN_PRESENCE_TYPES).join(" | ")}`,
+            );
+            humanPlanValid = false;
+          } else if (framePlan.presence !== "none" && !framePlan.purpose) {
+            fail(`${slug}: Frame ${framePlan.frame} needs Human purpose for ${framePlan.presence}`);
+            humanPlanValid = false;
+          }
+        }
+
+        const validHumanPlans = frameHumanPlans.filter((framePlan) =>
+          HUMAN_PRESENCE_TYPES.has(framePlan.presence),
+        );
+        if (validHumanPlans.length === frameCount) {
+          const actualHumanizedFrames = validHumanPlans.filter(
+            (framePlan) => framePlan.presence !== "none",
+          ).length;
+
+          if (!Number.isInteger(declaredHumanizedFrames)) {
+            fail(`${slug}: visual plan must declare Humanized frames: 1 by default`);
+            humanPlanValid = false;
+          } else if (declaredHumanizedFrames !== actualHumanizedFrames) {
+            fail(
+              `${slug}: Humanized frames declares ${declaredHumanizedFrames}, but ${actualHumanizedFrames} Frame sections are humanized`,
+            );
+            humanPlanValid = false;
+          }
+
+          if (actualHumanizedFrames < 1) {
+            fail(`${slug}: at least one inline frame must be deliberately humanized`);
+            humanPlanValid = false;
+          } else if (actualHumanizedFrames >= frameCount) {
+            fail(`${slug}: at least one inline frame must remain human-free`);
+            humanPlanValid = false;
+          } else if (actualHumanizedFrames > 2) {
+            fail(`${slug}: at most two inline frames may be humanized`);
+            humanPlanValid = false;
+          } else if (actualHumanizedFrames === 2 && !humanHeavyException) {
+            fail(`${slug}: two humanized frames require a Human-heavy exception`);
+            humanPlanValid = false;
+          }
+
+          if (humanPlanValid) {
+            pass(`${slug}: ${actualHumanizedFrames} of ${frameCount} inline frames deliberately humanized`);
+          }
+        }
+      }
     }
   }
 
@@ -159,7 +249,7 @@ async function verifySlug(slug) {
     const intro = section.match(/intro:\s*"([\s\S]*?)",\s*steps:/)?.[1]?.replace(/\\n/g, " ") ?? "";
     const imageRefs = allMatches(section, new RegExp(`imageSrc:\\s*"(/blog/${slug}/${locale}/[^"]+\\.jpg)"`, "g")).map((m) => m[1]);
     const promoCount = allMatches(section, /promoBanner:\s*{/g).length;
-    const courseHrefCount = allMatches(section, new RegExp(`href:\\s*COURSE_URL|href:\\s*"${COURSE_URL.replace(/\//g, "\\/")}"`, "g")).length;
+    const destinationHrefCount = resolvedHrefValues(section, source).filter((href) => href === promoDestination).length;
 
     if (locale === "ru") {
       const avoidableTerms = new Set(
@@ -201,11 +291,11 @@ async function verifySlug(slug) {
       await verifyImageFile(resolve(ROOT, "public", imageRef.replace(/^\//, "")), `${slug} ${locale} ${imageRef}`);
     }
 
-    if (promoCount < 1) fail(`${slug} ${locale}: expected at least one course promoBanner`);
+    if (promoCount < 1) fail(`${slug} ${locale}: expected at least one promoBanner`);
     else pass(`${slug} ${locale}: ${promoCount} promoBanner blocks`);
 
-    if (courseHrefCount < promoCount) fail(`${slug} ${locale}: promoBanner href must point to ${COURSE_URL}`);
-    else pass(`${slug} ${locale}: course CTA hrefs valid`);
+    if (destinationHrefCount < promoCount) fail(`${slug} ${locale}: promoBanner href must point to ${promoDestination}`);
+    else pass(`${slug} ${locale}: promo CTA hrefs valid`);
   }
 }
 
