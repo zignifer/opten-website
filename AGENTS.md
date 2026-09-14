@@ -296,7 +296,11 @@ the website and must be represented by server-side promo codes (planned common
 campaigns: `-20%` and `-40%`). On desktop, the course-root checkout card shows
 the compact subtitle `Курс из 16 уроков по ИИ для начинающих` directly below
 the course name without increasing the fixed card height; the subtitle stays
-hidden on mobile. Marketing/partner course promo codes live in the extension-owned
+hidden on mobile. The pending-payment hint stays a compact `Уже оплатили? Как войти`
+button in the existing footer row. It opens a keyboard/touch-accessible popover
+with the full checkout email and sign-in guidance; never truncate the email or
+increase the purchase card height to fit this message.
+Marketing/partner course promo codes live in the extension-owned
 `course_promo_codes` table (RLS on, no public policies) with `discount_kind` =
 `fixed_price` or `percentage`, `enabled`, optional `usage_limit`, `times_used`,
 `starts_at`, and `expires_at`. Codes must use uppercase `A-Z0-9` so the same

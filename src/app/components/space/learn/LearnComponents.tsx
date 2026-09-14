@@ -39,6 +39,7 @@ import { fetchYouTubeLessonComments, type YouTubeLessonComment, type YouTubeLess
 import LocalizedLink from "../../LocalizedLink";
 import ResponsiveImage from "../../ResponsiveImage";
 import SiteFooter from "../../SiteFooter";
+import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
 import SpaceHeader from "../SpaceHeader";
 import { useSpaceAuth } from "../SpaceAuthProvider";
 import LearnLessonCard from "./LearnLessonCard";
@@ -2415,7 +2416,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     : promoFeedback
       ? promoFeedback
     : pendingPayment
-      ? { tone: "muted" as const, text: copy.coursePaymentPending(pendingPayment.email) }
+      ? { tone: "pending" as const, text: copy.coursePaymentHelp }
       : loadingAccess
         ? { tone: "muted" as const, text: copy.courseAccessLoading }
         : { tone: "legal" as const, text: copy.courseLegalNotice };
@@ -2668,7 +2669,33 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
             {submitting ? copy.coursePaymentOpening : copy.courseBuyButton(salePrice)}
           </button>
           <div className="absolute left-0 top-[355px] flex h-[16px] w-full items-center justify-center overflow-hidden" aria-live="polite">
-            {formMessage && (
+            {formMessage.tone === "pending" && pendingPayment ? (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex cursor-pointer items-center gap-[6px] border-0 bg-transparent p-0 font-['Inter',sans-serif] text-[12px] leading-[16px] text-white/65 transition hover:text-[#9cfb51] focus-visible:text-[#9cfb51] focus-visible:outline-none focus-visible:underline"
+                  >
+                    <Mail size={13} className="shrink-0" aria-hidden="true" />
+                    <span>{formMessage.text}</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  side="bottom"
+                  sideOffset={12}
+                  collisionPadding={16}
+                  aria-label={copy.coursePaymentHelpTitle}
+                  className="w-[300px] max-w-[calc(100vw-32px)] rounded-[10px] border-white/15 bg-[#102629] p-[16px] text-white shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
+                >
+                  <h3 className="text-[14px] font-bold leading-[20px]">{copy.coursePaymentHelpTitle}</h3>
+                  <p className="mt-[8px] text-[13px] leading-[20px] text-white/65">
+                    {copy.coursePaymentHelpDescription}
+                    <span className="mt-[6px] block font-medium text-white [overflow-wrap:anywhere]">{pendingPayment.email}</span>
+                  </p>
+                  <p className="mt-[10px] text-[12px] leading-[18px] text-white/55">{copy.coursePaymentHelpInbox}</p>
+                </PopoverContent>
+              </Popover>
+            ) : (
               <p
                 className={`flex min-w-0 items-center justify-center gap-[8px] truncate font-['Inter',sans-serif] text-[12px] font-normal leading-[16px] ${
                   formMessage.tone === "error"
@@ -3106,7 +3133,10 @@ const detailCopy = {
     courseCheckoutNote: "Оплата через YooKassa. После оплаты отправим ссылку для входа на этот email; позже можно входить обычным кодом на ту же почту.",
     courseLegalNotice: "Оплачивая, принимаете оферту и политику.",
     courseAccessLoading: "Проверяем доступ к курсу...",
-    coursePaymentPending: (email: string) => `Если оплата уже прошла, письмо со ссылкой отправлено на ${email}.`,
+    coursePaymentHelp: "Уже оплатили? Как войти",
+    coursePaymentHelpTitle: "Вход в курс",
+    coursePaymentHelpDescription: "После успешной оплаты ссылка для входа придёт на:",
+    coursePaymentHelpInbox: "Проверьте входящие и папку «Спам».",
     courseBuyButton: (price: string) => `Открыть весь курс за ${price}`,
     buyCourseShort: (price: string) => `Открыть весь курс за ${price}`,
     courseAccessActive: "Доступ к курсу активен",
@@ -3200,7 +3230,10 @@ const detailCopy = {
     courseCheckoutNote: "Checkout is handled by YooKassa. After payment, we send a sign-in link to this email; later you can sign in with the usual email code.",
     courseLegalNotice: "By paying, you accept terms and privacy.",
     courseAccessLoading: "Checking course access...",
-    coursePaymentPending: (email: string) => `If payment has succeeded, the access email was sent to ${email}.`,
+    coursePaymentHelp: "Already paid? How to sign in",
+    coursePaymentHelpTitle: "Course sign-in",
+    coursePaymentHelpDescription: "After successful payment, your sign-in link will be sent to:",
+    coursePaymentHelpInbox: "Check your inbox and spam folder.",
     courseBuyButton: (price: string) => `Open full course for ${price}`,
     buyCourseShort: (price: string) => `Open full course for ${price}`,
     courseAccessActive: "Course access active",
