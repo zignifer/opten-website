@@ -24,6 +24,7 @@
     "verify:blog-seo": "node scripts/verify-blog-seo-routes.mjs",
     "verify:seo-topics": "node scripts/verify-seo-topic-registry.mjs",
     "verify:kinescope-course": "node scripts/verify-kinescope-course.mjs",
+    "verify:course-promo": "node scripts/verify-course-promo.mjs",
     "verify:hidden-intro": "node scripts/verify-hidden-intro.mjs",
     "verify:prompt-library-favorite": "node scripts/verify-prompt-library-favorite.mjs",
     "verify:prompt-workbench-vibecoding": "node scripts/verify-prompt-workbench-vibecoding.mjs",

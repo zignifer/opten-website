@@ -351,6 +351,13 @@ successful payment and mark the lead paid, but do not send a Telegram
 payment-success message; course access is delivered by email;
 reminders and broadcasts skip used claims and mark Bot API 403/blocked
 recipients as blocked.
+After a Telegram claim expires or is used, manual promo codes, including
+`INTRO20`, remain available under their own server-side validity rules. Claim
+expiry must not clear a manual promo when currency changes. Show promo checking,
+success, and errors visibly above the expired-link notice; distinguish a network
+failure from an invalid promo. Quote requests have a bounded timeout and may retry
+once on a transient failure; payment creation must never auto-retry. Checkout
+waits for the selected discount quote to resolve before it can be submitted.
 Expired or used legacy 40% claims remain inactive and unchanged for checkout
 and audit purposes. The bot's expired-state copy always shows the current 20%
 campaign wording instead of the stored historical percentage, so `/start`

@@ -322,7 +322,12 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
   While a claim is active, the website must hide the manual promo field and
   send `discount_claim_token` to `create-course-payment`; the backend ignores
   `promo_code` when a valid claim token is present. Quote preview can show the
-  claim price/timer, but claims are marked used only by successful
+  claim price/timer. After expiry or use, manual promos (including `INTRO20`)
+  are quoted and submitted without `discount_claim_token`, using their own
+  validity rules. A stored expired claim must not clear a manual promo on a
+  currency change. Quote requests may retry one transient failure; payment
+  creation must never automatically retry or submit while a quote is pending.
+  Claims are marked used only by successful
   YooKassa/Paddle course webhooks. Successful course webhooks mark the related
   lead paid but do not send a Telegram payment-success message; access is
   delivered by email. USD claim checkout requires a Paddle

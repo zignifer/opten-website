@@ -159,7 +159,7 @@ export async function quoteCoursePayment(
   discountClaimToken?: string,
 ): Promise<CoursePaymentResponse> {
   const normalizedClaimToken = normalizeCourseDiscountClaimToken(discountClaimToken);
-  const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-course-payment`, {
+  const request: RequestInit = {
     method: "POST",
     headers: {
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
@@ -173,8 +173,31 @@ export async function quoteCoursePayment(
       discount_claim_token: normalizedClaimToken || undefined,
       quote_only: true,
     }),
-  });
-  const body = (await response.json().catch(() => ({}))) as CoursePaymentResponse;
-  if (!response.ok || body.error) throw new Error(body.error || "course_quote_failed");
-  return body;
+  };
+
+  // Only quote_only requests are safe to retry: they never create an order.
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12_000);
+    let retryable = true;
+    try {
+      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-course-payment`, {
+        ...request,
+        signal: controller.signal,
+      });
+      retryable = response.status === 429 || response.status >= 500;
+      const body = (await response.json()) as CoursePaymentResponse;
+      if (!response.ok || body.error) throw new Error(body.error || "course_quote_failed");
+      if (!Number.isFinite(body.amount_value) || (body.amount_value ?? 0) <= 0 || body.currency !== currency) {
+        throw new Error("course_quote_failed");
+      }
+      return body;
+    } catch (error) {
+      if (attempt === 0 && (retryable || controller.signal.aborted)) continue;
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+  throw new Error("course_quote_failed");
 }
