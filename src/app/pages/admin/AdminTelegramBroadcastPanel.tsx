@@ -42,9 +42,11 @@ const VALID_UPLOAD_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 export function AdminTelegramBroadcastPanel({
   accessToken,
   onSent,
+  paused = false,
 }: {
   accessToken: string;
   onSent: () => void;
+  paused?: boolean;
 }) {
   const [segment, setSegment] = useState<AdminTelegramBroadcastSegment>("access_granted_not_paid");
   const [text, setText] = useState("");
@@ -222,6 +224,9 @@ export function AdminTelegramBroadcastPanel({
         </span>
       </div>
 
+      {paused ? (
+        <p className="mt-[14px] text-[14px] text-[#66756f]">Бот приостановлен. Ответы, скидки по ссылкам, напоминания и рассылки отключены.</p>
+      ) : (
       <div className="mt-[14px] grid gap-[14px] lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="grid gap-[12px]">
           <label className="grid gap-[6px] text-[13px] font-semibold text-[#34423e]">
@@ -369,6 +374,10 @@ export function AdminTelegramBroadcastPanel({
           </div>
         </aside>
       </div>
+
+      )}
+      {paused && error ? <BroadcastError message={error} /> : null}
+      {paused && deleteResult ? <p className="text-[13px] text-[#315d24]">{deleteResult}</p> : null}
 
       <div className="mt-[16px] border-t border-[#eef2eb] pt-[14px]">
         <div className="flex flex-wrap items-center justify-between gap-[10px]">

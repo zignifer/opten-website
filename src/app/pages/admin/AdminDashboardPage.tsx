@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router";
 import {
   AlertTriangle,
   CheckCircle2,
-  Clock3,
   KeyRound,
   Lock,
   RefreshCw,
@@ -87,7 +86,7 @@ export default function AdminDashboardPage() {
               Owner dashboard
             </p>
             <h1 className="m-0 mt-[6px] font-['Unbounded',sans-serif] text-[28px] font-semibold leading-[1.12] tracking-[0] text-[#091413] md:text-[34px]">
-              Telegram-воронка курса
+              Архив Telegram-бота
             </h1>
           </div>
           <div className="flex flex-wrap items-center gap-[10px]">
@@ -120,7 +119,7 @@ export default function AdminDashboardPage() {
         {stats ? (
           <>
             <AdminStatsView stats={stats} />
-            <AdminTelegramBroadcastPanel accessToken={accessToken} onSent={() => loadStats(true)} />
+            <AdminTelegramBroadcastPanel accessToken={accessToken} onSent={() => loadStats(true)} paused />
           </>
         ) : statsState === "loading" ? (
           <CenteredState icon={<RefreshCw className="animate-spin" size={22} />} title="Загружаем статистику" />
@@ -141,7 +140,6 @@ function AdminStatsView({ stats }: { stats: AdminTelegramStats }) {
       { label: "Открыли курс", value: courseOpened, icon: CheckCircle2, tone: "blue" },
       { label: "Создали заказ", value: stats.orders.created, icon: ShoppingCart, tone: "amber" },
       { label: "Оплатили", value: paidOrders, icon: ShieldCheck, tone: "emerald" },
-      { label: "Скидка действует", value: stats.claims.active, icon: Clock3, tone: "violet" },
       { label: "Заблокировали бота", value: stats.funnel.blocked, icon: AlertTriangle, tone: "red" },
     ],
     [courseLinksSent, courseOpened, paidOrders, stats],

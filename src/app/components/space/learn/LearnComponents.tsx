@@ -1,7 +1,6 @@
 import {
   Check,
   ChevronDown,
-  Clock,
   Copy,
   CreditCard,
   Crown,
@@ -33,8 +32,6 @@ import {
   normalizeCourseEmail,
   normalizeCoursePromoCode,
   quoteCoursePayment,
-  readCourseDiscountClaimTokenFromSearch,
-  readStoredCourseDiscountClaim,
 } from "../../../../lib/courseAccess";
 import { useCurrencyPreference } from "../../../../lib/currency";
 import { ensurePaddle } from "../../../../lib/paddle";
@@ -2370,7 +2367,6 @@ type CoursePromoFeedback = {
 
 const COURSE_PAYMENT_PENDING_STORAGE_KEY = "opten_course_payment_pending_v1";
 
-type CourseDiscountClaimState = "idle" | "checking" | "active" | "expired" | "invalid";
 
 function CoursePurchaseTitle({ title }: { title: string }) {
   const titleClass = "max-w-[314px] text-[19px] font-bold leading-[1.22] tracking-normal text-white max-sm:text-[18px]";
@@ -2380,21 +2376,13 @@ function CoursePurchaseTitle({ title }: { title: string }) {
 
 function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, initialEmail, playerHeight }: CoursePurchaseCardProps) {
   const { lang } = useLang();
-  const location = useLocation();
   const [currency] = useCurrencyPreference();
   const copy = detailCopy[lang];
-  const discountClaimToken = useMemo(
-    () => readCourseDiscountClaimTokenFromSearch(location.search) ?? readStoredCourseDiscountClaim(),
-    [location.search],
-  );
   const [email, setEmail] = useState(initialEmail);
   const [emailTouched, setEmailTouched] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null);
   const [appliedPromoQuote, setAppliedPromoQuote] = useState<CoursePaymentResponse | null>(null);
-  const [discountClaimQuote, setDiscountClaimQuote] = useState<CoursePaymentResponse | null>(null);
-  const [discountClaimState, setDiscountClaimState] = useState<CourseDiscountClaimState>("idle");
-  const [claimNow, setClaimNow] = useState(() => Date.now());
   const [promoChecking, setPromoChecking] = useState(false);
   const [promoFeedback, setPromoFeedback] = useState<CoursePromoFeedback>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -2408,76 +2396,16 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     if (!emailTouched && initialEmail) setEmail(initialEmail);
   }, [emailTouched, initialEmail]);
 
-  useEffect(() => {
-    if (!discountClaimToken) {
-      setDiscountClaimQuote(null);
-      setDiscountClaimState("idle");
-      return;
-    }
-
-    let cancelled = false;
-    setDiscountClaimState("checking");
-    setDiscountClaimQuote(null);
-    setPromoFeedback(null);
-
-    quoteCoursePayment(purchase.courseSlug, currency, undefined, discountClaimToken)
-      .then((quote) => {
-        if (cancelled) return;
-        setDiscountClaimQuote(quote);
-        setClaimNow(Date.now());
-        const expiresAtMs = Date.parse(quote.discount_claim_expires_at ?? "");
-        const claimIsActive = quote.discount_claim_active === true && Number.isFinite(expiresAtMs) && expiresAtMs > Date.now();
-        setDiscountClaimState(claimIsActive ? "active" : "expired");
-        if (claimIsActive) {
-          setAppliedPromoCode(null);
-          setAppliedPromoQuote(null);
-        }
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        const message = err instanceof Error ? err.message : "";
-        setDiscountClaimQuote(null);
-        setDiscountClaimState(message.includes("expired") || message.includes("used") ? "expired" : "invalid");
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [currency, discountClaimToken, purchase.courseSlug]);
-
-  useEffect(() => {
-    if (!discountClaimToken || discountClaimState === "idle") return;
-    const timer = window.setInterval(() => setClaimNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, [discountClaimState, discountClaimToken]);
-
   const normalizedEmail = normalizeCourseEmail(email);
   const baseSaleValue = currency === "USD" ? purchase.priceUsd : purchase.priceRub;
-  const claimExpiresAtMs = Date.parse(discountClaimQuote?.discount_claim_expires_at ?? "");
-  const activeDiscountClaim =
-    discountClaimState === "active" &&
-    discountClaimQuote?.discount_claim_active === true &&
-    Number.isFinite(claimExpiresAtMs) &&
-    claimExpiresAtMs > claimNow;
-  const claimBlocksPromo = Boolean(discountClaimToken && (discountClaimState === "checking" || activeDiscountClaim));
-  const claimExpired = Boolean(
-    discountClaimToken &&
-      (discountClaimState === "expired" || discountClaimState === "invalid" || (discountClaimState === "active" && !activeDiscountClaim)),
-  );
-  const quotedAmountValue = activeDiscountClaim
-    ? typeof discountClaimQuote?.amount_value === "number"
-      ? discountClaimQuote.amount_value
-      : null
-    : appliedPromoQuote?.currency === currency && typeof appliedPromoQuote.amount_value === "number"
-      ? appliedPromoQuote.amount_value
-      : null;
+  const quotedAmountValue = appliedPromoQuote?.currency === currency && typeof appliedPromoQuote.amount_value === "number"
+    ? appliedPromoQuote.amount_value
+    : null;
   const effectiveSaleValue = quotedAmountValue ?? baseSaleValue;
-  const showCrossedPrice = Boolean(activeDiscountClaim || (appliedPromoCode && appliedPromoQuote));
+  const showCrossedPrice = Boolean(appliedPromoCode && quotedAmountValue !== null);
   const salePrice = formatCoursePrice(effectiveSaleValue, currency);
   const crossedPrice = formatCoursePrice(baseSaleValue, currency);
-  const claimRemaining = activeDiscountClaim ? formatCourseClaimRemaining(claimExpiresAtMs - claimNow) : "";
-  const claimDiscountPercent = discountClaimQuote?.claim_discount_percent ?? 20;
-  const quotePending = (claimBlocksPromo && discountClaimState === "checking") || promoChecking || Boolean(
+  const quotePending = promoChecking || Boolean(
     appliedPromoCode && (!appliedPromoQuote || appliedPromoQuote.currency !== currency),
   );
   const formMessage = error
@@ -2486,8 +2414,6 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
       ? { tone: "muted" as const, text: copy.coursePromoChecking }
     : promoFeedback
       ? promoFeedback
-    : claimExpired
-      ? { tone: "muted" as const, text: copy.courseClaimExpired }
     : pendingPayment
       ? { tone: "muted" as const, text: copy.coursePaymentPending(pendingPayment.email) }
       : loadingAccess
@@ -2495,12 +2421,6 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
         : { tone: "legal" as const, text: copy.courseLegalNotice };
 
   useEffect(() => {
-    if (claimBlocksPromo) {
-      setAppliedPromoQuote(null);
-      setPromoChecking(false);
-      return;
-    }
-
     if (!appliedPromoCode) {
       setAppliedPromoQuote(null);
       setPromoChecking(false);
@@ -2540,11 +2460,9 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     return () => {
       cancelled = true;
     };
-  }, [appliedPromoCode, claimBlocksPromo, currency, purchase.courseSlug, copy.coursePromoApplied, copy.coursePromoInvalid, copy.coursePromoInactive, copy.coursePromoUnavailable]);
+  }, [appliedPromoCode, currency, purchase.courseSlug, copy.coursePromoApplied, copy.coursePromoInvalid, copy.coursePromoInactive, copy.coursePromoUnavailable]);
 
   const handlePromoApply = () => {
-    if (claimBlocksPromo) return;
-
     if (appliedPromoCode) {
       setAppliedPromoCode(null);
       setAppliedPromoQuote(null);
@@ -2586,9 +2504,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     setSubmitting(true);
     try {
       const returnUrl = typeof window !== "undefined" ? window.location.href.split("#")[0] : `/learn/courses/${purchase.courseSlug}`;
-      const effectivePromoCode = activeDiscountClaim ? undefined : appliedPromoCode ?? undefined;
-      const effectiveClaimToken = activeDiscountClaim ? discountClaimToken ?? undefined : undefined;
-      const result = await createCoursePayment(purchase.courseSlug, normalizedEmail, returnUrl, currency, effectivePromoCode, effectiveClaimToken);
+      const result = await createCoursePayment(purchase.courseSlug, normalizedEmail, returnUrl, currency, appliedPromoCode ?? undefined);
 
       const pending = {
         courseSlug: purchase.courseSlug,
@@ -2680,63 +2596,45 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
         </div>
 
         <div className="absolute left-0 top-[129px] h-[62px] w-full">
-          {claimBlocksPromo ? (
-            <>
-              <p className="block h-[12px] text-[12px] font-bold leading-[12px] text-white/62">
-                {copy.courseClaimLabel}
-              </p>
-              <div className="mt-[8px] flex h-[42px] items-center gap-[9px] rounded-[8px] border border-[#9cfb51]/65 bg-[#06191c] px-[12px]">
-                <Clock size={16} strokeWidth={2} className="shrink-0 text-[#9cfb51]" />
-                <p className="min-w-0 truncate text-[13px] font-bold leading-[16px] text-white">
-                  {discountClaimState === "checking"
-                    ? copy.courseClaimChecking
-                    : copy.courseClaimActive(claimDiscountPercent, claimRemaining)}
-                </p>
-              </div>
-            </>
-          ) : (
-            <>
-              <label className="block h-[12px] text-[12px] font-bold leading-[12px] text-white/62" htmlFor="course-purchase-promo">
-                {copy.coursePromoLabel}
-              </label>
-              <div
-                className={`mt-[8px] flex h-[42px] items-center gap-[8px] rounded-[8px] border bg-[#06191c] pl-[12px] pr-[6px] transition focus-within:border-[#9cfb51]/65 ${
-                  promoFeedback?.tone === "error"
-                    ? "border-[#ff8f8f]/55"
-                    : appliedPromoCode
-                      ? "border-[#9cfb51]/65"
-                      : "border-white/12"
-                }`}
-                title={promoFeedback?.text ?? undefined}
-              >
-                <Tag size={16} strokeWidth={2} className="shrink-0 text-white/38" />
-                <input
-                  id="course-purchase-promo"
-                  type="text"
-                  value={promoCode}
-                  onChange={(event) => {
-                    setPromoCode(normalizeCoursePromoCode(event.target.value).replace(/[^A-Z0-9]/g, "").slice(0, 32));
-                    setAppliedPromoCode(null);
-                    setAppliedPromoQuote(null);
-                    setPromoFeedback(null);
-                  }}
-                  placeholder={copy.coursePromoPlaceholder}
-                  autoComplete="off"
-                  autoCapitalize="characters"
-                  readOnly={Boolean(appliedPromoCode) || promoChecking}
-                  className="h-full min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium uppercase text-white outline-none placeholder:normal-case placeholder:text-white/28"
-                />
-                <button
-                  type="button"
-                  disabled={promoChecking}
-                  onClick={handlePromoApply}
-                  className="h-[30px] min-w-[82px] shrink-0 cursor-pointer rounded-[6px] border-0 bg-white/8 px-[10px] text-[12px] font-bold text-white/78 transition hover:bg-white/12 hover:text-white disabled:cursor-wait disabled:opacity-70"
-                >
-                  {promoChecking ? copy.coursePromoChecking : appliedPromoCode ? copy.coursePromoCancel : copy.coursePromoApply}
-                </button>
-              </div>
-            </>
-          )}
+          <label className="block h-[12px] text-[12px] font-bold leading-[12px] text-white/62" htmlFor="course-purchase-promo">
+            {copy.coursePromoLabel}
+          </label>
+          <div
+            className={`mt-[8px] flex h-[42px] items-center gap-[8px] rounded-[8px] border bg-[#06191c] pl-[12px] pr-[6px] transition focus-within:border-[#9cfb51]/65 ${
+              promoFeedback?.tone === "error"
+                ? "border-[#ff8f8f]/55"
+                : appliedPromoCode
+                  ? "border-[#9cfb51]/65"
+                  : "border-white/12"
+            }`}
+            title={promoFeedback?.text ?? undefined}
+          >
+            <Tag size={16} strokeWidth={2} className="shrink-0 text-white/38" />
+            <input
+              id="course-purchase-promo"
+              type="text"
+              value={promoCode}
+              onChange={(event) => {
+                setPromoCode(normalizeCoursePromoCode(event.target.value).replace(/[^A-Z0-9]/g, "").slice(0, 32));
+                setAppliedPromoCode(null);
+                setAppliedPromoQuote(null);
+                setPromoFeedback(null);
+              }}
+              placeholder={copy.coursePromoPlaceholder}
+              autoComplete="off"
+              autoCapitalize="characters"
+              readOnly={Boolean(appliedPromoCode) || promoChecking}
+              className="h-full min-w-0 flex-1 border-0 bg-transparent text-[14px] font-medium uppercase text-white outline-none placeholder:normal-case placeholder:text-white/28"
+            />
+            <button
+              type="button"
+              disabled={promoChecking}
+              onClick={handlePromoApply}
+              className="h-[30px] min-w-[82px] shrink-0 cursor-pointer rounded-[6px] border-0 bg-white/8 px-[10px] text-[12px] font-bold text-white/78 transition hover:bg-white/12 hover:text-white disabled:cursor-wait disabled:opacity-70"
+            >
+              {promoChecking ? copy.coursePromoChecking : appliedPromoCode ? copy.coursePromoCancel : copy.coursePromoApply}
+            </button>
+          </div>
         </div>
 
         <form className="contents" onSubmit={handleSubmit}>
@@ -2801,14 +2699,6 @@ function appendCourseOrderParam(returnUrl: string, orderId?: string) {
   } catch {
     return returnUrl;
   }
-}
-
-function formatCourseClaimRemaining(ms: number): string {
-  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  return [hours, minutes, seconds].map((value) => String(value).padStart(2, "0")).join(":");
 }
 
 function readPendingCoursePayment(courseSlug: string): PendingCoursePayment | null {
@@ -3208,10 +3098,6 @@ const detailCopy = {
     coursePromoInactive: "Промокод больше не действует.",
     coursePromoUnavailable: "Ошибка проверки. Примените код ещё раз.",
     coursePromoApplied: "Промокод применён.",
-    courseClaimLabel: "Скидка по ссылке",
-    courseClaimChecking: "Проверяем персональную скидку...",
-    courseClaimActive: (percent: number, remaining: string) => `Скидка ${percent}% еще ${remaining}`,
-    courseClaimExpired: "Срок ссылки истёк. Промокод доступен.",
     courseEmailLabel: "Email для доступа",
     courseEmailPlaceholder: "Ваш Email",
     courseInvalidEmail: "Введите корректный email.",
@@ -3306,10 +3192,6 @@ const detailCopy = {
     coursePromoInactive: "This promo code is no longer active.",
     coursePromoUnavailable: "Could not check the code. Click Apply to retry.",
     coursePromoApplied: "Promo code applied.",
-    courseClaimLabel: "Link discount",
-    courseClaimChecking: "Checking personal discount...",
-    courseClaimActive: (percent: number, remaining: string) => `${percent}% discount: ${remaining} left`,
-    courseClaimExpired: "Link discount expired. You can use a promo code.",
     courseEmailLabel: "Access email",
     courseEmailPlaceholder: "you@example.com",
     courseInvalidEmail: "Enter a valid email.",

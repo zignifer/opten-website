@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Navigate, useLocation, useParams } from "react-router";
+import { Navigate, useParams } from "react-router";
 import { CourseIntroLayout, LessonDetailLayout } from "../../components/space/learn/LearnComponents";
 import {
   findPrivateCourseLesson,
@@ -9,17 +9,12 @@ import {
 } from "../../../content/space/privateCourse";
 import { getLearnLessonTitle } from "../../../content/space/learn";
 import { useLang } from "../../../i18n/LangContext";
-import {
-  readCourseDiscountClaimTokenFromSearch,
-  readStoredCourseDiscountClaim,
-  rememberCourseDiscountClaim,
-} from "../../../lib/courseAccess";
+import NotFound from "../NotFound";
 
 const RETIRED_HIDDEN_INTRO_SLUG = "hidden-intro";
 
 export default function PrivateCoursePage() {
   const { courseSlug, lessonSlug } = useParams();
-  const location = useLocation();
   const { lang } = useLang();
   const collection = getPrivateCourseCollection(courseSlug);
   const lesson = findPrivateCourseLesson(courseSlug, lessonSlug);
@@ -28,12 +23,7 @@ export default function PrivateCoursePage() {
     : lesson
       ? `${getLearnLessonTitle(lesson, lang)} — Opten course`
       : "Opten private course";
-  const discountClaimToken =
-    readCourseDiscountClaimTokenFromSearch(location.search)
-    ?? readStoredCourseDiscountClaim();
-
   useNoIndexPrivateCourse(pageTitle);
-  useRememberCourseDiscountClaim(Boolean(collection), discountClaimToken);
 
   if (!collection) {
     return <Navigate to="/learn" replace />;
@@ -44,7 +34,7 @@ export default function PrivateCoursePage() {
   }
 
   if (lessonSlug === RETIRED_HIDDEN_INTRO_SLUG) {
-    return <Navigate to={`/learn/courses/${collection.id}${location.search}`} replace />;
+    return <NotFound />;
   }
 
   if (!lesson) {
@@ -61,13 +51,6 @@ export default function PrivateCoursePage() {
       nextLesson={nextLesson}
     />
   );
-}
-
-function useRememberCourseDiscountClaim(active: boolean, discountClaimToken: string | null) {
-  useEffect(() => {
-    if (!active || !discountClaimToken) return;
-    rememberCourseDiscountClaim(discountClaimToken);
-  }, [active, discountClaimToken]);
 }
 
 function useNoIndexPrivateCourse(title: string) {

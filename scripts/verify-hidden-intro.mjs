@@ -5,7 +5,6 @@ import assert from "node:assert/strict";
 const root = process.cwd();
 const read = (file) => readFileSync(join(root, file), "utf8");
 
-const claim = read("src/content/space/courseDiscountClaim.ts");
 const privateCourse = read("src/content/space/privateCourse.ts");
 const privateCoursePage = read("src/app/pages/space/PrivateCoursePage.tsx");
 const components = read("src/app/components/space/learn/LearnComponents.tsx");
@@ -22,17 +21,11 @@ assert.equal(
   false,
   "Retired lesson-zero content module must stay deleted",
 );
-assert.match(
-  claim,
-  /COURSE_DISCOUNT_CLAIM_STORAGE_KEY\s*=\s*"opten_course_preview_claim_v1"/,
-  "Legacy claim storage key must stay compatible with issued checkout discounts",
-);
 assert.match(privateCourse, /const privateCourseTotalLessons = 16/, "Paid course progress must remain 16 lessons");
 assert.doesNotMatch(privateCourse, /privateCourseHiddenIntroLesson|PRIVATE_COURSE_HIDDEN_INTRO|AI контент-завод|Бесплатный нулевой урок/iu);
 
 assert.match(privateCoursePage, /RETIRED_HIDDEN_INTRO_SLUG\s*=\s*"hidden-intro"/);
-assert.match(privateCoursePage, /lessonSlug === RETIRED_HIDDEN_INTRO_SLUG[\s\S]*<Navigate to=\{`\/learn\/courses\/\$\{collection\.id\}\$\{location\.search\}`\}/);
-assert.match(privateCoursePage, /readStoredCourseDiscountClaim/, "Issued discounts must survive navigation to the course root");
+assert.match(privateCoursePage, /lessonSlug === RETIRED_HIDDEN_INTRO_SLUG[\s\S]*?<NotFound \/>/);
 
 assert.doesNotMatch(components, /telegramHiddenIntro|privateCourseHiddenIntroLesson|HIDDEN_INTRO_SLUG|Бесплатно после подписки/iu);
 assert.match(components, /const hasAccess = courseAccess \|\| proAccess/, "Generator access must remain course purchase or Pro");
@@ -44,9 +37,11 @@ assert.doesNotMatch(tokenApi, /discountClaimToken|telegram-hidden-intro|KINESCOP
 assert.doesNotMatch(authApi, /telegram-hidden-intro|KINESCOPE_HIDDEN_INTRO_SLUG/);
 assert.doesNotMatch(serverCourse, /hidden-intro|a4722357-b131-491f-8ca0-cdd11d927630/);
 
-assert.match(agents, /retired lesson-zero route/i);
-assert.match(agents, /redirects to the course/i);
-assert.match(integrationContract, /retired lesson-zero route/i);
-assert.match(integrationContract, /redirects to the course root/i);
 
-console.log("Lesson-zero retirement guardrails passed.");
+assert.doesNotMatch(courseAccess, /discountClaim|discount_claim|opten_course_preview_claim_v1/);
+assert.doesNotMatch(components, /claimBlocksPromo|courseClaimExpired|discountClaimToken/);
+assert.doesNotMatch(privateCoursePage, /rememberCourseDiscountClaim|readStoredCourseDiscountClaim/);
+assert.match(agents, /Telegram course bot is paused/);
+assert.match(integrationContract, /Telegram course bot is paused/);
+
+console.log("Telegram discounts and lesson-zero retirement guardrails passed.");

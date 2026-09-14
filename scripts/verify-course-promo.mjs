@@ -34,37 +34,23 @@ const json = (body, status = 200) => new Response(JSON.stringify(body), { status
 let checks = 0;
 
 try {
-  // Expired/used claims must not poison subsequent manual quotes or checkout.
-  for (const error of ['discount_claim_expired', 'discount_claim_used']) {
-    const requests = [];
-    globalThis.fetch = async (_url, init) => {
-      const body = JSON.parse(init.body);
-      requests.push(body);
-      if (body.discount_claim_token) return json({ error }, 400);
-      return json(body.quote_only ? quote(body.currency) : { order_id: 'test-order' });
-    };
-    await assert.rejects(quoteCoursePayment(slug, 'RUB', undefined, claim), { message: error });
-    for (const currency of ['RUB', 'USD']) {
-      const result = await quoteCoursePayment(slug, currency, ' intro20 ');
-      assert.equal(result.amount_value, currency === 'RUB' ? 3992 : 55.2);
-    }
-    await createCoursePayment(slug, 'TEST@example.invalid', 'https://example.invalid', 'RUB', 'INTRO20');
-    assert.equal(requests.length, 4);
-    for (const body of requests.slice(1)) {
-      assert.equal(body.promo_code, 'INTRO20');
-      assert.equal(body.discount_claim_token, undefined);
-    }
-    checks += 1;
-  }
-
-  // Active claims retain priority; the two discounts must never stack.
+  // Old callers/storage cannot suppress an explicit manual promo or send a claim.
+  const requests = [];
+  globalThis.window = { localStorage: { getItem() { throw new Error('Claim storage must not be read'); } } };
   globalThis.fetch = async (_url, init) => {
     const body = JSON.parse(init.body);
-    assert.equal(body.discount_claim_token, claim);
-    assert.equal(body.promo_code, undefined);
-    return json({ ...quote(), discount_claim_active: true, promo_code: null });
+    requests.push(body);
+    assert.equal(body.discount_claim_token, undefined);
+    assert.equal(body.promo_code, 'INTRO20');
+    return json(body.quote_only ? quote(body.currency) : { order_id: 'test-order' });
   };
-  await quoteCoursePayment(slug, 'RUB', 'INTRO20', claim);
+  for (const currency of ['RUB', 'USD']) {
+    const result = await quoteCoursePayment(slug, currency, ' intro20 ', claim);
+    assert.equal(result.amount_value, currency === 'RUB' ? 3992 : 55.2);
+  }
+  await createCoursePayment(slug, 'test@example.invalid', 'https://example.invalid', 'RUB', 'INTRO20', claim);
+  assert.equal(requests.length, 3);
+  delete globalThis.window;
   checks += 1;
 
   for (const failure of ['network', 503, 429]) {

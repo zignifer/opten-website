@@ -310,101 +310,42 @@ short-lived Kinescope embed URL with `drmauthtoken`. Kinescope calls
 Kinescope API key, auth JWT secret, Supabase service-role key, YooKassa secret,
 Resend key, or raw playback token in the client bundle.
 
-The Telegram course offer is a separate sales funnel for this course, not a
-course entitlement and not a Pro feature. The Telegram bot backend retains the
-legacy service name `supabase/functions/telegram-hidden-intro-webhook` for
-deployment compatibility and has `verify_jwt = false`; it validates
-`TELEGRAM_WEBHOOK_SECRET`, stores started users in
-`telegram_hidden_intro_leads`, writes
-funnel events to `telegram_hidden_intro_events`, and issues one random per-user
-`course_discount_claims` token directly from `/start`. The start flow creates
-or reuses the claim immediately and opens the course root with a 20% checkout
-discount for its first 24 hours. The retired lesson-zero route
-`/learn/courses/ai-content-marketing-2026/hidden-intro` redirects to the course
-root while preserving `?claim=...`, so old links may retain an active checkout
-discount but can never open a video. The retired Kinescope video is not in the
-server playback whitelist, the course sidebar contains only the 16 paid lessons,
-and the bot no longer checks channel membership or grants lesson access. The
-legacy storage key `localStorage.opten_course_preview_claim_v1` remains only so
-already-issued discount links survive the retirement. The claim is not a course
-entitlement: all 16 paid lessons still require `course-access-summary`, and the
-claim never unlocks private course prompts, lesson materials, paid lessons, or the separate
-`Генератор промптов Opten` section. That collection-level generator block must
-remain visible on every paid lesson page, but must not appear on the course
-root. On desktop lesson pages it stays compact inside the left lesson-content
-column and appears before lesson materials and prompts, never as a full-width
-block below the course sidebar. The course root goes directly from its intro
-copy to the course showcase. Its explanatory description is
-shown only while access is locked; a course buyer or active Pro user sees the
-heading and working ChatGPT and Claude/Codex links without the sales
-description. Everyone else sees the same two generators in a locked conversion
-state with one outlined `Открыть по подписке` CTA to `/pay`; the banner copy
-may also mention the full course, but the course checkout CTA stays in the
-dedicated purchase surface instead of this compact generator block.
-A Telegram lead may receive the 24h discount claim exactly once: repeated
-course requests reuse the same claim token, while an expired or used discount
-is never reissued or extended. Manual admin broadcasts
-are delivery-only and must never create, refresh, or extend
-`course_discount_claims`. The 24h 20% claim discount has priority over manual
-promo codes and must not stack. Provider webhooks mark it used only after
-successful payment and mark the lead paid, but do not send a Telegram
-payment-success message; course access is delivered by email;
-reminders and broadcasts skip used claims and mark Bot API 403/blocked
-recipients as blocked.
-After a Telegram claim expires or is used, manual promo codes, including
-`INTRO20`, remain available under their own server-side validity rules. Claim
-expiry must not clear a manual promo when currency changes. Show promo checking,
-success, and errors visibly above the expired-link notice; distinguish a network
-failure from an invalid promo. Quote requests have a bounded timeout and may retry
-once on a transient failure; payment creation must never auto-retry. Checkout
-waits for the selected discount quote to resolve before it can be submitted.
-Expired or used legacy 40% claims remain inactive and unchanged for checkout
-and audit purposes. The bot's expired-state copy always shows the current 20%
-campaign wording instead of the stored historical percentage, so `/start`
-cannot surface the retired 40% message.
+The Telegram course bot is paused. It must not send replies, callback answers,
+course offers, videos, reminders, or broadcasts, and must not create new leads or
+course discount claims. The Telegram webhook is removed at Bot API level; the
+legacy webhook handler acknowledges authenticated requests silently with
+`{ ok: true, paused: true }`. Reminder cron jobs are inactive, reminder handlers
+return a zero-send paused result, and broadcast handlers reject sends.
+Existing bot profile values, historical leads, claims, events, broadcasts, orders,
+and entitlements are retained. No pause announcement is sent to existing chats.
 
-For future `/start` updates only, the Telegram bot immediately creates or reuses
-the one-time claim and shows the course without a navigation menu, channel
-membership check, free lesson, or lesson-zero branch. A newly created active
-claim sends the Figma-approved HTML course offer first, with one `Открыть курс`
-button to the claim-bearing course root, then schedules the reviewed course intro
-video as a background task so media delivery cannot delay the webhook response. A repeated
-request reuses the same token without extending it and sends the short `Ссылка
-на курс уже готова` response without replaying the video. It does not grant the
-generator; the generator opens only after course purchase or through active
-Opten Pro. Retired callbacks `open_hidden_intro`, `check_subscription`, and
-`get_course_access` remain recognized so buttons already present in old chats
-enter the same direct course flow; they must never call `getChatMember`, grant
-lesson access, or send the retired welcome photo/copy. Reminder links always
-open the claim-bearing course root.
-Changing `/start` must never trigger a broadcast or any message to existing
-leads. Every paid lesson continues to point to the normal course purchase surface.
-The locked Bot API name is `Влад Воронежцев | Уроки и промпты`, and the locked
-short description is `Доступ к урокам и каналу с промптами.`; future bot
-updates must not change either value unless the owner explicitly asks. The Bot
-API long description remains `Привет! Здесь можно получить доступ к курсу по
-ИИ или перейти в мой закрытый телеграм канал с промптами и
-инструкциями.\n\nЖми /Start 👇`, and the `/start` command description is
-`Открыть доступ`.
-These exact name, short description, long description, and command values must
-be set and verified in both the default Bot API scope and the `ru` language
-scope, because Telegram clients may prefer the localized RU profile.
-If claim creation fails, the bot shows `Открыть курс` first as the recognized
-`get_course_access` retry callback and `Перейти в Telegram` second.
-The video must use a stable public HTTPS URL. The reviewed default is the
-source-controlled 720p H.264/AAC asset at
-`/assets/telegram/ai-content-marketing-2026-intro-v2.mp4` (5.9 MB, compressed
-with H.264 CRF 27 and below Telegram's 20 MB remote-URL limit);
-`TELEGRAM_INTRO_VIDEO_URL` may override it.
-Do not use a Telegram `file_id`, because a stale ID can silently restore cached
-media after deploys.
+Course checkout now uses only the normal base price and manually entered promo
+codes, including `INTRO20` and `START20`, under their server-side validity rules.
+The site does not read or store `?claim=` or the retired localStorage claim key,
+and never sends a claim token. The server ignores all legacy claim fields and
+never quotes, reserves, or creates a new order with a Telegram discount. Old
+already-created payments must still finish through the normal provider webhooks,
+including entitlement and email delivery. Do not delete historical claim data.
+There are no Telegram discount timers, expiry messages, or claim-based redirects.
+The retired `/learn/courses/ai-content-marketing-2026/hidden-intro` route shows the
+normal not-found page in place; it must not redirect to the course or Learn.
+Quote requests have a bounded timeout and may retry once on a transient failure;
+payment creation must never auto-retry. Checkout waits for a pending promo quote.
+
+The `Генератор промптов Opten` collection block remains visible on every paid
+lesson page, before materials and prompts in the compact left content column,
+and absent from the course root. Its working ChatGPT and Claude/Codex links
+require course purchase or active Pro. Buyers and Pro users do not see the sales
+description; locked visitors see one outlined `Открыть по подписке` CTA to `/pay`.
+All 16 paid lessons still require normal course access. Retired lesson-zero video
+content stays outside the Kinescope whitelist.
 
 The owner/admin dashboard on opten.space is a general protected admin surface
 under `/admin`, not a Telegram-only one-off. The first module is Telegram
 course-funnel operations: read funnel stats through `/api/admin/telegram-stats`,
-send Telegram broadcasts through `/api/admin/telegram-broadcast`, and review or
+review historical Telegram data, and review or
 delete stored broadcast history through `/api/admin/telegram-broadcasts`. The
-active dashboard follows the current direct `/start` course flow and shows
+dashboard labels these as historical data for the paused bot and shows
 unique bot starts, issued course links, course opens where tracked, checkout
 orders, successful payments, active discounts, and blocked chats. Historical
 course-selection, subscription, lesson-zero, and free-lesson events may remain
@@ -418,9 +359,9 @@ checks the website JWT + owner allowlist and then calls the extension-owned
 `telegram-hidden-intro-assets` Edge Function with `TELEGRAM_ADMIN_SECRET`.
 Uploaded images are stored server-side and exposed only as random public HTTPS
 asset URLs for Telegram `sendPhoto`; never put raw image data or operational
-storage/service secrets in browser storage. Broadcast send must always run a
-dry-run recipient preview first and require an explicit final confirmation with
-the exact recipient count; the extension-owned backend must persist new
+storage/service secrets in browser storage. Broadcast composition is hidden while the bot is paused; both the site API and
+backend reject sends with `telegram_bot_paused`. Historical message deletion
+remains owner-gated; the extension-owned backend must persist new
 broadcast recipient `message_id` values before a post can be deleted later. Old
 broadcasts that were sent before message IDs were stored are not reliably
 deletable. `/admin` authenticates through

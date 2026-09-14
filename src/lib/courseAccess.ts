@@ -1,6 +1,5 @@
 import { SUPABASE_ANON_KEY, SUPABASE_FUNCTIONS_URL } from "./optenAuth";
 import type { Currency } from "./currency";
-import { COURSE_DISCOUNT_CLAIM_STORAGE_KEY } from "../content/space/courseDiscountClaim";
 
 export type CourseAccessSummary = {
   course_slug: string;
@@ -25,10 +24,7 @@ export type CoursePaymentResponse = {
   promo_code?: string | null;
   discount_code?: string | null;
   discount_id?: string | null;
-  discount_claim_active?: boolean;
-  discount_claim_expires_at?: string | null;
-  claim_discount_percent?: number | null;
-  discount_source?: "promo_code" | "telegram_hidden_intro" | string | null;
+  discount_source?: "promo_code" | string | null;
   currency?: Currency;
   error?: string;
 };
@@ -59,40 +55,6 @@ export function isCourseTestPromoCode(value: string): boolean {
 export function isValidCoursePromoCode(value: string): boolean {
   const normalized = normalizeCoursePromoCode(value);
   return /^[A-Z0-9]{1,32}$/.test(normalized);
-}
-
-export function normalizeCourseDiscountClaimToken(value: string | null | undefined): string {
-  return (value ?? "").trim();
-}
-
-export function isValidCourseDiscountClaimToken(value: string | null | undefined): boolean {
-  return /^[A-Za-z0-9_-]{32,160}$/.test(normalizeCourseDiscountClaimToken(value));
-}
-
-export function readCourseDiscountClaimTokenFromSearch(search: string): string | null {
-  const token = normalizeCourseDiscountClaimToken(new URLSearchParams(search).get("claim"));
-  return isValidCourseDiscountClaimToken(token) ? token : null;
-}
-
-export function readStoredCourseDiscountClaim(): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const token = normalizeCourseDiscountClaimToken(window.localStorage.getItem(COURSE_DISCOUNT_CLAIM_STORAGE_KEY));
-    return isValidCourseDiscountClaimToken(token) ? token : null;
-  } catch {
-    return null;
-  }
-}
-
-export function rememberCourseDiscountClaim(value: string): string | null {
-  const token = normalizeCourseDiscountClaimToken(value);
-  if (!isValidCourseDiscountClaimToken(token)) return null;
-  try {
-    window.localStorage.setItem(COURSE_DISCOUNT_CLAIM_STORAGE_KEY, token);
-  } catch {
-    // The claim can still be used from the current URL when storage is unavailable.
-  }
-  return token;
 }
 
 export function formatCoursePrice(value: number, currency: Currency): string {
@@ -128,9 +90,7 @@ export async function createCoursePayment(
   returnUrl: string,
   currency: Currency = "RUB",
   promoCode?: string,
-  discountClaimToken?: string,
 ): Promise<CoursePaymentResponse> {
-  const normalizedClaimToken = normalizeCourseDiscountClaimToken(discountClaimToken);
   const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-course-payment`, {
     method: "POST",
     headers: {
@@ -143,8 +103,7 @@ export async function createCoursePayment(
       email: normalizeCourseEmail(email),
       return_url: returnUrl,
       currency,
-      promo_code: normalizedClaimToken ? undefined : promoCode ? normalizeCoursePromoCode(promoCode) : undefined,
-      discount_claim_token: normalizedClaimToken || undefined,
+      promo_code: promoCode ? normalizeCoursePromoCode(promoCode) : undefined,
     }),
   });
   const body = (await response.json().catch(() => ({}))) as CoursePaymentResponse;
@@ -156,9 +115,7 @@ export async function quoteCoursePayment(
   courseSlug: string,
   currency: Currency = "RUB",
   promoCode?: string,
-  discountClaimToken?: string,
 ): Promise<CoursePaymentResponse> {
-  const normalizedClaimToken = normalizeCourseDiscountClaimToken(discountClaimToken);
   const request: RequestInit = {
     method: "POST",
     headers: {
@@ -169,8 +126,7 @@ export async function quoteCoursePayment(
     body: JSON.stringify({
       course_slug: courseSlug,
       currency,
-      promo_code: normalizedClaimToken ? undefined : promoCode ? normalizeCoursePromoCode(promoCode) : undefined,
-      discount_claim_token: normalizedClaimToken || undefined,
+      promo_code: promoCode ? normalizeCoursePromoCode(promoCode) : undefined,
       quote_only: true,
     }),
   };
