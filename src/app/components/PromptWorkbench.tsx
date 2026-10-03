@@ -421,7 +421,7 @@ export default function PromptWorkbench() {
               <CopyPromptIcon copied={copied} />
             </button>
           </div>
-          <div className="grid w-full grid-cols-2 gap-2.5 md:w-auto">
+          <div className="grid w-full grid-cols-1 gap-2.5 sm:grid-cols-2 md:w-auto">
             <div className="relative md:w-[219px]">
               <select
                 aria-label={text.typeLabel}

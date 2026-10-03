@@ -4,6 +4,8 @@ export const PROMPT_WORKBENCH_MODELS = {
   image: [
     { slug: "nano-banana-2", label: "Nano Banana 2" },
     { slug: "nano-banana-pro", label: "Nano Banana Pro" },
+    { slug: "gpt-image-2.5-sunburst", label: "GPT Image 2.5 Sunburst" },
+    { slug: "gpt-image-2.5-flare", label: "GPT Image 2.5 Flare" },
     { slug: "gpt-image-2", label: "GPT Image 2" },
     { slug: "midjourney-8.1", label: "Midjourney 8.1" },
     { slug: "seedream-5-pro", label: "Seedream 5.0 Pro" },
@@ -12,6 +14,7 @@ export const PROMPT_WORKBENCH_MODELS = {
   video: [
     { slug: "seedance-2.5", label: "Seedance 2.5" },
     { slug: "seedance-2.0", label: "Seedance 2.0" },
+    { slug: "kling-4", label: "Kling 4.0" },
     { slug: "kling-3", label: "Kling 3.0" },
     { slug: "veo-3.1", label: "Google Veo 3.1" },
     { slug: "flux-3", label: "FLUX 3" },

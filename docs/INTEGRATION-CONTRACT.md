@@ -450,10 +450,15 @@ calling the finalizer directly in a unit test is not sufficient billing coverage
 
 - Accepted action: `improve` only. Prompt scoring is not part of this endpoint.
 - Allowed image models, in popup order: `nano-banana-2`, `nano-banana-pro`,
-  `gpt-image-2`, `midjourney-8.1`, `seedream-5-pro`, `recraft-v4.1`.
+  `gpt-image-2.5-sunburst`, `gpt-image-2.5-flare`, `gpt-image-2`,
+  `midjourney-8.1`, `seedream-5-pro`, `recraft-v4.1`.
 - Allowed video models, in popup order: `seedance-2.5`, `seedance-2.0`,
-  `kling-3`, `veo-3.1`, `flux-3`, `grok-imagine-video-1.5`. Labels and ordering
+  `kling-4`, `kling-3`, `veo-3.1`, `flux-3`, `grok-imagine-video-1.5`. Labels and ordering
   mirror `PS_CHAT_TOP_MODELS` in the extension popup.
+- GPT Image 2.5 Sunburst/Flare accept text-only input; references are optional.
+  The website chooses internal prompt-skill IDs, not image/video generation API
+  models. Kling 4.0 selection does not assert live availability on an aggregator;
+  the proxy profile preserves Flash/full-model distinctions.
 - Allowed site-only Vibe Coding models, in fixed order: `codex`, `claude`,
   `gemini`. They map server-side to the proxy's non-public `_coding-*` adapters;
   underscore-prefixed adapters are excluded from and blocked by the public
@@ -825,7 +830,7 @@ If you switch envs, you must also flip the corresponding Paddle priceIds in the 
 | Allowing anonymous landing requests to reach promptscore-proxy | Unmetered Claude usage and shared-ledger abuse | Verify the website JWT in `/api/prompt-workbench` before every proxy request; let the proxy enforce Free signup credits and Pro usage. |
 | Trusting `count_usage` or any other client field to decide billing | An authenticated caller can bypass credits by changing the request body | Treat every score/rewrite as billable in promptscore-proxy; reserve atomically before Anthropic and release only the exact failed-provider reservation. |
 | Marketing a named Pro model that is not actually used | Misleading paid-product claim and loss of user trust | Describe the product tier (`Opten Pro`) or name the real model; do not advertise a fabricated provider/model name. |
-| Letting the landing model list drift from `PS_CHAT_TOP_MODELS` | Website and extension produce different quick-mode behavior or expose unsupported skills | Keep the exact 14 slugs, labels, order, and image/video grouping synchronized with `C:\Projects\promptscore\popup\popup.js`. |
+| Letting the landing model list drift from `PS_CHAT_TOP_MODELS` | Website and extension produce different quick-mode behavior or expose unsupported skills | Keep slugs, labels, order, and image/video grouping in `PROMPT_WORKBENCH_MODELS` synchronized with `C:\Projects\promptscore\popup\popup.js`; every exposed slug must have a proxy skill. |
 
 ---
 
