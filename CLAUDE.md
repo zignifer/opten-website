@@ -293,7 +293,11 @@ send a direct website auth link to the same email. The internal test promo
 `FREE` maps to `100 ₽` or `$1` and requires a separate Paddle `$1` price ID.
 The canonical course name is `Курс по ИИ` (`AI Course` in EN). The public base price is `2 990 ₽` / `$41`; public discounts are not hard-coded in
 the website and must be represented by server-side promo codes (planned common
-campaigns: `-20%` and `-40%`). On desktop, the course-root checkout card shows
+campaigns: `-20%` and `-40%`).
+The fixed-price `LAST` promo now equals the base price: keep it valid without
+an additional Paddle discount, and show a crossed-out price only when the
+effective quote is strictly lower than the current base price.
+On desktop, the course-root checkout card shows
 the compact subtitle `Курс из 16 уроков по ИИ для начинающих` directly below
 the course name without increasing the fixed card height; the subtitle stays
 hidden on mobile. The pending-payment hint stays a compact `Уже оплатили? Как войти`

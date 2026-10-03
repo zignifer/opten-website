@@ -2403,7 +2403,7 @@ function CoursePurchaseCard({ collection, purchase, hasAccess, loadingAccess, in
     ? appliedPromoQuote.amount_value
     : null;
   const effectiveSaleValue = quotedAmountValue ?? baseSaleValue;
-  const showCrossedPrice = Boolean(appliedPromoCode && quotedAmountValue !== null);
+  const showCrossedPrice = Boolean(appliedPromoCode && quotedAmountValue !== null && quotedAmountValue < baseSaleValue);
   const salePrice = formatCoursePrice(effectiveSaleValue, currency);
   const crossedPrice = formatCoursePrice(baseSaleValue, currency);
   const quotePending = promoChecking || Boolean(
