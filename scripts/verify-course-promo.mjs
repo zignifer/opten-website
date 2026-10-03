@@ -25,7 +25,7 @@ const originalSetTimeout = globalThis.setTimeout;
 const slug = 'ai-content-marketing-2026';
 const claim = 'expired_claim_regression_check_000000000000';
 const quote = (currency = 'RUB') => ({
-  amount_value: currency === 'RUB' ? 3992 : 55.2,
+  amount_value: currency === 'RUB' ? 2392 : 32.8,
   currency,
   promo_code: 'INTRO20',
   discount_claim_active: false,
@@ -46,7 +46,7 @@ try {
   };
   for (const currency of ['RUB', 'USD']) {
     const result = await quoteCoursePayment(slug, currency, ' intro20 ', claim);
-    assert.equal(result.amount_value, currency === 'RUB' ? 3992 : 55.2);
+    assert.equal(result.amount_value, currency === 'RUB' ? 2392 : 32.8);
   }
   await createCoursePayment(slug, 'test@example.invalid', 'https://example.invalid', 'RUB', 'INTRO20', claim);
   assert.equal(requests.length, 3);
@@ -64,7 +64,7 @@ try {
       }
       return json(quote());
     };
-    assert.equal((await quoteCoursePayment(slug, 'RUB', 'INTRO20')).amount_value, 3992);
+    assert.equal((await quoteCoursePayment(slug, 'RUB', 'INTRO20')).amount_value, 2392);
     assert.equal(calls, 2);
     checks += 1;
   }

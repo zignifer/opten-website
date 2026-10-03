@@ -275,7 +275,7 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
 
 - The site shows a standalone course offer controlled by the global website
   currency switcher. The canonical product name is `Курс по ИИ` (`AI Course`
-  in EN). The public base price is `4 990 ₽` / `$69`; public discounts
+  in EN). The public base price is `2 990 ₽` / `$41`; public discounts
   are not hard-coded in the website and must come from server-side promo codes
   (planned common campaigns: `-20%` and `-40%`). The current USD checkout still
   uses the configured course Paddle one-time price ID returned by the backend.
@@ -322,7 +322,9 @@ Hidden Kinescope course `ai-content-marketing-2026` is a separate paid product:
   fixed-price promos use the standard course price ID plus a Paddle discount
   code. Current `LAST` maps to `2 990 ₽` / `$41`, has no start timer, expiry
   timestamp, or usage limit, and stays enabled until the owner requests manual
-  deactivation. Never let the browser set arbitrary checkout amounts.
+  deactivation. When its fixed amount equals the base price, it remains valid
+  with zero discount and no Paddle discount code/ID; its historical `LAST4990`
+  discount is archived in Paddle and must never be applied again. Never let the browser set arbitrary checkout amounts.
 - The YooKassa `/webhook` handler must branch on `metadata.kind` before
   requiring `metadata.user_id`. Course webhooks grant/confirm
   `course_entitlements`, create or reuse the Supabase Auth user for that email,
@@ -801,7 +803,7 @@ The paid course purchase card also calls `ensurePaddle()` lazily before USD cour
   `PADDLE_PRICE_ID_COURSE_AI_CONTENT_MARKETING_2026_{SANDBOX|PRODUCTION}`
   and `PADDLE_PRICE_ID_COURSE_AI_CONTENT_MARKETING_2026_FREE_{SANDBOX|PRODUCTION}`.
   The current live production IDs are
-  `pri_01kvk9vzec7cwgq7zgs9azw2re` (`$69`) and
+  `pri_01kvk9vzec7cwgq7zgs9azw2re` (`$41`) and
   `pri_01kvk9x5mcnadfj0beymk23ze5` (`$1` FREE test).
 
 If you switch envs, you must also flip the corresponding Paddle priceIds in the extension's `create-payment-paddle` and `create-course-payment` Edge Functions.
