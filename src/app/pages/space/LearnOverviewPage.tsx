@@ -57,10 +57,10 @@ const pinnedFreeLessons = PINNED_FREE_LESSON_SLUGS.map((slug) => {
 });
 
 const authorSocialLinks = [
-  { label: "YouTube", href: "https://www.youtube.com/channel/UC797Sd_fYNILYZFuXsjjFDA", iconPath: "/assets/space/social/youtube.svg" },
-  { label: "Instagram", href: "https://www.instagram.com/v.voronezhtsev/", iconPath: "/assets/space/social/instagram.svg" },
-  { label: "Telegram", href: "https://t.me/v_voronezhtsev", iconPath: "/assets/space/social/telegram.svg" },
-  { label: "TikTok", href: "https://www.tiktok.com/@v_voronezhtsev", iconPath: "/assets/space/social/tiktok.svg" },
+  { label: "YouTube", href: "https://www.youtube.com/@aivor_v", iconPath: "/assets/space/social/youtube.svg" },
+  { label: "Instagram", href: "https://www.instagram.com/aivor_v/", iconPath: "/assets/space/social/instagram.svg" },
+  { label: "Telegram", href: "https://t.me/aivor_v", iconPath: "/assets/space/social/telegram.svg" },
+  { label: "TikTok", href: "https://www.tiktok.com/@aivor_v", iconPath: "/assets/space/social/tiktok.svg" },
 ] as const;
 
 const sortLabels: Record<LearnLang, Record<SortKey, string>> = {

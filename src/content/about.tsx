@@ -43,7 +43,7 @@ const ru: AboutContent = {
             видео и интерфейсов. Веду контент не только в YouTube Shorts: делаю короткие ролики,
             длинные разборы, посты, промпты и закулисье в Instagram, Telegram, YouTube, TikTok и VK.
             На YouTube меня можно найти как{" "}
-            <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>, а в Telegram я веду канал «Влад Воронежцев | Про нейросети». С 2024-го года я ушёл
+            <a href="https://www.youtube.com/@aivor_v" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@aivor_v</a>, а в Telegram я веду канал «Влад Воронежцев | Про нейросети». С 2024-го года я ушёл
             в AI-креатив с головой: Midjourney, Kling, Veo, Sora, Nano Banana, Seedance — пробовал
             почти всё, что вышло.
           </p>
@@ -118,12 +118,12 @@ const ru: AboutContent = {
           <p className="mb-[14px]">
             Если хотите связаться лично, написать про баг, попросить добавить поддержку конкретной модели
             или просто обсудить генерации — мне удобнее всего в Telegram:{" "}
-            <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v_voronezhtsev</a>.
+            <a href="https://t.me/aivor_v" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@aivor_v</a>.
             Там же мой канал «Влад Воронежцев | Про нейросети» — туда я выкладываю длинные разборы, промпты,
             ссылки и закулисье.
           </p>
           <p className="mb-[14px]">
-            YouTube — <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>.
+            YouTube — <a href="https://www.youtube.com/@aivor_v" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@aivor_v</a>.
             Там короткие туториалы, тренды и часть длинных разборов. Instagram/Reels я использую как
             параллельный охват для тех же AI- и дизайн-тем.
           </p>
@@ -162,7 +162,7 @@ const en: AboutContent = {
             video and interface generation. I don't only make YouTube Shorts: I publish short videos,
             long-form breakdowns, posts, prompts and behind-the-scenes notes across Instagram,
             Telegram, YouTube, TikTok and VK. On YouTube, you can find me as{" "}
-            <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>, and on Telegram I run the "Vlad Voronezhtsev | About AI" channel. In 2024 I went all
+            <a href="https://www.youtube.com/@aivor_v" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@aivor_v</a>, and on Telegram I run the "Vlad Voronezhtsev | About AI" channel. In 2024 I went all
             in on AI creative work: Midjourney, Kling, Veo, Sora, Nano Banana, Seedance — I tried
             just about everything that shipped.
           </p>
@@ -237,12 +237,12 @@ const en: AboutContent = {
           <p className="mb-[14px]">
             If you'd like to reach out — bug reports, requests for support of a specific model, or
             just to talk about generation — the easiest way to reach me is Telegram:{" "}
-            <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v_voronezhtsev</a>.
+            <a href="https://t.me/aivor_v" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@aivor_v</a>.
             That's also where my channel "Vlad Voronezhtsev | About AI" lives — long-form breakdowns,
             prompts, links and behind-the-scenes go there.
           </p>
           <p className="mb-[14px]">
-            YouTube — <a href="https://youtube.com/@v.voronezhtsev" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@v.voronezhtsev</a>.
+            YouTube — <a href="https://www.youtube.com/@aivor_v" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@aivor_v</a>.
             Short tutorials, trends, and some long-form breakdowns. Instagram/Reels is the parallel
             reach channel for the same AI and design topics.
           </p>

@@ -94,7 +94,7 @@ assert.match(content, /ai-website-vibe-design/, "Learn catalog must include the 
 assert.match(content, /thumbnailPath: "https:\/\/i\.ytimg\.com\/vi\/ZWLiM5Wqv3M\/maxresdefault\.jpg"/, "AI website vibe-design lesson must use its live YouTube thumbnail");
 assert.match(content, /youtubeId: "ZWLiM5Wqv3M"/, "AI website vibe-design lesson must use the requested YouTube video");
 assert.match(content, /time: "31:07", seconds: 1867/, "AI website vibe-design lesson must keep all 20 original YouTube chapters");
-assert.match(content, /https:\/\/t\.me\/v_voronezhtsev/, "AI website vibe-design lesson must include the author's Seedance materials link");
+assert.match(content, /https:\/\/t\.me\/aivor_v/, "AI website vibe-design lesson must include the author's Seedance materials link");
 assert.match(content, /https:\/\/higgsfield\.ai\//, "Actual AI tools lesson must include the Higgsfield material");
 assert.match(content, /https:\/\/freepik\.com\//, "Actual AI tools lesson must include the Freepik / Magnific material");
 assert.match(content, /https:\/\/syntx\.ai\/welcome\/GlUETIt6/, "Actual AI tools lesson must include the Syntx material");

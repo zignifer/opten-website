@@ -16,6 +16,12 @@ knowledge belongs here, with detailed specs in `docs/`.
 **opten.space** — public website for the **Opten** Chrome extension. Vite +
 React 18 + TypeScript + Tailwind 4, SPA, deployed on Vercel.
 
+Founder social profiles use the handle `aivor_v` across Telegram, YouTube,
+Instagram, and TikTok: `https://t.me/aivor_v`,
+`https://www.youtube.com/@aivor_v`, `https://www.instagram.com/aivor_v/`,
+and `https://www.tiktok.com/@aivor_v`. Keep visible RU/EN handles, contact
+links, Learn materials, and SEO `sameAs` URLs consistent with these profiles.
+
 ## Hard command: write SEO article
 
 When the user writes `напиши SEO-статью`, `напиши seo статью`, or asks to write

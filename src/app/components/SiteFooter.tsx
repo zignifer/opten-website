@@ -28,7 +28,7 @@ export default function SiteFooter({ variant = "full" }: SiteFooterProps): JSX.E
       <LocalizedLink to="/privacy" className="hover:text-white">{t("footer.privacy")}</LocalizedLink>
       <LocalizedLink to="/terms" className="hover:text-white">{t("footer.terms")}</LocalizedLink>
       <LocalizedLink to="/refund" className="hover:text-white">{t("footer.refund")}</LocalizedLink>
-      <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="hover:text-white">{t("footer.contact")}</a>
+      <a href="https://t.me/aivor_v" target="_blank" rel="noopener noreferrer" className="hover:text-white">{t("footer.contact")}</a>
     </>
   );
 

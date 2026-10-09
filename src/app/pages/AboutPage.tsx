@@ -61,7 +61,7 @@ export default function AboutPage() {
             </p>
             <div className="mt-[4px] flex flex-wrap items-center justify-center gap-[10px]">
               <a
-                href="https://t.me/v_voronezhtsev"
+                href="https://t.me/aivor_v"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-[8px] rounded-[100px] bg-[#9cfb51] px-[20px] py-[10px] font-['PT_Root_UI',sans-serif] text-[14px] font-bold text-[#011417] no-underline transition hover:-translate-y-0.5"

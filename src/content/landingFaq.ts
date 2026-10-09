@@ -36,7 +36,7 @@ const ru: FaqItem[] = [
   },
   {
     q: "Где работает расширение?",
-    a: "Сейчас полная поддержка: syntx.ai (все страницы генерации), higgsfield.ai (image + video), freepik.com (AI-генераторы, включая Magnific, и brand mode). Активно расширяем покрытие на других AI-агрегаторов — Aitrix, TensorArt, OpenRouter, Flora, MagAI. Если на твоём любимом сайте Opten ещё не работает — напиши в Telegram @v_voronezhtsev, мы приоритизируем по запросам.",
+    a: "Сейчас полная поддержка: syntx.ai (все страницы генерации), higgsfield.ai (image + video), freepik.com (AI-генераторы, включая Magnific, и brand mode). Активно расширяем покрытие на других AI-агрегаторов — Aitrix, TensorArt, OpenRouter, Flora, MagAI. Если на твоём любимом сайте Opten ещё не работает — напиши в Telegram @aivor_v, мы приоритизируем по запросам.",
   },
 ];
 
@@ -63,7 +63,7 @@ const en: FaqItem[] = [
   },
   {
     q: "Where does the extension work?",
-    a: "Currently fully supported: syntx.ai (all generation pages), higgsfield.ai (image + video), freepik.com (AI generators including Magnific, and brand mode). We're actively expanding to other AI aggregators — Aitrix, TensorArt, OpenRouter, Flora, MagAI. If your favorite site isn't supported yet, message @v_voronezhtsev on Telegram and we'll prioritize by request volume.",
+    a: "Currently fully supported: syntx.ai (all generation pages), higgsfield.ai (image + video), freepik.com (AI generators including Magnific, and brand mode). We're actively expanding to other AI aggregators — Aitrix, TensorArt, OpenRouter, Flora, MagAI. If your favorite site isn't supported yet, message @aivor_v on Telegram and we'll prioritize by request volume.",
   },
 ];
 

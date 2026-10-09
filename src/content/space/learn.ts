@@ -307,12 +307,12 @@ const emptyMaterials: Record<LearnLang, LearnMaterial[]> = { ru: [], en: [] };
 
 const aiWebsiteVibeDesignMaterials: Record<LearnLang, LearnMaterial[]> = {
   ru: [
-    { title: "Инструкция и материалы Seedance 2.5", meta: "Материалы к уроку в Telegram-канале автора", kind: "link", actionLabel: "Открыть", href: "https://t.me/v_voronezhtsev" },
+    { title: "Инструкция и материалы Seedance 2.5", meta: "Материалы к уроку в Telegram-канале автора", kind: "link", actionLabel: "Открыть", href: "https://t.me/aivor_v" },
     { title: "Syntx", meta: "Генерация фото и видео со скидкой автора 15%", kind: "link", actionLabel: "Перейти", href: "https://syntx.ai/welcome/GlUETIt6" },
     { title: "Полный курс по нейросетям", meta: "Визуал, видео и сайты с помощью ИИ", kind: "link", actionLabel: "Открыть курс", href: "/learn/courses/ai-content-marketing-2026" },
   ],
   en: [
-    { title: "Seedance 2.5 guide and materials", meta: "Lesson materials in the author's Telegram channel", kind: "link", actionLabel: "Open", href: "https://t.me/v_voronezhtsev" },
+    { title: "Seedance 2.5 guide and materials", meta: "Lesson materials in the author's Telegram channel", kind: "link", actionLabel: "Open", href: "https://t.me/aivor_v" },
     { title: "Syntx", meta: "AI image and video generation with the author's 15% discount", kind: "link", actionLabel: "Open", href: "https://syntx.ai/welcome/GlUETIt6" },
     { title: "Complete AI course", meta: "Visuals, video, and websites made with AI", kind: "link", actionLabel: "Open course", href: "/learn/courses/ai-content-marketing-2026" },
   ],

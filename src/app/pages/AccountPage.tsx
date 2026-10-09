@@ -579,7 +579,7 @@ export default function AccountPage() {
             <LocalizedLink to="/privacy" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.privacy")}</LocalizedLink>
             <LocalizedLink to="/terms" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.terms")}</LocalizedLink>
             <LocalizedLink to="/refund" className="hover:text-white transition-colors no-underline text-inherit">{t("footer.refund")}</LocalizedLink>
-            <a href="https://t.me/v_voronezhtsev" target="_blank" rel="noopener noreferrer" className="flex gap-[8px] items-center hover:text-white transition-colors no-underline text-inherit">
+            <a href="https://t.me/aivor_v" target="_blank" rel="noopener noreferrer" className="flex gap-[8px] items-center hover:text-white transition-colors no-underline text-inherit">
               <div className="overflow-clip relative shrink-0 size-[14px]">
                 <div className="absolute inset-[17.97%_8.92%_0.78%_7.33%]">
                   <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15.0741 14.6261">

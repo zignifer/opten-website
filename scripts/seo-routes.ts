@@ -144,11 +144,11 @@ export const DEFAULT_OG_IMAGE_EN = `${SITE_ORIGIN}/og-card-en.png`; // Phase 3 D
 
 // Phase 4 D-09: external URLs used by multiple schema blocks.
 const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/opten-%E2%80%94-ai-prompt-scorer/iphkppgbobpilmphloffcalicmejacfl";
-const FOUNDER_TELEGRAM_URL = "https://t.me/v_voronezhtsev";
+const FOUNDER_TELEGRAM_URL = "https://t.me/aivor_v";
 // Post-2026-05-17 GEO audit: founder's AI-blogger YouTube — primary external authority signal,
 // previously not linked in sameAs (audit CR-2). Public about copy now positions Vlad as a
 // multi-platform AI creator across Instagram, Telegram, YouTube, TikTok and VK.
-const FOUNDER_YOUTUBE_URL = "https://www.youtube.com/@v.voronezhtsev";
+const FOUNDER_YOUTUBE_URL = "https://www.youtube.com/@aivor_v";
 const VIDEO_UPLOAD_TIMEZONE = "+05:00";
 const HIDDEN_LEARN_OVERVIEW_LESSON_SLUGS = new Set<string>(hiddenLearnOverviewLessonSlugs);
 
