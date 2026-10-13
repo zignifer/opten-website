@@ -11,6 +11,11 @@ Public site for the Opten Chrome extension. This note is the map of content for 
 
 ## Core docs
 
+- [[DESIGN]] — визуальная база, библиотека и активные направления страниц
+- [[docs/page-workflow/README]] — **новая страница: директор → свежий агент сборки**
+- [[docs/page-workflow/02-CREATIVE-DIRECTOR]] — подготовка направления, без генерации
+- [[docs/page-workflow/03-START-PAGE]] — реализация и проверка всей страницы
+- [[docs/page-workflow/MEDIA-PROTOCOL]] — интерфейсы, изображения, иконки и происхождение файлов
 - [[docs/INTEGRATION-CONTRACT]] — **binding interface with the Chrome extension** (read before touching billing/auth/routes)
 - [[docs/CONTENT-AUTHORING]] — **GEO+SEO playbook for new pages, blog posts, images** (read before any content change)
 - [[docs/TECH]] — stack snapshot
@@ -40,8 +45,8 @@ milestones still use ordinary docs or issues.
 
 ## Project instructions
 
-- [[CLAUDE]] — instructions for Claude Code (this file is read by the agent at session start)
-- [[AGENTS]] — mirror of CLAUDE.md for other agents
+- [[AGENTS]] — source of truth for project instructions
+- [[CLAUDE]] — compatibility mirror generated from AGENTS.md via `npm run sync:agents`
 - [[guidelines/Guidelines]] — Figma-Make output guidelines
 
 ## Auto-memory (Claude Code)

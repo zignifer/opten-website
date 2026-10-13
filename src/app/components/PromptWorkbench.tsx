@@ -228,7 +228,7 @@ function readPreferences(): { type: PromptWorkbenchType; model: string } | null 
   }
 }
 
-export default function PromptWorkbench() {
+export default function PromptWorkbench({ preview = false }: { preview?: boolean } = {}) {
   const { lang } = useLang();
   const { refresh, session, status } = useSpaceAuth();
   const text = copy[lang];
@@ -251,11 +251,12 @@ export default function PromptWorkbench() {
     && prompt.length <= MAX_PROMPT_CHARS
     && !references.some((reference) => reference.status === "loading");
   useEffect(() => {
+    if (preview) return;
     const preferences = readPreferences();
     if (!preferences) return;
     setType(preferences.type);
     setModel(preferences.model);
-  }, []);
+  }, [preview]);
 
   useEffect(() => () => {
     mountedRef.current = false;
@@ -280,7 +281,7 @@ export default function PromptWorkbench() {
     const nextModel = DEFAULT_MODEL_BY_TYPE[nextType];
     setType(nextType);
     setModel(nextModel);
-    storePreferences(nextType, nextModel);
+    if (!preview) storePreferences(nextType, nextModel);
     setError(null);
     setCopied(false);
     if (copyResetTimer.current !== null) {
@@ -292,7 +293,7 @@ export default function PromptWorkbench() {
   function changeModel(nextModel: string) {
     if (!PROMPT_WORKBENCH_MODELS[type].some((item) => item.slug === nextModel)) return;
     setModel(nextModel);
-    storePreferences(type, nextModel);
+    if (!preview) storePreferences(type, nextModel);
   }
 
   async function copyPrompt() {
@@ -364,6 +365,10 @@ export default function PromptWorkbench() {
     if (type !== "vibecoding" && promptLooksLikeVibecoding(prompt)) {
       changeType("vibecoding");
       setError(text.vibecodingModeSuggested);
+      return;
+    }
+    if (preview) {
+      setError(lang === "ru" ? "Витрина компонентов: ИИ-запрос не отправляется." : "Component preview: no AI request is sent.");
       return;
     }
     if (status === "loading") {

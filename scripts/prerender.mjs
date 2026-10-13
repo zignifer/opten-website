@@ -20,7 +20,7 @@ const SSR_BUNDLE = resolve(ROOT, ".ssr-cache", "entry-server.js");
 const MANIFEST_BUNDLE = resolve(ROOT, ".ssr-meta", "seo-routes.js");
 
 const { renderRoute } = await import(pathToFileURL(SSR_BUNDLE).href);
-const { routes, SITE_ORIGIN, DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_EN } = await import(pathToFileURL(MANIFEST_BUNDLE).href);
+const { routes, SITE_ORIGIN, DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_EN, FOUNDER_NAME, FOUNDER_NAME_EN } = await import(pathToFileURL(MANIFEST_BUNDLE).href);
 
 const template = await readFile(resolve(DIST, "index.html"), "utf-8");
 
@@ -119,11 +119,10 @@ function applyMeta(html, meta) {
   // content="Opten" — for routes with a named human author (/about, /guides/*) it should reflect
   // the actual byline so AI systems attribute citations to a person rather than the brand.
   if (meta.author) {
-    // FOUNDER_NAME ships in Cyrillic ("Влад Воронежцев"); use the Latin
-    // transliteration on EN routes so /en/* pages carry no Russian byline.
+    // Use the shared EN spelling on English routes so metadata matches the visible byline.
     const authorValue =
-      meta.htmlLang === "en" && meta.author === "Влад Воронежцев"
-        ? "Vlad Voronezhtsev"
+      meta.htmlLang === "en" && meta.author === FOUNDER_NAME
+        ? FOUNDER_NAME_EN
         : meta.author;
     html = html.replace(
       /<meta\s+name="author"\s+content="[^"]*"\s*\/?>/,

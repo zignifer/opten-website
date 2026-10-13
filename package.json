@@ -36,7 +36,9 @@
     "yandex:webmaster:recrawl": "node scripts/yandex-webmaster.mjs recrawl",
     "yandex:webmaster:sitemaps": "node scripts/yandex-webmaster.mjs sitemaps",
     "yandex:webmaster:summary": "node scripts/yandex-webmaster.mjs summary",
-    "yandex:webmaster:user": "node scripts/yandex-webmaster.mjs user"
+    "yandex:webmaster:user": "node scripts/yandex-webmaster.mjs user",
+    "sync:design-system": "node scripts/sync-design-system.mjs",
+    "verify:design-system": "node scripts/verify-design-system.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

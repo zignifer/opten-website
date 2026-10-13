@@ -39,11 +39,11 @@ const ru: AboutContent = {
       body: (
         <>
           <p className="mb-[14px]">
-            Я Влад Воронежцев — веб-дизайнер и AI-блогер про нейросети для генерации картинок,
+            Я Влад Эйвор — веб-дизайнер и AI-блогер про нейросети для генерации картинок,
             видео и интерфейсов. Веду контент не только в YouTube Shorts: делаю короткие ролики,
             длинные разборы, посты, промпты и закулисье в Instagram, Telegram, YouTube, TikTok и VK.
             На YouTube меня можно найти как{" "}
-            <a href="https://www.youtube.com/@aivor_v" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@aivor_v</a>, а в Telegram я веду канал «Влад Воронежцев | Про нейросети». С 2024-го года я ушёл
+            <a href="https://www.youtube.com/@aivor_v" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@aivor_v</a>, а в Telegram я веду канал «Влад Эйвор | Про нейросети». С 2024-го года я ушёл
             в AI-креатив с головой: Midjourney, Kling, Veo, Sora, Nano Banana, Seedance — пробовал
             почти всё, что вышло.
           </p>
@@ -119,7 +119,7 @@ const ru: AboutContent = {
             Если хотите связаться лично, написать про баг, попросить добавить поддержку конкретной модели
             или просто обсудить генерации — мне удобнее всего в Telegram:{" "}
             <a href="https://t.me/aivor_v" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@aivor_v</a>.
-            Там же мой канал «Влад Воронежцев | Про нейросети» — туда я выкладываю длинные разборы, промпты,
+            Там же мой канал «Влад Эйвор | Про нейросети» — туда я выкладываю длинные разборы, промпты,
             ссылки и закулисье.
           </p>
           <p className="mb-[14px]">
@@ -158,11 +158,11 @@ const en: AboutContent = {
       body: (
         <>
           <p className="mb-[14px]">
-            I'm Vlad Voronezhtsev — a web designer and AI blogger covering neural networks for image,
+            I'm Vlad Aivor — a web designer and AI blogger covering neural networks for image,
             video and interface generation. I don't only make YouTube Shorts: I publish short videos,
             long-form breakdowns, posts, prompts and behind-the-scenes notes across Instagram,
             Telegram, YouTube, TikTok and VK. On YouTube, you can find me as{" "}
-            <a href="https://www.youtube.com/@aivor_v" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@aivor_v</a>, and on Telegram I run the "Vlad Voronezhtsev | About AI" channel. In 2024 I went all
+            <a href="https://www.youtube.com/@aivor_v" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@aivor_v</a>, and on Telegram I run the "Vlad Aivor | About AI" channel. In 2024 I went all
             in on AI creative work: Midjourney, Kling, Veo, Sora, Nano Banana, Seedance — I tried
             just about everything that shipped.
           </p>
@@ -238,7 +238,7 @@ const en: AboutContent = {
             If you'd like to reach out — bug reports, requests for support of a specific model, or
             just to talk about generation — the easiest way to reach me is Telegram:{" "}
             <a href="https://t.me/aivor_v" target="_blank" rel="noopener noreferrer" className="text-[#9cfb51] underline hover:text-white transition-colors">@aivor_v</a>.
-            That's also where my channel "Vlad Voronezhtsev | About AI" lives — long-form breakdowns,
+            That's also where my channel "Vlad Aivor | About AI" lives — long-form breakdowns,
             prompts, links and behind-the-scenes go there.
           </p>
           <p className="mb-[14px]">

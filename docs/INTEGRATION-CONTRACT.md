@@ -360,6 +360,16 @@ and send. Admin composition is hidden and the remaining dashboard is historical.
 Historical stats, broadcast history/deletion, payment attribution, and stored
 assets remain protected by the same existing owner/service boundaries.
 
+The website owner workspace at `/admin` now opens with project documentation
+and separate website/extension design libraries. `GET /api/admin/session`
+accepts the normal website Bearer JWT, verifies it with the existing verifier,
+checks the same owner allowlist, and returns `{ ok: true }` with private/no-store
+caching. It makes no Telegram or extension API call. Historical Telegram
+operations live in a separately loaded archive module and keep their existing
+authorization contracts. The design-only preview query is development-only;
+production always requires owner authorization. The extension library reads a
+committed sanitized snapshot and does not execute the extension runtime.
+
 The retired `/learn/courses/ai-content-marketing-2026/hidden-intro` route renders
 the normal not-found page at that URL. There is no redirect to the course or Learn
 and no processing of a claim query. `telegram-hidden-intro-opened` remains HTTP 410.

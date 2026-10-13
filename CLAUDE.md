@@ -13,8 +13,85 @@ knowledge belongs here, with detailed specs in `docs/`.
 
 ## Project
 
+## Design system and owner documentation
+
+Read `DESIGN.md` before visual changes. The current React/Vite site and the
+homepage are the website's visual source; `C:\Projects\promptscore\popup`
+and `content/content.css` are the extension's separate visual source. Keep
+website and extension typography, geometry, assets, and states distinct.
+Do not import Astro, desktop-only defaults, a starter theme, or a new design
+methodology from generic project-setup documents. Use external design skills
+only when explicitly requested. Existing responsive behavior stays in scope.
+
+The owner workspace at `/admin` contains the two design libraries and project
+documentation; Telegram is an archive module. Access is checked with the normal
+website JWT and `/api/admin/session` using the existing server-side allowlist,
+independently of Telegram availability. Never add a browser password or an
+owner email check as authorization. `/admin` remains SPA-only and noindex.
+
+Use real shared component imports in the website catalog. Document observed
+variants and exceptions instead of inventing an idealized UI kit. The generated
+inventory in `src/design-system/generated/` is derived data: run
+`npm run sync:design-system` after changing component structure, typography,
+effects, icons, or assets. To refresh the extension snapshot, run
+`npm run sync:design-system -- --extension C:\Projects\promptscore`; the
+extension checkout is read-only and not required for normal website builds.
+Keep the snapshot's source hashes/version and its coverage limitations visible.
+
+The local-only `/admin?preview=design-system` preview is guarded by
+`import.meta.env.DEV`. It exposes design documentation only, never operational
+Telegram modules or admin API authorization. Production ignores this flag.
+Verify visual changes in the browser at desktop and mobile sizes, including
+fonts, crops, wrapping, overflow, and the affected interactive states. Update
+the primary registry and `DESIGN.md` with new families; do not silently mark
+agent-verified material as user-approved. After editing this file, run
+`npm run sync:agents`.
+
+## New page workflow — creative direction, then a fresh builder
+
+For a request to create or substantially rethink a website page, use the
+project-owned two-stage workflow in `docs/page-workflow/README.md`.
+`Новая страница: ...`, `хочу сделать новую страницу ...`, and
+`подготовь направление ...` start the Creative Director role: read
+`docs/page-workflow/02-CREATIVE-DIRECTOR.md`, inspect the actual homepage,
+relevant library specimens, source components and canonical content, then save
+a page-specific `VISUAL-DIRECTION.rNN.md` under `docs/page-workflow/pages/`.
+Record its route/scope/status/link in `DESIGN.md`. This stage plans all needed
+graphics and motion; it must not generate images, implement the page, change
+components/tokens, install dependencies, commit, publish or edit Figma.
+
+Finish direction with a self-contained starter prompt and offer implementation
+by another agent in a fresh context. Do not automatically continue into page
+construction. Do not create a new chat merely to offer the handoff: create one
+only when the user explicitly requests it. A new chat is preferred to a fork
+for fresh-context implementation. Do not pass chat history as a substitute for
+the saved direction, content and project contracts.
+
+The fresh builder reads `docs/page-workflow/03-START-PAGE.md`, the exact saved
+direction, `DESIGN.md`, canonical content and relevant product contracts. It
+independently checks the direction against actual components and rendered
+results, develops proposed compositions, produces and integrates the final
+media using `docs/page-workflow/MEDIA-PROTOCOL.md`, and completes the scoped
+browser/build checks. Planning readiness, agent verification and user approval
+are separate states. Keep the existing React/Vite/Tailwind stack, self-hosted
+variable fonts, responsive behavior and website/extension separation; this is
+not a temporary exception pending Astro migration.
+
+Explicit user instructions may override this default, including a requested
+single-stage run. A small local fix, a documentation change, explicit approval,
+the hard `напиши SEO-статью` command and existing model/Learn publication
+pipelines retain their own scope/workflow; never restart full page planning
+just because an existing page is involved. External design/art-direction
+skills still require an explicit user request. Technical tool skills remain
+applicable. No automatic parallel subagents are required by this workflow.
+
 **opten.space** — public website for the **Opten** Chrome extension. Vite +
 React 18 + TypeScript + Tailwind 4, SPA, deployed on Vercel.
+
+The founder's public name is `Влад Эйвор` (`Vlad Aivor` in EN). Use it in
+visible author copy, bios, alt text, and SEO author/Person metadata. The course
+author's experience is `9 лет в Digital` (`9 years in Digital` in EN). Keep
+registered entrepreneur names unchanged in legal copy and business details.
 
 Founder social profiles use the handle `aivor_v` across Telegram, YouTube,
 Instagram, and TikTok: `https://t.me/aivor_v`,
@@ -362,8 +439,11 @@ All 16 paid lessons still require normal course access. Retired lesson-zero vide
 content stays outside the Kinescope whitelist.
 
 The owner/admin dashboard on opten.space is a general protected admin surface
-under `/admin`, not a Telegram-only one-off. The first module is Telegram
-course-funnel operations: read funnel stats through `/api/admin/telegram-stats`,
+under `/admin`. Its default modules are project documentation and the separate
+website/extension design libraries. `/api/admin/session` checks the normal
+website JWT and existing owner allowlist without contacting Telegram. The
+Telegram archive module retains historical course-funnel operations: read
+funnel stats through `/api/admin/telegram-stats`,
 review historical Telegram data, and review or
 delete stored broadcast history through `/api/admin/telegram-broadcasts`. The
 dashboard labels these as historical data for the paused bot and shows
@@ -430,8 +510,9 @@ Cloud quota settings only if the retry also fails.
   Kinescope course playback token/auth endpoints)
 - **i18n:** Custom React context, RU/EN; URL prefix wins (`/en/*`), then `localStorage.opten_lang_v3` (explicit user choice, written by LangSwitcher), then `navigator.language`. Legacy key `opten_lang` is read **only** when its value is `"en"` for one-shot migration; RU values from the old key are intentionally ignored (they often came from auto-write, not explicit choice). Internal navigation uses `<LocalizedLink>` (drop-in `<Link>` replacement) — on `/en/*` URLs it rewrites internal hrefs to `/en/<sibling>` for EN-prefixed routes, including static/blog routes, 62 model slugs from `src/content/models/slugs.ts`, and Learn lesson slugs from `src/content/space/learnSlugs.ts`.
 
-No tests, no ESLint config, no `typecheck` script. TS errors surface during
-`vite build` (`npm run build`).
+No general test runner or ESLint config, and no `typecheck` script. Existing
+`verify:*` scripts check their specific contracts. `npm run build` runs Vite
+and production gates; Vite transpilation is not a full TypeScript typecheck.
 
 See [docs/TECH.md](docs/TECH.md) for full picture.
 
@@ -923,6 +1004,10 @@ Non-negotiables (the full set lives in `docs/CONTENT-AUTHORING.md`):
 
 Reference documentation lives in `docs/`:
 
+- [docs/page-workflow/README.md](docs/page-workflow/README.md) — **two-stage new-page workflow and fresh-context handoff**
+- [docs/page-workflow/02-CREATIVE-DIRECTOR.md](docs/page-workflow/02-CREATIVE-DIRECTOR.md) — **direction only; no generation or implementation**
+- [docs/page-workflow/03-START-PAGE.md](docs/page-workflow/03-START-PAGE.md) — **fresh builder, complete implementation and visual QA**
+- [docs/page-workflow/MEDIA-PROTOCOL.md](docs/page-workflow/MEDIA-PROTOCOL.md) — **images, real UI screenshots, icons and production records**
 - [docs/INTEGRATION-CONTRACT.md](docs/INTEGRATION-CONTRACT.md) — **binding interface with the extension**
 - [docs/CONTENT-AUTHORING.md](docs/CONTENT-AUTHORING.md) — **GEO+SEO playbook for new pages, blog posts, images** (read before any content change)
 - [docs/LEARN-PUBLISHING.md](docs/LEARN-PUBLISHING.md) — **public Learn video publishing workflow** (RU/EN lesson data, timestamps, thumbnails, OG images, schema, sitemap)

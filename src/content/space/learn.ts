@@ -273,15 +273,15 @@ const legacyLearnAssetBase = "/assets/space/learn-v2";
 const learnAssetBase = "/assets/learn";
 
 export const learnDefaultAuthor: LearnAuthor = {
-  name: "Влад Воронежцев",
+  name: "Влад Эйвор",
   localizedName: {
-    ru: "Влад Воронежцев",
-    en: "Vlad Voronezhtsev",
+    ru: "Влад Эйвор",
+    en: "Vlad Aivor",
   },
-  initials: "ВВ",
+  initials: "ВЭ",
   role: {
-    ru: "9 лет в digital",
-    en: "Web designer, AI creator",
+    ru: "9 лет в Digital",
+    en: "9 years in Digital",
   },
   intro: {
     ru: "Показываю рабочие AI-процессы на реальных уроках: от идеи и промпта до результата.",
@@ -716,8 +716,8 @@ export const publicLearnLessons: LearnLesson[] = [
       en: "The AI tools that matter in 2026 — five services for design and content",
     },
     seoDescription: {
-      ru: "Урок Влада Воронежцева: 5 нейросетей, которые закрывают основные задачи в дизайне, визуалах, видео и создании контента в 2026 году.",
-      en: "A practical lesson by Vlad Voronezhtsev: five AI tools that cover design, visuals, video, and content creation in 2026.",
+      ru: "Урок Влада Эйвора: 5 нейросетей, которые закрывают основные задачи в дизайне, визуалах, видео и создании контента в 2026 году.",
+      en: "A practical lesson by Vlad Aivor: five AI tools that cover design, visuals, video, and content creation in 2026.",
     },
     category: "ai-video",
     duration: "07:45",

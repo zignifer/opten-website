@@ -54,7 +54,7 @@ export default function AboutPage() {
           </picture>
           <div className="flex max-w-[780px] flex-col items-center gap-[14px]">
             <h1 className="font-['Unbounded',sans-serif] text-[36px] font-bold leading-[1.1] tracking-[-0.6px] text-white sm:text-[44px] md:text-[52px]">
-              Влад Воронежцев
+              {t("about.name")}
             </h1>
             <p className="max-w-[650px] text-[17px] leading-[1.6] text-white/70 md:text-[18px]">
               {t("about.tagline")}

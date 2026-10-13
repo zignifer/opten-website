@@ -11,3 +11,6 @@
 *.js text
 *.mjs text
 *.css text
+
+# Extension snapshot assets retain their exact source bytes and checksums.
+public/assets/design-system-extension/** -text whitespace=cr-at-eol

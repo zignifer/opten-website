@@ -136,7 +136,8 @@ export interface ModelIslandData {
 
 // Post-2026-05-17 GEO audit ME-10: shared author string for routes with a human byline.
 // Match PERSON_FOUNDER_BLOCK.name so meta + JSON-LD don't disagree (audit CR-1 root-cause class).
-export const FOUNDER_NAME = "Влад Воронежцев";
+export const FOUNDER_NAME = "Влад Эйвор";
+export const FOUNDER_NAME_EN = "Vlad Aivor";
 
 export const SITE_ORIGIN = "https://opten.space";
 export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/og-card-ru.png`;
@@ -233,17 +234,14 @@ export const SOFTWARE_APP_BLOCK: SchemaBlock = {
 };
 
 // Phase 4 D-09: defined at module scope, wired onto /about only in Plan 04-05 (per D-03).
-// Post-2026-05-17 GEO audit CR-1: name was "Виктор Воронежцев" — schema-vs-body conflict (visible
-// text везде "Влад Воронежцев"). Audit confirmed independently by 4/5 agents + Codex CLI.
-// Fixed by promoting "Влад" to canonical name and keeping the legal form as alternateName.
+// Use the public name and its EN spelling; registered business names belong to legal copy.
 export const PERSON_FOUNDER_BLOCK: SchemaBlock = {
   "@context": "https://schema.org",
   "@type": "Person",
   "@id": `${SITE_ORIGIN}/#person-founder`,
-  name: "Влад Воронежцев",
-  alternateName: "Воронежцев Владислав Павлович",
-  givenName: "Владислав",
-  familyName: "Воронежцев",
+  name: FOUNDER_NAME,
+  alternateName: FOUNDER_NAME_EN,
+  givenName: "Влад",
   url: `${SITE_ORIGIN}/about`,
   jobTitle: "Founder, Opten",
   description: "AI-блогер и веб-дизайнер, автор Chrome-расширения Opten для оценки промптов под конкретные AI-модели.",
@@ -749,8 +747,8 @@ function learnHubRoute(lang: LearnLang): RouteMeta {
     ? "Курсы по нейросетям и ИИ: AI-видео, дизайн, вайб-кодинг | Opten"
     : "AI Courses & Tutorials: Vibe Coding, Web Design and AI Video | Opten";
   const description = lang === "ru"
-    ? "Бесплатное обучение ИИ и нейросетям от Opten: уроки по AI-видео, веб-дизайну в Figma, вайб-кодингу и промптам. Практические разборы Влада Воронежцева."
-    : "Free AI courses and tutorials from Opten: learn AI, vibe coding, Figma web design, AI video, prompt engineering and practical AI workflows with Vlad Voronezhtsev.";
+    ? "Бесплатное обучение ИИ и нейросетям от Opten: уроки по AI-видео, веб-дизайну в Figma, вайб-кодингу и промптам. Практические разборы Влада Эйвора."
+    : "Free AI courses and tutorials from Opten: learn AI, vibe coding, Figma web design, AI video, prompt engineering and practical AI workflows with Vlad Aivor.";
   const visibleLessons = publicLearnLessons.filter((lesson) => !HIDDEN_LEARN_OVERVIEW_LESSON_SLUGS.has(lesson.slug));
 
   return {
@@ -1330,7 +1328,7 @@ export const routes: RouteMeta[] = [
       xDefault: `${SITE_ORIGIN}/about`,
     },
     title: "О проекте Opten — кто стоит за расширением",
-    description: "Opten — личный проект Влада Воронежцева, AI-блогера, веб-дизайнера и автора Chrome-расширения для оценки промптов. История, контакты, реквизиты.",
+    description: "Opten — личный проект Влада Эйвора, AI-блогера, веб-дизайнера и автора Chrome-расширения для оценки промптов. История, контакты, реквизиты.",
     canonical: `${SITE_ORIGIN}/about`,
     ogTitle: "О проекте Opten",
     ogDescription: "История создания Opten — расширения для оценки промптов под конкретную AI-модель.",
@@ -1348,7 +1346,7 @@ export const routes: RouteMeta[] = [
         pageId: `${SITE_ORIGIN}/about`,
         type: "Article",
         headline: "О проекте Opten — кто стоит за расширением",
-        description: "Opten — личный проект Влада Воронежцева, AI-блогера, веб-дизайнера и автора Chrome-расширения для оценки промптов.",
+        description: "Opten — личный проект Влада Эйвора, AI-блогера, веб-дизайнера и автора Chrome-расширения для оценки промптов.",
         datePublished: "2026-05-17",
         dateModified: "2026-05-31",
         inLanguage: "ru-RU",
@@ -3559,7 +3557,7 @@ export const routes: RouteMeta[] = [
       xDefault: `${SITE_ORIGIN}/about`,
     },
     title: "About Opten — who's behind the extension",
-    description: "Opten is a personal project by Vlad Voronezhtsev, AI blogger, web designer and creator of the Chrome extension for prompt scoring. Origin story, contacts, legal details.",
+    description: "Opten is a personal project by Vlad Aivor, AI blogger, web designer and creator of the Chrome extension for prompt scoring. Origin story, contacts, legal details.",
     canonical: `${SITE_ORIGIN}/en/about`,
     ogTitle: "About Opten",
     ogDescription: "Origin story of Opten — the extension for scoring prompts against specific AI models.",
@@ -3575,7 +3573,7 @@ export const routes: RouteMeta[] = [
         pageId: `${SITE_ORIGIN}/en/about`,
         type: "Article",
         headline: "About Opten — who's behind the extension",
-        description: "Opten is a personal project by Vlad Voronezhtsev, AI blogger, web designer and creator of the Chrome extension for prompt scoring.",
+        description: "Opten is a personal project by Vlad Aivor, AI blogger, web designer and creator of the Chrome extension for prompt scoring.",
         datePublished: "2026-05-17",
         dateModified: "2026-05-31",
         inLanguage: "en-US",
