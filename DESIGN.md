@@ -103,6 +103,36 @@ existing auth, billing, routes, copy, SEO and extension integration contracts.
 Check conflicts between AGENTS.md and observed code explicitly; an inventory
 does not authorize unrelated product corrections.
 
+The palette is organized by semantic role: Opten's main colors, feedback and
+interaction states, platform-logo colors, local surfaces/decor, then technical
+UI and legacy imports. Every value retains the actual paint property, utility
+or CSS declaration, component and source line. A hue alone does not define a
+status; yellow in AccountPage denotes cancelled renewal, while the same HEX
+also occurs inside Chrome's logo.
+`src/design-system/color-roles.json` stores the reviewed source annotations used
+by the UI and exported generated inventory. Update annotations with their
+components when an existing role changes; they do not replace actual CSS.
+
+Geometry is separated into radii, padding, margin, gaps and layout constraints.
+Labelled diagrams explain the property and direction; numeric Tailwind spacing
+uses the existing 4 px step, explicit arbitrary values retain their unit, and
+breakpoint/state prefixes remain visible. Diagrams are illustrative and scaled;
+the exact declaration and source location are authoritative. Extraction reads
+whole JSX utility tokens and paint properties, excluding prose hash fragments
+and partial matches such as `top-[248px]` becoming `p-[248px]`.
+
+Gallery SVGs preserve metadata aspect ratios even when their original
+`preserveAspectRatio="none"` permits stretching. Product assets remain unchanged.
+Standalone blog and Learn cards live in an intrinsic grid column up to 380 px;
+they do not expand to a section's viewport width or cause the frame's height to
+grow from a percentage-height feedback loop. Both Learn description variants
+still use the real production component and content.
+Their default viewport follows the available panel width, so narrow admin
+screens show the whole card; fixed 360/390/768/1200 px viewports remain available
+for inspection. In-app browser QA covered semantic search, spacing/grid
+diagrams, popup variable usage, both lesson variants, correct SVG proportions
+and a narrow owner-workspace panel. No browser errors were observed.
+
 The generic `01-PROJECT-SETUP.md` contributed source traceability, a layered
 component catalog, media registration and browser verification. Its Astro
 migration and 1728px desktop default were not adopted. The page production
@@ -142,6 +172,9 @@ stubbed in those HTTP tests; the production verifier itself is unchanged.
 `npm run build`, `npm run verify:design-system`,
 `npm run verify:prompt-workbench-vibecoding` (57 golden cases), and
 `npm run verify:email-only-auth` passed locally. Screenshots are local QA
-artifacts under `output/playwright/`. The new session endpoint and owner
-workspace have not been deployed or tested against a live production session.
-This is local verification, not user approval or a production release.
+artifacts under `output/playwright/`. The first workspace was released in
+`27f794d` on 2026-10-13; Vercel reached READY and public HTTP checks verified
+the noindex admin route and denial without an owner JWT. A live owner-session
+review was not part of those checks. Subsequent library refinements require
+their own browser/build verification and release. Agent verification remains
+separate from user approval.

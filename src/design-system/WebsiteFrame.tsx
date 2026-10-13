@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 // A real viewport: production media queries and imported React components run
 // against the specimen width. No copied component markup or screenshot assets.
-export default function WebsiteFrame({ children, width, title }: { children: ReactNode; width: number; title: string }) {
+export default function WebsiteFrame({ children, width, title }: { children: ReactNode; width: number | "auto"; title: string }) {
   const frame = useRef<HTMLIFrameElement>(null);
   const [target, setTarget] = useState<HTMLElement | null>(null);
   const [height, setHeight] = useState(180);
@@ -22,5 +22,5 @@ export default function WebsiteFrame({ children, width, title }: { children: Rea
     observer.observe(specimen);
     return () => observer.disconnect();
   }, []);
-  return <div className="ds-frame-scroll"><iframe ref={frame} title={title} sandbox="allow-same-origin" style={{ width, height }} />{target && createPortal(children, target)}</div>;
+  return <div className="ds-frame-scroll"><iframe ref={frame} title={title} sandbox="allow-same-origin" style={{ width: width === "auto" ? "100%" : width, height }} />{target && createPortal(children, target)}</div>;
 }

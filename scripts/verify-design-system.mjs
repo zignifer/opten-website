@@ -10,6 +10,14 @@ const website = JSON.parse(await read('src/design-system/generated/website.json'
 const extension = JSON.parse(await read('src/design-system/generated/extension.json'));
 assert(website.typography.length > 0, 'Text role extraction is empty');
 assert(website.assets.some(item => item.family === 'landing-design'), 'Homepage media missing');
+assert(!website.colors.some(item => ['#418', '#423', '#441188', '#442233'].includes(item.value)), 'Non-CSS hash fragments entered the palette');
+assert(!website.geometry.some(item => ['p-[248px]', 'p-[930px]'].includes(item.value)), 'Positioning utility was misread as padding');
+assert(website.geometry.some(item => item.value === 'mt-16' && item.usages.some(usage => usage.component === 'Hero' && usage.property === 'margin-top')), 'Homepage CTA rhythm must retain its exact utility and role');
+assert(website.geometry.some(item => item.value === 'grid-cols-3'), 'Grid columns missing from the geometry register');
+assert(website.colors.every(item => item.usages.length && item.usages.every(usage => usage.line > 0 && usage.property && usage.component)), 'Color usage context missing');
+assert(website.colors.find(item => item.value === '#fbbc04')?.role?.name.includes('Подписка отменена'), 'Yellow account state role missing from exported inventory');
+assert(website.variables.some(item => item.name === '--primary'), 'CSS root-variable extraction failed');
+assert(extension.rules.some(rule => Object.values(rule.properties).some(value => value.includes('var(--ps-popup-bg)'))), 'Popup variable usage evidence missing');
 assert(!/<script\b|\son\w+=/i.test(extension.markup), 'Extension snapshot must have no executable scripts');
 for (const asset of extension.assets) {
   const data = await fs.readFile(path.join(root, 'public', asset.src));

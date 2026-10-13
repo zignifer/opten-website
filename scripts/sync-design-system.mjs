@@ -33,7 +33,7 @@ function cssInventory(text, source) {
   const clean = text.replace(/\/\*[\s\S]*?\*\//g, '');
   const rules = [];
   for (const match of clean.matchAll(/([^{}]+)\{([^{}]+)\}/g)) {
-    const selector = match[1].trim();
+    const selector = match[1].trim().split(';').at(-1).trim();
     const properties = {};
     for (const prop of match[2].matchAll(/([\w-]+)\s*:\s*([^;]+);?/g)) properties[prop[1]] = prop[2].trim();
     rules.push({ selector, properties, source });
@@ -65,6 +65,40 @@ const typography = [];
 const effects = new Map();
 const colors = new Map();
 const geometry = new Map();
+const colorProperties = /^(?:color|background|backgroundColor|borderColor|outlineColor|fill|stroke|boxShadow|textShadow)$/;
+const hexColors = /#[\da-fA-F]{8}\b|#[\da-fA-F]{6}\b|#[\da-fA-F]{3}\b/g;
+function record(map, key, source, usage) {
+  if (map === colors && /^#[\da-f]{3}$/i.test(key)) key = '#' + key.slice(1).split('').map(char => char + char).join('');
+  const item = map.get(key) || { value: key, count: 0, sources: [], usages: [] };
+  item.count++;
+  if (!item.sources.includes(source)) item.sources.push(source);
+  const bucket = item.usages.filter(other => other.source === usage.source && other.component === usage.component && other.property === usage.property);
+  if (bucket.length < 2 && !bucket.some(other => other.expression === usage.expression)) {
+    if (item.usages.length < 24) item.usages.push(usage);
+    else if (!item.usages.some(other => other.source === usage.source && other.component === usage.component)) {
+      const repeated = item.usages.findIndex((other,index,all) => all.some((entry,j) => j < index && entry.source === other.source && entry.component === other.component));
+      if (repeated !== -1) item.usages.splice(repeated,1,usage);
+    }
+  }
+  map.set(key, item);
+}
+function utilityProperty(token) {
+  const name = token.replace(/^(?:[\w-]+:)*/, '');
+  if (name.startsWith('bg-')) return 'background';
+  if (name.startsWith('text-')) return 'color';
+  if (name.startsWith('shadow-')) return 'box-shadow';
+  if (name.startsWith('ring-') || name.startsWith('outline-')) return 'focus-ring';
+  if (name.startsWith('border-')) return 'border-color';
+  if (name.startsWith('fill-')) return 'fill';
+  if (name.startsWith('stroke-')) return 'stroke';
+  if (name.startsWith('rounded-')) return 'border-radius';
+  const spacing = name.match(/^(p[xytrblse]?|m[xytrblse]?|gap(?:-[xy])?|space-[xy]|max-w|min-h|grid-cols)-/);
+  if (spacing) {
+    const properties = { p:'padding',px:'padding-inline',py:'padding-block',pt:'padding-top',pb:'padding-bottom',pl:'padding-left',pr:'padding-right',m:'margin',mx:'margin-inline',my:'margin-block',mt:'margin-top',mb:'margin-bottom',ml:'margin-left',mr:'margin-right',gap:'gap','gap-x':'column-gap','gap-y':'row-gap','space-x':'space-x','space-y':'space-y','max-w':'max-width','min-h':'min-height','grid-cols':'grid-template-columns' };
+    return properties[spacing[1]] || spacing[1];
+  }
+  return 'decoration';
+}
 const roleNames = {
   Hero: 'Hero · главный заголовок', SectionTitle: 'Заголовок секции', Step: 'Шаг установки',
   FeatureCard: 'Карточка возможности', PrivacyItem: 'Блок приватности', PlanCard: 'Тарифная карточка',
@@ -78,6 +112,7 @@ for (const source of sources) {
   }
   function visit(node, symbol = '') {
     if (ts.isFunctionDeclaration(node) && node.name) symbol = node.name.text;
+    if (ts.isVariableDeclaration(node) && node.initializer && (ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer))) symbol = node.name.getText(ast);
     if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
       const library = node.moduleSpecifier.text;
       if (library === 'lucide-react' || library.startsWith('@mui/icons-material')) {
@@ -100,24 +135,40 @@ for (const source of sources) {
         if (classes.some(value => /text-\[\d/.test(value))) typography.push({ id: `${symbol}-${node.pos}`, name: `${roleNames[symbol]} · ${tag}`, symbol, tag, classes: [...new Set(classes)].join(' '), source: source.file, line: ast.getLineAndCharacterOfPosition(node.getStart(ast)).line + 1 });
       }
     }
+    if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
+      const element = node.tagName.getText(ast);
+      const line = ast.getLineAndCharacterOfPosition(node.getStart(ast)).line + 1;
+      for (const attribute of node.attributes.properties) {
+        if (!ts.isJsxAttribute(attribute) || !attribute.initializer) continue;
+        const name = attribute.name.getText(ast);
+        const values = strings(attribute.initializer);
+        if (name === 'className') for (const token of values.flatMap(value => value.split(/\s+/)).filter(Boolean)) {
+          const usage = { source: source.file, line, component: symbol || path.basename(source.file, path.extname(source.file)), element, property: utilityProperty(token), expression: token };
+          // Exact utility tokens only: top-[248px] must not become p-[248px].
+          if (/^(?:[\w-]+:)*(?:rounded(?:-[\w]+)?|p[xytrblse]?|m[xytrblse]?|gap(?:-[xy])?|space-[xy]|min-h|max-w|grid-cols|shadow)-(?:\[[^\]]+\]|[\d.]+|full|none|auto)(?:\/\d+)?$/.test(token)) record(token.includes('shadow-') ? effects : geometry, token, source.file, usage);
+          if (/^(?:[\w-]+:)*(?:bg|text|border|ring|outline|fill|stroke|shadow|from|to|via|decoration)-/.test(token)) for (const match of token.matchAll(hexColors)) record(colors, match[0].toLowerCase(), source.file, usage);
+          if (/^(?:[\w-]+:)*text-white(?:\/\d+)?$/.test(token)) record(colors, '#ffffff', source.file, usage);
+          if (/^(?:[\w-]+:)*text-black(?:\/\d+)?$/.test(token)) record(colors, '#000000', source.file, usage);
+        }
+        if (['fill', 'stroke', 'color', 'stopColor'].includes(name)) for (const value of values) for (const match of value.matchAll(hexColors)) record(colors, match[0].toLowerCase(), source.file, { source: source.file, line, component: symbol || path.basename(source.file, path.extname(source.file)), element, property: name, expression: value });
+      }
+    }
+    if (ts.isPropertyAssignment(node) && colorProperties.test(node.name.getText(ast).replace(/["']/g, ''))) {
+      const property = node.name.getText(ast).replace(/["']/g, '');
+      for (const value of strings(node.initializer)) for (const match of value.matchAll(hexColors)) record(colors, match[0].toLowerCase(), source.file, { source: source.file, line: ast.getLineAndCharacterOfPosition(node.getStart(ast)).line + 1, component: symbol || path.basename(source.file, path.extname(source.file)), element: 'style', property, expression: value });
+    }
     node.forEachChild(child => visit(child, symbol));
   }
   visit(ast);
-  for (const match of source.text.matchAll(/#[\da-fA-F]{6}\b|#[\da-fA-F]{3}\b/g)) {
-    const value = match[0].toLowerCase();
-    const item = colors.get(value) || { value, count: 0, sources: [] };
-    item.count++; if (!item.sources.includes(source.file)) item.sources.push(source.file);
-    colors.set(value, item);
-  }
-  for (const match of source.text.matchAll(/((?:(?:hover|focus|md|sm|lg):)?shadow-\[[^\]\r\n]+\]|rounded-\[[^\]\r\n]+\]|(?:gap|p[xy]?|m[bt]|min-h|max-w)-\[\d+px\])/g)) {
-    const value = match[1];
-    const map = value.includes('shadow') ? effects : geometry;
-    const item = map.get(value) || { value, sources: [] };
-    if (!item.sources.includes(source.file)) item.sources.push(source.file);
-    map.set(value, item);
-  }
 }
 const cssRules = sources.filter(source => source.file.endsWith('.css')).flatMap(source => cssInventory(source.text, source.file));
+const colorRoles = JSON.parse(await fs.readFile(path.join(root, 'src/design-system/color-roles.json'), 'utf8'));
+for (const rule of cssRules) for (const [property, value] of Object.entries(rule.properties)) {
+  if (!/color|background|shadow|fill|stroke|border/.test(property)) continue;
+  const source = sources.find(item => item.file === rule.source);
+  const line = source ? source.text.slice(0, source.text.indexOf(rule.selector)).split('\n').length : 1;
+  for (const match of value.matchAll(hexColors)) record(colors, match[0].toLowerCase(), rule.source, { source: rule.source, line, component: rule.selector, element: 'CSS', property, expression: `${property}: ${value}` });
+}
 const fonts = cssRules.filter(rule => rule.selector.includes('@font-face')).map(rule => ({ ...rule.properties, source: rule.source }));
 const variables = cssRules.filter(rule => rule.selector === ':root').flatMap(rule => Object.entries(rule.properties).filter(([name]) => name.startsWith('--')).map(([name, value]) => ({ name, value, source: rule.source })));
 const mediaPaths = (await walk(path.join(root, 'public'))).filter(file => /\.(svg|png|jpe?g|webp|avif|gif)$/i.test(file) && !/\/(generated|design-system-extension)\//.test(slash(file)));
@@ -133,7 +184,7 @@ for (let start = 0; start < mediaPaths.length; start += 10) {
 const remoteAssets = [...new Set(sources.flatMap(source => [...source.text.matchAll(/https:\/\/(?:i\.ytimg\.com|img\.youtube\.com)[^\s"'`]+/g)].map(match => match[0])))];
 await save('website.json', {
   sourceHashes: Object.fromEntries(sources.filter(source => /LandingSections|fonts.css|theme.css/.test(source.file)).map(source => [source.file, hash(source.text)])),
-  colors: [...colors.values()].sort((a, b) => b.count - a.count).map(item => ({ ...item, sources: item.sources.slice(0, 6) })),
+  colors: [...colors.values()].sort((a, b) => b.count - a.count).map(item => ({ ...item, role: colorRoles[item.value] || null })),
   variables, fonts, typography, effects: [...effects.values()], geometry: [...geometry.values()],
   cssEffects: cssRules.filter(rule => Object.keys(rule.properties).some(name => /shadow|filter|background-image|transition/.test(name))),
   icons: [...icons.values()].sort((a, b) => a.name.localeCompare(b.name)), components, assets, remoteAssets,
@@ -227,7 +278,7 @@ if (extensionArgument !== -1) {
   await save('extension.json', {
     version: JSON.parse(original['manifest.json']).version, revision,
     sourceHashes: Object.fromEntries(files.map(file => [file, hash(original[file])])),
-    markup, css: original['popup/popup.css'], fontCss,
+    markup, css: original['popup/popup.css'], fontCss, rules: popupRules,
     translations, mappings, demos, assets: extensionAssets,
     variables: popupRules.filter(rule => rule.selector === ':root').flatMap(rule => Object.entries(rule.properties).map(([name, value]) => ({ name, value, source: rule.source }))),
     typography: popupRules.filter(rule => rule.properties['font-size']).map(rule => ({ ...rule, id: rule.selector })),

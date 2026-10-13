@@ -38,6 +38,16 @@ effects, icons, or assets. To refresh the extension snapshot, run
 extension checkout is read-only and not required for normal website builds.
 Keep the snapshot's source hashes/version and its coverage limitations visible.
 
+Library colors need semantic roles and actual CSS/property/component usage,
+not generic "observed color" labels. Separate the Opten palette, interaction
+states, platform logos and technical/legacy UI values. Extract complete
+utility tokens and paint properties, never arbitrary hash fragments or
+substrings of positioning classes. Explain padding, margin, gap, radii and
+layout constraints with labelled diagrams and responsive conditions. Preserve
+asset aspect ratios in gallery previews, including SVGs whose source allows
+stretching. Show standalone cards in a representative grid/container instead
+of expanding them to the width of a whole section.
+
 The local-only `/admin?preview=design-system` preview is guarded by
 `import.meta.env.DEV`. It exposes design documentation only, never operational
 Telegram modules or admin API authorization. Production ignores this flag.
