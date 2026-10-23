@@ -136,8 +136,8 @@ export interface ModelIslandData {
 
 // Post-2026-05-17 GEO audit ME-10: shared author string for routes with a human byline.
 // Match PERSON_FOUNDER_BLOCK.name so meta + JSON-LD don't disagree (audit CR-1 root-cause class).
-export const FOUNDER_NAME = "Влад Эйвор";
-export const FOUNDER_NAME_EN = "Vlad Aivor";
+export const FOUNDER_NAME = "Влад Воронежцев";
+export const FOUNDER_NAME_EN = "Vlad Voronezhtsev";
 
 export const SITE_ORIGIN = "https://opten.space";
 export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/og-card-ru.png`;
@@ -747,8 +747,8 @@ function learnHubRoute(lang: LearnLang): RouteMeta {
     ? "Курсы по нейросетям и ИИ: AI-видео, дизайн, вайб-кодинг | Opten"
     : "AI Courses & Tutorials: Vibe Coding, Web Design and AI Video | Opten";
   const description = lang === "ru"
-    ? "Бесплатное обучение ИИ и нейросетям от Opten: уроки по AI-видео, веб-дизайну в Figma, вайб-кодингу и промптам. Практические разборы Влада Эйвора."
-    : "Free AI courses and tutorials from Opten: learn AI, vibe coding, Figma web design, AI video, prompt engineering and practical AI workflows with Vlad Aivor.";
+    ? "Бесплатное обучение ИИ и нейросетям от Opten: уроки по AI-видео, веб-дизайну в Figma, вайб-кодингу и промптам. Практические разборы Влада Воронежцева."
+    : "Free AI courses and tutorials from Opten: learn AI, vibe coding, Figma web design, AI video, prompt engineering and practical AI workflows with Vlad Voronezhtsev.";
   const visibleLessons = publicLearnLessons.filter((lesson) => !HIDDEN_LEARN_OVERVIEW_LESSON_SLUGS.has(lesson.slug));
 
   return {
@@ -1328,7 +1328,7 @@ export const routes: RouteMeta[] = [
       xDefault: `${SITE_ORIGIN}/about`,
     },
     title: "О проекте Opten — кто стоит за расширением",
-    description: "Opten — личный проект Влада Эйвора, AI-блогера, веб-дизайнера и автора Chrome-расширения для оценки промптов. История, контакты, реквизиты.",
+    description: "Opten — личный проект Влада Воронежцева, AI-блогера, веб-дизайнера и автора Chrome-расширения для оценки промптов. История, контакты, реквизиты.",
     canonical: `${SITE_ORIGIN}/about`,
     ogTitle: "О проекте Opten",
     ogDescription: "История создания Opten — расширения для оценки промптов под конкретную AI-модель.",
@@ -1346,7 +1346,7 @@ export const routes: RouteMeta[] = [
         pageId: `${SITE_ORIGIN}/about`,
         type: "Article",
         headline: "О проекте Opten — кто стоит за расширением",
-        description: "Opten — личный проект Влада Эйвора, AI-блогера, веб-дизайнера и автора Chrome-расширения для оценки промптов.",
+        description: "Opten — личный проект Влада Воронежцева, AI-блогера, веб-дизайнера и автора Chrome-расширения для оценки промптов.",
         datePublished: "2026-05-17",
         dateModified: "2026-05-31",
         inLanguage: "ru-RU",
@@ -3557,7 +3557,7 @@ export const routes: RouteMeta[] = [
       xDefault: `${SITE_ORIGIN}/about`,
     },
     title: "About Opten — who's behind the extension",
-    description: "Opten is a personal project by Vlad Aivor, AI blogger, web designer and creator of the Chrome extension for prompt scoring. Origin story, contacts, legal details.",
+    description: "Opten is a personal project by Vlad Voronezhtsev, AI blogger, web designer and creator of the Chrome extension for prompt scoring. Origin story, contacts, legal details.",
     canonical: `${SITE_ORIGIN}/en/about`,
     ogTitle: "About Opten",
     ogDescription: "Origin story of Opten — the extension for scoring prompts against specific AI models.",
@@ -3573,7 +3573,7 @@ export const routes: RouteMeta[] = [
         pageId: `${SITE_ORIGIN}/en/about`,
         type: "Article",
         headline: "About Opten — who's behind the extension",
-        description: "Opten is a personal project by Vlad Aivor, AI blogger, web designer and creator of the Chrome extension for prompt scoring.",
+        description: "Opten is a personal project by Vlad Voronezhtsev, AI blogger, web designer and creator of the Chrome extension for prompt scoring.",
         datePublished: "2026-05-17",
         dateModified: "2026-05-31",
         inLanguage: "en-US",

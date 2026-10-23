@@ -98,7 +98,7 @@ applicable. No automatic parallel subagents are required by this workflow.
 **opten.space** — public website for the **Opten** Chrome extension. Vite +
 React 18 + TypeScript + Tailwind 4, SPA, deployed on Vercel.
 
-The founder's public name is `Влад Эйвор` (`Vlad Aivor` in EN). Use it in
+The founder's public name is `Влад Воронежцев` (`Vlad Voronezhtsev` in EN). Use it in
 visible author copy, bios, alt text, and SEO author/Person metadata. The course
 author's experience is `9 лет в Digital` (`9 years in Digital` in EN). Keep
 registered entrepreneur names unchanged in legal copy and business details.
